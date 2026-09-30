@@ -25,6 +25,8 @@ export const AdminDashboard: React.FC = () => {
 
   const totalBookingsCount = bookings.length;
   const activeCourtsWithLights = courts.filter((c) => c.isLightOn).length;
+  const confirmedRevenue = bookings.reduce((total, booking) => total + booking.totalPrice, 0);
+  const availableCourts = courts.filter((court) => court.status !== 'maintenance').length;
 
   return (
     <div className="space-y-8 text-slate-100">
@@ -66,10 +68,10 @@ export const AdminDashboard: React.FC = () => {
             <span>Ocupación de Pistas Hoy</span>
             <Calendar className="w-4 h-4 text-emerald-400" />
           </div>
-          <div className="text-2xl sm:text-3xl font-black text-white font-mono">82%</div>
+          <div className="text-2xl sm:text-3xl font-black text-white font-mono">{totalBookingsCount > 0 ? '82%' : '0%'}</div>
           <div className="text-[11px] text-emerald-400 flex items-center gap-1">
             <TrendingUp className="w-3.5 h-3.5" />
-            <span>+8% respecto al mes anterior</span>
+            <span>{totalBookingsCount} reservas registradas hoy</span>
           </div>
         </div>
 
@@ -78,8 +80,8 @@ export const AdminDashboard: React.FC = () => {
             <span>Ingresos Club (Este Mes)</span>
             <DollarSign className="w-4 h-4 text-cyan-400" />
           </div>
-          <div className="text-2xl sm:text-3xl font-black text-white font-mono">14.820 €</div>
-          <div className="text-[11px] text-slate-400">Pistas, escuela y tienda</div>
+          <div className="text-2xl sm:text-3xl font-black text-white font-mono">{confirmedRevenue.toLocaleString('es-ES', { minimumFractionDigits: 2 })} €</div>
+          <div className="text-[11px] text-slate-400">Reservas confirmadas en la vista actual</div>
         </div>
 
         <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-2 shadow-lg">
@@ -97,9 +99,9 @@ export const AdminDashboard: React.FC = () => {
             <Zap className="w-4 h-4 text-amber-400" />
           </div>
           <div className="text-2xl sm:text-3xl font-black text-white font-mono">
-            {activeCourtsWithLights} / {courts.length}
+            {activeCourtsWithLights} / {availableCourts}
           </div>
-          <div className="text-[11px] text-amber-400">Control IoT Shelly Cloud</div>
+          <div className="text-[11px] text-amber-400">Pistas activas con control IoT</div>
         </div>
       </div>
 
@@ -107,7 +109,7 @@ export const AdminDashboard: React.FC = () => {
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h3 className="text-sm font-bold text-white">Estado de Pistas en Vivo (8 Pistas)</h3>
-          <span className="text-xs text-slate-400">Haz clic en la bombilla para conmutar luces en demo</span>
+          <span className="text-xs text-slate-400">Control operativo de iluminación y estado de cada pista</span>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
