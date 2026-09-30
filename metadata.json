@@ -1,0 +1,6 @@
+{
+  "name": "SETMIO PADEL PRO",
+  "description": "Plataforma SaaS multiempresa de marca blanca para clubes, academias, entrenadores y jugadores de pádel.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
