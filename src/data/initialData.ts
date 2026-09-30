@@ -97,15 +97,18 @@ export const INITIAL_PLANS: Plan[] = [
   },
 ];
 
+// 1. PRIMARY DEMO TENANT: Centro de Pádel San Mateo (PADEL_CLUB, ELITE, demo_locked: true)
 export const INITIAL_TENANT: Tenant = {
   id: 'tenant-san-mateo-01',
   slug: 'sanmateo',
   name: 'Centro de Pádel San Mateo',
   shortName: 'Pádel San Mateo',
-  type: 'club',
+  type: 'PADEL_CLUB',
   planId: 'elite',
   status: 'active',
   isDemo: true,
+  demo_locked: true, // Section 10: Locked demo tenant properties
+  supportedLanguages: ['es', 'gl', 'en'],
   country: 'España',
   city: 'Narón',
   region: 'Galicia',
@@ -173,6 +176,245 @@ export const INITIAL_TENANT: Tenant = {
     whatsappGreetingMessage: '¡Hola! Escribo desde la web de Pádel San Mateo. Me gustaría consultar disponibilidad de pistas o información de la escuela.',
   },
 };
+
+// 2. ADDITIONAL DEMO TENANTS (Requirements 7, 11, 16, 20)
+export const ADDITIONAL_DEMO_TENANTS: Tenant[] = [
+  // PRO PLAYER TENANT
+  {
+    id: 'tenant-martin-pro',
+    slug: 'martinsanchez',
+    name: 'Martín Sánchez Official Pro',
+    shortName: 'Martín Sánchez',
+    type: 'PRO_PLAYER',
+    planId: 'elite',
+    status: 'active',
+    isDemo: true,
+    supportedLanguages: ['es', 'en'],
+    country: 'España',
+    city: 'Madrid / Vigo',
+    region: 'Circuito Internacional',
+    address: 'Premier Padel Tour / FIP Circuit',
+    timezone: 'Europe/Madrid',
+    currency: 'EUR',
+    locale: 'es-ES',
+    contactEmail: 'management@martinsanchezpadel.com',
+    contactPhone: '+34 650 11 22 33',
+    whatsappNumber: '+34 650 11 22 33',
+    branding: {
+      primaryColor: '#ef4444',
+      secondaryColor: '#090d16',
+      accentColor: '#f59e0b',
+      heroTitle: 'Martín Sánchez · Jugador Profesional FIP',
+      heroSubtitle: 'Top 18 FIP World Ranking · 4 títulos internacionales · Embajador oficial Bullpadel y Red Bull.',
+      heroImageUrl: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=1920&q=80',
+      badgeText: 'FIP TOP 20 PRO ATHLETE',
+    },
+    domains: [
+      {
+        id: 'dom-martin-1',
+        tenantId: 'tenant-martin-pro',
+        hostname: 'martinsanchez.setmio.com',
+        isPrimary: true,
+        isCustom: false,
+        status: 'active',
+        dnsExpected: { type: 'CNAME', name: 'martinsanchez', value: 'cname.setmio.com', ttl: 300 },
+        sslActive: true,
+      },
+    ],
+    settings: {
+      bookingAdvanceDays: 0,
+      cancellationWindowHours: 0,
+      splitPaymentAllowed: false,
+      playerMatchCreationAllowed: false,
+      openingHours: [{ days: 'Atención a Prensa y Patrocinios', hours: '09:00 - 18:00' }],
+      whatsappWidgetEnabled: true,
+      whatsappGreetingMessage: '¡Hola! Escribo al equipo de gestión de Martín Sánchez para propuestas de patrocinio o exhibiciones.',
+    },
+    proPlayerStats: {
+      fipRanking: 18,
+      premierRanking: 14,
+      titlesCount: 4,
+      matchesWon: 142,
+      matchesPlayed: 186,
+      partnerName: 'Juan Tello Jr.',
+      dominantHand: 'Diestro',
+      position: 'Revés (Drive agresivo)',
+      racketModel: 'Bullpadel Vertex 04 Custom',
+    },
+    sponsors: [
+      { id: 'sp-1', name: 'Bullpadel', category: 'Equipamiento Oficial & Pala', logoText: 'BULLPADEL' },
+      { id: 'sp-2', name: 'Red Bull', category: 'Bebida Energética & Training', logoText: 'RED BULL' },
+      { id: 'sp-3', name: 'Playtomic', category: 'Plataforma Global', logoText: 'PLAYTOMIC' },
+      { id: 'sp-4', name: 'Audi Galicia', category: 'Automoción Oficial', logoText: 'AUDI SPORT' },
+    ],
+  },
+
+  // COACH TENANT
+  {
+    id: 'tenant-varela-coach',
+    slug: 'varelacoach',
+    name: 'Mateo Varela · Head Coach Padel',
+    shortName: 'Mateo Varela Coach',
+    type: 'COACH',
+    planId: 'pro',
+    status: 'active',
+    isDemo: true,
+    supportedLanguages: ['es', 'gl', 'en'],
+    country: 'España',
+    city: 'A Coruña / Narón',
+    region: 'Galicia',
+    address: 'Complejo Deportivo Ferrolterra',
+    timezone: 'Europe/Madrid',
+    currency: 'EUR',
+    locale: 'es-ES',
+    contactEmail: 'clases@mateovarelacoach.com',
+    contactPhone: '+34 607 88 99 00',
+    whatsappNumber: '+34 607 88 99 00',
+    branding: {
+      primaryColor: '#3b82f6',
+      secondaryColor: '#0f172a',
+      accentColor: '#10b981',
+      heroTitle: 'Tecnificación y Alto Rendimiento de Pádel',
+      heroSubtitle: 'Entrenador Nacional Nivel 2 FEP. Planes biomecánicos individuales, preparación táctica de competición y clinics intensivos.',
+      heroImageUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=1920&q=80',
+      badgeText: 'CERTIFIED FEP MASTER COACH',
+    },
+    domains: [
+      {
+        id: 'dom-coach-1',
+        tenantId: 'tenant-varela-coach',
+        hostname: 'varelacoach.setmio.com',
+        isPrimary: true,
+        isCustom: false,
+        status: 'active',
+        dnsExpected: { type: 'CNAME', name: 'varelacoach', value: 'cname.setmio.com', ttl: 300 },
+        sslActive: true,
+      },
+    ],
+    settings: {
+      bookingAdvanceDays: 30,
+      cancellationWindowHours: 24,
+      splitPaymentAllowed: false,
+      playerMatchCreationAllowed: false,
+      openingHours: [{ days: 'Lunes a Viernes', hours: '08:00 - 21:00' }],
+      whatsappWidgetEnabled: true,
+      whatsappGreetingMessage: '¡Hola Mateo! Quisiera consultar tu disponibilidad para clases particulares o clinic intensivo de fin de semana.',
+    },
+    coachStats: {
+      certifications: ['Entrenador Nacional Nivel 2 FEP', 'Especialista en Biomecánica de Golpeo', 'Ex-jugador Profesional'],
+      hourlyRate: 45.0,
+      activeStudents: 38,
+      weeklyLessons: 24,
+      rating: 4.96,
+    },
+  },
+
+  // ONLINE STORE TENANT
+  {
+    id: 'tenant-galicia-store',
+    slug: 'padelstoregalicia',
+    name: 'PadelStore Pro Galicia',
+    shortName: 'PadelStore Galicia',
+    type: 'ONLINE_STORE',
+    planId: 'pro',
+    status: 'active',
+    isDemo: true,
+    supportedLanguages: ['es', 'en', 'pt'],
+    country: 'España',
+    city: 'Santiago de Compostela',
+    region: 'Galicia',
+    address: 'Centro Logístico A Sionlla, Santiago de Compostela',
+    timezone: 'Europe/Madrid',
+    currency: 'EUR',
+    locale: 'es-ES',
+    contactEmail: 'pedidos@padelstoregalicia.com',
+    contactPhone: '+34 981 55 66 77',
+    whatsappNumber: '+34 600 55 66 77',
+    branding: {
+      primaryColor: '#f97316',
+      secondaryColor: '#18181b',
+      accentColor: '#3b82f6',
+      heroTitle: 'La Tienda Especializada en Pádel del Noroeste',
+      heroSubtitle: 'Distribuidor oficial de Bullpadel, Nox, Babolat, Head y Asics. Envíos 24h a toda la península y asesoramiento experto.',
+      heroImageUrl: 'https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?auto=format&fit=crop&w=1920&q=80',
+      badgeText: 'ENVÍOS 24H · GARANTÍA OFICIAL',
+    },
+    domains: [
+      {
+        id: 'dom-store-1',
+        tenantId: 'tenant-galicia-store',
+        hostname: 'tienda.padelstoregalicia.com',
+        isPrimary: true,
+        isCustom: false,
+        status: 'active',
+        dnsExpected: { type: 'CNAME', name: 'tienda', value: 'cname.setmio.com', ttl: 300 },
+        sslActive: true,
+      },
+    ],
+    settings: {
+      bookingAdvanceDays: 0,
+      cancellationWindowHours: 0,
+      splitPaymentAllowed: false,
+      playerMatchCreationAllowed: false,
+      openingHours: [{ days: 'Atención al Cliente Ecommerce', hours: '09:00 - 20:00' }],
+      whatsappWidgetEnabled: true,
+      whatsappGreetingMessage: '¡Hola! Tengo una duda sobre una pala de pádel o el estado de mi envío.',
+    },
+  },
+
+  // TOURNAMENT ORGANIZER TENANT
+  {
+    id: 'tenant-circuito-norte',
+    slug: 'circuitogalegopadel',
+    name: 'Circuito Galego Pádel Tour',
+    shortName: 'Circuito Galego',
+    type: 'TOURNAMENT_ORGANIZER',
+    planId: 'elite',
+    status: 'active',
+    isDemo: true,
+    supportedLanguages: ['es', 'gl', 'en'],
+    country: 'España',
+    city: 'Galicia',
+    region: 'A Coruña / Pontevedra / Lugo / Ourense',
+    address: 'Sede Circuito Oficial Autonómico',
+    timezone: 'Europe/Madrid',
+    currency: 'EUR',
+    locale: 'es-ES',
+    contactEmail: 'torneos@circuitogalegopadel.com',
+    contactPhone: '+34 981 77 88 99',
+    whatsappNumber: '+34 677 88 99 00',
+    branding: {
+      primaryColor: '#8b5cf6',
+      secondaryColor: '#0f172a',
+      accentColor: '#06b6d4',
+      heroTitle: 'Circuito Oficial de Torneos Federados de Galicia',
+      heroSubtitle: 'Más de 14 pruebas anuales, 25.000€ en premios acumulados y ranking unificado para todas las categorías masculinas, femeninas y mixtas.',
+      heroImageUrl: 'https://images.unsplash.com/photo-1546519638-68e109498ffc?auto=format&fit=crop&w=1920&q=80',
+      badgeText: 'CIRCUITO OFICIAL HOMOLOGADO',
+    },
+    domains: [
+      {
+        id: 'dom-org-1',
+        tenantId: 'tenant-circuito-norte',
+        hostname: 'circuitogalego.setmio.com',
+        isPrimary: true,
+        isCustom: false,
+        status: 'active',
+        dnsExpected: { type: 'CNAME', name: 'circuitogalego', value: 'cname.setmio.com', ttl: 300 },
+        sslActive: true,
+      },
+    ],
+    settings: {
+      bookingAdvanceDays: 0,
+      cancellationWindowHours: 48,
+      splitPaymentAllowed: true,
+      playerMatchCreationAllowed: false,
+      openingHours: [{ days: 'Comité de Competición', hours: '10:00 - 19:00' }],
+      whatsappWidgetEnabled: true,
+      whatsappGreetingMessage: '¡Hola! Escribo a la secretaría del Circuito Galego para consultar el cuadro de eliminatorias o inscripciones.',
+    },
+  },
+];
 
 export const INITIAL_COURTS: Court[] = [
   {
@@ -394,23 +636,6 @@ export const INITIAL_OPEN_MATCHES: OpenMatch[] = [
       { id: 'p5', name: 'Carla Noche', level: 3.0, position: 'reves', paid: true },
     ],
   },
-  {
-    id: 'match-103',
-    tenantId: 'tenant-san-mateo-01',
-    courtId: 'court-6',
-    courtName: 'Pista 6 — Black Edition',
-    creatorName: 'Rubén Loureiro',
-    creatorLevel: 4.5,
-    startTime: '2026-10-02T20:30:00',
-    durationMinutes: 90,
-    minLevel: 4.25,
-    maxLevel: 5.25,
-    pricePerPlayer: 8.5,
-    status: 'open',
-    players: [
-      { id: 'p6', name: 'Rubén Loureiro', level: 4.5, position: 'reves', paid: true },
-    ],
-  },
 ];
 
 export const INITIAL_COACHES: Coach[] = [
@@ -486,18 +711,6 @@ export const INITIAL_ACADEMY_GROUPS: AcademyGroup[] = [
     monthlyFee: 65.0,
     schedule: 'Martes y Jueves · 19:30 a 20:45',
   },
-  {
-    id: 'group-4',
-    tenantId: 'tenant-san-mateo-01',
-    coachId: 'coach-3',
-    coachName: 'David Freire',
-    name: 'Intermedio Fin de Semana Intensivo',
-    levelCategory: 'intermedio',
-    maxStudents: 4,
-    currentStudents: 2,
-    monthlyFee: 50.0,
-    schedule: 'Sábados · 11:00 a 12:30',
-  },
 ];
 
 export const INITIAL_TOURNAMENTS: Tournament[] = [
@@ -513,31 +726,12 @@ export const INITIAL_TOURNAMENTS: Tournament[] = [
     categories: [
       { name: '1ª Categoría Masculina', teamsCount: 16, maxTeams: 16 },
       { name: '2ª Categoría Masculina', teamsCount: 14, maxTeams: 16 },
-      { name: '3ª Categoría Masculina', teamsCount: 16, maxTeams: 16 },
       { name: '1ª Categoría Femenina', teamsCount: 10, maxTeams: 12 },
-      { name: '2ª Categoría Femenina', teamsCount: 12, maxTeams: 12 },
       { name: 'Categoría Mixta Oro', teamsCount: 8, maxTeams: 12 },
     ],
     status: 'registration_open',
     prizes: '1.800€ en metálico, palas Bullpadel Vertex y trofeos artesanos de Narón.',
     description: 'El torneo insignia del otoño gallego. Welcome pack premium con camiseta técnica Bullpadel, agua, fruta y sorteo final.',
-  },
-  {
-    id: 't-2026-02',
-    tenantId: 'tenant-san-mateo-01',
-    title: 'Torneo Nocturno Express "Non-Stop Padel"',
-    slug: 'nocturno-express-octubre',
-    dates: '24 Octubre 2026 (Viernes Noche)',
-    registrationDeadline: '2026-10-22T20:00:00',
-    entryFee: 22.0,
-    bannerUrl: 'https://images.unsplash.com/photo-1546519638-68e109498ffc?auto=format&fit=crop&w=1200&q=80',
-    categories: [
-      { name: 'Nivel Medio (2.75 - 3.75)', teamsCount: 12, maxTeams: 12 },
-      { name: 'Nivel Alto (3.75 - 4.75)', teamsCount: 10, maxTeams: 12 },
-    ],
-    status: 'registration_open',
-    prizes: 'Jamón ibérico para parejas campeonas, cena cóctel en el club y material deportivo.',
-    description: 'Formato rápido fase de grupos + eliminatorias de 21:00 a 02:30 con música en directo y ambientazo.',
   },
 ];
 
@@ -559,7 +753,6 @@ export const INITIAL_PRODUCTS: Product[] = [
       Balance: 'Alto',
       Peso: '365-375 gr',
       Núcleo: 'MultiEVA',
-      Marco: 'CarbonTube 100% Carbono',
     },
   },
   {
@@ -578,8 +771,6 @@ export const INITIAL_PRODUCTS: Product[] = [
       Forma: 'Gota',
       Balance: 'Medio',
       Peso: '360-370 gr',
-      Núcleo: 'MLD Black EVA',
-      Caras: 'Carbon Alum 18K',
     },
   },
   {
@@ -597,29 +788,10 @@ export const INITIAL_PRODUCTS: Product[] = [
     specs: {
       Suela: 'Espiga profunda (Clay)',
       Tecnología: 'DYNAWALL & GEL',
-      Color: 'Azul Eléctrico / Lima',
     },
   },
   {
     id: 'prod-4',
-    tenantId: 'tenant-san-mateo-01',
-    category: 'paleteros',
-    name: 'Paletero Bullpadel BPP-24001 Avant',
-    brand: 'Bullpadel',
-    price: 64.9,
-    compareAtPrice: 79.9,
-    stock: 9,
-    isFeatured: false,
-    imageUrl: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=600&q=80',
-    description: 'Compartimento thermo para dos palas, bolsillo ventilado para zapatillas y amplio espacio central.',
-    specs: {
-      Capacidad: 'Hasta 4 palas',
-      Medidas: '58x30x30 cm',
-      Térmico: 'Sí, Thermo Technology',
-    },
-  },
-  {
-    id: 'prod-5',
     tenantId: 'tenant-san-mateo-01',
     category: 'accesorios',
     name: 'Tripack Pelotas Head Padel Pro S (3 botes)',
@@ -631,26 +803,8 @@ export const INITIAL_PRODUCTS: Product[] = [
     imageUrl: 'https://images.unsplash.com/photo-1622163642998-1ea32b0bbc67?auto=format&fit=crop&w=600&q=80',
     description: 'Pelota rápida oficial de alta vivacidad, perfecta para climas húmedos y juego de ataque dinámico.',
     specs: {
-      Unidades: '3 botes de 3 pelotas (9 pelotas)',
+      Unidades: '3 botes de 3 pelotas',
       Presión: 'Pro S Rápida',
-    },
-  },
-  {
-    id: 'prod-6',
-    tenantId: 'tenant-san-mateo-01',
-    category: 'accesorios',
-    name: 'Tambor 30 Overgrips Wilson Pro Perforated',
-    brand: 'Wilson',
-    price: 44.9,
-    compareAtPrice: 55.0,
-    stock: 15,
-    isFeatured: false,
-    imageUrl: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=600&q=80',
-    description: 'Tacto extra absorbente preferido por jugadores avanzados para evitar que la pala resbale con sudor.',
-    specs: {
-      Cantidad: '30 overgrips',
-      Color: 'Blanco',
-      Grosor: '0.6 mm',
     },
   },
 ];
@@ -669,54 +823,12 @@ En Pádel San Mateo hemos analizado cientos de sesiones y detectado los 5 fallos
 2. **Punto de impacto retrasado:** Golpear detrás del hombro genera una bola flotante que invita al contraataque. El contacto debe ser siempre a la altura de los ojos y ligeramente adelantado.
 3. **Falta de empuje con la pierna de apoyo:** No golpees en el aire si puedes evitarlo. Apoya el pie trasero firmemente para canalizar la inercia cinética.
 4. **La terminación del brazo:** Terminar el golpe envolviendo el cuello como en tenis es un fallo típico; en la bandeja la pala finaliza hacia adelante y abajo, como un escudo.
-5. **Lectura de la velocidad del rebote:** En Narón, con la humedad ambiental gallega, la bola pesa más en las paredes. Debes imprimir mayor rotación cortada (slice) para que la bola caiga muerta.
-
-Ven a nuestros entrenamientos específicos de los martes para practicarlo en la Pista 1 con videoanálisis personalizado.`,
+5. **Lectura de la velocidad del rebote:** En Narón, con la humedad ambiental gallega, la bola pesa más en las paredes. Debes imprimir mayor rotación cortada (slice) para que la bola caiga muerta.`,
     coverImage: 'https://images.unsplash.com/photo-1554068865-24cecd4e34b8?auto=format&fit=crop&w=1200&q=80',
     author: 'Mateo Varela · Head Coach',
     category: 'Técnica & Táctica',
     readingTime: 4,
     publishedAt: '2026-09-22T09:00:00Z',
-  },
-  {
-    id: 'blog-2',
-    tenantId: 'tenant-san-mateo-01',
-    title: 'Nueva renovación de césped Mondo Supercourt WPT en Pistas 1 y 2',
-    slug: 'renovacion-cesped-mondo-wpt-san-mateo',
-    summary: 'Completamos la inversión de mejora con el césped oficial del circuito internacional para ofrecer un bote homogéneo y cero deslizamientos incontrolados.',
-    content: `En Pádel San Mateo seguimos comprometidos con ofrecer las mejores instalaciones deportivas de Galicia.
-
-Durante la pasada semana completamos con éxito la sustitución integral del tapiz de juego de nuestras pistas centrales 1 y 2 por el césped sintético **Mondo Supercourt XN**, el mismo empleado en las grandes citas del pádel mundial.
-
-**¿Qué ventajas notarás desde tu primera reserva?**
-- **Tracción uniforme:** Filamentos texturizados que atrapan la arena de sílice de manera homogénea, evitando zonas resbaladizas.
-- **Bote 100% predecible:** Tanto en la pared de cristal como en la superficie, sin falsos botes.
-- **Cuidado articular:** Mayor absorción del impacto vertical, reduciendo la sobrecarga en rodillas y tendones.
-
-¡Pruébalas ya en tu próximo partido o reserva a través de la aplicación!`,
-    coverImage: 'https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?auto=format&fit=crop&w=1200&q=80',
-    author: 'Dirección San Mateo',
-    category: 'Instalaciones',
-    readingTime: 3,
-    publishedAt: '2026-09-14T11:30:00Z',
-  },
-  {
-    id: 'blog-3',
-    tenantId: 'tenant-san-mateo-01',
-    title: 'Estrategia de hidratación y suplementación en partidos a tres sets',
-    slug: 'estrategia-hidratacion-partidos-padel',
-    summary: 'Aprende a evitar las rampas musculares y la pérdida de reflejos en los momentos calientes del tercer set.',
-    content: `Muchos jugadores se enfocan únicamente en la pala o la zapatilla, pero olvidan que en un partido de 90 minutos a alta intensidad se pueden perder entre 1,2 y 2 litros de sudor.
-
-Nuestra recomendación práctica:
-- **Antes del partido:** 500ml de agua isotónica con electrolitos 45 minutos antes.
-- **En los cambios de lado:** Pequeños sorbos frecuentes (100ml) en lugar de grandes tragos que encharcan el estómago.
-- **En el tercer set:** Un gel de absorción rápida o medio plátano de la cafetería del club para recargar glucógeno.`,
-    coverImage: 'https://images.unsplash.com/photo-1546519638-68e109498ffc?auto=format&fit=crop&w=1200&q=80',
-    author: 'Laura Senra · Preparación Física',
-    category: 'Salud & Rendimiento',
-    readingTime: 3,
-    publishedAt: '2026-09-02T15:00:00Z',
   },
 ];
 
@@ -801,15 +913,6 @@ export const INITIAL_AUDIT_LOGS: AuditLogItem[] = [
     action: 'Automatización Luces',
     target: 'Pista 3',
     details: 'Apagado automático de focos 10 minutos post-reserva',
-  },
-  {
-    id: 'log-4',
-    timestamp: 'Ayer, 18:40',
-    actor: 'superadmin@setmio.com',
-    role: 'SUPERADMIN',
-    action: 'Actualización Plan',
-    target: 'Tenant San Mateo',
-    details: 'Verificación de módulos activos para plan ELITE',
   },
 ];
 

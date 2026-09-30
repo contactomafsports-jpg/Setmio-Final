@@ -10,10 +10,13 @@ import {
   CheckCircle2,
   ShieldCheck,
   Zap,
+  Sun,
+  Moon,
+  Laptop,
 } from 'lucide-react';
 
 export const AdminSettings: React.FC = () => {
-  const { currentTenant, updateCurrentTenant, triggerDemoToast } = useApp();
+  const { currentTenant, updateCurrentTenant, triggerDemoToast, theme, setTheme } = useApp();
 
   const [whatsappEnabled, setWhatsappEnabled] = useState(currentTenant.settings.whatsappWidgetEnabled);
   const [whatsappNumber, setWhatsappNumber] = useState(currentTenant.whatsappNumber);
@@ -52,35 +55,108 @@ export const AdminSettings: React.FC = () => {
   };
 
   return (
-    <div className="space-y-8 text-slate-100 max-w-5xl">
+    <div className="space-y-8 text-slate-900 dark:text-slate-100 max-w-5xl transition-colors duration-200">
       <div>
-        <div className="text-xs font-semibold text-emerald-400 uppercase tracking-wider">
+        <div className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
           Ajustes del Sistema
         </div>
-        <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight mt-1">
+        <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight mt-1">
           Configuración General de {currentTenant.shortName}
         </h1>
-        <p className="text-xs text-slate-400 mt-1 max-w-xl">
-          Administra las reglas de negocio de pistas, datos de contacto oficiales, pasarelas de cobro y widget flotante de WhatsApp.
+        <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 mt-1 max-w-xl">
+          Administra las reglas de negocio de pistas, modo visual (claro/oscuro), datos de contacto oficiales, pasarelas de cobro y widget flotante de WhatsApp.
         </p>
       </div>
 
       <form onSubmit={handleSave} className="space-y-6 text-xs">
-        {/* WhatsApp Widget Configuration (Requirement 25) */}
-        <div className="p-6 rounded-3xl bg-slate-900 border border-slate-800 space-y-4 shadow-xl">
+        {/* Appearance & Theme Setting */}
+        <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-4 shadow-sm">
           <div className="flex items-center justify-between">
-            <h3 className="text-sm font-bold text-white flex items-center gap-2">
-              <MessageCircle className="w-4 h-4 text-emerald-400" />
+            <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              <Sun className="w-4 h-4 text-amber-500" />
+              <span>Modo Visual & Apariencia</span>
+            </h3>
+            <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold bg-emerald-50 dark:bg-emerald-950 px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800">
+              Modo Claro por Defecto
+            </span>
+          </div>
+
+          <p className="text-slate-600 dark:text-slate-400 text-[11px] leading-relaxed">
+            Personaliza el tema visual de la plataforma. El modo claro es el predeterminado para garantizar máxima legibilidad en recepciones iluminadas y dispositivos móviles.
+          </p>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+            <button
+              type="button"
+              onClick={() => setTheme('light')}
+              className={`p-4 rounded-2xl border text-left flex items-center gap-3 transition ${
+                theme === 'light'
+                  ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-500 shadow-sm'
+                  : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 hover:border-slate-300'
+              }`}
+            >
+              <div className="w-8 h-8 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center shrink-0">
+                <Sun className="w-4 h-4" />
+              </div>
+              <div>
+                <div className="font-bold text-slate-900 dark:text-white">Modo Claro</div>
+                <div className="text-[10px] text-slate-500">Predeterminado</div>
+              </div>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setTheme('dark')}
+              className={`p-4 rounded-2xl border text-left flex items-center gap-3 transition ${
+                theme === 'dark'
+                  ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-500 shadow-sm'
+                  : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 hover:border-slate-300'
+              }`}
+            >
+              <div className="w-8 h-8 rounded-xl bg-slate-800 text-cyan-300 flex items-center justify-center shrink-0">
+                <Moon className="w-4 h-4" />
+              </div>
+              <div>
+                <div className="font-bold text-slate-900 dark:text-white">Modo Oscuro</div>
+                <div className="text-[10px] text-slate-500">Alto contraste nocturno</div>
+              </div>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setTheme('system')}
+              className={`p-4 rounded-2xl border text-left flex items-center gap-3 transition ${
+                theme === 'system'
+                  ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-500 shadow-sm'
+                  : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 hover:border-slate-300'
+              }`}
+            >
+              <div className="w-8 h-8 rounded-xl bg-teal-100 text-teal-600 dark:bg-teal-950 flex items-center justify-center shrink-0">
+                <Laptop className="w-4 h-4" />
+              </div>
+              <div>
+                <div className="font-bold text-slate-900 dark:text-white">Automático</div>
+                <div className="text-[10px] text-slate-500">Según sistema operativo</div>
+              </div>
+            </button>
+          </div>
+        </div>
+
+        {/* WhatsApp Widget Configuration */}
+        <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-4 shadow-sm">
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              <MessageCircle className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
               <span>Configuración del Botón Flotante de WhatsApp</span>
             </h3>
 
             <div className="flex items-center gap-2">
-              <span className="text-slate-400">Activar botón:</span>
+              <span className="text-slate-500 text-xs">Activar botón:</span>
               <button
                 type="button"
                 onClick={() => setWhatsappEnabled(!whatsappEnabled)}
                 className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                  whatsappEnabled ? 'bg-emerald-500' : 'bg-slate-700'
+                  whatsappEnabled ? 'bg-emerald-600' : 'bg-slate-300 dark:bg-slate-700'
                 }`}
               >
                 <span
@@ -92,67 +168,67 @@ export const AdminSettings: React.FC = () => {
             </div>
           </div>
 
-          <p className="text-slate-400 text-[11px] leading-relaxed">
+          <p className="text-slate-600 dark:text-slate-400 text-[11px] leading-relaxed">
             Permite a los visitantes y jugadores contactar con recepción en un clic. Se abrirá la aplicación oficial de WhatsApp con el mensaje inicial preparado.
           </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
             <div>
-              <label className="block text-slate-300 mb-1 font-medium">Número de WhatsApp del Club</label>
+              <label className="block text-slate-700 dark:text-slate-300 mb-1 font-semibold">Número de WhatsApp del Club</label>
               <input
                 type="text"
                 value={whatsappNumber}
                 onChange={(e) => setWhatsappNumber(e.target.value)}
                 placeholder="+34 600 000 000"
-                className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white font-mono focus:outline-none focus:border-emerald-500"
+                className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-slate-900 dark:text-white font-mono focus:outline-none focus:border-emerald-500"
               />
             </div>
 
             <div>
-              <label className="block text-slate-300 mb-1 font-medium">Mensaje Inicial Automático</label>
+              <label className="block text-slate-700 dark:text-slate-300 mb-1 font-semibold">Mensaje Inicial Automático</label>
               <input
                 type="text"
                 value={whatsappGreeting}
                 onChange={(e) => setWhatsappGreeting(e.target.value)}
                 placeholder="¡Hola! Quisiera consultar pistas..."
-                className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-emerald-500"
+                className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
               />
             </div>
           </div>
         </div>
 
         {/* Booking Rules & Advance window */}
-        <div className="p-6 rounded-3xl bg-slate-900 border border-slate-800 space-y-4 shadow-xl">
-          <h3 className="text-sm font-bold text-white flex items-center gap-2">
-            <Clock className="w-4 h-4 text-cyan-400" />
+        <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-4 shadow-sm">
+          <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+            <Clock className="w-4 h-4 text-teal-600 dark:text-cyan-400" />
             <span>Políticas de Reserva y Cancelación</span>
           </h3>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
-              <label className="block text-slate-300 mb-1 font-medium">Días de Antelación de Reserva</label>
+              <label className="block text-slate-700 dark:text-slate-300 mb-1 font-semibold">Días de Antelación de Reserva</label>
               <input
                 type="number"
                 value={bookingAdvanceDays}
                 onChange={(e) => setBookingAdvanceDays(parseInt(e.target.value) || 7)}
-                className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white font-mono focus:outline-none focus:border-emerald-500"
+                className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-slate-900 dark:text-white font-mono focus:outline-none focus:border-emerald-500"
               />
               <span className="text-[10px] text-slate-500">Máximo número de días vista</span>
             </div>
 
             <div>
-              <label className="block text-slate-300 mb-1 font-medium">Plazo Cancelación Gratuita</label>
+              <label className="block text-slate-700 dark:text-slate-300 mb-1 font-semibold">Plazo Cancelación Gratuita</label>
               <input
                 type="number"
                 value={cancellationHours}
                 onChange={(e) => setCancellationHours(parseInt(e.target.value) || 24)}
-                className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white font-mono focus:outline-none focus:border-emerald-500"
+                className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-slate-900 dark:text-white font-mono focus:outline-none focus:border-emerald-500"
               />
               <span className="text-[10px] text-slate-500">Horas antes del partido</span>
             </div>
 
             <div>
-              <label className="block text-slate-300 mb-1 font-medium">Permitir Pago Dividido (Split)</label>
+              <label className="block text-slate-700 dark:text-slate-300 mb-1 font-semibold">Permitir Pago Dividido (Split)</label>
               <div className="pt-2">
                 <button
                   type="button"
@@ -160,7 +236,7 @@ export const AdminSettings: React.FC = () => {
                   className={`px-3 py-1.5 rounded-lg font-semibold transition ${
                     splitPayment
                       ? 'bg-emerald-600 text-white'
-                      : 'bg-slate-800 text-slate-400'
+                      : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
                   }`}
                 >
                   {splitPayment ? 'Activado (4 Partes)' : 'Desactivado (Pago Único)'}
@@ -171,34 +247,34 @@ export const AdminSettings: React.FC = () => {
         </div>
 
         {/* Payment Gateways Config (Stripe / Redsys / Bizum) */}
-        <div className="p-6 rounded-3xl bg-slate-900 border border-slate-800 space-y-4 shadow-xl">
+        <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-4 shadow-sm">
           <div className="flex items-center justify-between">
-            <h3 className="text-sm font-bold text-white flex items-center gap-2">
-              <CreditCard className="w-4 h-4 text-purple-400" />
+            <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              <CreditCard className="w-4 h-4 text-purple-600 dark:text-purple-400" />
               <span>Pasarelas de Cobro de Jugadores (Club Gateway)</span>
             </h3>
-            <span className="text-[10px] font-mono text-emerald-400 bg-emerald-950 px-2 py-0.5 rounded border border-emerald-800">
+            <span className="text-[10px] font-mono text-emerald-700 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-950 px-2 py-0.5 rounded border border-emerald-300 dark:border-emerald-800">
               Modo Demostración Activo
             </span>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <div className="p-3.5 rounded-2xl bg-slate-950 border border-slate-800 space-y-1">
-              <div className="font-bold text-white">Stripe Connect</div>
-              <div className="text-[10px] text-slate-400">Tarjetas Visa, Mastercard, Apple Pay, Google Pay</div>
-              <div className="text-emerald-400 font-semibold text-[10px] pt-1">Conectado (Demo)</div>
+            <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 space-y-1">
+              <div className="font-bold text-slate-900 dark:text-white">Stripe Connect</div>
+              <div className="text-[10px] text-slate-500 dark:text-slate-400">Tarjetas Visa, Mastercard, Apple Pay, Google Pay</div>
+              <div className="text-emerald-600 dark:text-emerald-400 font-semibold text-[10px] pt-1">Conectado (Demo)</div>
             </div>
 
-            <div className="p-3.5 rounded-2xl bg-slate-950 border border-slate-800 space-y-1">
-              <div className="font-bold text-white">Redsys TPV Virtual</div>
-              <div className="text-[10px] text-slate-400">Pasarela bancaria directa española (Sabadell / Caixa)</div>
-              <div className="text-slate-400 text-[10px] pt-1">Preparado para producción</div>
+            <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 space-y-1">
+              <div className="font-bold text-slate-900 dark:text-white">Redsys TPV Virtual</div>
+              <div className="text-[10px] text-slate-500 dark:text-slate-400">Pasarela bancaria directa española (Sabadell / Caixa)</div>
+              <div className="text-slate-500 text-[10px] pt-1">Preparado para producción</div>
             </div>
 
-            <div className="p-3.5 rounded-2xl bg-slate-950 border border-slate-800 space-y-1">
-              <div className="font-bold text-white">Bizum Pay</div>
-              <div className="text-[10px] text-slate-400">Cobro instantáneo mediante número de móvil</div>
-              <div className="text-emerald-400 font-semibold text-[10px] pt-1">Habilitado</div>
+            <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 space-y-1">
+              <div className="font-bold text-slate-900 dark:text-white">Bizum Pay</div>
+              <div className="text-[10px] text-slate-500 dark:text-slate-400">Cobro instantáneo mediante número de móvil</div>
+              <div className="text-emerald-600 dark:text-emerald-400 font-semibold text-[10px] pt-1">Habilitado</div>
             </div>
           </div>
         </div>
@@ -207,7 +283,7 @@ export const AdminSettings: React.FC = () => {
         <div className="flex justify-end pt-2">
           <button
             type="submit"
-            className="px-6 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs shadow-lg transition flex items-center gap-2"
+            className="px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 dark:bg-emerald-500 dark:hover:bg-emerald-400 text-white dark:text-slate-950 font-bold text-xs shadow-md transition flex items-center gap-2"
           >
             <Save className="w-4 h-4" />
             <span>Guardar Configuración General</span>

@@ -10,6 +10,7 @@ import {
   MessageCircle,
   HelpCircle,
   ShieldCheck,
+  CheckCircle2,
 } from 'lucide-react';
 
 export const ContactFAQView: React.FC = () => {
@@ -17,6 +18,7 @@ export const ContactFAQView: React.FC = () => {
 
   const [formName, setFormName] = useState('');
   const [formEmail, setFormEmail] = useState('');
+  const [formPhone, setFormPhone] = useState('');
   const [formMessage, setFormMessage] = useState('');
   const [activeFAQ, setActiveFAQ] = useState<number | null>(0);
 
@@ -46,178 +48,194 @@ export const ContactFAQView: React.FC = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     triggerDemoToast(
-      'Mensaje Enviado (Modo Demo)',
-      `Gracias ${formName}. Tu consulta ha sido recibida en recepción de Pádel San Mateo. Te responderemos en breve a ${formEmail}.`,
+      'Mensaje Enviado',
+      `Gracias ${formName}. Tu consulta ha sido recibida en recepción de Pádel San Mateo. Te responderemos a ${formEmail}.`,
       'success'
     );
     setFormName('');
     setFormEmail('');
+    setFormPhone('');
     setFormMessage('');
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-16 text-slate-100">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-16 text-slate-900 dark:text-slate-100 transition-colors duration-200">
       {/* Header */}
       <div className="max-w-3xl space-y-3">
-        <div className="text-xs font-semibold text-emerald-400 uppercase tracking-wider">
-          Atención & Ubicación
+        <div className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
+          <MapPin className="w-4 h-4" />
+          <span>Contacto & Atención al Jugador</span>
         </div>
-        <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight">
-          Contacto & Preguntas Frecuentes
+        <h1 className="text-3xl sm:text-5xl font-black text-slate-900 dark:text-white tracking-tight leading-tight">
+          Estamos en Narón, Galicia
         </h1>
-        <p className="text-slate-300 text-xs sm:text-sm leading-relaxed">
-          Estamos en Narón (A Coruña) a tu completa disposición. Consúltanos dudas sobre reservas, clases de la escuela, torneos o compras en nuestra tienda oficial.
+        <p className="text-slate-600 dark:text-slate-300 text-xs sm:text-sm leading-relaxed">
+          Ven a conocernos al Polígono Industrial Río do Pozo. Resolveremos cualquier consulta sobre reservas de pistas, escuela federada, torneos o material deportivo.
         </p>
       </div>
 
-      {/* Contact Cards & Form Split */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        {/* Info Cards */}
-        <div className="lg:col-span-5 space-y-4">
-          <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-4">
-            <h3 className="text-sm font-bold text-white">Datos de Contacto Directo</h3>
+      {/* Contact Cards Row */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
+          <div className="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+            <MapPin className="w-5 h-5" />
+          </div>
+          <h3 className="text-base font-bold text-slate-900 dark:text-white">Ubicación & Acceso</h3>
+          <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+            {currentTenant.address}<br />
+            Polígono Industrial Río do Pozo<br />
+            15578 Narón, A Coruña (Galicia)
+          </p>
+          <div className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 pt-1">
+            Parking privado gratuito vigilado (80 plazas)
+          </div>
+        </div>
 
-            <div className="space-y-3 text-xs text-slate-300">
-              <div className="flex items-start gap-3">
-                <MapPin className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                <div>
-                  <div className="font-semibold text-white">Centro de Pádel San Mateo</div>
-                  <div className="text-slate-400">{currentTenant.address}</div>
-                </div>
-              </div>
+        <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
+          <div className="w-10 h-10 rounded-xl bg-teal-100 dark:bg-teal-950 text-teal-600 dark:text-cyan-400 flex items-center justify-center">
+            <Clock className="w-5 h-5" />
+          </div>
+          <h3 className="text-base font-bold text-slate-900 dark:text-white">Horario de Apertura</h3>
+          <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+            Lunes a Viernes: <strong>8:00 - 23:30 h</strong><br />
+            Sábados: <strong>8:30 - 23:00 h</strong><br />
+            Domingos y Festivos: <strong>9:00 - 22:30 h</strong>
+          </p>
+          <div className="text-[11px] font-semibold text-teal-600 dark:text-cyan-400 pt-1">
+            Cafetería y Pro Shop abiertos en horario de pistas
+          </div>
+        </div>
 
-              <div className="flex items-center gap-3">
-                <Phone className="w-4 h-4 text-emerald-400 shrink-0" />
-                <div>
-                  <div className="text-slate-400">Teléfono Recepción:</div>
-                  <a href={`tel:${currentTenant.contactPhone}`} className="font-semibold text-white hover:text-emerald-400">
-                    {currentTenant.contactPhone}
-                  </a>
-                </div>
-              </div>
+        <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
+          <div className="w-10 h-10 rounded-xl bg-purple-100 dark:bg-purple-950 text-purple-600 dark:text-purple-400 flex items-center justify-center">
+            <Phone className="w-5 h-5" />
+          </div>
+          <h3 className="text-base font-bold text-slate-900 dark:text-white">Teléfono & WhatsApp</h3>
+          <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+            Recepción: <strong>{currentTenant.contactPhone}</strong><br />
+            Email: <strong>{currentTenant.contactEmail}</strong>
+          </p>
+          <div className="pt-2">
+            <a
+              href={`https://wa.me/34981380000?text=${encodeURIComponent('Hola, me gustaría información sobre las pistas de Pádel San Mateo')}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600 text-white font-bold text-xs shadow-sm hover:bg-emerald-500 transition"
+            >
+              <MessageCircle className="w-3.5 h-3.5" />
+              <span>Chatear por WhatsApp</span>
+            </a>
+          </div>
+        </div>
+      </div>
 
-              <div className="flex items-center gap-3">
-                <Mail className="w-4 h-4 text-emerald-400 shrink-0" />
-                <div>
-                  <div className="text-slate-400">Correo Electrónico:</div>
-                  <a href={`mailto:${currentTenant.contactEmail}`} className="font-semibold text-white hover:text-emerald-400">
-                    {currentTenant.contactEmail}
-                  </a>
-                </div>
-              </div>
+      {/* Grid: FAQ Accordion + Contact Form */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+        {/* FAQ Accordion */}
+        <div className="lg:col-span-7 space-y-6">
+          <div className="space-y-1">
+            <div className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
+              <HelpCircle className="w-4 h-4" />
+              <span>Preguntas Frecuentes</span>
             </div>
+            <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
+              Dudas comunes sobre reservas y el club
+            </h2>
+          </div>
 
-            <div className="pt-3 border-t border-slate-800 space-y-2 text-xs">
-              <div className="flex items-center gap-2 text-emerald-400 font-semibold">
-                <Clock className="w-3.5 h-3.5" />
-                <span>Horarios Ininterrumpidos:</span>
+          <div className="space-y-3">
+            {faqs.map((faq, idx) => (
+              <div
+                key={idx}
+                className="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm"
+              >
+                <button
+                  onClick={() => setActiveFAQ(activeFAQ === idx ? null : idx)}
+                  className="w-full p-4 text-left font-bold text-xs sm:text-sm text-slate-900 dark:text-white flex items-center justify-between gap-3 hover:text-emerald-600 dark:hover:text-emerald-400 transition"
+                >
+                  <span>{faq.q}</span>
+                  <ChevronDown
+                    className={`w-4 h-4 shrink-0 transition-transform ${
+                      activeFAQ === idx ? 'rotate-180 text-emerald-500' : 'text-slate-400'
+                    }`}
+                  />
+                </button>
+                {activeFAQ === idx && (
+                  <div className="px-4 pb-4 pt-1 text-xs text-slate-600 dark:text-slate-400 leading-relaxed border-t border-slate-100 dark:border-slate-800/80">
+                    {faq.a}
+                  </div>
+                )}
               </div>
-              {currentTenant.settings.openingHours.map((h, i) => (
-                <div key={i} className="flex justify-between text-[11px] text-slate-400">
-                  <span>{h.days}:</span>
-                  <span className="text-slate-200">{h.hours}</span>
-                </div>
-              ))}
-            </div>
+            ))}
           </div>
         </div>
 
         {/* Contact Form */}
-        <div className="lg:col-span-7 p-6 rounded-2xl bg-slate-900 border border-slate-800 shadow-xl space-y-4">
-          <h3 className="text-sm font-bold text-white">Envíanos un Mensaje</h3>
-          <p className="text-xs text-slate-400">
-            Responderemos a tu solicitud en menos de 2 horas en horario de apertura.
-          </p>
+        <div className="lg:col-span-5 p-6 sm:p-8 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl space-y-4">
+          <div className="space-y-1">
+            <h3 className="text-lg font-bold text-slate-900 dark:text-white">Envíanos un Mensaje</h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              Te responderemos en menos de 2 horas en horario de apertura.
+            </p>
+          </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4 text-xs">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-slate-300 mb-1 font-medium">Nombre Completo</label>
-                <input
-                  type="text"
-                  required
-                  value={formName}
-                  onChange={(e) => setFormName(e.target.value)}
-                  placeholder="Tu nombre"
-                  className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-emerald-500"
-                />
-              </div>
+          <form onSubmit={handleSubmit} className="space-y-3.5 text-xs">
+            <div>
+              <label className="block text-slate-700 dark:text-slate-300 font-semibold mb-1">Tu Nombre</label>
+              <input
+                type="text"
+                required
+                value={formName}
+                onChange={(e) => setFormName(e.target.value)}
+                placeholder="Nombre completo"
+                className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+              />
+            </div>
 
+            <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-slate-300 mb-1 font-medium">Correo Electrónico</label>
+                <label className="block text-slate-700 dark:text-slate-300 font-semibold mb-1">Email</label>
                 <input
                   type="email"
                   required
                   value={formEmail}
                   onChange={(e) => setFormEmail(e.target.value)}
-                  placeholder="tu@email.es"
-                  className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-emerald-500"
+                  placeholder="tu@email.com"
+                  className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                />
+              </div>
+              <div>
+                <label className="block text-slate-700 dark:text-slate-300 font-semibold mb-1">Teléfono</label>
+                <input
+                  type="tel"
+                  value={formPhone}
+                  onChange={(e) => setFormPhone(e.target.value)}
+                  placeholder="+34 600..."
+                  className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-slate-300 mb-1 font-medium">Mensaje / Consulta</label>
+              <label className="block text-slate-700 dark:text-slate-300 font-semibold mb-1">Mensaje o Consulta</label>
               <textarea
                 required
                 rows={4}
                 value={formMessage}
                 onChange={(e) => setFormMessage(e.target.value)}
-                placeholder="¿En qué te podemos ayudar?"
-                className="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-white focus:outline-none focus:border-emerald-500"
+                placeholder="¿En qué te podemos ayudar? (reservas de grupos, clases, eventos de empresa...)"
+                className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl p-3 text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 leading-relaxed resize-none"
               />
             </div>
 
             <button
               type="submit"
-              className="py-3 px-6 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs shadow-lg transition flex items-center justify-center gap-2"
+              className="w-full py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 dark:bg-emerald-500 dark:hover:bg-emerald-400 text-white dark:text-slate-950 font-bold transition shadow-md flex items-center justify-center gap-2"
             >
               <Send className="w-4 h-4" />
-              <span>Enviar Mensaje</span>
+              <span>Enviar Consulta</span>
             </button>
           </form>
-        </div>
-      </div>
-
-      {/* Accordion FAQ Section */}
-      <div className="space-y-6 pt-6 border-t border-slate-800">
-        <div>
-          <div className="text-xs font-semibold text-cyan-400 uppercase tracking-wider">
-            Respuestas Rápidas
-          </div>
-          <h2 className="text-2xl font-black text-white tracking-tight mt-1">
-            Preguntas Frecuentes
-          </h2>
-        </div>
-
-        <div className="space-y-3">
-          {faqs.map((faq, idx) => {
-            const isOpen = activeFAQ === idx;
-            return (
-              <div
-                key={idx}
-                className="rounded-2xl bg-slate-900 border border-slate-800 overflow-hidden transition"
-              >
-                <button
-                  onClick={() => setActiveFAQ(isOpen ? null : idx)}
-                  className="w-full p-4 text-left flex items-center justify-between gap-4 text-xs sm:text-sm font-semibold text-white hover:text-emerald-400 transition"
-                >
-                  <span>{faq.q}</span>
-                  <ChevronDown
-                    className={`w-4 h-4 shrink-0 transition-transform ${
-                      isOpen ? 'rotate-180 text-emerald-400' : 'text-slate-400'
-                    }`}
-                  />
-                </button>
-
-                {isOpen && (
-                  <div className="px-4 pb-4 text-xs text-slate-400 leading-relaxed border-t border-slate-800/60 pt-3">
-                    {faq.a}
-                  </div>
-                )}
-              </div>
-            );
-          })}
         </div>
       </div>
     </div>

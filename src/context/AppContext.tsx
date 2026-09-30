@@ -20,6 +20,7 @@ import {
 } from '../types/database';
 import {
   INITIAL_TENANT,
+  ADDITIONAL_DEMO_TENANTS,
   INITIAL_PLANS,
   INITIAL_COURTS,
   INITIAL_BOOKINGS,
@@ -34,6 +35,8 @@ import {
   INITIAL_AUDIT_LOGS,
   INITIAL_PAGE_BLOCKS,
 } from '../data/initialData';
+import { SupportedLanguage, getTranslation } from '../lib/i18n';
+import { checkPermission, PermissionAction, PermissionCheckResult } from '../lib/permissions';
 
 export type MainView = 'public' | 'admin' | 'player' | 'hq';
 
@@ -74,6 +77,8 @@ export type PlayerTab =
   | 'favorites'
   | 'ai_coach';
 
+export type ThemeMode = 'light' | 'dark' | 'system';
+
 export interface UserSession {
   id: string;
   name: string;
@@ -98,6 +103,20 @@ export interface AIMessage {
 }
 
 interface AppContextType {
+  // Theme & i18n
+  theme: ThemeMode;
+  setTheme: (theme: ThemeMode) => void;
+  toggleTheme: () => void;
+  language: SupportedLanguage;
+  setLanguage: (lang: SupportedLanguage) => void;
+  t: (key: string, fallback?: string) => string;
+
+  // Search & Onboarding modals
+  searchModalOpen: boolean;
+  setSearchModalOpen: (open: boolean) => void;
+  onboardingOpen: boolean;
+  setOnboardingOpen: (open: boolean) => void;
+
   // Navigation & Views
   currentView: MainView;
   setCurrentView: (view: MainView) => void;
@@ -120,10 +139,11 @@ interface AppContextType {
   plans: Plan[];
   updatePlan: (planId: string, updated: Partial<Plan>) => void;
 
-  // Auth & Roles
+  // Auth & Roles & Permissions
   currentUser: UserSession;
   switchUserRole: (role: UserRole) => void;
   isSuperadmin: boolean;
+  can: (action: PermissionAction) => PermissionCheckResult;
 
   // Domain Business Data
   courts: Court[];
@@ -285,9 +305,79 @@ const ROLE_PROFILES: Record<UserRole, UserSession> = {
     avatarUrl: 'https://images.unsplash.com/photo-1567532939604-b6b5b0db2604?auto=format&fit=crop&w=200&q=80',
     playLevel: 2.2,
   },
+  STAFF: {
+    id: 'user-staff-01',
+    name: 'Marcos Rúa (Mantenimiento)',
+    email: 'staff@padelsanmateo.es',
+    role: 'STAFF',
+    avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80',
+    playLevel: 2.5,
+  },
 };
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  // Theme state (LIGHT MODE is default per requirement 45)
+  const [theme, setTheme] = useState<ThemeMode>(() => {
+    try {
+      const saved = localStorage.getItem('setmio_theme') as ThemeMode;
+      return saved || 'light';
+    } catch {
+      return 'light';
+    }
+  });
+
+  const toggleTheme = () => {
+    setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
+  };
+
+  // Language state (default 'es' per requirement 40)
+  const [language, setLanguageState] = useState<SupportedLanguage>(() => {
+    try {
+      const saved = localStorage.getItem('setmio_lang') as SupportedLanguage;
+      return saved || 'es';
+    } catch {
+      return 'es';
+    }
+  });
+
+  const setLanguage = (lang: SupportedLanguage) => {
+    setLanguageState(lang);
+    try {
+      localStorage.setItem('setmio_lang', lang);
+    } catch {
+      // Ignore
+    }
+  };
+
+  const t = (key: string, fallback?: string): string => {
+    return getTranslation(language, key, fallback);
+  };
+
+  // Sync theme with DOM documentElement
+  useEffect(() => {
+    const root = document.documentElement;
+    try {
+      localStorage.setItem('setmio_theme', theme);
+    } catch {
+      // Ignore
+    }
+
+    if (theme === 'dark') {
+      root.classList.add('dark');
+    } else if (theme === 'light') {
+      root.classList.remove('dark');
+    } else {
+      // System
+      const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      if (isDark) root.classList.add('dark');
+      else root.classList.remove('dark');
+    }
+  }, [theme]);
+
+  // Modals state
+  const [searchModalOpen, setSearchModalOpen] = useState(false);
+  const [onboardingOpen, setOnboardingOpen] = useState(false);
+
   // Navigation
   const [currentView, setCurrentView] = useState<MainView>('public');
   const [publicPage, setPublicPage] = useState<PublicPage>('home');
@@ -299,114 +389,23 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   // Multi-tenant & Plans
   const [tenants, setTenants] = useState<Tenant[]>([
     INITIAL_TENANT,
-    {
-      id: 'tenant-racket-coruna',
-      slug: 'corunapadel',
-      name: 'Racket Padel Coruña',
-      shortName: 'Padel Coruña',
-      type: 'club',
-      planId: 'pro',
-      status: 'active',
-      isDemo: true,
-      country: 'España',
-      city: 'A Coruña',
-      region: 'Galicia',
-      address: 'Matogrande, A Coruña',
-      timezone: 'Europe/Madrid',
-      currency: 'EUR',
-      locale: 'es-ES',
-      contactEmail: 'info@corunapadel-demo.es',
-      contactPhone: '+34 981 12 34 56',
-      whatsappNumber: '+34 611 22 33 44',
-      branding: {
-        logoUrl: '',
-        primaryColor: '#3b82f6',
-        secondaryColor: '#090d16',
-        accentColor: '#10b981',
-        heroTitle: 'Tu Club de Pádel en A Coruña',
-        heroSubtitle: '6 pistas cubiertas de cristal templado y zona fitness.',
-        heroImageUrl: 'https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?auto=format&fit=crop&w=1920&q=80',
-        badgeText: 'CLUB PRO · CORUÑA',
-      },
-      domains: [
-        {
-          id: 'dom-coruna-1',
-          tenantId: 'tenant-racket-coruna',
-          hostname: 'corunapadel.setmio.com',
-          isPrimary: true,
-          isCustom: false,
-          status: 'active',
-          dnsExpected: { type: 'CNAME', name: 'corunapadel', value: 'cname.setmio.com', ttl: 300 },
-          sslActive: true,
-        },
-      ],
-      settings: {
-        bookingAdvanceDays: 7,
-        cancellationWindowHours: 24,
-        splitPaymentAllowed: true,
-        playerMatchCreationAllowed: false,
-        openingHours: [{ days: 'Todos los días', hours: '09:00 - 23:00' }],
-        whatsappWidgetEnabled: true,
-        whatsappGreetingMessage: '¡Hola! Quiero consultar pistas en Racket Coruña.',
-      },
-    },
-    {
-      id: 'tenant-academia-galan',
-      slug: 'academiagalan',
-      name: 'Academia de Tecnificación Élite',
-      shortName: 'Tecnificación Élite',
-      type: 'academy',
-      planId: 'starter',
-      status: 'active',
-      isDemo: true,
-      country: 'España',
-      city: 'Santiago de Compostela',
-      region: 'Galicia',
-      address: 'Complexo Deportivo San Lázaro',
-      timezone: 'Europe/Madrid',
-      currency: 'EUR',
-      locale: 'es-ES',
-      contactEmail: 'contacto@tecnificacion-demo.es',
-      contactPhone: '+34 981 99 88 77',
-      whatsappNumber: '+34 699 88 77 66',
-      branding: {
-        logoUrl: '',
-        primaryColor: '#f59e0b',
-        secondaryColor: '#18181b',
-        accentColor: '#ef4444',
-        heroTitle: 'Formación de Pádel de Alto Rendimiento',
-        heroSubtitle: 'Metodología probada para jugadores en circuito autonómico y nacional.',
-        heroImageUrl: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&w=1920&q=80',
-        badgeText: 'ACADEMIA DEPORTIVA',
-      },
-      domains: [
-        {
-          id: 'dom-elite-1',
-          tenantId: 'tenant-academia-galan',
-          hostname: 'tecnificacion.setmio.com',
-          isPrimary: true,
-          isCustom: false,
-          status: 'active',
-          dnsExpected: { type: 'CNAME', name: 'tecnificacion', value: 'cname.setmio.com', ttl: 300 },
-          sslActive: true,
-        },
-      ],
-      settings: {
-        bookingAdvanceDays: 5,
-        cancellationWindowHours: 48,
-        splitPaymentAllowed: false,
-        playerMatchCreationAllowed: false,
-        openingHours: [{ days: 'Lunes a Sábado', hours: '08:00 - 22:00' }],
-        whatsappWidgetEnabled: true,
-        whatsappGreetingMessage: '¡Hola! Me gustaría inscribirme en la academia.',
-      },
-    },
+    ...ADDITIONAL_DEMO_TENANTS,
   ]);
 
   const [currentTenantId, setCurrentTenantId] = useState<string>('tenant-san-mateo-01');
   const currentTenant = tenants.find((t) => t.id === currentTenantId) || tenants[0];
 
   const updateCurrentTenant = (updated: Partial<Tenant>) => {
+    // Check if locked demo
+    if (currentTenant.demo_locked && updated.type && updated.type !== currentTenant.type && currentUser.role !== 'SUPERADMIN') {
+      triggerDemoToast(
+        'Modificación Bloqueada',
+        'Centro de Pádel San Mateo es el tenant demostración principal y su tipo PADEL_CLUB está protegido.',
+        'warning'
+      );
+      return;
+    }
+
     setTenants((prev) =>
       prev.map((t) => (t.id === currentTenant.id ? { ...t, ...updated } : t))
     );
@@ -414,9 +413,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const switchTenant = (tenantId: string) => {
     setCurrentTenantId(tenantId);
+    const target = tenants.find((t) => t.id === tenantId);
+    if (target) {
+      // If user language is not supported by target tenant, fallback to first supported
+      if (!target.supportedLanguages.includes(language)) {
+        setLanguage(target.supportedLanguages[0]);
+      }
+    }
     triggerDemoToast(
-      'Cambio de Empresa (Tenant)',
-      `Ahora visualizando el espacio de "${tenants.find((t) => t.id === tenantId)?.name}". Los datos y la identidad de marca han cambiado.`,
+      'Espacio Seleccionado',
+      `Ahora visualizando "${target?.name}" (${target?.type.replace('_', ' ')}). Interfaz y datos adaptados al negocio.`,
       'info'
     );
   };
@@ -438,7 +444,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [currentUser, setCurrentUser] = useState<UserSession>(ROLE_PROFILES.TENANT_OWNER);
 
   const switchUserRole = (role: UserRole) => {
-    const profile = ROLE_PROFILES[role];
+    const profile = ROLE_PROFILES[role] || ROLE_PROFILES.PLAYER;
     setCurrentUser(profile);
 
     // Auto navigate to relevant view based on role
@@ -452,12 +458,23 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
     triggerDemoToast(
       `Perfil Activo: ${role}`,
-      `Sesión cambiada a ${profile.name} con permisos de ${role}.`,
+      `Sesión cambiada a ${profile.name} con permisos contextuales.`,
       'info'
     );
   };
 
   const isSuperadmin = currentUser.role === 'SUPERADMIN';
+
+  // Permission check helper
+  const can = (action: PermissionAction): PermissionCheckResult => {
+    return checkPermission(
+      currentUser.role,
+      action,
+      currentTenant.type,
+      currentTenant.planId,
+      currentTenant.demo_locked || false
+    );
+  };
 
   // Domain Business State
   const [courts, setCourts] = useState<Court[]>(INITIAL_COURTS);
@@ -557,6 +574,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   // Court Actions
   const toggleCourtLight = (courtId: string) => {
+    const perm = can('manage_smart_courts');
+    if (!perm.allowed) {
+      triggerDemoToast('Permiso Denegado', perm.message || 'No tienes permisos para conmutar iluminación.', 'warning');
+      return;
+    }
+
     setCourts((prev) =>
       prev.map((c) =>
         c.id === courtId ? { ...c, isLightOn: !c.isLightOn } : c
@@ -588,7 +611,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
     triggerDemoToast(
       'Automatización de Pista',
-      `Iluminación de ${targetCourt?.name} cambiada a ${newState ? 'ENCENDIDA' : 'APAGADA'} (Modo Demostración).`,
+      `Iluminación de ${targetCourt?.name} cambiada a ${newState ? 'ENCENDIDA' : 'APAGADA'}.`,
       'info'
     );
   };
@@ -645,7 +668,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
     triggerDemoToast(
       'Reserva Registrada con Éxito',
-      `Pista confirmada. En producción se enviará confirmación por correo y WhatsApp con el PIN ${randomPin}.`,
+      `Pista confirmada. PIN ${randomPin} asignado para apertura de puertas.`,
       'success'
     );
 
@@ -704,7 +727,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     );
     triggerDemoToast(
       '¡Te has unido al partido!',
-      `Plaza confirmada en Pádel San Mateo. Pago demo de señal registrado.`,
+      `Plaza confirmada en ${currentTenant.shortName}.`,
       'success'
     );
   };
@@ -725,7 +748,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     );
     triggerDemoToast(
       'Inscripción de Pareja Registrada',
-      `Pareja "${teamName}" inscrita en la categoría "${categoryName}". Recibiréis el cuadro y horarios por correo.`,
+      `Pareja "${teamName}" inscrita en la categoría "${categoryName}".`,
       'success'
     );
   };
@@ -746,7 +769,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       prev.map((d) => {
         if (d.id !== deviceId) return d;
         const nextState = !d.relayState;
-        // Also update court light if linked
         if (d.courtId) {
           setCourts((cList) =>
             cList.map((c) => (c.id === d.courtId ? { ...c, isLightOn: nextState } : c))
@@ -757,7 +779,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     );
     triggerDemoToast(
       'Dispositivo IoT Conmutado',
-      `Relé de encendido/apagado ejecutado en modo demostración.`,
+      `Relé ejecutado en modo demostración.`,
       'info'
     );
   };
@@ -792,7 +814,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   // Notifications
   const [notifications, setNotifications] = useState<NotificationItem[]>([
     {
-      id: 'n-1',
+      id: 'notif-1',
       title: 'Pistas renovadas en Narón',
       message: 'Nuevo césped Mondo Supercourt WPT disponible para reserva en pistas 1 y 2.',
       type: 'system',
@@ -800,7 +822,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       read: false,
     },
     {
-      id: 'n-2',
+      id: 'notif-2',
       title: 'I Open Primavera Pádel San Mateo',
       message: 'Abiertas las inscripciones para el torneo con 1.800€ en premios.',
       type: 'tournament',
@@ -820,7 +842,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     {
       id: 'msg-1',
       sender: 'assistant',
-      text: `¡Hola! Soy el asistente inteligente de ${currentTenant.name}. Puedo ayudarte a consultar disponibilidad de pistas, información de la escuela, torneos en Narón, o gestionar tus reservas. ¿En qué te puedo asesorar?`,
+      text: `¡Hola! Soy el asistente inteligente de Setmio Padel Pro para ${currentTenant.name}. Puedo informarte de disponibilidad, escuela, torneos, estadísticas o ayudarte con la gestión. ¿En qué te asesoro?`,
       timestamp: 'Ahora',
     },
   ]);
@@ -839,23 +861,24 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setAiMessages((prev) => [...prev, userMsg]);
     setIsAiThinking(true);
 
-    // Contextual demo response generator
     setTimeout(() => {
       let reply = '';
       const lower = text.toLowerCase();
 
-      if (lower.includes('pista') || lower.includes('reserv') || lower.includes('horario') || lower.includes('precio')) {
-        reply = `En ${currentTenant.name} disponemos de 8 pistas cubiertas de última generación (césped oficial Mondo Supercourt WPT). Las tarifas oscilan entre 18€/h (pista individual) y 30€/h (Pista Central Panorámica). Abrimos de lunes a viernes de 08:30 a 23:30. ¿Quieres que te muestre los huecos libres para hoy?`;
-      } else if (lower.includes('escuela') || lower.includes('clase') || lower.includes('entrenador') || lower.includes('aprender')) {
-        reply = `Nuestra escuela está dirigida por Mateo Varela (Entrenador Nacional Nivel 2 FEP) y Laura Senra. Ofrecemos grupos reducidos de iniciación, perfeccionamiento y competición infantil desde 50€/mes. ¿Cuál es tu nivel aproximado de juego?`;
-      } else if (lower.includes('torneo') || lower.includes('competic') || lower.includes('liga')) {
-        reply = `Actualmente tenemos abierta la inscripción para el "I Open Primavera Pádel San Mateo 2026" (17 al 19 de Octubre) con 1.800€ en premios en metálico y material Bullpadel. Puedes apuntar a tu pareja directamente desde la sección de Torneos.`;
-      } else if (lower.includes('tienda') || lower.includes('pala') || lower.includes('zapatilla') || lower.includes('comprar')) {
-        reply = `En nuestra tienda física y online contamos con las últimas palas Bullpadel Vertex 04, Nox AT10 Agustín Tapia 18K y calzado Asics con hasta un 15% de descuento para socios. ¿Buscas una pala de control o de potencia?`;
-      } else if (lower.includes('naron') || lower.includes('donde') || lower.includes('ubicacion') || lower.includes('telefono')) {
-        reply = `Estamos ubicados en el Polígono Industrial Río do Pozo (Avda. dos Padelistas 14, Narón, Galicia). Nuestro teléfono de contacto es el 981 38 00 00 y disponemos de amplio aparcamiento privado gratuito.`;
+      if (currentTenant.type === 'PRO_PLAYER') {
+        reply = `Hola. Soy el asistente oficial de ${currentTenant.name}. Actualmente ocupa el ranking FIP #${currentTenant.proPlayerStats?.fipRanking || 18}. Su próximo torneo es en Madrid. Para solicitudes de patrocinio, clinics o exhibiciones, puedes consultar la sección de Media Kit y Contacto.`;
+      } else if (currentTenant.type === 'COACH') {
+        reply = `Hola. Soy el asistente de ${currentTenant.name}. Ofrece clases individuales (tarifa ${currentTenant.coachStats?.hourlyRate || 45}€/h) y clinics grupales de fin de semana. ¿Buscas perfeccionar tu técnica o preparar torneos de competición?`;
+      } else if (currentTenant.type === 'ONLINE_STORE') {
+        reply = `¡Bienvenido a ${currentTenant.name}! Contamos con stock oficial de palas Bullpadel Vertex 04, Nox AT10 Agustín Tapia y calzado Asics con envíos 24h a toda la península. ¿Buscas una pala de control o potencia?`;
+      } else if (lower.includes('pista') || lower.includes('reserv') || lower.includes('horario') || lower.includes('precio')) {
+        reply = `En ${currentTenant.name} disponemos de 8 pistas cubiertas con césped Mondo Supercourt WPT. Las tarifas oscilan entre 18€/h y 30€/h. El club abre de 08:30 a 23:30. ¿Quieres que te muestre los huecos libres para hoy?`;
+      } else if (lower.includes('escuela') || lower.includes('clase') || lower.includes('entrenador')) {
+        reply = `Nuestra escuela oficial está dirigida por Mateo Varela (Nivel 2 FEP) y Laura Senra. Ofrecemos grupos de iniciación, perfeccionamiento y competición infantil desde 55€/mes.`;
+      } else if (lower.includes('torneo') || lower.includes('competic')) {
+        reply = `Actualmente tenemos abierta la inscripción para el "I Open Primavera Pádel San Mateo 2026" con 1.800€ en premios y material oficial Bullpadel.`;
       } else {
-        reply = `Como asistente de ${currentTenant.name}, puedo gestionar tus reservas, unirte a partidos abiertos de tu nivel o informarte de todas las actividades del club. Recuerda que la plataforma está en modo demostración conectado a la base de datos Supabase.`;
+        reply = `Como asistente contextual de ${currentTenant.name}, puedo ayudarte con cualquier servicio deportivo, reservas y consultas. Todo el sistema está activo en modo demostración con aislamiento multi-tenant.`;
       }
 
       setAiMessages((prev) => [
@@ -884,7 +907,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const clearDemoToast = () => setDemoToast(null);
 
-  // Auto clear toast after 4.5 seconds
   useEffect(() => {
     if (!demoToast) return;
     const timer = setTimeout(() => {
@@ -896,6 +918,18 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   return (
     <AppContext.Provider
       value={{
+        theme,
+        setTheme,
+        toggleTheme,
+        language,
+        setLanguage,
+        t,
+
+        searchModalOpen,
+        setSearchModalOpen,
+        onboardingOpen,
+        setOnboardingOpen,
+
         currentView,
         setCurrentView,
         publicPage,
@@ -919,6 +953,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         currentUser,
         switchUserRole,
         isSuperadmin,
+        can,
 
         courts,
         toggleCourtLight,

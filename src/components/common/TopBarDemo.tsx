@@ -13,6 +13,8 @@ import {
   CheckCircle2,
   X,
   ExternalLink,
+  Sun,
+  Moon,
 } from 'lucide-react';
 import { getSupabaseStatus } from '../../lib/supabase';
 
@@ -26,6 +28,8 @@ export const TopBarDemo: React.FC = () => {
     currentUser,
     switchUserRole,
     triggerDemoToast,
+    theme,
+    toggleTheme,
   } = useApp();
 
   const [showRoleMenu, setShowRoleMenu] = useState(false);
@@ -198,6 +202,23 @@ export const TopBarDemo: React.FC = () => {
                 </div>
               )}
             </div>
+
+            {/* Theme Toggle Button */}
+            <button
+              onClick={toggleTheme}
+              className="p-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 transition-colors flex items-center gap-1.5"
+              title={theme === 'dark' ? 'Cambiar a Modo Claro' : 'Cambiar a Modo Oscuro'}
+              aria-label="Alternar tema claro/oscuro"
+            >
+              {theme === 'dark' ? (
+                <Sun className="w-4 h-4 text-amber-400" />
+              ) : (
+                <Moon className="w-4 h-4 text-cyan-300" />
+              )}
+              <span className="hidden xl:inline text-[11px] font-medium text-slate-300">
+                {theme === 'dark' ? 'Modo Claro' : 'Modo Oscuro'}
+              </span>
+            </button>
 
             {/* Architecture / Info */}
             <button

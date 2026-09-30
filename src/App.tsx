@@ -25,7 +25,7 @@ import { LegalView } from './components/public/LegalView';
 
 // Admin views
 import { AdminLayout } from './components/admin/AdminLayout';
-import { AdminDashboard } from './components/admin/AdminDashboard';
+import { ContextualDashboard } from './components/admin/dashboards/ContextualDashboard';
 import { AdminAgenda } from './components/admin/AdminAgenda';
 import { AdminCustomers } from './components/admin/AdminCustomers';
 import { AdminSchool } from './components/admin/AdminSchool';
@@ -91,7 +91,7 @@ export function App() {
   const renderAdminTab = () => {
     switch (adminTab) {
       case 'dashboard':
-        return <AdminDashboard />;
+        return <ContextualDashboard />;
       case 'agenda':
         return <AdminAgenda />;
       case 'customers':
@@ -115,12 +115,12 @@ export function App() {
       case 'settings':
         return <AdminSettings />;
       default:
-        return <AdminDashboard />;
+        return <ContextualDashboard />;
     }
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 font-sans text-slate-100 selection:bg-emerald-500 selection:text-slate-950 antialiased">
+    <div className="min-h-screen bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 font-sans selection:bg-emerald-500 selection:text-white antialiased transition-colors duration-200">
       {/* 1. Global Platform TopBar with demo role, tenant and view switcher */}
       <TopBarDemo />
 

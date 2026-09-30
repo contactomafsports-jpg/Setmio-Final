@@ -1,4 +1,14 @@
-export type TenantType = 'club' | 'academy' | 'coach' | 'pro_player' | 'organizer' | 'team' | 'store' | 'other';
+import { SupportedLanguage } from '../lib/i18n';
+
+export type TenantType =
+  | 'PADEL_CLUB'
+  | 'ACADEMY'
+  | 'COACH'
+  | 'PRO_PLAYER'
+  | 'ONLINE_STORE'
+  | 'TOURNAMENT_ORGANIZER'
+  | 'TEAM'
+  | 'PROFESSIONAL';
 
 export type UserRole =
   | 'SUPERADMIN'
@@ -12,7 +22,8 @@ export type UserRole =
   | 'ACADEMY_MANAGER'
   | 'TEAM_MANAGER'
   | 'PROFESSIONAL_PLAYER'
-  | 'PARENT_OR_GUARDIAN';
+  | 'PARENT_OR_GUARDIAN'
+  | 'STAFF';
 
 export type PlanTier = 'free' | 'starter' | 'pro' | 'elite';
 
@@ -66,22 +77,32 @@ export interface TenantDomain {
   sslActive: boolean;
 }
 
+export interface SponsorItem {
+  id: string;
+  name: string;
+  category: string;
+  logoText: string;
+  websiteUrl?: string;
+}
+
 export interface Tenant {
   id: string;
-  slug: string; // 'sanmateo'
-  name: string; // 'Centro de Pádel San Mateo'
-  shortName: string; // 'Pádel San Mateo'
+  slug: string; // 'sanmateo', 'martinsanchez', 'galiciastore', etc.
+  name: string;
+  shortName: string;
   type: TenantType;
   planId: PlanTier;
   status: 'active' | 'suspended' | 'trial';
   isDemo: boolean;
+  demo_locked?: boolean; // Section 10: locked demo tenant properties
+  supportedLanguages: SupportedLanguage[];
   country: string;
-  city: string; // 'Narón'
-  region: string; // 'Galicia'
-  address: string; // 'Polígono Río do Pozo, Narón'
-  timezone: string; // 'Europe/Madrid'
-  currency: string; // 'EUR'
-  locale: string; // 'es'
+  city: string;
+  region: string;
+  address: string;
+  timezone: string;
+  currency: string;
+  locale: string;
   contactEmail: string;
   contactPhone: string;
   whatsappNumber: string;
@@ -99,6 +120,26 @@ export interface Tenant {
     whatsappWidgetEnabled: boolean;
     whatsappGreetingMessage: string;
   };
+  // Specific contextual metadata
+  proPlayerStats?: {
+    fipRanking: number;
+    premierRanking: number;
+    titlesCount: number;
+    matchesWon: number;
+    matchesPlayed: number;
+    partnerName: string;
+    dominantHand: string;
+    position: string;
+    racketModel: string;
+  };
+  coachStats?: {
+    certifications: string[];
+    hourlyRate: number;
+    activeStudents: number;
+    weeklyLessons: number;
+    rating: number;
+  };
+  sponsors?: SponsorItem[];
 }
 
 export interface UserProfile {
@@ -112,6 +153,7 @@ export interface UserProfile {
   dominantHand: 'right' | 'left';
   preferredPosition: 'drive' | 'reves' | 'both';
   isSuperadmin: boolean;
+  preferredLanguage?: SupportedLanguage;
 }
 
 export interface Court {
@@ -255,7 +297,7 @@ export interface BlogPost {
 
 export interface PageBlock {
   id: string;
-  type: 'hero' | 'quick_booking' | 'courts_grid' | 'tournaments_banner' | 'academy_teaser' | 'featured_products' | 'latest_blog' | 'contact_card';
+  type: 'hero' | 'quick_booking' | 'courts_grid' | 'tournaments_banner' | 'academy_teaser' | 'featured_products' | 'latest_blog' | 'contact_card' | 'ranking_kpis' | 'sponsors_grid' | 'coaching_services';
   title?: string;
   subtitle?: string;
   isVisible: boolean;

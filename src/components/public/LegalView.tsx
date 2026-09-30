@@ -6,23 +6,23 @@ export const LegalView: React.FC = () => {
   const { currentTenant } = useApp();
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-12 text-slate-100">
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-12 text-slate-900 dark:text-slate-100 transition-colors duration-200">
       <div>
-        <div className="text-xs font-semibold text-emerald-400 uppercase tracking-wider">
+        <div className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
           Transparencia & Cumplimiento Legal
         </div>
-        <h1 className="text-3xl font-black text-white tracking-tight mt-1">
+        <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight mt-1">
           Información Legal y Condiciones de Servicio
         </h1>
-        <p className="text-xs text-slate-400 mt-1">
+        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
           {currentTenant.name} · Polígono Industrial Río do Pozo, Narón (Galicia)
         </p>
       </div>
 
-      <div className="space-y-8 text-xs text-slate-300 leading-relaxed">
-        <section className="p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-3">
-          <div className="flex items-center gap-2 text-sm font-bold text-white">
-            <FileText className="w-4 h-4 text-emerald-400" />
+      <div className="space-y-6 text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+        <section className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-3 shadow-sm">
+          <div className="flex items-center gap-2 text-sm font-bold text-slate-900 dark:text-white">
+            <FileText className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
             <span>1. Aviso Legal e Identificación de la Empresa</span>
           </div>
           <p>
@@ -33,9 +33,9 @@ export const LegalView: React.FC = () => {
           </p>
         </section>
 
-        <section className="p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-3">
-          <div className="flex items-center gap-2 text-sm font-bold text-white">
-            <Lock className="w-4 h-4 text-cyan-400" />
+        <section className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-3 shadow-sm">
+          <div className="flex items-center gap-2 text-sm font-bold text-slate-900 dark:text-white">
+            <Lock className="w-4 h-4 text-teal-600 dark:text-cyan-400" />
             <span>2. Política de Privacidad y Protección de Datos (RGPD)</span>
           </div>
           <p>
@@ -46,12 +46,12 @@ export const LegalView: React.FC = () => {
           </p>
         </section>
 
-        <section className="p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-3">
-          <div className="flex items-center gap-2 text-sm font-bold text-white">
-            <Shield className="w-4 h-4 text-purple-400" />
+        <section className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-3 shadow-sm">
+          <div className="flex items-center gap-2 text-sm font-bold text-slate-900 dark:text-white">
+            <Shield className="w-4 h-4 text-purple-600 dark:text-purple-400" />
             <span>3. Condiciones de Reserva, Cancelación y Pagos</span>
           </div>
-          <ul className="list-disc pl-5 space-y-1.5 text-slate-400">
+          <ul className="list-disc pl-5 space-y-1.5 text-slate-500 dark:text-slate-400">
             <li>Las reservas pueden anularse con reembolso íntegro hasta con {currentTenant.settings.cancellationWindowHours} horas de antelación.</li>
             <li>El uso de calzado específico de pádel (suela espiga o all-court) es obligatorio en todas las pistas para garantizar la durabilidad del césped Mondo Supercourt.</li>
             <li>Los códigos PIN de acceso son personales e intransferibles y se desactivan al finalizar el horario reservado.</li>
