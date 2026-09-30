@@ -107,10 +107,10 @@ export const HomeView: React.FC = () => {
               </div>
 
               {/* Key Trust Metrics */}
-              <div className="pt-6 border-t border-slate-200 dark:border-slate-800/80 grid grid-cols-3 gap-4 text-xs">
+              <div className="pt-6 border-t border-white/15 grid grid-cols-3 gap-4 text-xs">
                 <div>
-                  <div className="text-2xl font-black text-slate-900 dark:text-white">8 Pistas</div>
-                  <div className="text-slate-500 dark:text-slate-400 text-[11px] mt-0.5 font-medium">Césped WPT Oficial</div>
+                  <div className="text-2xl font-black text-white">8 Pistas</div>
+                  <div className="text-slate-300 text-[11px] mt-0.5 font-medium">Césped WPT Oficial</div>
                 </div>
                 <div>
                   <div className="text-2xl font-black text-emerald-600 dark:text-emerald-400">14 Horas</div>

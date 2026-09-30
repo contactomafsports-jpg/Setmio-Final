@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap');
 @import "tailwindcss";
 
 @variant dark (&:where(.dark, .dark *));
@@ -62,7 +63,6 @@ input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-
 
 @media print { nav, aside, header, button { display: none !important; } main { padding: 0 !important; } }
 
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap');
 :root { font-family: 'DM Sans', Inter, sans-serif; }
 h1, h2, h3, h4 { font-family: 'Manrope', 'DM Sans', sans-serif; letter-spacing: -.025em; }
 
