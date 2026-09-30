@@ -17,7 +17,7 @@ export const PWAInstallPrompt: React.FC = () => {
       {(isInstallable || isIOS) && (
         <aside
           aria-label="Instalación de la aplicación"
-          className="fixed bottom-3 left-1/2 -translate-x-1/2 z-40 w-[95%] max-w-md bg-slate-900/95 backdrop-blur-md border border-slate-700 rounded-2xl p-3.5 shadow-2xl flex items-center justify-between gap-3 text-slate-100"
+          className="fixed bottom-4 left-3 right-3 sm:left-auto sm:right-5 sm:w-[360px] z-40 bg-slate-950/95 backdrop-blur-xl border border-white/10 rounded-2xl p-3 shadow-2xl flex items-center justify-between gap-3 text-slate-100 ring-1 ring-black/10"
         >
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-700 flex items-center justify-center font-black text-white shrink-0 text-sm shadow">

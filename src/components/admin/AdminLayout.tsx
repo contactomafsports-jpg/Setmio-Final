@@ -272,7 +272,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
         </header>
 
         {/* Child Tab Content View */}
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto bg-slate-100 dark:bg-slate-950">
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto bg-[radial-gradient(circle_at_top_right,rgba(16,185,129,0.08),transparent_28%),#f8fafc] dark:bg-slate-950">
           {children}
         </main>
       </div>
