@@ -152,6 +152,7 @@ interface AppContextType {
 
   bookings: Booking[];
   createBooking: (newBooking: Omit<Booking, 'id' | 'tenantId'>) => Booking;
+  updateBooking: (bookingId: string, updates: Partial<Booking>) => void;
   cancelBooking: (bookingId: string) => void;
 
   openMatches: OpenMatch[];
@@ -675,10 +676,15 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return newBooking;
   };
 
+  const updateBooking = (bookingId: string, updates: Partial<Booking>) => {
+  setBookings((prev) => prev.map((booking) => booking.id === bookingId ? { ...booking, ...updates } : booking));
+  triggerDemoToast('Reserva actualizada', 'Los cambios se han guardado en el historial del club.', 'success');
+  };
+
   const cancelBooking = (bookingId: string) => {
-    setBookings((prev) =>
-      prev.map((b) => (b.id === bookingId ? { ...b, status: 'canceled' } : b))
-    );
+  setBookings((prev) =>
+  prev.map((b) => (b.id === bookingId ? { ...b, status: 'canceled' } : b))
+  );
     triggerDemoToast(
       'Reserva Cancelada',
       'La reserva ha sido cancelada y la pista queda liberada en la agenda del club.',
@@ -959,9 +965,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         toggleCourtLight,
         updateCourtRate,
 
-        bookings,
-        createBooking,
-        cancelBooking,
+  bookings,
+  createBooking,
+  updateBooking,
+  cancelBooking,
 
         openMatches,
         createOpenMatch,

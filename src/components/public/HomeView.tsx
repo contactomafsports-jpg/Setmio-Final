@@ -63,8 +63,9 @@ export const HomeView: React.FC = () => {
   return (
     <div className="space-y-16 lg:space-y-24 pb-20 text-slate-900 dark:text-slate-100 transition-colors duration-200">
       {/* 1. HERO SECTION */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-slate-100 via-white to-slate-50 dark:from-slate-900 dark:via-slate-950 dark:to-slate-950 pt-10 pb-16 lg:pt-20 lg:pb-28 border-b border-slate-200 dark:border-slate-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="relative overflow-hidden bg-slate-950 pt-10 pb-16 lg:pt-20 lg:pb-28 border-b border-slate-800">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_20%,rgba(16,185,129,0.22),transparent_34%),linear-gradient(120deg,rgba(15,23,42,0.98),rgba(15,23,42,0.76))]" aria-hidden="true" />
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
             {/* Left Copy */}
             <div className="lg:col-span-7 space-y-6">
@@ -75,11 +76,11 @@ export const HomeView: React.FC = () => {
                 <span className="text-slate-500 dark:text-slate-400 font-medium">{currentTenant.city}, Galicia</span>
               </div>
 
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-slate-900 dark:text-white leading-[1.1] text-balance">
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white leading-[1.1] text-balance">
                 {currentTenant.branding.heroTitle}
               </h1>
 
-              <p className="text-base sm:text-lg text-slate-600 dark:text-slate-300 max-w-xl font-normal leading-relaxed">
+              <p className="text-base sm:text-lg text-slate-200 max-w-xl font-normal leading-relaxed">
                 {currentTenant.branding.heroSubtitle}
               </p>
 
