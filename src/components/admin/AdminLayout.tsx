@@ -86,7 +86,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-100 text-slate-950 dark:bg-slate-950 dark:text-slate-100 flex flex-col md:flex-row pb-20 md:pb-0 transition-colors duration-200">
+    <div data-admin-shell className="min-h-screen bg-slate-100 text-slate-950 dark:bg-slate-950 dark:text-slate-100 flex flex-col md:flex-row pb-20 md:pb-0 transition-colors duration-200">
       {/* DESKTOP SIDEBAR */}
       <aside className="hidden md:flex flex-col w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 shrink-0">
         {/* Club Brand in Sidebar */}
@@ -272,13 +272,13 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
         </header>
 
         {/* Child Tab Content View */}
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto bg-slate-100 dark:bg-slate-950">
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto bg-[radial-gradient(circle_at_top_right,rgba(16,185,129,0.08),transparent_28%),#f8fafc] dark:bg-slate-950">
           {children}
         </main>
       </div>
 
       {/* MOBILE NATIVE BOTTOM BAR */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 py-1.5 px-2 flex items-center justify-around shadow-2xl">
+      <nav aria-label="Navegación principal del club" className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-t border-slate-200/80 dark:border-slate-800/80 px-2 pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] flex items-center justify-around shadow-[0_-12px_30px_rgba(15,23,42,0.08)]">
         {mainTabs.map((tab) => {
           const isActive = adminTab === tab.id && !mobileMoreOpen;
           return (
