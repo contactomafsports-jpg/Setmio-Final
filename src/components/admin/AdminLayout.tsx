@@ -86,7 +86,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col md:flex-row pb-20 md:pb-0 transition-colors duration-200">
+    <div className="min-h-screen bg-slate-100 text-slate-950 dark:bg-slate-950 dark:text-slate-100 flex flex-col md:flex-row pb-20 md:pb-0 transition-colors duration-200">
       {/* DESKTOP SIDEBAR */}
       <aside className="hidden md:flex flex-col w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 shrink-0">
         {/* Club Brand in Sidebar */}
@@ -195,10 +195,10 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
       {/* MAIN CONTENT CONTAINER */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Top Management Header */}
-        <header className="sticky top-8 sm:top-9 z-30 bg-slate-900/95 backdrop-blur-md border-b border-slate-800 px-4 sm:px-6 py-3 flex items-center justify-between">
+        <header className="sticky top-0 z-30 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-4 sm:px-6 py-3 flex items-center justify-between">
           <div className="flex items-center gap-2 min-w-0">
             <div className="size-2 rounded-full bg-emerald-400 shadow-[0_0_0_4px_rgba(52,211,153,0.12)] shrink-0" />
-            <h1 className="text-sm sm:text-base font-bold text-white truncate">
+            <h1 className="text-sm sm:text-base font-bold text-slate-950 dark:text-white truncate">
               {tabLabels[adminTab]}
             </h1>
             <span className="text-slate-600">·</span>
@@ -272,7 +272,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
         </header>
 
         {/* Child Tab Content View */}
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto bg-slate-950">
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto bg-slate-100 dark:bg-slate-950">
           {children}
         </main>
       </div>
@@ -324,6 +324,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
             </div>
 
             <div className="grid grid-cols-1 gap-2">
+              <p className="text-[11px] leading-relaxed text-slate-500 dark:text-slate-400">Accede a cualquier área sin perder el contexto de tu club.</p>
               {moreTabs.map((tab) => (
                 <button
                   key={tab.id}

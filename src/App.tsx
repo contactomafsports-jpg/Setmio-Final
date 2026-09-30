@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useApp } from './context/AppContext';
-import { TopBarDemo } from './components/common/TopBarDemo';
 import { Navbar } from './components/common/Navbar';
 import { Footer } from './components/common/Footer';
 import { DraggableAIAgent } from './components/common/DraggableAIAgent';
@@ -121,10 +120,7 @@ export function App() {
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 font-sans selection:bg-emerald-500 selection:text-white antialiased transition-colors duration-200">
-      {/* 1. Global Platform TopBar with demo role, tenant and view switcher */}
-      <TopBarDemo />
-
-      {/* 2. Main View Renderer */}
+      {/* Main view renderer. Public pages own their header/footer; private pages own their app shell. */}
       {currentView === 'public' && (
         <div className="flex flex-col min-h-screen">
           <Navbar onOpenCart={() => setCartOpen(true)} onOpenAuth={() => setAuthOpen(true)} />

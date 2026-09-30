@@ -109,7 +109,7 @@ export const AdminDashboard: React.FC = () => {
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h3 className="text-sm font-bold text-white">Estado de Pistas en Vivo (8 Pistas)</h3>
-          <span className="text-xs text-slate-400">Haz clic en la bombilla para conmutar luces en demo</span>
+          <span className="text-xs text-slate-400">Control operativo de iluminación y estado de cada pista</span>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
