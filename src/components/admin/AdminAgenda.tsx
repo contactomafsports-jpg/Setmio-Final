@@ -19,6 +19,7 @@ export const AdminAgenda: React.FC = () => {
     courts,
     bookings,
     createBooking,
+    updateBooking,
     cancelBooking,
     toggleCourtLight,
     currentUser,
@@ -76,8 +77,8 @@ export const AdminAgenda: React.FC = () => {
       {/* Header & Date Controls */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-xl font-bold text-white">Cuadrante Diario de Pistas</h2>
-          <p className="text-xs text-slate-400">8 Pistas cubiertas · Control en vivo de reservas y luces</p>
+          <h2 className="text-xl font-bold text-white">Reservas y disponibilidad</h2>
+          <p className="text-xs text-slate-400">Cuadrante de pistas, historial y gestión completa del club</p>
         </div>
 
         <div className="flex items-center gap-3">
@@ -192,6 +193,24 @@ export const AdminAgenda: React.FC = () => {
         </div>
       </div>
 
+      {/* Reservation history */}
+      <section className="rounded-2xl bg-slate-900 border border-slate-800 overflow-hidden">
+        <div className="p-4 border-b border-slate-800 flex items-center justify-between">
+          <div><h3 className="font-bold text-white text-sm">Todas las reservas</h3><p className="text-[11px] text-slate-400">Histórico completo, incluidas canceladas</p></div>
+          <span className="text-[11px] rounded-full bg-slate-800 px-2.5 py-1 text-slate-300">{bookings.length} registros</span>
+        </div>
+        <div className="divide-y divide-slate-800/80">
+          {bookings.map((booking) => (
+            <button key={booking.id} onClick={() => setSelectedBooking(booking)} className="w-full p-4 text-left flex flex-wrap items-center gap-3 hover:bg-slate-800/50 transition">
+              <div className="size-9 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center"><Calendar className="w-4 h-4" /></div>
+              <div className="min-w-[150px] flex-1"><div className="text-xs font-bold text-white">{booking.creatorName}</div><div className="text-[11px] text-slate-400">{booking.courtName} · {booking.startTime.replace('T', ' ')}</div></div>
+              <span className={`text-[10px] font-bold uppercase ${booking.status === 'canceled' ? 'text-rose-400' : 'text-emerald-400'}`}>{booking.status === 'canceled' ? 'Cancelada' : 'Confirmada'}</span>
+              <span className="text-xs font-mono text-slate-300">{booking.totalPrice.toFixed(2)} €</span>
+            </button>
+          ))}
+        </div>
+      </section>
+
       {/* Booking Detail Modal */}
       {selectedBooking && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm">
@@ -229,7 +248,17 @@ export const AdminAgenda: React.FC = () => {
               </div>
             </div>
 
-            <div className="pt-2 flex gap-2">
+            <div className="pt-2 grid grid-cols-2 gap-2">
+              <button
+                onClick={() => {
+                  const nextName = window.prompt('Titular de la reserva', selectedBooking.creatorName);
+                  if (nextName?.trim()) updateBooking(selectedBooking.id, { creatorName: nextName.trim() });
+                  setSelectedBooking(null);
+                }}
+                className="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-bold text-xs transition"
+              >
+                Editar titular
+              </button>
               <button
                 onClick={() => {
                   cancelBooking(selectedBooking.id);

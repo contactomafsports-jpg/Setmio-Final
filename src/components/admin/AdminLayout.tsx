@@ -48,7 +48,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
 
   const mainTabs: { id: AdminTab; label: string; icon: React.ReactNode }[] = [
     { id: 'dashboard', label: 'Inicio', icon: <Home className="w-5 h-5" /> },
-    { id: 'agenda', label: 'Agenda', icon: <Calendar className="w-5 h-5" /> },
+    { id: 'agenda', label: 'Reservas', icon: <Calendar className="w-5 h-5" /> },
     { id: 'customers', label: 'Clientes', icon: <Users className="w-5 h-5" /> },
     { id: 'subscription', label: 'Negocio', icon: <Briefcase className="w-5 h-5" /> },
   ];
