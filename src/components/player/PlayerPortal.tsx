@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import {
+  Home,
   Calendar,
   Users,
   Award,
@@ -18,6 +19,8 @@ import {
   Sun,
   Moon,
   ArrowRight,
+  ClipboardList,
+  UserRound,
 } from 'lucide-react';
 
 export const PlayerPortal: React.FC = () => {
@@ -39,12 +42,22 @@ export const PlayerPortal: React.FC = () => {
   } = useApp();
 
   const [activePlayerTab, setActivePlayerTab] = useState<
-    'overview' | 'bookings' | 'stats' | 'favorites' | 'ai_coach'
+    'overview' | 'bookings' | 'stats' | 'favorites' | 'ai_coach' | 'matches' | 'profile'
   >('overview');
 
-  // Player personal bookings
-  const myBookings = bookings.slice(0, 2);
-  const myMatches = openMatches.slice(0, 2);
+  const normalizedPlayerName = currentUser.name.split(' (')[0].trim().toLocaleLowerCase();
+  const myBookings = bookings.filter((booking) =>
+    booking.creatorId === currentUser.id ||
+    booking.creatorName.split(' (')[0].trim().toLocaleLowerCase() === normalizedPlayerName
+  );
+  const upcomingBooking = myBookings.find((booking) =>
+    new Date(booking.startTime).getTime() >= Date.now() &&
+    (booking.status === 'confirmed' || booking.status === 'pending')
+  );
+  const invitations = openMatches.filter((match) =>
+    match.status === 'open' && match.players.length < 4 &&
+    currentUser.playLevel >= match.minLevel && currentUser.playLevel <= match.maxLevel
+  );
 
   // Favorite items resolved
   const favoriteProducts = products.filter((p) => favorites.includes(p.id));
@@ -167,7 +180,7 @@ export const PlayerPortal: React.FC = () => {
                 : 'text-teal-700 dark:text-cyan-400 hover:text-teal-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-900'
             }`}
           >
-            ✨ Coach Personal IA
+            Coach Personal IA
           </button>
         </div>
       </div>
@@ -178,7 +191,7 @@ export const PlayerPortal: React.FC = () => {
         {activePlayerTab === 'overview' && (
           <div className="space-y-6">
             {/* Next Match Highlight Card */}
-            {myBookings[0] && (
+            {upcomingBooking && (
               <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-emerald-500/40 shadow-xl space-y-4">
                 <div className="flex items-center justify-between text-xs">
                   <span className="text-emerald-600 dark:text-emerald-400 font-bold uppercase tracking-wider flex items-center gap-1.5">
@@ -193,18 +206,18 @@ export const PlayerPortal: React.FC = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
                   <div>
                     <div className="text-slate-500 dark:text-slate-400">Pista:</div>
-                    <div className="font-bold text-slate-900 dark:text-white text-sm">{myBookings[0].courtName}</div>
+                    <div className="font-bold text-slate-900 dark:text-white text-sm">{upcomingBooking.courtName}</div>
                   </div>
                   <div>
                     <div className="text-slate-500 dark:text-slate-400">Horario:</div>
                     <div className="font-mono font-bold text-emerald-600 dark:text-emerald-400 text-sm">
-                      {myBookings[0].startTime.replace('T', ' ')}
+                      {new Date(upcomingBooking.startTime).toLocaleString('es-ES', { dateStyle: 'medium', timeStyle: 'short' })}
                     </div>
                   </div>
                   <div>
                     <div className="text-slate-500 dark:text-slate-400">PIN Cerradura Pista:</div>
                     <div className="font-mono font-bold text-amber-500 text-lg">
-                      {myBookings[0].accessPin || '4821#'}
+                      {upcomingBooking.accessPin || 'Pendiente'}
                     </div>
                   </div>
                 </div>
@@ -212,6 +225,14 @@ export const PlayerPortal: React.FC = () => {
                 <div className="pt-2 border-t border-slate-100 dark:border-slate-800 text-[11px] text-slate-500 dark:text-slate-400">
                   Las luces se encenderán automáticamente 5 minutos antes del inicio de tu reserva.
                 </div>
+              </div>
+            )}
+            {!upcomingBooking && (
+              <div className="rounded-3xl border border-dashed border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 p-6 text-center">
+                <Calendar className="w-8 h-8 mx-auto text-slate-400" />
+                <h3 className="mt-3 font-bold text-slate-900 dark:text-white">No tienes reservas próximas</h3>
+                <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Cuando reserves una pista, aparecerá aquí con los datos de acceso.</p>
+                <button onClick={() => { setCurrentView('public'); setPublicPage('booking'); }} className="mt-4 px-4 py-2 rounded-xl bg-emerald-600 text-white text-sm font-bold">Buscar pista</button>
               </div>
             )}
 
@@ -258,7 +279,7 @@ export const PlayerPortal: React.FC = () => {
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {openMatches.slice(0, 2).map((m) => (
+                {invitations.slice(0, 2).map((m) => (
                   <div
                     key={m.id}
                     className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-3 shadow-sm text-xs"
@@ -285,6 +306,11 @@ export const PlayerPortal: React.FC = () => {
                     </div>
                   </div>
                 ))}
+                {invitations.length === 0 && (
+                  <div className="sm:col-span-2 rounded-2xl border border-dashed border-slate-300 dark:border-slate-700 p-5 text-center text-sm text-slate-500 dark:text-slate-400">
+                    No hay partidos abiertos de tu nivel con plazas disponibles.
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -295,7 +321,7 @@ export const PlayerPortal: React.FC = () => {
           <div className="space-y-4">
             <h3 className="text-sm font-bold text-slate-900 dark:text-white">Historial de Reservas y Partidos</h3>
             <div className="space-y-3">
-              {bookings.map((b) => (
+              {myBookings.map((b) => (
                 <div
                   key={b.id}
                   className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-xs shadow-sm"
@@ -316,6 +342,13 @@ export const PlayerPortal: React.FC = () => {
                   </div>
                 </div>
               ))}
+              {myBookings.length === 0 && (
+                <div className="rounded-3xl border border-dashed border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 p-8 text-center">
+                  <Calendar className="w-8 h-8 mx-auto text-slate-400" />
+                  <h4 className="mt-3 font-bold text-slate-900 dark:text-white">Todavía no tienes reservas</h4>
+                  <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Aquí verás las reservas asociadas a tu perfil.</p>
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -457,7 +490,57 @@ export const PlayerPortal: React.FC = () => {
             </div>
           </div>
         )}
+        {activePlayerTab === 'matches' && (
+          <section className="space-y-4">
+            <div>
+              <h2 className="text-lg font-bold text-slate-900 dark:text-white">Convocatorias de tu nivel</h2>
+              <p className="text-sm text-slate-500 dark:text-slate-400">Partidos abiertos compatibles con tu nivel ({currentUser.playLevel.toFixed(2)}).</p>
+            </div>
+            {invitations.length === 0 ? (
+              <div className="rounded-3xl border border-dashed border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 p-8 text-center">
+                <Users className="w-8 h-8 mx-auto text-slate-400" />
+                <h3 className="mt-3 font-bold text-slate-900 dark:text-white">No hay convocatorias disponibles</h3>
+                <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Vuelve a consultar más tarde o busca partidos abiertos.</p>
+                <button onClick={() => { setCurrentView('public'); setPublicPage('matches'); }} className="mt-4 px-4 py-2 rounded-xl bg-emerald-600 text-white text-sm font-bold">Ver partidos abiertos</button>
+              </div>
+            ) : invitations.map((match) => (
+              <article key={match.id} className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div>
+                  <div className="font-bold text-slate-900 dark:text-white">{match.courtName}</div>
+                  <div className="text-sm text-slate-500">{new Date(match.startTime).toLocaleString('es-ES', { dateStyle: 'medium', timeStyle: 'short' })} · Nivel {match.minLevel}–{match.maxLevel}</div>
+                </div>
+                <button onClick={() => { setCurrentView('public'); setPublicPage('matches'); }} className="px-4 py-2 rounded-xl bg-emerald-600 text-white text-sm font-bold">Ver partido</button>
+              </article>
+            ))}
+          </section>
+        )}
+        {activePlayerTab === 'profile' && (
+          <section className="max-w-2xl rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6">
+            <h2 className="text-lg font-bold text-slate-900 dark:text-white">Tu perfil</h2>
+            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Datos de la sesión de demostración activa.</p>
+            <dl className="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+              <div><dt className="text-slate-500">Nombre</dt><dd className="mt-1 font-semibold">{currentUser.name}</dd></div>
+              <div><dt className="text-slate-500">Correo</dt><dd className="mt-1 font-semibold">{currentUser.email}</dd></div>
+              <div><dt className="text-slate-500">Nivel de juego</dt><dd className="mt-1 font-semibold">{currentUser.playLevel.toFixed(2)}</dd></div>
+              <div><dt className="text-slate-500">Club</dt><dd className="mt-1 font-semibold">{currentTenant.name}</dd></div>
+            </dl>
+          </section>
+        )}
       </main>
+      <nav aria-label="Navegación del jugador" className="md:hidden fixed bottom-0 inset-x-0 z-40 grid grid-cols-5 border-t border-slate-200 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl px-1 pt-2 pb-[calc(.5rem+env(safe-area-inset-bottom))] shadow-[0_-10px_30px_rgba(15,23,42,.1)]">
+        {[
+          { label: 'Inicio', icon: Home, action: () => setActivePlayerTab('overview'), active: activePlayerTab === 'overview' },
+          { label: 'Reservar', icon: Calendar, action: () => { setCurrentView('public'); setPublicPage('booking'); }, active: false },
+          { label: 'Partidos', icon: Users, action: () => { setCurrentView('public'); setPublicPage('matches'); }, active: false },
+          { label: 'Convocatorias', icon: ClipboardList, action: () => setActivePlayerTab('matches'), active: activePlayerTab === 'matches' },
+          { label: 'Perfil', icon: UserRound, action: () => setActivePlayerTab('profile'), active: activePlayerTab === 'profile' },
+        ].map(({ label, icon: Icon, action, active }) => (
+          <button key={label} onClick={action} aria-current={active ? 'page' : undefined} className={`flex flex-col items-center justify-center gap-1 py-1 text-[10px] font-semibold ${active ? 'text-emerald-600' : 'text-slate-500 dark:text-slate-400'}`}>
+            <Icon className="w-5 h-5" />
+            <span>{label}</span>
+          </button>
+        ))}
+      </nav>
     </div>
   );
 };

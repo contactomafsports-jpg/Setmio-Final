@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useApp, AdminTab } from '../../context/AppContext';
 import {
   Home,
@@ -46,6 +46,15 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   const [mobileMoreOpen, setMobileMoreOpen] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
 
+  useEffect(() => {
+    if (!mobileMoreOpen) return;
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setMobileMoreOpen(false);
+    };
+    window.addEventListener('keydown', closeOnEscape);
+    return () => window.removeEventListener('keydown', closeOnEscape);
+  }, [mobileMoreOpen]);
+
   const mainTabs: { id: AdminTab; label: string; icon: React.ReactNode }[] = [
     { id: 'dashboard', label: 'Inicio', icon: <Home className="w-5 h-5" /> },
     { id: 'agenda', label: 'Reservas', icon: <Calendar className="w-5 h-5" /> },
@@ -55,6 +64,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
 
   const moreTabs: { id: AdminTab; label: string; icon: React.ReactNode; desc: string; badge?: string }[] = [
     { id: 'web_editor', label: 'Editor Web y App', icon: <Palette className="w-5 h-5 text-emerald-500" />, desc: 'Diseño, bloques y marca blanca' },
+    { id: 'teams', label: 'Equipos y plantillas', icon: <Users className="w-5 h-5 text-indigo-500" />, desc: 'Convocatorias y gestión de jugadores' },
     { id: 'domains', label: 'Mi Web y mi App', icon: <Globe className="w-5 h-5 text-teal-500" />, desc: 'Dominios, DNS y enlaces públicos', badge: 'Prioritario' },
     { id: 'smart_courts', label: 'Pistas Inteligentes', icon: <Zap className="w-5 h-5 text-amber-500" />, desc: 'Luces automáticas y PIN cerradura', badge: 'IoT' },
     { id: 'academy', label: 'Escuela y Clases', icon: <GraduationCap className="w-5 h-5 text-purple-500" />, desc: 'Grupos, alumnos y entrenadores' },
@@ -68,6 +78,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
     dashboard: 'Resumen',
     agenda: 'Reservas',
     customers: 'Clientes',
+    teams: 'Equipos y plantillas',
     subscription: 'Negocio',
     web_editor: 'Editor Web y App',
     domains: 'Mi Web y mi App',
@@ -92,9 +103,13 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
         {/* Club Brand in Sidebar */}
         <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
           <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-700 text-white font-black flex items-center justify-center shrink-0 text-sm shadow-sm">
-              SM
-            </div>
+            {currentTenant.branding.logoUrl ? (
+              <img src={currentTenant.branding.logoUrl} alt="" className="w-8 h-8 rounded-xl bg-white object-contain border border-slate-200 p-1 shrink-0" />
+            ) : (
+              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-700 text-white font-black flex items-center justify-center shrink-0 text-sm shadow-sm">
+                {currentTenant.shortName.split(/\s+/).map((part) => part[0]).join('').slice(0, 2).toUpperCase()}
+              </div>
+            )}
             <div className="min-w-0">
               <div className="font-extrabold text-xs text-slate-900 dark:text-white truncate">{currentTenant.shortName}</div>
               <div className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold uppercase tracking-wider">Gestión Club</div>
@@ -264,6 +279,11 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
                         <div className="text-slate-400 text-[9px]">{n.timestamp}</div>
                       </div>
                     ))}
+                    {notifications.length === 0 && (
+                      <div className="rounded-xl border border-dashed border-slate-300 dark:border-slate-700 p-5 text-center text-slate-500 dark:text-slate-400">
+                        No tienes notificaciones nuevas.
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
@@ -311,8 +331,11 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
 
       {/* MOBILE "MÁS" BOTTOM SHEET */}
       {mobileMoreOpen && (
-        <div className="md:hidden fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-sm flex flex-col justify-end animate-in fade-in duration-150">
-          <div className="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-700 rounded-t-3xl p-5 max-h-[80vh] overflow-y-auto space-y-4 shadow-2xl">
+        <div
+          className="md:hidden fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-sm flex flex-col justify-end animate-in fade-in duration-150"
+          onClick={(event) => { if (event.target === event.currentTarget) setMobileMoreOpen(false); }}
+        >
+          <div role="dialog" aria-modal="true" aria-label="Módulos de gestión" className="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-700 rounded-t-3xl p-5 max-h-[80vh] overflow-y-auto space-y-4 shadow-2xl">
             <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
               <h3 className="text-sm font-bold text-slate-900 dark:text-white">Módulos de Gestión</h3>
               <button

@@ -23,10 +23,19 @@ export const AdminDashboard: React.FC = () => {
     triggerDemoToast,
   } = useApp();
 
-  const totalBookingsCount = bookings.length;
+  const today = new Date();
+  const todayKey = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+  const monthKey = todayKey.slice(0, 7);
+  const todayBookings = bookings.filter((booking) => booking.startTime.slice(0, 10) === todayKey);
+  const monthPaidBookings = bookings.filter((booking) =>
+    booking.startTime.slice(0, 7) === monthKey && booking.paymentStatus === 'paid'
+  );
+  const activeClients = new Set(bookings.flatMap((booking) =>
+    [booking.creatorName, ...booking.participants.map((participant) => participant.name)]
+  )).size;
   const activeCourtsWithLights = courts.filter((c) => c.isLightOn).length;
-  const confirmedRevenue = bookings.reduce((total, booking) => total + booking.totalPrice, 0);
-  const availableCourts = courts.filter((court) => court.status !== 'maintenance').length;
+  const confirmedRevenue = monthPaidBookings.reduce((total, booking) => total + booking.totalPrice, 0);
+  const availableCourts = courts.length;
 
   return (
     <div className="space-y-8 text-slate-900 dark:text-slate-100">
@@ -40,7 +49,7 @@ export const AdminDashboard: React.FC = () => {
             Bienvenido, {currentTenant.name}
           </h2>
           <p className="text-xs text-slate-400">
-            {currentTenant.city}, Galicia · Todo el sistema operativo en tiempo real
+            {currentTenant.city}, {currentTenant.region} · Datos de demostración en este navegador
           </p>
         </div>
 
@@ -65,51 +74,51 @@ export const AdminDashboard: React.FC = () => {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-2 shadow-lg">
           <div className="flex items-center justify-between text-xs text-slate-400">
-            <span>Ocupación de Pistas Hoy</span>
+            <span>Reservas registradas hoy</span>
             <Calendar className="w-4 h-4 text-emerald-400" />
           </div>
-          <div className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white font-mono">{totalBookingsCount > 0 ? '82%' : '0%'}</div>
+          <div className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white font-mono">{todayBookings.length}</div>
           <div className="text-[11px] text-emerald-400 flex items-center gap-1">
             <TrendingUp className="w-3.5 h-3.5" />
-            <span>{totalBookingsCount} reservas registradas hoy</span>
+            <span>De los datos de esta demostración</span>
           </div>
         </div>
 
         <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-2 shadow-lg">
           <div className="flex items-center justify-between text-xs text-slate-400">
-            <span>Ingresos Club (Este Mes)</span>
+            <span>Cobros registrados este mes</span>
             <DollarSign className="w-4 h-4 text-cyan-400" />
           </div>
           <div className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white font-mono">{confirmedRevenue.toLocaleString('es-ES', { minimumFractionDigits: 2 })} €</div>
-          <div className="text-[11px] text-slate-400">Reservas confirmadas en la vista actual</div>
+          <div className="text-[11px] text-slate-400">Solo reservas marcadas como pagadas</div>
         </div>
 
         <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-2 shadow-lg">
           <div className="flex items-center justify-between text-xs text-slate-400">
-            <span>Jugadores Activos</span>
+            <span>Personas en reservas</span>
             <Users className="w-4 h-4 text-purple-400" />
           </div>
-          <div className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white font-mono">418</div>
-          <div className="text-[11px] text-purple-400">62 socios con cuota mensual</div>
+          <div className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white font-mono">{activeClients}</div>
+          <div className="text-[11px] text-purple-400">Personas únicas en el conjunto de reservas</div>
         </div>
 
         <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-2 shadow-lg">
           <div className="flex items-center justify-between text-xs text-slate-400">
-            <span>Iluminación Activa</span>
+            <span>Luces marcadas como activas</span>
             <Zap className="w-4 h-4 text-amber-400" />
           </div>
           <div className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white font-mono">
             {activeCourtsWithLights} / {availableCourts}
           </div>
-          <div className="text-[11px] text-amber-400">Pistas activas con control IoT</div>
+          <div className="text-[11px] text-amber-400">Estado simulado localmente · sin conexión IoT</div>
         </div>
       </div>
 
       {/* Courts Status Quick Grid */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <h3 className="text-sm font-bold text-slate-900 dark:text-white">Estado de Pistas en Vivo (8 Pistas)</h3>
-          <span className="text-xs text-slate-400">Control operativo de iluminación y estado de cada pista</span>
+          <h3 className="text-sm font-bold text-slate-900 dark:text-white">Estado de pistas ({courts.length})</h3>
+          <span className="text-xs text-slate-400">Vista local de demostración; no controla hardware conectado</span>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

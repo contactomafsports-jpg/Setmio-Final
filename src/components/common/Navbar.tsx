@@ -58,16 +58,14 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCart, onOpenAuth }) => {
 
   const mainNavLinks: { id: PublicPage; label: string; icon: React.ReactNode }[] = [
     { id: 'home', label: 'Inicio', icon: null },
-    { id: 'club', label: 'El Club', icon: <Info className="w-4 h-4" /> },
     { id: 'courts', label: 'Pistas', icon: <Sparkles className="w-4 h-4" /> },
-    { id: 'booking', label: 'Reservar', icon: <Calendar className="w-4 h-4" /> },
-    { id: 'matches', label: 'Partidos', icon: <Users className="w-4 h-4" /> },
     { id: 'academy', label: 'Escuela', icon: <GraduationCap className="w-4 h-4" /> },
     { id: 'tournaments', label: 'Torneos', icon: <Trophy className="w-4 h-4" /> },
     { id: 'shop', label: 'Tienda', icon: <Store className="w-4 h-4" /> },
-    { id: 'blog', label: 'Blog', icon: <BookOpen className="w-4 h-4" /> },
     { id: 'contact', label: 'Contacto', icon: <MapPin className="w-4 h-4" /> },
   ];
+  const enabledPublicPages = currentTenant.publicPages ?? ['home', 'courts', 'academy', 'tournaments', 'shop', 'contact'];
+  const visibleMainNavLinks = mainNavLinks.filter((link) => enabledPublicPages.includes(link.id));
 
   const handleNavClick = (pageId: PublicPage) => {
     setPublicPage(pageId);
@@ -77,7 +75,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCart, onOpenAuth }) => {
 
   return (
     <>
-      <header className="sticky top-8 sm:top-9 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 transition-colors duration-200">
+      <header className="sticky top-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 transition-colors duration-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             {/* Brand Logo & Name */}
@@ -85,9 +83,13 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCart, onOpenAuth }) => {
               onClick={() => handleNavClick('home')}
               className="flex items-center gap-3 text-left focus:outline-none group"
             >
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-700 flex items-center justify-center font-black text-white text-base shadow-md shadow-emerald-500/20 group-hover:scale-105 transition-transform">
-                SM
-              </div>
+              {currentTenant.branding.logoUrl ? (
+                <img src={currentTenant.branding.logoUrl} alt="" className="w-10 h-10 rounded-xl object-contain bg-white border border-slate-200 p-1 group-hover:scale-105 transition-transform" />
+              ) : (
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-700 flex items-center justify-center font-black text-white text-base shadow-md shadow-emerald-500/20 group-hover:scale-105 transition-transform">
+                  {currentTenant.shortName.split(/\s+/).map((part) => part[0]).join('').slice(0, 2).toUpperCase()}
+                </div>
+              )}
               <div>
                 <div className="font-extrabold text-base tracking-tight text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
                   {currentTenant.shortName}
@@ -100,7 +102,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCart, onOpenAuth }) => {
 
             {/* Desktop Navigation Links */}
             <nav className="hidden lg:flex items-center gap-1 xl:gap-1.5" aria-label="Navegación principal">
-              {mainNavLinks.map((link) => {
+              {visibleMainNavLinks.map((link) => {
                 const isActive = publicPage === link.id;
                 return (
                   <button
@@ -214,15 +216,19 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCart, onOpenAuth }) => {
             {/* Top Bar inside Drawer */}
             <div className="p-4 sm:p-5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
               <div className="flex items-center gap-3">
+              {currentTenant.branding.logoUrl ? (
+                <img src={currentTenant.branding.logoUrl} alt="" className="w-9 h-9 rounded-xl object-contain bg-white border border-slate-200 p-1" />
+              ) : (
                 <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-700 flex items-center justify-center font-black text-white text-sm shadow">
-                  SM
+                  {currentTenant.shortName.split(/\s+/).map((part) => part[0]).join('').slice(0, 2).toUpperCase()}
                 </div>
+              )}
                 <div>
                   <div className="font-extrabold text-sm text-slate-900 dark:text-white leading-tight">
                     {currentTenant.shortName}
                   </div>
                   <div className="text-[11px] text-slate-500 dark:text-slate-400">
-                    {currentTenant.city}, Galicia
+                    {currentTenant.city}, {currentTenant.region}
                   </div>
                 </div>
               </div>

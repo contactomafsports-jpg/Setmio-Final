@@ -107,6 +107,8 @@ export interface Tenant {
   contactPhone: string;
   whatsappNumber: string;
   branding: TenantBranding;
+  /** Public routes available to this club's white-label website. */
+  publicPages?: string[];
   domains: TenantDomain[];
   settings: {
     bookingAdvanceDays: number;

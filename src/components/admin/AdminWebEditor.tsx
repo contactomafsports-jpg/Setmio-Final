@@ -23,7 +23,18 @@ export const AdminWebEditor: React.FC = () => {
 
   const [previewDevice, setPreviewDevice] = useState<'desktop' | 'mobile'>('desktop');
   const [publishStatus, setPublishStatus] = useState<'published' | 'draft_pending'>('published');
-  const [activeTab, setActiveTab] = useState<'blocks' | 'branding' | 'history'>('blocks');
+  const [activeTab, setActiveTab] = useState<'blocks' | 'branding' | 'pages'>('blocks');
+  const [enabledPages, setEnabledPages] = useState<string[]>(
+    currentTenant.publicPages ?? ['home', 'courts', 'academy', 'tournaments', 'shop', 'contact']
+  );
+  const publicPageOptions = [
+    { id: 'home', title: 'Inicio', description: 'Presentación del club y acceso a las reservas' },
+    { id: 'courts', title: 'Pistas e instalaciones', description: 'Instalaciones, servicios y tarifas' },
+    { id: 'academy', title: 'Escuela y academia', description: 'Clases, grupos y entrenadores' },
+    { id: 'tournaments', title: 'Torneos y ligas', description: 'Competiciones, cuadros e inscripciones' },
+    { id: 'shop', title: 'Tienda', description: 'Catálogo deportivo y pedidos' },
+    { id: 'contact', title: 'Contacto y club', description: 'Ubicación, horarios y preguntas frecuentes' },
+  ];
 
   // Local branding edit states
   const [heroTitle, setHeroTitle] = useState(currentTenant.branding.heroTitle);
@@ -179,7 +190,52 @@ export const AdminWebEditor: React.FC = () => {
             >
               Textos & Paleta
             </button>
+            <button
+              onClick={() => setActiveTab('pages')}
+              className={`flex-1 py-2 text-center font-bold rounded-xl transition ${
+                activeTab === 'pages' ? 'bg-slate-800 text-white' : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              Páginas
+            </button>
           </div>
+
+          {activeTab === 'pages' && (
+            <div className="p-6 rounded-3xl bg-slate-900 border border-slate-800 space-y-4 shadow-xl">
+              <div>
+                <h3 className="text-sm font-bold text-white">Páginas de la web pública</h3>
+                <p className="text-xs text-slate-400 mt-1">Activa las secciones que se muestran en la navegación del club. Los cambios son locales en esta demostración.</p>
+              </div>
+              <div className="space-y-2">
+                {publicPageOptions.map((page) => {
+                  const active = enabledPages.includes(page.id);
+                  return (
+                    <button
+                      key={page.id}
+                      type="button"
+                      aria-pressed={active}
+                      onClick={() => {
+                        if (active && enabledPages.length === 1) return;
+                        const next = active ? enabledPages.filter((id) => id !== page.id) : [...enabledPages, page.id];
+                        setEnabledPages(next);
+                        updateCurrentTenant({ publicPages: next });
+                        setPublishStatus('draft_pending');
+                      }}
+                      className="w-full p-3.5 rounded-2xl border border-slate-800 bg-slate-950 flex items-center justify-between gap-4 text-left"
+                    >
+                      <span>
+                        <span className="block text-xs font-semibold text-white">{page.title}</span>
+                        <span className="block mt-1 text-[10px] text-slate-400">{page.description}</span>
+                      </span>
+                      <span className={`shrink-0 px-2.5 py-1 rounded-full text-[10px] font-bold ${active ? 'bg-emerald-950 text-emerald-300' : 'bg-slate-800 text-slate-400'}`}>
+                        {active ? 'Activa' : 'Oculta'}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
 
           {activeTab === 'blocks' && (
             <div className="p-6 rounded-3xl bg-slate-900 border border-slate-800 space-y-4 shadow-xl">

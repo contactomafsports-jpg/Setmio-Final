@@ -129,6 +129,7 @@ export const INITIAL_TENANT: Tenant = {
     heroImageUrl: 'https://images.unsplash.com/photo-1554068865-24cecd4e34b8?auto=format&fit=crop&w=1920&q=80',
     badgeText: 'CLUB OFICIAL ELITE · GALICIA',
   },
+  publicPages: ['home', 'courts', 'academy', 'tournaments', 'shop', 'contact'],
   domains: [
     {
       id: 'dom-setmio-default',

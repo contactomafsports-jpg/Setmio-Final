@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useApp } from './context/AppContext';
 import { Navbar } from './components/common/Navbar';
 import { Footer } from './components/common/Footer';
@@ -27,6 +27,7 @@ import { AdminLayout } from './components/admin/AdminLayout';
 import { ContextualDashboard } from './components/admin/dashboards/ContextualDashboard';
 import { AdminAgenda } from './components/admin/AdminAgenda';
 import { AdminCustomers } from './components/admin/AdminCustomers';
+import { AdminTeams } from './components/admin/AdminTeams';
 import { AdminSchool } from './components/admin/AdminSchool';
 import { AdminTournaments } from './components/admin/AdminTournaments';
 import { AdminShopOrders } from './components/admin/AdminShopOrders';
@@ -46,7 +47,9 @@ import { CheckCircle2, AlertTriangle, Info, X } from 'lucide-react';
 export function App() {
   const {
     currentView,
+    currentTenant,
     publicPage,
+    setPublicPage,
     adminTab,
     demoToast,
     clearDemoToast,
@@ -54,6 +57,13 @@ export function App() {
 
   const [cartOpen, setCartOpen] = useState(false);
   const [authOpen, setAuthOpen] = useState(false);
+
+  useEffect(() => {
+    const enabled = currentTenant.publicPages ?? ['home', 'courts', 'academy', 'tournaments', 'shop', 'contact'];
+    if (['home', 'courts', 'academy', 'tournaments', 'shop', 'contact'].includes(publicPage) && !enabled.includes(publicPage)) {
+      setPublicPage(enabled[0] as typeof publicPage);
+    }
+  }, [currentTenant.publicPages, publicPage, setPublicPage]);
 
   // Render Public Page Switcher
   const renderPublicPage = () => {
@@ -95,6 +105,8 @@ export function App() {
         return <AdminAgenda />;
       case 'customers':
         return <AdminCustomers />;
+      case 'teams':
+        return <AdminTeams />;
       case 'academy':
         return <AdminSchool />;
       case 'tournaments':

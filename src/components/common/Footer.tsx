@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 
 export const Footer: React.FC = () => {
-  const { currentTenant, setPublicPage, setCurrentView } = useApp();
+  const { currentTenant, courts, setPublicPage, setCurrentView } = useApp();
 
   const handleNav = (page: PublicPage) => {
     setPublicPage(page);
@@ -25,7 +25,7 @@ export const Footer: React.FC = () => {
       <div className="border-b border-slate-800/80 bg-slate-900/40 py-6 px-4">
         <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
           <div>
-            <div className="text-xl font-black text-white tracking-tight">8 Pistas</div>
+            <div className="text-xl font-black text-white tracking-tight">{courts.length} Pistas</div>
             <div className="text-[11px] text-emerald-400 font-medium">Césped WPT Panorámico</div>
           </div>
           <div>
@@ -192,7 +192,7 @@ export const Footer: React.FC = () => {
         {/* Bottom copyright & Platform white-label credit */}
         <div className="mt-12 pt-6 border-t border-slate-900 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-slate-400">
           <div>
-            © {new Date().getFullYear()} {currentTenant.name}. Todos los derechos reservados. Polígono Río do Pozo, Narón (A Coruña).
+            © {new Date().getFullYear()} {currentTenant.name}. Todos los derechos reservados. {currentTenant.address}
           </div>
 
           <div className="flex items-center gap-4">

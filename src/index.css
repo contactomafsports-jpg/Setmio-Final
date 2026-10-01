@@ -15,13 +15,19 @@
   font-family: Inter, ui-sans-serif, system-ui, sans-serif;
   color: #10221d;
   background: #f5f6f1;
+  --color-primary: #185c43;
+  --color-secondary: #10221d;
+  --color-accent: #c7f36b;
+  --color-background: #f5f6f1;
+  --color-foreground: #10221d;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
 }
 
 * { box-sizing: border-box; }
-html { background: #f5f6f1; }
-body { margin: 0; min-width: 320px; background: #f5f6f1; }
+html, body, #root { min-height: 100%; margin: 0; }
+html { background: var(--color-background); scroll-padding-top: 5rem; }
+body { margin: 0; min-width: 320px; background: var(--color-background); color: var(--color-foreground); }
 button, input, select, textarea { font: inherit; }
 button { -webkit-tap-highlight-color: transparent; }
 ::selection { background: #c7f36b; color: #10221d; }
@@ -45,6 +51,7 @@ button { -webkit-tap-highlight-color: transparent; }
 
 @media (max-width: 767px) {
   [data-admin-shell] main { padding-bottom: 6.5rem; }
+  body { padding-top: 0 !important; }
 }
 
 @media (min-width: 768px) {
@@ -75,4 +82,18 @@ h1, h2, h3, h4 { font-family: 'Manrope', 'DM Sans', sans-serif; letter-spacing: 
 /* Setmio design system */
 @layer base {
   body { font-feature-settings: "cv11", "ss01"; }
+}
+
+/* Club theme tokens are injected by AppContext so the club's palette updates
+   across the public site and private shells without a page reload. */
+.bg-emerald-600 { background-color: var(--color-primary) !important; }
+.hover\:bg-emerald-500:hover { background-color: color-mix(in srgb, var(--color-primary) 86%, white) !important; }
+.text-emerald-600 { color: var(--color-primary) !important; }
+.border-emerald-500, .border-emerald-600 { border-color: var(--color-primary) !important; }
+.from-emerald-500 { --tw-gradient-from: var(--color-primary) var(--tw-gradient-from-position) !important; }
+.ring-emerald-500 { --tw-ring-color: var(--color-primary) !important; }
+.focus\:ring-emerald-500:focus { --tw-ring-color: var(--color-primary) !important; }
+
+@supports (padding: env(safe-area-inset-bottom)) {
+  .safe-area-bottom { padding-bottom: max(.5rem, env(safe-area-inset-bottom)); }
 }

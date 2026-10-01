@@ -54,10 +54,84 @@ export type PublicPage =
   | 'contact'
   | 'legal';
 
+const PUBLIC_ROUTES: Record<string, PublicPage> = {
+  '/': 'home',
+  '/club': 'club',
+  '/pistas': 'courts',
+  '/reservar': 'booking',
+  '/partidos': 'matches',
+  '/escuela': 'academy',
+  '/torneos': 'tournaments',
+  '/tienda': 'shop',
+  '/blog': 'blog',
+  '/contacto': 'contact',
+  '/legal': 'legal',
+};
+
+const routeForPage: Record<PublicPage, string> = {
+  home: '/',
+  club: '/club',
+  courts: '/pistas',
+  booking: '/reservar',
+  matches: '/partidos',
+  academy: '/escuela',
+  tournaments: '/torneos',
+  shop: '/tienda',
+  blog: '/blog',
+  article: '/blog',
+  contact: '/contacto',
+  legal: '/legal',
+};
+
+const routeForAdminTab: Record<AdminTab, string> = {
+  dashboard: '/gestion',
+  agenda: '/gestion/reservas',
+  customers: '/gestion/clientes',
+  teams: '/gestion/equipos',
+  academy: '/gestion/escuela',
+  tournaments: '/gestion/torneos',
+  shop: '/gestion/tienda',
+  smart_courts: '/gestion/pistas-inteligentes',
+  pos_cafe: '/gestion/pos',
+  web_editor: '/gestion/editor-web',
+  domains: '/gestion/dominios',
+  subscription: '/gestion/negocio',
+  settings: '/gestion/configuracion',
+};
+
+const routeForPlayerTab: Record<PlayerTab, string> = {
+  dashboard: '/app',
+  my_bookings: '/app/reservas',
+  my_matches: '/app/partidos',
+  my_academy: '/app/escuela',
+  statistics: '/app/estadisticas',
+  favorites: '/app/favoritos',
+  ai_coach: '/app/entrenador',
+};
+
+const readRoute = () => {
+  if (typeof window === 'undefined') {
+    return { view: 'public' as MainView, page: 'home' as PublicPage, admin: 'dashboard' as AdminTab, player: 'dashboard' as PlayerTab };
+  }
+  const path = window.location.pathname.replace(/\/+$/, '') || '/';
+  if (path === '/hq') return { view: 'hq' as MainView, page: 'home' as PublicPage, admin: 'dashboard' as AdminTab, player: 'dashboard' as PlayerTab };
+  if (path === '/gestion' || path.startsWith('/gestion/')) {
+    const admin = (Object.entries(routeForAdminTab).find(([, route]) => route === path)?.[0] || 'dashboard') as AdminTab;
+    return { view: 'admin' as MainView, page: 'home' as PublicPage, admin, player: 'dashboard' as PlayerTab };
+  }
+  if (path === '/app' || path.startsWith('/app/')) {
+    const player = (Object.entries(routeForPlayerTab).find(([, route]) => route === path)?.[0] || 'dashboard') as PlayerTab;
+    return { view: 'player' as MainView, page: 'home' as PublicPage, admin: 'dashboard' as AdminTab, player };
+  }
+  const page = PUBLIC_ROUTES[path] || 'home';
+  return { view: 'public' as MainView, page, admin: 'dashboard' as AdminTab, player: 'dashboard' as PlayerTab };
+};
+
 export type AdminTab =
   | 'dashboard'
   | 'agenda'
   | 'customers'
+  | 'teams'
   | 'academy'
   | 'tournaments'
   | 'shop'
@@ -207,6 +281,24 @@ interface AppContextType {
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
+
+function readDemoState<T>(key: string, fallback: T): T {
+  if (typeof window === 'undefined') return fallback;
+  try {
+    const value = window.localStorage.getItem(key);
+    return value ? JSON.parse(value) as T : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+function saveDemoState<T>(key: string, value: T) {
+  try {
+    window.localStorage.setItem(key, JSON.stringify(value));
+  } catch {
+    // Keep the in-memory demo usable if browser storage is unavailable.
+  }
+}
 
 // Initial demo profiles for role switching
 const ROLE_PROFILES: Record<UserRole, UserSession> = {
@@ -380,21 +472,61 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [onboardingOpen, setOnboardingOpen] = useState(false);
 
   // Navigation
-  const [currentView, setCurrentView] = useState<MainView>('public');
-  const [publicPage, setPublicPage] = useState<PublicPage>('home');
+  const initialRoute = readRoute();
+  const [currentView, setCurrentViewState] = useState<MainView>(initialRoute.view);
+  const [publicPage, setPublicPageState] = useState<PublicPage>(initialRoute.page);
   const [selectedArticleId, setSelectedArticleId] = useState<string | null>(null);
   const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
-  const [adminTab, setAdminTab] = useState<AdminTab>('dashboard');
-  const [playerTab, setPlayerTab] = useState<PlayerTab>('dashboard');
+  const [adminTab, setAdminTabState] = useState<AdminTab>(initialRoute.admin);
+  const [playerTab, setPlayerTabState] = useState<PlayerTab>(initialRoute.player);
+
+  const setCurrentView = (view: MainView) => setCurrentViewState(view);
+  const setPublicPage = (page: PublicPage) => setPublicPageState(page);
+  const setAdminTab = (tab: AdminTab) => setAdminTabState(tab);
+  const setPlayerTab = (tab: PlayerTab) => setPlayerTabState(tab);
+
+  useEffect(() => {
+    const onPopState = () => {
+      const route = readRoute();
+      setCurrentViewState(route.view);
+      setPublicPageState(route.page);
+      setAdminTabState(route.admin);
+      setPlayerTabState(route.player);
+    };
+    window.addEventListener('popstate', onPopState);
+    return () => window.removeEventListener('popstate', onPopState);
+  }, []);
+
+  useEffect(() => {
+    const path = currentView === 'admin'
+      ? routeForAdminTab[adminTab]
+      : currentView === 'player'
+        ? routeForPlayerTab[playerTab]
+        : currentView === 'hq'
+          ? '/hq'
+          : routeForPage[publicPage];
+    const nextUrl = `${path}${window.location.search}${window.location.hash}`;
+    if (window.location.pathname !== path) window.history.pushState({}, '', nextUrl);
+  }, [currentView, publicPage, adminTab, playerTab]);
 
   // Multi-tenant & Plans
-  const [tenants, setTenants] = useState<Tenant[]>([
-    INITIAL_TENANT,
-    ...ADDITIONAL_DEMO_TENANTS,
-  ]);
+  const [tenants, setTenants] = useState<Tenant[]>(() =>
+    readDemoState('setmio_demo_tenants_v1', [INITIAL_TENANT, ...ADDITIONAL_DEMO_TENANTS])
+  );
+  useEffect(() => saveDemoState('setmio_demo_tenants_v1', tenants), [tenants]);
 
   const [currentTenantId, setCurrentTenantId] = useState<string>('tenant-san-mateo-01');
   const currentTenant = tenants.find((t) => t.id === currentTenantId) || tenants[0];
+
+  useEffect(() => {
+    const root = document.documentElement;
+    const { primaryColor, secondaryColor, accentColor } = currentTenant.branding;
+    root.style.setProperty('--color-primary', primaryColor || '#185c43');
+    root.style.setProperty('--color-secondary', secondaryColor || '#10221d');
+    root.style.setProperty('--color-accent', accentColor || '#c7f36b');
+    root.style.setProperty('--color-background', '#f5f6f1');
+    root.style.setProperty('--color-foreground', secondaryColor || '#10221d');
+  }, [currentTenant.branding]);
 
   const updateCurrentTenant = (updated: Partial<Tenant>) => {
     // Check if locked demo
@@ -442,7 +574,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   // User & Role Switching
-  const [currentUser, setCurrentUser] = useState<UserSession>(ROLE_PROFILES.TENANT_OWNER);
+  const [currentUser, setCurrentUser] = useState<UserSession>(
+    initialRoute.view === 'player' ? ROLE_PROFILES.PLAYER : ROLE_PROFILES.TENANT_OWNER
+  );
 
   const switchUserRole = (role: UserRole) => {
     const profile = ROLE_PROFILES[role] || ROLE_PROFILES.PLAYER;
@@ -478,21 +612,21 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   // Domain Business State
-  const [courts, setCourts] = useState<Court[]>(INITIAL_COURTS);
-  const [bookings, setBookings] = useState<Booking[]>(INITIAL_BOOKINGS);
-  const [openMatches, setOpenMatches] = useState<OpenMatch[]>(INITIAL_OPEN_MATCHES);
+  const [courts, setCourts] = useState<Court[]>(() => readDemoState('setmio_demo_courts_v1', INITIAL_COURTS));
+  const [bookings, setBookings] = useState<Booking[]>(() => readDemoState('setmio_demo_bookings_v1', INITIAL_BOOKINGS));
+  const [openMatches, setOpenMatches] = useState<OpenMatch[]>(() => readDemoState('setmio_demo_matches_v1', INITIAL_OPEN_MATCHES));
   const [coaches] = useState<Coach[]>(INITIAL_COACHES);
   const [academyGroups] = useState<AcademyGroup[]>(INITIAL_ACADEMY_GROUPS);
-  const [tournaments, setTournaments] = useState<Tournament[]>(INITIAL_TOURNAMENTS);
+  const [tournaments, setTournaments] = useState<Tournament[]>(() => readDemoState('setmio_demo_tournaments_v1', INITIAL_TOURNAMENTS));
   const [products] = useState<Product[]>(INITIAL_PRODUCTS);
   const [blogPosts] = useState<BlogPost[]>(INITIAL_BLOG_POSTS);
-  const [pageBlocks, setPageBlocks] = useState<PageBlock[]>(INITIAL_PAGE_BLOCKS);
+  const [pageBlocks, setPageBlocks] = useState<PageBlock[]>(() => readDemoState('setmio_demo_page_blocks_v1', INITIAL_PAGE_BLOCKS));
   const [smartDevices, setSmartDevices] = useState<SmartCourtDevice[]>(INITIAL_SMART_DEVICES);
   const [cafeProducts, setCafeProducts] = useState<CafeProduct[]>(INITIAL_CAFE_PRODUCTS);
   const [auditLogs, setAuditLogs] = useState<AuditLogItem[]>(INITIAL_AUDIT_LOGS);
 
   // E-commerce Cart
-  const [cart, setCart] = useState<CartItem[]>([]);
+  const [cart, setCart] = useState<CartItem[]>(() => readDemoState('setmio_demo_cart_v1', []));
   const [couponCode, setCouponCode] = useState<string>('');
   const [discountPercent, setDiscountPercent] = useState<number>(0);
 
@@ -556,7 +690,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   // Favorites
-  const [favorites, setFavorites] = useState<string[]>(['prod-1', 'court-1', 'coach-1', 't-2026-01']);
+  const [favorites, setFavorites] = useState<string[]>(() => readDemoState('setmio_demo_favorites_v1', ['prod-1', 'court-1', 'coach-1', 't-2026-01']));
+  useEffect(() => {
+    saveDemoState('setmio_demo_courts_v1', courts);
+    saveDemoState('setmio_demo_bookings_v1', bookings);
+    saveDemoState('setmio_demo_matches_v1', openMatches);
+    saveDemoState('setmio_demo_tournaments_v1', tournaments);
+    saveDemoState('setmio_demo_page_blocks_v1', pageBlocks);
+    saveDemoState('setmio_demo_cart_v1', cart);
+    saveDemoState('setmio_demo_favorites_v1', favorites);
+  }, [courts, bookings, openMatches, tournaments, pageBlocks, cart, favorites]);
 
   const toggleFavorite = (itemId: string) => {
     setFavorites((prev) => {
