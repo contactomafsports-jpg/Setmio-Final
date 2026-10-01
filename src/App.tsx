@@ -41,6 +41,7 @@ import { AdminSettings } from './components/admin/AdminSettings';
 // Player & HQ views
 import { PlayerPortal } from './components/player/PlayerPortal';
 import { SuperadminHQ } from './components/hq/SuperadminHQ';
+import { CoachPortal } from './components/coach/CoachPortal';
 
 import { CheckCircle2, AlertTriangle, Info, X } from 'lucide-react';
 
@@ -148,6 +149,10 @@ export function App() {
 
       {currentView === 'player' && (
         <PlayerPortal />
+      )}
+
+      {currentView === 'coach' && (
+        <CoachPortal />
       )}
 
       {currentView === 'hq' && (

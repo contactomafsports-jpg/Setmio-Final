@@ -185,8 +185,8 @@ export const PlayerPortal: React.FC = () => {
         </div>
       </div>
 
-      {/* Main Container */}
-      <main className="max-w-5xl mx-auto px-4 sm:px-8 py-6 space-y-8">
+      {/* Main Container with safe bottom padding for fixed mobile nav */}
+      <main className="max-w-5xl mx-auto px-4 sm:px-8 pt-6 pb-32 sm:pb-12 space-y-8">
         {/* OVERVIEW TAB */}
         {activePlayerTab === 'overview' && (
           <div className="space-y-6">

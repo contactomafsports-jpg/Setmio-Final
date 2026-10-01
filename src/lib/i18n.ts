@@ -8,7 +8,8 @@ export type SupportedLanguage =
   | 'gl'
   | 'ca'
   | 'eu'
-  | 'va';
+  | 'va'
+  | 'ar';
 
 export interface LanguageOption {
   code: SupportedLanguage;
@@ -18,15 +19,16 @@ export interface LanguageOption {
 
 export const SUPPORTED_LANGUAGES: LanguageOption[] = [
   { code: 'es', name: 'Español', flag: '🇪🇸' },
+  { code: 'gl', name: 'Galego', flag: '🇪🇸' },
   { code: 'en', name: 'English', flag: '🇬🇧' },
-  { code: 'gl', name: 'Galego', flag: '🏳️' },
   { code: 'pt', name: 'Português', flag: '🇵🇹' },
-  { code: 'it', name: 'Italiano', flag: '🇮🇹' },
   { code: 'fr', name: 'Français', flag: '🇫🇷' },
   { code: 'de', name: 'Deutsch', flag: '🇩🇪' },
-  { code: 'ca', name: 'Català', flag: '🏳️' },
-  { code: 'eu', name: 'Euskera', flag: '🏳️' },
-  { code: 'va', name: 'Valencià', flag: '🏳️' },
+  { code: 'it', name: 'Italiano', flag: '🇮🇹' },
+  { code: 'ca', name: 'Català', flag: '🇪🇸' },
+  { code: 'eu', name: 'Euskera', flag: '🇪🇸' },
+  { code: 'va', name: 'Valencià', flag: '🇪🇸' },
+  { code: 'ar', name: 'العربية (Árabe)', flag: '🇸🇦' },
 ];
 
 export const TRANSLATIONS: Record<SupportedLanguage, Record<string, string>> = {
@@ -757,6 +759,53 @@ export const TRANSLATIONS: Record<SupportedLanguage, Record<string, string>> = {
     'ai.assistant': 'Assistent Intel·ligent',
     'ai.askPlaceholder': 'Pregunta sobre disponibilitat, escola, tornejos...',
     'ai.coachTitle': 'Entrenador Personal IA',
+  },
+  ar: {
+    'nav.home': 'الرئيسية',
+    'nav.club': 'النادي',
+    'nav.courts': 'الملاعب',
+    'nav.booking': 'حجز ملعب',
+    'nav.matches': 'مباريات مفتوحة',
+    'nav.academy': 'الأكاديمية',
+    'nav.tournaments': 'البطولات',
+    'nav.shop': 'المتجر',
+    'nav.blog': 'المدونة',
+    'nav.contact': 'اتصل بنا',
+    'nav.myAccount': 'حسابي',
+    'nav.bookCourt': 'احجز الآن',
+    'nav.search': 'بحث...',
+    'view.public': 'الموقع العام',
+    'view.admin': 'إدارة النادي',
+    'view.player': 'منطقة اللاعب',
+    'view.hq': 'سيت ميو HQ',
+    'common.demo': 'وضع التجربة',
+    'common.search': 'بحث',
+    'common.filter': 'تصفية',
+    'common.save': 'حفظ',
+    'common.cancel': 'إلغاء',
+    'common.confirm': 'تأكيد',
+    'common.available': 'متاح',
+    'common.occupied': 'مشغول',
+    'common.price': 'السعر',
+    'common.court': 'الملعب',
+    'role.SUPERADMIN': 'المسؤول الرئيسي',
+    'role.TENANT_OWNER': 'مالك النادي',
+    'role.TENANT_ADMIN': 'مدير النادي',
+    'role.COACH': 'المدرب',
+    'role.PLAYER': 'عضو / لاعب',
+    'tenant.PADEL_CLUB': 'نادي بادل',
+    'tenant.ACADEMY': 'أكاديمية بادل',
+    'tenant.COACH': 'مدرب مستقل',
+    'booking.title': 'حجز الملاعب أونلاين',
+    'booking.subtitle': 'ملاعب مغطاة بعشب WPT الرسمي',
+    'booking.splitPayment': 'تقسيم الدفع',
+    'booking.fullPayment': 'دفع كامل',
+    'booking.confirmBtn': 'تأكيد الحجز',
+    'booking.pinCode': 'رمز الدخول PIN',
+    'theme.light': 'الوضع الفاتح',
+    'theme.dark': 'الوضع الداكن',
+    'ai.assistant': 'المساعد الذكي',
+    'ai.coachTitle': 'مدرب البادل الذكي',
   },
 };
 

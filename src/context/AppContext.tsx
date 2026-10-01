@@ -38,7 +38,7 @@ import {
 import { SupportedLanguage, getTranslation } from '../lib/i18n';
 import { checkPermission, PermissionAction, PermissionCheckResult } from '../lib/permissions';
 
-export type MainView = 'public' | 'admin' | 'player' | 'hq';
+export type MainView = 'public' | 'admin' | 'player' | 'coach' | 'hq';
 
 export type PublicPage =
   | 'home'
@@ -115,6 +115,9 @@ const readRoute = () => {
   }
   const path = window.location.pathname.replace(/\/+$/, '') || '/';
   if (path === '/hq') return { view: 'hq' as MainView, page: 'home' as PublicPage, admin: 'dashboard' as AdminTab, player: 'dashboard' as PlayerTab };
+  if (path === '/profesor' || path.startsWith('/profesor/')) {
+    return { view: 'coach' as MainView, page: 'home' as PublicPage, admin: 'dashboard' as AdminTab, player: 'dashboard' as PlayerTab };
+  }
   if (path === '/gestion' || path.startsWith('/gestion/')) {
     const admin = (Object.entries(routeForAdminTab).find(([, route]) => route === path)?.[0] || 'dashboard') as AdminTab;
     return { view: 'admin' as MainView, page: 'home' as PublicPage, admin, player: 'dashboard' as PlayerTab };
@@ -232,6 +235,7 @@ interface AppContextType {
   openMatches: OpenMatch[];
   createOpenMatch: (match: Omit<OpenMatch, 'id' | 'tenantId'>) => void;
   joinOpenMatch: (matchId: string, player: { name: string; level: number; position: 'drive' | 'reves' | 'both' }) => void;
+  leaveOpenMatch: (matchId: string, playerName: string) => void;
 
   coaches: Coach[];
   academyGroups: AcademyGroup[];
@@ -502,9 +506,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       ? routeForAdminTab[adminTab]
       : currentView === 'player'
         ? routeForPlayerTab[playerTab]
-        : currentView === 'hq'
-          ? '/hq'
-          : routeForPage[publicPage];
+        : currentView === 'coach'
+          ? '/profesor'
+          : currentView === 'hq'
+            ? '/hq'
+            : routeForPage[publicPage];
     const nextUrl = `${path}${window.location.search}${window.location.hash}`;
     if (window.location.pathname !== path) window.history.pushState({}, '', nextUrl);
   }, [currentView, publicPage, adminTab, playerTab]);
@@ -881,6 +887,25 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     );
   };
 
+  const leaveOpenMatch = (matchId: string, playerName: string) => {
+    setOpenMatches((prev) =>
+      prev.map((m) => {
+        if (m.id !== matchId) return m;
+        const updatedPlayers = m.players.filter((p) => p.name !== playerName);
+        return {
+          ...m,
+          players: updatedPlayers,
+          status: 'open',
+        };
+      })
+    );
+    triggerDemoToast(
+      'Plaza liberada',
+      'Te has desapuntado del partido correctamente.',
+      'info'
+    );
+  };
+
   // Tournaments
   const registerTournamentTeam = (tournamentId: string, categoryName: string, teamName: string) => {
     setTournaments((prev) =>
@@ -1116,6 +1141,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         openMatches,
         createOpenMatch,
         joinOpenMatch,
+        leaveOpenMatch,
 
         coaches,
         academyGroups,

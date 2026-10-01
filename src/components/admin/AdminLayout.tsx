@@ -346,29 +346,65 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
               </button>
             </div>
 
-            <div className="grid grid-cols-1 gap-2">
-              <p className="text-[11px] leading-relaxed text-slate-500 dark:text-slate-400">Accede a cualquier área sin perder el contexto de tu club.</p>
-              {moreTabs.map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => handleSelectTab(tab.id)}
-                  className={`w-full p-3 rounded-2xl border text-left flex items-center justify-between transition ${
-                    adminTab === tab.id
-                      ? 'bg-emerald-50 dark:bg-slate-800 border-emerald-500 text-emerald-900 dark:text-white'
-                      : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300'
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700">
-                      {tab.icon}
-                    </div>
-                    <div>
-                      <div className="text-xs font-bold text-slate-900 dark:text-white">{tab.label}</div>
-                      <div className="text-[10px] text-slate-500 dark:text-slate-400">{tab.desc}</div>
-                    </div>
+            <div className="space-y-4">
+              <p className="text-[11px] leading-relaxed text-slate-500 dark:text-slate-400">
+                Módulos organizados por áreas de gestión del club.
+              </p>
+
+              {[
+                {
+                  title: 'Instalaciones & Automatización',
+                  tabs: moreTabs.filter((t) => ['smart_courts'].includes(t.id)),
+                },
+                {
+                  title: 'Comunidad & Competición',
+                  tabs: moreTabs.filter((t) => ['teams', 'academy', 'tournaments'].includes(t.id)),
+                },
+                {
+                  title: 'Ventas & Restauración',
+                  tabs: moreTabs.filter((t) => ['shop', 'pos_cafe'].includes(t.id)),
+                },
+                {
+                  title: 'Marca Blanca & Configuración',
+                  tabs: moreTabs.filter((t) => ['web_editor', 'domains', 'settings'].includes(t.id)),
+                },
+              ].map((section) => (
+                <div key={section.title} className="space-y-2">
+                  <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-1">
+                    {section.title}
                   </div>
-                  <ChevronRight className="w-4 h-4 text-slate-400" />
-                </button>
+                  <div className="grid grid-cols-1 gap-1.5">
+                    {section.tabs.map((tab) => (
+                      <button
+                        key={tab.id}
+                        onClick={() => handleSelectTab(tab.id)}
+                        className={`w-full p-2.5 rounded-2xl border text-left flex items-center justify-between transition ${
+                          adminTab === tab.id
+                            ? 'bg-emerald-50 dark:bg-slate-800 border-emerald-500 text-emerald-900 dark:text-white'
+                            : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300'
+                        }`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="p-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700">
+                            {tab.icon}
+                          </div>
+                          <div>
+                            <div className="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                              <span>{tab.label}</span>
+                              {tab.badge && (
+                                <span className="px-1.5 py-0.2 rounded text-[9px] font-black bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
+                                  {tab.badge}
+                                </span>
+                              )}
+                            </div>
+                            <div className="text-[10px] text-slate-500 dark:text-slate-400">{tab.desc}</div>
+                          </div>
+                        </div>
+                        <ChevronRight className="w-4 h-4 text-slate-400" />
+                      </button>
+                    ))}
+                  </div>
+                </div>
               ))}
             </div>
           </div>

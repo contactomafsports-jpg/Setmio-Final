@@ -33,8 +33,15 @@ export const AdminAgenda: React.FC = () => {
   // New reservation from reception
   const [newCourtId, setNewCourtId] = useState(courts[0]?.id || 'court-1');
   const [newTime, setNewTime] = useState('17:00');
+  const [durationMinutes, setDurationMinutes] = useState<60 | 90 | 120>(90);
+  const [clientType, setClientType] = useState<'existing' | 'new' | 'block'>('existing');
+  const [selectedMember, setSelectedMember] = useState('Carlos Méndez (Socio 108)');
   const [newClientName, setNewClientName] = useState('');
+  const [newClientPhone, setNewClientPhone] = useState('');
   const [newSplit, setNewSplit] = useState(false);
+  const [invitedPlayer2, setInvitedPlayer2] = useState('');
+  const [invitedPlayer3, setInvitedPlayer3] = useState('');
+  const [invitedPlayer4, setInvitedPlayer4] = useState('');
 
   const timeRows = [
     '09:00', '10:30', '12:00', '13:30', '15:00', '16:30', '17:00', '18:30', '20:00', '21:30'
@@ -53,23 +60,50 @@ export const AdminAgenda: React.FC = () => {
     e.preventDefault();
     const court = courts.find((c) => c.id === newCourtId) || courts[0];
     const startISO = `${currentDate}T${newTime}:00`;
+    const hours = durationMinutes / 60;
+    const finalPrice = clientType === 'block' ? 0 : court.hourlyRate * hours;
+    const clientDisplayName = clientType === 'block'
+      ? `BLOQUEO: ${newClientName || 'Mantenimiento / Evento Club'}`
+      : clientType === 'existing'
+      ? selectedMember
+      : newClientName || 'Cliente Mostrador';
 
-    const newB = createBooking({
+    const participants = newSplit
+      ? [
+          { name: clientDisplayName, paid: true, amount: finalPrice / 4 },
+          { name: invitedPlayer2 || 'Jugador 2 (Pendiente)', paid: false, amount: finalPrice / 4 },
+          { name: invitedPlayer3 || 'Jugador 3 (Pendiente)', paid: false, amount: finalPrice / 4 },
+          { name: invitedPlayer4 || 'Jugador 4 (Pendiente)', paid: false, amount: finalPrice / 4 },
+        ]
+      : [{ name: clientDisplayName, paid: true, amount: finalPrice }];
+
+    const startH = parseInt(newTime.split(':')[0], 10);
+    const startM = parseInt(newTime.split(':')[1], 10);
+    const totalMinutes = startH * 60 + startM + durationMinutes;
+    const endH = Math.floor(totalMinutes / 60);
+    const endM = totalMinutes % 60;
+    const endISO = `${currentDate}T${String(endH).padStart(2, '0')}:${String(endM).padStart(2, '0')}:00`;
+
+    createBooking({
       courtId: court.id,
       courtName: court.name,
-      creatorId: 'reception-client',
-      creatorName: newClientName || 'Cliente Recepción',
+      creatorId: clientType === 'existing' ? 'socio-member' : 'reception-client',
+      creatorName: clientDisplayName,
       startTime: startISO,
-      endTime: `${currentDate}T20:00:00`,
+      endTime: endISO,
       status: 'confirmed',
-      totalPrice: court.hourlyRate * 1.5,
-      paymentStatus: 'paid',
+      totalPrice: finalPrice,
+      paymentStatus: clientType === 'block' ? 'paid' : newSplit ? 'partially_paid' : 'paid',
       isSplitPayment: newSplit,
-      participants: [{ name: newClientName || 'Cliente Mostrador', paid: true, amount: court.hourlyRate * 1.5 }],
+      participants,
+      notes: clientType === 'block' ? 'Pista bloqueada administrativamente por recepción.' : undefined,
     });
 
     setShowNewModal(false);
     setNewClientName('');
+    setInvitedPlayer2('');
+    setInvitedPlayer3('');
+    setInvitedPlayer4('');
   };
 
   return (
@@ -282,20 +316,118 @@ export const AdminAgenda: React.FC = () => {
 
             <form onSubmit={handleCreateSubmit} className="space-y-3.5 text-xs">
               <div>
-                <label className="block text-slate-300 mb-1">Nombre del Socio / Cliente</label>
-                <input
-                  type="text"
-                  required
-                  value={newClientName}
-                  onChange={(e) => setNewClientName(e.target.value)}
-                  placeholder="Carlos Méndez"
-                  className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-emerald-500"
-                />
+                <label className="block text-slate-300 mb-1 font-semibold">Tipo de Operación</label>
+                <div className="grid grid-cols-3 gap-1.5 p-1 bg-slate-950 rounded-xl border border-slate-700">
+                  <button
+                    type="button"
+                    onClick={() => setClientType('existing')}
+                    className={`py-1.5 px-2 rounded-lg font-bold text-[11px] transition ${
+                      clientType === 'existing' ? 'bg-emerald-600 text-white' : 'text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    Socio Club
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setClientType('new')}
+                    className={`py-1.5 px-2 rounded-lg font-bold text-[11px] transition ${
+                      clientType === 'new' ? 'bg-emerald-600 text-white' : 'text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    Nuevo / Libre
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setClientType('block')}
+                    className={`py-1.5 px-2 rounded-lg font-bold text-[11px] transition ${
+                      clientType === 'block' ? 'bg-rose-600 text-white' : 'text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    Bloqueo Pista
+                  </button>
+                </div>
+              </div>
+
+              {clientType === 'existing' && (
+                <div>
+                  <label className="block text-slate-300 mb-1 font-semibold">Socio del Club</label>
+                  <select
+                    value={selectedMember}
+                    onChange={(e) => setSelectedMember(e.target.value)}
+                    className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-emerald-500 font-medium"
+                  >
+                    <option value="Carlos Méndez (Socio 108)">Carlos Méndez — Socio #108 (Nivel 3.85)</option>
+                    <option value="Rosa Carballo (Socia 042)">Rosa Carballo — Socia #042 (Nivel 3.50)</option>
+                    <option value="Pablo Vello (Socio 019)">Pablo Vello — Socio #019 (Nivel 4.80)</option>
+                    <option value="Iván Gómez (Socio 087)">Iván Gómez — Socio #087 (Nivel 3.00)</option>
+                    <option value="Laura Senra (Socia Pro)">Laura Senra — Socia Pro (Nivel 5.00)</option>
+                  </select>
+                </div>
+              )}
+
+              {clientType === 'new' && (
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <label className="block text-slate-300 mb-1 font-semibold">Nombre Cliente</label>
+                    <input
+                      type="text"
+                      required
+                      value={newClientName}
+                      onChange={(e) => setNewClientName(e.target.value)}
+                      placeholder="Ej. Juan Pérez"
+                      className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-emerald-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-slate-300 mb-1 font-semibold">Teléfono / WhatsApp</label>
+                    <input
+                      type="tel"
+                      value={newClientPhone}
+                      onChange={(e) => setNewClientPhone(e.target.value)}
+                      placeholder="+34 600..."
+                      className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-emerald-500"
+                    />
+                  </div>
+                </div>
+              )}
+
+              {clientType === 'block' && (
+                <div>
+                  <label className="block text-slate-300 mb-1 font-semibold">Motivo del Bloqueo</label>
+                  <input
+                    type="text"
+                    required
+                    value={newClientName}
+                    onChange={(e) => setNewClientName(e.target.value)}
+                    placeholder="Ej. Mantenimiento césped o Cuadro de Torneo"
+                    className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-rose-500 font-semibold text-rose-300"
+                  />
+                </div>
+              )}
+
+              <div>
+                <label className="block text-slate-300 mb-1 font-semibold">Duración de la Reserva</label>
+                <div className="grid grid-cols-3 gap-2">
+                  {[60, 90, 120].map((dur) => (
+                    <button
+                      key={dur}
+                      type="button"
+                      onClick={() => setDurationMinutes(dur as typeof durationMinutes)}
+                      className={`py-1.5 px-2 rounded-xl font-bold border transition text-center ${
+                        durationMinutes === dur
+                          ? 'bg-emerald-500/20 border-emerald-500 text-emerald-300'
+                          : 'border-slate-700 text-slate-400 hover:text-white'
+                      }`}
+                    >
+                      {dur} min {dur === 90 ? '(1h 30m)' : dur === 120 ? '(2 horas)' : '(1 hora)'}
+                    </button>
+                  ))}
+                </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-slate-300 mb-1">Pista</label>
+                  <label className="block text-slate-300 mb-1 font-semibold">Pista</label>
                   <select
                     value={newCourtId}
                     onChange={(e) => setNewCourtId(e.target.value)}
@@ -307,7 +439,7 @@ export const AdminAgenda: React.FC = () => {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-slate-300 mb-1">Hora Inicio</label>
+                  <label className="block text-slate-300 mb-1 font-semibold">Hora Inicio</label>
                   <select
                     value={newTime}
                     onChange={(e) => setNewTime(e.target.value)}
@@ -319,6 +451,47 @@ export const AdminAgenda: React.FC = () => {
                   </select>
                 </div>
               </div>
+
+              {clientType !== 'block' && (
+                <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 space-y-2">
+                  <label className="flex items-center gap-2 cursor-pointer font-semibold text-slate-300">
+                    <input
+                      type="checkbox"
+                      checked={newSplit}
+                      onChange={(e) => setNewSplit(e.target.checked)}
+                      className="rounded accent-emerald-500 w-4 h-4"
+                    />
+                    <span>Habilitar Pago Dividido (Split 4 jugadores)</span>
+                  </label>
+
+                  {newSplit && (
+                    <div className="space-y-1.5 pt-1 text-[11px]">
+                      <span className="text-slate-400 block font-medium">Invitar compañeros (email o nombre):</span>
+                      <input
+                        type="text"
+                        placeholder="Jugador 2: ej. marcos@email.es"
+                        value={invitedPlayer2}
+                        onChange={(e) => setInvitedPlayer2(e.target.value)}
+                        className="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-white"
+                      />
+                      <input
+                        type="text"
+                        placeholder="Jugador 3: ej. brais@email.es"
+                        value={invitedPlayer3}
+                        onChange={(e) => setInvitedPlayer3(e.target.value)}
+                        className="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-white"
+                      />
+                      <input
+                        type="text"
+                        placeholder="Jugador 4: ej. lucia@email.es"
+                        value={invitedPlayer4}
+                        onChange={(e) => setInvitedPlayer4(e.target.value)}
+                        className="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-white"
+                      />
+                    </div>
+                  )}
+                </div>
+              )}
 
               <div className="pt-2 flex items-center justify-end gap-2">
                 <button

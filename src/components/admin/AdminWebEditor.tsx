@@ -349,9 +349,65 @@ export const AdminWebEditor: React.FC = () => {
                 />
               </div>
 
+              {/* Manual Custom HEX Codes */}
+              <div className="space-y-3 pt-2">
+                <label className="block text-slate-400 font-medium">Personalización Manual de Colores (Códigos HEX)</label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="p-3 rounded-2xl bg-slate-950 border border-slate-800 space-y-1.5">
+                    <span className="text-[11px] font-semibold text-slate-300">Color Primario / Marca</span>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="color"
+                        value={primaryColor}
+                        onChange={(e) => {
+                          setPrimaryColor(e.target.value);
+                          setPublishStatus('draft_pending');
+                        }}
+                        className="w-8 h-8 rounded-lg cursor-pointer bg-transparent border-0"
+                      />
+                      <input
+                        type="text"
+                        value={primaryColor}
+                        onChange={(e) => {
+                          setPrimaryColor(e.target.value);
+                          setPublishStatus('draft_pending');
+                        }}
+                        placeholder="#185c43"
+                        className="flex-1 px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white font-mono text-xs focus:outline-none focus:border-emerald-500 uppercase font-bold"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="p-3 rounded-2xl bg-slate-950 border border-slate-800 space-y-1.5">
+                    <span className="text-[11px] font-semibold text-slate-300">Color de Acento / Botones</span>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="color"
+                        value={accentColor}
+                        onChange={(e) => {
+                          setAccentColor(e.target.value);
+                          setPublishStatus('draft_pending');
+                        }}
+                        className="w-8 h-8 rounded-lg cursor-pointer bg-transparent border-0"
+                      />
+                      <input
+                        type="text"
+                        value={accentColor}
+                        onChange={(e) => {
+                          setAccentColor(e.target.value);
+                          setPublishStatus('draft_pending');
+                        }}
+                        placeholder="#c7f36b"
+                        className="flex-1 px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white font-mono text-xs focus:outline-none focus:border-emerald-500 uppercase font-bold"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               {/* Predefined controlled palettes */}
               <div className="space-y-2 pt-2">
-                <label className="block text-slate-400 font-medium">Paletas Deportivas Controladas</label>
+                <label className="block text-slate-400 font-medium">Paletas Deportivas Sugeridas</label>
                 <div className="grid grid-cols-2 gap-2">
                   {predefinedPalettes.map((pal) => (
                     <button

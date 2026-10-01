@@ -20,6 +20,7 @@ export const OpenMatchesView: React.FC = () => {
     openMatches,
     createOpenMatch,
     joinOpenMatch,
+    leaveOpenMatch,
     currentUser,
     courts,
     currentTenant,
@@ -92,6 +93,11 @@ export const OpenMatchesView: React.FC = () => {
       level: currentUser.playLevel,
       position: 'both',
     });
+    setSelectedMatch(null);
+  };
+
+  const handleLeave = (matchId: string) => {
+    leaveOpenMatch(matchId, currentUser.name);
     setSelectedMatch(null);
   };
 
@@ -248,10 +254,14 @@ export const OpenMatchesView: React.FC = () => {
                 </button>
 
                 {userInMatch ? (
-                  <div className="flex-1 py-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 text-xs font-bold text-center border border-emerald-200 dark:border-emerald-800 flex items-center justify-center gap-1.5">
+                  <button
+                    onClick={() => handleLeave(m.id)}
+                    className="flex-1 py-2.5 rounded-xl bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/50 text-rose-700 dark:text-rose-400 text-xs font-bold text-center border border-rose-200 dark:border-rose-800 flex items-center justify-center gap-1.5 transition"
+                    title="Desapuntarme de este partido"
+                  >
                     <UserCheck className="w-4 h-4" />
-                    <span>Inscrito</span>
-                  </div>
+                    <span>Desapuntarme</span>
+                  </button>
                 ) : isFull ? (
                   <button
                     disabled
@@ -351,13 +361,25 @@ export const OpenMatchesView: React.FC = () => {
                 Cerrar
               </button>
 
-              {selectedMatch.players.length < 4 && !selectedMatch.players.some((p) => p.name === currentUser.name) && (
+              {selectedMatch.players.some((p) => p.name === currentUser.name) ? (
+                <button
+                  onClick={() => handleLeave(selectedMatch.id)}
+                  className="px-6 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs shadow-md transition flex items-center gap-1.5"
+                >
+                  <UserCheck className="w-4 h-4" />
+                  <span>Desapuntarme del Partido</span>
+                </button>
+              ) : selectedMatch.players.length < 4 ? (
                 <button
                   onClick={() => handleJoin(selectedMatch)}
                   className="px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 dark:bg-emerald-500 dark:hover:bg-emerald-400 text-white dark:text-slate-950 font-bold text-xs shadow-md transition"
                 >
                   Unirme por {selectedMatch.pricePerPlayer.toFixed(2)} €
                 </button>
+              ) : (
+                <span className="px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-400 font-bold text-xs">
+                  Partido Completo
+                </span>
               )}
             </div>
           </div>
