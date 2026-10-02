@@ -89,7 +89,7 @@ export const TopBarDemo: React.FC = () => {
               {showTenantMenu && (
                 <div className="absolute top-full left-0 mt-1 w-64 bg-slate-900 border border-slate-700 rounded-lg shadow-2xl py-1 z-50">
                   <div className="px-3 py-1.5 border-b border-slate-800 text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
-                    Empresas Disponibles (Multi-Tenant)
+                    Espacios disponibles
                   </div>
                   {tenants.map((t) => (
                     <button

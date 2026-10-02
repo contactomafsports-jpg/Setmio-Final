@@ -161,9 +161,9 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCart, onOpenAuth }) => {
                   title="Cambiar idioma de la plataforma"
                   aria-label="Seleccionar idioma"
                 >
-                  <span className="text-sm leading-none">{currentLangOption?.flag || '🌐'}</span>
-                  <span className="hidden sm:inline font-mono uppercase text-[11px] font-bold">
-                    {language.toUpperCase()}
+                  <span className="hidden sm:inline text-sm leading-none">{currentLangOption?.flag || '🌐'}</span>
+                  <span className="font-mono uppercase text-[11px] font-bold">
+                    {language.slice(0, 2).toUpperCase()}
                   </span>
                   <ChevronDown className="w-3 h-3 text-slate-400" />
                 </button>
