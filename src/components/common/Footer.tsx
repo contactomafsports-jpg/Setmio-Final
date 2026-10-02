@@ -21,28 +21,6 @@ export const Footer: React.FC = () => {
 
   return (
     <footer className="bg-slate-950 border-t border-slate-800 text-slate-400 text-xs">
-      {/* Top Banner / Club Highlights */}
-      <div className="border-b border-slate-800/80 bg-slate-900/40 py-6 px-4">
-        <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-          <div>
-            <div className="text-xl font-black text-white tracking-tight">{courts.length} Pistas</div>
-            <div className="text-[11px] text-emerald-400 font-medium">Césped WPT Panorámico</div>
-          </div>
-          <div>
-            <div className="text-xl font-black text-white tracking-tight">Escuela FEP</div>
-            <div className="text-[11px] text-emerald-400 font-medium">Entrenadores Nacionales</div>
-          </div>
-          <div>
-            <div className="text-xl font-black text-white tracking-tight">Torneos Pro</div>
-            <div className="text-[11px] text-emerald-400 font-medium">Ligas y Circuitos Gallegos</div>
-          </div>
-          <div>
-            <div className="text-xl font-black text-white tracking-tight">Pro Shop</div>
-            <div className="text-[11px] text-emerald-400 font-medium">Material Oficial & Cafetería</div>
-          </div>
-        </div>
-      </div>
-
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
           {/* Brand info */}

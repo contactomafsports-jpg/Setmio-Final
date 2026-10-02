@@ -21,6 +21,9 @@ export const AdminSettings: React.FC = () => {
   const [whatsappEnabled, setWhatsappEnabled] = useState(currentTenant.settings.whatsappWidgetEnabled);
   const [whatsappNumber, setWhatsappNumber] = useState(currentTenant.whatsappNumber);
   const [whatsappGreeting, setWhatsappGreeting] = useState(currentTenant.settings.whatsappGreetingMessage);
+  const [chatWidgetMode, setChatWidgetMode] = useState<'whatsapp' | 'ai' | 'both'>(
+    currentTenant.settings.chatWidgetMode || 'both'
+  );
 
   const [bookingAdvanceDays, setBookingAdvanceDays] = useState(currentTenant.settings.bookingAdvanceDays);
   const [cancellationHours, setCancellationHours] = useState(currentTenant.settings.cancellationWindowHours);
@@ -44,6 +47,7 @@ export const AdminSettings: React.FC = () => {
         bookingAdvanceDays,
         cancellationWindowHours: cancellationHours,
         splitPaymentAllowed: splitPayment,
+        chatWidgetMode,
       },
     });
 
@@ -169,8 +173,65 @@ export const AdminSettings: React.FC = () => {
           </div>
 
           <p className="text-slate-600 dark:text-slate-400 text-[11px] leading-relaxed">
-            Permite a los visitantes y jugadores contactar con recepción en un clic. Se abrirá la aplicación oficial de WhatsApp con el mensaje inicial preparado.
+            Personaliza el comportamiento del widget flotante de atención al cliente y soporte entre 3 modalidades operativas:
           </p>
+
+          {/* 3-Mode Widget Selector */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+            <button
+              type="button"
+              onClick={() => setChatWidgetMode('whatsapp')}
+              className={`p-3.5 rounded-2xl border text-left transition ${
+                chatWidgetMode === 'whatsapp'
+                  ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-500 shadow-sm'
+                  : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 hover:border-slate-300'
+              }`}
+            >
+              <div className="flex items-center gap-2 mb-1">
+                <MessageCircle className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                <span className="font-bold text-slate-900 dark:text-white">1) Solo WhatsApp</span>
+              </div>
+              <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-normal">
+                Abre chat directo en WhatsApp oficial con mensaje preconfigurado dinámico.
+              </p>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setChatWidgetMode('ai')}
+              className={`p-3.5 rounded-2xl border text-left transition ${
+                chatWidgetMode === 'ai'
+                  ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-500 shadow-sm'
+                  : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 hover:border-slate-300'
+              }`}
+            >
+              <div className="flex items-center gap-2 mb-1">
+                <Zap className="w-4 h-4 text-teal-600 dark:text-cyan-400" />
+                <span className="font-bold text-slate-900 dark:text-white">2) Solo Agente IA</span>
+              </div>
+              <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-normal">
+                Chat flotante estético, no invasivo, con avatar y respuestas automáticas inteligentes.
+              </p>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setChatWidgetMode('both')}
+              className={`p-3.5 rounded-2xl border text-left transition ${
+                chatWidgetMode === 'both'
+                  ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-500 shadow-sm ring-1 ring-emerald-500'
+                  : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 hover:border-slate-300'
+              }`}
+            >
+              <div className="flex items-center gap-2 mb-1">
+                <ShieldCheck className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                <span className="font-bold text-slate-900 dark:text-white">3) Ambos (Recomendado)</span>
+              </div>
+              <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-normal">
+                Abre agente IA con botón interno para desviar la consulta a WhatsApp si el usuario lo desea.
+              </p>
+            </button>
+          </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
             <div>

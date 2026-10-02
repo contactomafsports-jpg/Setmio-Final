@@ -22,10 +22,15 @@ export const BookingFlow: React.FC = () => {
     currentUser,
     setPublicPage,
     triggerDemoToast,
+    selectedCourtsForBooking,
   } = useApp();
 
   const [selectedDate, setSelectedDate] = useState('2026-10-01');
-  const [selectedCourtId, setSelectedCourtId] = useState<string>(courts[0]?.id || 'court-1');
+  const [selectedCourtId, setSelectedCourtId] = useState<string>(
+    selectedCourtsForBooking && selectedCourtsForBooking.length > 0
+      ? selectedCourtsForBooking[0]
+      : courts[0]?.id || 'court-1'
+  );
   const [selectedSlot, setSelectedSlot] = useState<string>('18:30');
   const [duration, setDuration] = useState<60 | 90>(90);
   const [isSplitPayment, setIsSplitPayment] = useState<boolean>(true);

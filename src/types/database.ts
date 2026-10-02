@@ -88,6 +88,7 @@ export interface SponsorItem {
 export interface Tenant {
   id: string;
   slug: string; // 'sanmateo', 'martinsanchez', 'galiciastore', etc.
+  custom_domain?: string | null; // e.g. 'padelsanmateo.com'
   name: string;
   shortName: string;
   type: TenantType;
@@ -121,6 +122,8 @@ export interface Tenant {
     }[];
     whatsappWidgetEnabled: boolean;
     whatsappGreetingMessage: string;
+    chatWidgetMode?: 'whatsapp' | 'ai' | 'both';
+    purchasePolicies?: string;
   };
   // Specific contextual metadata
   proPlayerStats?: {
@@ -142,6 +145,23 @@ export interface Tenant {
     rating: number;
   };
   sponsors?: SponsorItem[];
+}
+
+export interface Club {
+  id: string;
+  slug: string;
+  name: string;
+  short_name?: string;
+  custom_domain?: string | null;
+  plan_id?: string;
+  city?: string;
+  address?: string;
+  contact_email?: string;
+  contact_phone?: string;
+  whatsapp_number?: string;
+  status?: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface UserProfile {
@@ -244,6 +264,50 @@ export interface AcademyGroup {
   schedule: string;
 }
 
+export interface TournamentSponsor {
+  id: string;
+  name: string;
+  logoUrl: string;
+  websiteUrl: string;
+  description: string;
+}
+
+export interface RegisteredPair {
+  id: string;
+  player1: {
+    id: string;
+    name: string;
+    email: string;
+    phone: string;
+    level: number;
+  };
+  player2: {
+    id: string;
+    name: string;
+    email: string;
+    phone: string;
+    level: number;
+  };
+  category: string;
+  paymentStatus: 'paid' | 'pending';
+  paymentMethod: 'online' | 'club';
+  status: 'confirmed' | 'pending_partner';
+  createdAt: string;
+}
+
+export interface TournamentBracketMatch {
+  id: string;
+  round: string; // '1/16', 'Octavos', 'Cuartos', 'Semifinal', 'Final'
+  matchIndex: number;
+  team1: string;
+  team2: string;
+  score?: string;
+  scheduledTime?: string;
+  courtName?: string;
+  courtId?: string;
+  isCompleted: boolean;
+}
+
 export interface Tournament {
   id: string;
   tenantId: string;
@@ -253,14 +317,58 @@ export interface Tournament {
   registrationDeadline: string;
   entryFee: number;
   bannerUrl: string;
+  posterUrl?: string;
   categories: {
     name: string;
     teamsCount: number;
     maxTeams: number;
   }[];
   status: 'upcoming' | 'registration_open' | 'in_progress' | 'completed';
+  format?: 'elimination' | 'league' | 'pozo' | 'league_and_elimination';
+  rankingCategory?: string; // e.g. 'Circuito Setmio Oro'
+  rankingPoints?: {
+    champion: number;
+    finalist: number;
+    semifinalist: number;
+    quarterfinalist: number;
+  };
+  paymentMethod?: 'online' | 'club' | 'both';
+  sponsors?: TournamentSponsor[];
+  registeredPairs?: RegisteredPair[];
+  brackets?: TournamentBracketMatch[];
   prizes: string;
   description: string;
+}
+
+export interface ClubTeamPlayer {
+  id: string;
+  name: string;
+  level: number;
+  hand: 'diestro' | 'zurdo';
+  position: 'drive' | 'reves' | 'ambas';
+  avatarUrl?: string;
+}
+
+export interface ClubTeam {
+  id: string;
+  tenantId?: string;
+  name: string;
+  category: string; // e.g. '1ª Categoría Gallega', 'Veteranos +40'
+  gender: 'masculino' | 'femenino' | 'mixto' | 'menores';
+  division?: string;
+  coach: string;
+  captain: string;
+  photoUrl: string;
+  players: ClubTeamPlayer[];
+  matchesWon?: number;
+  matchesPlayed?: number;
+  nextMatch?: {
+    opponent: string;
+    date: string;
+    time: string;
+    location: string;
+  };
+  updatedAt?: string;
 }
 
 export interface Product {

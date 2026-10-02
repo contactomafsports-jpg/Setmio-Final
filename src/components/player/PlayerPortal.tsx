@@ -21,7 +21,19 @@ import {
   ArrowRight,
   ClipboardList,
   UserRound,
+  Trophy,
+  GraduationCap,
+  FileText,
+  X,
+  Menu,
+  Phone,
+  Mail,
+  ExternalLink,
+  Plus,
+  Flame,
 } from 'lucide-react';
+import { BookingFlow } from '../public/BookingFlow';
+import { OpenMatchesView } from '../public/OpenMatchesView';
 
 export const PlayerPortal: React.FC = () => {
   const {
@@ -34,39 +46,130 @@ export const PlayerPortal: React.FC = () => {
     courts,
     coaches,
     tournaments,
-    setPublicPage,
-    setCurrentView,
     triggerDemoToast,
     theme,
     toggleTheme,
+    setCurrentView,
   } = useApp();
 
   const [activePlayerTab, setActivePlayerTab] = useState<
-    'overview' | 'bookings' | 'stats' | 'favorites' | 'ai_coach' | 'matches' | 'profile'
+    'overview' | 'booking' | 'matches' | 'tournaments' | 'teams' | 'academy' | 'stats' | 'profile'
   >('overview');
+
+  const [legalModalOpen, setLegalModalOpen] = useState(false);
+  const [publicProfileModalOpen, setPublicProfileModalOpen] = useState(false);
+  const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
+  const [tournamentSubTab, setTournamentSubTab] = useState<'inscribed' | 'in_progress' | 'upcoming'>('inscribed');
 
   const normalizedPlayerName = currentUser.name.split(' (')[0].trim().toLocaleLowerCase();
   const myBookings = bookings.filter((booking) =>
     booking.creatorId === currentUser.id ||
     booking.creatorName.split(' (')[0].trim().toLocaleLowerCase() === normalizedPlayerName
   );
+
   const upcomingBooking = myBookings.find((booking) =>
     new Date(booking.startTime).getTime() >= Date.now() &&
     (booking.status === 'confirmed' || booking.status === 'pending')
   );
-  const invitations = openMatches.filter((match) =>
-    match.status === 'open' && match.players.length < 4 &&
-    currentUser.playLevel >= match.minLevel && currentUser.playLevel <= match.maxLevel
-  );
 
-  // Favorite items resolved
-  const favoriteProducts = products.filter((p) => favorites.includes(p.id));
-  const favoriteCourts = courts.filter((c) => favorites.includes(c.id));
+  // Player's teams
+  const myTeams = [
+    {
+      id: 'team-masculino-1',
+      name: 'Absoluto Masculino A',
+      category: '1ª Categoría Gallega · División de Honor',
+      role: 'Jugador Titular',
+      captain: 'Mateo Varela',
+      nextMatch: 'vs Club de Campo Ferrol (12 Oct, 11:00)',
+      status: 'Convocado',
+    },
+    {
+      id: 'team-social',
+      name: 'Equipo Liga Social San Mateo',
+      category: 'Liga Primavera Nivel 3.5 - 4.5',
+      role: 'Capitán de Pareja',
+      captain: currentUser.name,
+      nextMatch: 'vs Pareja Gómez / Permuy (Jueves 19:30)',
+      status: 'Confirmado',
+    },
+  ];
+
+  // Competitions
+  const enrolledTournaments = tournaments.slice(0, 1);
+  const inProgressTournaments = tournaments.filter((t) => t.status === 'in_progress');
+  const upcomingTournamentsList = tournaments.filter((t) => t.status === 'registration_open' || t.status === 'upcoming');
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 pb-24 transition-colors duration-200">
-      {/* Player Header Banner */}
-      <div className="bg-white dark:bg-gradient-to-b dark:from-slate-900 dark:to-slate-950 border-b border-slate-200 dark:border-slate-800 px-4 sm:px-8 py-6 shadow-sm">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 pb-24 transition-colors duration-200 w-full max-w-full overflow-x-hidden">
+      {/* 1. TOP APP HEADER (App Shell Privada) */}
+      <header className="sticky top-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-4 sm:px-6 py-3 shadow-sm">
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            {/* Mobile Drawer Toggle */}
+            <button
+              onClick={() => setMobileDrawerOpen(true)}
+              className="lg:hidden p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+              aria-label="Menú lateral"
+            >
+              <Menu className="w-5 h-5" />
+            </button>
+
+            <div className="flex items-center gap-2.5">
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-700 flex items-center justify-center font-black text-white text-sm shadow">
+                SM
+              </div>
+              <div>
+                <div className="font-extrabold text-sm text-slate-900 dark:text-white leading-tight">
+                  {currentTenant.shortName}
+                </div>
+                <div className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold uppercase tracking-wider">
+                  Área Privada del Jugador
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            {/* Theme Toggle */}
+            <button
+              onClick={toggleTheme}
+              className="p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+              title={theme === 'dark' ? 'Modo claro' : 'Modo oscuro'}
+            >
+              {theme === 'dark' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-slate-700" />}
+            </button>
+
+            {/* Public profile button */}
+            <button
+              onClick={() => setPublicProfileModalOpen(true)}
+              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+            >
+              <User className="w-3.5 h-3.5 text-emerald-500" />
+              <span>Mi Perfil Público</span>
+            </button>
+
+            {/* Legal modal button */}
+            <button
+              onClick={() => setLegalModalOpen(true)}
+              className="p-2 rounded-xl text-slate-500 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+              title="Información Legal y Normativa"
+            >
+              <FileText className="w-4 h-4" />
+            </button>
+
+            {/* Switch to public web */}
+            <button
+              onClick={() => setCurrentView('public')}
+              className="text-xs font-semibold text-slate-500 hover:text-emerald-600 dark:hover:text-emerald-400 px-2 py-1 transition"
+            >
+              Web Pública
+            </button>
+          </div>
+        </div>
+      </header>
+
+      {/* 2. PLAYER HERO PROFILE BANNER */}
+      <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-4 sm:px-6 py-5">
         <div className="max-w-5xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-4">
             <div className="relative">
@@ -94,112 +197,82 @@ export const PlayerPortal: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-2">
-            {/* Theme Toggle Button */}
             <button
-              onClick={toggleTheme}
-              className="p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition"
-              title={theme === 'dark' ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
-            >
-              {theme === 'dark' ? (
-                <Sun className="w-4 h-4 text-amber-400" />
-              ) : (
-                <Moon className="w-4 h-4 text-slate-700" />
-              )}
-            </button>
-
-            <button
-              onClick={() => {
-                setCurrentView('public');
-                setPublicPage('booking');
-              }}
-              className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 dark:bg-emerald-500 dark:hover:bg-emerald-400 text-white dark:text-slate-950 font-bold text-xs shadow transition flex items-center gap-1.5"
+              onClick={() => setActivePlayerTab('booking')}
+              className={`px-4 py-2.5 rounded-xl font-bold text-xs shadow transition flex items-center gap-1.5 ${
+                activePlayerTab === 'booking'
+                  ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-950'
+                  : 'bg-emerald-600 hover:bg-emerald-500 text-white'
+              }`}
             >
               <Calendar className="w-4 h-4" />
               <span>Reservar Pista</span>
             </button>
-
             <button
-              onClick={() => setActivePlayerTab('ai_coach')}
-              className="px-3.5 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-teal-700 dark:text-cyan-400 font-semibold text-xs border border-slate-200 dark:border-slate-700 transition flex items-center gap-1.5"
+              onClick={() => setActivePlayerTab('matches')}
+              className={`px-3.5 py-2.5 rounded-xl border text-xs font-bold transition flex items-center gap-1.5 ${
+                activePlayerTab === 'matches'
+                  ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-500 text-emerald-700 dark:text-emerald-400'
+                  : 'border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+              }`}
             >
-              <Bot className="w-4 h-4" />
-              <span>AI Coach</span>
+              <Users className="w-4 h-4" />
+              <span>Partidos "Play!"</span>
             </button>
           </div>
         </div>
       </div>
 
-      {/* Navigation Sub-Tabs */}
-      <div className="max-w-5xl mx-auto px-4 sm:px-8 pt-4">
-        <div className="flex items-center gap-1.5 border-b border-slate-200 dark:border-slate-800 pb-3 overflow-x-auto no-scrollbar text-xs">
-          <button
-            onClick={() => setActivePlayerTab('overview')}
-            className={`px-3.5 py-2 rounded-xl font-bold whitespace-nowrap transition ${
-              activePlayerTab === 'overview'
-                ? 'bg-emerald-600 text-white shadow-sm'
-                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-900'
-            }`}
-          >
-            Mi Espacio
-          </button>
-          <button
-            onClick={() => setActivePlayerTab('bookings')}
-            className={`px-3.5 py-2 rounded-xl font-bold whitespace-nowrap transition ${
-              activePlayerTab === 'bookings'
-                ? 'bg-emerald-600 text-white shadow-sm'
-                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-900'
-            }`}
-          >
-            Mis Reservas ({myBookings.length})
-          </button>
-          <button
-            onClick={() => setActivePlayerTab('stats')}
-            className={`px-3.5 py-2 rounded-xl font-bold whitespace-nowrap transition ${
-              activePlayerTab === 'stats'
-                ? 'bg-emerald-600 text-white shadow-sm'
-                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-900'
-            }`}
-          >
-            Nivel & Estadísticas
-          </button>
-          <button
-            onClick={() => setActivePlayerTab('favorites')}
-            className={`px-3.5 py-2 rounded-xl font-bold whitespace-nowrap transition ${
-              activePlayerTab === 'favorites'
-                ? 'bg-emerald-600 text-white shadow-sm'
-                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-900'
-            }`}
-          >
-            Favoritos ({favorites.length})
-          </button>
-          <button
-            onClick={() => setActivePlayerTab('ai_coach')}
-            className={`px-3.5 py-2 rounded-xl font-bold whitespace-nowrap transition ${
-              activePlayerTab === 'ai_coach'
-                ? 'bg-teal-600 text-white shadow-sm'
-                : 'text-teal-700 dark:text-cyan-400 hover:text-teal-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-900'
-            }`}
-          >
-            Coach Personal IA
-          </button>
+      {/* 3. DESKTOP / TABLET SUB-TABS NAVIGATION */}
+      <div className="hidden lg:block bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800">
+        <div className="max-w-5xl mx-auto px-6">
+          <nav className="flex space-x-2 py-2" aria-label="Pestañas de navegación">
+            {[
+              { id: 'overview', label: 'Mi Espacio', icon: Home },
+              { id: 'booking', label: 'Reservar Pista', icon: Calendar },
+              { id: 'matches', label: 'Partidos Abiertos', icon: Users },
+              { id: 'tournaments', label: 'Mis Competiciones', icon: Trophy },
+              { id: 'teams', label: 'Mis Equipos', icon: Shield },
+              { id: 'academy', label: 'Escuela & Clases', icon: GraduationCap },
+              { id: 'stats', label: 'Nivel & Stats', icon: TrendingUp },
+              { id: 'profile', label: 'Mi Ficha', icon: UserRound },
+            ].map((tab) => {
+              const Icon = tab.icon;
+              const isActive = activePlayerTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActivePlayerTab(tab.id as typeof activePlayerTab)}
+                  className={`px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
+                    isActive
+                      ? 'bg-emerald-600 text-white shadow-sm'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800'
+                  }`}
+                >
+                  <Icon className="w-4 h-4" />
+                  <span>{tab.label}</span>
+                </button>
+              );
+            })}
+          </nav>
         </div>
       </div>
 
-      {/* Main Container with safe bottom padding for fixed mobile nav */}
-      <main className="max-w-5xl mx-auto px-4 sm:px-8 pt-6 pb-32 sm:pb-12 space-y-8">
+      {/* 4. MAIN CONTENT AREA */}
+      <main className="max-w-5xl mx-auto px-4 sm:px-6 pt-6 space-y-8">
         {/* OVERVIEW TAB */}
         {activePlayerTab === 'overview' && (
-          <div className="space-y-6">
+          <div className="space-y-6 animate-in fade-in duration-150">
             {/* Next Match Highlight Card */}
             {upcomingBooking && (
-              <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-emerald-500/40 shadow-xl space-y-4">
+              <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-emerald-500/40 shadow-lg space-y-4">
                 <div className="flex items-center justify-between text-xs">
                   <span className="text-emerald-600 dark:text-emerald-400 font-bold uppercase tracking-wider flex items-center gap-1.5">
                     <Clock className="w-4 h-4" />
-                    <span>Tu Próximo Partido Confirmado</span>
+                    <span>Tu Próxima Reserva Confirmada</span>
                   </span>
                   <span className="px-2.5 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 font-bold">
-                    Pista 1 Central
+                    Pista Activa
                   </span>
                 </div>
 
@@ -217,7 +290,7 @@ export const PlayerPortal: React.FC = () => {
                   <div>
                     <div className="text-slate-500 dark:text-slate-400">PIN Cerradura Pista:</div>
                     <div className="font-mono font-bold text-amber-500 text-lg">
-                      {upcomingBooking.accessPin || 'Pendiente'}
+                      {upcomingBooking.accessPin || '4829#'}
                     </div>
                   </div>
                 </div>
@@ -227,320 +300,598 @@ export const PlayerPortal: React.FC = () => {
                 </div>
               </div>
             )}
-            {!upcomingBooking && (
-              <div className="rounded-3xl border border-dashed border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 p-6 text-center">
-                <Calendar className="w-8 h-8 mx-auto text-slate-400" />
-                <h3 className="mt-3 font-bold text-slate-900 dark:text-white">No tienes reservas próximas</h3>
-                <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Cuando reserves una pista, aparecerá aquí con los datos de acceso.</p>
-                <button onClick={() => { setCurrentView('public'); setPublicPage('booking'); }} className="mt-4 px-4 py-2 rounded-xl bg-emerald-600 text-white text-sm font-bold">Buscar pista</button>
-              </div>
-            )}
 
-            {/* Quick Stats Grid */}
+            {/* Quick Stats Grid with AUDITED "Nivel" label (No FEP) */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs">
               <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-1 shadow-sm">
-                <span className="text-slate-500 dark:text-slate-400 text-[11px]">Nivel FEP:</span>
-                <div className="text-2xl font-black text-slate-900 dark:text-white font-mono tabular-nums">{currentUser.playLevel.toFixed(2)}</div>
+                <span className="text-slate-500 dark:text-slate-400 text-[11px] font-semibold">Nivel:</span>
+                <div className="text-2xl font-black text-slate-900 dark:text-white font-mono tabular-nums">
+                  {currentUser.playLevel.toFixed(2)}
+                </div>
                 <div className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold">+0.15 este mes</div>
               </div>
 
               <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-1 shadow-sm">
-                <span className="text-slate-500 dark:text-slate-400 text-[11px]">Partidos Jugados:</span>
+                <span className="text-slate-500 dark:text-slate-400 text-[11px] font-semibold">Partidos Jugados:</span>
                 <div className="text-2xl font-black text-slate-900 dark:text-white font-mono tabular-nums">34</div>
                 <div className="text-[10px] text-slate-500 dark:text-slate-400">22 victorias (64%)</div>
               </div>
 
               <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-1 shadow-sm">
-                <span className="text-slate-500 dark:text-slate-400 text-[11px]">Saldo Monedero:</span>
+                <span className="text-slate-500 dark:text-slate-400 text-[11px] font-semibold">Saldo Monedero:</span>
                 <div className="text-2xl font-black text-emerald-600 dark:text-emerald-400 font-mono tabular-nums">24.50 €</div>
                 <div className="text-[10px] text-slate-500 dark:text-slate-400">Recarga en cafetería o app</div>
               </div>
 
               <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-1 shadow-sm">
-                <span className="text-slate-500 dark:text-slate-400 text-[11px]">Escuela San Mateo:</span>
-                <div className="text-sm font-bold text-teal-600 dark:text-cyan-400 pt-1">Perfeccionamiento</div>
-                <div className="text-[10px] text-slate-500 dark:text-slate-400">Mateo Varela · M/J</div>
+                <span className="text-slate-500 dark:text-slate-400 text-[11px] font-semibold">Equipos Oficiales:</span>
+                <div className="text-2xl font-black text-slate-900 dark:text-white font-mono tabular-nums">2</div>
+                <div className="text-[10px] text-slate-500 dark:text-slate-400">1ª Categoría Gallega</div>
               </div>
             </div>
 
-            {/* Open Matches Community invitations */}
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <h3 className="text-sm font-bold text-slate-900 dark:text-white">Partidos Abiertos con Plazas Libres</h3>
-                <button
-                  onClick={() => {
-                    setCurrentView('public');
-                    setPublicPage('matches');
-                  }}
-                  className="text-xs text-emerald-600 dark:text-emerald-400 font-semibold hover:underline"
-                >
-                  Ver todos los partidos
-                </button>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {invitations.slice(0, 2).map((m) => (
-                  <div
-                    key={m.id}
-                    className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-3 shadow-sm text-xs"
-                  >
-                    <div className="flex justify-between text-slate-500 dark:text-slate-400">
-                      <span className="text-emerald-600 dark:text-emerald-400 font-bold">Nivel {m.minLevel} - {m.maxLevel}</span>
-                      <span className="font-mono text-slate-900 dark:text-white font-bold tabular-nums">{m.pricePerPlayer.toFixed(2)} €</span>
-                    </div>
-
-                    <div className="font-bold text-slate-900 dark:text-white">{m.courtName}</div>
-                    <div className="text-[11px] text-slate-500 dark:text-slate-400">{m.startTime.replace('T', ' ')} (90 min)</div>
-
-                    <div className="pt-2 flex items-center justify-between">
-                      <span className="text-slate-500 dark:text-slate-400 text-[11px]">{m.players.length} / 4 jugadores</span>
-                      <button
-                        onClick={() => {
-                          setCurrentView('public');
-                          setPublicPage('matches');
-                        }}
-                        className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 dark:bg-emerald-500 dark:hover:bg-emerald-400 text-white dark:text-slate-950 font-bold text-xs"
-                      >
-                        Apuntarme
-                      </button>
-                    </div>
-                  </div>
-                ))}
-                {invitations.length === 0 && (
-                  <div className="sm:col-span-2 rounded-2xl border border-dashed border-slate-300 dark:border-slate-700 p-5 text-center text-sm text-slate-500 dark:text-slate-400">
-                    No hay partidos abiertos de tu nivel con plazas disponibles.
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* BOOKINGS TAB */}
-        {activePlayerTab === 'bookings' && (
-          <div className="space-y-4">
-            <h3 className="text-sm font-bold text-slate-900 dark:text-white">Historial de Reservas y Partidos</h3>
-            <div className="space-y-3">
-              {myBookings.map((b) => (
-                <div
-                  key={b.id}
-                  className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-xs shadow-sm"
-                >
-                  <div className="space-y-1">
-                    <div className="font-bold text-slate-900 dark:text-white text-sm">{b.courtName}</div>
-                    <div className="text-slate-500 dark:text-slate-400">{b.startTime.replace('T', ' ')}</div>
-                    <div className="text-[11px] text-emerald-600 dark:text-emerald-400">
-                      PIN Acceso Pista: <strong className="font-mono font-bold text-amber-500">{b.accessPin}</strong>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-4">
-                    <span className="font-mono font-bold text-slate-900 dark:text-white text-sm tabular-nums">{b.totalPrice.toFixed(2)} €</span>
-                    <span className="px-2.5 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-400 font-bold uppercase text-[10px] border border-emerald-300 dark:border-emerald-800">
-                      {b.status}
-                    </span>
-                  </div>
+            {/* Quick Actions Shortcuts */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div
+                onClick={() => setActivePlayerTab('booking')}
+                className="cursor-pointer p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm hover:border-emerald-500 transition group space-y-2"
+              >
+                <div className="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+                  <Calendar className="w-5 h-5" />
                 </div>
-              ))}
-              {myBookings.length === 0 && (
-                <div className="rounded-3xl border border-dashed border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 p-8 text-center">
-                  <Calendar className="w-8 h-8 mx-auto text-slate-400" />
-                  <h4 className="mt-3 font-bold text-slate-900 dark:text-white">Todavía no tienes reservas</h4>
-                  <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Aquí verás las reservas asociadas a tu perfil.</p>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* STATS & PROGRESS TAB */}
-        {activePlayerTab === 'stats' && (
-          <div className="space-y-6">
-            <h3 className="text-sm font-bold text-slate-900 dark:text-white">Evolución de Rendimiento Deportivo</h3>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs">
-              <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-4 shadow-sm">
-                <div className="font-bold text-slate-900 dark:text-white text-sm">Habilidades Evaluadas por Entrenador</div>
-
-                <div className="space-y-3">
-                  <div>
-                    <div className="flex justify-between text-slate-700 dark:text-slate-300 mb-1">
-                      <span>Bandeja y Víbora:</span>
-                      <span className="font-bold text-emerald-600 dark:text-emerald-400">8.5 / 10</span>
-                    </div>
-                    <div className="w-full h-2 rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden">
-                      <div className="h-full bg-emerald-500 rounded-full" style={{ width: '85%' }} />
-                    </div>
-                  </div>
-
-                  <div>
-                    <div className="flex justify-between text-slate-700 dark:text-slate-300 mb-1">
-                      <span>Salida de Pared:</span>
-                      <span className="font-bold text-teal-600 dark:text-cyan-400">7.8 / 10</span>
-                    </div>
-                    <div className="w-full h-2 rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden">
-                      <div className="h-full bg-teal-500 rounded-full" style={{ width: '78%' }} />
-                    </div>
-                  </div>
-
-                  <div>
-                    <div className="flex justify-between text-slate-700 dark:text-slate-300 mb-1">
-                      <span>Volea de Bloqueo:</span>
-                      <span className="font-bold text-purple-600 dark:text-purple-400">8.2 / 10</span>
-                    </div>
-                    <div className="w-full h-2 rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden">
-                      <div className="h-full bg-purple-500 rounded-full" style={{ width: '82%' }} />
-                    </div>
-                  </div>
-
-                  <div>
-                    <div className="flex justify-between text-slate-700 dark:text-slate-300 mb-1">
-                      <span>Remate x3 y Definición:</span>
-                      <span className="font-bold text-amber-500">6.9 / 10</span>
-                    </div>
-                    <div className="w-full h-2 rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden">
-                      <div className="h-full bg-amber-500 rounded-full" style={{ width: '69%' }} />
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-4 shadow-sm">
-                <div className="font-bold text-slate-900 dark:text-white text-sm">Objetivos del Trimestre</div>
-                <ul className="space-y-3 text-slate-600 dark:text-slate-300">
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
-                    <span>Mejorar el primer saque buscando el cristal lateral.</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
-                    <span>Reducir errores no forzados en globos defensivos.</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
-                    <span>Alcanzar el nivel 4.0 antes del Torneo de Primavera.</span>
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* FAVORITES TAB */}
-        {activePlayerTab === 'favorites' && (
-          <div className="space-y-6">
-            <h3 className="text-sm font-bold text-slate-900 dark:text-white">Tus Elementos Guardados en Favoritos</h3>
-
-            <div className="space-y-4">
-              <div className="text-xs font-bold text-slate-400 uppercase tracking-wider">Productos Guardados:</div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                {favoriteProducts.map((p) => (
-                  <div key={p.id} className="p-3.5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex gap-3 text-xs shadow-sm">
-                    <img src={p.imageUrl} alt={p.name} className="w-16 h-16 object-cover rounded-xl shrink-0" />
-                    <div className="min-w-0 flex-1">
-                      <div className="font-bold text-slate-900 dark:text-white truncate">{p.name}</div>
-                      <div className="font-mono text-emerald-600 dark:text-emerald-400 font-bold tabular-nums">{p.price.toFixed(2)} €</div>
-                      <button
-                        onClick={() => {
-                          setCurrentView('public');
-                          setPublicPage('shop');
-                        }}
-                        className="text-[11px] text-teal-600 dark:text-cyan-400 hover:underline mt-1 font-semibold"
-                      >
-                        Ver en tienda
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* AI COACH TAB */}
-        {activePlayerTab === 'ai_coach' && (
-          <div className="space-y-6">
-            <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-teal-500/40 shadow-xl space-y-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-teal-100 dark:bg-teal-950/60 text-teal-700 dark:text-cyan-400 flex items-center justify-center">
-                  <Bot className="w-6 h-6" />
-                </div>
-                <div>
-                  <h3 className="text-base font-bold text-slate-900 dark:text-white">Entrenador Personal de IA</h3>
-                  <div className="text-xs text-teal-600 dark:text-cyan-400">Análisis táctico y preparación personalizada de partidos</div>
-                </div>
-              </div>
-
-              <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 space-y-2 text-xs">
-                <div className="font-bold text-emerald-600 dark:text-emerald-400">Recomendación para tu próximo partido:</div>
-                <p className="text-slate-700 dark:text-slate-300 leading-relaxed text-[11px]">
-                  "Como juegas en la posición de revés con una pala de potencia (Bullpadel Vertex), te sugiero fijar al drive rival con voleas profundas al cuerpo antes de intentar la definición por 3. En las pistas de Narón con humedad matinal la bola pesará más: usa la bajada de pared plana en lugar de liftada."
+                <h3 className="font-bold text-sm text-slate-900 dark:text-white group-hover:text-emerald-600 transition-colors">
+                  Reservar Pista en el Club
+                </h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  Accede al cuadrante directo con tarifas de socio y pago dividido.
                 </p>
               </div>
 
-              <div className="pt-2 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
-                <span>Función en Acceso Anticipado para Socios de {currentTenant.shortName}</span>
+              <div
+                onClick={() => setActivePlayerTab('matches')}
+                className="cursor-pointer p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm hover:border-emerald-500 transition group space-y-2"
+              >
+                <div className="w-10 h-10 rounded-xl bg-teal-100 dark:bg-teal-950 text-teal-600 dark:text-cyan-400 flex items-center justify-center">
+                  <Users className="w-5 h-5" />
+                </div>
+                <h3 className="font-bold text-sm text-slate-900 dark:text-white group-hover:text-emerald-600 transition-colors">
+                  Partidos Abiertos ("Play!")
+                </h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  Únete a partidas niveladas con jugadores de tu mismo rango.
+                </p>
+              </div>
+
+              <div
+                onClick={() => setActivePlayerTab('tournaments')}
+                className="cursor-pointer p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm hover:border-emerald-500 transition group space-y-2"
+              >
+                <div className="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-950 text-amber-600 dark:text-amber-400 flex items-center justify-center">
+                  <Trophy className="w-5 h-5" />
+                </div>
+                <h3 className="font-bold text-sm text-slate-900 dark:text-white group-hover:text-emerald-600 transition-colors">
+                  Mis Competiciones
+                </h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  Consulta tus cuadros, horarios de cruces y suma puntos de ranking.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* BOOKING TAB EMBEDDED INSIDE APP (Isolation maintained!) */}
+        {activePlayerTab === 'booking' && (
+          <div className="animate-in fade-in duration-150">
+            <BookingFlow />
+          </div>
+        )}
+
+        {/* MATCHES TAB EMBEDDED INSIDE APP */}
+        {activePlayerTab === 'matches' && (
+          <div className="animate-in fade-in duration-150">
+            <OpenMatchesView />
+          </div>
+        )}
+
+        {/* TOURNAMENTS TAB (Mis Competiciones) */}
+        {activePlayerTab === 'tournaments' && (
+          <div className="space-y-6 animate-in fade-in duration-150">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <h2 className="text-xl font-black text-slate-900 dark:text-white">Mis Competiciones</h2>
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  Torneos oficiales federados, ligas sociales y rankings en los que participas.
+                </p>
+              </div>
+
+              {/* Subtabs for Tournaments */}
+              <div className="flex items-center gap-1 bg-white dark:bg-slate-900 p-1 rounded-xl border border-slate-200 dark:border-slate-800 text-xs font-semibold">
                 <button
-                  onClick={() => triggerDemoToast('Rutina Táctica Generada', 'Plan de calentamiento de 15 minutos enviado a tu móvil.', 'success')}
-                  className="px-4 py-2 rounded-xl bg-teal-600 hover:bg-teal-500 dark:bg-cyan-500 dark:hover:bg-cyan-400 text-white dark:text-slate-950 font-bold transition shadow-sm"
+                  onClick={() => setTournamentSubTab('inscribed')}
+                  className={`px-3 py-1.5 rounded-lg transition ${
+                    tournamentSubTab === 'inscribed' ? 'bg-emerald-600 text-white' : 'text-slate-600 dark:text-slate-400'
+                  }`}
                 >
-                  Generar Rutina Táctica
+                  Inscrito (1)
+                </button>
+                <button
+                  onClick={() => setTournamentSubTab('in_progress')}
+                  className={`px-3 py-1.5 rounded-lg transition ${
+                    tournamentSubTab === 'in_progress' ? 'bg-emerald-600 text-white' : 'text-slate-600 dark:text-slate-400'
+                  }`}
+                >
+                  En Curso ({inProgressTournaments.length})
+                </button>
+                <button
+                  onClick={() => setTournamentSubTab('upcoming')}
+                  className={`px-3 py-1.5 rounded-lg transition ${
+                    tournamentSubTab === 'upcoming' ? 'bg-emerald-600 text-white' : 'text-slate-600 dark:text-slate-400'
+                  }`}
+                >
+                  Próximas ({upcomingTournamentsList.length})
+                </button>
+              </div>
+            </div>
+
+            {tournamentSubTab === 'inscribed' && (
+              <div className="space-y-4">
+                {enrolledTournaments.map((t) => (
+                  <div
+                    key={t.id}
+                    className="p-5 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-4"
+                  >
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                      <div>
+                        <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 font-bold text-[10px] uppercase">
+                          Pareja Confirmada
+                        </span>
+                        <h3 className="text-lg font-bold text-slate-900 dark:text-white mt-1">{t.title}</h3>
+                        <p className="text-xs text-slate-500">{t.dates} · Cuadro 2ª Categoría</p>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-xs font-semibold text-slate-500">Pareja:</div>
+                        <div className="font-bold text-slate-900 dark:text-white text-sm">Carlos Méndez / Diego Soto</div>
+                      </div>
+                    </div>
+
+                    <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs flex items-center justify-between">
+                      <span className="text-slate-600 dark:text-slate-400">
+                        Próximo cruce: <strong>Viernes 19:00 en Pista 2 Panorámica</strong>
+                      </span>
+                      <span className="font-bold text-emerald-600 dark:text-emerald-400">Puntúa Ranking Setmio Oro</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {tournamentSubTab === 'in_progress' && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {inProgressTournaments.map((t) => (
+                  <div key={t.id} className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-2">
+                    <span className="text-[10px] font-bold text-amber-500 uppercase">Fase de Cuartos</span>
+                    <h4 className="font-bold text-sm text-slate-900 dark:text-white">{t.title}</h4>
+                    <p className="text-xs text-slate-500">{t.dates}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {tournamentSubTab === 'upcoming' && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {upcomingTournamentsList.map((t) => (
+                  <div key={t.id} className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-2">
+                    <span className="text-[10px] font-bold text-emerald-500 uppercase">Inscripción Abierta</span>
+                    <h4 className="font-bold text-sm text-slate-900 dark:text-white">{t.title}</h4>
+                    <p className="text-xs text-slate-500">{t.dates} · {t.entryFee.toFixed(2)} €/jugador</p>
+                    <button
+                      onClick={() => triggerDemoToast('Inscripción Solicitada', `Pareja enviada para ${t.title}. Tu compañero recibirá notificación.`, 'success')}
+                      className="px-3 py-1.5 rounded-xl bg-emerald-600 text-white font-bold text-xs"
+                    >
+                      Inscribirme con mi pareja
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* TEAMS TAB (Mis Equipos) */}
+        {activePlayerTab === 'teams' && (
+          <div className="space-y-6 animate-in fade-in duration-150">
+            <div>
+              <h2 className="text-xl font-black text-slate-900 dark:text-white">Mis Equipos</h2>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                Equipos y plantillas oficiales a las que perteneces en {currentTenant.name}.
+              </p>
+            </div>
+
+            <div className="space-y-4">
+              {myTeams.map((team) => (
+                <div
+                  key={team.id}
+                  className="p-5 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-4"
+                >
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                      <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 font-bold text-[10px] uppercase">
+                        {team.role}
+                      </span>
+                      <h3 className="text-lg font-bold text-slate-900 dark:text-white mt-1">{team.name}</h3>
+                      <p className="text-xs text-slate-500">{team.category}</p>
+                    </div>
+                    <span className="px-3 py-1 rounded-xl bg-slate-100 dark:bg-slate-800 text-xs font-bold text-slate-800 dark:text-slate-200">
+                      Estado: {team.status}
+                    </span>
+                  </div>
+
+                  <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs flex items-center justify-between">
+                    <div>
+                      <div className="text-slate-400 text-[10px]">Próxima Jornada:</div>
+                      <div className="font-bold text-slate-800 dark:text-slate-200">{team.nextMatch}</div>
+                    </div>
+                    <button
+                      onClick={() => triggerDemoToast('Asistencia Confirmada', 'Has confirmado tu asistencia para la convocatoria del equipo.', 'success')}
+                      className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs"
+                    >
+                      Confirmar Asistencia
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* ACADEMY TAB (Escuela & Clases) */}
+        {activePlayerTab === 'academy' && (
+          <div className="space-y-6 animate-in fade-in duration-150">
+            <div>
+              <h2 className="text-xl font-black text-slate-900 dark:text-white">Escuela & Clases de Pádel</h2>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                Tus grupos de entrenamiento, clases particulares y progreso técnico.
+              </p>
+            </div>
+
+            <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <span className="text-[10px] font-bold uppercase text-purple-600 dark:text-purple-400">
+                    Grupo Cuatrimestral Activo
+                  </span>
+                  <h3 className="text-lg font-bold text-slate-900 dark:text-white mt-0.5">
+                    Perfeccionamiento Nivel 3.5 - 4.5
+                  </h3>
+                  <p className="text-xs text-slate-500">Monitora: Laura Senra · Martes y Jueves 19:30 - 20:30</p>
+                </div>
+                <div className="text-right">
+                  <div className="text-xs font-semibold text-slate-400">Asistencia</div>
+                  <div className="font-mono font-black text-base text-emerald-600">14/16 sesiones</div>
+                </div>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-purple-50 dark:bg-purple-950/30 border border-purple-200 dark:border-purple-800 text-xs text-purple-900 dark:text-purple-300">
+                <strong>Próxima sesión:</strong> Mañana a las 19:30. Trabajo intensivo de salida de pared y transición rápida de bloqueo en la red.
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* STATS & LEVEL TAB */}
+        {activePlayerTab === 'stats' && (
+          <div className="space-y-6 animate-in fade-in duration-150">
+            <div>
+              <h2 className="text-xl font-black text-slate-900 dark:text-white">Estadísticas & Nivel</h2>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                Evolución de juego y rendimiento en partidos oficiales y sociales.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+              <div className="p-5 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-3">
+                <h3 className="font-bold text-slate-900 dark:text-white">Distribución de Victorias</h3>
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <span>Partidos Ganados</span>
+                    <strong className="text-emerald-600 font-mono">22 (64.7%)</strong>
+                  </div>
+                  <div className="w-full bg-slate-200 dark:bg-slate-800 h-2 rounded-full overflow-hidden">
+                    <div className="bg-emerald-500 h-full w-[65%]" />
+                  </div>
+                  <div className="flex justify-between text-slate-400 pt-1">
+                    <span>Partidos Perdidos</span>
+                    <span className="font-mono">12 (35.3%)</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-5 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-3">
+                <h3 className="font-bold text-slate-900 dark:text-white">Rendimiento por Posición</h3>
+                <div className="space-y-1.5 text-slate-600 dark:text-slate-400">
+                  <div className="flex justify-between">
+                    <span>Posición en Revés:</span>
+                    <strong className="text-slate-900 dark:text-white">72% efectividad</strong>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Posición en Drive:</span>
+                    <strong className="text-slate-900 dark:text-white">55% efectividad</strong>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Tie-breaks ganados:</span>
+                    <strong className="text-slate-900 dark:text-white">8 de 11 (72.7%)</strong>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* PROFILE TAB */}
+        {activePlayerTab === 'profile' && (
+          <div className="space-y-6 animate-in fade-in duration-150 max-w-2xl">
+            <div>
+              <h2 className="text-xl font-black text-slate-900 dark:text-white">Ficha del Jugador</h2>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                Datos de socio, contacto y preferencias de juego.
+              </p>
+            </div>
+
+            <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-4 text-xs">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <span className="text-slate-400">Nombre Completo:</span>
+                  <div className="font-bold text-slate-900 dark:text-white text-sm mt-0.5">{currentUser.name}</div>
+                </div>
+                <div>
+                  <span className="text-slate-400">Email:</span>
+                  <div className="font-bold text-slate-900 dark:text-white text-sm mt-0.5">{currentUser.email}</div>
+                </div>
+                <div>
+                  <span className="text-slate-400">Nivel Asignado:</span>
+                  <div className="font-bold text-emerald-600 dark:text-emerald-400 text-sm mt-0.5 font-mono">
+                    {currentUser.playLevel.toFixed(2)}
+                  </div>
+                </div>
+                <div>
+                  <span className="text-slate-400">Club Principal:</span>
+                  <div className="font-bold text-slate-900 dark:text-white text-sm mt-0.5">{currentTenant.name}</div>
+                </div>
+              </div>
+
+              <div className="pt-4 border-t border-slate-200 dark:border-slate-800 flex gap-3">
+                <button
+                  onClick={() => setPublicProfileModalOpen(true)}
+                  className="px-4 py-2.5 rounded-xl bg-emerald-600 text-white font-bold text-xs flex items-center gap-1.5"
+                >
+                  <ExternalLink className="w-3.5 h-3.5" />
+                  <span>Ver Mi Perfil Público</span>
                 </button>
               </div>
             </div>
           </div>
         )}
-        {activePlayerTab === 'matches' && (
-          <section className="space-y-4">
-            <div>
-              <h2 className="text-lg font-bold text-slate-900 dark:text-white">Convocatorias de tu nivel</h2>
-              <p className="text-sm text-slate-500 dark:text-slate-400">Partidos abiertos compatibles con tu nivel ({currentUser.playLevel.toFixed(2)}).</p>
-            </div>
-            {invitations.length === 0 ? (
-              <div className="rounded-3xl border border-dashed border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 p-8 text-center">
-                <Users className="w-8 h-8 mx-auto text-slate-400" />
-                <h3 className="mt-3 font-bold text-slate-900 dark:text-white">No hay convocatorias disponibles</h3>
-                <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Vuelve a consultar más tarde o busca partidos abiertos.</p>
-                <button onClick={() => { setCurrentView('public'); setPublicPage('matches'); }} className="mt-4 px-4 py-2 rounded-xl bg-emerald-600 text-white text-sm font-bold">Ver partidos abiertos</button>
-              </div>
-            ) : invitations.map((match) => (
-              <article key={match.id} className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                <div>
-                  <div className="font-bold text-slate-900 dark:text-white">{match.courtName}</div>
-                  <div className="text-sm text-slate-500">{new Date(match.startTime).toLocaleString('es-ES', { dateStyle: 'medium', timeStyle: 'short' })} · Nivel {match.minLevel}–{match.maxLevel}</div>
-                </div>
-                <button onClick={() => { setCurrentView('public'); setPublicPage('matches'); }} className="px-4 py-2 rounded-xl bg-emerald-600 text-white text-sm font-bold">Ver partido</button>
-              </article>
-            ))}
-          </section>
-        )}
-        {activePlayerTab === 'profile' && (
-          <section className="max-w-2xl rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6">
-            <h2 className="text-lg font-bold text-slate-900 dark:text-white">Tu perfil</h2>
-            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Datos de la sesión de demostración activa.</p>
-            <dl className="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
-              <div><dt className="text-slate-500">Nombre</dt><dd className="mt-1 font-semibold">{currentUser.name}</dd></div>
-              <div><dt className="text-slate-500">Correo</dt><dd className="mt-1 font-semibold">{currentUser.email}</dd></div>
-              <div><dt className="text-slate-500">Nivel de juego</dt><dd className="mt-1 font-semibold">{currentUser.playLevel.toFixed(2)}</dd></div>
-              <div><dt className="text-slate-500">Club</dt><dd className="mt-1 font-semibold">{currentTenant.name}</dd></div>
-            </dl>
-          </section>
-        )}
       </main>
-      <nav aria-label="Navegación del jugador" className="md:hidden fixed bottom-0 inset-x-0 z-40 grid grid-cols-5 border-t border-slate-200 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl px-1 pt-2 pb-[calc(.5rem+env(safe-area-inset-bottom))] shadow-[0_-10px_30px_rgba(15,23,42,.1)]">
+
+      {/* 5. NATIVE MOBILE BOTTOM BAR (Clean, accessible, no overlapping text!) */}
+      <nav
+        aria-label="Navegación móvil del jugador"
+        className="lg:hidden fixed bottom-0 inset-x-0 z-40 border-t border-slate-200 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl px-2 pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] shadow-[0_-8px_25px_rgba(15,23,42,0.08)] grid grid-cols-5 gap-1"
+      >
         {[
-          { label: 'Inicio', icon: Home, action: () => setActivePlayerTab('overview'), active: activePlayerTab === 'overview' },
-          { label: 'Reservar', icon: Calendar, action: () => { setCurrentView('public'); setPublicPage('booking'); }, active: false },
-          { label: 'Partidos', icon: Users, action: () => { setCurrentView('public'); setPublicPage('matches'); }, active: false },
-          { label: 'Convocatorias', icon: ClipboardList, action: () => setActivePlayerTab('matches'), active: activePlayerTab === 'matches' },
-          { label: 'Perfil', icon: UserRound, action: () => setActivePlayerTab('profile'), active: activePlayerTab === 'profile' },
-        ].map(({ label, icon: Icon, action, active }) => (
-          <button key={label} onClick={action} aria-current={active ? 'page' : undefined} className={`flex flex-col items-center justify-center gap-1 py-1 text-[10px] font-semibold ${active ? 'text-emerald-600' : 'text-slate-500 dark:text-slate-400'}`}>
-            <Icon className="w-5 h-5" />
-            <span>{label}</span>
-          </button>
-        ))}
+          { id: 'overview', label: 'Inicio', icon: Home },
+          { id: 'booking', label: 'Reservar', icon: Calendar },
+          { id: 'matches', label: 'Partidos', icon: Users },
+          { id: 'tournaments', label: 'Torneos', icon: Trophy },
+          { id: 'teams', label: 'Equipos', icon: Shield },
+        ].map((item) => {
+          const Icon = item.icon;
+          const isActive = activePlayerTab === item.id;
+          return (
+            <button
+              key={item.id}
+              onClick={() => setActivePlayerTab(item.id as typeof activePlayerTab)}
+              className={`flex flex-col items-center justify-center py-1 rounded-xl transition ${
+                isActive
+                  ? 'text-emerald-600 dark:text-emerald-400 font-bold'
+                  : 'text-slate-500 dark:text-slate-400'
+              }`}
+            >
+              <Icon className="w-5 h-5 mb-0.5" />
+              <span className="text-[10px] leading-tight truncate">{item.label}</span>
+            </button>
+          );
+        })}
       </nav>
+
+      {/* 6. MODAL PERFIL PÚBLICO DEL JUGADOR */}
+      {publicProfileModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm animate-in fade-in duration-150">
+          <div className="relative w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl text-slate-900 dark:text-slate-100">
+            <button
+              onClick={() => setPublicProfileModalOpen(false)}
+              className="absolute top-4 right-4 p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className="text-center space-y-3 pt-2">
+              <img
+                src={currentUser.avatarUrl}
+                alt={currentUser.name}
+                className="w-24 h-24 rounded-3xl object-cover border-4 border-emerald-500 mx-auto shadow-xl"
+              />
+              <div>
+                <h3 className="text-xl font-black text-slate-900 dark:text-white">{currentUser.name}</h3>
+                <p className="text-xs text-slate-500">{currentTenant.name} · Ficha Federada Verificada</p>
+              </div>
+
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 font-mono font-bold text-xs">
+                <span>Nivel {currentUser.playLevel.toFixed(2)}</span>
+                <span>·</span>
+                <span>Diestro / Revés</span>
+              </div>
+            </div>
+
+            <div className="my-6 grid grid-cols-3 gap-2 p-3 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-center text-xs">
+              <div>
+                <div className="text-slate-400 text-[10px]">Partidos</div>
+                <div className="font-bold text-slate-900 dark:text-white text-base font-mono">34</div>
+              </div>
+              <div>
+                <div className="text-slate-400 text-[10px]">Victorias</div>
+                <div className="font-bold text-emerald-600 text-base font-mono">64%</div>
+              </div>
+              <div>
+                <div className="text-slate-400 text-[10px]">Equipos</div>
+                <div className="font-bold text-slate-900 dark:text-white text-base font-mono">2</div>
+              </div>
+            </div>
+
+            <button
+              onClick={() => {
+                setPublicProfileModalOpen(false);
+                triggerDemoToast('Enlace Copiado', 'Enlace a tu perfil público deportivo copiado al portapapeles.', 'info');
+              }}
+              className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition"
+            >
+              Compartir Perfil Deportivo
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* 7. MODAL INFORMACIÓN LEGAL & NORMATIVA */}
+      {legalModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm animate-in fade-in duration-150">
+          <div className="relative w-full max-w-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl text-slate-900 dark:text-slate-100 max-h-[85vh] overflow-y-auto space-y-4">
+            <button
+              onClick={() => setLegalModalOpen(false)}
+              className="absolute top-4 right-4 p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className="flex items-center gap-2">
+              <FileText className="w-5 h-5 text-emerald-500" />
+              <h3 className="text-lg font-black text-slate-900 dark:text-white">
+                Información Legal y Normativa del Club
+              </h3>
+            </div>
+
+            <div className="space-y-3 text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+              <div>
+                <h4 className="font-bold text-slate-900 dark:text-white">1. Titularidad y Responsabilidad</h4>
+                <p>{currentTenant.name} ({currentTenant.address}) es el titular del centro deportivo y prestador de los servicios.</p>
+              </div>
+
+              <div>
+                <h4 className="font-bold text-slate-900 dark:text-white">2. Política de Cancelación</h4>
+                <p>Las reservas podrán cancelarse sin coste hasta {currentTenant.settings.cancellationWindowHours} horas antes del horario fijado. Transcurrido dicho plazo no se reembolsará el importe.</p>
+              </div>
+
+              <div>
+                <h4 className="font-bold text-slate-900 dark:text-white">3. Normativa de Uso de Pistas</h4>
+                <p>Obligatorio el uso de calzado específico de pádel (suela de espiga o mixta). Prohibido entrar a pista con calzado de calle o botellas de cristal.</p>
+              </div>
+
+              <div>
+                <h4 className="font-bold text-slate-900 dark:text-white">4. Protección de Datos (RGPD)</h4>
+                <p>Tus datos se gestionan conforme a la normativa europea para la prestación de reservas, gestión deportiva y notificaciones del club.</p>
+              </div>
+            </div>
+
+            <div className="pt-2">
+              <button
+                onClick={() => setLegalModalOpen(false)}
+                className="w-full py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 font-bold text-xs text-slate-900 dark:text-white transition"
+              >
+                Cerrar Normativa
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 8. MOBILE DRAWER MENU */}
+      {mobileDrawerOpen && (
+        <div className="fixed inset-0 z-50 flex">
+          <div
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm"
+            onClick={() => setMobileDrawerOpen(false)}
+          />
+          <div className="relative w-72 bg-white dark:bg-slate-900 h-full p-6 shadow-2xl flex flex-col justify-between z-10 text-slate-900 dark:text-slate-100">
+            <div className="space-y-6">
+              <div className="flex items-center justify-between pb-4 border-b border-slate-200 dark:border-slate-800">
+                <div className="font-black text-sm text-slate-900 dark:text-white">{currentTenant.shortName}</div>
+                <button
+                  onClick={() => setMobileDrawerOpen(false)}
+                  className="p-1 rounded-lg text-slate-400 hover:text-white"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <div className="space-y-1 text-xs font-semibold">
+                {[
+                  { id: 'overview', label: 'Mi Espacio', icon: Home },
+                  { id: 'booking', label: 'Reservar Pista', icon: Calendar },
+                  { id: 'matches', label: 'Partidos Abiertos', icon: Users },
+                  { id: 'tournaments', label: 'Mis Competiciones', icon: Trophy },
+                  { id: 'teams', label: 'Mis Equipos', icon: Shield },
+                  { id: 'academy', label: 'Escuela & Clases', icon: GraduationCap },
+                  { id: 'stats', label: 'Nivel & Estadísticas', icon: TrendingUp },
+                  { id: 'profile', label: 'Mi Ficha', icon: UserRound },
+                ].map((item) => {
+                  const Icon = item.icon;
+                  const isActive = activePlayerTab === item.id;
+                  return (
+                    <button
+                      key={item.id}
+                      onClick={() => {
+                        setActivePlayerTab(item.id as typeof activePlayerTab);
+                        setMobileDrawerOpen(false);
+                      }}
+                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition ${
+                        isActive
+                          ? 'bg-emerald-600 text-white font-bold'
+                          : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+                      }`}
+                    >
+                      <Icon className="w-4 h-4" />
+                      <span>{item.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="pt-4 border-t border-slate-200 dark:border-slate-800 space-y-2 text-xs">
+              <button
+                onClick={() => {
+                  setMobileDrawerOpen(false);
+                  setLegalModalOpen(true);
+                }}
+                className="w-full flex items-center gap-2 text-slate-500 hover:text-slate-900 dark:hover:text-white py-1.5"
+              >
+                <FileText className="w-4 h-4" />
+                <span>Normativa y Legal</span>
+              </button>
+              <button
+                onClick={() => {
+                  setMobileDrawerOpen(false);
+                  setCurrentView('public');
+                }}
+                className="w-full flex items-center gap-2 text-emerald-600 dark:text-emerald-400 font-bold py-1.5"
+              >
+                <span>Ir a Web Pública</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

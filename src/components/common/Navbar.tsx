@@ -36,6 +36,7 @@ interface NavbarProps {
 export const Navbar: React.FC<NavbarProps> = ({ onOpenCart, onOpenAuth }) => {
   const {
     currentTenant,
+    currentUser,
     publicPage,
     setPublicPage,
     cart,
@@ -46,6 +47,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCart, onOpenAuth }) => {
     setTheme,
     language,
     setLanguage,
+    navigateToCorporate,
   } = useApp();
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -96,7 +98,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCart, onOpenAuth }) => {
 
   return (
     <>
-      <header className="sticky top-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 transition-colors duration-200">
+      <header className="sticky top-0 z-40 w-full max-w-full overflow-x-hidden bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 transition-colors duration-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             {/* Brand Logo & Name */}
@@ -112,13 +114,18 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCart, onOpenAuth }) => {
                 </div>
               )}
               <div>
-                <div className="font-extrabold text-base tracking-tight text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
-                  {currentTenant.shortName}
-                </div>
-                <div className="text-[11px] text-slate-500 dark:text-slate-400 font-medium leading-none">
-                  {currentTenant.city} · {currentTenant.region}
+                <div className="font-extrabold text-base sm:text-lg tracking-tight text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                  {currentTenant.name}
                 </div>
               </div>
+            </button>
+
+            <button
+              onClick={navigateToCorporate}
+              className="hidden xl:inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 text-[11px] font-bold text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition border border-slate-200 dark:border-slate-700"
+              title="Volver a la plataforma corporativa de Setmio SaaS"
+            >
+              <span>← Setmio SaaS</span>
             </button>
 
             {/* Desktop Navigation Links */}
@@ -204,14 +211,18 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCart, onOpenAuth }) => {
                 )}
               </button>
 
-              {/* Favorites Icon */}
+              {/* Favorites Icon: if not logged in -> Auth modal; if logged in -> Cart */}
               <button
                 onClick={() => {
-                  setPublicPage('shop');
-                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                  if (!currentUser) {
+                    onOpenAuth();
+                  } else {
+                    onOpenCart();
+                  }
                 }}
                 className="relative p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition"
-                title="Ver favoritos"
+                title={!currentUser ? 'Inicia sesión para ver tus favoritos' : 'Ver carrito'}
+                aria-label="Favoritos o carrito"
               >
                 <Heart className="w-4 h-4" />
                 {favorites.length > 0 && (

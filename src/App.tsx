@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useApp } from './context/AppContext';
+import { TopBarDemo } from './components/common/TopBarDemo';
 import { Navbar } from './components/common/Navbar';
 import { Footer } from './components/common/Footer';
 import { DraggableAIAgent } from './components/common/DraggableAIAgent';
@@ -18,9 +19,13 @@ import { OpenMatchesView } from './components/public/OpenMatchesView';
 import { AcademyView } from './components/public/AcademyView';
 import { TournamentsView } from './components/public/TournamentsView';
 import { ShopView } from './components/public/ShopView';
+import { TeamsView } from './components/public/TeamsView';
 import { BlogView } from './components/public/BlogView';
 import { ContactFAQView } from './components/public/ContactFAQView';
 import { LegalView } from './components/public/LegalView';
+import { BrandSplashScreen } from './components/common/BrandSplashScreen';
+import { SetmioCorporateLanding } from './components/public/SetmioCorporateLanding';
+import { SetmioCorporateLoader } from './components/common/SetmioCorporateLoader';
 
 // Admin views
 import { AdminLayout } from './components/admin/AdminLayout';
@@ -54,10 +59,44 @@ export function App() {
     adminTab,
     demoToast,
     clearDemoToast,
+    isCorporateLanding,
+    navigateToClub,
   } = useApp();
 
   const [cartOpen, setCartOpen] = useState(false);
   const [authOpen, setAuthOpen] = useState(false);
+
+  // Corporate loader animation (ONLY for the main SaaS corporate landing, NEVER for clubs)
+  const [corporateLoaderDone, setCorporateLoaderDone] = useState(() => {
+    if (typeof window === 'undefined') return true;
+    return sessionStorage.getItem('setmio_corporate_loader_seen') === 'true';
+  });
+
+  const handleCorporateLoaderComplete = () => {
+    setCorporateLoaderDone(true);
+    try {
+      sessionStorage.setItem('setmio_corporate_loader_seen', 'true');
+    } catch {
+      // Ignore
+    }
+  };
+
+  // PWA Brand splash screen (Only for installed private app sessions)
+  const [showSplash, setShowSplash] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    // Do not show on public club web (clean fluid instant load)
+    if (isCorporateLanding) return false;
+    return sessionStorage.getItem('setmio_splash_seen') !== 'true';
+  });
+
+  const handleSplashComplete = () => {
+    setShowSplash(false);
+    try {
+      sessionStorage.setItem('setmio_splash_seen', 'true');
+    } catch {
+      // Ignore
+    }
+  };
 
   useEffect(() => {
     const enabled = currentTenant.publicPages ?? ['home', 'courts', 'academy', 'tournaments', 'shop', 'contact'];
@@ -83,7 +122,10 @@ export function App() {
         return <AcademyView />;
       case 'tournaments':
         return <TournamentsView />;
+      case 'teams':
+        return <TeamsView />;
       case 'shop':
+      case 'product_detail':
         return <ShopView />;
       case 'blog':
       case 'article':
@@ -133,30 +175,50 @@ export function App() {
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 font-sans selection:bg-emerald-500 selection:text-white antialiased transition-colors duration-200">
-      {/* Main view renderer. Public pages own their header/footer; private pages own their app shell. */}
-      {currentView === 'public' && (
-        <div className="flex flex-col min-h-screen">
-          <Navbar onOpenCart={() => setCartOpen(true)} onOpenAuth={() => setAuthOpen(true)} />
-          <main className="flex-1">{renderPublicPage()}</main>
-          {/* Public Footer ONLY in public view (Requirement 8: No footer in app) */}
-          <Footer />
-        </div>
-      )}
+      {/* 0. Demo & Global Role Switcher Bar */}
+      <TopBarDemo />
 
-      {currentView === 'admin' && (
-        <AdminLayout>{renderAdminTab()}</AdminLayout>
-      )}
+      {/* PWA & Brand Splash Screen */}
+      {showSplash && <BrandSplashScreen onComplete={handleSplashComplete} />}
 
-      {currentView === 'player' && (
-        <PlayerPortal />
-      )}
+      {/* Main view renderer: Corporate SaaS Landing OR Club View */}
+      {isCorporateLanding && currentView === 'public' ? (
+        <>
+          {!corporateLoaderDone && (
+            <SetmioCorporateLoader onComplete={handleCorporateLoaderComplete} />
+          )}
+          <SetmioCorporateLanding
+            onOpenAuth={() => setAuthOpen(true)}
+            onExploreClub={navigateToClub}
+          />
+        </>
+      ) : (
+        <>
+          {currentView === 'public' && (
+            <div className="flex flex-col min-h-screen">
+              <Navbar onOpenCart={() => setCartOpen(true)} onOpenAuth={() => setAuthOpen(true)} />
+              <main className="flex-1">{renderPublicPage()}</main>
+              {/* Public Footer ONLY in public view (Requirement 8: No footer in app) */}
+              <Footer />
+            </div>
+          )}
 
-      {currentView === 'coach' && (
-        <CoachPortal />
-      )}
+          {currentView === 'admin' && (
+            <AdminLayout>{renderAdminTab()}</AdminLayout>
+          )}
 
-      {currentView === 'hq' && (
-        <SuperadminHQ />
+          {currentView === 'player' && (
+            <PlayerPortal />
+          )}
+
+          {currentView === 'coach' && (
+            <CoachPortal />
+          )}
+
+          {currentView === 'hq' && (
+            <SuperadminHQ />
+          )}
+        </>
       )}
 
       {/* 3. Floating AI Agent (Draggable, session memory, tenant branded) */}

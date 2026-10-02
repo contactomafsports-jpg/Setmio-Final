@@ -6,7 +6,10 @@ export const WhatsAppFloat: React.FC = () => {
   const { currentTenant, currentView } = useApp();
 
   const isEnabled = currentTenant.settings.whatsappWidgetEnabled;
-  if (!isEnabled) return null;
+  const mode = currentTenant.settings.chatWidgetMode || 'both';
+
+  // Only render dedicated WhatsApp float button if mode is specifically 'whatsapp'
+  if (!isEnabled || mode !== 'whatsapp') return null;
 
   // Clean phone number for wa.me
   const cleanPhone = (currentTenant.whatsappNumber || currentTenant.contactPhone || '')

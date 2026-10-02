@@ -49,6 +49,8 @@ export type PublicPage =
   | 'academy'
   | 'tournaments'
   | 'shop'
+  | 'product_detail'
+  | 'teams'
   | 'blog'
   | 'article'
   | 'contact'
@@ -63,6 +65,8 @@ const PUBLIC_ROUTES: Record<string, PublicPage> = {
   '/escuela': 'academy',
   '/torneos': 'tournaments',
   '/tienda': 'shop',
+  '/producto': 'product_detail',
+  '/equipos': 'teams',
   '/blog': 'blog',
   '/contacto': 'contact',
   '/legal': 'legal',
@@ -77,6 +81,8 @@ const routeForPage: Record<PublicPage, string> = {
   academy: '/escuela',
   tournaments: '/torneos',
   shop: '/tienda',
+  product_detail: '/tienda',
+  teams: '/equipos',
   blog: '/blog',
   article: '/blog',
   contact: '/contacto',
@@ -111,23 +117,111 @@ const routeForPlayerTab: Record<PlayerTab, string> = {
 
 const readRoute = () => {
   if (typeof window === 'undefined') {
-    return { view: 'public' as MainView, page: 'home' as PublicPage, admin: 'dashboard' as AdminTab, player: 'dashboard' as PlayerTab };
+    return {
+      view: 'public' as MainView,
+      page: 'home' as PublicPage,
+      admin: 'dashboard' as AdminTab,
+      player: 'dashboard' as PlayerTab,
+      clubSlug: null as string | null,
+      isCorporate: true,
+    };
   }
+
+  const hostname = window.location.hostname.toLowerCase();
   const path = window.location.pathname.replace(/\/+$/, '') || '/';
-  if (path === '/hq') return { view: 'hq' as MainView, page: 'home' as PublicPage, admin: 'dashboard' as AdminTab, player: 'dashboard' as PlayerTab };
-  if (path === '/profesor' || path.startsWith('/profesor/')) {
-    return { view: 'coach' as MainView, page: 'home' as PublicPage, admin: 'dashboard' as AdminTab, player: 'dashboard' as PlayerTab };
+
+  // 1. Detect Subdomain (e.g. sanmateo.setmiofinal2.vercel.app or sanmateo.localhost)
+  let detectedSubdomain: string | null = null;
+  if (hostname.endsWith('.setmiofinal2.vercel.app')) {
+    const sub = hostname.replace('.setmiofinal2.vercel.app', '');
+    if (sub && sub !== 'www' && sub !== 'app') detectedSubdomain = sub;
+  } else if (hostname.endsWith('.localhost')) {
+    const sub = hostname.replace('.localhost', '');
+    if (sub && sub !== 'www') detectedSubdomain = sub;
   }
-  if (path === '/gestion' || path.startsWith('/gestion/')) {
-    const admin = (Object.entries(routeForAdminTab).find(([, route]) => route === path)?.[0] || 'dashboard') as AdminTab;
-    return { view: 'admin' as MainView, page: 'home' as PublicPage, admin, player: 'dashboard' as PlayerTab };
+
+  // 2. Detect Custom Domain (e.g. padelsanmateo.com, padelsanmateo.es)
+  let detectedCustomDomainClub: string | null = null;
+  if (
+    hostname === 'padelsanmateo.com' ||
+    hostname === 'www.padelsanmateo.com' ||
+    hostname === 'padelsanmateo.es' ||
+    hostname === 'www.padelsanmateo.es'
+  ) {
+    detectedCustomDomainClub = 'sanmateo';
+  } else if (hostname === 'padelcoruna.es') {
+    detectedCustomDomainClub = 'padelcoruna';
+  } else if (hostname === 'martinsanchezpadel.com') {
+    detectedCustomDomainClub = 'martinsanchez';
   }
-  if (path === '/app' || path.startsWith('/app/')) {
-    const player = (Object.entries(routeForPlayerTab).find(([, route]) => route === path)?.[0] || 'dashboard') as PlayerTab;
-    return { view: 'player' as MainView, page: 'home' as PublicPage, admin: 'dashboard' as AdminTab, player };
+
+  // 3. Detect Path /club/:slug
+  let pathClubSlug: string | null = null;
+  let remainingPath = path;
+  if (path.startsWith('/club/')) {
+    const parts = path.split('/');
+    pathClubSlug = parts[2] || null;
+    remainingPath = '/' + parts.slice(3).join('/');
+    if (remainingPath === '/') remainingPath = '/';
   }
-  const page = PUBLIC_ROUTES[path] || 'home';
-  return { view: 'public' as MainView, page, admin: 'dashboard' as AdminTab, player: 'dashboard' as PlayerTab };
+
+  const activeClubSlug = pathClubSlug || detectedSubdomain || detectedCustomDomainClub;
+
+  // On base root '/' without any specific club slug, serve Setmio Corporate SaaS Landing!
+  const isCorporate = !activeClubSlug && (path === '/' || path === '');
+
+  if (remainingPath === '/hq') {
+    return {
+      view: 'hq' as MainView,
+      page: 'home' as PublicPage,
+      admin: 'dashboard' as AdminTab,
+      player: 'dashboard' as PlayerTab,
+      clubSlug: activeClubSlug,
+      isCorporate: false,
+    };
+  }
+  if (remainingPath === '/profesor' || remainingPath.startsWith('/profesor/')) {
+    return {
+      view: 'coach' as MainView,
+      page: 'home' as PublicPage,
+      admin: 'dashboard' as AdminTab,
+      player: 'dashboard' as PlayerTab,
+      clubSlug: activeClubSlug,
+      isCorporate: false,
+    };
+  }
+  if (remainingPath === '/gestion' || remainingPath.startsWith('/gestion/')) {
+    const admin = (Object.entries(routeForAdminTab).find(([, route]) => route === remainingPath)?.[0] || 'dashboard') as AdminTab;
+    return {
+      view: 'admin' as MainView,
+      page: 'home' as PublicPage,
+      admin,
+      player: 'dashboard' as PlayerTab,
+      clubSlug: activeClubSlug,
+      isCorporate: false,
+    };
+  }
+  if (remainingPath === '/app' || remainingPath.startsWith('/app/')) {
+    const player = (Object.entries(routeForPlayerTab).find(([, route]) => route === remainingPath)?.[0] || 'dashboard') as PlayerTab;
+    return {
+      view: 'player' as MainView,
+      page: 'home' as PublicPage,
+      admin: 'dashboard' as AdminTab,
+      player,
+      clubSlug: activeClubSlug,
+      isCorporate: false,
+    };
+  }
+
+  const page = PUBLIC_ROUTES[remainingPath] || 'home';
+  return {
+    view: 'public' as MainView,
+    page,
+    admin: 'dashboard' as AdminTab,
+    player: 'dashboard' as PlayerTab,
+    clubSlug: activeClubSlug,
+    isCorporate,
+  };
 };
 
 export type AdminTab =
@@ -195,6 +289,10 @@ interface AppContextType {
   setOnboardingOpen: (open: boolean) => void;
 
   // Navigation & Views
+  isCorporateLanding: boolean;
+  setIsCorporateLanding: (isCorporate: boolean) => void;
+  navigateToClub: (slug: string) => void;
+  navigateToCorporate: () => void;
   currentView: MainView;
   setCurrentView: (view: MainView) => void;
   publicPage: PublicPage;
@@ -203,6 +301,10 @@ interface AppContextType {
   setSelectedArticleId: (id: string | null) => void;
   selectedProductId: string | null;
   setSelectedProductId: (id: string | null) => void;
+  selectedTeamId: string | null;
+  setSelectedTeamId: (id: string | null) => void;
+  selectedCourtsForBooking: string[];
+  setSelectedCourtsForBooking: (courts: string[]) => void;
   adminTab: AdminTab;
   setAdminTab: (tab: AdminTab) => void;
   playerTab: PlayerTab;
@@ -477,43 +579,25 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   // Navigation
   const initialRoute = readRoute();
+  const [isCorporateLanding, setIsCorporateLanding] = useState<boolean>(initialRoute.isCorporate);
   const [currentView, setCurrentViewState] = useState<MainView>(initialRoute.view);
   const [publicPage, setPublicPageState] = useState<PublicPage>(initialRoute.page);
   const [selectedArticleId, setSelectedArticleId] = useState<string | null>(null);
   const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
+  const [selectedTeamId, setSelectedTeamId] = useState<string | null>(null);
+  const [selectedCourtsForBooking, setSelectedCourtsForBooking] = useState<string[]>([]);
   const [adminTab, setAdminTabState] = useState<AdminTab>(initialRoute.admin);
   const [playerTab, setPlayerTabState] = useState<PlayerTab>(initialRoute.player);
 
-  const setCurrentView = (view: MainView) => setCurrentViewState(view);
+  const setCurrentView = (view: MainView) => {
+    if (view !== 'public') {
+      setIsCorporateLanding(false);
+    }
+    setCurrentViewState(view);
+  };
   const setPublicPage = (page: PublicPage) => setPublicPageState(page);
   const setAdminTab = (tab: AdminTab) => setAdminTabState(tab);
   const setPlayerTab = (tab: PlayerTab) => setPlayerTabState(tab);
-
-  useEffect(() => {
-    const onPopState = () => {
-      const route = readRoute();
-      setCurrentViewState(route.view);
-      setPublicPageState(route.page);
-      setAdminTabState(route.admin);
-      setPlayerTabState(route.player);
-    };
-    window.addEventListener('popstate', onPopState);
-    return () => window.removeEventListener('popstate', onPopState);
-  }, []);
-
-  useEffect(() => {
-    const path = currentView === 'admin'
-      ? routeForAdminTab[adminTab]
-      : currentView === 'player'
-        ? routeForPlayerTab[playerTab]
-        : currentView === 'coach'
-          ? '/profesor'
-          : currentView === 'hq'
-            ? '/hq'
-            : routeForPage[publicPage];
-    const nextUrl = `${path}${window.location.search}${window.location.hash}`;
-    if (window.location.pathname !== path) window.history.pushState({}, '', nextUrl);
-  }, [currentView, publicPage, adminTab, playerTab]);
 
   // Multi-tenant & Plans
   const [tenants, setTenants] = useState<Tenant[]>(() =>
@@ -521,8 +605,80 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   );
   useEffect(() => saveDemoState('setmio_demo_tenants_v1', tenants), [tenants]);
 
-  const [currentTenantId, setCurrentTenantId] = useState<string>('tenant-san-mateo-01');
+  const [currentTenantId, setCurrentTenantId] = useState<string>(() => {
+    if (initialRoute.clubSlug) {
+      const match = [INITIAL_TENANT, ...ADDITIONAL_DEMO_TENANTS].find((t) => t.slug === initialRoute.clubSlug);
+      if (match) return match.id;
+    }
+    return 'tenant-san-mateo-01';
+  });
+
   const currentTenant = tenants.find((t) => t.id === currentTenantId) || tenants[0];
+
+  const navigateToClub = (slug: string) => {
+    setIsCorporateLanding(false);
+    const target = tenants.find((t) => t.slug === slug);
+    if (target) {
+      setCurrentTenantId(target.id);
+    }
+    setCurrentViewState('public');
+    setPublicPageState('home');
+    if (typeof window !== 'undefined') {
+      window.history.pushState({}, '', `/club/${slug}`);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  const navigateToCorporate = () => {
+    setIsCorporateLanding(true);
+    setCurrentViewState('public');
+    setPublicPageState('home');
+    if (typeof window !== 'undefined') {
+      window.history.pushState({}, '', '/');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  useEffect(() => {
+    const onPopState = () => {
+      const route = readRoute();
+      setIsCorporateLanding(route.isCorporate);
+      setCurrentViewState(route.view);
+      setPublicPageState(route.page);
+      setAdminTabState(route.admin);
+      setPlayerTabState(route.player);
+      if (route.clubSlug) {
+        const target = tenants.find((t) => t.slug === route.clubSlug);
+        if (target) setCurrentTenantId(target.id);
+      }
+    };
+    window.addEventListener('popstate', onPopState);
+    return () => window.removeEventListener('popstate', onPopState);
+  }, [tenants]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (isCorporateLanding) {
+      if (window.location.pathname !== '/' && !window.location.pathname.startsWith('/club/')) {
+        window.history.pushState({}, '', '/');
+      }
+      return;
+    }
+    const prefix = `/club/${currentTenant.slug}`;
+    const path = currentView === 'admin'
+      ? `${prefix}${routeForAdminTab[adminTab]}`
+      : currentView === 'player'
+        ? `${prefix}${routeForPlayerTab[playerTab]}`
+        : currentView === 'coach'
+          ? `${prefix}/profesor`
+          : currentView === 'hq'
+            ? `${prefix}/hq`
+            : publicPage === 'home'
+              ? prefix
+              : `${prefix}${routeForPage[publicPage]}`;
+    const nextUrl = `${path}${window.location.search}${window.location.hash}`;
+    if (window.location.pathname !== path) window.history.pushState({}, '', nextUrl);
+  }, [isCorporateLanding, currentTenant.slug, currentView, publicPage, adminTab, playerTab]);
 
   useEffect(() => {
     const root = document.documentElement;
@@ -587,14 +743,17 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const switchUserRole = (role: UserRole) => {
     const profile = ROLE_PROFILES[role] || ROLE_PROFILES.PLAYER;
     setCurrentUser(profile);
+    setIsCorporateLanding(false);
 
     // Auto navigate to relevant view based on role
     if (role === 'SUPERADMIN') {
-      setCurrentView('hq');
+      setCurrentViewState('hq');
     } else if (role === 'PLAYER' || role === 'PARENT_OR_GUARDIAN') {
-      setCurrentView('player');
+      setCurrentViewState('player');
+    } else if (role === 'COACH') {
+      setCurrentViewState('coach');
     } else {
-      setCurrentView('admin');
+      setCurrentViewState('admin');
     }
 
     triggerDemoToast(
@@ -1104,6 +1263,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         onboardingOpen,
         setOnboardingOpen,
 
+        isCorporateLanding,
+        setIsCorporateLanding,
+        navigateToClub,
+        navigateToCorporate,
+
         currentView,
         setCurrentView,
         publicPage,
@@ -1112,6 +1276,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         setSelectedArticleId,
         selectedProductId,
         setSelectedProductId,
+        selectedTeamId,
+        setSelectedTeamId,
+        selectedCourtsForBooking,
+        setSelectedCourtsForBooking,
         adminTab,
         setAdminTab,
         playerTab,

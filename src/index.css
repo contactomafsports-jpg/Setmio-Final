@@ -25,9 +25,9 @@
 }
 
 * { box-sizing: border-box; }
-html, body, #root { min-height: 100%; margin: 0; }
+html, body, #root { min-height: 100%; margin: 0; max-width: 100%; overflow-x: hidden; }
 html { background: var(--color-background); scroll-padding-top: 5rem; }
-body { margin: 0; min-width: 320px; background: var(--color-background); color: var(--color-foreground); }
+body { margin: 0; min-width: 320px; background: var(--color-background); color: var(--color-foreground); overflow-x: hidden; }
 button, input, select, textarea { font: inherit; }
 button { -webkit-tap-highlight-color: transparent; }
 ::selection { background: #c7f36b; color: #10221d; }

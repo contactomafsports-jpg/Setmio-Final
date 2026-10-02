@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useApp } from '../../context/AppContext';
 import {
   MessageSquare,
+  MessageCircle,
   X,
   Minimize2,
   Maximize2,
@@ -11,6 +12,7 @@ import {
   Move,
   CheckCircle2,
   HelpCircle,
+  ExternalLink,
 } from 'lucide-react';
 
 export const DraggableAIAgent: React.FC = () => {
@@ -24,6 +26,7 @@ export const DraggableAIAgent: React.FC = () => {
   } = useApp();
 
   const [isOpen, setIsOpen] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
   const [inputText, setInputText] = useState('');
   const [position, setPosition] = useState<{ x: number; y: number }>({ x: 24, y: 88 });
   const [isDragging, setIsDragging] = useState(false);
@@ -35,6 +38,25 @@ export const DraggableAIAgent: React.FC = () => {
   });
 
   const chatEndRef = useRef<HTMLDivElement>(null);
+
+  const widgetMode = currentTenant.settings.chatWidgetMode || 'both';
+
+  // If set to 'whatsapp' only, the unified DraggableAIAgent hides and WhatsAppFloat is rendered
+  if (widgetMode === 'whatsapp') {
+    return null;
+  }
+
+  // Precomputed WhatsApp URL for diverting conversations
+  const cleanPhone = (currentTenant.whatsappNumber || currentTenant.contactPhone || '')
+    .replace(/[^\d+]/g, '')
+    .replace('+', '');
+
+  const greeting = encodeURIComponent(
+    currentTenant.settings.whatsappGreetingMessage ||
+      `¡Hola! Escribo desde la web de ${currentTenant.name}. Quisiera hablar con recepción tras consultar el asistente virtual.`
+  );
+
+  const whatsappDivertUrl = `https://wa.me/${cleanPhone}?text=${greeting}`;
 
   // Restore position from sessionStorage if exists
   useEffect(() => {
@@ -126,47 +148,67 @@ export const DraggableAIAgent: React.FC = () => {
   const headerInfo = getAgentHeader();
 
   return (
-    <div
-      style={{
-        position: 'fixed',
-        right: `${position.x}px`,
-        bottom: `${position.y}px`,
-        zIndex: 50,
-      }}
-      className="touch-none select-none transition-shadow"
-    >
+    <>
       {!isOpen ? (
         // Minimized floating bubble
         <div
-          onPointerDown={handlePointerDown}
-          onPointerMove={handlePointerMove}
-          onPointerUp={handlePointerUp}
-          onClick={() => {
-            if (!isDragging) setIsOpen(true);
+          style={{
+            position: 'fixed',
+            right: `${position.x}px`,
+            bottom: `${position.y}px`,
+            zIndex: 50,
           }}
-          className="group relative flex items-center gap-2 cursor-grab active:cursor-grabbing p-3 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-700 text-white shadow-2xl hover:scale-105 transition-transform"
-          title="Arrastra para mover o haz clic para abrir el Asistente IA"
+          className="touch-none select-none transition-shadow"
         >
-          <div className="relative">
-            <Bot className="w-6 h-6 text-white" />
-            <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-emerald-300 ring-2 ring-emerald-950 animate-pulse" />
-          </div>
-          <span className="hidden sm:inline text-xs font-bold tracking-tight pr-1">
-            Asistente {currentTenant.shortName}
-          </span>
-          <div className="opacity-40 group-hover:opacity-100 transition-opacity">
-            <Move className="w-3.5 h-3.5" />
-          </div>
-        </div>
-      ) : (
-        // Expanded Chat Window
-        <div className="w-[92vw] sm:w-[380px] h-[520px] max-h-[82vh] bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl flex flex-col overflow-hidden text-slate-100 animate-in fade-in zoom-in-95 duration-150">
-          {/* Header & Drag Handle */}
           <div
             onPointerDown={handlePointerDown}
             onPointerMove={handlePointerMove}
             onPointerUp={handlePointerUp}
-            className="cursor-grab active:cursor-grabbing bg-slate-950 px-4 py-3 border-b border-slate-800 flex items-center justify-between"
+            onClick={() => {
+              if (!isDragging) setIsOpen(true);
+            }}
+            className="group relative flex items-center gap-2 cursor-grab active:cursor-grabbing p-3 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-700 text-white shadow-2xl hover:scale-105 transition-transform"
+            title="Arrastra para mover o haz clic para abrir el Asistente IA"
+          >
+            <div className="relative">
+              <Bot className="w-6 h-6 text-white" />
+              <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-emerald-300 ring-2 ring-emerald-950 animate-pulse" />
+            </div>
+            <span className="hidden sm:inline text-xs font-bold tracking-tight pr-1">
+              Asistente {currentTenant.shortName}
+            </span>
+            <div className="opacity-40 group-hover:opacity-100 transition-opacity">
+              <Move className="w-3.5 h-3.5" />
+            </div>
+          </div>
+        </div>
+      ) : (
+        // Expanded Chat Window (Supports Fullscreen or floating card)
+        <div
+          style={
+            isFullscreen
+              ? undefined
+              : {
+                  position: 'fixed',
+                  right: `${position.x}px`,
+                  bottom: `${position.y}px`,
+                  zIndex: 50,
+                }
+          }
+          className={
+            isFullscreen
+              ? 'fixed inset-2 sm:inset-6 z-[70] bg-slate-900 border border-slate-700 rounded-3xl shadow-2xl flex flex-col overflow-hidden text-slate-100 animate-in fade-in zoom-in-95 duration-150'
+              : 'w-[92vw] sm:w-[380px] h-[520px] max-h-[82vh] bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl flex flex-col overflow-hidden text-slate-100 animate-in fade-in zoom-in-95 duration-150'
+          }
+        >
+          {/* Header & Drag Handle */}
+          <div
+            onPointerDown={isFullscreen ? undefined : handlePointerDown}
+            onPointerMove={isFullscreen ? undefined : handlePointerMove}
+            onPointerUp={isFullscreen ? undefined : handlePointerUp}
+            className={`${
+              isFullscreen ? 'cursor-default' : 'cursor-grab active:cursor-grabbing'
+            } bg-slate-950 px-4 py-3 border-b border-slate-800 flex items-center justify-between`}
           >
             <div className="flex items-center gap-2.5">
               <div className="w-8 h-8 rounded-lg bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400">
@@ -184,15 +226,35 @@ export const DraggableAIAgent: React.FC = () => {
             </div>
 
             <div className="flex items-center gap-1">
+              {/* WhatsApp Divert button if mode is 'both' */}
+              {widgetMode === 'both' && (
+                <a
+                  href={whatsappDivertUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hidden sm:inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/30 text-[10px] font-bold transition mr-1"
+                  title="Desviar conversación a WhatsApp oficial"
+                >
+                  <MessageCircle className="w-3.5 h-3.5 text-emerald-400" />
+                  <span>WhatsApp</span>
+                </a>
+              )}
+
+              {/* Fullscreen Expand / Restore */}
               <button
-                onClick={() => setIsOpen(false)}
+                onClick={() => setIsFullscreen(!isFullscreen)}
                 className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
-                title="Minimizar"
+                title={isFullscreen ? 'Reducir tamaño' : 'Pantalla completa'}
               >
-                <Minimize2 className="w-4 h-4" />
+                {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
               </button>
+
+              {/* Close Button */}
               <button
-                onClick={() => setIsOpen(false)}
+                onClick={() => {
+                  setIsOpen(false);
+                  setIsFullscreen(false);
+                }}
                 className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
                 title="Cerrar"
               >
@@ -208,9 +270,19 @@ export const DraggableAIAgent: React.FC = () => {
               <span>Web Chat: Activo</span>
             </div>
             <div className="flex items-center gap-2 text-slate-400">
-              <span>WhatsApp: Configurado Demo</span>
-              <span>·</span>
-              <span>IG: Próx</span>
+              {widgetMode === 'both' ? (
+                <a
+                  href={whatsappDivertUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-emerald-400 hover:underline flex items-center gap-1"
+                >
+                  <MessageCircle className="w-3 h-3" />
+                  <span>Desviar a WhatsApp</span>
+                </a>
+              ) : (
+                <span>Atención Setmio IA</span>
+              )}
             </div>
           </div>
 
@@ -288,6 +360,6 @@ export const DraggableAIAgent: React.FC = () => {
           </form>
         </div>
       )}
-    </div>
+    </>
   );
 };

@@ -12,6 +12,7 @@ import {
   Search,
   BookOpen,
   Sparkles,
+  ChevronRight,
 } from 'lucide-react';
 
 export const BlogView: React.FC = () => {
@@ -30,6 +31,10 @@ export const BlogView: React.FC = () => {
   const categories = ['all', 'Técnica & Táctica', 'Instalaciones', 'Salud & Rendimiento'];
 
   const selectedArticle = blogPosts.find((p) => p.id === selectedArticleId);
+
+  const relatedArticles = selectedArticle
+    ? blogPosts.filter((p) => p.id !== selectedArticle.id).slice(0, 3)
+    : [];
 
   const filteredPosts = blogPosts.filter((p) => {
     const matchCat = selectedCategory === 'all' || p.category === selectedCategory;
@@ -52,11 +57,12 @@ export const BlogView: React.FC = () => {
       {/* If an article is selected, show Full Article Reader View */}
       {selectedArticle ? (
         <article className="max-w-4xl mx-auto space-y-8 animate-in fade-in duration-150">
+          {/* Aesthetic Back Button */}
           <button
             onClick={() => setSelectedArticleId(null)}
-            className="flex items-center gap-2 text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:underline transition"
+            className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 text-xs font-bold text-slate-800 dark:text-slate-200 shadow-sm transition"
           >
-            <ArrowLeft className="w-4 h-4" />
+            <ArrowLeft className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
             <span>Volver a Todos los Artículos</span>
           </button>
 
@@ -128,13 +134,59 @@ export const BlogView: React.FC = () => {
 
             <div className="p-6 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 my-8">
               <h4 className="font-bold text-emerald-900 dark:text-emerald-300 text-sm mb-1">
-                Consejo del Entrenador en Pádel San Mateo
+                Consejo del Entrenador en {currentTenant.name}
               </h4>
               <p className="text-xs text-emerald-800 dark:text-emerald-400 leading-relaxed">
-                "Dedica 15 minutos en el calentamiento a realizar intercambios lentos de bandeja a media pista sin buscar rematar. Calibrarás el bote del césped Mondo azul del club y ganarás confianza en la pala."
+                "Dedica 15 minutos en el calentamiento a realizar intercambios lentos de bandeja a media pista sin buscar rematar. Calibrarás el bote del césped del club y ganarás confianza en la pala."
               </p>
             </div>
           </div>
+
+          {/* Related Articles Carousel / Section */}
+          {relatedArticles.length > 0 && (
+            <div className="pt-10 border-t border-slate-200 dark:border-slate-800 space-y-6">
+              <div className="flex items-center justify-between">
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                  <Sparkles className="w-5 h-5 text-emerald-500" />
+                  <span>Artículos Relacionados</span>
+                </h3>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                {relatedArticles.map((article) => (
+                  <div
+                    key={article.id}
+                    onClick={() => {
+                      setSelectedArticleId(article.id);
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }}
+                    className="cursor-pointer rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm hover:shadow-md transition group flex flex-col justify-between"
+                  >
+                    <div>
+                      <div className="relative h-36 w-full overflow-hidden">
+                        <img
+                          src={article.coverImage}
+                          alt={article.title}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                        />
+                      </div>
+                      <div className="p-4 space-y-2">
+                        <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase">
+                          {article.category}
+                        </span>
+                        <h4 className="font-bold text-xs text-slate-900 dark:text-white line-clamp-2 group-hover:text-emerald-600 transition-colors">
+                          {article.title}
+                        </h4>
+                      </div>
+                    </div>
+                    <div className="p-4 pt-0 text-[11px] text-slate-400 font-medium">
+                      {article.readingTime} min de lectura
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Footer Back & CTA */}
           <div className="pt-8 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between">
@@ -151,7 +203,7 @@ export const BlogView: React.FC = () => {
                 setPublicPage('booking');
                 window.scrollTo({ top: 0, behavior: 'smooth' });
               }}
-              className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 dark:bg-emerald-500 dark:hover:bg-emerald-400 text-white dark:text-slate-950 font-bold text-xs shadow transition"
+              className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow transition"
             >
               Reservar Pista para Practicar
             </button>
@@ -167,7 +219,7 @@ export const BlogView: React.FC = () => {
                 <span>Actualidad & Consejos de Pádel</span>
               </div>
               <h1 className="text-3xl sm:text-5xl font-black text-slate-900 dark:text-white tracking-tight mt-1">
-                Blog Oficial Pádel San Mateo
+                Blog Oficial {currentTenant.name}
               </h1>
               <p className="text-slate-600 dark:text-slate-400 text-xs sm:text-sm mt-2 max-w-xl">
                 Artículos técnicos elaborados por nuestros entrenadores, análisis de biomecánica, crónicas de torneos y novedades del club en Narón.

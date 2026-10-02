@@ -101,6 +101,7 @@ export const INITIAL_PLANS: Plan[] = [
 export const INITIAL_TENANT: Tenant = {
   id: 'tenant-san-mateo-01',
   slug: 'sanmateo',
+  custom_domain: 'padelsanmateo.com',
   name: 'Centro de Pádel San Mateo',
   shortName: 'Pádel San Mateo',
   type: 'PADEL_CLUB',

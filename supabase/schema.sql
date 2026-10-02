@@ -63,6 +63,7 @@ CREATE TABLE IF NOT EXISTS public.plans (
 CREATE TABLE IF NOT EXISTS public.tenants (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   slug TEXT UNIQUE NOT NULL,
+  custom_domain TEXT UNIQUE, -- ej: 'padelsanmateo.com'
   name TEXT NOT NULL,
   short_name TEXT NOT NULL,
   type tenant_type NOT NULL DEFAULT 'PADEL_CLUB',
@@ -84,6 +85,32 @@ CREATE TABLE IF NOT EXISTS public.tenants (
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+-- ==============================================================================
+-- 3.1 TABLA CLUBS (Acceso directo para Middleware Edge & Multi-tenant Routing)
+-- ==============================================================================
+CREATE TABLE IF NOT EXISTS public.clubs (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  slug TEXT UNIQUE NOT NULL, -- ej: 'sanmateo'
+  name TEXT NOT NULL,
+  short_name TEXT NOT NULL,
+  custom_domain TEXT UNIQUE, -- ej: 'padelsanmateo.com'
+  plan_id TEXT REFERENCES public.plans(id),
+  status TEXT NOT NULL DEFAULT 'active',
+  country TEXT NOT NULL DEFAULT 'España',
+  city TEXT NOT NULL,
+  region TEXT,
+  address TEXT NOT NULL,
+  contact_email TEXT NOT NULL,
+  contact_phone TEXT,
+  whatsapp_number TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+ALTER TABLE public.clubs ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Public Read Clubs" ON public.clubs FOR SELECT USING (true);
+CREATE POLICY "Admin Write Clubs" ON public.clubs FOR ALL USING (true);
 
 CREATE TABLE IF NOT EXISTS public.tenant_domains (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -530,6 +557,27 @@ INSERT INTO public.tenants (
   '+34 600 00 00 00',
   ARRAY['home', 'courts', 'academy', 'tournaments', 'shop', 'contact']
 ) ON CONFLICT (id) DO NOTHING;
+
+-- 12.2.1 Tabla CLUBS para Middleware de Vercel & Multi-Tenant
+INSERT INTO public.clubs (
+  id, slug, name, short_name, custom_domain, plan_id, status,
+  country, city, region, address, contact_email, contact_phone, whatsapp_number
+) VALUES (
+  '11111111-1111-1111-1111-111111111111',
+  'sanmateo',
+  'Centro de Pádel San Mateo',
+  'Pádel San Mateo',
+  'padelsanmateo.com',
+  'elite',
+  'active',
+  'España',
+  'Narón',
+  'Galicia',
+  'Polígono Industrial Río do Pozo, Avda. dos Padelistas 14, Narón, A Coruña',
+  'info@padelsanmateo-demo.es',
+  '+34 981 38 00 00',
+  '+34 600 00 00 00'
+) ON CONFLICT (slug) DO UPDATE SET custom_domain = EXCLUDED.custom_domain;
 
 -- Configuración de Marca y Tema Visual del Club
 INSERT INTO public.tenant_branding (

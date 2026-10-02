@@ -30,6 +30,10 @@ export const TopBarDemo: React.FC = () => {
     triggerDemoToast,
     theme,
     toggleTheme,
+    isCorporateLanding,
+    setIsCorporateLanding,
+    navigateToClub,
+    navigateToCorporate,
   } = useApp();
 
   const [showRoleMenu, setShowRoleMenu] = useState(false);
@@ -51,7 +55,7 @@ export const TopBarDemo: React.FC = () => {
 
   return (
     <>
-      <header className="sticky top-0 z-50 bg-slate-950/95 backdrop-blur-md border-b border-slate-800 text-slate-200 text-xs">
+      <header className="sticky top-0 z-50 w-full max-w-full overflow-x-hidden bg-slate-950/95 backdrop-blur-md border-b border-slate-800 text-slate-200 text-xs shadow-md">
         <div className="max-w-7xl mx-auto px-3 sm:px-4 py-1.5 flex flex-wrap items-center justify-between gap-2">
           {/* Brand & Platform Badge */}
           <div className="flex items-center gap-2">
@@ -113,54 +117,95 @@ export const TopBarDemo: React.FC = () => {
           {/* Core Views Switcher */}
           <div className="flex items-center gap-1 bg-slate-900 p-0.5 rounded-lg border border-slate-800">
             <button
-              onClick={() => setCurrentView('public')}
+              onClick={() => {
+                navigateToCorporate();
+              }}
               className={`flex items-center gap-1 px-2.5 py-1 rounded text-xs font-medium transition ${
-                currentView === 'public'
-                  ? 'bg-emerald-600 text-white shadow-sm'
+                isCorporateLanding && currentView === 'public'
+                  ? 'bg-emerald-600 text-white shadow-sm font-bold'
                   : 'text-slate-400 hover:text-slate-200'
               }`}
+              title="Landing Corporativa de Setmio SaaS"
             >
-              <Globe className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Web Pública</span>
-            </button>
-
-            <button
-              onClick={() => setCurrentView('admin')}
-              className={`flex items-center gap-1 px-2.5 py-1 rounded text-xs font-medium transition ${
-                currentView === 'admin'
-                  ? 'bg-emerald-600 text-white shadow-sm'
-                  : 'text-slate-400 hover:text-slate-200'
-              }`}
-            >
-              <LayoutDashboard className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">App Gestión</span>
-            </button>
-
-            <button
-              onClick={() => setCurrentView('player')}
-              className={`flex items-center gap-1 px-2.5 py-1 rounded text-xs font-medium transition ${
-                currentView === 'player'
-                  ? 'bg-emerald-600 text-white shadow-sm'
-                  : 'text-slate-400 hover:text-slate-200'
-              }`}
-            >
-              <User className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Área Jugador</span>
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Setmio SaaS</span>
             </button>
 
             <button
               onClick={() => {
+                setIsCorporateLanding(false);
+                setCurrentView('public');
+              }}
+              className={`flex items-center gap-1 px-2.5 py-1 rounded text-xs font-medium transition ${
+                !isCorporateLanding && currentView === 'public'
+                  ? 'bg-emerald-600 text-white shadow-sm font-bold'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+              title={`Web Pública de ${currentTenant.shortName}`}
+            >
+              <Globe className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Web Club</span>
+            </button>
+
+            <button
+              onClick={() => {
+                setIsCorporateLanding(false);
+                setCurrentView('admin');
+              }}
+              className={`flex items-center gap-1 px-2.5 py-1 rounded text-xs font-medium transition ${
+                currentView === 'admin'
+                  ? 'bg-emerald-600 text-white shadow-sm font-bold'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              <LayoutDashboard className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Gestión Club</span>
+            </button>
+
+            <button
+              onClick={() => {
+                setIsCorporateLanding(false);
+                setCurrentView('player');
+              }}
+              className={`flex items-center gap-1 px-2.5 py-1 rounded text-xs font-medium transition ${
+                currentView === 'player'
+                  ? 'bg-emerald-600 text-white shadow-sm font-bold'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              <User className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">App Jugador</span>
+            </button>
+
+            <button
+              onClick={() => {
+                setIsCorporateLanding(false);
+                switchUserRole('COACH');
+                setCurrentView('coach');
+              }}
+              className={`flex items-center gap-1 px-2.5 py-1 rounded text-xs font-medium transition ${
+                currentView === 'coach'
+                  ? 'bg-emerald-600 text-white shadow-sm font-bold'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              <span className="hidden md:inline">Portal Coach</span>
+            </button>
+
+            <button
+              onClick={() => {
+                setIsCorporateLanding(false);
                 switchUserRole('SUPERADMIN');
                 setCurrentView('hq');
               }}
               className={`flex items-center gap-1 px-2.5 py-1 rounded text-xs font-medium transition ${
                 currentView === 'hq'
-                  ? 'bg-purple-600 text-white shadow-sm'
+                  ? 'bg-purple-600 text-white shadow-sm font-bold'
                   : 'text-purple-400 hover:text-purple-300'
               }`}
             >
               <ShieldAlert className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Setmio HQ</span>
+              <span className="hidden sm:inline">Superadmin</span>
             </button>
           </div>
 
@@ -180,14 +225,24 @@ export const TopBarDemo: React.FC = () => {
               {showRoleMenu && (
                 <div className="absolute top-full right-0 mt-1 w-64 bg-slate-900 border border-slate-700 rounded-lg shadow-2xl py-1 z-50">
                   <div className="px-3 py-1.5 border-b border-slate-800 text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
-                    Cambiar Perfil de Demostración
+                    Cambiar Rol Activo (Simulador)
                   </div>
                   {rolesList.map((item) => (
                     <button
                       key={item.role}
                       onClick={() => {
                         switchUserRole(item.role);
+                        setIsCorporateLanding(false);
+                        if (item.role === 'PLAYER') setCurrentView('player');
+                        else if (item.role === 'COACH') setCurrentView('coach');
+                        else if (item.role === 'SUPERADMIN') setCurrentView('hq');
+                        else setCurrentView('admin');
                         setShowRoleMenu(false);
+                        triggerDemoToast(
+                          'Rol Cambiado',
+                          `Cambiado al perfil "${item.label}". Se ha cargado el entorno de trabajo correspondiente.`,
+                          'info'
+                        );
                       }}
                       className={`w-full text-left px-3 py-2 text-xs hover:bg-slate-800 transition ${
                         currentUser.role === item.role
