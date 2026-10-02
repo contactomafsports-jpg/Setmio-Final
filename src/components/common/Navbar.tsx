@@ -99,12 +99,12 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCart, onOpenAuth }) => {
   return (
     <>
       <header className="sticky top-0 z-40 w-full max-w-full overflow-x-hidden bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 transition-colors duration-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
+        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex w-full min-w-0 items-center justify-between gap-2 h-16">
             {/* Brand Logo & Name */}
             <button
               onClick={() => handleNavClick('home')}
-              className="flex items-center gap-3 text-left focus:outline-none group"
+              className="flex min-w-0 items-center gap-3 text-left focus:outline-none group"
             >
               {currentTenant.branding.logoUrl ? (
                 <img src={currentTenant.branding.logoUrl} alt="" className="w-10 h-10 rounded-xl object-contain bg-white border border-slate-200 p-1 group-hover:scale-105 transition-transform" />
@@ -114,7 +114,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCart, onOpenAuth }) => {
                 </div>
               )}
               <div>
-                <div className="font-extrabold text-base sm:text-lg tracking-tight text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                <div className="max-w-[38vw] truncate font-extrabold text-base sm:text-lg tracking-tight text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
                   {currentTenant.name}
                 </div>
               </div>
@@ -152,7 +152,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCart, onOpenAuth }) => {
             </nav>
 
             {/* Right Action Icons & CTA */}
-            <div className="flex items-center gap-1.5 sm:gap-2.5">
+            <div className="flex shrink-0 items-center gap-1.5 sm:gap-2.5">
               {/* Language Selector Dropdown */}
               <div className="relative" ref={langMenuRef}>
                 <button
@@ -279,7 +279,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCart, onOpenAuth }) => {
 
       {/* ULTRA-PRO MOBILE NAVIGATION DRAWER */}
       {mobileMenuOpen && (
-        <div className="fixed inset-0 z-50 lg:hidden animate-in fade-in duration-200">
+        <div className="fixed inset-x-0 top-16 bottom-0 z-50 w-full lg:hidden animate-in fade-in duration-200">
           {/* Backdrop blur */}
           <div
             className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm"
@@ -288,7 +288,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCart, onOpenAuth }) => {
           />
 
           {/* Slide-over panel */}
-          <div className="fixed inset-y-0 right-0 w-full max-w-sm bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 shadow-2xl flex flex-col justify-between overflow-hidden animate-in slide-in-from-right duration-250 border-l border-slate-200 dark:border-slate-800">
+          <div className="fixed top-16 left-0 right-0 bottom-0 w-full max-w-none bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 shadow-2xl flex flex-col justify-between overflow-hidden animate-in slide-in-from-right duration-250 border-t border-slate-200 dark:border-slate-800">
             {/* Top Bar inside Drawer */}
             <div className="p-4 sm:p-5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
               <div className="flex items-center gap-3">

@@ -177,7 +177,7 @@ export function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 font-sans selection:bg-emerald-500 selection:text-white antialiased transition-colors duration-200">
+    <div className="w-full min-h-screen overflow-x-hidden bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 font-sans selection:bg-emerald-500 selection:text-white antialiased transition-colors duration-200">
       {/* 0. Demo & Global Role Switcher Bar */}
       <TopBarDemo />
 
@@ -200,7 +200,7 @@ export function App() {
           {currentView === 'public' && (
             <div className="flex flex-col min-h-screen">
               <Navbar onOpenCart={() => setCartOpen(true)} onOpenAuth={() => setAuthOpen(true)} />
-              <main className="flex-1">{renderPublicPage()}</main>
+              <main className="w-full min-w-0 flex-1 overflow-x-hidden">{renderPublicPage()}</main>
               {/* Public Footer ONLY in public view (Requirement 8: No footer in app) */}
               <Footer />
             </div>
