@@ -103,6 +103,7 @@ const routeForAdminTab: Record<AdminTab, string> = {
   domains: '/gestion/dominios',
   subscription: '/gestion/negocio',
   settings: '/gestion/configuracion',
+  ai_agent: '/gestion/ai-agent',
 };
 
 const routeForPlayerTab: Record<PlayerTab, string> = {
@@ -237,7 +238,8 @@ export type AdminTab =
   | 'web_editor'
   | 'domains'
   | 'subscription'
-  | 'settings';
+  | 'settings'
+  | 'ai_agent';
 
 export type PlayerTab =
   | 'dashboard'

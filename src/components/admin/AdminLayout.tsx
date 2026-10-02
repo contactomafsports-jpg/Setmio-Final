@@ -23,6 +23,7 @@ import {
   Shield,
   Sun,
   Moon,
+  Bot,
 } from 'lucide-react';
 
 interface AdminLayoutProps {
@@ -72,6 +73,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
     { id: 'shop', label: 'Tienda y Pedidos', icon: <ShoppingBag className="w-5 h-5 text-blue-500" />, desc: 'Catálogo de palas e inventario' },
     { id: 'pos_cafe', label: 'Cafetería y TPV', icon: <Coffee className="w-5 h-5 text-rose-500" />, desc: 'Caja rápida y barra social', badge: 'TPV' },
     { id: 'settings', label: 'Configuración Club', icon: <Settings className="w-5 h-5 text-slate-500" />, desc: 'Horarios, políticas y WhatsApp' },
+    { id: 'ai_agent', label: 'Recepcionista e IA 24/7', icon: <Bot className="w-5 h-5 text-emerald-500" />, desc: 'Chat, llamadas, WhatsApp y reservas', badge: 'IA' },
   ];
 
   const tabLabels: Record<AdminTab, string> = {
@@ -88,6 +90,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
     shop: 'Tienda y Pedidos',
     pos_cafe: 'Cafetería y TPV',
     settings: 'Configuración Club',
+    ai_agent: 'Recepcionista e IA 24/7',
   };
 
   const handleSelectTab = (tab: AdminTab) => {

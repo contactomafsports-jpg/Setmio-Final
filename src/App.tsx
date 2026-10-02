@@ -42,6 +42,7 @@ import { AdminWebEditor } from './components/admin/AdminWebEditor';
 import { AdminDomains } from './components/admin/AdminDomains';
 import { AdminSubscription } from './components/admin/AdminSubscription';
 import { AdminSettings } from './components/admin/AdminSettings';
+import { AdminAIAgent } from './components/admin/AdminAIAgent';
 
 // Player & HQ views
 import { PlayerPortal } from './components/player/PlayerPortal';
@@ -168,6 +169,8 @@ export function App() {
         return <AdminSubscription />;
       case 'settings':
         return <AdminSettings />;
+      case 'ai_agent':
+        return <AdminAIAgent />;
       default:
         return <ContextualDashboard />;
     }
