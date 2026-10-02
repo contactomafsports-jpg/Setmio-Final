@@ -6,6 +6,7 @@ export function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl
     const hostname = request.headers.get('host') || ''
 
+    // Public, static, and API routes should never be rewritten.
     if (
       pathname.startsWith('/club') ||
       pathname.startsWith('/api') ||
@@ -15,29 +16,22 @@ export function middleware(request: NextRequest) {
       return NextResponse.next()
     }
 
+    const currentHost = hostname
+      .replace('.setmiofinal2.vercel.app', '')
+      .replace('.setmiofinal.vercel.app', '')
+      .replace('.localhost:3000', '')
+      .replace('localhost:3000', '')
+
     if (
-      hostname.includes('setmiofinal2.vercel.app') ||
-      hostname.includes('setmiofinal.vercel.app') ||
-      hostname.includes('localhost')
+      currentHost &&
+      currentHost !== hostname &&
+      !currentHost.includes(':') &&
+      currentHost !== 'setmiofinal2' &&
+      currentHost !== 'setmiofinal'
     ) {
-      const subdomain = hostname
-        .replace('.setmiofinal2.vercel.app', '')
-        .replace('.setmiofinal.vercel.app', '')
-        .replace('.localhost:3000', '')
-        .replace('localhost:3000', '')
-
-      if (
-        subdomain &&
-        subdomain !== hostname &&
-        subdomain !== 'setmiofinal2' &&
-        subdomain !== 'setmiofinal'
-      ) {
-        return NextResponse.rewrite(
-          new URL(`/club/${subdomain}${pathname}`, request.url),
-        )
-      }
-
-      return NextResponse.next()
+      return NextResponse.rewrite(
+        new URL(`/club/${currentHost}${pathname}`, request.url),
+      )
     }
 
     return NextResponse.next()
