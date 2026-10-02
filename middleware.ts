@@ -1,1 +1,51 @@
-import { NextResponse } from 'next/server'\nimport type { NextRequest } from 'next/server'\n\nexport function middleware(request: NextRequest) {\n  try {\n    const hostname = request.headers.get('host') || ''\n\n    if (\n      hostname.includes('setmiofinal2.vercel.app') ||\n      hostname.includes('setmiofinal.vercel.app') ||\n      hostname.includes('localhost')\n    ) {\n      return NextResponse.next()\n    }\n\n    const currentHost = hostname\n      .replace('.setmiofinal2.vercel.app', '')\n      .replace('.setmiofinal.vercel.app', '')\n      .replace('.localhost:3000', '')\n\n    if (currentHost && currentHost !== hostname && !currentHost.includes(':')) {\n      return NextResponse.rewrite(\n        new URL(`/club/${currentHost}${request.nextUrl.pathname}`, request.url),\n      )\n    }\n\n    return NextResponse.next()\n  } catch {\n    return NextResponse.next()\n  }\n}\n\nexport const config = {\n  matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)'],\n}\n
+import { NextResponse } from 'next/server'
+import type { NextRequest } from 'next/server'
+
+export function middleware(request: NextRequest) {
+  try {
+    const { pathname } = request.nextUrl
+    const hostname = request.headers.get('host') || ''
+
+    if (
+      pathname.startsWith('/club') ||
+      pathname.startsWith('/api') ||
+      pathname.startsWith('/_next') ||
+      pathname.includes('.')
+    ) {
+      return NextResponse.next()
+    }
+
+    if (
+      hostname.includes('setmiofinal2.vercel.app') ||
+      hostname.includes('setmiofinal.vercel.app') ||
+      hostname.includes('localhost')
+    ) {
+      const subdomain = hostname
+        .replace('.setmiofinal2.vercel.app', '')
+        .replace('.setmiofinal.vercel.app', '')
+        .replace('.localhost:3000', '')
+        .replace('localhost:3000', '')
+
+      if (
+        subdomain &&
+        subdomain !== hostname &&
+        subdomain !== 'setmiofinal2' &&
+        subdomain !== 'setmiofinal'
+      ) {
+        return NextResponse.rewrite(
+          new URL(`/club/${subdomain}${pathname}`, request.url),
+        )
+      }
+
+      return NextResponse.next()
+    }
+
+    return NextResponse.next()
+  } catch {
+    return NextResponse.next()
+  }
+}
+
+export const config = {
+  matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)'],
+}
