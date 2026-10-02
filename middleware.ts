@@ -27,7 +27,8 @@ const KNOWN_CLUBS_BY_CUSTOM_DOMAIN: Record<string, string> = {
 };
 
 export async function middleware(request: any) {
-  const url = new URL(request.url);
+  try {
+    const url = new URL(request.url);
   const hostname = (request.headers?.get?.('host') || url.hostname || '').toLowerCase();
   const cleanHost = hostname.split(':')[0]; // Eliminar puerto si existe (:3000)
   const pathname = url.pathname;
@@ -104,9 +105,13 @@ export async function middleware(request: any) {
   }
 
   // Si se encontró el club por dominio personalizado, reescribir internamente a /club/[slug]
-  if (clubSlug) {
-    url.pathname = `/club/${clubSlug}${pathname === '/' ? '' : pathname}`;
-    return (globalThis as any).NextResponse?.rewrite(url);
+    if (clubSlug) {
+      url.pathname = `/club/${clubSlug}${pathname === '/' ? '' : pathname}`;
+      return (globalThis as any).NextResponse?.rewrite(url);
+    }
+  } catch (error) {
+    console.error('[v0] Tenant middleware fallback:', error);
+    return;
   }
 }
 
@@ -120,6 +125,6 @@ export const config = {
      * - favicon.ico (favicon file)
      * - icon.svg
      */
-    '/((?!api|_next/static|_next/image|assets|favicon.ico|icon.svg|manifest.webmanifest).*)',
+    '/((?!api|_next/static|_next/image|favicon.ico).*)',
   ],
 };
