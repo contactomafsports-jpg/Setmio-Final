@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { useApp } from './context/AppContext';
-import { TopBarDemo } from './components/common/TopBarDemo';
 import { Navbar } from './components/common/Navbar';
 import { Footer } from './components/common/Footer';
 import { DraggableAIAgent } from './components/common/DraggableAIAgent';
@@ -178,9 +177,6 @@ export function App() {
 
   return (
     <div className="w-full min-h-screen overflow-x-hidden bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 font-sans selection:bg-emerald-500 selection:text-white antialiased transition-colors duration-200">
-      {/* 0. Demo & Global Role Switcher Bar */}
-      <TopBarDemo />
-
       {/* PWA & Brand Splash Screen */}
       {showSplash && <BrandSplashScreen onComplete={handleSplashComplete} />}
 

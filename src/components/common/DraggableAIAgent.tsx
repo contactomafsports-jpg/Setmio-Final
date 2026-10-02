@@ -75,10 +75,20 @@ export const DraggableAIAgent: React.FC = () => {
     }
   }, []);
 
+  // Keep the mobile assistant as a true overlay without moving the page behind it.
+  useEffect(() => {
+    if (!isOpen) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [isOpen]);
+
   // Auto scroll chat to bottom
   useEffect(() => {
     if (isOpen) {
-      chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      chatEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
   }, [aiMessages, isOpen]);
 
@@ -198,7 +208,7 @@ export const DraggableAIAgent: React.FC = () => {
           className={
             isFullscreen
               ? 'fixed inset-2 sm:inset-6 z-[70] bg-slate-900 border border-slate-700 rounded-3xl shadow-2xl flex flex-col overflow-hidden text-slate-100 animate-in fade-in zoom-in-95 duration-150'
-              : 'w-[92vw] sm:w-[380px] h-[520px] max-h-[82vh] bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl flex flex-col overflow-hidden text-slate-100 animate-in fade-in zoom-in-95 duration-150'
+              : 'fixed inset-0 z-[70] sm:inset-auto sm:right-6 sm:bottom-6 sm:w-[380px] sm:h-[520px] sm:max-h-[82vh] bg-slate-900 border border-slate-700 sm:rounded-2xl shadow-2xl flex flex-col overflow-hidden text-slate-100 animate-in fade-in zoom-in-95 duration-150'
           }
         >
           {/* Header & Drag Handle */}

@@ -11,10 +11,10 @@ export const SetmioCorporateLoader: React.FC<SetmioCorporateLoaderProps> = ({ on
 
   useEffect(() => {
     const phrases = [
-      'Iniciando infraestructura de pádel en la nube...',
-      'Conectando domótica IoT de pistas y reservas...',
-      'Cargando pasarelas de pago y split bancario...',
-      'Preparando ecosistema inteligente Setmio SaaS...',
+      'Preparando tu espacio de pádel...',
+      'Conectando reservas, escuela y comunidad...',
+      'Activando tu experiencia Setmio...',
+      'Todo listo para jugar mejor...',
     ];
 
     let currentPhraseIdx = 0;
@@ -47,7 +47,7 @@ export const SetmioCorporateLoader: React.FC<SetmioCorporateLoaderProps> = ({ on
   return (
     <div
       className="fixed inset-0 z-[120] flex flex-col items-center justify-center bg-slate-950 text-white select-none transition-opacity duration-300"
-      aria-label="Cargando Setmio Pádel SaaS"
+        aria-label="Cargando Setmio"
     >
       {/* Background ambient glow */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,rgba(16,185,129,0.25),transparent_60%)] pointer-events-none" />
@@ -69,13 +69,13 @@ export const SetmioCorporateLoader: React.FC<SetmioCorporateLoaderProps> = ({ on
         <div className="space-y-1">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 text-[10px] font-bold tracking-widest uppercase border border-emerald-500/30">
             <Sparkles className="w-3 h-3" />
-            <span>SaaS Deportivo Multi-Tenant</span>
+            <span>La nueva experiencia del pádel</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white">
             SETMIO <span className="text-emerald-400">PADEL</span>
           </h1>
           <p className="text-xs text-slate-400 font-medium">
-            La plataforma integral para clubes, entrenadores y jugadores
+            Web, gestión y comunidad para profesionales del pádel
           </p>
         </div>
 
