@@ -112,7 +112,7 @@ export const AdminDomains: React.FC = () => {
           Enlaces de Publicación y Dominios Propios
         </h1>
         <p className="text-xs sm:text-sm text-slate-400 mt-1 max-w-2xl">
-          Consulta y comparte las direcciones web oficiales de tu club o conecta tu propio dominio con enrutamiento inteligente gestionado en la nube.
+          Consulta y comparte las direcciones web oficiales de tu club o conecta tu propio dominio con enrutamiento multi-tenant gestionado en Vercel.
         </p>
       </div>
 

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import {
   Sparkles,
@@ -16,7 +16,6 @@ import {
   Bot,
   ExternalLink,
   ChevronRight,
-  ChevronDown,
   Star,
   Globe,
   Sliders,
@@ -31,23 +30,16 @@ import {
   Check,
   Menu,
 } from 'lucide-react';
-import { SupportedLanguage, SUPPORTED_LANGUAGES } from '../../lib/i18n';
-import { OfficialFlag } from '../common/OfficialFlag';
+import { SupportedLanguage } from '../../lib/i18n';
 
 interface SetmioCorporateLandingProps {
   onOpenAuth: () => void;
   onExploreClub: (slug: string) => void;
-  onOpenDemoRoleModal?: () => void;
-  onOpenOnboarding?: () => void;
-  onOpenFeatures?: () => void;
 }
 
 export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
   onOpenAuth,
   onExploreClub,
-  onOpenDemoRoleModal,
-  onOpenOnboarding,
-  onOpenFeatures,
 }) => {
   const {
     currentTenant,
@@ -61,87 +53,83 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
     setCurrentView,
     triggerDemoToast,
     setIsCorporateLanding,
-    setPublicPage,
   } = useApp();
 
   const [registerModalOpen, setRegisterModalOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [langDropdownOpen, setLangDropdownOpen] = useState(false);
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('monthly');
-  const langRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const handleOutsideClick = (e: MouseEvent) => {
-      if (langRef.current && !langRef.current.contains(e.target as Node)) {
-        setLangDropdownOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleOutsideClick);
-    return () => document.removeEventListener('mousedown', handleOutsideClick);
-  }, []);
+  // Form states for new club registration
+  const [clubName, setClubName] = useState('');
+  const [clubSlug, setClubSlug] = useState('');
+  const [clubCourts, setClubCourts] = useState(6);
+  const [clubCity, setClubCity] = useState('');
+  const [contactName, setContactName] = useState('');
+  const [contactEmail, setContactEmail] = useState('');
+  const [contactPhone, setContactPhone] = useState('');
+  const [selectedPlanId, setSelectedPlanId] = useState('pro');
 
   const handleRegisterClubSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setRegisterModalOpen(false);
     triggerDemoToast(
       '¡Solicitud de Club Recibida!',
-      'Hemos preparado la instancia para tu club. Te hemos enviado las credenciales de acceso.',
+      `Hemos creado la instancia para "${clubName}". Te hemos enviado los accesos a ${contactEmail}. Podrás acceder en ${clubSlug}.setmiofinal2.vercel.app`,
       'success'
     );
   };
 
-  const handleOpenDemo = () => {
-    if (onOpenDemoRoleModal) {
-      onOpenDemoRoleModal();
-    } else {
-      triggerDemoToast('Selector de Demo', 'Abriendo selector de roles...', 'info');
-    }
-  };
-
-  const handleOpenRegister = () => {
-    if (onOpenOnboarding) {
-      onOpenOnboarding();
-    } else {
-      setRegisterModalOpen(true);
-    }
-  };
-
-  const handleOpenFeaturesClick = () => {
-    if (onOpenFeatures) {
-      onOpenFeatures();
-    } else {
-      setPublicPage('features');
-    }
+  const handleQuickDemoRole = (role: 'SUPERADMIN' | 'TENANT_OWNER' | 'COACH' | 'PLAYER') => {
+    setIsCorporateLanding(false);
+    switchUserRole(role);
+    if (role === 'PLAYER') setCurrentView('player');
+    else if (role === 'COACH') setCurrentView('coach');
+    else if (role === 'SUPERADMIN') setCurrentView('hq');
+    else setCurrentView('admin');
   };
 
   return (
     <div className="min-h-screen bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-200 overflow-x-hidden w-full max-w-full">
       {/* 1. TOP HEADER / NAVBAR CORPORATIVA */}
-      <header className="sticky top-0 z-40 bg-white/95 dark:bg-slate-950/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 w-full overflow-x-hidden">
+      <header className="sticky top-0 z-40 bg-white/95 dark:bg-slate-950/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-          {/* Brand Logo - Mobile Clean Rule: Only Icon + Setmio Name */}
-          <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-700 flex items-center justify-center text-white font-black text-xl shadow-md shadow-emerald-500/20 shrink-0">
+          {/* Brand Logo */}
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-700 flex items-center justify-center text-white font-black text-xl shadow-md shadow-emerald-500/20">
               S
             </div>
-            <div className="min-w-0">
-              <div className="text-xl sm:text-2xl font-black tracking-tight text-slate-900 dark:text-white truncate">
-                SETMIO
+            <div>
+              <div className="text-xl font-black tracking-tight text-slate-900 dark:text-white flex items-center gap-1.5">
+                <span>SETMIO</span>
+                <span className="text-xs font-extrabold uppercase px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-800">
+                  SaaS PÁDEL
+                </span>
               </div>
-              {/* Hidden on mobile, only visible on md+ screens */}
-              <p className="hidden md:block text-[10px] text-slate-500 dark:text-slate-400 font-medium truncate">
-                Software de Marca Blanca para Profesionales del Pádel
+              <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">
+                Software de Gestión para Clubes, Escuelas y Jugadores
               </p>
             </div>
           </div>
 
-          {/* Center Navigation Links (Desktop) */}
+          {/* Center Navigation Links */}
           <nav className="hidden lg:flex items-center gap-6 text-xs font-bold text-slate-600 dark:text-slate-300">
             <button
-              onClick={handleOpenFeaturesClick}
-              className="hover:text-emerald-600 dark:hover:text-emerald-400 transition"
+              onClick={() => onExploreClub('sanmateo')}
+              className="text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 font-extrabold flex items-center gap-1 transition px-2 py-1 rounded-lg hover:bg-emerald-50 dark:hover:bg-emerald-950/40"
             >
-              Descubrir funcionalidades
+              <span>🎾 Web Club (San Mateo)</span>
+            </button>
+            <button
+              onClick={() => handleQuickDemoRole('TENANT_OWNER')}
+              className="hover:text-emerald-600 dark:hover:text-emerald-400 transition px-2 py-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800"
+            >
+              Gestión Admin
+            </button>
+            <button
+              onClick={() => handleQuickDemoRole('PLAYER')}
+              className="hover:text-emerald-600 dark:hover:text-emerald-400 transition px-2 py-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800"
+            >
+              App Jugador
             </button>
             <a href="#soluciones" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition">
               Soluciones
@@ -149,64 +137,13 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
             <a href="#precios" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition">
               Precios
             </a>
-            <button
-              onClick={() => onExploreClub('sanmateo')}
-              className="text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 font-extrabold flex items-center gap-1 transition px-2 py-1 rounded-lg hover:bg-emerald-50 dark:hover:bg-emerald-950/40"
-            >
-              <span>🎾 Demo Club (San Mateo)</span>
-            </button>
-            <a href="#contacto" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition">
-              Contacto
+            <a href="#demos" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition">
+              Clubes
             </a>
           </nav>
 
           {/* Right Action Buttons */}
-          <div className="flex items-center gap-1.5 sm:gap-2.5">
-            {/* Language Selector with Official Regional Flags */}
-            <div className="relative" ref={langRef}>
-              <button
-                onClick={() => setLangDropdownOpen(!langDropdownOpen)}
-                className="p-1.5 sm:px-2.5 sm:py-1.5 rounded-xl border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition flex items-center gap-1.5 text-xs font-bold"
-                title="Cambiar idioma con banderas oficiales"
-                aria-label="Seleccionar idioma"
-              >
-                <OfficialFlag code={language} className="w-4 h-3 sm:w-5 sm:h-3.5" />
-                {/* On mobile show only 2 initials */}
-                <span className="font-mono text-[11px] uppercase tracking-wider">
-                  {language.toUpperCase()}
-                </span>
-                <ChevronDown className="w-3 h-3 text-slate-400 hidden sm:inline" />
-              </button>
-
-              {langDropdownOpen && (
-                <div className="absolute top-full right-0 mt-2 w-56 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl py-2 z-50 animate-in fade-in zoom-in-95 duration-100 max-h-80 overflow-y-auto">
-                  <div className="px-3 py-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100 dark:border-slate-800">
-                    Idiomas & Banderas Oficiales
-                  </div>
-                  {SUPPORTED_LANGUAGES.map((l) => (
-                    <button
-                      key={l.code}
-                      onClick={() => {
-                        setLanguage(l.code);
-                        setLangDropdownOpen(false);
-                      }}
-                      className={`w-full px-3 py-2 text-xs text-left flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800 transition ${
-                        language === l.code
-                          ? 'text-emerald-600 dark:text-emerald-400 font-bold bg-emerald-50/60 dark:bg-emerald-950/40'
-                          : 'text-slate-700 dark:text-slate-300 font-medium'
-                      }`}
-                    >
-                      <span className="flex items-center gap-2.5">
-                        <OfficialFlag code={l.code} className="w-4 h-3" />
-                        <span>{l.name}</span>
-                      </span>
-                      {language === l.code && <Check className="w-3.5 h-3.5 text-emerald-500" />}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-
+          <div className="flex items-center gap-2 sm:gap-3">
             {/* Theme Toggle */}
             <button
               onClick={toggleTheme}
@@ -216,39 +153,47 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
               {theme === 'dark' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-slate-700" />}
             </button>
 
-            {/* Button: Ver Demo (Abre modal selector de roles) */}
-            <button
-              onClick={handleOpenDemo}
-              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 transition"
-              title="Abrir selector interactivo de roles"
+            {/* Language Selector */}
+            <select
+              value={language}
+              onChange={(e) => setLanguage(e.target.value as SupportedLanguage)}
+              className="bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs font-bold rounded-xl px-2.5 py-1.5 focus:outline-none focus:border-emerald-500 text-slate-800 dark:text-slate-200"
             >
-              <Sparkles className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-              <span>Ver demo</span>
-            </button>
-
-            {/* Button: Registrarse (Lleva al onboarding asistido) */}
-            <button
-              onClick={handleOpenRegister}
-              className="hidden sm:inline-flex px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs shadow-md shadow-emerald-600/20 transition items-center gap-1.5"
-            >
-              <span>Registrarse</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </button>
+              <option value="es">🇪🇸 Español</option>
+              <option value="gl">🇪🇸 Gallego</option>
+              <option value="en">🇬🇧 English</option>
+              <option value="pt">🇵🇹 Português</option>
+              <option value="fr">🇫🇷 Français</option>
+              <option value="de">🇩🇪 Deutsch</option>
+              <option value="it">🇮🇹 Italiano</option>
+              <option value="ca">🇪🇸 Català</option>
+              <option value="eu">🇪🇸 Euskara</option>
+              <option value="va">🇪🇸 Valencià</option>
+              <option value="ar">🇦🇪 العربية</option>
+            </select>
 
             {/* Global Login */}
             <button
               onClick={onOpenAuth}
-              className="p-2 sm:px-3 sm:py-2 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 transition flex items-center gap-1.5"
-              title="Acceso de usuarios registrados"
+              className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 transition"
             >
               <Lock className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-              <span className="hidden sm:inline">Acceso</span>
+              <span>Acceso Global</span>
+            </button>
+
+            {/* CTA Registrar Club */}
+            <button
+              onClick={() => setRegisterModalOpen(true)}
+              className="hidden sm:inline-flex px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs shadow-md shadow-emerald-600/20 transition items-center gap-1.5"
+            >
+              <span>Registrar Club</span>
+              <ArrowRight className="w-3.5 h-3.5" />
             </button>
 
             {/* Mobile Hamburger Toggle Button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition border border-slate-200 dark:border-slate-800"
+              className="md:hidden p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition border border-slate-200 dark:border-slate-800"
               aria-label="Abrir menú de navegación"
             >
               {mobileMenuOpen ? <X className="w-5 h-5 text-emerald-600" /> : <Menu className="w-5 h-5" />}
@@ -256,29 +201,10 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
           </div>
         </div>
 
-        {/* Mobile Navigation Drawer with perfect viewport boundary */}
+        {/* Mobile Navigation Drawer */}
         {mobileMenuOpen && (
-          <div className="lg:hidden border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 p-4 space-y-3 animate-in slide-in-from-top-2 duration-150 shadow-xl w-full overflow-x-hidden">
-            <nav className="flex flex-col space-y-1.5 text-sm font-semibold text-slate-700 dark:text-slate-200">
-              <button
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  handleOpenFeaturesClick();
-                }}
-                className="text-left px-3 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition font-bold text-emerald-600 dark:text-emerald-400"
-              >
-                ✨ Descubrir funcionalidades
-              </button>
-              <button
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  handleOpenDemo();
-                }}
-                className="text-left px-3 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition font-bold text-slate-900 dark:text-white flex items-center justify-between"
-              >
-                <span>🎮 Ver demo (Selector de Roles)</span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
+          <div className="md:hidden border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 p-4 space-y-3 animate-in slide-in-from-top-2 duration-150 shadow-xl">
+            <nav className="flex flex-col space-y-2 text-sm font-semibold text-slate-700 dark:text-slate-200">
               <a
                 href="#soluciones"
                 onClick={() => setMobileMenuOpen(false)}
@@ -298,7 +224,7 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
                 onClick={() => setMobileMenuOpen(false)}
                 className="px-3 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition"
               >
-                💶 Planes & Precios
+                💶 Planes & Precios (60-80€/mes)
               </a>
               <button
                 onClick={() => {
@@ -310,19 +236,16 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
                 <span>🏆 Demo Club: Pádel San Mateo</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
+              <a
+                href="#contacto"
+                onClick={() => setMobileMenuOpen(false)}
+                className="px-3 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+              >
+                📞 Contacto & Soporte
+              </a>
             </nav>
 
             <div className="pt-3 border-t border-slate-200 dark:border-slate-800 flex flex-col gap-2">
-              <button
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  handleOpenRegister();
-                }}
-                className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-black shadow-md flex items-center justify-center gap-2"
-              >
-                <span>Registrarse (Onboarding 30 Días)</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </button>
               <button
                 onClick={() => {
                   setMobileMenuOpen(false);
@@ -331,7 +254,18 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
                 className="w-full py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center justify-center gap-2"
               >
                 <Lock className="w-3.5 h-3.5 text-emerald-600" />
-                <span>Acceso Clientes / Socios</span>
+                <span>Acceso Global Socios / Admin</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  setRegisterModalOpen(true);
+                }}
+                className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-black shadow-md flex items-center justify-center gap-2"
+              >
+                <span>Registrar Mi Club (30 Días Gratis)</span>
+                <ArrowRight className="w-3.5 h-3.5" />
               </button>
             </div>
           </div>
@@ -343,57 +277,58 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-96 bg-[radial-gradient(circle_at_50%_20%,rgba(16,185,129,0.15),transparent_60%)] pointer-events-none" />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center space-y-8">
-          {/* Trust Badge - Updated positioning */}
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-800 text-xs font-bold shadow-xs">
+          {/* Trust Badge */}
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-800 text-xs font-bold shadow-sm">
             <Sparkles className="w-4 h-4 text-emerald-500" />
-            <span>Tecnología de Vanguardia para la Industria del Pádel</span>
+            <span>El Software Multi-Tenant #1 para la Industria del Pádel</span>
           </div>
 
           {/* Main Headline */}
           <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight text-slate-900 dark:text-white max-w-4xl mx-auto leading-[1.1] text-balance">
-            Software de{' '}
+            El software de gestión integral para{' '}
             <span className="bg-gradient-to-r from-emerald-600 via-teal-500 to-cyan-500 bg-clip-text text-transparent">
-              Marca Blanca
-            </span>{' '}
-            integral para profesionales del pádel.
+              clubes de pádel
+            </span>
+            , academias y jugadores.
           </h1>
 
-          {/* Subtitle - Exact copy requirement */}
+          {/* Subtitle */}
           <p className="text-base sm:text-xl text-slate-600 dark:text-slate-300 max-w-3xl mx-auto font-normal leading-relaxed text-balance">
-            Incluye Web Pública, App de Gestión Interna, App para Personal y Clientes, y Agente de IA para web y redes.
+            Automatiza reservas con domótica IoT, dinamiza partidas abiertas ("Play!"), gestiona torneos oficiales con rankings en tiempo real, tienda con test en pista y copiloto de IA con WhatsApp. Todo bajo tu propia marca blanca.
           </p>
 
           {/* CTAs Group */}
           <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
             <button
-              onClick={handleOpenFeaturesClick}
-              className="px-7 py-4 rounded-2xl bg-slate-900 dark:bg-slate-800 hover:bg-slate-800 dark:hover:bg-slate-700 text-white font-black text-sm shadow-xl shadow-slate-900/20 transition hover:scale-[1.02] flex items-center gap-2"
-            >
-              <Sparkles className="w-4 h-4 text-emerald-400" />
-              <span>Descubrir funcionalidades</span>
-            </button>
-
-            <button
-              onClick={handleOpenDemo}
+              onClick={() => onExploreClub('sanmateo')}
               className="px-7 py-4 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-sm shadow-xl shadow-emerald-600/30 transition hover:scale-[1.02] flex items-center gap-2"
             >
               <Play className="w-4 h-4 fill-white" />
-              <span>Ver demo</span>
+              <span>Ver Web Club Demo (San Mateo)</span>
             </button>
 
             <button
-              onClick={handleOpenRegister}
+              onClick={() => handleQuickDemoRole('TENANT_OWNER')}
+              className="px-6 py-4 rounded-2xl bg-slate-900 dark:bg-slate-800 hover:bg-slate-800 dark:hover:bg-slate-700 text-white font-bold text-sm border border-slate-700 shadow-md transition flex items-center gap-2"
+            >
+              <Shield className="w-4 h-4 text-cyan-400" />
+              <span>Panel Gestión Admin</span>
+            </button>
+
+            <button
+              onClick={() => handleQuickDemoRole('PLAYER')}
               className="px-6 py-4 rounded-2xl bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-900 dark:text-white font-bold text-sm border border-slate-300 dark:border-slate-700 shadow-md transition flex items-center gap-2"
             >
-              <span>Registrarse</span>
-              <ArrowRight className="w-4 h-4" />
+              <Users className="w-4 h-4 text-emerald-500" />
+              <span>Entorno Jugador</span>
             </button>
 
             <button
-              onClick={() => onExploreClub('sanmateo')}
+              onClick={() => setRegisterModalOpen(true)}
               className="px-5 py-4 rounded-2xl bg-slate-100 dark:bg-slate-900/60 hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs border border-slate-200 dark:border-slate-800 transition flex items-center gap-1.5"
             >
-              <span>🎾 Ver Web Demo Club (San Mateo)</span>
+              <span>Registrar Nuevo Club</span>
+              <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
 
@@ -452,18 +387,18 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
         </div>
       </section>
 
-      {/* 3. METRICAS DE IMPACTO (Sin cifras inventadas como 450 clubes) */}
+      {/* 3. METRICAS DE IMPACTO */}
       <section className="py-12 bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 text-center">
             <div>
               <div className="text-3xl sm:text-5xl font-black text-emerald-600 dark:text-emerald-400 font-mono">
-                100%
+                +450
               </div>
               <div className="text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-300 mt-1">
-                Marca Blanca Integral
+                Clubes y Academias
               </div>
-              <div className="text-[11px] text-slate-500">Tu propio dominio, logo y colores oficiales</div>
+              <div className="text-[11px] text-slate-500">En España, Portugal y Latinoamérica</div>
             </div>
 
             <div>
@@ -961,7 +896,7 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
               <span className="text-base font-black text-white">SETMIO PADEL PRO</span>
             </div>
             <p className="text-slate-400 leading-relaxed text-[11px]">
-              Software de Marca Blanca integral para profesionales del pádel. Incluye Web Pública, App de Gestión Interna, App para Personal y Clientes, y Agente de IA para web y redes.
+              La plataforma SaaS multi-tenant definitiva para la digitalización integral de clubes de pádel, academias, entrenadores y competiciones.
             </p>
             <div className="text-[11px] text-slate-500">
               Desplegado en producción sobre Vercel Edge & Supabase PostgreSQL.

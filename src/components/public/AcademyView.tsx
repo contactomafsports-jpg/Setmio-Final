@@ -14,8 +14,6 @@ import {
   Sparkles,
   GraduationCap,
   Video,
-  ArrowLeft,
-  Clock,
 } from 'lucide-react';
 
 export const AcademyView: React.FC = () => {

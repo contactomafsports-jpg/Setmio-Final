@@ -21,10 +21,9 @@ import { isSupabaseConfigured, supabase } from '../../lib/supabase';
 interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onOpenRoleModal?: () => void;
 }
 
-export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onOpenRoleModal }) => {
+export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
   const { currentTenant, switchUserRole, triggerDemoToast, setCurrentView } = useApp();
 
   const [mode, setMode] = useState<'login' | 'register'>('login');
@@ -160,30 +159,11 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onOpenRol
 
         {/* Quick Demo Logins Section */}
         {mode === 'login' && (
-          <div className="mb-6 space-y-3">
-            {/* Requirement 2: En /login, añade un botón "Entrar a la Demo" que abre un modal selector de roles */}
-            <button
-              type="button"
-              onClick={() => {
-                if (onOpenRoleModal) {
-                  onClose();
-                  onOpenRoleModal();
-                } else {
-                  triggerDemoToast('Selector de Roles', 'Selecciona el rol con el que deseas ingresar a la demo.', 'info');
-                }
-              }}
-              className="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-500 hover:to-teal-500 text-white font-extrabold text-sm flex items-center justify-center gap-2.5 shadow-lg shadow-emerald-600/30 transition transform hover:scale-[1.01] active:scale-[0.99]"
-            >
-              <Sparkles className="w-4 h-4 text-emerald-200" />
-              <span>Entrar a la Demo</span>
-              <ArrowRight className="w-4 h-4 text-emerald-200" />
-            </button>
-
-            <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 space-y-2.5">
-              <div className="flex items-center justify-between text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-                <span>O entra directamente con un clic:</span>
-                <span className="text-emerald-600 dark:text-emerald-400 font-semibold">Demo 1-Clic</span>
-              </div>
+          <div className="mb-6 p-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 space-y-3">
+            <div className="flex items-center justify-between text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+              <span>Acceso Rápido por Rol (Demostración)</span>
+              <span className="text-emerald-600 dark:text-emerald-400 font-semibold">1-Clic</span>
+            </div>
             <div className="grid grid-cols-2 gap-2 text-xs">
               <button
                 type="button"
@@ -229,12 +209,11 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onOpenRol
                 <div className="w-2 h-2 rounded-full bg-amber-500" />
                 <div>
                   <div className="text-slate-900 dark:text-white font-bold">Superadmin HQ</div>
-                  <div className="text-[10px] text-slate-500 dark:text-slate-400">Control Global de Plataforma</div>
+                  <div className="text-[10px] text-slate-500 dark:text-slate-400">Control Multi-Tenant</div>
                 </div>
               </button>
             </div>
           </div>
-        </div>
         )}
 
         {/* Step Indicator for Register Wizard */}

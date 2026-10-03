@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useApp } from './context/AppContext';
-import { RoleSelectorModal } from './components/common/RoleSelectorModal';
+import { TopBarDemo } from './components/common/TopBarDemo';
 import { Navbar } from './components/common/Navbar';
 import { Footer } from './components/common/Footer';
 import { DraggableAIAgent } from './components/common/DraggableAIAgent';
@@ -65,7 +65,6 @@ export function App() {
 
   const [cartOpen, setCartOpen] = useState(false);
   const [authOpen, setAuthOpen] = useState(false);
-  const [roleSelectorOpen, setRoleSelectorOpen] = useState(false);
 
   // Corporate loader animation (ONLY for the main SaaS corporate landing, NEVER for clubs)
   const [corporateLoaderDone, setCorporateLoaderDone] = useState(() => {
@@ -176,6 +175,9 @@ export function App() {
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 font-sans selection:bg-emerald-500 selection:text-white antialiased transition-colors duration-200">
+      {/* 0. Demo & Global Role Switcher Bar */}
+      <TopBarDemo />
+
       {/* PWA & Brand Splash Screen */}
       {showSplash && <BrandSplashScreen onComplete={handleSplashComplete} />}
 
@@ -188,18 +190,13 @@ export function App() {
           <SetmioCorporateLanding
             onOpenAuth={() => setAuthOpen(true)}
             onExploreClub={navigateToClub}
-            onOpenDemoRoleModal={() => setRoleSelectorOpen(true)}
           />
         </>
       ) : (
         <>
           {currentView === 'public' && (
             <div className="flex flex-col min-h-screen">
-              <Navbar
-                onOpenCart={() => setCartOpen(true)}
-                onOpenAuth={() => setAuthOpen(true)}
-                onOpenDemo={() => setRoleSelectorOpen(true)}
-              />
+              <Navbar onOpenCart={() => setCartOpen(true)} onOpenAuth={() => setAuthOpen(true)} />
               <main className="flex-1">{renderPublicPage()}</main>
               {/* Public Footer ONLY in public view (Requirement 8: No footer in app) */}
               <Footer />
@@ -238,15 +235,7 @@ export function App() {
 
       {/* 7. Drawers and Modals */}
       <CartDrawer isOpen={cartOpen} onClose={() => setCartOpen(false)} />
-      <AuthModal
-        isOpen={authOpen}
-        onClose={() => setAuthOpen(false)}
-        onOpenRoleModal={() => setRoleSelectorOpen(true)}
-      />
-      <RoleSelectorModal
-        isOpen={roleSelectorOpen}
-        onClose={() => setRoleSelectorOpen(false)}
-      />
+      <AuthModal isOpen={authOpen} onClose={() => setAuthOpen(false)} />
 
       {/* 8. Demo Action Notification Toast */}
       {demoToast && (
