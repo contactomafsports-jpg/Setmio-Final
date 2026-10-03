@@ -235,7 +235,7 @@ export function App() {
       ) : (
         <>
           {currentView === 'public' && (isCorporateLanding ? (
-            <CorporateLayout>{renderPublicPage()}</CorporateLayout>
+            <CorporateLayout onOpenDemo={() => setRoleSelectorOpen(true)}>{renderPublicPage()}</CorporateLayout>
           ) : (
             <div className="flex min-h-screen flex-col">
               <Navbar onOpenCart={() => setCartOpen(true)} onOpenAuth={() => setAuthOpen(true)} onOpenDemo={() => setRoleSelectorOpen(true)} />

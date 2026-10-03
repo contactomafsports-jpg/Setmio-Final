@@ -810,7 +810,7 @@ export const TRANSLATIONS: Record<SupportedLanguage, Record<string, string>> = {
 };
 
 const CORPORATE_TRANSLATIONS: Record<SupportedLanguage, Record<string, string>> = {
-  es: { 'corporate.discoverFeatures': 'Descubrir funcionalidades', 'nav.solutions': 'Soluciones', 'nav.pricing': 'Precios', 'corporate.heroTitle': 'Software de Marca Blanca integral para profesionales del pádel.' },
+  es: { 'corporate.discoverFeatures': 'Descubrir funcionalidades', 'nav.home': 'Inicio', 'nav.solutions': 'Soluciones', 'nav.features': 'Funcionalidades', 'nav.modules': 'Módulos y domótica', 'nav.blog': 'Blog', 'nav.demo': 'Ver demo', 'nav.pricing': 'Precios', 'nav.contact': 'Contacto', 'footer.tagline': 'Software de marca blanca para clubes y profesionales del pádel.', 'corporate.heroTitle': 'Software de Marca Blanca integral para profesionales del pádel.' },
   en: { 'corporate.discoverFeatures': 'Discover features', 'nav.solutions': 'Solutions', 'nav.pricing': 'Pricing', 'corporate.heroTitle': 'Complete white-label software for padel professionals.' },
   gl: { 'corporate.discoverFeatures': 'Descubrir funcionalidades', 'nav.solutions': 'Solucións', 'nav.pricing': 'Prezos', 'corporate.heroTitle': 'Software de marca branca para profesionais do pádel.' },
   ca: { 'corporate.discoverFeatures': 'Descobrir funcionalitats', 'nav.solutions': 'Solucions', 'nav.pricing': 'Preus', 'corporate.heroTitle': 'Programari de marca blanca per a professionals del pàdel.' },
