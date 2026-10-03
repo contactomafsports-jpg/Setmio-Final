@@ -76,6 +76,27 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
   const [contactEmail, setContactEmail] = useState('');
   const [contactPhone, setContactPhone] = useState('');
   const langRef = useRef<HTMLDivElement>(null);
+  const revealRefs = useRef<HTMLElement[]>([]);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => entries.forEach((entry) => entry.isIntersecting && entry.target.classList.add('is-visible')),
+      { threshold: 0.12 }
+    );
+    revealRefs.current.forEach((element) => element && observer.observe(element));
+    return () => observer.disconnect();
+  }, []);
+
+  const reveal = (element: HTMLElement | null) => {
+    if (element && !revealRefs.current.includes(element)) revealRefs.current.push(element);
+  };
+
+  const navigatePublicRoute = (path: string, page: 'features' | 'blog' | 'contact') => {
+    window.history.pushState({}, '', path);
+    setPublicPage(page);
+    setMobileMenuOpen(false);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   useEffect(() => {
     const handleOutsideClick = (e: MouseEvent) => {
@@ -152,7 +173,7 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
           {/* Center Navigation Links (Desktop) */}
           <nav className="hidden lg:flex items-center gap-6 text-xs font-bold text-slate-600 dark:text-slate-300">
             <button
-              onClick={handleOpenFeaturesClick}
+              onClick={() => navigatePublicRoute('/funcionalidades', 'features')}
               className="hover:text-emerald-600 dark:hover:text-emerald-400 transition"
             >
               Descubrir funcionalidades
@@ -160,18 +181,19 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
             <a href="#soluciones" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition">
               Soluciones
             </a>
-            <a href="#precios" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition">
+            <button onClick={() => setPublicPage('pricing')} className="hover:text-emerald-600 dark:hover:text-emerald-400 transition">
               Precios
-            </a>
+            </button>
             <button
               onClick={() => onExploreClub('sanmateo')}
               className="text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 font-extrabold flex items-center gap-1 transition px-2 py-1 rounded-lg hover:bg-emerald-50 dark:hover:bg-emerald-950/40"
             >
-              <span>🎾 Demo Club (San Mateo)</span>
+              <Sparkles className="w-3.5 h-3.5" aria-hidden="true" />
+              <span>Demo Club · San Mateo</span>
             </button>
-            <a href="#contacto" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition">
+            <button onClick={() => navigatePublicRoute('/contacto', 'contact')} className="hover:text-emerald-600 dark:hover:text-emerald-400 transition">
               Contacto
-            </a>
+            </button>
           </nav>
 
           {/* Right Action Buttons */}
@@ -230,16 +252,6 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
               {theme === 'dark' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-slate-700" />}
             </button>
 
-            {/* Button: Ver Demo (Abre modal selector de roles) */}
-            <button
-              onClick={handleOpenDemo}
-              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 transition"
-              title="Abrir selector interactivo de roles"
-            >
-              <Sparkles className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-              <span>Ver demo</span>
-            </button>
-
             {/* Button: Registrarse (Lleva al onboarding asistido) */}
             <button
               onClick={handleOpenRegister}
@@ -272,61 +284,29 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
 
         {/* Mobile Navigation Drawer with perfect viewport boundary */}
         {mobileMenuOpen && (
-          <div className="lg:hidden border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 p-4 space-y-3 animate-in slide-in-from-top-2 duration-150 shadow-xl w-full overflow-x-hidden">
-            <nav className="flex flex-col space-y-1.5 text-sm font-semibold text-slate-700 dark:text-slate-200">
-              <button
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  handleOpenFeaturesClick();
-                }}
-                className="text-left px-3 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition font-bold text-emerald-600 dark:text-emerald-400"
-              >
-                ✨ Descubrir funcionalidades
-              </button>
-              <button
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  handleOpenDemo();
-                }}
-                className="text-left px-3 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition font-bold text-slate-900 dark:text-white flex items-center justify-between"
-              >
-                <span>🎮 Ver demo (Selector de Roles)</span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
-              <a
-                href="#soluciones"
-                onClick={() => setMobileMenuOpen(false)}
-                className="px-3 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition"
-              >
-                🎾 Soluciones
-              </a>
-              <a
-                href="#modulos"
-                onClick={() => setMobileMenuOpen(false)}
-                className="px-3 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition"
-              >
-                ⚡ Módulos & Domótica
-              </a>
-              <a
-                href="#precios"
-                onClick={() => setMobileMenuOpen(false)}
-                className="px-3 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition"
-              >
-                💶 Planes & Precios
-              </a>
-              <button
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  onExploreClub('sanmateo');
-                }}
-                className="text-left px-3 py-2 rounded-xl text-emerald-600 dark:text-emerald-400 font-bold hover:bg-emerald-50 dark:hover:bg-emerald-950/40 transition flex items-center justify-between"
-              >
-                <span>🏆 Demo Club: Pádel San Mateo</span>
-                <ArrowRight className="w-4 h-4" />
+          <div className="lg:hidden absolute left-3 right-3 top-[calc(100%+0.75rem)] rounded-3xl border border-white/60 dark:border-slate-700/70 bg-white/80 dark:bg-slate-950/80 p-3 shadow-2xl shadow-slate-900/10 backdrop-blur-2xl animate-in slide-in-from-top-2 duration-200">
+            <nav className="flex flex-col gap-1.5 text-sm font-semibold text-slate-700 dark:text-slate-200">
+              {[
+                { label: 'Funcionalidades', icon: Sparkles, action: () => navigatePublicRoute('/funcionalidades', 'features') },
+                { label: 'Ver demo', icon: Play, action: handleOpenDemo },
+                { label: 'Soluciones', icon: Layers, href: '#soluciones' },
+                { label: 'Módulos y domótica', icon: Sliders, href: '#modulos' },
+                { label: 'Planes y precios', icon: CreditCard, href: '#precios' },
+              ].map(({ label, icon: Icon, action, href }) => (
+                <button key={label} onClick={action || (() => { window.location.hash = href!.slice(1); setMobileMenuOpen(false); })} className="flex items-center gap-3 rounded-2xl px-3.5 py-3 text-left hover:bg-slate-100/80 dark:hover:bg-slate-800/70 transition">
+                  <Icon className="w-4 h-4 text-emerald-600 dark:text-emerald-400" strokeWidth={1.5} aria-hidden="true" />
+                  <span>{label}</span>
+                  <ArrowRight className="ml-auto w-4 h-4 text-slate-400" strokeWidth={1.5} aria-hidden="true" />
+                </button>
+              ))}
+              <button onClick={() => { setMobileMenuOpen(false); onExploreClub('sanmateo'); }} className="flex items-center gap-3 rounded-2xl px-3.5 py-3 text-left text-emerald-700 dark:text-emerald-300 hover:bg-emerald-50/80 dark:hover:bg-emerald-950/40 transition">
+                <Building2 className="w-4 h-4" strokeWidth={1.5} aria-hidden="true" />
+                <span>Demo Club · San Mateo</span>
+                <ArrowRight className="ml-auto w-4 h-4" strokeWidth={1.5} aria-hidden="true" />
               </button>
             </nav>
 
-            <div className="pt-3 border-t border-slate-200 dark:border-slate-800 flex flex-col gap-2">
+            <div className="pt-3 mt-2 border-t border-slate-200/70 dark:border-slate-800 flex flex-col gap-2">
               <button
                 onClick={() => {
                   setMobileMenuOpen(false);
@@ -353,10 +333,13 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
       </header>
 
       {/* 2. HERO SECTION CORPORATIVO */}
-      <section className="relative overflow-hidden pt-12 pb-20 lg:pt-20 lg:pb-32 bg-gradient-to-b from-slate-50 via-white to-slate-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 border-b border-slate-200 dark:border-slate-800">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-96 bg-[radial-gradient(circle_at_50%_20%,rgba(16,185,129,0.15),transparent_60%)] pointer-events-none" />
+      <section ref={reveal} className="scroll-reveal relative overflow-hidden pt-12 pb-20 lg:pt-20 lg:pb-32 bg-slate-950 border-b border-slate-800">
+        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1554068865-24cecd4e34b8?auto=format&fit=crop&w=2000&q=85')] bg-cover bg-center" />
+        <div className="absolute inset-0 bg-[linear-gradient(115deg,rgba(7,20,16,.94),rgba(7,20,16,.78)_48%,rgba(7,20,16,.92))]" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-96 bg-[radial-gradient(circle_at_50%_20%,rgba(199,243,107,0.18),transparent_60%)] pointer-events-none" />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center space-y-8">
+          <div className="mx-auto max-w-3xl rounded-3xl border border-white/10 bg-white/[0.04] px-5 py-8 backdrop-blur-[2px]">
           {/* Trust Badge - Updated positioning */}
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-800 text-xs font-bold shadow-xs">
             <Sparkles className="w-4 h-4 text-emerald-500" />
@@ -364,7 +347,7 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
           </div>
 
           {/* Main Headline */}
-          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight text-slate-900 dark:text-white max-w-4xl mx-auto leading-[1.1] text-balance">
+          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight text-white max-w-4xl mx-auto leading-[1.1] text-balance">
             Software de{' '}
             <span className="bg-gradient-to-r from-emerald-600 via-teal-500 to-cyan-500 bg-clip-text text-transparent">
               Marca Blanca
@@ -407,7 +390,7 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
               onClick={() => onExploreClub('sanmateo')}
               className="px-5 py-4 rounded-2xl bg-slate-100 dark:bg-slate-900/60 hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs border border-slate-200 dark:border-slate-800 transition flex items-center gap-1.5"
             >
-              <span>🎾 Ver Web Demo Club (San Mateo)</span>
+              <><Sparkles className="w-4 h-4 text-emerald-600" aria-hidden="true" /><span>Ver Web Demo Club · San Mateo</span></>
             </button>
           </div>
 
@@ -422,6 +405,8 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
             <span className="flex items-center gap-1.5">
               <CheckCircle2 className="w-4 h-4 text-emerald-500" /> Soporte personalizado 365 días
             </span>
+          </div>
+
           </div>
 
           {/* Live Platform Preview Mockup */}
@@ -467,7 +452,7 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
       </section>
 
       {/* 3. METRICAS DE IMPACTO (Sin cifras inventadas como 450 clubes) */}
-      <section className="py-12 bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800">
+      <section ref={reveal} className="scroll-reveal py-12 bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 text-center">
             <div>
@@ -514,7 +499,7 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
       </section>
 
       {/* 4. SOLUCIONES POR PERFIL (Clubes, Profesores, Jugadores) */}
-      <section id="soluciones" className="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
+      <section ref={reveal} id="soluciones" className="scroll-reveal py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
         <div className="text-center max-w-3xl mx-auto space-y-3">
           <div className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
             Arquitectura 360°
@@ -623,7 +608,23 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
         </div>
       </section>
 
-      {/* 5. MÓDULOS TECNOLÓGICOS DIFERENCIALES */}
+      {/* 5. VÍDEO DESTACADO DE PÁDEL */}
+      <section ref={reveal} className="scroll-reveal py-20 bg-slate-950 text-white border-y border-slate-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-[.8fr_1.2fr] gap-10 items-center">
+          <div className="space-y-5">
+            <div className="text-xs font-bold uppercase tracking-[0.2em] text-emerald-400">Tecnología que se siente en pista</div>
+            <h2 className="text-3xl sm:text-5xl font-black tracking-tight">El juego profesional, dentro de tu operación.</h2>
+            <p className="text-sm sm:text-base text-slate-300 leading-relaxed">Descubre cómo una experiencia digital premium convierte cada reserva, clase y competición en una relación más sólida con tus jugadores.</p>
+          </div>
+          <div className="overflow-hidden rounded-3xl border border-white/10 bg-slate-900 shadow-2xl aspect-video">
+            <video className="h-full w-full object-cover" autoPlay muted loop playsInline controls preload="metadata" poster="https://images.unsplash.com/photo-1554068865-24cecd4e34b8?auto=format&fit=crop&w=1600&q=80" aria-label="Partido profesional de pádel">
+              <source src="https://cdn.coverr.co/videos/coverr-a-padel-match-1573/1080p.mp4" type="video/mp4" />
+            </video>
+          </div>
+        </div>
+      </section>
+
+      {/* 6. MÓDULOS TECNOLÓGICOS DIFERENCIALES */}
       <section id="modulos" className="py-20 bg-slate-50 dark:bg-slate-900/50 border-y border-slate-200 dark:border-slate-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
           <div className="text-center max-w-3xl mx-auto space-y-2">

@@ -212,7 +212,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
       {/* MAIN CONTENT CONTAINER */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Top Management Header */}
-        <header className="sticky top-0 z-30 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-4 sm:px-6 py-3 flex items-center justify-between">
+        <header className="fixed top-0 left-0 right-0 md:left-64 z-40 h-14 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-4 sm:px-6 flex items-center justify-between">
           <div className="flex items-center gap-2 min-w-0">
             <div className="size-2 rounded-full bg-emerald-400 shadow-[0_0_0_4px_rgba(52,211,153,0.12)] shrink-0" />
             <h1 className="text-sm sm:text-base font-bold text-slate-950 dark:text-white truncate">
@@ -307,7 +307,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
         </header>
 
         {/* Child Tab Content View */}
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto bg-[radial-gradient(circle_at_top_right,rgba(16,185,129,0.08),transparent_28%),#f8fafc] dark:bg-slate-950">
+        <main className="flex-1 pt-20 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto bg-[radial-gradient(circle_at_top_right,rgba(16,185,129,0.08),transparent_28%),#f8fafc] dark:bg-slate-950">
           {children}
         </main>
       </div>

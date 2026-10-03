@@ -247,17 +247,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCart, onOpenAuth, onOpenDe
                 )}
               </button>
 
-              {/* Ver Demo Button */}
-              {onOpenDemo && (
-                <button
-                  onClick={onOpenDemo}
-                  className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-purple-50 dark:bg-purple-950/50 hover:bg-purple-100 dark:hover:bg-purple-900/50 text-xs font-bold text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800 transition shadow-xs"
-                  title="Abrir selector de roles demo"
-                >
-                  <Sparkles className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
-                  <span>Ver Demo</span>
-                </button>
-              )}
+
 
               {/* User Account / Login Button */}
               <button
@@ -301,7 +291,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCart, onOpenAuth, onOpenDe
           />
 
           {/* Slide-over panel */}
-          <div className="fixed inset-y-0 right-0 w-full max-w-sm bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 shadow-2xl flex flex-col justify-between overflow-hidden animate-in slide-in-from-right duration-250 border-l border-slate-200 dark:border-slate-800">
+          <div className="fixed inset-y-0 right-0 w-full max-w-sm bg-background/95 dark:bg-slate-900/95 backdrop-blur-xl text-foreground dark:text-slate-100 shadow-2xl flex flex-col justify-between overflow-hidden animate-in slide-in-from-right duration-250 border-l border-border dark:border-slate-800">
             {/* Top Bar inside Drawer */}
             <div className="p-4 sm:p-5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -333,6 +323,41 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCart, onOpenAuth, onOpenDe
 
             {/* Scrollable Navigation Body */}
             <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-6">
+              <nav aria-label="Páginas públicas de Setmio" className="space-y-1">
+                <div className="px-2 text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Setmio</div>
+                {[
+                  { path: '/', label: 'Inicio' },
+                  { path: '/funcionalidades', label: 'Funcionalidades' },
+                  { path: '/precios', label: 'Precios' },
+                  { path: '/blog', label: 'Blog' },
+                  { path: '/contacto', label: 'Contacto' },
+                ].map((link) => (
+                  <button
+                    key={link.path}
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      if (link.path === '/') {
+                        navigateToCorporate();
+                        return;
+                      }
+                      window.history.pushState({}, '', link.path);
+                      window.dispatchEvent(new PopStateEvent('popstate'));
+                    }}
+                    className="w-full flex items-center justify-between rounded-xl px-3 py-2.5 text-left text-sm font-semibold text-foreground dark:text-slate-200 hover:bg-muted dark:hover:bg-slate-800 transition active:scale-[0.98]"
+                  >
+                    <span>{link.label}</span>
+                    <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                  </button>
+                ))}
+                <button
+                  onClick={() => { setMobileMenuOpen(false); onOpenAuth(); }}
+                  className="w-full flex items-center justify-center gap-2 rounded-xl bg-foreground px-3 py-2.5 text-sm font-bold text-background hover:opacity-90 transition active:scale-[0.98]"
+                >
+                  <User className="w-4 h-4" />
+                  Login
+                </button>
+              </nav>
+
               {/* Highlighted Booking Card */}
               <button
                 onClick={() => handleNavClick('booking')}

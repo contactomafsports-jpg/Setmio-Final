@@ -4,6 +4,7 @@ import { RoleSelectorModal } from './components/common/RoleSelectorModal';
 import { Navbar } from './components/common/Navbar';
 import { Footer } from './components/common/Footer';
 import { DraggableAIAgent } from './components/common/DraggableAIAgent';
+import { PrivateMobileNav } from './components/common/PrivateMobileNav';
 import { WhatsAppFloat } from './components/common/WhatsAppFloat';
 import { PWAInstallPrompt } from './components/common/PWAInstallPrompt';
 import { OfflineBanner } from './components/common/OfflineBanner';
@@ -26,6 +27,7 @@ import { LegalView } from './components/public/LegalView';
 import { BrandSplashScreen } from './components/common/BrandSplashScreen';
 import { SetmioCorporateLanding } from './components/public/SetmioCorporateLanding';
 import { FeaturesView } from './components/public/FeaturesView';
+import { PricingView } from './components/public/PricingView';
 import { PlayerPublicProfileView } from './components/public/PlayerPublicProfileView';
 import { SetmioCorporateLoader } from './components/common/SetmioCorporateLoader';
 
@@ -102,6 +104,23 @@ export function App() {
   };
 
   useEffect(() => {
+    const routeToPage: Record<string, typeof publicPage> = {
+      '/': 'home',
+      '/funcionalidades': 'features',
+      '/blog': 'blog',
+      '/contacto': 'contact',
+      '/precios': 'pricing',
+    };
+    const syncRoute = () => {
+      const page = routeToPage[window.location.pathname];
+      if (page) setPublicPage(page);
+    };
+    syncRoute();
+    window.addEventListener('popstate', syncRoute);
+    return () => window.removeEventListener('popstate', syncRoute);
+  }, [setPublicPage]);
+
+  useEffect(() => {
     const enabled = currentTenant.publicPages ?? ['home', 'courts', 'academy', 'tournaments', 'shop', 'contact'];
     if (['home', 'courts', 'academy', 'tournaments', 'shop', 'contact'].includes(publicPage) && !enabled.includes(publicPage)) {
       setPublicPage(enabled[0] as typeof publicPage);
@@ -115,6 +134,8 @@ export function App() {
         return <HomeView />;
       case 'features':
         return <FeaturesView onBack={() => setPublicPage('home')} onOpenDemo={() => setRoleSelectorOpen(true)} />;
+      case 'pricing':
+        return <PricingView onBack={() => setPublicPage('home')} onOpenDemo={() => setRoleSelectorOpen(true)} />;
       case 'player_profile':
         return <PlayerPublicProfileView onBack={() => setPublicPage('teams')} />;
       case 'club':
@@ -181,7 +202,7 @@ export function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 font-sans selection:bg-emerald-500 selection:text-white antialiased transition-colors duration-200">
+    <div className="min-h-screen bg-background text-foreground dark:bg-slate-950 dark:text-slate-100 font-sans selection:bg-emerald-500 selection:text-foreground antialiased transition-colors duration-200">
       {/* PWA & Brand Splash Screen */}
       {showSplash && <BrandSplashScreen onComplete={handleSplashComplete} />}
 
@@ -216,17 +237,26 @@ export function App() {
             <AdminLayout>{renderAdminTab()}</AdminLayout>
           )}
 
-          {currentView === 'player' && (
-            <PlayerPortal />
-          )}
-
-          {currentView === 'coach' && (
-            <CoachPortal />
-          )}
-
-          {currentView === 'hq' && (
-            <SuperadminHQ />
-          )}
+  {currentView === 'player' && (
+  <>
+    <PrivateMobileNav title="Área de Jugador" onMore={() => undefined} />
+    <PlayerPortal />
+  </>
+  )}
+  
+  {currentView === 'coach' && (
+  <>
+    <PrivateMobileNav title="Portal del Profesor" onMore={() => undefined} />
+    <CoachPortal />
+  </>
+  )}
+  
+  {currentView === 'hq' && (
+  <>
+    <PrivateMobileNav title="Setmio HQ" onMore={() => undefined} />
+    <SuperadminHQ />
+  </>
+  )}
         </>
       )}
 
@@ -269,13 +299,13 @@ export function App() {
           )}
 
           <div className="flex-1 min-w-0 text-xs">
-            <div className="font-bold text-white">{demoToast.title}</div>
+            <div className="font-bold text-foreground">{demoToast.title}</div>
             <div className="text-slate-300 text-[11px] mt-0.5 leading-relaxed">{demoToast.description}</div>
           </div>
 
           <button
             onClick={clearDemoToast}
-            className="p-1 rounded-lg text-slate-400 hover:text-white"
+            className="p-1 rounded-lg text-slate-500 hover:text-foreground transition-colors"
           >
             <X className="w-4 h-4" />
           </button>

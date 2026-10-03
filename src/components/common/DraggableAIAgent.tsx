@@ -174,8 +174,9 @@ export const DraggableAIAgent: React.FC = () => {
             onClick={() => {
               if (!isDragging) setIsOpen(true);
             }}
-            className="group relative flex items-center gap-2 cursor-grab active:cursor-grabbing p-3 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-700 text-white shadow-2xl hover:scale-105 transition-transform"
+            className="group relative flex items-center gap-2 cursor-grab active:cursor-grabbing p-3 sm:px-3.5 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-700 text-white shadow-2xl hover:scale-105 transition-transform touch-none"
             title="Arrastra para mover o haz clic para abrir el Asistente IA"
+            aria-label="Abrir Asistente IA"
           >
             <div className="relative">
               <Bot className="w-6 h-6 text-white" />
