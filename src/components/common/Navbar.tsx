@@ -323,26 +323,17 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCart, onOpenAuth, onOpenDe
 
             {/* Scrollable Navigation Body */}
             <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-6">
-              <nav aria-label="Páginas públicas de Setmio" className="space-y-1">
-                <div className="px-2 text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Setmio</div>
+              <nav aria-label="Navegación del club" className="space-y-1">
+                <div className="px-2 text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Club</div>
                 {[
-                  { path: '/', label: 'Inicio' },
-                  { path: '/funcionalidades', label: 'Funcionalidades' },
-                  { path: '/precios', label: 'Precios' },
-                  { path: '/blog', label: 'Blog' },
-                  { path: '/contacto', label: 'Contacto' },
+                  { id: 'booking' as PublicPage, label: 'Reservar Pista' },
+                  { id: 'matches' as PublicPage, label: 'Partidos Abiertos' },
+                  { id: 'academy' as PublicPage, label: 'Escuela' },
+                  { id: 'tournaments' as PublicPage, label: 'Competición' },
                 ].map((link) => (
                   <button
-                    key={link.path}
-                    onClick={() => {
-                      setMobileMenuOpen(false);
-                      if (link.path === '/') {
-                        navigateToCorporate();
-                        return;
-                      }
-                      window.history.pushState({}, '', link.path);
-                      window.dispatchEvent(new PopStateEvent('popstate'));
-                    }}
+                    key={link.id}
+                    onClick={() => handleNavClick(link.id)}
                     className="w-full flex items-center justify-between rounded-xl px-3 py-2.5 text-left text-sm font-semibold text-foreground dark:text-slate-200 hover:bg-muted dark:hover:bg-slate-800 transition active:scale-[0.98]"
                   >
                     <span>{link.label}</span>
@@ -354,7 +345,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCart, onOpenAuth, onOpenDe
                   className="w-full flex items-center justify-center gap-2 rounded-xl bg-foreground px-3 py-2.5 text-sm font-bold text-background hover:opacity-90 transition active:scale-[0.98]"
                 >
                   <User className="w-4 h-4" />
-                  Login
+                  Registro / Acceso
                 </button>
               </nav>
 
