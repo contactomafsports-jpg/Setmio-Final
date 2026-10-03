@@ -44,6 +44,9 @@ export type PublicPage =
   | 'home'
   | 'features'
   | 'pricing'
+  | 'solutions'
+  | 'modules'
+  | 'demo'
   | 'player_profile'
   | 'club'
   | 'courts'
@@ -62,6 +65,9 @@ export type PublicPage =
 const PUBLIC_ROUTES: Record<string, PublicPage> = {
   '/': 'home',
   '/funcionalidades': 'features',
+  '/soluciones': 'solutions',
+  '/modulos-domotica': 'modules',
+  '/demo': 'demo',
   '/precios': 'pricing',
   '/perfil-jugador': 'player_profile',
   '/club': 'club',
@@ -81,6 +87,9 @@ const PUBLIC_ROUTES: Record<string, PublicPage> = {
 const routeForPage: Record<PublicPage, string> = {
   home: '/',
   features: '/funcionalidades',
+  solutions: '/soluciones',
+  modules: '/modulos-domotica',
+  demo: '/demo',
   pricing: '/precios',
   player_profile: '/perfil-jugador',
   club: '/club',

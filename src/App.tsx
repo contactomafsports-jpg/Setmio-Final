@@ -91,6 +91,9 @@ export function App() {
     const routeToPage: Record<string, typeof publicPage> = {
       '/': 'home',
       '/funcionalidades': 'features',
+      '/soluciones': 'solutions',
+      '/modulos-domotica': 'modules',
+      '/demo': 'demo',
       '/blog': 'blog',
       '/contacto': 'contact',
       '/precios': 'pricing',
@@ -117,7 +120,11 @@ export function App() {
       case 'home':
         return <HomeView />;
       case 'features':
+      case 'solutions':
+      case 'modules':
         return <FeaturesView onBack={() => setPublicPage('home')} onOpenDemo={() => setRoleSelectorOpen(true)} />;
+      case 'demo':
+        return <HomeView />;
       case 'pricing':
         return <PricingView onBack={() => setPublicPage('home')} onOpenDemo={() => setRoleSelectorOpen(true)} />;
       case 'player_profile':

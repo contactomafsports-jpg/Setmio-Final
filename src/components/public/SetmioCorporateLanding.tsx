@@ -94,12 +94,17 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
     if (element && !revealRefs.current.includes(element)) revealRefs.current.push(element);
   };
 
-  const navigatePublicRoute = (path: string, page: 'home' | 'features' | 'pricing' | 'blog' | 'contact') => {
+  const navigatePublicRoute = (path: string, page: 'home' | 'features' | 'solutions' | 'modules' | 'demo' | 'pricing' | 'blog' | 'contact') => {
     window.history.pushState({}, '', path);
     setPublicPage(page);
     setMobileMenuOpen(false);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
+
+  useEffect(() => {
+    document.body.style.overflow = mobileMenuOpen ? 'hidden' : '';
+    return () => { document.body.style.overflow = ''; };
+  }, [mobileMenuOpen]);
 
   useEffect(() => {
     const handleOutsideClick = (e: MouseEvent) => {
@@ -298,16 +303,15 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
               <nav className="flex flex-col gap-1.5 text-sm font-semibold text-slate-800 dark:text-slate-200">
               {[
                 { label: 'Inicio', icon: Home, action: () => navigatePublicRoute('/', 'home') },
+                { label: 'Soluciones', icon: Layers, action: () => navigatePublicRoute('/soluciones', 'solutions') },
                 { label: 'Funcionalidades', icon: Sparkles, action: () => navigatePublicRoute('/funcionalidades', 'features') },
-                { label: 'Precios', icon: CreditCard, action: () => navigatePublicRoute('/precios', 'pricing') },
+                { label: 'Módulos y domótica', icon: Sliders, action: () => navigatePublicRoute('/modulos-domotica', 'modules') },
                 { label: 'Blog', icon: BookOpen, action: () => navigatePublicRoute('/blog', 'blog') },
+                { label: 'Ver demo', icon: Play, action: () => navigatePublicRoute('/demo', 'demo') },
+                { label: 'Precios', icon: CreditCard, action: () => navigatePublicRoute('/precios', 'pricing') },
                 { label: 'Contacto', icon: Mail, action: () => navigatePublicRoute('/contacto', 'contact') },
-                { label: 'Ver demo', icon: Play, action: handleOpenDemo },
-                { label: 'Soluciones', icon: Layers, href: '#soluciones' },
-                { label: 'Módulos y domótica', icon: Sliders, href: '#modulos' },
-                { label: 'Planes y precios', icon: CreditCard, href: '#precios' },
-              ].map(({ label, icon: Icon, action, href }) => (
-                <button key={label} onClick={action || (() => { window.location.hash = href!.slice(1); setMobileMenuOpen(false); })} className="flex items-center gap-3 rounded-2xl px-3.5 py-3 text-left hover:bg-slate-100/80 dark:hover:bg-slate-800/70 transition">
+              ].map(({ label, icon: Icon, action }) => (
+                <button key={label} onClick={action} className="flex items-center gap-3 rounded-2xl px-3.5 py-3 text-left hover:bg-slate-100/80 dark:hover:bg-slate-800/70 transition">
                   <Icon className="w-4 h-4 text-emerald-600 dark:text-emerald-400" strokeWidth={1.5} aria-hidden="true" />
                   <span>{label}</span>
                   <ArrowRight className="ml-auto w-4 h-4 text-slate-400" strokeWidth={1.5} aria-hidden="true" />
@@ -344,7 +348,7 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
                 }}
                 className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-black shadow-md flex items-center justify-center gap-2"
               >
-                <span>Registrarse (Onboarding 30 Días)</span>
+                <span>Registrarse</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>
               <button
@@ -355,7 +359,7 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
                 className="w-full py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center justify-center gap-2"
               >
                 <Lock className="w-3.5 h-3.5 text-emerald-600" />
-                <span>Acceso Clientes / Socios</span>
+                <span>Acceso Usuarios</span>
               </button>
             </div>
             </div>
@@ -1070,7 +1074,7 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
                 <span>Alta de Club en Setmio</span>
               </div>
               <h3 className="text-2xl font-black text-slate-900 dark:text-white">
-                Comienza tus 30 días de prueba gratis
+                Comienza con Setmio
               </h3>
               <p className="text-xs text-slate-600 dark:text-slate-400">
                 Configura tu club en menos de 2 minutos. Sin tarjeta de crédito requerida.
