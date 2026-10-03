@@ -1,11 +1,11 @@
 import React from 'react';
-import { Menu, X } from 'lucide-react';
+import { ArrowRight, BookOpen, Check, CreditCard, Home, Layers, Lightbulb, Lock, Mail, Menu, Moon, Play, Sliders, Sparkles, Sun, X } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { SUPPORTED_LANGUAGES } from '../../lib/i18n';
 
-interface CorporateHeaderProps { onOpenDemo?: () => void }
+interface CorporateHeaderProps { onOpenDemo?: () => void; onOpenAuth?: () => void; onOpenRegister?: () => void }
 
-export function CorporateHeader({ onOpenDemo }: CorporateHeaderProps) {
+export function CorporateHeader({ onOpenDemo, onOpenAuth, onOpenRegister }: CorporateHeaderProps) {
   const [open, setOpen] = React.useState(false);
 const { t, language, setLanguage } = useApp();
   React.useEffect(() => {
