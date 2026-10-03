@@ -103,6 +103,23 @@ export function App() {
   };
 
   useEffect(() => {
+    const routeToPage: Record<string, typeof publicPage> = {
+      '/': 'home',
+      '/funcionalidades': 'features',
+      '/blog': 'blog',
+      '/contacto': 'contact',
+      '/precios': 'pricing',
+    };
+    const syncRoute = () => {
+      const page = routeToPage[window.location.pathname];
+      if (page) setPublicPage(page);
+    };
+    syncRoute();
+    window.addEventListener('popstate', syncRoute);
+    return () => window.removeEventListener('popstate', syncRoute);
+  }, [setPublicPage]);
+
+  useEffect(() => {
     const enabled = currentTenant.publicPages ?? ['home', 'courts', 'academy', 'tournaments', 'shop', 'contact'];
     if (['home', 'courts', 'academy', 'tournaments', 'shop', 'contact'].includes(publicPage) && !enabled.includes(publicPage)) {
       setPublicPage(enabled[0] as typeof publicPage);

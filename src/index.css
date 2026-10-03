@@ -48,6 +48,9 @@ button:active, [role="button"]:active, a:active { transform: scale(.97); }
 
 .hero-glow { background: radial-gradient(circle at 75% 10%, rgba(199,243,107,.23), transparent 32%), linear-gradient(120deg, #10221d 0%, #163a2d 55%, #10221d 100%); }
 .card-lift { transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease; }
+.scroll-reveal { opacity: 0; transform: translateY(22px); transition: opacity .7s ease, transform .7s cubic-bezier(.22,1,.36,1); }
+.scroll-reveal.is-visible { opacity: 1; transform: translateY(0); }
+@media (prefers-reduced-motion: reduce) { .scroll-reveal { opacity: 1; transform: none; transition: none; } }
 .card-lift:hover { transform: translateY(-3px); box-shadow: 0 18px 45px rgba(16,34,29,.11); }
 @media (prefers-reduced-motion: reduce) { .card-lift:hover { transform: none; } }
 
