@@ -247,17 +247,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCart, onOpenAuth, onOpenDe
                 )}
               </button>
 
-              {/* Ver Demo Button */}
-              {onOpenDemo && (
-                <button
-                  onClick={onOpenDemo}
-                  className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-purple-50 dark:bg-purple-950/50 hover:bg-purple-100 dark:hover:bg-purple-900/50 text-xs font-bold text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800 transition shadow-xs"
-                  title="Abrir selector de roles demo"
-                >
-                  <Sparkles className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
-                  <span>Ver Demo</span>
-                </button>
-              )}
+
 
               {/* User Account / Login Button */}
               <button

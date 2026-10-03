@@ -167,7 +167,8 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
               onClick={() => onExploreClub('sanmateo')}
               className="text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 font-extrabold flex items-center gap-1 transition px-2 py-1 rounded-lg hover:bg-emerald-50 dark:hover:bg-emerald-950/40"
             >
-              <span>🎾 Demo Club (San Mateo)</span>
+              <Sparkles className="w-3.5 h-3.5" aria-hidden="true" />
+              <span>Demo Club · San Mateo</span>
             </button>
             <a href="#contacto" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition">
               Contacto
@@ -407,7 +408,7 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
               onClick={() => onExploreClub('sanmateo')}
               className="px-5 py-4 rounded-2xl bg-slate-100 dark:bg-slate-900/60 hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs border border-slate-200 dark:border-slate-800 transition flex items-center gap-1.5"
             >
-              <span>🎾 Ver Web Demo Club (San Mateo)</span>
+              <><Sparkles className="w-4 h-4 text-emerald-600" aria-hidden="true" /><span>Ver Web Demo Club · San Mateo</span></>
             </button>
           </div>
 
