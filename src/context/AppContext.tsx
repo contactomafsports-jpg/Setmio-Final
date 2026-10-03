@@ -711,12 +711,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    if (isCorporateLanding) {
-      if (window.location.pathname !== '/' && !window.location.pathname.startsWith('/club/')) {
-        window.history.pushState({}, '', '/');
-      }
-      return;
-    }
+  if (isCorporateLanding) {
+  const corporatePath = routeForPage[publicPage];
+  if (window.location.pathname !== corporatePath && !window.location.pathname.startsWith('/club/')) {
+  window.history.pushState({}, '', corporatePath);
+  }
+  return;
+  }
     const prefix = `/club/${currentTenant.slug}`;
     const path = currentView === 'admin'
       ? `${prefix}${routeForAdminTab[adminTab]}`

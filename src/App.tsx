@@ -205,14 +205,12 @@ export function App() {
       {!isCorporateLanding && showSplash && <BrandSplashScreen onComplete={handleSplashComplete} />}
 
       {/* Main view renderer: Corporate SaaS Landing OR Club View */}
-      {isCorporateLanding && currentView === 'public' ? (
-        <>
-          <SetmioCorporateLanding
-            onOpenAuth={() => setAuthOpen(true)}
-            onExploreClub={navigateToClub}
-            onOpenDemoRoleModal={() => setRoleSelectorOpen(true)}
-          />
-        </>
+      {isCorporateLanding && currentView === 'public' && publicPage === 'home' ? (
+        <SetmioCorporateLanding
+          onOpenAuth={() => setAuthOpen(true)}
+          onExploreClub={navigateToClub}
+          onOpenDemoRoleModal={() => setRoleSelectorOpen(true)}
+        />
       ) : (
         <>
           {currentView === 'public' && (
