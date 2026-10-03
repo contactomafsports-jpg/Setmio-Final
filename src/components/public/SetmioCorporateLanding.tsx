@@ -192,13 +192,6 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
             <button onClick={() => setPublicPage('pricing')} className="hover:text-emerald-600 dark:hover:text-emerald-400 transition">
               Precios
             </button>
-            <button
-              onClick={() => onExploreClub('sanmateo')}
-              className="text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 font-extrabold flex items-center gap-1 transition px-2 py-1 rounded-lg hover:bg-emerald-50 dark:hover:bg-emerald-950/40"
-            >
-              <Sparkles className="w-3.5 h-3.5" aria-hidden="true" />
-              <span>Demo Club · San Mateo</span>
-            </button>
             <button onClick={() => navigatePublicRoute('/contacto', 'contact')} className="hover:text-emerald-600 dark:hover:text-emerald-400 transition">
               Contacto
             </button>
@@ -317,11 +310,7 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
                   <ArrowRight className="ml-auto w-4 h-4 text-slate-400" strokeWidth={1.5} aria-hidden="true" />
                 </button>
               ))}
-              <button onClick={() => { setMobileMenuOpen(false); onExploreClub('sanmateo'); }} className="flex items-center gap-3 rounded-2xl px-3.5 py-3 text-left text-emerald-700 dark:text-emerald-300 hover:bg-emerald-50/80 dark:hover:bg-emerald-950/40 transition">
-                <Building2 className="w-4 h-4" strokeWidth={1.5} aria-hidden="true" />
-                <span>Demo Club · San Mateo</span>
-                <ArrowRight className="ml-auto w-4 h-4" strokeWidth={1.5} aria-hidden="true" />
-              </button>
+
             </nav>
 
             <div className="mt-3 border-t border-slate-200/70 pt-3 dark:border-slate-800">
@@ -421,12 +410,7 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
               <ArrowRight className="w-4 h-4" />
             </button>
 
-            <button
-              onClick={() => onExploreClub('sanmateo')}
-              className="px-5 py-4 rounded-2xl bg-slate-100 dark:bg-slate-900/60 hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs border border-slate-200 dark:border-slate-800 transition flex items-center gap-1.5"
-            >
-              <><Sparkles className="w-4 h-4 text-emerald-600" aria-hidden="true" /><span>Ver Web Demo Club · San Mateo</span></>
-            </button>
+
           </div>
 
           {/* Micro-guarantees */}
