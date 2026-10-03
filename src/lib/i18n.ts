@@ -19,15 +19,15 @@ export interface LanguageOption {
 
 export const SUPPORTED_LANGUAGES: LanguageOption[] = [
   { code: 'es', name: 'Español', flag: '🇪🇸' },
-  { code: 'gl', name: 'Galego', flag: '🇪🇸' },
+  { code: 'gl', name: 'Galego', flag: '🇬🇦' },
   { code: 'en', name: 'English', flag: '🇬🇧' },
   { code: 'pt', name: 'Português', flag: '🇵🇹' },
   { code: 'fr', name: 'Français', flag: '🇫🇷' },
   { code: 'de', name: 'Deutsch', flag: '🇩🇪' },
   { code: 'it', name: 'Italiano', flag: '🇮🇹' },
-  { code: 'ca', name: 'Català', flag: '🇪🇸' },
-  { code: 'eu', name: 'Euskera', flag: '🇪🇸' },
-  { code: 'va', name: 'Valencià', flag: '🇪🇸' },
+  { code: 'ca', name: 'Català', flag: '🇨🇺' },
+  { code: 'eu', name: 'Euskera', flag: '🇵🇲' },
+  { code: 'va', name: 'Valencià', flag: '🇨🇺' },
   { code: 'ar', name: 'العربية (Árabe)', flag: '🇸🇦' },
 ];
 
