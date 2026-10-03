@@ -38,10 +38,11 @@ export const AdminDashboard: React.FC = () => {
   const availableCourts = courts.length;
 
   return (
-    <div className="space-y-8 text-slate-900 dark:text-slate-100">
+    <div className="space-y-6 sm:space-y-8 text-slate-900 dark:text-slate-100">
       {/* Welcome Banner */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 rounded-3xl bg-gradient-to-r from-slate-900 to-slate-900/60 border border-slate-800 shadow-xl">
-        <div className="space-y-1">
+      <div className="relative overflow-hidden flex flex-col sm:flex-row sm:items-center justify-between gap-5 p-5 sm:p-6 rounded-3xl bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950/80 border border-slate-800 shadow-xl">
+        <div className="pointer-events-none absolute -right-12 -top-16 size-40 rounded-full bg-emerald-400/10 blur-3xl" />
+        <div className="relative space-y-1">
           <div className="text-xs font-semibold text-emerald-400 uppercase tracking-wider">
             Panel de Operaciones · Plan {currentTenant.planId.toUpperCase()}
           </div>
