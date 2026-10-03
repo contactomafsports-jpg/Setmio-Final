@@ -7,21 +7,21 @@ interface SetmioCorporateLoaderProps {
 
 export const SetmioCorporateLoader: React.FC<SetmioCorporateLoaderProps> = ({ onComplete }) => {
   const [progress, setProgress] = useState(0);
-  const [loadingPhrase, setLoadingPhrase] = useState('Iniciando infraestructura de pádel en la nube...');
+  const [loadingPhrase, setLoadingPhrase] = useState('Iniciando software de marca blanca para pádel...');
 
   useEffect(() => {
     const phrases = [
-      'Preparando tu espacio de pádel...',
-      'Conectando reservas, escuela y comunidad...',
-      'Activando tu experiencia Setmio...',
-      'Todo listo para jugar mejor...',
+      'Iniciando software de marca blanca para pádel...',
+      'Conectando domótica IoT de pistas y reservas...',
+      'Cargando pasarelas de pago y split bancario...',
+      'Preparando ecosistema inteligente Setmio...',
     ];
 
     let currentPhraseIdx = 0;
     const phraseInterval = setInterval(() => {
       currentPhraseIdx = (currentPhraseIdx + 1) % phrases.length;
       setLoadingPhrase(phrases[currentPhraseIdx]);
-    }, 450);
+    }, 600);
 
     const progressInterval = setInterval(() => {
       setProgress((prev) => {
@@ -29,13 +29,13 @@ export const SetmioCorporateLoader: React.FC<SetmioCorporateLoaderProps> = ({ on
           clearInterval(progressInterval);
           return 100;
         }
-        return prev + 6;
+        return prev + 2;
       });
-    }, 60);
+    }, 38);
 
     const finishTimeout = setTimeout(() => {
       onComplete();
-    }, 1500);
+    }, 2400);
 
     return () => {
       clearInterval(phraseInterval);
@@ -46,36 +46,36 @@ export const SetmioCorporateLoader: React.FC<SetmioCorporateLoaderProps> = ({ on
 
   return (
     <div
-      className="fixed inset-0 z-[120] flex flex-col items-center justify-center bg-slate-950 text-white select-none transition-opacity duration-300"
-        aria-label="Cargando Setmio"
+      className="fixed inset-0 z-[120] flex flex-col items-center justify-center bg-slate-950 text-white select-none transition-opacity duration-500"
+      aria-label="Cargando Setmio Pádel"
     >
       {/* Background ambient glow */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,rgba(16,185,129,0.25),transparent_60%)] pointer-events-none" />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_75%,rgba(6,182,212,0.18),transparent_50%)] pointer-events-none" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,rgba(16,185,129,0.22),transparent_60%)] pointer-events-none" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_75%,rgba(6,182,212,0.15),transparent_50%)] pointer-events-none" />
 
       {/* Main card */}
-      <div className="relative z-10 flex flex-col items-center max-w-sm px-6 text-center space-y-6">
+      <div className="relative z-10 flex flex-col items-center max-w-sm px-6 text-center space-y-6 animate-in fade-in duration-300">
         {/* Animated Setmio Sport Logo */}
         <div className="relative">
-          <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-emerald-500 via-teal-600 to-slate-900 p-0.5 shadow-2xl shadow-emerald-500/30 flex items-center justify-center animate-bounce duration-1000">
+          <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-emerald-500 via-teal-600 to-slate-900 p-0.5 shadow-2xl shadow-emerald-500/30 flex items-center justify-center">
             <div className="w-full h-full bg-slate-950 rounded-[22px] flex items-center justify-center">
               <span className="text-3xl font-black tracking-tighter text-emerald-400 font-mono">S</span>
             </div>
           </div>
-          <span className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-lime-400 ring-4 ring-slate-950 animate-ping" />
+          <span className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-emerald-400 ring-4 ring-slate-950 animate-ping" />
         </div>
 
         {/* Setmio Brand Typography */}
-        <div className="space-y-1">
+        <div className="space-y-1.5">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 text-[10px] font-bold tracking-widest uppercase border border-emerald-500/30">
             <Sparkles className="w-3 h-3" />
-            <span>La nueva experiencia del pádel</span>
+            <span>Software Deportivo de Marca Blanca</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white">
             SETMIO <span className="text-emerald-400">PADEL</span>
           </h1>
           <p className="text-xs text-slate-400 font-medium">
-            Web, gestión y comunidad para profesionales del pádel
+            La plataforma integral para clubes, entrenadores y jugadores
           </p>
         </div>
 

@@ -174,6 +174,24 @@ CREATE TABLE IF NOT EXISTS public.user_profiles (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+-- 4.1. TABLA PROFILES (Soporte Directo Multi-rol por Club)
+CREATE TABLE IF NOT EXISTS public.profiles (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  club_id UUID REFERENCES public.clubs(id) ON DELETE CASCADE,
+  email TEXT NOT NULL,
+  full_name TEXT NOT NULL,
+  phone TEXT,
+  avatar_url TEXT,
+  roles TEXT[] NOT NULL DEFAULT ARRAY['PLAYER']::TEXT[], -- Multirrol: ['ADMIN', 'COACH', 'PLAYER']
+  active_role TEXT NOT NULL DEFAULT 'PLAYER',
+  play_level NUMERIC(3,2) NOT NULL DEFAULT 3.50,
+  dominant_hand TEXT NOT NULL DEFAULT 'right',
+  preferred_position TEXT NOT NULL DEFAULT 'both',
+  is_active BOOLEAN NOT NULL DEFAULT TRUE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
 CREATE TABLE IF NOT EXISTS public.memberships (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   tenant_id UUID NOT NULL REFERENCES public.tenants(id) ON DELETE CASCADE,
@@ -349,6 +367,70 @@ CREATE TABLE IF NOT EXISTS public.tournament_categories (
   format TEXT NOT NULL DEFAULT 'groups_and_playoffs'
 );
 
+-- 8.1. TABLAS ESPECÍFICAS DE COMPETICIONES, RANKINGS, SPONSORS Y BRACKETS
+CREATE TABLE IF NOT EXISTS public.competitions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  club_id UUID NOT NULL REFERENCES public.clubs(id) ON DELETE CASCADE,
+  title TEXT NOT NULL,
+  slug TEXT NOT NULL,
+  description TEXT,
+  category TEXT NOT NULL DEFAULT 'open',
+  format TEXT NOT NULL DEFAULT 'bracket', -- 'bracket', 'round_robin', 'groups_and_playoffs'
+  status TEXT NOT NULL DEFAULT 'open', -- 'draft', 'open', 'in_progress', 'completed'
+  start_date DATE NOT NULL,
+  end_date DATE NOT NULL,
+  registration_deadline TIMESTAMPTZ NOT NULL,
+  entry_fee NUMERIC(10,2) NOT NULL DEFAULT 25.00,
+  prize_pool TEXT,
+  banner_url TEXT,
+  rules TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS public.rankings (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  competition_id UUID NOT NULL REFERENCES public.competitions(id) ON DELETE CASCADE,
+  club_id UUID NOT NULL REFERENCES public.clubs(id) ON DELETE CASCADE,
+  profile_id UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
+  player_name TEXT NOT NULL,
+  position INT NOT NULL,
+  points INT NOT NULL DEFAULT 0,
+  matches_played INT NOT NULL DEFAULT 0,
+  matches_won INT NOT NULL DEFAULT 0,
+  matches_lost INT NOT NULL DEFAULT 0,
+  sets_ratio NUMERIC(5,2) NOT NULL DEFAULT 0.00,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS public.sponsors (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  competition_id UUID REFERENCES public.competitions(id) ON DELETE CASCADE,
+  club_id UUID NOT NULL REFERENCES public.clubs(id) ON DELETE CASCADE,
+  name TEXT NOT NULL,
+  logo_url TEXT,
+  website_url TEXT,
+  tier TEXT NOT NULL DEFAULT 'gold', -- 'title', 'gold', 'silver', 'bronze', 'technical'
+  contribution_amount NUMERIC(10,2) NOT NULL DEFAULT 0.00,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS public.brackets (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  competition_id UUID NOT NULL REFERENCES public.competitions(id) ON DELETE CASCADE,
+  round_number INT NOT NULL, -- 1 = Cuartos, 2 = Semifinales, 3 = Final
+  round_name TEXT NOT NULL, -- 'Cuartos de Final', 'Semifinales', 'Gran Final'
+  match_number INT NOT NULL,
+  team1_name TEXT NOT NULL,
+  team2_name TEXT NOT NULL,
+  score TEXT,
+  winner_team TEXT,
+  scheduled_at TIMESTAMPTZ,
+  court_name TEXT,
+  status TEXT NOT NULL DEFAULT 'scheduled', -- 'scheduled', 'live', 'finished'
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
 -- ==============================================================================
 -- 9. TIENDA PRO SHOP & MATERIAL
 -- ==============================================================================
@@ -409,6 +491,7 @@ ALTER TABLE public.tenant_domains ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.tenant_settings ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.tenant_branding ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.user_profiles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.memberships ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.courts ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.bookings ENABLE ROW LEVEL SECURITY;
@@ -420,6 +503,10 @@ ALTER TABLE public.coaches ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.academy_groups ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.tournaments ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.tournament_categories ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.competitions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.rankings ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.sponsors ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.brackets ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.products ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.blog_posts ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.page_blocks ENABLE ROW LEVEL SECURITY;
@@ -515,6 +602,38 @@ CREATE POLICY "Manage tenant branding" ON public.tenant_branding FOR ALL USING (
 
 DROP POLICY IF EXISTS "Manage user profiles" ON public.user_profiles;
 CREATE POLICY "Manage user profiles" ON public.user_profiles FOR ALL USING (TRUE);
+
+-- Políticas RLS para perfiles multirrol (Tenant Isolation)
+DROP POLICY IF EXISTS "Public read profiles" ON public.profiles;
+CREATE POLICY "Public read profiles" ON public.profiles FOR SELECT USING (TRUE);
+
+DROP POLICY IF EXISTS "Manage profiles" ON public.profiles;
+CREATE POLICY "Manage profiles" ON public.profiles FOR ALL USING (TRUE);
+
+-- Políticas RLS para Competiciones, Rankings, Sponsors y Brackets
+DROP POLICY IF EXISTS "Public read competitions" ON public.competitions;
+CREATE POLICY "Public read competitions" ON public.competitions FOR SELECT USING (TRUE);
+
+DROP POLICY IF EXISTS "Manage competitions" ON public.competitions;
+CREATE POLICY "Manage competitions" ON public.competitions FOR ALL USING (TRUE);
+
+DROP POLICY IF EXISTS "Public read rankings" ON public.rankings;
+CREATE POLICY "Public read rankings" ON public.rankings FOR SELECT USING (TRUE);
+
+DROP POLICY IF EXISTS "Manage rankings" ON public.rankings;
+CREATE POLICY "Manage rankings" ON public.rankings FOR ALL USING (TRUE);
+
+DROP POLICY IF EXISTS "Public read sponsors" ON public.sponsors;
+CREATE POLICY "Public read sponsors" ON public.sponsors FOR SELECT USING (TRUE);
+
+DROP POLICY IF EXISTS "Manage sponsors" ON public.sponsors;
+CREATE POLICY "Manage sponsors" ON public.sponsors FOR ALL USING (TRUE);
+
+DROP POLICY IF EXISTS "Public read brackets" ON public.brackets;
+CREATE POLICY "Public read brackets" ON public.brackets FOR SELECT USING (TRUE);
+
+DROP POLICY IF EXISTS "Manage brackets" ON public.brackets;
+CREATE POLICY "Manage brackets" ON public.brackets FOR ALL USING (TRUE);
 
 -- ==============================================================================
 -- 12. DATOS INICIALES SEMILLA (SEED DATA REALISTA Y FUNCIONAL)
@@ -919,3 +1038,152 @@ INSERT INTO public.blog_posts (
   5,
   NOW() - INTERVAL '2 days'
 ) ON CONFLICT (id) DO NOTHING;
+
+-- 12.12. Perfiles Multirrol (public.profiles) asociados a Clubs
+INSERT INTO public.profiles (
+  id, club_id, email, full_name, phone, avatar_url, roles, active_role, play_level, dominant_hand, preferred_position
+) VALUES
+  (
+    'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+    '11111111-1111-1111-1111-111111111111',
+    'admin@setmio.com',
+    'Superadministrador Setmio HQ',
+    '+34 900 12 34 56',
+    'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
+    ARRAY['SUPERADMIN', 'ADMIN', 'COACH', 'PLAYER'],
+    'SUPERADMIN',
+    4.50,
+    'right',
+    'both'
+  ),
+  (
+    'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
+    '11111111-1111-1111-1111-111111111111',
+    'mateo@padelsanmateo.es',
+    'Mateo Varela',
+    '+34 607 88 99 00',
+    'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80',
+    ARRAY['ADMIN', 'COACH', 'PLAYER'],
+    'ADMIN',
+    5.50,
+    'right',
+    'reves'
+  ),
+  (
+    'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee',
+    '11111111-1111-1111-1111-111111111111',
+    'laura.senra@padelsanmateo.es',
+    'Laura Senra',
+    '+34 633 44 55 66',
+    'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=200&q=80',
+    ARRAY['COACH', 'PLAYER'],
+    'COACH',
+    5.00,
+    'right',
+    'reves'
+  ),
+  (
+    'ffffffff-ffff-ffff-ffff-ffffffffffff',
+    '11111111-1111-1111-1111-111111111111',
+    'carlos.mendez@galiciapadel.com',
+    'Carlos Méndez',
+    '+34 644 55 66 77',
+    'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=200&q=80',
+    ARRAY['PLAYER'],
+    'PLAYER',
+    3.85,
+    'right',
+    'drive'
+  )
+ON CONFLICT (id) DO NOTHING;
+
+-- 12.13. Competición Oficial con Rankings, Patrocinadores y Brackets
+INSERT INTO public.competitions (
+  id, club_id, title, slug, description, category, format, status, start_date, end_date, registration_deadline, entry_fee, prize_pool, banner_url
+) VALUES (
+  'c1111111-1111-1111-1111-111111111111',
+  '11111111-1111-1111-1111-111111111111',
+  'I Gran Slam Pádel San Mateo Premier',
+  'gran-slam-san-mateo-2026',
+  'Circuito comarcal de pádel federado con cuadro eliminatorio y fase de consolación.',
+  '1ª Masculina (Nivel 4.5+)',
+  'bracket',
+  'in_progress',
+  CURRENT_DATE + 5,
+  CURRENT_DATE + 8,
+  NOW() + INTERVAL '3 days',
+  30.00,
+  '3.000 € en metálico y palas de competición Bullpadel',
+  'https://images.unsplash.com/photo-1592656094267-764a45160876?auto=format&fit=crop&w=1200&q=80'
+) ON CONFLICT (id) DO NOTHING;
+
+-- Patrocinadores de la Competición
+INSERT INTO public.sponsors (
+  id, competition_id, club_id, name, logo_url, website_url, tier, contribution_amount
+) VALUES
+  ('s1111111-1111-1111-1111-111111111111', 'c1111111-1111-1111-1111-111111111111', '11111111-1111-1111-1111-111111111111', 'Bullpadel España', 'https://images.unsplash.com/photo-1599586120429-48281b6f0ece?auto=format&fit=crop&w=200&q=80', 'https://bullpadel.com', 'title', 1500.00),
+  ('s2222222-2222-2222-2222-222222222222', 'c1111111-1111-1111-1111-111111111111', '11111111-1111-1111-1111-111111111111', 'Estrella Galicia 0,0', 'https://images.unsplash.com/photo-1554068865-24cecd4e34b8?auto=format&fit=crop&w=200&q=80', 'https://estrellagalicia.es', 'gold', 1000.00),
+  ('s3333333-3333-3333-3333-333333333333', 'c1111111-1111-1111-1111-111111111111', '11111111-1111-1111-1111-111111111111', 'Head Padel Pro', 'https://images.unsplash.com/photo-1622163642998-1ea32b0bbc67?auto=format&fit=crop&w=200&q=80', 'https://head.com', 'silver', 500.00)
+ON CONFLICT (id) DO NOTHING;
+
+-- Rankings de la Competición
+INSERT INTO public.rankings (
+  id, competition_id, club_id, profile_id, player_name, position, points, matches_played, matches_won, matches_lost, sets_ratio
+) VALUES
+  ('r1111111-1111-1111-1111-111111111111', 'c1111111-1111-1111-1111-111111111111', '11111111-1111-1111-1111-111111111111', 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'Mateo Varela', 1, 1250, 6, 6, 0, 100.00),
+  ('r2222222-2222-2222-2222-222222222222', 'c1111111-1111-1111-1111-111111111111', '11111111-1111-1111-1111-111111111111', 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee', 'Laura Senra', 2, 1050, 6, 5, 1, 83.33),
+  ('r3333333-3333-3333-3333-333333333333', 'c1111111-1111-1111-1111-111111111111', '11111111-1111-1111-1111-111111111111', 'ffffffff-ffff-ffff-ffff-ffffffffffff', 'Carlos Méndez', 3, 850, 5, 4, 1, 80.00),
+  ('r4444444-4444-4444-4444-444444444444', 'c1111111-1111-1111-1111-111111111111', '11111111-1111-1111-1111-111111111111', NULL, 'Pablo Vello', 4, 720, 5, 3, 2, 60.00)
+ON CONFLICT (id) DO NOTHING;
+
+-- Cuadro Eliminatorio (Brackets) de la Competición
+INSERT INTO public.brackets (
+  id, competition_id, club_id, round_number, round_name, match_number, team1_name, team2_name, score, winner_team, scheduled_at, court_name, status
+) VALUES
+  (
+    'b1111111-1111-1111-1111-111111111111',
+    'c1111111-1111-1111-1111-111111111111',
+    '11111111-1111-1111-1111-111111111111',
+    1,
+    'Semifinales',
+    1,
+    'Mateo Varela / Laura Senra',
+    'Pablo Vello / Marcos Seijo',
+    '6-3, 6-4',
+    'Mateo Varela / Laura Senra',
+    NOW() + INTERVAL '1 day 10 hours',
+    'Pista 1 — Central Panorámica WPT',
+    'finished'
+  ),
+  (
+    'b2222222-2222-2222-2222-222222222222',
+    'c1111111-1111-1111-1111-111111111111',
+    '11111111-1111-1111-1111-111111111111',
+    1,
+    'Semifinales',
+    2,
+    'Carlos Méndez / Brais Quintana',
+    'Javier Aneiros / Manuel Rico',
+    '7-6, 4-6, 6-3',
+    'Carlos Méndez / Brais Quintana',
+    NOW() + INTERVAL '1 day 12 hours',
+    'Pista 2 — Panorámica Pro',
+    'finished'
+  ),
+  (
+    'b3333333-3333-3333-3333-333333333333',
+    'c1111111-1111-1111-1111-111111111111',
+    '11111111-1111-1111-1111-111111111111',
+    2,
+    'Gran Final',
+    1,
+    'Mateo Varela / Laura Senra',
+    'Carlos Méndez / Brais Quintana',
+    'Pendiente de juego',
+    NULL,
+    NOW() + INTERVAL '2 days 18 hours',
+    'Pista 1 — Central Panorámica WPT',
+    'scheduled'
+  )
+ON CONFLICT (id) DO NOTHING;
+

@@ -49,6 +49,31 @@ export const HomeView: React.FC = () => {
   const [selectedCourtIds, setSelectedCourtIds] = useState<string[]>(['court-1']);
   const [tournamentFilter, setTournamentFilter] = useState<'all' | 'open' | 'progress' | 'upcoming'>('all');
 
+  // Search Availability Form States
+  const [searchDate, setSearchDate] = useState(() => new Date().toISOString().split('T')[0]);
+  const [searchTimeSlot, setSearchTimeSlot] = useState('afternoon');
+  const [searchPlayersFormat, setSearchPlayersFormat] = useState('4');
+
+  const handleAvailabilitySearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const targetCourt = searchPlayersFormat === '2' 
+      ? courts.find((c) => c.isSingle)?.id || courts[0]?.id
+      : searchPlayersFormat === 'indoor'
+      ? courts.find((c) => c.courtType === 'indoor')?.id || courts[0]?.id
+      : courts[0]?.id;
+
+    if (targetCourt) {
+      setSelectedCourtsForBooking([targetCourt]);
+    }
+    setPublicPage('booking');
+    triggerDemoToast(
+      'Disponibilidad Consultada',
+      `Filtros aplicados para el ${searchDate}. Redirigiendo a reservas en tiempo real.`,
+      'success'
+    );
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const featuredProducts = products.filter((p) => p.isFeatured).slice(0, 4);
   const upcomingMatches = openMatches.slice(0, 3);
   const featuredCoach = coaches[0];
@@ -200,94 +225,138 @@ export const HomeView: React.FC = () => {
         </div>
       </section>
 
-      {/* 2. PISTAS: INTERACTIVE MULTI-COURT SELECTOR */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
-          <div>
-            <div className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
-              <Sparkles className="w-4 h-4" />
-              <span>Instalaciones del Club</span>
+      {/* 2. FORMULARIO DE BÚSQUEDA DE DISPONIBILIDAD (Requisito: Las pistas no son lo importante en la home) */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 sm:-mt-10 relative z-20">
+        <div className="p-6 sm:p-8 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 dark:border-slate-800 pb-4">
+            <div>
+              <div className="text-xs font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
+                <Sparkles className="w-4 h-4" />
+                <span>Búsqueda Rápida de Disponibilidad</span>
+              </div>
+              <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white mt-1">
+                Reserva tu pista en tiempo real
+              </h2>
             </div>
-            <h2 className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-white tracking-tight mt-1">
-              PISTAS
-            </h2>
-            <p className="text-slate-600 dark:text-slate-400 text-xs sm:text-sm mt-1 max-w-xl">
-              Selecciona una o varias pistas para comparar disponibilidad y transferir directamente a tu reserva.
-            </p>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <span className="text-xs font-bold text-slate-600 dark:text-slate-300">
-              {selectedCourtIds.length} {selectedCourtIds.length === 1 ? 'pista seleccionada' : 'pistas seleccionadas'}
-            </span>
             <button
-              onClick={handleStartBookingWithCourts}
-              className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md transition flex items-center gap-1.5"
+              onClick={() => {
+                setPublicPage('courts');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              className="text-xs font-bold text-slate-500 hover:text-emerald-600 dark:hover:text-emerald-400 flex items-center gap-1 transition self-start sm:self-auto px-3 py-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800"
             >
-              <Calendar className="w-3.5 h-3.5" />
-              <span>Reservar Selección</span>
+              <span>Ver catálogo de 8 pistas</span>
+              <ChevronRight className="w-4 h-4" />
             </button>
           </div>
-        </div>
 
-        {/* Visual multi-court selector cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {courts.map((court) => {
-            const isSelected = selectedCourtIds.includes(court.id);
-            return (
-              <div
-                key={court.id}
-                onClick={() => handleToggleCourtSelection(court.id)}
-                className={`cursor-pointer rounded-2xl p-4 border transition-all duration-200 flex flex-col justify-between space-y-3 ${
-                  isSelected
-                    ? 'bg-emerald-50/80 dark:bg-emerald-950/40 border-emerald-500 ring-2 ring-emerald-500/20 shadow-md'
-                    : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700'
-                }`}
+          <form onSubmit={handleAvailabilitySearchSubmit} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
+            <div>
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                Fecha del Partido
+              </label>
+              <input
+                type="date"
+                value={searchDate}
+                min={new Date().toISOString().split('T')[0]}
+                onChange={(e) => setSearchDate(e.target.value)}
+                className="w-full px-4 py-3 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white text-xs font-bold focus:ring-2 focus:ring-emerald-500 transition"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                Franja Horaria Preferida
+              </label>
+              <select
+                value={searchTimeSlot}
+                onChange={(e) => setSearchTimeSlot(e.target.value)}
+                className="w-full px-4 py-3 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white text-xs font-bold focus:ring-2 focus:ring-emerald-500 transition"
               >
-                <div>
-                  <div className="relative h-32 rounded-xl overflow-hidden mb-3">
+                <option value="any">Cualquier Horario Disponible</option>
+                <option value="morning">Mañanas (08:30 - 14:00)</option>
+                <option value="afternoon">Tardes (16:00 - 20:00)</option>
+                <option value="evening">Noche Prime (20:00 - 23:30)</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                Jugadores / Modalidad
+              </label>
+              <select
+                value={searchPlayersFormat}
+                onChange={(e) => setSearchPlayersFormat(e.target.value)}
+                className="w-full px-4 py-3 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white text-xs font-bold focus:ring-2 focus:ring-emerald-500 transition"
+              >
+                <option value="4">4 Jugadores (Pista Dobles WPT)</option>
+                <option value="2">2 Jugadores (Pista Individual 1 vs 1)</option>
+                <option value="indoor">Pista Indoor Climatizada</option>
+              </select>
+            </div>
+
+            <div>
+              <button
+                type="submit"
+                className="w-full py-3.5 px-6 rounded-2xl bg-emerald-600 hover:bg-emerald-500 dark:bg-emerald-500 dark:hover:bg-emerald-400 text-white dark:text-slate-950 font-black text-xs shadow-lg shadow-emerald-600/30 flex items-center justify-center gap-2 transition hover:scale-[1.02] active:scale-[0.98]"
+              >
+                <Calendar className="w-4 h-4" />
+                <span>Consultar Disponibilidad</span>
+              </button>
+            </div>
+          </form>
+
+          {/* Carrusel Deslizante Horizontal de Instalaciones */}
+          <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
+            <div className="flex items-center justify-between mb-3 text-xs font-bold text-slate-500 dark:text-slate-400">
+              <span>Instalaciones destacadas:</span>
+              <button
+                onClick={() => {
+                  setPublicPage('courts');
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                className="text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1"
+              >
+                <span>Ver todas</span>
+                <ChevronRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
+
+            <div className="flex items-center gap-4 overflow-x-auto pb-2 scrollbar-none snap-x snap-mandatory">
+              {courts.map((court) => (
+                <div
+                  key={court.id}
+                  onClick={() => {
+                    setSelectedCourtsForBooking([court.id]);
+                    setPublicPage('booking');
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}
+                  className="min-w-[240px] sm:min-w-[270px] snap-start rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 p-3 hover:border-emerald-500 transition cursor-pointer space-y-2 shrink-0 group"
+                >
+                  <div className="relative h-28 rounded-xl overflow-hidden">
                     <img
                       src={court.photoUrl}
                       alt={court.name}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
-                    <div className="absolute top-2 right-2">
-                      {isSelected ? (
-                        <div className="w-6 h-6 rounded-lg bg-emerald-600 text-white flex items-center justify-center shadow">
-                          <Check className="w-4 h-4 stroke-[3]" />
-                        </div>
-                      ) : (
-                        <div className="w-6 h-6 rounded-lg bg-black/50 text-white/70 flex items-center justify-center backdrop-blur-sm">
-                          <Square className="w-4 h-4" />
-                        </div>
-                      )}
-                    </div>
-                    <div className="absolute bottom-2 left-2">
-                      <span className="px-2 py-0.5 rounded-md bg-slate-950/80 text-white text-[10px] font-bold uppercase backdrop-blur-sm">
-                        {court.courtType === 'indoor' ? 'Indoor' : court.courtType === 'outdoor' ? 'Outdoor' : 'Cubierta'}
-                      </span>
-                    </div>
+                    <span className="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-slate-950/80 backdrop-blur-md text-[10px] font-bold text-emerald-400">
+                      {court.courtType.toUpperCase()}
+                    </span>
+                    <span className="absolute bottom-2 right-2 px-2 py-0.5 rounded bg-emerald-600 text-white font-mono font-bold text-[10px]">
+                      {court.hourlyRate.toFixed(2)} €/h
+                    </span>
                   </div>
-
-                  <h3 className="font-bold text-sm text-slate-900 dark:text-white truncate">
+                  <div className="font-bold text-xs text-slate-900 dark:text-white truncate">
                     {court.name}
-                  </h3>
-                  <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
-                    {court.isSingle ? 'Pista Individual 1vs1' : court.isPanoramic ? 'Panorámica WPT' : 'Cristal Estándar'}
-                  </p>
+                  </div>
+                  <div className="text-[10px] text-slate-500 dark:text-slate-400 flex items-center justify-between">
+                    <span className="truncate">{court.surface}</span>
+                    <span className="text-emerald-600 dark:text-emerald-400 font-bold shrink-0">Reservar →</span>
+                  </div>
                 </div>
-
-                <div className="pt-2 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between text-xs font-mono">
-                  <span className="font-bold text-slate-900 dark:text-white">
-                    {court.hourlyRate.toFixed(2)} €/h
-                  </span>
-                  <span className={`text-[11px] font-sans font-semibold ${isSelected ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400'}`}>
-                    {isSelected ? 'Preseleccionada' : 'Clic para añadir'}
-                  </span>
-                </div>
-              </div>
-            );
-          })}
+              ))}
+            </div>
+          </div>
         </div>
       </section>
 

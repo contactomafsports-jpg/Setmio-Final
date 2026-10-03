@@ -40,20 +40,6 @@ export const BrandSplashScreen: React.FC<BrandSplashScreenProps> = ({ onComplete
   }, []);
 
   const handleFinish = () => {
-    // If the user has an active session (not anonymous guest), route directly to their private role view!
-    if (currentUser) {
-      if (currentUser.role === 'PLAYER') {
-        setCurrentView('player');
-      } else if (currentUser.role === 'SUPERADMIN') {
-        setCurrentView('hq');
-      } else if (currentUser.role === 'COACH') {
-        setCurrentView('coach');
-      } else {
-        setCurrentView('admin');
-      }
-    } else {
-      setCurrentView('public');
-    }
     onComplete();
   };
 

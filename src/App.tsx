@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useApp } from './context/AppContext';
+import { RoleSelectorModal } from './components/common/RoleSelectorModal';
 import { Navbar } from './components/common/Navbar';
 import { Footer } from './components/common/Footer';
 import { DraggableAIAgent } from './components/common/DraggableAIAgent';
@@ -41,7 +42,6 @@ import { AdminWebEditor } from './components/admin/AdminWebEditor';
 import { AdminDomains } from './components/admin/AdminDomains';
 import { AdminSubscription } from './components/admin/AdminSubscription';
 import { AdminSettings } from './components/admin/AdminSettings';
-import { AdminAIAgent } from './components/admin/AdminAIAgent';
 
 // Player & HQ views
 import { PlayerPortal } from './components/player/PlayerPortal';
@@ -65,6 +65,7 @@ export function App() {
 
   const [cartOpen, setCartOpen] = useState(false);
   const [authOpen, setAuthOpen] = useState(false);
+  const [roleSelectorOpen, setRoleSelectorOpen] = useState(false);
 
   // Corporate loader animation (ONLY for the main SaaS corporate landing, NEVER for clubs)
   const [corporateLoaderDone, setCorporateLoaderDone] = useState(() => {
@@ -168,15 +169,13 @@ export function App() {
         return <AdminSubscription />;
       case 'settings':
         return <AdminSettings />;
-      case 'ai_agent':
-        return <AdminAIAgent />;
       default:
         return <ContextualDashboard />;
     }
   };
 
   return (
-    <div className="w-full min-h-screen overflow-x-hidden bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 font-sans selection:bg-emerald-500 selection:text-white antialiased transition-colors duration-200">
+    <div className="min-h-screen bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 font-sans selection:bg-emerald-500 selection:text-white antialiased transition-colors duration-200">
       {/* PWA & Brand Splash Screen */}
       {showSplash && <BrandSplashScreen onComplete={handleSplashComplete} />}
 
@@ -189,14 +188,19 @@ export function App() {
           <SetmioCorporateLanding
             onOpenAuth={() => setAuthOpen(true)}
             onExploreClub={navigateToClub}
+            onOpenDemoRoleModal={() => setRoleSelectorOpen(true)}
           />
         </>
       ) : (
         <>
           {currentView === 'public' && (
             <div className="flex flex-col min-h-screen">
-              <Navbar onOpenCart={() => setCartOpen(true)} onOpenAuth={() => setAuthOpen(true)} />
-              <main className="w-full min-w-0 flex-1 overflow-x-hidden">{renderPublicPage()}</main>
+              <Navbar
+                onOpenCart={() => setCartOpen(true)}
+                onOpenAuth={() => setAuthOpen(true)}
+                onOpenDemo={() => setRoleSelectorOpen(true)}
+              />
+              <main className="flex-1">{renderPublicPage()}</main>
               {/* Public Footer ONLY in public view (Requirement 8: No footer in app) */}
               <Footer />
             </div>
@@ -234,7 +238,15 @@ export function App() {
 
       {/* 7. Drawers and Modals */}
       <CartDrawer isOpen={cartOpen} onClose={() => setCartOpen(false)} />
-      <AuthModal isOpen={authOpen} onClose={() => setAuthOpen(false)} />
+      <AuthModal
+        isOpen={authOpen}
+        onClose={() => setAuthOpen(false)}
+        onOpenRoleModal={() => setRoleSelectorOpen(true)}
+      />
+      <RoleSelectorModal
+        isOpen={roleSelectorOpen}
+        onClose={() => setRoleSelectorOpen(false)}
+      />
 
       {/* 8. Demo Action Notification Toast */}
       {demoToast && (

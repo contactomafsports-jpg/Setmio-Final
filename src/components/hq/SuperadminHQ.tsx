@@ -18,6 +18,10 @@ import {
   Eye,
   RefreshCw,
   Search,
+  User,
+  Menu,
+  X,
+  ChevronRight,
 } from 'lucide-react';
 
 export const SuperadminHQ: React.FC = () => {
@@ -30,11 +34,13 @@ export const SuperadminHQ: React.FC = () => {
     auditLogs,
     triggerDemoToast,
     currentUser,
+    switchUserRole,
   } = useApp();
 
   const [activeHqTab, setActiveHqTab] = useState<'overview' | 'tenants' | 'plans' | 'domains' | 'audit'>('overview');
   const [tenantSearch, setTenantSearch] = useState('');
   const [showCreateTenantModal, setShowCreateTenantModal] = useState(false);
+  const [showMoreDrawer, setShowMoreDrawer] = useState(false);
 
   // New tenant form
   const [newClubName, setNewClubName] = useState('');
@@ -75,20 +81,41 @@ export const SuperadminHQ: React.FC = () => {
             <span>SETMIO HQ · Panel de Superadministración Global</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-black text-white">
-            Infraestructura SaaS Multi-Tenant
+            Infraestructura Global Setmio
           </h1>
           <p className="text-xs text-slate-400">
             Control de empresas cliente, suscripciones de software, catálogo de planes y auditoría global.
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2">
+          {/* Quick Switch to Modo Jugador */}
+          <button
+            onClick={() => {
+              switchUserRole('PLAYER');
+              setCurrentView('player');
+            }}
+            className="px-3 py-2 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/40 text-emerald-300 font-bold text-xs flex items-center gap-1.5 transition"
+            title="Alternar a Modo Jugador sin cerrar sesión"
+          >
+            <User className="w-4 h-4" />
+            <span>Modo Jugador</span>
+          </button>
+
+          <button
+            onClick={() => setCurrentView('public')}
+            className="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 font-bold text-xs flex items-center gap-1.5 transition"
+          >
+            <Eye className="w-4 h-4" />
+            <span className="hidden sm:inline">Web Club</span>
+          </button>
+
           <button
             onClick={() => setShowCreateTenantModal(true)}
-            className="px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 font-bold text-white text-xs shadow-lg flex items-center gap-1.5 transition"
+            className="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 font-bold text-white text-xs shadow-lg flex items-center gap-1.5 transition"
           >
             <Plus className="w-4 h-4" />
-            <span>Aprovisionar Nuevo Tenant</span>
+            <span>Nuevo Club</span>
           </button>
         </div>
       </div>
@@ -448,6 +475,151 @@ export const SuperadminHQ: React.FC = () => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* MOBILE BOTTOM NAVIGATION BAR FOR SUPERADMIN */}
+      <nav
+        aria-label="Navegación móvil Superadmin"
+        className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-slate-900/95 backdrop-blur-md border-t border-slate-800 grid grid-cols-5 px-1 py-1 text-[10px] shadow-2xl"
+      >
+        <button
+          onClick={() => setActiveHqTab('overview')}
+          className={`flex flex-col items-center justify-center py-1.5 rounded-xl transition ${
+            activeHqTab === 'overview' ? 'text-purple-400 font-bold' : 'text-slate-400'
+          }`}
+        >
+          <TrendingUp className="w-5 h-5 mb-0.5" />
+          <span>Resumen</span>
+        </button>
+
+        <button
+          onClick={() => setActiveHqTab('tenants')}
+          className={`flex flex-col items-center justify-center py-1.5 rounded-xl transition ${
+            activeHqTab === 'tenants' ? 'text-purple-400 font-bold' : 'text-slate-400'
+          }`}
+        >
+          <Building2 className="w-5 h-5 mb-0.5" />
+          <span>Clubes</span>
+        </button>
+
+        <button
+          onClick={() => setShowCreateTenantModal(true)}
+          className="flex flex-col items-center justify-center py-1 text-white"
+        >
+          <div className="w-10 h-10 -mt-4 rounded-full bg-gradient-to-r from-purple-500 to-indigo-600 flex items-center justify-center shadow-lg border-2 border-slate-900">
+            <Plus className="w-5 h-5" />
+          </div>
+          <span className="text-[9px] font-bold text-purple-400 mt-0.5">Crear</span>
+        </button>
+
+        <button
+          onClick={() => setActiveHqTab('plans')}
+          className={`flex flex-col items-center justify-center py-1.5 rounded-xl transition ${
+            activeHqTab === 'plans' ? 'text-purple-400 font-bold' : 'text-slate-400'
+          }`}
+        >
+          <DollarSign className="w-5 h-5 mb-0.5" />
+          <span>Planes</span>
+        </button>
+
+        <button
+          onClick={() => setShowMoreDrawer(true)}
+          className="flex flex-col items-center justify-center py-1.5 rounded-xl text-slate-400 hover:text-white"
+        >
+          <Menu className="w-5 h-5 mb-0.5" />
+          <span>Más</span>
+        </button>
+      </nav>
+
+      {/* MOBILE MORE DRAWER */}
+      {showMoreDrawer && (
+        <div className="fixed inset-0 z-50 flex flex-col justify-end bg-black/70 backdrop-blur-sm md:hidden animate-in fade-in duration-200">
+          <div className="bg-slate-900 rounded-t-3xl border-t border-slate-800 p-5 space-y-4 max-h-[85vh] overflow-y-auto">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+              <div className="flex items-center gap-2">
+                <ShieldAlert className="w-5 h-5 text-purple-400" />
+                <span className="font-bold text-sm text-white">Superadmin HQ · Opciones</span>
+              </div>
+              <button
+                onClick={() => setShowMoreDrawer(false)}
+                className="p-1 rounded-lg text-slate-400 hover:text-white"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="space-y-2">
+              <button
+                onClick={() => {
+                  setActiveHqTab('domains');
+                  setShowMoreDrawer(false);
+                }}
+                className="w-full p-3 rounded-2xl bg-slate-850 bg-slate-800/80 border border-slate-700 text-left flex items-center justify-between"
+              >
+                <div className="flex items-center gap-3">
+                  <Globe className="w-5 h-5 text-cyan-400" />
+                  <div>
+                    <div className="text-xs font-bold text-white">Enrutamiento & Dominios</div>
+                    <div className="text-[10px] text-slate-400">Certificados SSL y dominios personalizados</div>
+                  </div>
+                </div>
+                <ChevronRight className="w-4 h-4 text-slate-400" />
+              </button>
+
+              <button
+                onClick={() => {
+                  setActiveHqTab('audit');
+                  setShowMoreDrawer(false);
+                }}
+                className="w-full p-3 rounded-2xl bg-slate-850 bg-slate-800/80 border border-slate-700 text-left flex items-center justify-between"
+              >
+                <div className="flex items-center gap-3">
+                  <Clock className="w-5 h-5 text-amber-400" />
+                  <div>
+                    <div className="text-xs font-bold text-white">Auditoría Global de Seguridad</div>
+                    <div className="text-[10px] text-slate-400">Logs de accesos, reservas y cobros</div>
+                  </div>
+                </div>
+                <ChevronRight className="w-4 h-4 text-slate-400" />
+              </button>
+
+              <button
+                onClick={() => {
+                  switchUserRole('PLAYER');
+                  setCurrentView('player');
+                  setShowMoreDrawer(false);
+                }}
+                className="w-full p-3 rounded-2xl bg-emerald-950/60 border border-emerald-700 text-left flex items-center justify-between"
+              >
+                <div className="flex items-center gap-3">
+                  <User className="w-5 h-5 text-emerald-400" />
+                  <div>
+                    <div className="text-xs font-bold text-emerald-200">Alternar a Modo Jugador</div>
+                    <div className="text-[10px] text-emerald-400">Probar la experiencia desde el móvil del socio</div>
+                  </div>
+                </div>
+                <ChevronRight className="w-4 h-4 text-emerald-400" />
+              </button>
+
+              <button
+                onClick={() => {
+                  setCurrentView('admin');
+                  setShowMoreDrawer(false);
+                }}
+                className="w-full p-3 rounded-2xl bg-slate-800/80 border border-slate-700 text-left flex items-center justify-between"
+              >
+                <div className="flex items-center gap-3">
+                  <Building2 className="w-5 h-5 text-slate-300" />
+                  <div>
+                    <div className="text-xs font-bold text-white">Panel de Gestión del Club Activo</div>
+                    <div className="text-[10px] text-slate-400">Entrar como administrador de {tenants[0]?.shortName}</div>
+                  </div>
+                </div>
+                <ChevronRight className="w-4 h-4 text-slate-400" />
+              </button>
+            </div>
           </div>
         </div>
       )}

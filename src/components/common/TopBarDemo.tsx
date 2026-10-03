@@ -89,7 +89,7 @@ export const TopBarDemo: React.FC = () => {
               {showTenantMenu && (
                 <div className="absolute top-full left-0 mt-1 w-64 bg-slate-900 border border-slate-700 rounded-lg shadow-2xl py-1 z-50">
                   <div className="px-3 py-1.5 border-b border-slate-800 text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
-                    Espacios disponibles
+                    Clubes y Academias Activas
                   </div>
                   {tenants.map((t) => (
                     <button
@@ -333,10 +333,10 @@ export const TopBarDemo: React.FC = () => {
               <div className="p-3 rounded-lg bg-slate-950 border border-slate-800 space-y-1">
                 <div className="font-semibold text-slate-100 flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-amber-400" />
-                  Aislamiento Multi-Tenant y Seguridad RLS
+                  Aislamiento por Club y Seguridad RLS
                 </div>
                 <p className="text-slate-300">
-                  Todas las entidades de negocio (pistas, reservas, clientes, pedidos, facturas) llevan clave foránea <code className="text-cyan-300">tenant_id</code>. Las políticas RLS de Supabase garantizan que ningún usuario ni club acceda a datos de otra entidad.
+                  Todas las entidades de negocio (pistas, reservas, clientes, pedidos, facturas) llevan clave foránea <code className="text-cyan-300">tenant_id</code> o <code className="text-cyan-300">club_id</code>. Las políticas RLS de Supabase garantizan que ningún usuario ni club acceda a datos de otra entidad.
                 </p>
               </div>
 

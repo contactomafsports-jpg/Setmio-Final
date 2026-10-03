@@ -190,7 +190,7 @@ export const Footer: React.FC = () => {
 
         {/* Small subtle white label badge */}
         <div className="mt-4 text-center text-[10px] text-slate-400">
-          Tecnología SaaS impulsada por <span className="font-semibold text-slate-400">Setmio Padel Pro</span> · Versión Multi-Tenant
+          Tecnología SaaS impulsada por <span className="font-semibold text-slate-400">Setmio Padel Pro</span> · Software de Marca Blanca para Pádel
         </div>
       </div>
     </footer>

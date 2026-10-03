@@ -649,7 +649,7 @@ export const PlayerPortal: React.FC = () => {
                   <div className="font-bold text-slate-900 dark:text-white text-sm mt-0.5">{currentUser.email}</div>
                 </div>
                 <div>
-                  <span className="text-slate-500 dark:text-slate-400">Nivel:</span>
+                  <span className="text-slate-400">Nivel Asignado:</span>
                   <div className="font-bold text-emerald-600 dark:text-emerald-400 text-sm mt-0.5 font-mono">
                     {currentUser.playLevel.toFixed(2)}
                   </div>
@@ -677,7 +677,7 @@ export const PlayerPortal: React.FC = () => {
       {/* 5. NATIVE MOBILE BOTTOM BAR (Clean, accessible, no overlapping text!) */}
       <nav
         aria-label="Navegación móvil del jugador"
-        className="lg:hidden fixed bottom-0 inset-x-0 z-40 border-t border-slate-200 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl px-1 pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] shadow-[0_-8px_25px_rgba(15,23,42,0.08)] grid grid-cols-5 gap-0.5"
+        className="lg:hidden fixed bottom-0 inset-x-0 z-40 border-t border-slate-200 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl px-2 pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] shadow-[0_-8px_25px_rgba(15,23,42,0.08)] grid grid-cols-5 gap-1"
       >
         {[
           { id: 'overview', label: 'Inicio', icon: Home },
