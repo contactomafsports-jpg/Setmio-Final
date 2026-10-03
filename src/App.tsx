@@ -91,6 +91,10 @@ export function App() {
       '/': 'home',
       '/funcionalidades': 'features',
       '/soluciones': 'solutions',
+      '/soluciones/clubes': 'solution_clubs',
+      '/soluciones/profesores': 'solution_coaches',
+      '/soluciones/jugadores': 'solution_players',
+      '/soluciones/jugadores-profesionales': 'solution_pro_players',
       '/modulos-domotica': 'modules',
       '/demo': 'demo',
       '/blog': 'blog',
@@ -120,6 +124,10 @@ export function App() {
         return <HomeView />;
       case 'features':
       case 'solutions':
+      case 'solution_clubs':
+      case 'solution_coaches':
+      case 'solution_players':
+      case 'solution_pro_players':
       case 'modules':
         return <FeaturesView onBack={() => setPublicPage('home')} onOpenDemo={() => setRoleSelectorOpen(true)} />;
       case 'demo':

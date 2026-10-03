@@ -809,7 +809,21 @@ export const TRANSLATIONS: Record<SupportedLanguage, Record<string, string>> = {
   },
 };
 
+const CORPORATE_TRANSLATIONS: Record<SupportedLanguage, Record<string, string>> = {
+  es: { 'corporate.discoverFeatures': 'Descubrir funcionalidades', 'nav.solutions': 'Soluciones', 'nav.pricing': 'Precios', 'corporate.heroTitle': 'Software de Marca Blanca integral para profesionales del pádel.' },
+  en: { 'corporate.discoverFeatures': 'Discover features', 'nav.solutions': 'Solutions', 'nav.pricing': 'Pricing', 'corporate.heroTitle': 'Complete white-label software for padel professionals.' },
+  gl: { 'corporate.discoverFeatures': 'Descubrir funcionalidades', 'nav.solutions': 'Solucións', 'nav.pricing': 'Prezos', 'corporate.heroTitle': 'Software de marca branca para profesionais do pádel.' },
+  ca: { 'corporate.discoverFeatures': 'Descobrir funcionalitats', 'nav.solutions': 'Solucions', 'nav.pricing': 'Preus', 'corporate.heroTitle': 'Programari de marca blanca per a professionals del pàdel.' },
+  eu: { 'corporate.discoverFeatures': 'Ezagutu funtzioak', 'nav.solutions': 'Irtenbideak', 'nav.pricing': 'Prezioak', 'corporate.heroTitle': 'Padel profesionalentzako marka zuriko software integrala.' },
+  pt: { 'corporate.discoverFeatures': 'Descobrir funcionalidades', 'nav.solutions': 'Soluções', 'nav.pricing': 'Preços', 'corporate.heroTitle': 'Software white-label completo para profissionais de padel.' },
+  fr: { 'corporate.discoverFeatures': 'Découvrir les fonctionnalités', 'nav.solutions': 'Solutions', 'nav.pricing': 'Tarifs', 'corporate.heroTitle': 'Logiciel white-label complet pour les professionnels du padel.' },
+  de: { 'corporate.discoverFeatures': 'Funktionen entdecken', 'nav.solutions': 'Lösungen', 'nav.pricing': 'Preise', 'corporate.heroTitle': 'Komplette White-Label-Software für Padel-Profis.' },
+  it: { 'corporate.discoverFeatures': 'Scopri le funzionalità', 'nav.solutions': 'Soluzioni', 'nav.pricing': 'Prezzi', 'corporate.heroTitle': 'Software white-label completo per professionisti del padel.' },
+  va: { 'corporate.discoverFeatures': 'Descobrir funcionalitats', 'nav.solutions': 'Solucions', 'nav.pricing': 'Preus', 'corporate.heroTitle': 'Programari de marca blanca per a professionals del pàdel.' },
+  ar: { 'corporate.discoverFeatures': 'اكتشف الميزات', 'nav.solutions': 'الحلول', 'nav.pricing': 'الأسعار', 'corporate.heroTitle': 'برنامج متكامل بعلامة بيضاء لمحترفي البادل.' },
+};
+
 export function getTranslation(lang: SupportedLanguage, key: string, fallback?: string): string {
   const dict = TRANSLATIONS[lang] || TRANSLATIONS.es;
-  return dict[key] || TRANSLATIONS.es[key] || fallback || key;
+  return CORPORATE_TRANSLATIONS[lang]?.[key] || dict[key] || CORPORATE_TRANSLATIONS.es[key] || TRANSLATIONS.es[key] || fallback || key;
 }

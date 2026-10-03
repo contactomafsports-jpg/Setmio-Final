@@ -45,6 +45,10 @@ export type PublicPage =
   | 'features'
   | 'pricing'
   | 'solutions'
+  | 'solution_clubs'
+  | 'solution_coaches'
+  | 'solution_players'
+  | 'solution_pro_players'
   | 'modules'
   | 'demo'
   | 'player_profile'
@@ -66,6 +70,10 @@ const PUBLIC_ROUTES: Record<string, PublicPage> = {
   '/': 'home',
   '/funcionalidades': 'features',
   '/soluciones': 'solutions',
+  '/soluciones/clubes': 'solution_clubs',
+  '/soluciones/profesores': 'solution_coaches',
+  '/soluciones/jugadores': 'solution_players',
+  '/soluciones/jugadores-profesionales': 'solution_pro_players',
   '/modulos-domotica': 'modules',
   '/demo': 'demo',
   '/precios': 'pricing',
@@ -88,6 +96,10 @@ const routeForPage: Record<PublicPage, string> = {
   home: '/',
   features: '/funcionalidades',
   solutions: '/soluciones',
+  solution_clubs: '/soluciones/clubes',
+  solution_coaches: '/soluciones/profesores',
+  solution_players: '/soluciones/jugadores',
+  solution_pro_players: '/soluciones/jugadores-profesionales',
   modules: '/modulos-domotica',
   demo: '/demo',
   pricing: '/precios',
