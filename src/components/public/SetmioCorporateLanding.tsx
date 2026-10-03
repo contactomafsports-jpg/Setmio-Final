@@ -162,7 +162,7 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
   return (
     <div className="min-h-screen bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-200 w-full max-w-full">
       {/* 1. TOP HEADER / NAVBAR CORPORATIVA */}
-      <header className="sticky top-0 z-40 bg-white/95 dark:bg-slate-950/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 w-full">
+      <header aria-hidden="true" className="hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
           {/* Brand Logo - Mobile Clean Rule: Only Icon + Setmio Name */}
           <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">

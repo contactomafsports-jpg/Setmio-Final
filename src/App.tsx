@@ -226,23 +226,23 @@ export function App() {
       {!isCorporateLanding && showSplash && <BrandSplashScreen onComplete={handleSplashComplete} />}
 
       {/* Main view renderer: Corporate SaaS Landing OR Club View */}
-      {isCorporateLanding && currentView === 'public' && publicPage === 'home' ? (
-        <SetmioCorporateLanding
-          onOpenAuth={() => setAuthOpen(true)}
-          onExploreClub={navigateToClub}
-          onOpenDemoRoleModal={() => setRoleSelectorOpen(true)}
-        />
+      {currentView === 'public' && (isCorporateLanding ? (
+        <CorporateLayout onOpenDemo={() => setRoleSelectorOpen(true)} onOpenAuth={() => setAuthOpen(true)} onOpenRegister={() => setAuthOpen(true)}>
+          {publicPage === 'home' ? (
+            <SetmioCorporateLanding
+              onOpenAuth={() => setAuthOpen(true)}
+              onExploreClub={navigateToClub}
+              onOpenDemoRoleModal={() => setRoleSelectorOpen(true)}
+            />
+          ) : renderPublicPage()}
+        </CorporateLayout>
       ) : (
-        <>
-          {currentView === 'public' && (isCorporateLanding ? (
-            <CorporateLayout onOpenDemo={() => setRoleSelectorOpen(true)} onOpenAuth={() => setAuthOpen(true)} onOpenRegister={() => setAuthOpen(true)}>{renderPublicPage()}</CorporateLayout>
-          ) : (
-            <div className="flex min-h-screen flex-col">
-              <Navbar onOpenCart={() => setCartOpen(true)} onOpenAuth={() => setAuthOpen(true)} onOpenDemo={() => setRoleSelectorOpen(true)} />
-              <main className="flex-1">{renderPublicPage()}</main>
-              <Footer />
-            </div>
-          ))}
+        <div className="flex min-h-screen flex-col">
+          <Navbar onOpenCart={() => setCartOpen(true)} onOpenAuth={() => setAuthOpen(true)} onOpenDemo={() => setRoleSelectorOpen(true)} />
+          <main className="flex-1">{renderPublicPage()}</main>
+          <Footer />
+        </div>
+      ))}
 
           {currentView === 'admin' && (
             <AdminLayout>{renderAdminTab()}</AdminLayout>
@@ -253,8 +253,6 @@ export function App() {
   {currentView === 'coach' && <CoachPortal />}
 
   {currentView === 'hq' && <SuperadminHQ />}
-        </>
-      )}
 
       {currentView !== 'public' && (
         <div className="fixed bottom-4 left-4 right-4 z-[100] mx-auto flex max-w-xl items-center justify-between gap-3 rounded-2xl border border-emerald-400/40 bg-slate-950/95 px-4 py-3 text-white shadow-2xl backdrop-blur-md">
