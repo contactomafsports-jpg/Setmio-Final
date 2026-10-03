@@ -822,7 +822,7 @@ export const CoachPortal: React.FC = () => {
       {/* MOBILE BOTTOM NAVIGATION BAR */}
       <nav
         aria-label="Navegación móvil del profesor"
-        className="md:hidden fixed bottom-0 inset-x-0 z-[60] bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 grid grid-cols-5 px-1 py-1 text-[10px] shadow-lg"
+        className="md:hidden fixed bottom-0 inset-x-0 z-[60] bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 grid grid-cols-5 px-1 pt-1 pb-[calc(0.25rem+env(safe-area-inset-bottom))] text-[10px] shadow-lg"
       >
         <button
           onClick={() => setActiveTab('agenda')}
@@ -881,8 +881,8 @@ export const CoachPortal: React.FC = () => {
 
       {/* MOBILE MORE DRAWER */}
       {showMoreDrawer && (
-        <div className="fixed inset-0 z-[70] flex flex-col justify-end bg-black/60 backdrop-blur-sm md:hidden animate-in fade-in duration-200">
-          <div className="bg-white dark:bg-slate-900 rounded-t-3xl border-t border-slate-200 dark:border-slate-800 p-5 space-y-4 max-h-[85vh] overflow-y-auto">
+        <div className="fixed inset-0 z-[70] flex flex-col justify-end bg-black/60 backdrop-blur-sm md:hidden animate-in fade-in duration-200" onClick={() => setShowMoreDrawer(false)}>
+          <div className="bg-white dark:bg-slate-900 rounded-t-3xl border-t border-slate-200 dark:border-slate-800 p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] space-y-4 max-h-[85vh] overflow-y-auto" onClick={(event) => event.stopPropagation()}>
             <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
               <div className="flex items-center gap-2">
                 <GraduationCap className="w-5 h-5 text-indigo-500" />
@@ -890,7 +890,7 @@ export const CoachPortal: React.FC = () => {
               </div>
               <button
                 onClick={() => setShowMoreDrawer(false)}
-                className="p-1 rounded-lg text-slate-400 hover:text-white"
+                className="p-2 rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white"
               >
                 <X className="w-5 h-5" />
               </button>

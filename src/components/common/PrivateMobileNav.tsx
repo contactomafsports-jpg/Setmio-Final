@@ -18,7 +18,7 @@ export const PrivateMobileNav: React.FC<PrivateMobileNavProps> = ({ title, onMor
       </div>
       <button type="button" onClick={onMore} aria-label="Abrir más opciones" className="rounded-lg p-2 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"><Menu strokeWidth={1.5} /></button>
     </header>
-    <nav aria-label="Navegación privada móvil" className="fixed bottom-0 left-0 right-0 z-40 h-16 bg-background/80 backdrop-blur-md border-t border-border px-2 flex items-center justify-around shadow-[0_-8px_24px_rgba(16,34,29,0.06)] safe-area-bottom md:hidden">
+    <nav aria-label="Navegación privada móvil" className="fixed bottom-0 left-0 right-0 z-40 min-h-16 bg-background/95 backdrop-blur-md border-t border-border px-2 pt-1 pb-[calc(0.25rem+env(safe-area-inset-bottom))] flex items-center justify-around shadow-[0_-8px_24px_rgba(16,34,29,0.06)] md:hidden">
       <button type="button" onClick={onHome} className="flex flex-col items-center gap-1 text-muted-foreground text-[10px]"><Home strokeWidth={1.5} /><span>Inicio</span></button>
       <button type="button" onClick={onCalendar} className="flex flex-col items-center gap-1 text-muted-foreground text-[10px]"><CalendarDays strokeWidth={1.5} /><span>Agenda</span></button>
       <button type="button" onClick={onCommunity} className="flex flex-col items-center gap-1 text-muted-foreground text-[10px]"><Users strokeWidth={1.5} /><span>Comunidad</span></button>
