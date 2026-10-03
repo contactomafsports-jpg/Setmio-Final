@@ -159,7 +159,7 @@ export const CoachPortal: React.FC = () => {
   const [newType, setNewType] = useState<'individual' | 'pair' | 'group_monthly'>('individual');
   const [newStudent, setNewStudent] = useState('');
   const [newPhone, setNewPhone] = useState('');
-  const [newDate, setNewDate] = useState('2026-10-02');
+  const [newDate, setNewDate] = useState(() => new Date().toISOString().slice(0, 10));
   const [newTime, setNewTime] = useState('16:00 - 17:00');
   const [newCourt, setNewCourt] = useState('Pista 1 — Central Panorámica WPT');
   const [newPrice, setNewPrice] = useState(38);
@@ -202,7 +202,7 @@ export const CoachPortal: React.FC = () => {
   );
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-200 pb-20">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-200 pb-28 md:pb-8">
       {/* Top Header */}
       <header className="sticky top-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-4 sm:px-6 py-3">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
@@ -822,7 +822,7 @@ export const CoachPortal: React.FC = () => {
       {/* MOBILE BOTTOM NAVIGATION BAR */}
       <nav
         aria-label="Navegación móvil del profesor"
-        className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 grid grid-cols-5 px-1 py-1 text-[10px] shadow-lg"
+        className="md:hidden fixed bottom-0 inset-x-0 z-[60] bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 grid grid-cols-5 px-1 pt-1 pb-[calc(0.25rem+env(safe-area-inset-bottom))] text-[10px] shadow-lg"
       >
         <button
           onClick={() => setActiveTab('agenda')}
@@ -881,8 +881,8 @@ export const CoachPortal: React.FC = () => {
 
       {/* MOBILE MORE DRAWER */}
       {showMoreDrawer && (
-        <div className="fixed inset-0 z-50 flex flex-col justify-end bg-black/60 backdrop-blur-sm md:hidden animate-in fade-in duration-200">
-          <div className="bg-white dark:bg-slate-900 rounded-t-3xl border-t border-slate-200 dark:border-slate-800 p-5 space-y-4 max-h-[85vh] overflow-y-auto">
+        <div className="fixed inset-0 z-[70] flex flex-col justify-end bg-black/60 backdrop-blur-sm md:hidden animate-in fade-in duration-200" onClick={() => setShowMoreDrawer(false)}>
+          <div className="bg-white dark:bg-slate-900 rounded-t-3xl border-t border-slate-200 dark:border-slate-800 p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] space-y-4 max-h-[85vh] overflow-y-auto" onClick={(event) => event.stopPropagation()}>
             <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
               <div className="flex items-center gap-2">
                 <GraduationCap className="w-5 h-5 text-indigo-500" />
@@ -890,7 +890,7 @@ export const CoachPortal: React.FC = () => {
               </div>
               <button
                 onClick={() => setShowMoreDrawer(false)}
-                className="p-1 rounded-lg text-slate-400 hover:text-white"
+                className="p-2 rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white"
               >
                 <X className="w-5 h-5" />
               </button>

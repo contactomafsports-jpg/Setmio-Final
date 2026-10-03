@@ -25,7 +25,7 @@ export const BookingFlow: React.FC = () => {
     selectedCourtsForBooking,
   } = useApp();
 
-  const [selectedDate, setSelectedDate] = useState('2026-10-01');
+  const [selectedDate, setSelectedDate] = useState(() => new Date().toISOString().slice(0, 10));
   const [selectedCourtId, setSelectedCourtId] = useState<string>(
     selectedCourtsForBooking && selectedCourtsForBooking.length > 0
       ? selectedCourtsForBooking[0]
@@ -96,7 +96,7 @@ export const BookingFlow: React.FC = () => {
   };
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 text-slate-900 dark:text-slate-100 transition-colors duration-200">
+    <div className="min-h-[calc(100dvh-4rem)] max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 pb-24 text-slate-900 dark:text-slate-100 transition-colors duration-200">
       {/* If booking confirmed success view */}
       {confirmedBooking ? (
         <div className="max-w-xl mx-auto rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 p-8 shadow-2xl text-center space-y-6 animate-in zoom-in-95 duration-200">

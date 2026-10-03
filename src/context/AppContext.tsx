@@ -44,6 +44,9 @@ export type PublicPage =
   | 'home'
   | 'features'
   | 'pricing'
+  | 'solutions'
+  | 'modules'
+  | 'demo'
   | 'player_profile'
   | 'club'
   | 'courts'
@@ -62,6 +65,9 @@ export type PublicPage =
 const PUBLIC_ROUTES: Record<string, PublicPage> = {
   '/': 'home',
   '/funcionalidades': 'features',
+  '/soluciones': 'solutions',
+  '/modulos-domotica': 'modules',
+  '/demo': 'demo',
   '/precios': 'pricing',
   '/perfil-jugador': 'player_profile',
   '/club': 'club',
@@ -81,6 +87,9 @@ const PUBLIC_ROUTES: Record<string, PublicPage> = {
 const routeForPage: Record<PublicPage, string> = {
   home: '/',
   features: '/funcionalidades',
+  solutions: '/soluciones',
+  modules: '/modulos-domotica',
+  demo: '/demo',
   pricing: '/precios',
   player_profile: '/perfil-jugador',
   club: '/club',
@@ -627,6 +636,25 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   });
 
   const currentTenant = tenants.find((t) => t.id === currentTenantId) || tenants[0];
+
+  useEffect(() => {
+    const root = document.documentElement;
+    const branding = currentTenant?.branding;
+    if (isCorporateLanding || !branding) {
+      root.style.removeProperty('--club-primary');
+      root.style.removeProperty('--club-secondary');
+      root.style.removeProperty('--club-accent');
+      return;
+    }
+    root.style.setProperty('--club-primary', branding.primaryColor);
+    root.style.setProperty('--club-secondary', branding.secondaryColor);
+    root.style.setProperty('--club-accent', branding.accentColor);
+    return () => {
+      root.style.removeProperty('--club-primary');
+      root.style.removeProperty('--club-secondary');
+      root.style.removeProperty('--club-accent');
+    };
+  }, [currentTenant, isCorporateLanding]);
 
   const navigateToClub = (slug: string) => {
     setIsCorporateLanding(false);

@@ -149,7 +149,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onOpenRol
             SM
           </div>
           <h3 className="text-xl font-black text-slate-900 dark:text-white">
-            {mode === 'login' ? `Acceso a ${currentTenant.shortName}` : 'Alta de Jugador en el Club'}
+            {mode === 'login' ? 'Acceso Usuarios Setmio' : 'Crear cuenta Setmio'}
           </h3>
           <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
             {mode === 'login'
@@ -159,7 +159,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onOpenRol
         </div>
 
         {/* Quick Demo Logins Section */}
-        {mode === 'login' && (
+        {false && mode === 'login' && (
           <div className="mb-6 space-y-3">
             {/* Requirement 2: En /login, añade un botón "Entrar a la Demo" que abre un modal selector de roles */}
             <button

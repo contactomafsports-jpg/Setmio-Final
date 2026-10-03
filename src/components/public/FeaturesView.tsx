@@ -190,7 +190,7 @@ export const FeaturesView: React.FC<FeaturesViewProps> = ({
             ¿Listo para modernizar tu club de pádel?
           </h2>
           <p className="text-sm text-slate-300 max-w-xl">
-            Inicia tu prueba de 30 días sin compromiso o agenda una demostración con nuestro equipo técnico.
+            Agenda una demostración con nuestro equipo técnico.
           </p>
         </div>
 

@@ -100,11 +100,11 @@ export const PlayerPortal: React.FC = () => {
   const upcomingTournamentsList = tournaments.filter((t) => t.status === 'registration_open' || t.status === 'upcoming');
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 pb-24 transition-colors duration-200 w-full max-w-full overflow-x-hidden">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 pb-[calc(6rem+env(safe-area-inset-bottom))] transition-colors duration-200 w-full max-w-full overflow-x-hidden">
       {/* 1. TOP APP HEADER (App Shell Privada) */}
       <header className="sticky top-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-4 sm:px-6 py-3 shadow-sm">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3">
+          <div className="flex min-w-0 items-center gap-2 sm:gap-3">
             {/* Mobile Drawer Toggle */}
             <button
               onClick={() => setMobileDrawerOpen(true)}
@@ -114,8 +114,8 @@ export const PlayerPortal: React.FC = () => {
               <Menu className="w-5 h-5" />
             </button>
 
-            <div className="flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-700 flex items-center justify-center font-black text-white text-sm shadow">
+            <div className="min-w-0 flex items-center gap-2.5">
+              <div className="w-9 h-9 shrink-0 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-700 flex items-center justify-center font-black text-white text-sm shadow">
                 SM
               </div>
               <div>

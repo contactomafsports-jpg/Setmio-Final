@@ -4,7 +4,6 @@ import { RoleSelectorModal } from './components/common/RoleSelectorModal';
 import { Navbar } from './components/common/Navbar';
 import { Footer } from './components/common/Footer';
 import { DraggableAIAgent } from './components/common/DraggableAIAgent';
-import { PrivateMobileNav } from './components/common/PrivateMobileNav';
 import { WhatsAppFloat } from './components/common/WhatsAppFloat';
 import { PWAInstallPrompt } from './components/common/PWAInstallPrompt';
 import { OfflineBanner } from './components/common/OfflineBanner';
@@ -91,6 +90,9 @@ export function App() {
     const routeToPage: Record<string, typeof publicPage> = {
       '/': 'home',
       '/funcionalidades': 'features',
+      '/soluciones': 'solutions',
+      '/modulos-domotica': 'modules',
+      '/demo': 'demo',
       '/blog': 'blog',
       '/contacto': 'contact',
       '/precios': 'pricing',
@@ -117,7 +119,11 @@ export function App() {
       case 'home':
         return <HomeView />;
       case 'features':
+      case 'solutions':
+      case 'modules':
         return <FeaturesView onBack={() => setPublicPage('home')} onOpenDemo={() => setRoleSelectorOpen(true)} />;
+      case 'demo':
+        return <HomeView />;
       case 'pricing':
         return <PricingView onBack={() => setPublicPage('home')} onOpenDemo={() => setRoleSelectorOpen(true)} />;
       case 'player_profile':
@@ -218,26 +224,11 @@ export function App() {
             <AdminLayout>{renderAdminTab()}</AdminLayout>
           )}
 
-  {currentView === 'player' && (
-  <>
-    <PrivateMobileNav title="Área de Jugador" onMore={() => undefined} />
-    <PlayerPortal />
-  </>
-  )}
-  
-  {currentView === 'coach' && (
-  <>
-    <PrivateMobileNav title="Portal del Profesor" onMore={() => undefined} />
-    <CoachPortal />
-  </>
-  )}
-  
-  {currentView === 'hq' && (
-  <>
-    <PrivateMobileNav title="Setmio HQ" onMore={() => undefined} />
-    <SuperadminHQ />
-  </>
-  )}
+  {currentView === 'player' && <PlayerPortal />}
+
+  {currentView === 'coach' && <CoachPortal />}
+
+  {currentView === 'hq' && <SuperadminHQ />}
         </>
       )}
 
