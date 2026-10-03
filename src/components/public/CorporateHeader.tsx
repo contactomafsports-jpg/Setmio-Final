@@ -38,14 +38,14 @@ export function CorporateHeader({ onOpenDemo, onOpenAuth, onOpenRegister }: Corp
           <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-700 text-white">S</span> SETMIO
         </a>
         <div className="flex items-center gap-1">
-          <select aria-label="Idioma" value={language} onChange={(event) => setLanguage(event.target.value as typeof language)} className="hidden rounded-lg border border-slate-200 bg-white px-2 py-2 text-xs dark:border-slate-700 dark:bg-slate-900 sm:block">
+          <select aria-label="Idioma" value={language} onChange={(event) => setLanguage(event.target.value as typeof language)} className="rounded-lg border border-slate-200 bg-white px-1.5 py-2 text-[11px] dark:border-slate-700 dark:bg-slate-900 sm:px-2 sm:text-xs">
             {SUPPORTED_LANGUAGES.map((item) => <option key={item.code} value={item.code}>{item.flag} {item.code.toUpperCase()}</option>)}
           </select>
-          <button type="button" onClick={toggleTheme} className="hidden rounded-xl p-2 text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800 sm:block" aria-label={theme === 'dark' ? 'Activar modo claro' : 'Activar modo oscuro'}>{theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}</button>
-          <button type="button" onClick={onOpenAuth} className="hidden rounded-xl p-2 text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800 sm:block" aria-label="Acceso Usuarios"><Lock className="h-5 w-5" /></button>
-          <button type="button" onClick={() => setOpen((value) => !value)} className="rounded-xl p-2 text-slate-700 dark:text-slate-200 md:hidden" aria-label={open ? 'Cerrar menú' : 'Abrir menú'} aria-expanded={open}>{open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}</button>
+          <button type="button" onClick={toggleTheme} className="rounded-xl p-2 text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800" aria-label={theme === 'dark' ? 'Activar modo claro' : 'Activar modo oscuro'}>{theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}</button>
+          <button type="button" onClick={onOpenAuth} className="rounded-xl p-2 text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800" aria-label="Acceso Usuarios"><Lock className="h-5 w-5" /></button>
+          <button type="button" onClick={() => setOpen((value) => !value)} className="rounded-xl p-2 text-slate-700 dark:text-slate-200" aria-label={open ? 'Cerrar menú' : 'Abrir menú'} aria-expanded={open}>{open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}</button>
         </div>
-        <nav className="hidden items-center gap-4 text-xs font-bold md:flex" aria-label="Navegación corporativa">
+        <nav className="hidden items-center gap-4 text-xs font-bold lg:flex" aria-label="Navegación corporativa">
           <a href="/soluciones" className="hover:text-emerald-600">{t('nav.solutions', 'Soluciones')}</a>
           <a href="/funcionalidades" className="hover:text-emerald-600">{t('nav.features', 'Funcionalidades')}</a>
           <a href="/modulos-domotica" className="hover:text-emerald-600">{t('nav.modules', 'Módulos y domótica')}</a>
@@ -54,7 +54,7 @@ export function CorporateHeader({ onOpenDemo, onOpenAuth, onOpenRegister }: Corp
           <button type="button" onClick={onOpenDemo} className="rounded-lg bg-emerald-600 px-3 py-2 text-white">{t('nav.demo', 'Ver demo')}</button>
         </nav>
       </div>
-      {open && <div className="fixed inset-0 top-16 overscroll-none bg-slate-950/40 md:hidden" onClick={close}>
+      {open && <div className="fixed inset-0 top-16 overscroll-none bg-slate-950/40" onClick={close}>
         <nav className="max-h-[calc(100dvh-4rem)] overflow-y-auto overscroll-contain bg-white p-5 shadow-2xl dark:bg-slate-950" onClick={(event) => event.stopPropagation()} aria-label="Menú corporativo móvil">
           <div className="grid gap-1 text-sm font-bold">
             {menuItems.map(([Icon, key, label, href]) => href ? <a key={key} onClick={close} href={href} className="flex items-center justify-between rounded-xl p-3 hover:bg-emerald-50 dark:hover:bg-slate-900"><span className="flex items-center gap-3"><Icon className="h-4 w-4 text-emerald-600" />{t(key, label)}</span><ArrowRight className="h-4 w-4 text-slate-400" /></a> : <button key={key} type="button" onClick={() => { close(); onOpenDemo?.(); }} className="flex items-center justify-between rounded-xl p-3 text-left hover:bg-emerald-50 dark:hover:bg-slate-900"><span className="flex items-center gap-3"><Icon className="h-4 w-4 text-emerald-600" />{t(key, label)}</span><ArrowRight className="h-4 w-4 text-slate-400" /></button>)}
