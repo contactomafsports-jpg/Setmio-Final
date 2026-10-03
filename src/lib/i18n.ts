@@ -19,15 +19,15 @@ export interface LanguageOption {
 
 export const SUPPORTED_LANGUAGES: LanguageOption[] = [
   { code: 'es', name: 'Español', flag: '🇪🇸' },
-  { code: 'gl', name: 'Galego', flag: '🇬🇦' },
+  { code: 'gl', name: 'Galego', flag: 'GL' },
   { code: 'en', name: 'English', flag: '🇬🇧' },
   { code: 'pt', name: 'Português', flag: '🇵🇹' },
   { code: 'fr', name: 'Français', flag: '🇫🇷' },
   { code: 'de', name: 'Deutsch', flag: '🇩🇪' },
   { code: 'it', name: 'Italiano', flag: '🇮🇹' },
-  { code: 'ca', name: 'Català', flag: '🇨🇺' },
-  { code: 'eu', name: 'Euskera', flag: '🇵🇲' },
-  { code: 'va', name: 'Valencià', flag: '🇨🇺' },
+  { code: 'ca', name: 'Català', flag: 'CA' },
+  { code: 'eu', name: 'Euskera', flag: 'EU' },
+  { code: 'va', name: 'Valencià', flag: 'VA' },
   { code: 'ar', name: 'العربية (Árabe)', flag: '🇸🇦' },
 ];
 
@@ -810,16 +810,16 @@ export const TRANSLATIONS: Record<SupportedLanguage, Record<string, string>> = {
 };
 
 const CORPORATE_TRANSLATIONS: Record<SupportedLanguage, Record<string, string>> = {
-  es: { 'corporate.discoverFeatures': 'Descubrir funcionalidades', 'nav.home': 'Inicio', 'nav.solutions': 'Soluciones', 'nav.features': 'Funcionalidades', 'nav.modules': 'Módulos y domótica', 'nav.blog': 'Blog', 'nav.demo': 'Ver demo', 'nav.pricing': 'Precios', 'nav.contact': 'Contacto', 'footer.tagline': 'Software de marca blanca para clubes y profesionales del pádel.', 'nav.register': 'Registrarse', 'corporate.heroTitle': 'Software de Marca Blanca integral para profesionales del pádel.', 'nav.features': 'Funcionalidades', 'nav.modules': 'Módulos y domótica', 'nav.blog': 'Blog', 'nav.demo': 'Ver demo', 'nav.contact': 'Contacto', 'nav.login': 'Acceso Usuarios', 'nav.register': 'Registrarse', 'auth.noAccount': '¿No tienes una cuenta aún?', 'auth.registerFree': 'Regístrate gratis' },
-  en: { 'corporate.discoverFeatures': 'Discover features', 'nav.solutions': 'Solutions', 'nav.pricing': 'Pricing', 'corporate.heroTitle': 'Complete white-label software for padel professionals.', 'nav.features': 'Features', 'nav.modules': 'Modules & smart courts', 'nav.blog': 'Blog', 'nav.demo': 'View demo', 'nav.contact': 'Contact', 'nav.register': 'Sign up', 'nav.login': 'User login', 'auth.noAccount': 'Don’t have an account yet?', 'auth.registerFree': 'Sign up free' },
+  es: { 'corporate.discoverFeatures': 'Descubrir funcionalidades', 'nav.home': 'Inicio', 'nav.solutions': 'Soluciones', 'nav.features': 'Funcionalidades', 'nav.modules': 'Módulos y domótica', 'nav.blog': 'Blog', 'nav.demo': 'Ver demo', 'nav.pricing': 'Precios', 'nav.contact': 'Contacto', 'nav.language': 'Idioma', 'language.es': 'Español', 'footer.tagline': 'Software de marca blanca para clubes y profesionales del pádel.', 'nav.register': 'Registrarse', 'corporate.heroTitle': 'Software de Marca Blanca integral para profesionales del pádel.', 'nav.features': 'Funcionalidades', 'nav.modules': 'Módulos y domótica', 'nav.blog': 'Blog', 'nav.demo': 'Ver demo', 'nav.contact': 'Contacto', 'nav.login': 'Acceso Usuarios', 'nav.register': 'Registrarse', 'auth.noAccount': '¿No tienes una cuenta aún?', 'auth.registerFree': 'Regístrate gratis' },
+  en: { 'corporate.discoverFeatures': 'Discover features', 'nav.solutions': 'Solutions', 'nav.pricing': 'Pricing', 'corporate.heroTitle': 'Complete white-label software for padel professionals.', 'nav.features': 'Features', 'nav.modules': 'Modules & smart courts', 'nav.blog': 'Blog', 'nav.demo': 'View demo', 'nav.contact': 'Contact', 'nav.language': 'Language', 'language.es': 'Spanish', 'nav.register': 'Sign up', 'nav.login': 'User login', 'auth.noAccount': 'Don’t have an account yet?', 'auth.registerFree': 'Sign up free' },
   gl: { 'corporate.discoverFeatures': 'Descubrir funcionalidades', 'nav.solutions': 'Solucións', 'nav.pricing': 'Prezos', 'corporate.heroTitle': 'Software de marca branca para profesionais do pádel.', 'nav.features': 'Funcionalidades', 'nav.modules': 'Módulos e domótica', 'nav.blog': 'Blog', 'nav.demo': 'Ver demo', 'nav.contact': 'Contacto', 'nav.register': 'Rexístrate', 'nav.login': 'Acceso Usuarios', 'auth.noAccount': 'Aínda non tes unha conta?', 'auth.registerFree': 'Rexístrate gratis' },
-  ca: { 'corporate.discoverFeatures': 'Descobrir funcionalitats', 'nav.solutions': 'Solucions', 'nav.pricing': 'Preus', 'corporate.heroTitle': 'Programari de marca blanca per a professionals del pàdel.' },
-  eu: { 'corporate.discoverFeatures': 'Ezagutu funtzioak', 'nav.solutions': 'Irtenbideak', 'nav.pricing': 'Prezioak', 'corporate.heroTitle': 'Padel profesionalentzako marka zuriko software integrala.' },
-  pt: { 'corporate.discoverFeatures': 'Descobrir funcionalidades', 'nav.solutions': 'Soluções', 'nav.pricing': 'Preços', 'corporate.heroTitle': 'Software white-label completo para profissionais de padel.' },
+  ca: { 'corporate.discoverFeatures': 'Descobrir funcionalitats', 'nav.solutions': 'Solucions', 'nav.features': 'Funcionalitats', 'nav.modules': 'Mòduls i domòtica', 'nav.blog': 'Blog', 'nav.demo': 'Veure demo', 'nav.pricing': 'Preus', 'nav.contact': 'Contacte', 'nav.language': 'Idioma', 'nav.register': 'Registrar-se', 'nav.login': 'Accés usuaris', 'common.back': 'Tornar enrere', 'corporate.heroTitle': 'Programari de marca blanca per a professionals del pàdel.' },
+  eu: { 'corporate.discoverFeatures': 'Ezagutu funtzioak', 'nav.solutions': 'Irtenbideak', 'nav.features': 'Funtzionalitateak', 'nav.modules': 'Moduluak eta domotika', 'nav.blog': 'Bloga', 'nav.demo': 'Demoa ikusi', 'nav.pricing': 'Prezioak', 'nav.contact': 'Kontaktua', 'nav.language': 'Hizkuntza', 'nav.register': 'Erregistratu', 'nav.login': 'Erabiltzaileen sarbidea', 'common.back': 'Atzera', 'corporate.heroTitle': 'Padel profesionalentzako marka zuriko software integrala.' },
+  pt: { 'corporate.discoverFeatures': 'Descobrir funcionalidades', 'nav.solutions': 'Soluções', 'nav.features': 'Funcionalidades', 'nav.modules': 'Módulos e domótica', 'nav.blog': 'Blog', 'nav.demo': 'Ver demonstração', 'nav.pricing': 'Preços', 'nav.contact': 'Contacto', 'nav.language': 'Idioma', 'nav.register': 'Registar', 'nav.login': 'Acesso de utilizadores', 'common.back': 'Voltar atrás', 'corporate.heroTitle': 'Software white-label completo para profissionais de padel.' },
   fr: { 'corporate.discoverFeatures': 'Découvrir les fonctionnalités', 'nav.solutions': 'Solutions', 'nav.pricing': 'Tarifs', 'corporate.heroTitle': 'Logiciel white-label complet pour les professionnels du padel.' },
   de: { 'corporate.discoverFeatures': 'Funktionen entdecken', 'nav.solutions': 'Lösungen', 'nav.pricing': 'Preise', 'corporate.heroTitle': 'Komplette White-Label-Software für Padel-Profis.' },
   it: { 'corporate.discoverFeatures': 'Scopri le funzionalità', 'nav.solutions': 'Soluzioni', 'nav.pricing': 'Prezzi', 'corporate.heroTitle': 'Software white-label completo per professionisti del padel.' },
-  va: { 'corporate.discoverFeatures': 'Descobrir funcionalitats', 'nav.solutions': 'Solucions', 'nav.pricing': 'Preus', 'corporate.heroTitle': 'Programari de marca blanca per a professionals del pàdel.' },
+  va: { 'corporate.discoverFeatures': 'Descobrir funcionalitats', 'nav.solutions': 'Solucions', 'nav.features': 'Funcionalitats', 'nav.modules': 'Mòduls i domòtica', 'nav.blog': 'Blog', 'nav.demo': 'Veure demo', 'nav.pricing': 'Preus', 'nav.contact': 'Contacte', 'nav.language': 'Idioma', 'nav.register': 'Registrar-se', 'nav.login': 'Accés usuaris', 'common.back': 'Tornar arrere', 'corporate.heroTitle': 'Programari de marca blanca per a professionals del pàdel.' },
   ar: { 'corporate.discoverFeatures': 'اكتشف الميزات', 'nav.solutions': 'الحلول', 'nav.pricing': 'الأسعار', 'corporate.heroTitle': 'برنامج متكامل بعلامة بيضاء لمحترفي البادل.' },
 };
 
