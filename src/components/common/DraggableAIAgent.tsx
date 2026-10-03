@@ -75,10 +75,17 @@ export const DraggableAIAgent: React.FC = () => {
     }
   }, []);
 
-  // Auto scroll chat to bottom
+  // Auto scroll chat to bottom & block body scroll on mobile
   useEffect(() => {
     if (isOpen) {
       chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
+      if (isMobile) {
+        document.body.style.overflow = 'hidden';
+      }
+      return () => {
+        document.body.style.overflow = '';
+      };
     }
   }, [aiMessages, isOpen]);
 
@@ -183,31 +190,33 @@ export const DraggableAIAgent: React.FC = () => {
           </div>
         </div>
       ) : (
-        // Expanded Chat Window (Supports Fullscreen or floating card)
+        // Expanded Chat Window (Supports Fullscreen on desktop or full fixed overlay on mobile)
         <div
           style={
-            isFullscreen
+            isFullscreen || (typeof window !== 'undefined' && window.innerWidth < 640)
               ? undefined
               : {
                   position: 'fixed',
-                  right: `${position.x}px`,
-                  bottom: `${position.y}px`,
+                  right: `${Math.min(position.x, typeof window !== 'undefined' ? window.innerWidth - 400 : 20)}px`,
+                  bottom: `${Math.min(position.y, typeof window !== 'undefined' ? window.innerHeight - 540 : 20)}px`,
                   zIndex: 50,
                 }
           }
           className={
             isFullscreen
               ? 'fixed inset-2 sm:inset-6 z-[70] bg-slate-900 border border-slate-700 rounded-3xl shadow-2xl flex flex-col overflow-hidden text-slate-100 animate-in fade-in zoom-in-95 duration-150'
-              : 'w-[92vw] sm:w-[380px] h-[520px] max-h-[82vh] bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl flex flex-col overflow-hidden text-slate-100 animate-in fade-in zoom-in-95 duration-150'
+              : 'fixed inset-0 z-50 sm:inset-auto sm:w-[380px] sm:h-[520px] sm:max-h-[82vh] bg-slate-900 sm:border sm:border-slate-700 sm:rounded-2xl shadow-2xl flex flex-col overflow-hidden text-slate-100 animate-in fade-in zoom-in-95 duration-150'
           }
         >
           {/* Header & Drag Handle */}
           <div
-            onPointerDown={isFullscreen ? undefined : handlePointerDown}
-            onPointerMove={isFullscreen ? undefined : handlePointerMove}
-            onPointerUp={isFullscreen ? undefined : handlePointerUp}
+            onPointerDown={isFullscreen || (typeof window !== 'undefined' && window.innerWidth < 640) ? undefined : handlePointerDown}
+            onPointerMove={isFullscreen || (typeof window !== 'undefined' && window.innerWidth < 640) ? undefined : handlePointerMove}
+            onPointerUp={isFullscreen || (typeof window !== 'undefined' && window.innerWidth < 640) ? undefined : handlePointerUp}
             className={`${
-              isFullscreen ? 'cursor-default' : 'cursor-grab active:cursor-grabbing'
+              isFullscreen || (typeof window !== 'undefined' && window.innerWidth < 640)
+                ? 'cursor-default'
+                : 'cursor-grab active:cursor-grabbing'
             } bg-slate-950 px-4 py-3 border-b border-slate-800 flex items-center justify-between`}
           >
             <div className="flex items-center gap-2.5">

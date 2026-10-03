@@ -29,7 +29,7 @@ export const LegalView: React.FC = () => {
             En cumplimiento del artículo 10 de la Ley 34/2002 de Servicios de la Sociedad de la Información y de Comercio Electrónico (LSSI-CE), se informa de que este espacio web y aplicación deportiva son operados por <strong>{currentTenant.name}</strong>, con domicilio en {currentTenant.address} y correo de contacto {currentTenant.contactEmail}.
           </p>
           <p>
-            La plataforma tecnológica está provista bajo modelo SaaS de marca blanca por <strong>Setmio Padel Pro</strong> con infraestructura multi-tenant aislada.
+            La plataforma tecnológica está provista bajo modelo SaaS de marca blanca por <strong>Setmio Padel Pro</strong> con infraestructura cloud de alta disponibilidad y aislamiento seguro de datos.
           </p>
         </section>
 

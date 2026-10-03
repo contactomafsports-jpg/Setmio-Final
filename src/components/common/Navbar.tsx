@@ -31,9 +31,10 @@ import {
 interface NavbarProps {
   onOpenCart: () => void;
   onOpenAuth: () => void;
+  onOpenDemo?: () => void;
 }
 
-export const Navbar: React.FC<NavbarProps> = ({ onOpenCart, onOpenAuth }) => {
+export const Navbar: React.FC<NavbarProps> = ({ onOpenCart, onOpenAuth, onOpenDemo }) => {
   const {
     currentTenant,
     currentUser,
@@ -246,6 +247,18 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCart, onOpenAuth }) => {
                 )}
               </button>
 
+              {/* Ver Demo Button */}
+              {onOpenDemo && (
+                <button
+                  onClick={onOpenDemo}
+                  className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-purple-50 dark:bg-purple-950/50 hover:bg-purple-100 dark:hover:bg-purple-900/50 text-xs font-bold text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800 transition shadow-xs"
+                  title="Abrir selector de roles demo"
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
+                  <span>Ver Demo</span>
+                </button>
+              )}
+
               {/* User Account / Login Button */}
               <button
                 onClick={onOpenAuth}
@@ -338,6 +351,32 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCart, onOpenAuth }) => {
                 </div>
                 <ChevronRight className="w-4 h-4 text-emerald-100" />
               </button>
+
+              {/* Demo Roles Card */}
+              {onOpenDemo && (
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    onOpenDemo();
+                  }}
+                  className="w-full p-3 rounded-2xl bg-purple-50 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-800 text-left flex items-center justify-between transition"
+                >
+                  <div className="flex items-center gap-2.5">
+                    <div className="p-2 rounded-xl bg-purple-600 text-white shadow">
+                      <Sparkles className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <div className="text-xs font-bold text-purple-950 dark:text-purple-200">
+                        Probar Demo por Roles
+                      </div>
+                      <div className="text-[10px] text-purple-600 dark:text-purple-400">
+                        Superadmin, Club Admin, Profesor, Jugador
+                      </div>
+                    </div>
+                  </div>
+                  <ChevronRight className="w-4 h-4 text-purple-400" />
+                </button>
+              )}
 
               {/* Category 1: Instalaciones & Padel */}
               <div className="space-y-1">

@@ -23,6 +23,7 @@ import {
   Shield,
   Sun,
   Moon,
+  User,
 } from 'lucide-react';
 
 interface AdminLayoutProps {
@@ -36,6 +37,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
     setAdminTab,
     currentUser,
     setCurrentView,
+    switchUserRole,
     unreadNotificationsCount,
     markNotificationsAsRead,
     notifications,
@@ -236,6 +238,19 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
               )}
             </button>
 
+            {/* Quick Switch to Modo Jugador */}
+            <button
+              onClick={() => {
+                switchUserRole('PLAYER');
+                setCurrentView('player');
+              }}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 text-xs font-bold text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700 transition"
+              title="Cambiar a Modo Jugador sin cerrar sesión"
+            >
+              <User className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Modo Jugador</span>
+            </button>
+
             {/* Quick Public Web button */}
             <button
               onClick={() => setCurrentView('public')}
@@ -347,6 +362,30 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
             </div>
 
             <div className="space-y-4">
+              <button
+                onClick={() => {
+                  switchUserRole('PLAYER');
+                  setCurrentView('player');
+                  setMobileMoreOpen(false);
+                }}
+                className="w-full p-3 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-300 dark:border-emerald-700 text-left flex items-center justify-between transition hover:bg-emerald-100 dark:hover:bg-emerald-900/60"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-xl bg-emerald-600 text-white">
+                    <User className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <div className="text-xs font-bold text-emerald-950 dark:text-emerald-200">
+                      Alternar a Modo Jugador
+                    </div>
+                    <div className="text-[10px] text-emerald-700 dark:text-emerald-400">
+                      Prueba la experiencia de la app de socios y jugadores
+                    </div>
+                  </div>
+                </div>
+                <ChevronRight className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+              </button>
+
               <p className="text-[11px] leading-relaxed text-slate-500 dark:text-slate-400">
                 Módulos organizados por áreas de gestión del club.
               </p>

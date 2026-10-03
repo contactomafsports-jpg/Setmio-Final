@@ -1211,7 +1211,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       } else if (lower.includes('torneo') || lower.includes('competic')) {
         reply = `Actualmente tenemos abierta la inscripción para el "I Open Primavera Pádel San Mateo 2026" con 1.800€ en premios y material oficial Bullpadel.`;
       } else {
-        reply = `Como asistente contextual de ${currentTenant.name}, puedo ayudarte con cualquier servicio deportivo, reservas y consultas. Todo el sistema está activo en modo demostración con aislamiento multi-tenant.`;
+        reply = `Como asistente contextual de ${currentTenant.name}, puedo ayudarte con cualquier servicio deportivo, reservas y consultas. Todo el sistema está activo con aislamiento seguro de datos por club.`;
       }
 
       setAiMessages((prev) => [

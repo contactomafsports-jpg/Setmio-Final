@@ -21,6 +21,8 @@ import {
   Moon,
   Home,
   Check,
+  User,
+  Menu,
 } from 'lucide-react';
 
 interface PrivateClass {
@@ -143,12 +145,14 @@ export const CoachPortal: React.FC = () => {
     theme,
     toggleTheme,
     currentUser,
+    switchUserRole,
     triggerDemoToast,
   } = useApp();
 
   const [activeTab, setActiveTab] = useState<'agenda' | 'students' | 'availability' | 'rates'>('agenda');
   const [classList, setClassList] = useState<PrivateClass[]>(INITIAL_CLASSES);
   const [showNewClassModal, setShowNewClassModal] = useState(false);
+  const [showMoreDrawer, setShowMoreDrawer] = useState(false);
   const [searchStudent, setSearchStudent] = useState('');
 
   // Form states for new class
@@ -222,6 +226,19 @@ export const CoachPortal: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-2">
+            {/* Quick Switch to Modo Jugador */}
+            <button
+              onClick={() => {
+                switchUserRole('PLAYER');
+                setCurrentView('player');
+              }}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 text-xs font-bold text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700 transition"
+              title="Cambiar a Modo Jugador sin cerrar sesión"
+            >
+              <User className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Modo Jugador</span>
+            </button>
+
             <button
               onClick={toggleTheme}
               className="p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
@@ -798,6 +815,140 @@ export const CoachPortal: React.FC = () => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* MOBILE BOTTOM NAVIGATION BAR */}
+      <nav
+        aria-label="Navegación móvil del profesor"
+        className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 grid grid-cols-5 px-1 py-1 text-[10px] shadow-lg"
+      >
+        <button
+          onClick={() => setActiveTab('agenda')}
+          className={`flex flex-col items-center justify-center py-1.5 rounded-xl transition ${
+            activeTab === 'agenda'
+              ? 'text-indigo-600 dark:text-indigo-400 font-bold'
+              : 'text-slate-500 dark:text-slate-400'
+          }`}
+        >
+          <Calendar className="w-5 h-5 mb-0.5" />
+          <span>Agenda</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('students')}
+          className={`flex flex-col items-center justify-center py-1.5 rounded-xl transition ${
+            activeTab === 'students'
+              ? 'text-indigo-600 dark:text-indigo-400 font-bold'
+              : 'text-slate-500 dark:text-slate-400'
+          }`}
+        >
+          <Users className="w-5 h-5 mb-0.5" />
+          <span>Alumnos</span>
+        </button>
+
+        <button
+          onClick={() => setShowNewClassModal(true)}
+          className="flex flex-col items-center justify-center py-1 text-white"
+        >
+          <div className="w-10 h-10 -mt-4 rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg border-2 border-white dark:border-slate-900">
+            <Plus className="w-5 h-5" />
+          </div>
+          <span className="text-[9px] font-bold text-indigo-600 dark:text-indigo-400 mt-0.5">Nueva</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('availability')}
+          className={`flex flex-col items-center justify-center py-1.5 rounded-xl transition ${
+            activeTab === 'availability'
+              ? 'text-indigo-600 dark:text-indigo-400 font-bold'
+              : 'text-slate-500 dark:text-slate-400'
+          }`}
+        >
+          <Clock className="w-5 h-5 mb-0.5" />
+          <span>Horarios</span>
+        </button>
+
+        <button
+          onClick={() => setShowMoreDrawer(true)}
+          className="flex flex-col items-center justify-center py-1.5 rounded-xl text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+        >
+          <Menu className="w-5 h-5 mb-0.5" />
+          <span>Más</span>
+        </button>
+      </nav>
+
+      {/* MOBILE MORE DRAWER */}
+      {showMoreDrawer && (
+        <div className="fixed inset-0 z-50 flex flex-col justify-end bg-black/60 backdrop-blur-sm md:hidden animate-in fade-in duration-200">
+          <div className="bg-white dark:bg-slate-900 rounded-t-3xl border-t border-slate-200 dark:border-slate-800 p-5 space-y-4 max-h-[85vh] overflow-y-auto">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
+              <div className="flex items-center gap-2">
+                <GraduationCap className="w-5 h-5 text-indigo-500" />
+                <span className="font-bold text-sm text-slate-900 dark:text-white">Opciones del Profesor</span>
+              </div>
+              <button
+                onClick={() => setShowMoreDrawer(false)}
+                className="p-1 rounded-lg text-slate-400 hover:text-white"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="space-y-2">
+              <button
+                onClick={() => {
+                  setActiveTab('rates');
+                  setShowMoreDrawer(false);
+                }}
+                className="w-full p-3 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-left flex items-center justify-between"
+              >
+                <div className="flex items-center gap-3">
+                  <Award className="w-5 h-5 text-amber-500" />
+                  <div>
+                    <div className="text-xs font-bold text-slate-900 dark:text-white">Tarifas y Perfil Público</div>
+                    <div className="text-[10px] text-slate-500 dark:text-slate-400">Precios por hora, bio y certificaciones</div>
+                  </div>
+                </div>
+                <ChevronRight className="w-4 h-4 text-slate-400" />
+              </button>
+
+              <button
+                onClick={() => {
+                  switchUserRole('PLAYER');
+                  setCurrentView('player');
+                  setShowMoreDrawer(false);
+                }}
+                className="w-full p-3 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-800 text-left flex items-center justify-between"
+              >
+                <div className="flex items-center gap-3">
+                  <User className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                  <div>
+                    <div className="text-xs font-bold text-emerald-950 dark:text-emerald-200">Alternar a Modo Jugador</div>
+                    <div className="text-[10px] text-emerald-700 dark:text-emerald-400">Accede a tus reservas personales y partidas</div>
+                  </div>
+                </div>
+                <ChevronRight className="w-4 h-4 text-emerald-600" />
+              </button>
+
+              <button
+                onClick={() => {
+                  setCurrentView('public');
+                  setShowMoreDrawer(false);
+                }}
+                className="w-full p-3 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-left flex items-center justify-between"
+              >
+                <div className="flex items-center gap-3">
+                  <ExternalLink className="w-5 h-5 text-slate-500" />
+                  <div>
+                    <div className="text-xs font-bold text-slate-900 dark:text-white">Ver Web Pública del Club</div>
+                    <div className="text-[10px] text-slate-500 dark:text-slate-400">Pistas, escuela y torneos visibles</div>
+                  </div>
+                </div>
+                <ChevronRight className="w-4 h-4 text-slate-400" />
+              </button>
+            </div>
           </div>
         </div>
       )}
