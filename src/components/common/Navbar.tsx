@@ -282,7 +282,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCart, onOpenAuth, onOpenDe
 
       {/* ULTRA-PRO MOBILE NAVIGATION DRAWER */}
       {mobileMenuOpen && (
-        <div className="fixed inset-0 z-50 lg:hidden animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-[9999] lg:hidden animate-in fade-in duration-200">
           {/* Backdrop blur */}
           <div
             className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm"
@@ -291,7 +291,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCart, onOpenAuth, onOpenDe
           />
 
           {/* Slide-over panel */}
-          <div className="fixed inset-y-0 right-0 w-full max-w-sm bg-white dark:bg-slate-900 backdrop-blur-xl text-slate-900 dark:text-slate-100 shadow-2xl flex flex-col justify-between overflow-hidden animate-in slide-in-from-right duration-250 border-l border-slate-200 dark:border-slate-800">
+          <div className="fixed inset-y-0 right-0 z-[10000] h-dvh w-full max-w-sm bg-white dark:bg-slate-900 backdrop-blur-xl text-slate-900 dark:text-slate-100 shadow-2xl flex flex-col justify-between overflow-hidden animate-in slide-in-from-right duration-250 border-l border-slate-200 dark:border-slate-800">
             {/* Top Bar inside Drawer */}
             <div className="p-4 sm:p-5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
               <div className="flex items-center gap-3">
