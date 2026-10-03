@@ -146,6 +146,26 @@ export const AdminSettings: React.FC = () => {
           </div>
         </div>
 
+        {/* White-label Hero Media Configuration */}
+        <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-4 shadow-sm">
+          <div>
+            <h3 className="text-sm font-bold text-slate-900 dark:text-white">Medio del Hero público</h3>
+            <p className="text-[11px] text-slate-500 mt-1">Elige cómo presentar la cabecera de tu web de marca blanca.</p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            {[
+              { id: 'image', label: 'Imagen', description: 'Fotografía de pista' },
+              { id: 'video', label: 'Vídeo', description: 'Vídeo en bucle' },
+              { id: 'minimal', label: 'Sin medio / Minimalista', description: 'Degradado limpio' },
+            ].map((option) => (
+              <button key={option.id} type="button" className="p-3 rounded-2xl border border-slate-200 dark:border-slate-700 text-left hover:border-emerald-500 transition">
+                <span className="block text-xs font-bold text-slate-900 dark:text-white">{option.label}</span>
+                <span className="block text-[10px] text-slate-500 mt-1">{option.description}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
         {/* WhatsApp Widget Configuration */}
         <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-4 shadow-sm">
           <div className="flex items-center justify-between">

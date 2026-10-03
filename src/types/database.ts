@@ -57,6 +57,8 @@ export interface TenantBranding {
   heroTitle: string;
   heroSubtitle: string;
   heroImageUrl: string;
+  heroMediaType?: 'image' | 'video' | 'minimal';
+  heroVideoUrl?: string;
   badgeText: string;
 }
 

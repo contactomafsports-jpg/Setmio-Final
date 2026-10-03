@@ -4,6 +4,7 @@ import { RoleSelectorModal } from './components/common/RoleSelectorModal';
 import { Navbar } from './components/common/Navbar';
 import { Footer } from './components/common/Footer';
 import { DraggableAIAgent } from './components/common/DraggableAIAgent';
+import { PrivateMobileNav } from './components/common/PrivateMobileNav';
 import { WhatsAppFloat } from './components/common/WhatsAppFloat';
 import { PWAInstallPrompt } from './components/common/PWAInstallPrompt';
 import { OfflineBanner } from './components/common/OfflineBanner';
@@ -236,17 +237,26 @@ export function App() {
             <AdminLayout>{renderAdminTab()}</AdminLayout>
           )}
 
-          {currentView === 'player' && (
-            <PlayerPortal />
-          )}
-
-          {currentView === 'coach' && (
-            <CoachPortal />
-          )}
-
-          {currentView === 'hq' && (
-            <SuperadminHQ />
-          )}
+  {currentView === 'player' && (
+  <>
+    <PrivateMobileNav title="Área de Jugador" onMore={() => undefined} />
+    <PlayerPortal />
+  </>
+  )}
+  
+  {currentView === 'coach' && (
+  <>
+    <PrivateMobileNav title="Portal del Profesor" onMore={() => undefined} />
+    <CoachPortal />
+  </>
+  )}
+  
+  {currentView === 'hq' && (
+  <>
+    <PrivateMobileNav title="Setmio HQ" onMore={() => undefined} />
+    <SuperadminHQ />
+  </>
+  )}
         </>
       )}
 

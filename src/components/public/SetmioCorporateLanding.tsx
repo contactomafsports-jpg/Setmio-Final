@@ -334,10 +334,8 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
 
       {/* 2. HERO SECTION CORPORATIVO */}
       <section ref={reveal} className="scroll-reveal relative overflow-hidden pt-12 pb-20 lg:pt-20 lg:pb-32 bg-slate-950 border-b border-slate-800">
-        <video className="absolute inset-0 h-full w-full object-cover opacity-35" autoPlay muted loop playsInline poster="https://images.unsplash.com/photo-1554068865-24cecd4e34b8?auto=format&fit=crop&w=2000&q=80" aria-hidden="true">
-          <source src="https://cdn.coverr.co/videos/coverr-a-padel-match-1573/1080p.mp4" type="video/mp4" />
-        </video>
-        <div className="absolute inset-0 bg-[linear-gradient(115deg,rgba(7,20,16,.96),rgba(7,20,16,.76)_48%,rgba(7,20,16,.9))]" />
+        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1554068865-24cecd4e34b8?auto=format&fit=crop&w=2000&q=85')] bg-cover bg-center" />
+        <div className="absolute inset-0 bg-[linear-gradient(115deg,rgba(7,20,16,.94),rgba(7,20,16,.78)_48%,rgba(7,20,16,.92))]" />
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-96 bg-[radial-gradient(circle_at_50%_20%,rgba(199,243,107,0.18),transparent_60%)] pointer-events-none" />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center space-y-8">
@@ -349,7 +347,7 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
           </div>
 
           {/* Main Headline */}
-          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight text-slate-900 dark:text-white max-w-4xl mx-auto leading-[1.1] text-balance">
+          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight text-white max-w-4xl mx-auto leading-[1.1] text-balance">
             Software de{' '}
             <span className="bg-gradient-to-r from-emerald-600 via-teal-500 to-cyan-500 bg-clip-text text-transparent">
               Marca Blanca
@@ -610,7 +608,23 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
         </div>
       </section>
 
-      {/* 5. MÓDULOS TECNOLÓGICOS DIFERENCIALES */}
+      {/* 5. VÍDEO DESTACADO DE PÁDEL */}
+      <section ref={reveal} className="scroll-reveal py-20 bg-slate-950 text-white border-y border-slate-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-[.8fr_1.2fr] gap-10 items-center">
+          <div className="space-y-5">
+            <div className="text-xs font-bold uppercase tracking-[0.2em] text-emerald-400">Tecnología que se siente en pista</div>
+            <h2 className="text-3xl sm:text-5xl font-black tracking-tight">El juego profesional, dentro de tu operación.</h2>
+            <p className="text-sm sm:text-base text-slate-300 leading-relaxed">Descubre cómo una experiencia digital premium convierte cada reserva, clase y competición en una relación más sólida con tus jugadores.</p>
+          </div>
+          <div className="overflow-hidden rounded-3xl border border-white/10 bg-slate-900 shadow-2xl aspect-video">
+            <video className="h-full w-full object-cover" autoPlay muted loop playsInline controls preload="metadata" poster="https://images.unsplash.com/photo-1554068865-24cecd4e34b8?auto=format&fit=crop&w=1600&q=80" aria-label="Partido profesional de pádel">
+              <source src="https://cdn.coverr.co/videos/coverr-a-padel-match-1573/1080p.mp4" type="video/mp4" />
+            </video>
+          </div>
+        </div>
+      </section>
+
+      {/* 6. MÓDULOS TECNOLÓGICOS DIFERENCIALES */}
       <section id="modulos" className="py-20 bg-slate-50 dark:bg-slate-900/50 border-y border-slate-200 dark:border-slate-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
           <div className="text-center max-w-3xl mx-auto space-y-2">
