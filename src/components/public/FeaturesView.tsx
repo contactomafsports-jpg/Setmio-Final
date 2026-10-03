@@ -30,7 +30,7 @@ export const FeaturesView: React.FC<FeaturesViewProps> = ({
   onOpenDemo,
   onOpenOnboarding,
 }) => {
-  const { setPublicPage, setIsCorporateLanding } = useApp();
+  const { setPublicPage, setIsCorporateLanding, t } = useApp();
 
   const handleBack = () => {
     if (onBack) {
@@ -122,13 +122,13 @@ export const FeaturesView: React.FC<FeaturesViewProps> = ({
       <div className="text-center space-y-4 max-w-3xl mx-auto">
         <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-800 text-xs font-bold">
           <Sparkles className="w-4 h-4" />
-          <span>Ecosistema Tecnológico de Nueva Generación</span>
+          <span>{t('features.eyebrow', 'Ecosistema Tecnológico de Nueva Generación')}</span>
         </div>
         <h1 className="text-4xl sm:text-5xl font-black text-slate-900 dark:text-white tracking-tight">
-          Funcionalidades de <span className="text-emerald-600 dark:text-emerald-400">Setmio</span>
+          {t('features.title', 'Funcionalidades de')} <span className="text-emerald-600 dark:text-emerald-400">Setmio</span>
         </h1>
         <p className="text-slate-600 dark:text-slate-300 text-base leading-relaxed">
-          Software de Marca Blanca integral para profesionales del pádel. Diseñado para simplificar la gestión deportiva, maximizar la ocupación de pistas y potenciar la comunidad.
+          {t('features.description', 'Software de Marca Blanca integral para profesionales del pádel. Diseñado para simplificar la gestión deportiva, maximizar la ocupación de pistas y potenciar la comunidad.')}
         </p>
       </div>
 

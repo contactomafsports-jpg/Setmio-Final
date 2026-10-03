@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Check, Sparkles } from 'lucide-react';
 import { SubpageHeaderNav } from './SubpageHeaderNav';
+import { useApp } from '../../context/AppContext';
 
 interface PricingViewProps {
   onBack: () => void;
@@ -15,6 +16,7 @@ const plans = [
 
 export const PricingView: React.FC<PricingViewProps> = ({ onBack, onOpenDemo }) => {
   const [annual, setAnnual] = useState(false);
+  const { t } = useApp();
 
   return (
     <main className="min-h-[calc(100vh-4rem)] bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100">
@@ -23,13 +25,13 @@ export const PricingView: React.FC<PricingViewProps> = ({ onBack, onOpenDemo }) 
           <SubpageHeaderNav onBack={onBack} />
           <div className="flex flex-col justify-between gap-8 md:flex-row md:items-end">
             <div className="max-w-2xl">
-              <p className="mb-3 text-sm font-semibold uppercase tracking-[0.18em] text-emerald-600 dark:text-emerald-400">Precios claros</p>
-              <h1 className="text-balance text-4xl font-black tracking-tight sm:text-6xl">La infraestructura para hacer crecer tu club.</h1>
-              <p className="mt-5 max-w-xl text-base leading-7 text-muted-foreground sm:text-lg">Empieza con lo esencial y activa nuevos módulos cuando tu operación lo necesite.</p>
+              <p className="mb-3 text-sm font-semibold uppercase tracking-[0.18em] text-emerald-600 dark:text-emerald-400">{t('pricing.eyebrow', 'Precios claros')}</p>
+              <h1 className="text-balance text-4xl font-black tracking-tight sm:text-6xl">{t('pricing.title', 'La infraestructura para hacer crecer tu club.')}</h1>
+              <p className="mt-5 max-w-xl text-base leading-7 text-muted-foreground sm:text-lg">{t('pricing.description', 'Empieza con lo esencial y activa nuevos módulos cuando tu operación lo necesite.')}</p>
             </div>
             <div className="inline-flex items-center rounded-2xl border border-slate-200 bg-slate-100 p-1.5 shadow-inner dark:border-slate-700 dark:bg-slate-900" role="group" aria-label="Periodo de facturación">
-              <button onClick={() => setAnnual(false)} className={`rounded-xl px-4 py-2 text-sm font-bold transition ${!annual ? 'bg-white text-slate-900 shadow-sm dark:bg-slate-800 dark:text-white' : 'text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'}`}>Mensual</button>
-              <button onClick={() => setAnnual(true)} className={`rounded-xl px-4 py-2 text-sm font-bold transition ${annual ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'}`}>Anual <span className={`ml-1 rounded-full px-2 py-0.5 text-[10px] font-black ${annual ? 'bg-white/20 text-white' : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300'}`}>Ahorra 20%</span></button>
+              <button onClick={() => setAnnual(false)} className={`rounded-xl px-4 py-2 text-sm font-bold transition ${!annual ? 'bg-white text-slate-900 shadow-sm dark:bg-slate-800 dark:text-white' : 'text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'}`}>{t('pricing.monthly', 'Mensual')}</button>
+              <button onClick={() => setAnnual(true)} className={`rounded-xl px-4 py-2 text-sm font-bold transition ${annual ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'}`}>{t('pricing.annual', 'Anual')} <span className={`ml-1 rounded-full px-2 py-0.5 text-[10px] font-black ${annual ? 'bg-white/20 text-white' : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300'}`}>Ahorra 20%</span></button>
             </div>
           </div>
         </div>

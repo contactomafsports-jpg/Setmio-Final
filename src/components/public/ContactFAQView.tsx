@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 
 export const ContactFAQView: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
-  const { currentTenant, triggerDemoToast } = useApp();
+  const { currentTenant, triggerDemoToast, t } = useApp();
 
   const [formName, setFormName] = useState('');
   const [formEmail, setFormEmail] = useState('');
@@ -66,10 +66,10 @@ export const ContactFAQView: React.FC<{ onBack?: () => void }> = ({ onBack }) =>
       <div className="max-w-3xl space-y-3">
         <div className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
           <MapPin className="w-4 h-4" />
-          <span>Contacto & Atención al Jugador</span>
+          <span>{t('contact.eyebrow', 'Contacto & Atención al Jugador')}</span>
         </div>
         <h1 className="text-3xl sm:text-5xl font-black text-slate-900 dark:text-white tracking-tight leading-tight">
-          Estamos en Narón, Galicia
+          {t('contact.title', 'Estamos en Narón, Galicia')}
         </h1>
         <p className="text-slate-600 dark:text-slate-300 text-xs sm:text-sm leading-relaxed">
           Ven a conocernos al Polígono Industrial Río do Pozo. Resolveremos cualquier consulta sobre reservas de pistas, escuela federada, torneos o material deportivo.
@@ -82,7 +82,7 @@ export const ContactFAQView: React.FC<{ onBack?: () => void }> = ({ onBack }) =>
           <div className="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
             <MapPin className="w-5 h-5" />
           </div>
-          <h3 className="text-base font-bold text-slate-900 dark:text-white">Ubicación & Acceso</h3>
+          <h3 className="text-base font-bold text-slate-900 dark:text-white">{t('contact.location', 'Ubicación & Acceso')}</h3>
           <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
             {currentTenant.address}<br />
             Polígono Industrial Río do Pozo<br />
@@ -97,7 +97,7 @@ export const ContactFAQView: React.FC<{ onBack?: () => void }> = ({ onBack }) =>
           <div className="w-10 h-10 rounded-xl bg-teal-100 dark:bg-teal-950 text-teal-600 dark:text-cyan-400 flex items-center justify-center">
             <Clock className="w-5 h-5" />
           </div>
-          <h3 className="text-base font-bold text-slate-900 dark:text-white">Horario de Apertura</h3>
+          <h3 className="text-base font-bold text-slate-900 dark:text-white">{t('contact.hours', 'Horario de Apertura')}</h3>
           <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
             Lunes a Viernes: <strong>8:00 - 23:30 h</strong><br />
             Sábados: <strong>8:30 - 23:00 h</strong><br />
