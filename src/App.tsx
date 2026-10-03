@@ -28,6 +28,7 @@ import { SetmioCorporateLanding } from './components/public/SetmioCorporateLandi
 import { FeaturesView } from './components/public/FeaturesView';
 import { PricingView } from './components/public/PricingView';
 import { ModulosDomoticaPage } from './components/public/ModulosDomoticaPage';
+import { SolucionesPage } from './components/public/SolucionesPage';
 import { CorporateLayout } from './components/public/CorporateLayout';
 import { PlayerPublicProfileView } from './components/public/PlayerPublicProfileView';
 
@@ -126,19 +127,30 @@ export function App() {
     }
   }, [currentTenant.publicPages, publicPage, setPublicPage]);
 
+  const goHome = () => {
+    if (typeof window !== 'undefined' && window.location.pathname !== '/') {
+      window.history.pushState({}, '', '/');
+      window.dispatchEvent(new PopStateEvent('popstate'));
+    }
+    setPublicPage('home');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   // Render Public Page Switcher
   const renderPublicPage = () => {
     switch (publicPage) {
       case 'home':
         return <HomeView />;
       case 'features':
+        return <FeaturesView onBack={goHome} onOpenDemo={() => setRoleSelectorOpen(true)} />;
       case 'solutions':
       case 'solution_clubs':
       case 'solution_coaches':
       case 'solution_players':
       case 'solution_pro_players':
+        return <SolucionesPage onBack={goHome} onOpenDemo={() => setRoleSelectorOpen(true)} />;
       case 'modules':
-        return <ModulosDomoticaPage onBack={() => setPublicPage('home')} onOpenDemo={() => setRoleSelectorOpen(true)} />;
+        return <ModulosDomoticaPage onBack={goHome} onOpenDemo={() => setRoleSelectorOpen(true)} />;
       case 'demo':
         return <HomeView />;
       case 'pricing':
