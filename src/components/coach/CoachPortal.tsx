@@ -159,7 +159,7 @@ export const CoachPortal: React.FC = () => {
   const [newType, setNewType] = useState<'individual' | 'pair' | 'group_monthly'>('individual');
   const [newStudent, setNewStudent] = useState('');
   const [newPhone, setNewPhone] = useState('');
-  const [newDate, setNewDate] = useState('2026-10-02');
+  const [newDate, setNewDate] = useState(() => new Date().toISOString().slice(0, 10));
   const [newTime, setNewTime] = useState('16:00 - 17:00');
   const [newCourt, setNewCourt] = useState('Pista 1 — Central Panorámica WPT');
   const [newPrice, setNewPrice] = useState(38);

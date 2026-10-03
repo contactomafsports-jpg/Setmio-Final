@@ -637,6 +637,25 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const currentTenant = tenants.find((t) => t.id === currentTenantId) || tenants[0];
 
+  useEffect(() => {
+    const root = document.documentElement;
+    const branding = currentTenant?.branding;
+    if (isCorporateLanding || !branding) {
+      root.style.removeProperty('--club-primary');
+      root.style.removeProperty('--club-secondary');
+      root.style.removeProperty('--club-accent');
+      return;
+    }
+    root.style.setProperty('--club-primary', branding.primaryColor);
+    root.style.setProperty('--club-secondary', branding.secondaryColor);
+    root.style.setProperty('--club-accent', branding.accentColor);
+    return () => {
+      root.style.removeProperty('--club-primary');
+      root.style.removeProperty('--club-secondary');
+      root.style.removeProperty('--club-accent');
+    };
+  }, [currentTenant, isCorporateLanding]);
+
   const navigateToClub = (slug: string) => {
     setIsCorporateLanding(false);
     const target = tenants.find((t) => t.slug === slug);
