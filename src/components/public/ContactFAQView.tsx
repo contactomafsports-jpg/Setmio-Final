@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { SubpageHeaderNav } from './SubpageHeaderNav';
 import { useApp } from '../../context/AppContext';
 import {
   MapPin,
@@ -13,7 +14,7 @@ import {
   CheckCircle2,
 } from 'lucide-react';
 
-export const ContactFAQView: React.FC = () => {
+export const ContactFAQView: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
   const { currentTenant, triggerDemoToast } = useApp();
 
   const [formName, setFormName] = useState('');
@@ -59,8 +60,9 @@ export const ContactFAQView: React.FC = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-16 text-slate-900 dark:text-slate-100 transition-colors duration-200">
-      {/* Header */}
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-16 text-slate-900 dark:text-slate-100 transition-colors duration-200">
+  <SubpageHeaderNav onBack={onBack} />
+  {/* Header */}
       <div className="max-w-3xl space-y-3">
         <div className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
           <MapPin className="w-4 h-4" />

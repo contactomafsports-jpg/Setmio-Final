@@ -1,5 +1,6 @@
 import React from 'react';
 import { ArrowRight, CheckCircle2, LockKeyhole, Lightbulb, Wifi } from 'lucide-react';
+import { SubpageHeaderNav } from './SubpageHeaderNav';
 
 interface ModulosDomoticaPageProps {
   onBack: () => void;
@@ -10,7 +11,7 @@ export function ModulosDomoticaPage({ onBack, onOpenDemo }: ModulosDomoticaPageP
   return (
     <section className="min-h-[70vh] bg-slate-950 px-4 py-16 text-white sm:px-6 lg:px-8">
       <div className="mx-auto max-w-6xl">
-        <button type="button" onClick={onBack} className="mb-10 text-sm font-bold text-emerald-400 hover:text-emerald-300">← Volver a Setmio</button>
+        <SubpageHeaderNav onBack={onBack} />
         <div className="max-w-3xl">
           <p className="mb-4 text-xs font-black uppercase tracking-[0.24em] text-emerald-400">Módulos y domótica</p>
           <h1 className="text-4xl font-black tracking-tight sm:text-6xl">Pistas inteligentes, sin complicaciones.</h1>

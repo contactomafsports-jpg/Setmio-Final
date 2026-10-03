@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { ArrowLeft, Check, Sparkles } from 'lucide-react';
+import { Check, Sparkles } from 'lucide-react';
+import { SubpageHeaderNav } from './SubpageHeaderNav';
 
 interface PricingViewProps {
   onBack: () => void;
@@ -16,19 +17,17 @@ export const PricingView: React.FC<PricingViewProps> = ({ onBack, onOpenDemo }) 
   const [annual, setAnnual] = useState(false);
 
   return (
-    <main className="min-h-[calc(100vh-4rem)] bg-background text-foreground">
-      <section className="border-b border-border bg-muted/30 px-4 py-12 sm:px-6 lg:px-8 lg:py-20">
+    <main className="min-h-[calc(100vh-4rem)] bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100">
+      <section className="border-b border-slate-200 bg-white/80 px-4 py-12 sm:px-6 lg:px-8 lg:py-20 dark:border-slate-800 dark:bg-slate-900/60">
         <div className="mx-auto max-w-6xl">
-          <button onClick={onBack} className="mb-8 inline-flex items-center gap-2 text-sm font-medium text-muted-foreground transition hover:text-foreground">
-            <ArrowLeft className="size-4" /> Volver
-          </button>
+          <SubpageHeaderNav onBack={onBack} />
           <div className="flex flex-col justify-between gap-8 md:flex-row md:items-end">
             <div className="max-w-2xl">
               <p className="mb-3 text-sm font-semibold uppercase tracking-[0.18em] text-emerald-600 dark:text-emerald-400">Precios claros</p>
               <h1 className="text-balance text-4xl font-black tracking-tight sm:text-6xl">La infraestructura para hacer crecer tu club.</h1>
               <p className="mt-5 max-w-xl text-base leading-7 text-muted-foreground sm:text-lg">Empieza con lo esencial y activa nuevos módulos cuando tu operación lo necesite.</p>
             </div>
-            <div className="inline-flex rounded-full border border-border bg-card p-1 shadow-sm" role="group" aria-label="Periodo de facturación">
+            <div className="inline-flex rounded-full border border-slate-200 bg-white p-1 shadow-sm dark:border-slate-700 dark:bg-slate-900" role="group" aria-label="Periodo de facturación">
               <button onClick={() => setAnnual(false)} className={`rounded-full px-4 py-2 text-sm font-semibold transition ${!annual ? 'bg-foreground text-background' : 'text-muted-foreground hover:text-foreground'}`}>Mensual</button>
               <button onClick={() => setAnnual(true)} className={`rounded-full px-4 py-2 text-sm font-semibold transition ${annual ? 'bg-foreground text-background' : 'text-muted-foreground hover:text-foreground'}`}>Anual <span className="ml-1 text-emerald-500">-20%</span></button>
             </div>
@@ -40,7 +39,7 @@ export const PricingView: React.FC<PricingViewProps> = ({ onBack, onOpenDemo }) 
           {plans.map((plan) => {
             const price = plan.monthly === null ? null : annual ? Math.round(plan.monthly * 0.8) : plan.monthly;
             return (
-              <article key={plan.name} className={`relative flex flex-col rounded-3xl border bg-card p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-xl ${plan.featured ? 'border-emerald-500 ring-1 ring-emerald-500/30' : 'border-border'}`}>
+              <article key={plan.name} className={`relative flex flex-col rounded-3xl border bg-white p-6 shadow-sm transition dark:bg-slate-900 hover:-translate-y-1 hover:shadow-xl ${plan.featured ? 'border-emerald-500 ring-1 ring-emerald-500/30' : 'border-border'}`}>
                 {plan.featured && <div className="absolute -top-3 left-6 inline-flex items-center gap-1 rounded-full bg-emerald-600 px-3 py-1 text-xs font-bold text-white"><Sparkles className="size-3" /> Más elegido</div>}
                 <h2 className="text-xl font-bold">{plan.name}</h2>
                 <p className="mt-2 min-h-12 text-sm leading-6 text-muted-foreground">{plan.description}</p>

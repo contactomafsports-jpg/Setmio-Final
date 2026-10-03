@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { BlogPost } from '../../types/database';
+import { SubpageHeaderNav } from './SubpageHeaderNav';
 import {
   Clock,
   User,
@@ -15,7 +16,7 @@ import {
   ChevronRight,
 } from 'lucide-react';
 
-export const BlogView: React.FC = () => {
+export const BlogView: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
   const {
     blogPosts,
     selectedArticleId,
@@ -54,6 +55,7 @@ export const BlogView: React.FC = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 text-slate-900 dark:text-slate-100 transition-colors duration-200">
+      <SubpageHeaderNav onBack={onBack} />
       {/* If an article is selected, show Full Article Reader View */}
       {selectedArticle ? (
         <article className="max-w-4xl mx-auto space-y-8 animate-in fade-in duration-150">

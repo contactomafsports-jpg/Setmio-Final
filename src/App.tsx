@@ -154,7 +154,7 @@ export function App() {
       case 'demo':
         return <HomeView />;
       case 'pricing':
-        return <PricingView onBack={() => setPublicPage('home')} onOpenDemo={() => setRoleSelectorOpen(true)} />;
+        return <PricingView onBack={goHome} onOpenDemo={() => setRoleSelectorOpen(true)} />;
       case 'player_profile':
         return <PlayerPublicProfileView onBack={() => setPublicPage('teams')} />;
       case 'club':
@@ -176,9 +176,9 @@ export function App() {
         return <ShopView />;
       case 'blog':
       case 'article':
-        return <BlogView />;
+        return <BlogView onBack={goHome} />;
       case 'contact':
-        return <ContactFAQView />;
+        return <ContactFAQView onBack={goHome} />;
       case 'legal':
         return <LegalView />;
       default:
