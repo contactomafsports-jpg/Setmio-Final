@@ -25,6 +25,8 @@ import { ContactFAQView } from './components/public/ContactFAQView';
 import { LegalView } from './components/public/LegalView';
 import { BrandSplashScreen } from './components/common/BrandSplashScreen';
 import { SetmioCorporateLanding } from './components/public/SetmioCorporateLanding';
+import { FeaturesView } from './components/public/FeaturesView';
+import { PlayerPublicProfileView } from './components/public/PlayerPublicProfileView';
 import { SetmioCorporateLoader } from './components/common/SetmioCorporateLoader';
 
 // Admin views
@@ -111,6 +113,10 @@ export function App() {
     switch (publicPage) {
       case 'home':
         return <HomeView />;
+      case 'features':
+        return <FeaturesView onBack={() => setPublicPage('home')} onOpenDemo={() => setRoleSelectorOpen(true)} />;
+      case 'player_profile':
+        return <PlayerPublicProfileView onBack={() => setPublicPage('teams')} />;
       case 'club':
         return <AboutClubView />;
       case 'courts':
