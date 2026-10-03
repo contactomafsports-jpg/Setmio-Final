@@ -29,7 +29,6 @@ import { SetmioCorporateLanding } from './components/public/SetmioCorporateLandi
 import { FeaturesView } from './components/public/FeaturesView';
 import { PricingView } from './components/public/PricingView';
 import { PlayerPublicProfileView } from './components/public/PlayerPublicProfileView';
-import { SetmioCorporateLoader } from './components/common/SetmioCorporateLoader';
 
 // Admin views
 import { AdminLayout } from './components/admin/AdminLayout';
@@ -70,21 +69,6 @@ export function App() {
   const [cartOpen, setCartOpen] = useState(false);
   const [authOpen, setAuthOpen] = useState(false);
   const [roleSelectorOpen, setRoleSelectorOpen] = useState(false);
-
-  // Corporate loader animation (ONLY for the main SaaS corporate landing, NEVER for clubs)
-  const [corporateLoaderDone, setCorporateLoaderDone] = useState(() => {
-    if (typeof window === 'undefined') return true;
-    return sessionStorage.getItem('setmio_corporate_loader_seen') === 'true';
-  });
-
-  const handleCorporateLoaderComplete = () => {
-    setCorporateLoaderDone(true);
-    try {
-      sessionStorage.setItem('setmio_corporate_loader_seen', 'true');
-    } catch {
-      // Ignore
-    }
-  };
 
   // PWA Brand splash screen (Only for installed private app sessions)
   const [showSplash, setShowSplash] = useState(() => {
@@ -203,15 +187,12 @@ export function App() {
 
   return (
     <div className="min-h-screen bg-background text-foreground dark:bg-slate-950 dark:text-slate-100 font-sans selection:bg-emerald-500 selection:text-foreground antialiased transition-colors duration-200">
-      {/* PWA & Brand Splash Screen */}
-      {showSplash && <BrandSplashScreen onComplete={handleSplashComplete} />}
+      {/* Club/app splash only; Setmio corporate pages render immediately. */}
+      {!isCorporateLanding && showSplash && <BrandSplashScreen onComplete={handleSplashComplete} />}
 
       {/* Main view renderer: Corporate SaaS Landing OR Club View */}
       {isCorporateLanding && currentView === 'public' ? (
         <>
-          {!corporateLoaderDone && (
-            <SetmioCorporateLoader onComplete={handleCorporateLoaderComplete} />
-          )}
           <SetmioCorporateLanding
             onOpenAuth={() => setAuthOpen(true)}
             onExploreClub={navigateToClub}

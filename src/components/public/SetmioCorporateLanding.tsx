@@ -10,6 +10,8 @@ import {
   Calendar,
   Users,
   CreditCard,
+  Home,
+  BookOpen,
   Building2,
   GraduationCap,
   ShoppingBag,
@@ -67,6 +69,7 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
   const [registerModalOpen, setRegisterModalOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [langDropdownOpen, setLangDropdownOpen] = useState(false);
+  const [mobileLanguageOpen, setMobileLanguageOpen] = useState(false);
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('monthly');
   const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null);
   const [clubName, setClubName] = useState('');
@@ -91,7 +94,7 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
     if (element && !revealRefs.current.includes(element)) revealRefs.current.push(element);
   };
 
-  const navigatePublicRoute = (path: string, page: 'features' | 'blog' | 'contact') => {
+  const navigatePublicRoute = (path: string, page: 'home' | 'features' | 'pricing' | 'blog' | 'contact') => {
     window.history.pushState({}, '', path);
     setPublicPage(page);
     setMobileMenuOpen(false);
@@ -150,9 +153,9 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-200 overflow-x-hidden w-full max-w-full">
+    <div className="min-h-screen bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-200 w-full max-w-full">
       {/* 1. TOP HEADER / NAVBAR CORPORATIVA */}
-      <header className="sticky top-0 z-40 bg-white/95 dark:bg-slate-950/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 w-full overflow-x-hidden">
+      <header className="sticky top-0 z-40 bg-white/95 dark:bg-slate-950/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 w-full">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
           {/* Brand Logo - Mobile Clean Rule: Only Icon + Setmio Name */}
           <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
@@ -284,10 +287,21 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
 
         {/* Mobile Navigation Drawer with perfect viewport boundary */}
         {mobileMenuOpen && (
-          <div className="lg:hidden absolute left-3 right-3 top-[calc(100%+0.75rem)] rounded-3xl border border-white/60 dark:border-slate-700/70 bg-white/80 dark:bg-slate-950/80 p-3 shadow-2xl shadow-slate-900/10 backdrop-blur-2xl animate-in slide-in-from-top-2 duration-200">
-            <nav className="flex flex-col gap-1.5 text-sm font-semibold text-slate-700 dark:text-slate-200">
+          <div className="lg:hidden fixed inset-0 z-[9999] bg-slate-950/45 backdrop-blur-sm animate-in fade-in duration-200" role="dialog" aria-modal="true" aria-label="Menú de Setmio">
+            <div className="fixed inset-y-0 right-0 flex h-dvh w-full max-w-sm flex-col overflow-y-auto border-l border-slate-200 !bg-white p-4 text-slate-900 shadow-2xl backdrop-blur-2xl dark:border-slate-800 dark:bg-slate-950/95 dark:text-slate-100 animate-in slide-in-from-right duration-200">
+              <div className="mb-3 flex items-center justify-between border-b border-slate-200 pb-4 dark:border-slate-800">
+                <span className="text-sm font-black tracking-tight">SETMIO</span>
+                <button type="button" onClick={() => setMobileMenuOpen(false)} className="rounded-xl p-2 text-slate-600 hover:bg-slate-100 hover:text-slate-950 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white" aria-label="Cerrar menú">
+                  <X className="h-5 w-5" strokeWidth={1.5} />
+                </button>
+              </div>
+              <nav className="flex flex-col gap-1.5 text-sm font-semibold text-slate-800 dark:text-slate-200">
               {[
+                { label: 'Inicio', icon: Home, action: () => navigatePublicRoute('/', 'home') },
                 { label: 'Funcionalidades', icon: Sparkles, action: () => navigatePublicRoute('/funcionalidades', 'features') },
+                { label: 'Precios', icon: CreditCard, action: () => navigatePublicRoute('/precios', 'pricing') },
+                { label: 'Blog', icon: BookOpen, action: () => navigatePublicRoute('/blog', 'blog') },
+                { label: 'Contacto', icon: Mail, action: () => navigatePublicRoute('/contacto', 'contact') },
                 { label: 'Ver demo', icon: Play, action: handleOpenDemo },
                 { label: 'Soluciones', icon: Layers, href: '#soluciones' },
                 { label: 'Módulos y domótica', icon: Sliders, href: '#modulos' },
@@ -305,6 +319,22 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
                 <ArrowRight className="ml-auto w-4 h-4" strokeWidth={1.5} aria-hidden="true" />
               </button>
             </nav>
+
+            <div className="mt-3 border-t border-slate-200/70 pt-3 dark:border-slate-800">
+              <button type="button" onClick={() => setMobileLanguageOpen((open) => !open)} className="flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left text-sm font-semibold text-slate-800 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800" aria-expanded={mobileLanguageOpen}>
+                <span className="flex items-center gap-2"><Globe className="h-4 w-4 text-emerald-600" strokeWidth={1.5} /> Idioma: {SUPPORTED_LANGUAGES.find((item) => item.code === language)?.name ?? 'Español'}</span>
+                <ChevronDown className={`h-4 w-4 transition-transform ${mobileLanguageOpen ? 'rotate-180' : ''}`} />
+              </button>
+              {mobileLanguageOpen && (
+                <div className="mt-1 space-y-1 rounded-xl bg-slate-50 p-2 dark:bg-slate-900">
+                  {SUPPORTED_LANGUAGES.map((item) => (
+                    <button key={item.code} type="button" onClick={() => { setLanguage(item.code); setMobileLanguageOpen(false); }} className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-xs font-semibold transition ${language === item.code ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300' : 'text-slate-700 hover:bg-white dark:text-slate-300 dark:hover:bg-slate-800'}`} aria-pressed={language === item.code}>
+                      <span className="flex items-center gap-2"><span>{item.flag}</span>{item.name}</span><span className="font-mono uppercase text-[10px] text-slate-400">{item.code}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
 
             <div className="pt-3 mt-2 border-t border-slate-200/70 dark:border-slate-800 flex flex-col gap-2">
               <button
@@ -327,6 +357,7 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
                 <Lock className="w-3.5 h-3.5 text-emerald-600" />
                 <span>Acceso Clientes / Socios</span>
               </button>
+            </div>
             </div>
           </div>
         )}

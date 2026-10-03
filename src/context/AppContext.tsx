@@ -557,6 +557,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   };
 
+  useEffect(() => {
+    document.documentElement.lang = language;
+  }, [language]);
+
   const t = (key: string, fallback?: string): string => {
     return getTranslation(language, key, fallback);
   };
