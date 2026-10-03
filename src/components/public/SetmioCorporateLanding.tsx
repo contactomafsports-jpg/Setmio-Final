@@ -435,7 +435,7 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
                     <span className="w-3 h-3 rounded-full bg-amber-500" />
                     <span className="w-3 h-3 rounded-full bg-emerald-500" />
                     <span className="font-mono text-[11px] ml-2 text-slate-300">
-                      https://sanmateo.setmiofinal2.vercel.app/gestion
+                      https://tu-club.setmio.app/gestion
                     </span>
                   </div>
                   <div className="flex items-center gap-2 font-mono text-[10px] text-emerald-400">
@@ -725,7 +725,7 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
               <Globe className="w-6 h-6 text-cyan-500" />
               <h3 className="font-bold text-base text-slate-900 dark:text-white">Marca Blanca & Dominio Propio</h3>
               <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-                Conecta tu dominio personalizado (ej: padelsanmateo.com) y adapta los colores, logotipos y textos sin menciones técnicas.
+                Conecta tu dominio personalizado (ej: tuclub.com) y adapta los colores, logotipos y textos sin menciones técnicas.
               </p>
             </div>
           </div>
@@ -923,13 +923,13 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
               <div className="relative h-48 rounded-2xl overflow-hidden">
                 <img
                   src="https://images.unsplash.com/photo-1554068865-24cecd4e34b8?auto=format&fit=crop&w=800&q=80"
-                  alt="Centro de Pádel San Mateo"
+                  alt="Tu club de pádel"
                   className="w-full h-full object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent" />
                 <div className="absolute bottom-4 left-4 right-4 text-white">
-                  <div className="font-bold text-sm">Centro de Pádel San Mateo</div>
-                  <div className="text-xs text-emerald-400">Narón, Galicia · 8 pistas (4 indoor, 3 outdoor)</div>
+                  <div className="font-bold text-sm">Tu club de pádel</div>
+                  <div className="text-xs text-emerald-400">Tu marca · Pistas, socios y operaciones en un solo lugar</div>
                 </div>
               </div>
               <p className="text-xs text-slate-600 dark:text-slate-400">
@@ -1042,7 +1042,7 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
             <h4 className="font-bold text-white mb-3 text-sm">Plataforma</h4>
             <ul className="space-y-2 text-[11px]">
               <li><a href="#precios" className="hover:text-white transition">Planes & Tarifas</a></li>
-              <li><button onClick={() => onExploreClub('sanmateo')} className="hover:text-white transition text-left">Demo Pádel San Mateo</button></li>
+              <li><button onClick={() => onExploreClub('sanmateo')} className="hover:text-white transition text-left">Explorar demo de club</button></li>
               <li><button onClick={onOpenAuth} className="hover:text-white transition text-left">Login Global de Socios</button></li>
               <li><button onClick={() => setRegisterModalOpen(true)} className="hover:text-white transition text-left">Alta de Nuevo Club</button></li>
             </ul>
@@ -1096,7 +1096,7 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
                 <input
                   type="text"
                   required
-                  placeholder="ej. Pádel San Mateo"
+                  placeholder="ej. Club Central Padel"
                   value={clubName}
                   onChange={(e) => {
                     setClubName(e.target.value);
@@ -1121,7 +1121,7 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
                     <input
                       type="text"
                       required
-                      placeholder="sanmateo"
+                      placeholder="club-central"
                       value={clubSlug}
                       onChange={(e) => setClubSlug(e.target.value.toLowerCase().replace(/[^a-z0-9]/g, ''))}
                       className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-l-xl px-3 py-2.5 text-slate-900 dark:text-white font-mono focus:outline-none focus:border-emerald-500"
