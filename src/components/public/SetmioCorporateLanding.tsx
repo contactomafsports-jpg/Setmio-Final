@@ -10,6 +10,8 @@ import {
   Calendar,
   Users,
   CreditCard,
+  Home,
+  BookOpen,
   Building2,
   GraduationCap,
   ShoppingBag,
@@ -91,7 +93,7 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
     if (element && !revealRefs.current.includes(element)) revealRefs.current.push(element);
   };
 
-  const navigatePublicRoute = (path: string, page: 'features' | 'blog' | 'contact') => {
+  const navigatePublicRoute = (path: string, page: 'home' | 'features' | 'pricing' | 'blog' | 'contact') => {
     window.history.pushState({}, '', path);
     setPublicPage(page);
     setMobileMenuOpen(false);
@@ -284,10 +286,21 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
 
         {/* Mobile Navigation Drawer with perfect viewport boundary */}
         {mobileMenuOpen && (
-          <div className="lg:hidden absolute left-3 right-3 top-[calc(100%+0.75rem)] rounded-3xl border border-white/60 dark:border-slate-700/70 bg-white/80 dark:bg-slate-950/80 p-3 shadow-2xl shadow-slate-900/10 backdrop-blur-2xl animate-in slide-in-from-top-2 duration-200">
-            <nav className="flex flex-col gap-1.5 text-sm font-semibold text-slate-700 dark:text-slate-200">
+          <div className="lg:hidden fixed inset-0 z-50 bg-slate-950/45 backdrop-blur-sm animate-in fade-in duration-200" role="dialog" aria-modal="true" aria-label="Menú de Setmio">
+            <div className="absolute inset-y-0 right-0 flex w-full max-w-sm flex-col overflow-y-auto border-l border-slate-200 bg-white/95 p-4 text-slate-900 shadow-2xl backdrop-blur-2xl dark:border-slate-800 dark:bg-slate-950/95 dark:text-slate-100 animate-in slide-in-from-right duration-200">
+              <div className="mb-3 flex items-center justify-between border-b border-slate-200 pb-4 dark:border-slate-800">
+                <span className="text-sm font-black tracking-tight">SETMIO</span>
+                <button type="button" onClick={() => setMobileMenuOpen(false)} className="rounded-xl p-2 text-slate-600 hover:bg-slate-100 hover:text-slate-950 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white" aria-label="Cerrar menú">
+                  <X className="h-5 w-5" strokeWidth={1.5} />
+                </button>
+              </div>
+              <nav className="flex flex-col gap-1.5 text-sm font-semibold text-slate-800 dark:text-slate-200">
               {[
+                { label: 'Inicio', icon: Home, action: () => navigatePublicRoute('/', 'home') },
                 { label: 'Funcionalidades', icon: Sparkles, action: () => navigatePublicRoute('/funcionalidades', 'features') },
+                { label: 'Precios', icon: CreditCard, action: () => navigatePublicRoute('/precios', 'pricing') },
+                { label: 'Blog', icon: BookOpen, action: () => navigatePublicRoute('/blog', 'blog') },
+                { label: 'Contacto', icon: Mail, action: () => navigatePublicRoute('/contacto', 'contact') },
                 { label: 'Ver demo', icon: Play, action: handleOpenDemo },
                 { label: 'Soluciones', icon: Layers, href: '#soluciones' },
                 { label: 'Módulos y domótica', icon: Sliders, href: '#modulos' },
@@ -305,6 +318,19 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
                 <ArrowRight className="ml-auto w-4 h-4" strokeWidth={1.5} aria-hidden="true" />
               </button>
             </nav>
+
+            <div className="mt-3 border-t border-slate-200/70 pt-3 dark:border-slate-800">
+              <div className="mb-2 flex items-center gap-2 px-3 text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                <Globe className="h-3.5 w-3.5" strokeWidth={1.5} /> Idioma
+              </div>
+              <div className="grid grid-cols-5 gap-1.5">
+                {SUPPORTED_LANGUAGES.map((item) => (
+                  <button key={item.code} type="button" onClick={() => setLanguage(item.code as SupportedLanguage)} className={`rounded-xl border px-1 py-2 text-[10px] font-bold uppercase transition ${language === item.code ? 'border-emerald-500 bg-emerald-50 text-emerald-700 dark:border-emerald-400 dark:bg-emerald-950/50 dark:text-emerald-300' : 'border-slate-200 text-slate-600 hover:bg-slate-100 dark:border-slate-800 dark:text-slate-300 dark:hover:bg-slate-800'}`} aria-pressed={language === item.code}>
+                    {item.code}
+                  </button>
+                ))}
+              </div>
+            </div>
 
             <div className="pt-3 mt-2 border-t border-slate-200/70 dark:border-slate-800 flex flex-col gap-2">
               <button
@@ -327,6 +353,7 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
                 <Lock className="w-3.5 h-3.5 text-emerald-600" />
                 <span>Acceso Clientes / Socios</span>
               </button>
+            </div>
             </div>
           </div>
         )}

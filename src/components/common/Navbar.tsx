@@ -291,7 +291,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCart, onOpenAuth, onOpenDe
           />
 
           {/* Slide-over panel */}
-          <div className="fixed inset-y-0 right-0 w-full max-w-sm bg-background/95 dark:bg-slate-900/95 backdrop-blur-xl text-foreground dark:text-slate-100 shadow-2xl flex flex-col justify-between overflow-hidden animate-in slide-in-from-right duration-250 border-l border-border dark:border-slate-800">
+          <div className="fixed inset-y-0 right-0 w-full max-w-sm bg-white dark:bg-slate-900 backdrop-blur-xl text-slate-900 dark:text-slate-100 shadow-2xl flex flex-col justify-between overflow-hidden animate-in slide-in-from-right duration-250 border-l border-slate-200 dark:border-slate-800">
             {/* Top Bar inside Drawer */}
             <div className="p-4 sm:p-5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -334,7 +334,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCart, onOpenAuth, onOpenDe
                   <button
                     key={link.id}
                     onClick={() => handleNavClick(link.id)}
-                    className="w-full flex items-center justify-between rounded-xl px-3 py-2.5 text-left text-sm font-semibold text-foreground dark:text-slate-200 hover:bg-muted dark:hover:bg-slate-800 transition active:scale-[0.98]"
+                    className="w-full flex items-center justify-between rounded-xl px-3 py-2.5 text-left text-sm font-semibold text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition active:scale-[0.98]"
                   >
                     <span>{link.label}</span>
                     <ChevronRight className="w-4 h-4 text-muted-foreground" />
@@ -342,7 +342,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCart, onOpenAuth, onOpenDe
                 ))}
                 <button
                   onClick={() => { setMobileMenuOpen(false); onOpenAuth(); }}
-                  className="w-full flex items-center justify-center gap-2 rounded-xl bg-foreground px-3 py-2.5 text-sm font-bold text-background hover:opacity-90 transition active:scale-[0.98]"
+                  className="w-full flex items-center justify-center gap-2 rounded-xl bg-slate-900 px-3 py-2.5 text-sm font-bold text-white hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-200 transition active:scale-[0.98]"
                 >
                   <User className="w-4 h-4" />
                   Registro / Acceso
