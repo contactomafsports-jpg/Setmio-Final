@@ -73,6 +73,7 @@ export function App() {
   const [cartOpen, setCartOpen] = useState(false);
   const [authOpen, setAuthOpen] = useState(false);
   const [roleSelectorOpen, setRoleSelectorOpen] = useState(false);
+  const [registrationOpen, setRegistrationOpen] = useState(false);
 
   // PWA Brand splash screen (Only for installed private app sessions)
   const [showSplash, setShowSplash] = useState(() => {
@@ -95,8 +96,10 @@ export function App() {
     const routeToPage: Record<string, typeof publicPage> = {
       '/': 'home',
       '/funcionalidades': 'features',
+      '/registro': 'home',
       '/soluciones': 'solutions',
       '/soluciones/clubes': 'solution_clubs',
+      '/soluciones/escuelas': 'solution_schools',
       '/soluciones/profesores': 'solution_coaches',
       '/soluciones/jugadores': 'solution_players',
       '/soluciones/jugadores-profesionales': 'solution_pro_players',
@@ -113,6 +116,10 @@ export function App() {
         setRoleSelectorOpen(true);
       } else if (page) {
         setPublicPage(page);
+        if (window.location.pathname === '/registro') {
+          setRegistrationOpen(true);
+          setAuthOpen(true);
+        }
       }
     };
     syncRoute();
@@ -145,6 +152,7 @@ export function App() {
         return <FeaturesView onBack={goHome} onOpenDemo={() => setRoleSelectorOpen(true)} />;
       case 'solutions':
       case 'solution_clubs':
+      case 'solution_schools':
       case 'solution_coaches':
       case 'solution_players':
       case 'solution_pro_players':
@@ -227,12 +235,13 @@ export function App() {
 
       {/* Main view renderer: Corporate SaaS Landing OR Club View */}
       {currentView === 'public' && (isCorporateLanding ? (
-        <CorporateLayout onOpenDemo={() => setRoleSelectorOpen(true)} onOpenAuth={() => setAuthOpen(true)} onOpenRegister={() => setAuthOpen(true)}>
+        <CorporateLayout onOpenDemo={() => setRoleSelectorOpen(true)} onOpenAuth={() => setAuthOpen(true)} onOpenRegister={() => { window.history.pushState({}, '', '/registro'); setRegistrationOpen(true); setAuthOpen(true); }}>
           {publicPage === 'home' ? (
             <SetmioCorporateLanding
               onOpenAuth={() => setAuthOpen(true)}
               onExploreClub={navigateToClub}
               onOpenDemoRoleModal={() => setRoleSelectorOpen(true)}
+              onOpenFeatures={() => { window.history.pushState({}, '', '/funcionalidades'); setPublicPage('features'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
             />
           ) : renderPublicPage()}
         </CorporateLayout>
@@ -277,7 +286,8 @@ export function App() {
       <CartDrawer isOpen={cartOpen} onClose={() => setCartOpen(false)} />
       <AuthModal
         isOpen={authOpen}
-        onClose={() => setAuthOpen(false)}
+        initialMode={registrationOpen ? 'register' : 'login'}
+        onClose={() => { setAuthOpen(false); setRegistrationOpen(false); }}
         onOpenRoleModal={() => setRoleSelectorOpen(true)}
       />
       <RoleSelectorModal

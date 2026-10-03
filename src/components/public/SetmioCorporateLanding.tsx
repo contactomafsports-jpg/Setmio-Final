@@ -389,7 +389,7 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
               className="px-7 py-4 rounded-2xl bg-slate-900 dark:bg-slate-800 hover:bg-slate-800 dark:hover:bg-slate-700 text-white font-black text-sm shadow-xl shadow-slate-900/20 transition hover:scale-[1.02] flex items-center gap-2"
             >
               <Sparkles className="w-4 h-4 text-emerald-400" />
-              <span>Descubrir funcionalidades</span>
+              <span>{t('corporate.discoverFeatures', 'Descubrir funcionalidades')}</span>
             </button>
 
             <button
@@ -397,7 +397,7 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
               className="px-7 py-4 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-sm shadow-xl shadow-emerald-600/30 transition hover:scale-[1.02] flex items-center gap-2"
             >
               <Play className="w-4 h-4 fill-white" />
-              <span>Ver demo</span>
+              <span>{t('nav.demo', 'Ver demo')}</span>
             </button>
 
             <button

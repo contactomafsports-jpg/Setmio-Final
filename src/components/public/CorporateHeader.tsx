@@ -35,9 +35,9 @@ export function CorporateHeader({ onOpenDemo, onOpenAuth, onOpenRegister }: Corp
   return (
     <header className="sticky top-0 z-40 border-b border-slate-200/80 bg-white/95 backdrop-blur-md dark:border-slate-800 dark:bg-slate-950/95">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        <a href="/" onClick={close} className="flex items-center gap-2 font-black tracking-tight">
+        <button type="button" onClick={() => { close(); window.history.pushState({}, '', '/'); window.dispatchEvent(new PopStateEvent('popstate')); }} className="flex items-center gap-2 font-black tracking-tight">
           <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-700 text-white">S</span> SETMIO
-        </a>
+        </button>
         <div className="flex items-center gap-1">
           <select aria-label="Idioma" value={language} onChange={(event) => setLanguage(event.target.value as typeof language)} className="rounded-lg border border-slate-200 bg-white px-1.5 py-2 text-[11px] dark:border-slate-700 dark:bg-slate-900 sm:px-2 sm:text-xs">
             {SUPPORTED_LANGUAGES.map((item) => <option key={item.code} value={item.code}>{item.flag} {item.code.toUpperCase()}</option>)}
@@ -62,7 +62,7 @@ export function CorporateHeader({ onOpenDemo, onOpenAuth, onOpenRegister }: Corp
           </div>
           <div className="mt-4 grid gap-2 border-t border-slate-200 pt-4 dark:border-slate-800">
             <button type="button" onClick={() => setLanguageMenuOpen((value) => !value)} className="flex items-center justify-between rounded-xl p-3 text-left text-sm font-bold hover:bg-slate-100 dark:hover:bg-slate-900" aria-expanded={languageMenuOpen}><span className="flex items-center gap-3"><Globe className="h-4 w-4 text-emerald-600" />{SUPPORTED_LANGUAGES.find((item) => item.code === language)?.flag} Idioma: {SUPPORTED_LANGUAGES.find((item) => item.code === language)?.name ?? 'Español'}</span><span>⌄</span></button>{languageMenuOpen && <div className="grid grid-cols-2 gap-2 rounded-xl bg-slate-50 p-2 dark:bg-slate-900">{SUPPORTED_LANGUAGES.map((item) => <button type="button" key={item.code} onClick={() => { setLanguage(item.code); setLanguageMenuOpen(false); }} className={`rounded-lg px-2 py-2 text-left text-xs font-bold hover:bg-emerald-100 dark:hover:bg-slate-800 ${language === item.code ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300' : ''}`}>{item.flag} {item.name}</button>)}</div>}
-            <button type="button" onClick={() => { close(); onOpenRegister?.(); }} className="rounded-xl bg-emerald-600 px-4 py-3 text-sm font-black text-white">{t('nav.register', 'Registrarse')} <ArrowRight className="ml-1 inline h-4 w-4" /></button>
+            <button type="button" onClick={() => { close(); window.history.pushState({}, '', '/registro'); window.dispatchEvent(new PopStateEvent('popstate')); onOpenRegister?.(); }} className="rounded-xl bg-emerald-600 px-4 py-3 text-sm font-black text-white">{t('nav.register', 'Registrarse')} <ArrowRight className="ml-1 inline h-4 w-4" /></button>
             <button type="button" onClick={() => { close(); onOpenAuth?.(); }} className="rounded-xl border border-slate-300 px-4 py-3 text-sm font-bold dark:border-slate-700"><Lock className="mr-2 inline h-4 w-4 text-emerald-600" />{t('nav.login', 'Acceso Usuarios')}</button>
           </div>
         </nav>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { UserRole } from '../../types/database';
 import {
@@ -22,12 +22,14 @@ interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
   onOpenRoleModal?: () => void;
+  initialMode?: 'login' | 'register';
 }
 
-export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onOpenRoleModal }) => {
-  const { currentTenant, switchUserRole, triggerDemoToast, setCurrentView } = useApp();
+export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onOpenRoleModal, initialMode = 'login' }) => {
+  const { currentTenant, switchUserRole, triggerDemoToast, setCurrentView, t } = useApp();
 
-  const [mode, setMode] = useState<'login' | 'register'>('login');
+  const [mode, setMode] = useState<'login' | 'register'>(initialMode);
+  useEffect(() => { if (isOpen) setMode(initialMode); }, [initialMode, isOpen]);
   const [registerStep, setRegisterStep] = useState<1 | 2 | 3>(1);
   const [registrationRole, setRegistrationRole] = useState<'club' | 'school' | 'coach' | 'pro' | 'amateur' | null>(null);
   const registrationRoles = [
@@ -625,7 +627,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onOpenRol
         <div className="mt-6 pt-4 border-t border-slate-200 dark:border-slate-800 text-center text-xs text-slate-600 dark:text-slate-400">
           {mode === 'login' ? (
             <p>
-              ¿No tienes ficha de jugador todavía?{' '}
+              {t('auth.noAccount', '¿No tienes una cuenta aún?')} {' '}
               <button
                 type="button"
                 onClick={() => {
@@ -634,7 +636,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onOpenRol
                 }}
                 className="font-bold text-emerald-600 dark:text-emerald-400 hover:underline"
               >
-                Crear cuenta en 3 pasos
+                {t('auth.registerFree', 'Regístrate gratis')}
               </button>
             </p>
           ) : (
