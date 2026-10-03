@@ -27,6 +27,8 @@ import { BrandSplashScreen } from './components/common/BrandSplashScreen';
 import { SetmioCorporateLanding } from './components/public/SetmioCorporateLanding';
 import { FeaturesView } from './components/public/FeaturesView';
 import { PricingView } from './components/public/PricingView';
+import { ModulosDomoticaPage } from './components/public/ModulosDomoticaPage';
+import { CorporateLayout } from './components/public/CorporateLayout';
 import { PlayerPublicProfileView } from './components/public/PlayerPublicProfileView';
 
 // Admin views
@@ -63,6 +65,8 @@ export function App() {
     clearDemoToast,
     isCorporateLanding,
     navigateToClub,
+    currentUser,
+    navigateToCorporate,
   } = useApp();
 
   const [cartOpen, setCartOpen] = useState(false);
@@ -103,7 +107,12 @@ export function App() {
     };
     const syncRoute = () => {
       const page = routeToPage[window.location.pathname];
-      if (page) setPublicPage(page);
+      if (page === 'demo') {
+        setPublicPage('home');
+        setRoleSelectorOpen(true);
+      } else if (page) {
+        setPublicPage(page);
+      }
     };
     syncRoute();
     window.addEventListener('popstate', syncRoute);
@@ -129,7 +138,7 @@ export function App() {
       case 'solution_players':
       case 'solution_pro_players':
       case 'modules':
-        return <FeaturesView onBack={() => setPublicPage('home')} onOpenDemo={() => setRoleSelectorOpen(true)} />;
+        return <ModulosDomoticaPage onBack={() => setPublicPage('home')} onOpenDemo={() => setRoleSelectorOpen(true)} />;
       case 'demo':
         return <HomeView />;
       case 'pricing':
@@ -213,18 +222,15 @@ export function App() {
         />
       ) : (
         <>
-          {currentView === 'public' && (
-            <div className="flex flex-col min-h-screen">
-              <Navbar
-                onOpenCart={() => setCartOpen(true)}
-                onOpenAuth={() => setAuthOpen(true)}
-                onOpenDemo={() => setRoleSelectorOpen(true)}
-              />
+          {currentView === 'public' && (isCorporateLanding ? (
+            <CorporateLayout>{renderPublicPage()}</CorporateLayout>
+          ) : (
+            <div className="flex min-h-screen flex-col">
+              <Navbar onOpenCart={() => setCartOpen(true)} onOpenAuth={() => setAuthOpen(true)} onOpenDemo={() => setRoleSelectorOpen(true)} />
               <main className="flex-1">{renderPublicPage()}</main>
-              {/* Public Footer ONLY in public view (Requirement 8: No footer in app) */}
               <Footer />
             </div>
-          )}
+          ))}
 
           {currentView === 'admin' && (
             <AdminLayout>{renderAdminTab()}</AdminLayout>
@@ -236,6 +242,13 @@ export function App() {
 
   {currentView === 'hq' && <SuperadminHQ />}
         </>
+      )}
+
+      {currentView !== 'public' && (
+        <div className="fixed bottom-4 left-4 right-4 z-[100] mx-auto flex max-w-xl items-center justify-between gap-3 rounded-2xl border border-emerald-400/40 bg-slate-950/95 px-4 py-3 text-white shadow-2xl backdrop-blur-md">
+          <span className="min-w-0 truncate text-xs font-semibold"><span className="mr-1.5 text-emerald-400">●</span>Vista Previa Demo ({currentUser?.name ?? 'Setmio'})</span>
+          <button type="button" onClick={navigateToCorporate} className="shrink-0 rounded-xl bg-white px-3 py-2 text-[11px] font-black text-slate-900 transition hover:bg-emerald-100">Salir de la demo</button>
+        </div>
       )}
 
       {/* 3. Floating AI Agent (Draggable, session memory, tenant branded) */}

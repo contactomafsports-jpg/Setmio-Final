@@ -301,7 +301,7 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
                 { label: 'Funcionalidades', icon: Sparkles, action: () => navigatePublicRoute('/funcionalidades', 'features') },
                 { label: 'Módulos y domótica', icon: Sliders, action: () => navigatePublicRoute('/modulos-domotica', 'modules') },
                 { label: 'Blog', icon: BookOpen, action: () => navigatePublicRoute('/blog', 'blog') },
-                { label: 'Ver demo', icon: Play, action: () => navigatePublicRoute('/demo', 'demo') },
+                { label: 'Ver demo', icon: Play, action: handleOpenDemo },
                 { label: 'Precios', icon: CreditCard, action: () => navigatePublicRoute('/precios', 'pricing') },
                 { label: 'Contacto', icon: Mail, action: () => navigatePublicRoute('/contacto', 'contact') },
               ].map(({ label, icon: Icon, action }) => (

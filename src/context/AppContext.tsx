@@ -197,8 +197,8 @@ const readRoute = () => {
 
   const activeClubSlug = pathClubSlug || detectedSubdomain || detectedCustomDomainClub;
 
-  // On base root '/' without any specific club slug, serve Setmio Corporate SaaS Landing!
-  const isCorporate = !activeClubSlug && (path === '/' || path === '');
+  // Every public corporate route uses the Setmio layout; only /club/:slug uses the club layout.
+  const isCorporate = !activeClubSlug && Object.prototype.hasOwnProperty.call(PUBLIC_ROUTES, remainingPath);
 
   if (remainingPath === '/hq') {
     return {
