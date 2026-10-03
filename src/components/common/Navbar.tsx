@@ -101,21 +101,21 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCart, onOpenAuth, onOpenDe
     <>
       <header className="sticky top-0 z-40 w-full max-w-full overflow-x-hidden bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 transition-colors duration-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
+          <div className="flex items-center justify-between h-14 sm:h-16">
             {/* Brand Logo & Name */}
             <button
               onClick={() => handleNavClick('home')}
-              className="flex items-center gap-3 text-left focus:outline-none group"
+              className="min-w-0 flex items-center gap-2 text-left focus:outline-none group"
             >
               {currentTenant.branding.logoUrl ? (
-                <img src={currentTenant.branding.logoUrl} alt="" className="w-10 h-10 rounded-xl object-contain bg-white border border-slate-200 p-1 group-hover:scale-105 transition-transform" />
+                <img src={currentTenant.branding.logoUrl} alt="" className="h-8 w-8 shrink-0 rounded-lg object-contain bg-white border border-slate-200 p-1 group-hover:scale-105 transition-transform" />
               ) : (
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-700 flex items-center justify-center font-black text-white text-base shadow-md shadow-emerald-500/20 group-hover:scale-105 transition-transform">
+                <div className="h-8 w-8 shrink-0 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-700 flex items-center justify-center font-black text-white text-sm shadow-md shadow-emerald-500/20 group-hover:scale-105 transition-transform">
                   {currentTenant.shortName.split(/\s+/).map((part) => part[0]).join('').slice(0, 2).toUpperCase()}
                 </div>
               )}
               <div>
-                <div className="font-extrabold text-base sm:text-lg tracking-tight text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                <div className="max-w-[160px] truncate text-sm font-semibold tracking-tight text-slate-900 dark:text-white sm:max-w-none sm:text-lg group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
                   {currentTenant.name}
                 </div>
               </div>
@@ -201,7 +201,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCart, onOpenAuth, onOpenDe
               {/* Theme Toggle Button */}
               <button
                 onClick={toggleTheme}
-                className="p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                className="hidden lg:block p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                 title={theme === 'dark' ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
                 aria-label="Cambiar tema"
               >
@@ -221,7 +221,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCart, onOpenAuth, onOpenDe
                     onOpenCart();
                   }
                 }}
-                className="relative p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+                className="relative hidden lg:block p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition"
                 title={!currentUser ? 'Inicia sesión para ver tus favoritos' : 'Ver carrito'}
                 aria-label="Favoritos o carrito"
               >
@@ -236,7 +236,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCart, onOpenAuth, onOpenDe
               {/* Shopping Cart Drawer Trigger */}
               <button
                 onClick={onOpenCart}
-                className="relative p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+                className="relative hidden lg:block p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition"
                 title="Ver cesta de compra"
               >
                 <ShoppingBag className="w-4 h-4" />
@@ -291,7 +291,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCart, onOpenAuth, onOpenDe
           />
 
           {/* Slide-over panel */}
-          <div className="fixed inset-y-0 right-0 z-[10000] h-dvh w-full max-w-sm bg-white dark:bg-slate-900 backdrop-blur-xl text-slate-900 dark:text-slate-100 shadow-2xl flex flex-col justify-between overflow-hidden animate-in slide-in-from-right duration-250 border-l border-slate-200 dark:border-slate-800">
+          <div className="fixed inset-y-0 right-0 z-[10000] h-dvh w-full max-w-sm bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 shadow-2xl flex flex-col overflow-y-auto animate-in slide-in-from-right duration-250 border-l border-slate-200 dark:border-slate-800">
             {/* Top Bar inside Drawer */}
             <div className="p-4 sm:p-5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -322,7 +322,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCart, onOpenAuth, onOpenDe
             </div>
 
             {/* Scrollable Navigation Body */}
-            <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-6">
+            <div className="flex-1 p-4 sm:p-5 space-y-6">
               <nav aria-label="Navegación del club" className="space-y-1">
                 <div className="px-2 text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Club</div>
                 {[
