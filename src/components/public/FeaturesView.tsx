@@ -1,5 +1,6 @@
 import React from 'react';
 import { useApp } from '../../context/AppContext';
+import { SubpageHeaderNav } from './SubpageHeaderNav';
 import {
   ArrowLeft,
   Sparkles,
@@ -95,13 +96,7 @@ export const FeaturesView: React.FC<FeaturesViewProps> = ({
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-12 animate-in fade-in duration-200">
       {/* 1. TOP HEADER & BACK BUTTON */}
       <div className="flex items-center justify-between">
-        <button
-          onClick={handleBack}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-200 hover:text-emerald-600 dark:hover:text-emerald-400 font-bold text-xs shadow-xs transition"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          <span>Volver a la Home</span>
-        </button>
+  <SubpageHeaderNav onBack={handleBack} />
 
         <div className="flex items-center gap-3">
           {onOpenDemo && (
