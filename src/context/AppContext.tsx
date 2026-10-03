@@ -43,6 +43,7 @@ export type MainView = 'public' | 'admin' | 'player' | 'coach' | 'hq';
 export type PublicPage =
   | 'home'
   | 'features'
+  | 'pricing'
   | 'player_profile'
   | 'club'
   | 'courts'
@@ -61,6 +62,7 @@ export type PublicPage =
 const PUBLIC_ROUTES: Record<string, PublicPage> = {
   '/': 'home',
   '/funcionalidades': 'features',
+  '/precios': 'pricing',
   '/perfil-jugador': 'player_profile',
   '/club': 'club',
   '/pistas': 'courts',
@@ -79,6 +81,7 @@ const PUBLIC_ROUTES: Record<string, PublicPage> = {
 const routeForPage: Record<PublicPage, string> = {
   home: '/',
   features: '/funcionalidades',
+  pricing: '/precios',
   player_profile: '/perfil-jugador',
   club: '/club',
   courts: '/pistas',
