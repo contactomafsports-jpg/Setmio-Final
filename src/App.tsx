@@ -148,7 +148,7 @@ export function App() {
       case 'solution_coaches':
       case 'solution_players':
       case 'solution_pro_players':
-        return <SolucionesPage roleId={publicPage === 'solution_clubs' ? 'clubes' : publicPage === 'solution_coaches' ? 'profesores' : publicPage === 'solution_players' ? 'jugadores' : publicPage === 'solution_pro_players' ? 'profesionales' : undefined} onOpenRole={(roleId) => setPublicPage(`solution_${roleId === 'clubes' ? 'clubs' : roleId === 'profesores' ? 'coaches' : roleId === 'jugadores' ? 'players' : 'pro_players'}` as typeof publicPage)} onBack={goHome} onOpenDemo={() => setRoleSelectorOpen(true)} />;
+        return <SolucionesPage onOpenRegister={() => { setAuthOpen(true); }} roleId={publicPage === 'solution_clubs' ? 'clubes' : publicPage === 'solution_schools' ? 'escuelas' : publicPage === 'solution_coaches' ? 'profesores' : publicPage === 'solution_players' ? 'jugadores' : publicPage === 'solution_pro_players' ? 'profesionales' : undefined} onOpenRole={(roleId) => setPublicPage(`solution_${roleId === 'clubes' ? 'clubs' : roleId === 'escuelas' ? 'schools' : roleId === 'profesores' ? 'coaches' : roleId === 'jugadores' ? 'players' : 'pro_players'}` as typeof publicPage)} onBack={goHome} onOpenDemo={() => setRoleSelectorOpen(true)} />;
       case 'modules':
         return <ModulosDomoticaPage onBack={goHome} onOpenDemo={() => setRoleSelectorOpen(true)} />;
       case 'demo':

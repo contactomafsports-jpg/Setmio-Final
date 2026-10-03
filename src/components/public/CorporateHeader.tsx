@@ -22,6 +22,7 @@ const menuItems = [
 
 export function CorporateHeader({ onOpenDemo, onOpenAuth, onOpenRegister }: CorporateHeaderProps) {
   const [open, setOpen] = React.useState(false);
+  const [languageMenuOpen, setLanguageMenuOpen] = React.useState(false);
   const { t, language, setLanguage, theme, toggleTheme } = useApp();
   const close = () => setOpen(false);
 
@@ -60,7 +61,7 @@ export function CorporateHeader({ onOpenDemo, onOpenAuth, onOpenRegister }: Corp
             {menuItems.map(([Icon, key, label, href]) => href ? <a key={key} onClick={close} href={href} className="flex items-center justify-between rounded-xl p-3 hover:bg-emerald-50 dark:hover:bg-slate-900"><span className="flex items-center gap-3"><Icon className="h-4 w-4 text-emerald-600" />{t(key, label)}</span><ArrowRight className="h-4 w-4 text-slate-400" /></a> : <button key={key} type="button" onClick={() => { close(); onOpenDemo?.(); }} className="flex items-center justify-between rounded-xl p-3 text-left hover:bg-emerald-50 dark:hover:bg-slate-900"><span className="flex items-center gap-3"><Icon className="h-4 w-4 text-emerald-600" />{t(key, label)}</span><ArrowRight className="h-4 w-4 text-slate-400" /></button>)}
           </div>
           <div className="mt-4 grid gap-2 border-t border-slate-200 pt-4 dark:border-slate-800">
-            <button type="button" onClick={() => setLanguage(language)} className="flex items-center justify-between rounded-xl p-3 text-left text-sm font-bold hover:bg-slate-100 dark:hover:bg-slate-900"><span className="flex items-center gap-3"><Globe className="h-4 w-4 text-emerald-600" />Idioma: {SUPPORTED_LANGUAGES.find((item) => item.code === language)?.name ?? 'Español'}</span><span>⌄</span></button>
+            <button type="button" onClick={() => setLanguageMenuOpen((value) => !value)} className="flex items-center justify-between rounded-xl p-3 text-left text-sm font-bold hover:bg-slate-100 dark:hover:bg-slate-900" aria-expanded={languageMenuOpen}><span className="flex items-center gap-3"><Globe className="h-4 w-4 text-emerald-600" />{SUPPORTED_LANGUAGES.find((item) => item.code === language)?.flag} Idioma: {SUPPORTED_LANGUAGES.find((item) => item.code === language)?.name ?? 'Español'}</span><span>⌄</span></button>{languageMenuOpen && <div className="grid grid-cols-2 gap-2 rounded-xl bg-slate-50 p-2 dark:bg-slate-900">{SUPPORTED_LANGUAGES.map((item) => <button type="button" key={item.code} onClick={() => { setLanguage(item.code); setLanguageMenuOpen(false); }} className={`rounded-lg px-2 py-2 text-left text-xs font-bold hover:bg-emerald-100 dark:hover:bg-slate-800 ${language === item.code ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300' : ''}`}>{item.flag} {item.name}</button>)}</div>}
             <button type="button" onClick={() => { close(); onOpenRegister?.(); }} className="rounded-xl bg-emerald-600 px-4 py-3 text-sm font-black text-white">{t('nav.register', 'Registrarse')} <ArrowRight className="ml-1 inline h-4 w-4" /></button>
             <button type="button" onClick={() => { close(); onOpenAuth?.(); }} className="rounded-xl border border-slate-300 px-4 py-3 text-sm font-bold dark:border-slate-700"><Lock className="mr-2 inline h-4 w-4 text-emerald-600" />{t('nav.login', 'Acceso Usuarios')}</button>
           </div>

@@ -4,7 +4,8 @@ import { ArrowLeft } from 'lucide-react';
 export function SubpageHeaderNav({ onBack }: { onBack?: () => void }) {
   const handleBack = () => {
     try {
-      if (onBack) return onBack();
+      if (typeof window !== 'undefined' && window.history.length > 1) { window.history.back(); return; }
+      if (onBack) { onBack(); return; }
       if (window.history.length > 1) window.history.back();
       else window.location.assign('/');
     } catch {
