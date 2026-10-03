@@ -202,7 +202,7 @@ export function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 font-sans selection:bg-emerald-500 selection:text-white antialiased transition-colors duration-200">
+    <div className="min-h-screen bg-background text-foreground dark:bg-slate-950 dark:text-slate-100 font-sans selection:bg-emerald-500 selection:text-foreground antialiased transition-colors duration-200">
       {/* PWA & Brand Splash Screen */}
       {showSplash && <BrandSplashScreen onComplete={handleSplashComplete} />}
 
@@ -299,13 +299,13 @@ export function App() {
           )}
 
           <div className="flex-1 min-w-0 text-xs">
-            <div className="font-bold text-white">{demoToast.title}</div>
+            <div className="font-bold text-foreground">{demoToast.title}</div>
             <div className="text-slate-300 text-[11px] mt-0.5 leading-relaxed">{demoToast.description}</div>
           </div>
 
           <button
             onClick={clearDemoToast}
-            className="p-1 rounded-lg text-slate-400 hover:text-white"
+            className="p-1 rounded-lg text-slate-500 hover:text-foreground transition-colors"
           >
             <X className="w-4 h-4" />
           </button>
