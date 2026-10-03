@@ -68,6 +68,13 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [langDropdownOpen, setLangDropdownOpen] = useState(false);
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('monthly');
+  const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null);
+  const [clubName, setClubName] = useState('');
+  const [clubSlug, setClubSlug] = useState('');
+  const [clubCourts, setClubCourts] = useState(4);
+  const [clubCity, setClubCity] = useState('');
+  const [contactEmail, setContactEmail] = useState('');
+  const [contactPhone, setContactPhone] = useState('');
   const langRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -104,6 +111,13 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
     } else {
       setRegisterModalOpen(true);
     }
+  };
+
+  const handleQuickDemoRole = (role: 'SUPERADMIN' | 'TENANT_OWNER' | 'COACH' | 'PLAYER') => {
+    switchUserRole(role);
+    const view = role === 'SUPERADMIN' ? 'hq' : role === 'TENANT_OWNER' ? 'admin' : role === 'COACH' ? 'coach' : 'player';
+    setCurrentView(view);
+    triggerDemoToast('Demo Setmio', `Abriendo experiencia de ${view}...`, 'info');
   };
 
   const handleOpenFeaturesClick = () => {
