@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { SubpageHeaderNav } from './SubpageHeaderNav';
 import { useApp } from '../../context/AppContext';
 import {
   MapPin,
@@ -13,8 +14,8 @@ import {
   CheckCircle2,
 } from 'lucide-react';
 
-export const ContactFAQView: React.FC = () => {
-  const { currentTenant, triggerDemoToast } = useApp();
+export const ContactFAQView: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
+  const { currentTenant, triggerDemoToast, t } = useApp();
 
   const [formName, setFormName] = useState('');
   const [formEmail, setFormEmail] = useState('');
@@ -59,18 +60,19 @@ export const ContactFAQView: React.FC = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-16 text-slate-900 dark:text-slate-100 transition-colors duration-200">
-      {/* Header */}
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-16 text-slate-900 dark:text-slate-100 transition-colors duration-200">
+  <SubpageHeaderNav onBack={onBack} />
+  {/* Header */}
       <div className="max-w-3xl space-y-3">
         <div className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
           <MapPin className="w-4 h-4" />
-          <span>Contacto & Atención al Jugador</span>
+          <span>{t('contact.eyebrow', 'Contacto & Atención al Jugador')}</span>
         </div>
         <h1 className="text-3xl sm:text-5xl font-black text-slate-900 dark:text-white tracking-tight leading-tight">
-          Estamos en Narón, Galicia
+          {t('contact.title', 'Estamos en Narón, Galicia')}
         </h1>
         <p className="text-slate-600 dark:text-slate-300 text-xs sm:text-sm leading-relaxed">
-          Ven a conocernos al Polígono Industrial Río do Pozo. Resolveremos cualquier consulta sobre reservas de pistas, escuela federada, torneos o material deportivo.
+          {t('contact.description', 'Ven a conocernos al Polígono Industrial Río do Pozo. Resolveremos cualquier consulta sobre reservas de pistas, escuela federada, torneos o material deportivo.')}
         </p>
       </div>
 
@@ -80,14 +82,14 @@ export const ContactFAQView: React.FC = () => {
           <div className="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
             <MapPin className="w-5 h-5" />
           </div>
-          <h3 className="text-base font-bold text-slate-900 dark:text-white">Ubicación & Acceso</h3>
+          <h3 className="text-base font-bold text-slate-900 dark:text-white">{t('contact.location', 'Ubicación & Acceso')}</h3>
           <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
             {currentTenant.address}<br />
             Polígono Industrial Río do Pozo<br />
             15578 Narón, A Coruña (Galicia)
           </p>
           <div className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 pt-1">
-            Parking privado gratuito vigilado (80 plazas)
+            {t('contact.parking', 'Parking privado gratuito vigilado (80 plazas)')}
           </div>
         </div>
 
@@ -95,14 +97,14 @@ export const ContactFAQView: React.FC = () => {
           <div className="w-10 h-10 rounded-xl bg-teal-100 dark:bg-teal-950 text-teal-600 dark:text-cyan-400 flex items-center justify-center">
             <Clock className="w-5 h-5" />
           </div>
-          <h3 className="text-base font-bold text-slate-900 dark:text-white">Horario de Apertura</h3>
+          <h3 className="text-base font-bold text-slate-900 dark:text-white">{t('contact.hours', 'Horario de Apertura')}</h3>
           <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
             Lunes a Viernes: <strong>8:00 - 23:30 h</strong><br />
             Sábados: <strong>8:30 - 23:00 h</strong><br />
             Domingos y Festivos: <strong>9:00 - 22:30 h</strong>
           </p>
           <div className="text-[11px] font-semibold text-teal-600 dark:text-cyan-400 pt-1">
-            Cafetería y Pro Shop abiertos en horario de pistas
+            {t('contact.shopHours', 'Cafetería y Pro Shop abiertos en horario de pistas')}
           </div>
         </div>
 
@@ -110,7 +112,7 @@ export const ContactFAQView: React.FC = () => {
           <div className="w-10 h-10 rounded-xl bg-purple-100 dark:bg-purple-950 text-purple-600 dark:text-purple-400 flex items-center justify-center">
             <Phone className="w-5 h-5" />
           </div>
-          <h3 className="text-base font-bold text-slate-900 dark:text-white">Teléfono & WhatsApp</h3>
+          <h3 className="text-base font-bold text-slate-900 dark:text-white">{t('contact.phone', 'Teléfono & WhatsApp')}</h3>
           <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
             Recepción: <strong>{currentTenant.contactPhone}</strong><br />
             Email: <strong>{currentTenant.contactEmail}</strong>
@@ -123,7 +125,7 @@ export const ContactFAQView: React.FC = () => {
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600 text-white font-bold text-xs shadow-sm hover:bg-emerald-500 transition"
             >
               <MessageCircle className="w-3.5 h-3.5" />
-              <span>Chatear por WhatsApp</span>
+              <span>{t('contact.whatsapp', 'Chatear por WhatsApp')}</span>
             </a>
           </div>
         </div>
@@ -136,10 +138,10 @@ export const ContactFAQView: React.FC = () => {
           <div className="space-y-1">
             <div className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
               <HelpCircle className="w-4 h-4" />
-              <span>Preguntas Frecuentes</span>
+              <span>{t('contact.faq', 'Preguntas Frecuentes')}</span>
             </div>
             <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
-              Dudas comunes sobre reservas y el club
+              {t('contact.faqTitle', 'Dudas comunes sobre reservas y el club')}
             </h2>
           </div>
 
@@ -173,21 +175,21 @@ export const ContactFAQView: React.FC = () => {
         {/* Contact Form */}
         <div className="lg:col-span-5 p-6 sm:p-8 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl space-y-4">
           <div className="space-y-1">
-            <h3 className="text-lg font-bold text-slate-900 dark:text-white">Envíanos un Mensaje</h3>
+            <h3 className="text-lg font-bold text-slate-900 dark:text-white">{t('contact.formTitle', 'Envíanos un Mensaje')}</h3>
             <p className="text-xs text-slate-500 dark:text-slate-400">
-              Te responderemos en menos de 2 horas en horario de apertura.
+              {t('contact.formDescription', 'Te responderemos en menos de 2 horas en horario de apertura.')}
             </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-3.5 text-xs">
             <div>
-              <label className="block text-slate-700 dark:text-slate-300 font-semibold mb-1">Tu Nombre</label>
+              <label className="block text-slate-700 dark:text-slate-300 font-semibold mb-1">{t('contact.name', 'Tu Nombre')}</label>
               <input
                 type="text"
                 required
                 value={formName}
                 onChange={(e) => setFormName(e.target.value)}
-                placeholder="Nombre completo"
+                placeholder={t('contact.namePlaceholder', 'Nombre completo')}
                 className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
               />
             </div>
@@ -205,7 +207,7 @@ export const ContactFAQView: React.FC = () => {
                 />
               </div>
               <div>
-                <label className="block text-slate-700 dark:text-slate-300 font-semibold mb-1">Teléfono</label>
+                <label className="block text-slate-700 dark:text-slate-300 font-semibold mb-1">{t('contact.phoneLabel', 'Teléfono')}</label>
                 <input
                   type="tel"
                   value={formPhone}
@@ -217,13 +219,13 @@ export const ContactFAQView: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-slate-700 dark:text-slate-300 font-semibold mb-1">Mensaje o Consulta</label>
+              <label className="block text-slate-700 dark:text-slate-300 font-semibold mb-1">{t('contact.message', 'Mensaje o Consulta')}</label>
               <textarea
                 required
                 rows={4}
                 value={formMessage}
                 onChange={(e) => setFormMessage(e.target.value)}
-                placeholder="¿En qué te podemos ayudar? (reservas de grupos, clases, eventos de empresa...)"
+                placeholder={t('contact.messagePlaceholder', '¿En qué te podemos ayudar? (reservas de grupos, clases, eventos de empresa...)')}
                 className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl p-3 text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 leading-relaxed resize-none"
               />
             </div>
@@ -233,7 +235,7 @@ export const ContactFAQView: React.FC = () => {
               className="w-full py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 dark:bg-emerald-500 dark:hover:bg-emerald-400 text-white dark:text-slate-950 font-bold transition shadow-md flex items-center justify-center gap-2"
             >
               <Send className="w-4 h-4" />
-              <span>Enviar Consulta</span>
+              <span>{t('contact.submit', 'Enviar Consulta')}</span>
             </button>
           </form>
         </div>

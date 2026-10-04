@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 
 export const Footer: React.FC = () => {
-  const { currentTenant, courts, setPublicPage, setCurrentView } = useApp();
+  const { currentTenant, courts, setPublicPage, setCurrentView, t } = useApp();
 
   const handleNav = (page: PublicPage) => {
     setPublicPage(page);
@@ -40,7 +40,7 @@ export const Footer: React.FC = () => {
             </div>
 
             <p className="text-slate-400 leading-relaxed text-xs max-w-sm">
-              Tu centro deportivo de referencia en Ferrolterra y comarca de Narón. Pistas panorámicas cubiertas, climatización, club social, tienda oficial y la academia más activa de Galicia.
+              {t('footer.description', 'Tu centro deportivo de referencia en Ferrolterra y comarca de Narón. Pistas panorámicas cubiertas, climatización, club social, tienda oficial y la academia más activa de Galicia.')}
             </p>
 
             <div className="space-y-1.5 text-xs text-slate-300">
@@ -83,16 +83,16 @@ export const Footer: React.FC = () => {
 
           {/* Quick Links */}
           <div className="space-y-3">
-            <h4 className="text-xs font-bold text-white uppercase tracking-wider">Instalaciones & Juego</h4>
+            <h4 className="text-xs font-bold text-white uppercase tracking-wider">{t('footer.facilities', 'Instalaciones & Juego')}</h4>
             <ul className="space-y-2 text-xs">
               <li>
                 <button onClick={() => handleNav('courts')} className="hover:text-emerald-400 transition">
-                  Pistas y Tarifas
+                  {t('footer.courts', 'Pistas y Tarifas')}
                 </button>
               </li>
               <li>
                 <button onClick={() => handleNav('booking')} className="hover:text-emerald-400 transition">
-                  Reservar Pista Online
+                  {t('footer.booking', 'Reservar Pista Online')}
                 </button>
               </li>
               <li>
@@ -115,7 +115,7 @@ export const Footer: React.FC = () => {
 
           {/* Academy & Services */}
           <div className="space-y-3">
-            <h4 className="text-xs font-bold text-white uppercase tracking-wider">Escuela & Servicios</h4>
+            <h4 className="text-xs font-bold text-white uppercase tracking-wider">{t('footer.academy', 'Escuela & Servicios')}</h4>
             <ul className="space-y-2 text-xs">
               <li>
                 <button onClick={() => handleNav('academy')} className="hover:text-emerald-400 transition">

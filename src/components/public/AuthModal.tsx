@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { UserRole } from '../../types/database';
 import {
@@ -22,13 +22,23 @@ interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
   onOpenRoleModal?: () => void;
+  initialMode?: 'login' | 'register';
 }
 
-export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onOpenRoleModal }) => {
-  const { currentTenant, switchUserRole, triggerDemoToast, setCurrentView } = useApp();
+export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onOpenRoleModal, initialMode = 'login' }) => {
+  const { currentTenant, switchUserRole, triggerDemoToast, setCurrentView, t } = useApp();
 
-  const [mode, setMode] = useState<'login' | 'register'>('login');
+  const [mode, setMode] = useState<'login' | 'register'>(initialMode);
+  useEffect(() => { if (isOpen) setMode(initialMode); }, [initialMode, isOpen]);
   const [registerStep, setRegisterStep] = useState<1 | 2 | 3>(1);
+  const [registrationRole, setRegistrationRole] = useState<'club' | 'school' | 'coach' | 'pro' | 'amateur' | null>(null);
+  const registrationRoles = [
+    { id: 'club', label: 'Club', description: 'Gestiona pistas, socios y operaciones.' },
+    { id: 'school', label: 'Escuela', description: 'Organiza clases, grupos y alumnos.' },
+    { id: 'coach', label: 'Profesor', description: 'Impulsa tus clases y cobros.' },
+    { id: 'pro', label: 'Jugador Profesional', description: 'Centraliza calendario y oportunidades.' },
+    { id: 'amateur', label: 'Jugador Amateur', description: 'Reserva, juega y mejora.' },
+  ] as const;
 
   // Form Fields
   const [email, setEmail] = useState('');
@@ -323,7 +333,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onOpenRol
               {/* REGISTER STEP 1 */}
               {registerStep === 1 && (
                 <div className="space-y-4 animate-in fade-in duration-150">
-                  <div>
+                  {!registrationRole ? <div className="space-y-3"><p className="text-sm font-black text-slate-900 dark:text-white">¿Cómo vas a usar Setmio?</p><p className="text-xs text-slate-500">Elige tu perfil para personalizar tu experiencia.</p><div className="grid gap-2 sm:grid-cols-2">{registrationRoles.map((role) => <button type="button" key={role.id} onClick={() => setRegistrationRole(role.id)} className="rounded-2xl border border-slate-200 p-4 text-left transition hover:border-emerald-500 hover:bg-emerald-50 dark:border-slate-800 dark:hover:bg-emerald-950/30"><span className="block text-sm font-black">{role.label}</span><span className="mt-1 block text-xs text-slate-500">{role.description}</span></button>)}</div></div> : (<div className="space-y-4"><div className="flex items-center justify-between rounded-xl bg-emerald-50 px-3 py-2 text-xs font-bold text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-300">Perfil: {registrationRoles.find((role) => role.id === registrationRole)?.label}<button type="button" onClick={() => setRegistrationRole(null)} className="underline">Cambiar</button></div><div>
                     <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
                       Nombre y Apellidos
                     </label>
@@ -405,6 +415,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onOpenRol
                     <span>Siguiente: Perfil Deportivo</span>
                     <ArrowRight className="w-4 h-4" />
                   </button>
+                  </div>)}
                 </div>
               )}
 
@@ -616,7 +627,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onOpenRol
         <div className="mt-6 pt-4 border-t border-slate-200 dark:border-slate-800 text-center text-xs text-slate-600 dark:text-slate-400">
           {mode === 'login' ? (
             <p>
-              ¿No tienes ficha de jugador todavía?{' '}
+              {t('auth.noAccount', '¿No tienes una cuenta aún?')} {' '}
               <button
                 type="button"
                 onClick={() => {
@@ -625,7 +636,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onOpenRol
                 }}
                 className="font-bold text-emerald-600 dark:text-emerald-400 hover:underline"
               >
-                Crear cuenta en 3 pasos
+                {t('auth.registerFree', 'Regístrate gratis')}
               </button>
             </p>
           ) : (

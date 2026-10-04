@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { BlogPost } from '../../types/database';
+import { SubpageHeaderNav } from './SubpageHeaderNav';
 import {
   Clock,
   User,
@@ -15,7 +16,7 @@ import {
   ChevronRight,
 } from 'lucide-react';
 
-export const BlogView: React.FC = () => {
+export const BlogView: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
   const {
     blogPosts,
     selectedArticleId,
@@ -23,6 +24,7 @@ export const BlogView: React.FC = () => {
     triggerDemoToast,
     setPublicPage,
     currentTenant,
+    t,
   } = useApp();
 
   const [search, setSearch] = useState('');
@@ -54,6 +56,7 @@ export const BlogView: React.FC = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 text-slate-900 dark:text-slate-100 transition-colors duration-200">
+      <SubpageHeaderNav onBack={onBack} />
       {/* If an article is selected, show Full Article Reader View */}
       {selectedArticle ? (
         <article className="max-w-4xl mx-auto space-y-8 animate-in fade-in duration-150">
@@ -63,7 +66,7 @@ export const BlogView: React.FC = () => {
             className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 text-xs font-bold text-slate-800 dark:text-slate-200 shadow-sm transition"
           >
             <ArrowLeft className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-            <span>Volver a Todos los Artículos</span>
+            <span>{t('blog.back', 'Volver a Todos los Artículos')}</span>
           </button>
 
           <header className="space-y-4">
@@ -92,7 +95,7 @@ export const BlogView: React.FC = () => {
                 <button
                   onClick={() => handleShare(selectedArticle.title)}
                   className="p-1.5 rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition"
-                  title="Compartir artículo"
+                  title={t('blog.share', 'Compartir artículo')}
                 >
                   <Share2 className="w-4 h-4" />
                 </button>
@@ -148,7 +151,7 @@ export const BlogView: React.FC = () => {
               <div className="flex items-center justify-between">
                 <h3 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
                   <Sparkles className="w-5 h-5 text-emerald-500" />
-                  <span>Artículos Relacionados</span>
+                  <span>{t('blog.related', 'Artículos Relacionados')}</span>
                 </h3>
               </div>
 

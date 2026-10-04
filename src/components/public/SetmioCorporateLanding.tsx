@@ -103,8 +103,9 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
   };
 
   useEffect(() => {
-    document.body.style.overflow = mobileMenuOpen ? 'hidden' : '';
-    return () => { document.body.style.overflow = ''; };
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = mobileMenuOpen ? 'hidden' : previousOverflow;
+    return () => { document.body.style.overflow = previousOverflow; };
   }, [mobileMenuOpen]);
 
   useEffect(() => {
@@ -161,7 +162,7 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
   return (
     <div className="min-h-screen bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-200 w-full max-w-full">
       {/* 1. TOP HEADER / NAVBAR CORPORATIVA */}
-      <header className="sticky top-0 z-40 bg-white/95 dark:bg-slate-950/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 w-full">
+      <header aria-hidden="true" className="hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
           {/* Brand Logo - Mobile Clean Rule: Only Icon + Setmio Name */}
           <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
@@ -286,8 +287,8 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
 
         {/* Mobile Navigation Drawer with perfect viewport boundary */}
         {mobileMenuOpen && (
-          <div className="lg:hidden fixed inset-0 z-[9999] bg-slate-950/45 backdrop-blur-sm animate-in fade-in duration-200" role="dialog" aria-modal="true" aria-label="Menú de Setmio">
-            <div className="fixed inset-y-0 right-0 flex h-dvh w-full max-w-sm flex-col overflow-y-auto border-l border-slate-200 bg-white p-4 text-slate-900 shadow-2xl backdrop-blur-2xl dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100 animate-in slide-in-from-right duration-200">
+          <div className="lg:hidden fixed inset-0 z-[9999] overscroll-none bg-slate-950/45 backdrop-blur-sm animate-in fade-in duration-200" role="dialog" aria-modal="true" aria-label="Menú de Setmio" data-modal="true" onWheel={(event) => event.stopPropagation()} onTouchMove={(event) => event.stopPropagation()}>
+            <div className="fixed inset-y-0 right-0 flex h-dvh w-full max-w-sm flex-col overscroll-contain overflow-y-auto border-l border-slate-200 bg-white p-4 text-slate-900 shadow-2xl backdrop-blur-2xl dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100 animate-in slide-in-from-right duration-200">
               <div className="mb-3 flex items-center justify-between border-b border-slate-200 pb-4 dark:border-slate-800">
                 <span className="text-sm font-black tracking-tight">SETMIO</span>
                 <button type="button" onClick={() => setMobileMenuOpen(false)} className="rounded-xl p-2 text-slate-600 hover:bg-slate-100 hover:text-slate-950 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white" aria-label="Cerrar menú">
@@ -388,7 +389,7 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
               className="px-7 py-4 rounded-2xl bg-slate-900 dark:bg-slate-800 hover:bg-slate-800 dark:hover:bg-slate-700 text-white font-black text-sm shadow-xl shadow-slate-900/20 transition hover:scale-[1.02] flex items-center gap-2"
             >
               <Sparkles className="w-4 h-4 text-emerald-400" />
-              <span>Descubrir funcionalidades</span>
+              <span>{t('corporate.discoverFeatures', 'Descubrir funcionalidades')}</span>
             </button>
 
             <button
@@ -396,7 +397,7 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
               className="px-7 py-4 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-sm shadow-xl shadow-emerald-600/30 transition hover:scale-[1.02] flex items-center gap-2"
             >
               <Play className="w-4 h-4 fill-white" />
-              <span>Ver demo</span>
+              <span>{t('nav.demo', 'Ver demo')}</span>
             </button>
 
             <button

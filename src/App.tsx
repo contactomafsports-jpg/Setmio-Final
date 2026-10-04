@@ -28,6 +28,7 @@ import { SetmioCorporateLanding } from './components/public/SetmioCorporateLandi
 import { FeaturesView } from './components/public/FeaturesView';
 import { PricingView } from './components/public/PricingView';
 import { ModulosDomoticaPage } from './components/public/ModulosDomoticaPage';
+import { SolucionesPage } from './components/public/SolucionesPage';
 import { CorporateLayout } from './components/public/CorporateLayout';
 import { PlayerPublicProfileView } from './components/public/PlayerPublicProfileView';
 
@@ -72,6 +73,7 @@ export function App() {
   const [cartOpen, setCartOpen] = useState(false);
   const [authOpen, setAuthOpen] = useState(false);
   const [roleSelectorOpen, setRoleSelectorOpen] = useState(false);
+  const [registrationOpen, setRegistrationOpen] = useState(false);
 
   // PWA Brand splash screen (Only for installed private app sessions)
   const [showSplash, setShowSplash] = useState(() => {
@@ -94,8 +96,10 @@ export function App() {
     const routeToPage: Record<string, typeof publicPage> = {
       '/': 'home',
       '/funcionalidades': 'features',
+      '/registro': 'home',
       '/soluciones': 'solutions',
       '/soluciones/clubes': 'solution_clubs',
+      '/soluciones/escuelas': 'solution_schools',
       '/soluciones/profesores': 'solution_coaches',
       '/soluciones/jugadores': 'solution_players',
       '/soluciones/jugadores-profesionales': 'solution_pro_players',
@@ -112,6 +116,10 @@ export function App() {
         setRoleSelectorOpen(true);
       } else if (page) {
         setPublicPage(page);
+        if (window.location.pathname === '/registro') {
+          setRegistrationOpen(true);
+          setAuthOpen(true);
+        }
       }
     };
     syncRoute();
@@ -126,23 +134,35 @@ export function App() {
     }
   }, [currentTenant.publicPages, publicPage, setPublicPage]);
 
+  const goHome = () => {
+    if (typeof window !== 'undefined' && window.location.pathname !== '/') {
+      window.history.pushState({}, '', '/');
+      window.dispatchEvent(new PopStateEvent('popstate'));
+    }
+    setPublicPage('home');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   // Render Public Page Switcher
   const renderPublicPage = () => {
     switch (publicPage) {
       case 'home':
         return <HomeView />;
       case 'features':
+        return <FeaturesView onBack={goHome} onOpenDemo={() => setRoleSelectorOpen(true)} />;
       case 'solutions':
       case 'solution_clubs':
+      case 'solution_schools':
       case 'solution_coaches':
       case 'solution_players':
       case 'solution_pro_players':
+        return <SolucionesPage onOpenRegister={() => { setAuthOpen(true); }} roleId={publicPage === 'solution_clubs' ? 'clubes' : publicPage === 'solution_schools' ? 'escuelas' : publicPage === 'solution_coaches' ? 'profesores' : publicPage === 'solution_players' ? 'jugadores' : publicPage === 'solution_pro_players' ? 'profesionales' : undefined} onOpenRole={(roleId) => setPublicPage(`solution_${roleId === 'clubes' ? 'clubs' : roleId === 'escuelas' ? 'schools' : roleId === 'profesores' ? 'coaches' : roleId === 'jugadores' ? 'players' : 'pro_players'}` as typeof publicPage)} onBack={goHome} onOpenDemo={() => setRoleSelectorOpen(true)} />;
       case 'modules':
-        return <ModulosDomoticaPage onBack={() => setPublicPage('home')} onOpenDemo={() => setRoleSelectorOpen(true)} />;
+        return <ModulosDomoticaPage onBack={goHome} onOpenDemo={() => setRoleSelectorOpen(true)} />;
       case 'demo':
         return <HomeView />;
       case 'pricing':
-        return <PricingView onBack={() => setPublicPage('home')} onOpenDemo={() => setRoleSelectorOpen(true)} />;
+        return <PricingView onBack={goHome} onOpenDemo={() => setRoleSelectorOpen(true)} />;
       case 'player_profile':
         return <PlayerPublicProfileView onBack={() => setPublicPage('teams')} />;
       case 'club':
@@ -164,9 +184,9 @@ export function App() {
         return <ShopView />;
       case 'blog':
       case 'article':
-        return <BlogView />;
+        return <BlogView onBack={goHome} />;
       case 'contact':
-        return <ContactFAQView />;
+        return <ContactFAQView onBack={goHome} />;
       case 'legal':
         return <LegalView />;
       default:
@@ -214,23 +234,24 @@ export function App() {
       {!isCorporateLanding && showSplash && <BrandSplashScreen onComplete={handleSplashComplete} />}
 
       {/* Main view renderer: Corporate SaaS Landing OR Club View */}
-      {isCorporateLanding && currentView === 'public' && publicPage === 'home' ? (
-        <SetmioCorporateLanding
-          onOpenAuth={() => setAuthOpen(true)}
-          onExploreClub={navigateToClub}
-          onOpenDemoRoleModal={() => setRoleSelectorOpen(true)}
-        />
+      {currentView === 'public' && (isCorporateLanding ? (
+        <CorporateLayout onOpenDemo={() => setRoleSelectorOpen(true)} onOpenAuth={() => setAuthOpen(true)} onOpenRegister={() => { window.history.pushState({}, '', '/registro'); setRegistrationOpen(true); setAuthOpen(true); }}>
+          {publicPage === 'home' ? (
+            <SetmioCorporateLanding
+              onOpenAuth={() => setAuthOpen(true)}
+              onExploreClub={navigateToClub}
+              onOpenDemoRoleModal={() => setRoleSelectorOpen(true)}
+              onOpenFeatures={() => { window.history.pushState({}, '', '/funcionalidades'); setPublicPage('features'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+            />
+          ) : renderPublicPage()}
+        </CorporateLayout>
       ) : (
-        <>
-          {currentView === 'public' && (isCorporateLanding ? (
-            <CorporateLayout>{renderPublicPage()}</CorporateLayout>
-          ) : (
-            <div className="flex min-h-screen flex-col">
-              <Navbar onOpenCart={() => setCartOpen(true)} onOpenAuth={() => setAuthOpen(true)} onOpenDemo={() => setRoleSelectorOpen(true)} />
-              <main className="flex-1">{renderPublicPage()}</main>
-              <Footer />
-            </div>
-          ))}
+        <div className="flex min-h-screen flex-col">
+          <Navbar onOpenCart={() => setCartOpen(true)} onOpenAuth={() => setAuthOpen(true)} onOpenDemo={() => setRoleSelectorOpen(true)} />
+          <main className="flex-1">{renderPublicPage()}</main>
+          <Footer />
+        </div>
+      ))}
 
           {currentView === 'admin' && (
             <AdminLayout>{renderAdminTab()}</AdminLayout>
@@ -241,8 +262,6 @@ export function App() {
   {currentView === 'coach' && <CoachPortal />}
 
   {currentView === 'hq' && <SuperadminHQ />}
-        </>
-      )}
 
       {currentView !== 'public' && (
         <div className="fixed bottom-4 left-4 right-4 z-[100] mx-auto flex max-w-xl items-center justify-between gap-3 rounded-2xl border border-emerald-400/40 bg-slate-950/95 px-4 py-3 text-white shadow-2xl backdrop-blur-md">
@@ -267,7 +286,8 @@ export function App() {
       <CartDrawer isOpen={cartOpen} onClose={() => setCartOpen(false)} />
       <AuthModal
         isOpen={authOpen}
-        onClose={() => setAuthOpen(false)}
+        initialMode={registrationOpen ? 'register' : 'login'}
+        onClose={() => { setAuthOpen(false); setRegistrationOpen(false); }}
         onOpenRoleModal={() => setRoleSelectorOpen(true)}
       />
       <RoleSelectorModal

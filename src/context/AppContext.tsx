@@ -46,6 +46,7 @@ export type PublicPage =
   | 'pricing'
   | 'solutions'
   | 'solution_clubs'
+  | 'solution_schools'
   | 'solution_coaches'
   | 'solution_players'
   | 'solution_pro_players'
@@ -71,6 +72,7 @@ const PUBLIC_ROUTES: Record<string, PublicPage> = {
   '/funcionalidades': 'features',
   '/soluciones': 'solutions',
   '/soluciones/clubes': 'solution_clubs',
+  '/soluciones/escuelas': 'solution_schools',
   '/soluciones/profesores': 'solution_coaches',
   '/soluciones/jugadores': 'solution_players',
   '/soluciones/jugadores-profesionales': 'solution_pro_players',
@@ -97,6 +99,7 @@ const routeForPage: Record<PublicPage, string> = {
   features: '/funcionalidades',
   solutions: '/soluciones',
   solution_clubs: '/soluciones/clubes',
+  solution_schools: '/soluciones/escuelas',
   solution_coaches: '/soluciones/profesores',
   solution_players: '/soluciones/jugadores',
   solution_pro_players: '/soluciones/jugadores-profesionales',
