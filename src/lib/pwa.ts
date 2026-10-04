@@ -44,7 +44,7 @@ export function usePWA() {
     window.addEventListener('offline', handleOffline);
 
     // Register basic service worker for offline shell if supported
-    if ('serviceWorker' in navigator && process.env.NODE_ENV === 'production') {
+    if ('serviceWorker' in navigator && import.meta.env.PROD) {
       navigator.serviceWorker.register('/sw.js').catch((err) => {
         console.debug('Service Worker registration skipped or unavailable:', err);
       });
