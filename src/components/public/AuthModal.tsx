@@ -129,8 +129,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onOpenRol
           `Bienvenido a ${currentTenant.name}. Se ha iniciado sesión con tu perfil deportivo multirrol.`,
           'success'
         );
-        switchUserRole('PLAYER');
-        setCurrentView('player');
         onClose();
       }, 500);
     }
@@ -148,6 +146,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onOpenRol
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm animate-in fade-in duration-150">
       <div className="relative w-full max-w-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl text-slate-900 dark:text-slate-100 max-h-[92vh] overflow-y-auto">
         <button
+          aria-label={t('common.close', 'Cerrar')}
           onClick={onClose}
           className="absolute top-5 right-5 p-2 rounded-xl text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition"
         >
@@ -252,13 +251,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onOpenRol
           <div className="mb-6">
             <div className="flex items-center justify-between text-xs font-bold mb-2">
               <span className={registerStep >= 1 ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400'}>
-                1. Cuenta
+                {t('register.step.account', '1. Cuenta')}
               </span>
               <span className={registerStep >= 2 ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400'}>
-                2. Perfil Deportivo
+                {t('register.step.sports', '2. Perfil Deportivo')}
               </span>
               <span className={registerStep >= 3 ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400'}>
-                3. Preferencias
+                {t('register.step.preferences', '3. Preferencias')}
               </span>
             </div>
             <div className="grid grid-cols-3 gap-2">

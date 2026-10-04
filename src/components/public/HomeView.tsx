@@ -43,6 +43,7 @@ export const HomeView: React.FC = () => {
     toggleFavorite,
     isFavorite,
     triggerDemoToast,
+    t,
   } = useApp();
 
   // Multi-court visual selector state
@@ -67,8 +68,8 @@ export const HomeView: React.FC = () => {
     }
     setPublicPage('booking');
     triggerDemoToast(
-      'Disponibilidad Consultada',
-      `Filtros aplicados para el ${searchDate}. Redirigiendo a reservas en tiempo real.`,
+      t('home.availabilityToastTitle', 'Disponibilidad Consultada'),
+      t('home.availabilityToastDescription', `Filtros aplicados para el ${searchDate}. Redirigiendo a reservas en tiempo real.`),
       'success'
     );
     window.scrollTo({ top: 0, behavior: 'smooth' });
