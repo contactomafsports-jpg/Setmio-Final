@@ -158,11 +158,11 @@ export const HomeView: React.FC = () => {
             {/* Left Copy */}
             <div className="lg:col-span-7 space-y-6">
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white leading-[1.1] text-balance">
-                20 años acompañando a padeleros y padeleras.
+                {t('home.hero.title', '20 años acompañando a padeleros y padeleras.')}
               </h1>
 
               <p className="text-base sm:text-lg text-slate-200 max-w-xl font-normal leading-relaxed">
-                Reservas, partidas, competiciones y escuela. Una oferta completa para disfrutar del pádel.
+                {t('home.hero.subtitle', 'Reservas, partidas, competiciones y escuela. Una oferta completa para disfrutar del pádel.')}
               </p>
 
               {/* CTAs */}
@@ -172,7 +172,7 @@ export const HomeView: React.FC = () => {
                   className="px-6 py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 dark:bg-emerald-500 dark:hover:bg-emerald-400 font-extrabold text-white dark:text-slate-950 text-sm shadow-xl shadow-emerald-600/20 flex items-center gap-2 transition hover:scale-[1.02]"
                 >
                   <Calendar className="w-4 h-4" />
-                  <span>Reservar Pista Ahora</span>
+                  <span>{t('home.cta.book', 'Reservar Pista Ahora')}</span>
                 </button>
 
                 <button
@@ -183,23 +183,23 @@ export const HomeView: React.FC = () => {
                   className="px-5 py-3.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 font-semibold text-white text-sm flex items-center gap-2 transition backdrop-blur-md"
                 >
                   <Users className="w-4 h-4 text-emerald-400" />
-                  <span>Partidos Abiertos ("Play!")</span>
+                  <span>{t('home.cta.matches', 'Partidos Abiertos ("Play!")')}</span>
                 </button>
               </div>
 
               {/* Key Value Metrics */}
               <div className="pt-6 border-t border-white/15 grid grid-cols-3 gap-4 text-xs">
                 <div>
-                  <div className="text-xl sm:text-2xl font-black text-white">8 Pistas</div>
-                  <div className="text-slate-300 text-[11px] mt-0.5 font-medium">4 indoor, 3 outdoor (1 individual)</div>
+                  <div className="text-xl sm:text-2xl font-black text-white">{t('home.metric.courts', '8 Pistas')}</div>
+                  <div className="text-slate-300 text-[11px] mt-0.5 font-medium">{t('home.metric.courtsDetail', '4 indoor, 3 outdoor (1 individual)')}</div>
                 </div>
                 <div>
-                  <div className="text-xl sm:text-2xl font-black text-emerald-400">Escuela de Pádel</div>
-                  <div className="text-slate-300 text-[11px] mt-0.5 font-medium">Adultos y Menores</div>
+                  <div className="text-xl sm:text-2xl font-black text-emerald-400">{t('home.metric.academy', 'Escuela de Pádel')}</div>
+                  <div className="text-slate-300 text-[11px] mt-0.5 font-medium">{t('home.metric.academyDetail', 'Adultos y Menores')}</div>
                 </div>
                 <div>
-                  <div className="text-xl sm:text-2xl font-black text-cyan-400">Competición</div>
-                  <div className="text-slate-300 text-[11px] mt-0.5 font-medium">Ligas y Torneos Oficiales</div>
+                  <div className="text-xl sm:text-2xl font-black text-cyan-400">{t('home.metric.competition', 'Competición')}</div>
+                  <div className="text-slate-300 text-[11px] mt-0.5 font-medium">{t('home.metric.competitionDetail', 'Ligas y Torneos Oficiales')}</div>
                 </div>
               </div>
             </div>
@@ -235,10 +235,10 @@ export const HomeView: React.FC = () => {
             <div>
               <div className="text-xs font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
                 <Sparkles className="w-4 h-4" />
-                <span>Búsqueda Rápida de Disponibilidad</span>
+                <span>{t('home.search.eyebrow', 'Búsqueda Rápida de Disponibilidad')}</span>
               </div>
               <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white mt-1">
-                Reserva tu pista en tiempo real
+                {t('home.search.title', 'Reserva tu pista en tiempo real')}
               </h2>
             </div>
             <button
@@ -248,7 +248,7 @@ export const HomeView: React.FC = () => {
               }}
               className="text-xs font-bold text-slate-500 hover:text-emerald-600 dark:hover:text-emerald-400 flex items-center gap-1 transition self-start sm:self-auto px-3 py-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800"
             >
-              <span>Ver catálogo de 8 pistas</span>
+              <span>{t('home.search.catalog', 'Ver catálogo de 8 pistas')}</span>
               <ChevronRight className="w-4 h-4" />
             </button>
           </div>
@@ -256,7 +256,7 @@ export const HomeView: React.FC = () => {
           <form onSubmit={handleAvailabilitySearchSubmit} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
             <div>
               <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
-                Fecha del Partido
+                {t('home.search.date', 'Fecha del Partido')}
               </label>
               <input
                 type="date"
@@ -269,7 +269,7 @@ export const HomeView: React.FC = () => {
 
             <div>
               <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
-                Franja Horaria Preferida
+                {t('home.search.time', 'Franja Horaria Preferida')}
               </label>
               <select
                 value={searchTimeSlot}
@@ -285,7 +285,7 @@ export const HomeView: React.FC = () => {
 
             <div>
               <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
-                Jugadores / Modalidad
+                {t('home.search.players', 'Jugadores / Modalidad')}
               </label>
               <select
                 value={searchPlayersFormat}
@@ -304,7 +304,7 @@ export const HomeView: React.FC = () => {
                 className="w-full py-3.5 px-6 rounded-2xl bg-emerald-600 hover:bg-emerald-500 dark:bg-emerald-500 dark:hover:bg-emerald-400 text-white dark:text-slate-950 font-black text-xs shadow-lg shadow-emerald-600/30 flex items-center justify-center gap-2 transition hover:scale-[1.02] active:scale-[0.98]"
               >
                 <Calendar className="w-4 h-4" />
-                <span>Consultar Disponibilidad</span>
+                <span>{t('home.search.submit', 'Consultar Disponibilidad')}</span>
               </button>
             </div>
           </form>
@@ -312,7 +312,7 @@ export const HomeView: React.FC = () => {
           {/* Carrusel Deslizante Horizontal de Instalaciones */}
           <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
             <div className="flex items-center justify-between mb-3 text-xs font-bold text-slate-500 dark:text-slate-400">
-              <span>Instalaciones destacadas:</span>
+              <span>{t('home.search.featured', 'Instalaciones destacadas:')}</span>
               <button
                 onClick={() => {
                   setPublicPage('courts');
@@ -320,7 +320,7 @@ export const HomeView: React.FC = () => {
                 }}
                 className="text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1"
               >
-                <span>Ver todas</span>
+                <span>{t('home.search.all', 'Ver todas')}</span>
                 <ChevronRight className="w-3.5 h-3.5" />
               </button>
             </div>
@@ -354,7 +354,7 @@ export const HomeView: React.FC = () => {
                   </div>
                   <div className="text-[10px] text-slate-500 dark:text-slate-400 flex items-center justify-between">
                     <span className="truncate">{court.surface}</span>
-                    <span className="text-emerald-600 dark:text-emerald-400 font-bold shrink-0">Reservar →</span>
+                    <span className="text-emerald-600 dark:text-emerald-400 font-bold shrink-0">{t('home.search.book', 'Reservar →')}</span>
                   </div>
                 </div>
               ))}
@@ -369,13 +369,13 @@ export const HomeView: React.FC = () => {
           <div>
             <div className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
               <Shield className="w-4 h-4" />
-              <span>Competición y Club</span>
+              <span>{t('home.teams.eyebrow', 'Competición y Club')}</span>
             </div>
             <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight mt-1">
-              Conoce nuestros equipos
+              {t('home.teams.title', 'Conoce nuestros equipos')}
             </h2>
             <p className="text-slate-600 dark:text-slate-400 text-xs sm:text-sm mt-1">
-              Plantillas que compiten en las ligas federadas e interclubes representando a {currentTenant.name}.
+              {t('home.teams.description', `Plantillas que compiten en las ligas federadas e interclubes representando a ${currentTenant.name}.`)}
             </p>
           </div>
 
@@ -386,7 +386,7 @@ export const HomeView: React.FC = () => {
             }}
             className="px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 font-bold text-xs text-slate-900 dark:text-white transition flex items-center gap-2 self-start sm:self-auto shadow-sm"
           >
-            <span>Ver todos los equipos</span>
+            <span>{t('home.teams.all', 'Ver todos los equipos')}</span>
             <ArrowRight className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
           </button>
         </div>
@@ -415,7 +415,7 @@ export const HomeView: React.FC = () => {
                       {team.gender}
                     </span>
                     <span className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">
-                      Capitán: <strong className="text-slate-800 dark:text-slate-200">{team.captain}</strong>
+                      {t('home.teams.captain', 'Capitán:')} <strong className="text-slate-800 dark:text-slate-200">{team.captain}</strong>
                     </span>
                   </div>
                   <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors truncate">
@@ -429,10 +429,10 @@ export const HomeView: React.FC = () => {
 
               <div className="flex items-center justify-between sm:justify-end gap-4 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-100 dark:border-slate-800">
                 <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
-                  {team.rosterCount} jugadores
+                  {team.rosterCount} {t('home.teams.players', 'jugadores')}
                 </span>
                 <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-600 dark:text-emerald-400 group-hover:translate-x-1 transition-transform">
-                  <span>Ver ficha</span>
+                  <span>{t('home.teams.view', 'Ver ficha')}</span>
                   <ChevronRight className="w-4 h-4" />
                 </span>
               </div>
@@ -448,13 +448,13 @@ export const HomeView: React.FC = () => {
             <div>
               <div className="text-xs font-bold text-teal-600 dark:text-cyan-400 uppercase tracking-wider flex items-center gap-1.5">
                 <Trophy className="w-4 h-4" />
-                <span>Competición y Ligas</span>
+                <span>{t('home.tournaments.eyebrow', 'Competición y Ligas')}</span>
               </div>
               <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight mt-1">
-                Torneos y Circuitos Activos
+                {t('home.tournaments.title', 'Torneos y Circuitos Activos')}
               </h2>
               <p className="text-slate-600 dark:text-slate-400 text-xs sm:text-sm mt-1">
-                Inscríbete con tu pareja en torneos puntuables con cuadros oficiales y premios.
+                {t('home.tournaments.description', 'Inscríbete con tu pareja en torneos puntuables con cuadros oficiales y premios.')}
               </p>
             </div>
 
