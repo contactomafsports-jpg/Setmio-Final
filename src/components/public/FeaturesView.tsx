@@ -104,7 +104,7 @@ export const FeaturesView: React.FC<FeaturesViewProps> = ({
               onClick={onOpenDemo}
               className="px-4 py-2 rounded-xl bg-slate-900 dark:bg-slate-800 hover:bg-slate-800 text-white font-bold text-xs border border-slate-700 transition"
             >
-              Ver Demo Interactiva
+              {t('features.demo', 'Ver Demo Interactiva')}
             </button>
           )}
           {onOpenOnboarding && (
@@ -112,7 +112,7 @@ export const FeaturesView: React.FC<FeaturesViewProps> = ({
               onClick={onOpenOnboarding}
               className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-sm transition"
             >
-              Registrar Club
+              {t('features.register', 'Registrar Club')}
             </button>
           )}
         </div>
@@ -147,10 +147,10 @@ export const FeaturesView: React.FC<FeaturesViewProps> = ({
                 </div>
                 <div>
                   <h3 className="text-2xl font-black text-slate-900 dark:text-white">
-                    {pillar.title}
+                    {t(`features.pillars.${i}.title`, pillar.title)}
                   </h3>
                   <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-                    {pillar.subtitle}
+                    {t(`features.pillars.${i}.subtitle`, pillar.subtitle)}
                   </p>
                 </div>
 
@@ -158,7 +158,7 @@ export const FeaturesView: React.FC<FeaturesViewProps> = ({
                   {pillar.features.map((feat, idx) => (
                     <div key={idx} className="flex items-start gap-2.5 text-xs text-slate-700 dark:text-slate-300 leading-relaxed">
                       <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
-                      <span>{feat}</span>
+                      <span>{t(`features.pillars.${i}.feature.${idx}`, feat)}</span>
                     </div>
                   ))}
                 </div>
@@ -169,7 +169,7 @@ export const FeaturesView: React.FC<FeaturesViewProps> = ({
                   onClick={onOpenDemo}
                   className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition"
                 >
-                  <span>Probar en la demo</span>
+                  <span>{t('features.tryDemo', 'Probar en la demo')}</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </button>
               </div>
@@ -182,10 +182,10 @@ export const FeaturesView: React.FC<FeaturesViewProps> = ({
       <div className="p-8 sm:p-12 rounded-3xl bg-gradient-to-r from-slate-900 via-slate-900 to-slate-950 text-white border border-slate-800 shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-6 text-center sm:text-left">
         <div className="space-y-2">
           <h2 className="text-2xl sm:text-3xl font-black">
-            ¿Listo para modernizar tu club de pádel?
+            {t('features.ctaTitle', '¿Listo para modernizar tu club de pádel?')}
           </h2>
           <p className="text-sm text-slate-300 max-w-xl">
-            Agenda una demostración con nuestro equipo técnico.
+            {t('features.ctaDescription', 'Agenda una demostración con nuestro equipo técnico.')}
           </p>
         </div>
 
@@ -193,7 +193,7 @@ export const FeaturesView: React.FC<FeaturesViewProps> = ({
           onClick={onOpenOnboarding}
           className="px-8 py-4 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-sm shadow-xl shadow-emerald-600/30 transition hover:scale-[1.02] shrink-0 flex items-center gap-2"
         >
-          <span>Comenzar Ahora</span>
+          <span>{t('features.start', 'Comenzar Ahora')}</span>
           <ArrowRight className="w-4 h-4" />
         </button>
       </div>

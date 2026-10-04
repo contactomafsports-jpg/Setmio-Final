@@ -9,9 +9,9 @@ interface PricingViewProps {
 }
 
 const plans = [
-  { name: 'Esencial', description: 'Para clubes que empiezan a digitalizarse.', monthly: 99, features: ['Reservas y agenda', 'Web pública responsive', 'Base de clientes', 'Soporte por email'] },
-  { name: 'Profesional', description: 'La operación completa para crecer con control.', monthly: 199, featured: true, features: ['Todo lo de Esencial', 'Escuela y grupos', 'Torneos y ligas', 'Tienda y TPV', 'Automatizaciones IA'] },
-  { name: 'Enterprise', description: 'Marca blanca y control multi-sede.', monthly: null, features: ['Todo lo de Profesional', 'Multi-club y permisos', 'Dominios personalizados', 'Onboarding dedicado', 'SLA y soporte prioritario'] },
+  { id: 'essential', monthly: 99, features: ['booking', 'publicWeb', 'customers', 'emailSupport'] },
+  { id: 'professional', monthly: 199, featured: true, features: ['essential', 'academy', 'tournaments', 'shop', 'ai'] },
+  { id: 'enterprise', monthly: null, features: ['professional', 'multiClub', 'domains', 'onboarding', 'sla'] },
 ];
 
 export const PricingView: React.FC<PricingViewProps> = ({ onBack, onOpenDemo }) => {
@@ -31,7 +31,7 @@ export const PricingView: React.FC<PricingViewProps> = ({ onBack, onOpenDemo }) 
             </div>
             <div className="inline-flex items-center rounded-2xl border border-slate-200 bg-slate-100 p-1.5 shadow-inner dark:border-slate-700 dark:bg-slate-900" role="group" aria-label="Periodo de facturación">
               <button onClick={() => setAnnual(false)} className={`rounded-xl px-4 py-2 text-sm font-bold transition ${!annual ? 'bg-white text-slate-900 shadow-sm dark:bg-slate-800 dark:text-white' : 'text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'}`}>{t('pricing.monthly', 'Mensual')}</button>
-              <button onClick={() => setAnnual(true)} className={`rounded-xl px-4 py-2 text-sm font-bold transition ${annual ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'}`}>{t('pricing.annual', 'Anual')} <span className={`ml-1 rounded-full px-2 py-0.5 text-[10px] font-black ${annual ? 'bg-white/20 text-white' : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300'}`}>Ahorra 20%</span></button>
+              <button onClick={() => setAnnual(true)} className={`rounded-xl px-4 py-2 text-sm font-bold transition ${annual ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'}`}>{t('pricing.annual', 'Anual')} <span className={`ml-1 rounded-full px-2 py-0.5 text-[10px] font-black ${annual ? 'bg-white/20 text-white' : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300'}`}>{t('pricing.save', 'Ahorra 20%')}</span></button>
             </div>
           </div>
         </div>
@@ -41,17 +41,17 @@ export const PricingView: React.FC<PricingViewProps> = ({ onBack, onOpenDemo }) 
           {plans.map((plan) => {
             const price = plan.monthly === null ? null : annual ? Math.round(plan.monthly * 0.8) : plan.monthly;
             return (
-              <article key={plan.name} className={`relative flex flex-col rounded-3xl border bg-white p-6 shadow-sm transition dark:bg-slate-900 hover:-translate-y-1 hover:shadow-xl ${plan.featured ? 'border-emerald-500 ring-1 ring-emerald-500/30' : 'border-border'}`}>
-                {plan.featured && <div className="absolute -top-3 left-6 inline-flex items-center gap-1 rounded-full bg-emerald-600 px-3 py-1 text-xs font-bold text-white"><Sparkles className="size-3" /> Más elegido</div>}
-                <h2 className="text-xl font-bold">{plan.name}</h2>
-                <p className="mt-2 min-h-12 text-sm leading-6 text-muted-foreground">{plan.description}</p>
+              <article key={plan.id} className={`relative flex flex-col rounded-3xl border bg-white p-6 shadow-sm transition dark:bg-slate-900 hover:-translate-y-1 hover:shadow-xl ${plan.featured ? 'border-emerald-500 ring-1 ring-emerald-500/30' : 'border-border'}`}>
+                {plan.featured && <div className="absolute -top-3 left-6 inline-flex items-center gap-1 rounded-full bg-emerald-600 px-3 py-1 text-xs font-bold text-white"><Sparkles className="size-3" /> {t('pricing.popular', 'Más elegido')}</div>}
+                <h2 className="text-xl font-bold">{t(`pricing.plans.${plan.id}.name`, plan.id)}</h2>
+                <p className="mt-2 min-h-12 text-sm leading-6 text-muted-foreground">{t(`pricing.plans.${plan.id}.description`, '')}</p>
                 <div className="mt-6 flex items-end gap-1 border-b border-border pb-6">
-                  {price === null ? <span className="text-3xl font-black">A medida</span> : <><span className="text-5xl font-black tracking-tight">{price}€</span><span className="pb-1 text-sm text-muted-foreground">/ mes</span></>}
+                  {price === null ? <span className="text-3xl font-black">{t('pricing.custom', 'A medida')}</span> : <><span className="text-5xl font-black tracking-tight">{price}€</span><span className="pb-1 text-sm text-muted-foreground">{t('pricing.perMonth', '/ mes')}</span></>}
                 </div>
                 <ul className="flex flex-1 flex-col gap-3 py-6 text-sm">
-                  {plan.features.map((feature) => <li key={feature} className="flex items-start gap-2"><Check className="mt-0.5 size-4 shrink-0 text-emerald-600" /><span>{feature}</span></li>)}
+                  {plan.features.map((feature) => <li key={feature} className="flex items-start gap-2"><Check className="mt-0.5 size-4 shrink-0 text-emerald-600" /><span>{t(`pricing.features.${feature}`, feature)}</span></li>)}
                 </ul>
-                <button onClick={onOpenDemo} className={`w-full rounded-xl px-4 py-3 text-sm font-bold transition ${plan.featured ? 'bg-emerald-600 text-white hover:bg-emerald-500' : 'border border-border bg-background hover:bg-muted'}`}>{price === null ? 'Hablar con Setmio' : 'Probar en demo'}</button>
+                <button onClick={onOpenDemo} className={`w-full rounded-xl px-4 py-3 text-sm font-bold transition ${plan.featured ? 'bg-emerald-600 text-white hover:bg-emerald-500' : 'border border-border bg-background hover:bg-muted'}`}>{price === null ? t('pricing.contact', 'Hablar con Setmio') : t('pricing.demo', 'Probar en demo')}</button>
               </article>
             );
           })}

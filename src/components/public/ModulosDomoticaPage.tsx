@@ -22,12 +22,12 @@ export function ModulosDomoticaPage({ onBack, onOpenDemo }: ModulosDomoticaPageP
         </div>
         <div className="mt-16 grid gap-5 md:grid-cols-3">
           {[
-            [Lightbulb, 'Luces automáticas', 'Enciende y apaga cada pista según el calendario real de reservas.'],
-            [LockKeyhole, 'Accesos seguros', 'PINs temporales y control de puertas para cada reserva.'],
-            [Wifi, 'Telemetría conectada', 'Estado de dispositivos y alertas operativas en tiempo real.'],
+            [Lightbulb, 'modules.lights.title', 'modules.lights.description'],
+            [LockKeyhole, 'modules.access.title', 'modules.access.description'],
+            [Wifi, 'modules.telemetry.title', 'modules.telemetry.description'],
           ].map(([Icon, title, description]) => {
             const ModuleIcon = Icon as typeof Lightbulb;
-            return <article key={title as string} className="rounded-3xl border border-slate-800 bg-slate-900 p-6"><ModuleIcon className="h-7 w-7 text-emerald-400" /><h2 className="mt-5 text-lg font-black">{title as string}</h2><p className="mt-2 text-sm leading-relaxed text-slate-400">{description as string}</p><CheckCircle2 className="mt-6 h-4 w-4 text-emerald-500" /></article>;
+            return <article key={title as string} className="rounded-3xl border border-slate-800 bg-slate-900 p-6"><ModuleIcon className="h-7 w-7 text-emerald-400" /><h2 className="mt-5 text-lg font-black">{t(title as string, title as string)}</h2><p className="mt-2 text-sm leading-relaxed text-slate-400">{t(description as string, description as string)}</p><CheckCircle2 className="mt-6 h-4 w-4 text-emerald-500" /></article>;
           })}
         </div>
       </div>
