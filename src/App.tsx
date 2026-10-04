@@ -75,14 +75,19 @@ export function App() {
   const [roleSelectorOpen, setRoleSelectorOpen] = useState(false);
   const [registrationOpen, setRegistrationOpen] = useState(false);
 
+  const navigatePublic = (path: string) => {
+    if (typeof window !== 'undefined' && window.location.pathname !== path) {
+      window.history.pushState({}, '', path);
+      window.dispatchEvent(new PopStateEvent('popstate'));
+    }
+    setPublicPage(path === '/' ? 'home' : publicPage);
+  };
+
   const closeRegistration = () => {
     setAuthOpen(false);
     setRegistrationOpen(false);
-    if (typeof window !== 'undefined' && window.location.pathname === '/registro') {
-      window.history.pushState({}, '', '/');
-      window.dispatchEvent(new PopStateEvent('popstate'));
-    }
-    setPublicPage('home');
+    navigatePublic('/');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   // PWA Brand splash screen (Only for installed private app sessions)

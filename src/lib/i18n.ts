@@ -241,7 +241,7 @@ export const TRANSLATIONS: Record<SupportedLanguage, Record<string, string>> = {
     'common.confirm': 'Confirm',
     'common.delete': 'Delete',
     'common.edit': 'Edit',
-    'common.close': 'Close', 'register.step.account': '1. Account', 'register.step.sports': '2. Sports profile', 'register.step.preferences': '3. Preferences', 'home.availabilityToastTitle': 'Availability checked',
+    'common.close': 'Close', 'auth.emailLabel': 'Email or username', 'auth.emailPlaceholder': 'you@example.com', 'auth.passwordLabel': 'Password', 'auth.loading': 'Signing in...', 'auth.submit': 'Sign in to my account', 'register.useQuestion': 'How will you use Setmio?', 'register.profileHint': 'Choose your profile to personalize your experience.', 'register.fullName': 'Full name', 'register.email': 'Email address', 'register.phone': 'Mobile phone', 'register.fullNamePlaceholder': 'E.g. Lucas Rey', 'blog.readingTime': 'min read', 'blog.backToList': 'Back to articles', 'blog.eyebrow': 'News & Padel tips', 'blog.description': 'Technical articles from our coaches, biomechanics analysis, tournament reports and club news in Narón.', 'blog.searchPlaceholder': 'Search for an article or topic...', 'register.step.account': '1. Account', 'register.step.sports': '2. Sports profile', 'register.step.preferences': '3. Preferences', 'home.availabilityToastTitle': 'Availability checked',
     'common.back': 'Back',
     'common.loading': 'Loading...',
     'common.available': 'Available',
