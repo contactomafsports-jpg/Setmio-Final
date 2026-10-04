@@ -355,6 +355,7 @@ interface AppContextType {
   // Auth & Roles & Permissions
   currentUser: UserSession;
   switchUserRole: (role: UserRole) => void;
+  logoutOrExitDemo: () => void;
   isSuperadmin: boolean;
   can: (action: PermissionAction) => PermissionCheckResult;
 
@@ -584,6 +585,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   useEffect(() => {
     document.documentElement.lang = language;
+    document.documentElement.dir = language === 'ar' ? 'rtl' : 'ltr';
   }, [language]);
 
   const t = (key: string, fallback?: string): string => {
@@ -819,6 +821,25 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       `Sesión cambiada a ${profile.name} con permisos contextuales.`,
       'info'
     );
+  };
+
+  const logoutOrExitDemo = () => {
+    setCurrentUser(ROLE_PROFILES.PLAYER);
+    setCurrentViewState('public');
+    setPublicPage('home');
+    setIsCorporateLanding(true);
+    setCart([]);
+    setSelectedCourtsForBooking([]);
+    triggerDemoToast(
+      t('auth.sessionClosed', 'Sesión Cerrada'),
+      t('auth.exitDemoNotice', 'Has salido del modo demostración o sesión activa hacia la portada pública.'),
+      'info'
+    );
+    if (typeof window !== 'undefined') {
+      window.history.pushState({}, '', '/');
+      window.dispatchEvent(new PopStateEvent('popstate'));
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   };
 
   const isSuperadmin = currentUser.role === 'SUPERADMIN';
@@ -1353,6 +1374,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
         currentUser,
         switchUserRole,
+        logoutOrExitDemo,
         isSuperadmin,
         can,
 

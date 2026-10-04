@@ -298,9 +298,9 @@ export const BlogView: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
                   </div>
 
                   <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs">
-                    <span className="text-slate-500 font-medium">Por {post.author}</span>
+                    <span className="text-slate-500 font-medium">{t('blog.by', 'Por')} {post.author}</span>
                     <span className="text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1 group-hover:translate-x-1 transition-transform">
-                      Leer artículo <ArrowRight className="w-3.5 h-3.5" />
+                      {t('blog.readArticle', 'Leer artículo')} <ArrowRight className="w-3.5 h-3.5" />
                     </span>
                   </div>
                 </div>

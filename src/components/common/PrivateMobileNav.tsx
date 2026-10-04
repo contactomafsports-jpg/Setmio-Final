@@ -1,5 +1,6 @@
 import React from 'react';
-import { BarChart3, CalendarDays, Home, Menu, MoreHorizontal, Users } from 'lucide-react';
+import { BarChart3, CalendarDays, Home, Menu, MoreHorizontal, Users, LogOut } from 'lucide-react';
+import { useApp } from '../../context/AppContext';
 
 interface PrivateMobileNavProps {
   title: string;
@@ -9,20 +10,46 @@ interface PrivateMobileNavProps {
   onCommunity?: () => void;
 }
 
-export const PrivateMobileNav: React.FC<PrivateMobileNavProps> = ({ title, onMore, onHome, onCalendar, onCommunity }) => (
-  <>
-    <header className="fixed top-0 left-0 right-0 z-40 h-14 bg-background/80 backdrop-blur-md border-b border-border px-4 flex items-center justify-between shadow-sm md:hidden">
-      <div className="flex items-center gap-2 min-w-0">
-        <div className="size-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center font-black text-xs">SM</div>
-        <span className="font-bold text-sm truncate text-foreground">{title}</span>
-      </div>
-      <button type="button" onClick={onMore} aria-label="Abrir más opciones" className="rounded-lg p-2 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"><Menu strokeWidth={1.5} /></button>
-    </header>
-    <nav aria-label="Navegación privada móvil" className="fixed bottom-0 left-0 right-0 z-40 min-h-16 bg-background/95 backdrop-blur-md border-t border-border px-2 pt-1 pb-[calc(0.25rem+env(safe-area-inset-bottom))] flex items-center justify-around shadow-[0_-8px_24px_rgba(16,34,29,0.06)] md:hidden">
-      <button type="button" onClick={onHome} className="flex flex-col items-center gap-1 text-muted-foreground text-[10px]"><Home strokeWidth={1.5} /><span>Inicio</span></button>
-      <button type="button" onClick={onCalendar} className="flex flex-col items-center gap-1 text-muted-foreground text-[10px]"><CalendarDays strokeWidth={1.5} /><span>Agenda</span></button>
-      <button type="button" onClick={onCommunity} className="flex flex-col items-center gap-1 text-muted-foreground text-[10px]"><Users strokeWidth={1.5} /><span>Comunidad</span></button>
-      <button type="button" onClick={onMore} className="flex flex-col items-center gap-1 text-muted-foreground text-[10px]"><MoreHorizontal strokeWidth={1.5} /><span>Más</span></button>
-    </nav>
-  </>
-);
+export const PrivateMobileNav: React.FC<PrivateMobileNavProps> = ({ title, onMore, onHome, onCalendar, onCommunity }) => {
+  const { logoutOrExitDemo } = useApp();
+
+  return (
+    <>
+      <header className="fixed top-0 left-0 right-0 z-40 h-14 bg-background/80 backdrop-blur-md border-b border-border px-4 flex items-center justify-between shadow-sm md:hidden">
+        <div className="flex items-center gap-2 min-w-0">
+          <div className="size-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center font-black text-xs">SM</div>
+          <span className="font-bold text-sm truncate text-foreground">{title}</span>
+        </div>
+        <div className="flex items-center gap-1">
+          <button
+            type="button"
+            onClick={logoutOrExitDemo}
+            aria-label="Cerrar sesión / Salir Demo"
+            title="Cerrar sesión / Salir Demo"
+            className="rounded-lg p-2 text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors"
+          >
+            <LogOut className="w-5 h-5" strokeWidth={1.75} />
+          </button>
+          <button type="button" onClick={onMore} aria-label="Abrir más opciones" className="rounded-lg p-2 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors">
+            <Menu strokeWidth={1.5} />
+          </button>
+        </div>
+      </header>
+      <nav aria-label="Navegación privada móvil" className="fixed bottom-0 left-0 right-0 z-40 min-h-16 bg-background/95 backdrop-blur-md border-t border-border px-2 pt-1 pb-[calc(0.25rem+env(safe-area-inset-bottom))] flex items-center justify-around shadow-[0_-8px_24px_rgba(16,34,29,0.06)] md:hidden">
+        <button type="button" onClick={onHome} className="flex flex-col items-center gap-1 text-muted-foreground text-[10px]"><Home strokeWidth={1.5} /><span>Inicio</span></button>
+        <button type="button" onClick={onCalendar} className="flex flex-col items-center gap-1 text-muted-foreground text-[10px]"><CalendarDays strokeWidth={1.5} /><span>Agenda</span></button>
+        <button type="button" onClick={onCommunity} className="flex flex-col items-center gap-1 text-muted-foreground text-[10px]"><Users strokeWidth={1.5} /><span>Comunidad</span></button>
+        <button type="button" onClick={onMore} className="flex flex-col items-center gap-1 text-muted-foreground text-[10px]"><MoreHorizontal strokeWidth={1.5} /><span>Más</span></button>
+        <button
+          type="button"
+          onClick={logoutOrExitDemo}
+          className="flex flex-col items-center gap-1 text-rose-600 dark:text-rose-400 text-[10px] font-semibold"
+          title="Cerrar Sesión / Salir Demo"
+        >
+          <LogOut className="w-5 h-5 text-rose-600 dark:text-rose-400" strokeWidth={1.75} />
+          <span>Salir</span>
+        </button>
+      </nav>
+    </>
+  );
+};

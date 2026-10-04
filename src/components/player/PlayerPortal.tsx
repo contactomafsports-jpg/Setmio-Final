@@ -31,6 +31,7 @@ import {
   ExternalLink,
   Plus,
   Flame,
+  LogOut,
 } from 'lucide-react';
 import { BookingFlow } from '../public/BookingFlow';
 import { OpenMatchesView } from '../public/OpenMatchesView';
@@ -50,6 +51,7 @@ export const PlayerPortal: React.FC = () => {
     theme,
     toggleTheme,
     setCurrentView,
+    logoutOrExitDemo,
   } = useApp();
 
   const [activePlayerTab, setActivePlayerTab] = useState<
@@ -163,6 +165,16 @@ export const PlayerPortal: React.FC = () => {
               className="text-xs font-semibold text-slate-500 hover:text-emerald-600 dark:hover:text-emerald-400 px-2 py-1 transition"
             >
               Web Pública
+            </button>
+
+            {/* Cerrar Sesión / Salir Demo */}
+            <button
+              onClick={logoutOrExitDemo}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-50 dark:bg-rose-950/50 hover:bg-rose-100 dark:hover:bg-rose-900/50 text-xs font-bold text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800 transition shadow-sm"
+              title="Cerrar Sesión / Salir Demo"
+            >
+              <LogOut className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400" />
+              <span className="hidden sm:inline">Salir Demo</span>
             </button>
           </div>
         </div>
@@ -677,7 +689,7 @@ export const PlayerPortal: React.FC = () => {
       {/* 5. NATIVE MOBILE BOTTOM BAR (Clean, accessible, no overlapping text!) */}
       <nav
         aria-label="Navegación móvil del jugador"
-        className="lg:hidden fixed bottom-0 inset-x-0 z-40 border-t border-slate-200 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl px-2 pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] shadow-[0_-8px_25px_rgba(15,23,42,0.08)] grid grid-cols-5 gap-1"
+        className="lg:hidden fixed bottom-0 inset-x-0 z-40 border-t border-slate-200 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl px-2 pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] shadow-[0_-8px_25px_rgba(15,23,42,0.08)] grid grid-cols-6 gap-1"
       >
         {[
           { id: 'overview', label: 'Inicio', icon: Home },
@@ -703,6 +715,15 @@ export const PlayerPortal: React.FC = () => {
             </button>
           );
         })}
+
+        <button
+          onClick={logoutOrExitDemo}
+          className="flex flex-col items-center justify-center py-1 rounded-xl text-rose-600 dark:text-rose-400 font-semibold"
+          title="Cerrar Sesión / Salir Demo"
+        >
+          <LogOut className="w-5 h-5 mb-0.5 text-rose-600 dark:text-rose-400" />
+          <span className="text-[10px] leading-tight truncate">Salir</span>
+        </button>
       </nav>
 
       {/* 6. MODAL PERFIL PÚBLICO DEL JUGADOR */}
@@ -887,6 +908,16 @@ export const PlayerPortal: React.FC = () => {
               >
                 <span>Ir a Web Pública</span>
                 <ArrowRight className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => {
+                  setMobileDrawerOpen(false);
+                  logoutOrExitDemo();
+                }}
+                className="w-full flex items-center gap-2 text-rose-600 dark:text-rose-400 font-bold py-1.5"
+              >
+                <LogOut className="w-4 h-4 text-rose-600 dark:text-rose-400" />
+                <span>Cerrar Sesión / Salir Demo</span>
               </button>
             </div>
           </div>

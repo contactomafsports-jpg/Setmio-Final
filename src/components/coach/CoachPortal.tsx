@@ -23,6 +23,7 @@ import {
   Check,
   User,
   Menu,
+  LogOut,
 } from 'lucide-react';
 
 interface PrivateClass {
@@ -146,6 +147,7 @@ export const CoachPortal: React.FC = () => {
     toggleTheme,
     currentUser,
     switchUserRole,
+    logoutOrExitDemo,
     triggerDemoToast,
   } = useApp();
 
@@ -253,6 +255,16 @@ export const CoachPortal: React.FC = () => {
             >
               <ExternalLink className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">Ver Web Pública</span>
+            </button>
+
+            {/* Cerrar Sesión / Salir Demo */}
+            <button
+              onClick={logoutOrExitDemo}
+              className="px-3 py-1.5 rounded-xl bg-rose-50 dark:bg-rose-950/50 hover:bg-rose-100 dark:hover:bg-rose-900/50 text-xs font-bold text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800 flex items-center gap-1.5 transition shadow-sm"
+              title="Cerrar Sesión / Salir Demo"
+            >
+              <LogOut className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400" />
+              <span className="hidden sm:inline">Salir Demo</span>
             </button>
           </div>
         </div>
@@ -822,7 +834,7 @@ export const CoachPortal: React.FC = () => {
       {/* MOBILE BOTTOM NAVIGATION BAR */}
       <nav
         aria-label="Navegación móvil del profesor"
-        className="md:hidden fixed bottom-0 inset-x-0 z-[60] bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 grid grid-cols-5 px-1 pt-1 pb-[calc(0.25rem+env(safe-area-inset-bottom))] text-[10px] shadow-lg"
+        className="md:hidden fixed bottom-0 inset-x-0 z-[60] bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 grid grid-cols-6 px-1 pt-1 pb-[calc(0.25rem+env(safe-area-inset-bottom))] text-[10px] shadow-lg"
       >
         <button
           onClick={() => setActiveTab('agenda')}
@@ -877,6 +889,15 @@ export const CoachPortal: React.FC = () => {
           <Menu className="w-5 h-5 mb-0.5" />
           <span>Más</span>
         </button>
+
+        <button
+          onClick={logoutOrExitDemo}
+          className="flex flex-col items-center justify-center py-1.5 rounded-xl text-rose-600 dark:text-rose-400 hover:text-rose-700 font-semibold"
+          title="Cerrar Sesión / Salir Demo"
+        >
+          <LogOut className="w-5 h-5 mb-0.5 text-rose-600 dark:text-rose-400" />
+          <span>Salir</span>
+        </button>
       </nav>
 
       {/* MOBILE MORE DRAWER */}
@@ -897,6 +918,24 @@ export const CoachPortal: React.FC = () => {
             </div>
 
             <div className="space-y-2">
+              <button
+                onClick={() => {
+                  setShowMoreDrawer(false);
+                  logoutOrExitDemo();
+                }}
+                className="w-full p-3 rounded-2xl bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-300 font-bold text-xs hover:bg-rose-100 transition flex items-center justify-between"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-xl bg-rose-600 text-white">
+                    <LogOut className="w-4 h-4" />
+                  </div>
+                  <div className="text-left">
+                    <div>Cerrar Sesión / Salir Demo</div>
+                    <div className="text-[10px] text-rose-600/80 dark:text-rose-400 font-normal">Volver a la portada pública</div>
+                  </div>
+                </div>
+                <ChevronRight className="w-4 h-4 text-rose-400" />
+              </button>
               <button
                 onClick={() => {
                   setActiveTab('rates');

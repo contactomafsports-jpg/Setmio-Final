@@ -24,6 +24,7 @@ import {
   ChevronDown,
   Building2,
   Briefcase,
+  LogOut,
 } from 'lucide-react';
 
 interface NavbarProps {
@@ -46,6 +47,8 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCart, onOpenAuth, onOpenDe
     language,
     setLanguage,
     navigateToCorporate,
+    logoutOrExitDemo,
+    t,
   } = useApp();
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -252,7 +255,18 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCart, onOpenAuth, onOpenDe
                 className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800/80 hover:bg-slate-50 dark:hover:bg-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-200 transition shadow-sm"
               >
                 <User className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-                <span>Mi Cuenta</span>
+                <span>{currentUser ? currentUser.name.split(' ')[0] : t('nav.myAccount', 'Mi Cuenta')}</span>
+              </button>
+
+              {/* Cerrar Sesión / Salir Demo Button */}
+              <button
+                onClick={logoutOrExitDemo}
+                className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-rose-600 dark:text-rose-400 hover:bg-rose-100 dark:hover:bg-rose-900/40 text-xs font-bold transition shadow-sm"
+                title={t('auth.logout', 'Cerrar Sesión / Salir Demo')}
+                aria-label="Cerrar Sesión / Salir Demo"
+              >
+                <LogOut className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">{t('auth.exitDemo', 'Salir Demo')}</span>
               </button>
 
               {/* Quick Booking CTA */}
@@ -521,6 +535,17 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCart, onOpenAuth, onOpenDe
                   </button>
                 </div>
 
+                {/* Salir Demo / Cerrar Sesión Button */}
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    logoutOrExitDemo();
+                  }}
+                  className="w-full py-2.5 px-3 rounded-xl bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800 text-xs font-bold text-rose-700 dark:text-rose-300 flex items-center justify-center gap-1.5 transition"
+                >
+                  <LogOut className="w-4 h-4 text-rose-600 dark:text-rose-400" />
+                  <span>Cerrar Sesión / Salir Demo</span>
+                </button>
               </div>
 
               {/* Footer info */}

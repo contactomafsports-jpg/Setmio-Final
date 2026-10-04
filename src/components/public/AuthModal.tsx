@@ -32,13 +32,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onOpenRol
   const [mode, setMode] = useState<'login' | 'register'>(initialMode);
   useEffect(() => { if (isOpen) setMode(initialMode); }, [initialMode, isOpen]);
   const [registerStep, setRegisterStep] = useState<1 | 2 | 3>(1);
-  const [registrationRole, setRegistrationRole] = useState<'club' | 'school' | 'coach' | 'pro' | 'amateur' | null>(null);
+  const [registrationRole, setRegistrationRole] = useState<'superadmin' | 'tenant_owner' | 'coach_independent' | 'coach_club' | 'player' | null>(null);
   const registrationRoles = [
-    { id: 'club', label: t('register.role.club', 'Club'), description: t('register.role.clubDescription', 'Gestiona pistas, socios y operaciones.') },
-    { id: 'school', label: t('register.role.school', 'Escuela'), description: t('register.role.schoolDescription', 'Organiza clases, grupos y alumnos.') },
-    { id: 'coach', label: t('register.role.coach', 'Profesor'), description: t('register.role.coachDescription', 'Impulsa tus clases y cobros.') },
-    { id: 'pro', label: t('register.role.pro', 'Jugador Profesional'), description: t('register.role.proDescription', 'Centraliza calendario y oportunidades.') },
-    { id: 'amateur', label: t('register.role.amateur', 'Jugador Amateur'), description: t('register.role.amateurDescription', 'Reserva, juega y mejora.') },
+    { id: 'player' },
+    { id: 'tenant_owner' },
+    { id: 'coach_independent' },
+    { id: 'coach_club' },
+    { id: 'superadmin' },
   ] as const;
 
   // Form Fields
@@ -144,11 +144,11 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onOpenRol
   };
 
   const getLevelLabel = (level: number) => {
-    if (level < 2.5) return 'Iniciación (1.0 - 2.0)';
-    if (level < 3.5) return 'Intermedio Bajo (2.5 - 3.0)';
-    if (level < 4.5) return 'Intermedio Avanzado (3.5 - 4.0)';
-    if (level < 5.5) return 'Competición (4.5 - 5.0)';
-    return 'Alta Competición / Pro (5.5+)';
+    if (level < 2.5) return t('register.level.beginner', 'Iniciación (1.0 - 2.0)');
+    if (level < 3.5) return t('register.level.intermediateLow', 'Intermedio Bajo (2.5 - 3.0)');
+    if (level < 4.5) return t('register.level.intermediateHigh', 'Intermedio Avanzado (3.5 - 4.0)');
+    if (level < 5.5) return t('register.level.competition', 'Competición (4.5 - 5.0)');
+    return t('register.level.pro', 'Alta Competición / Pro (5.5+)');
   };
 
   return (
@@ -283,7 +283,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onOpenRol
                 className="w-full mt-4 p-2.5 rounded-xl bg-gradient-to-r from-emerald-500/10 to-teal-500/10 hover:from-emerald-500/20 hover:to-teal-500/20 border border-emerald-500/30 text-emerald-700 dark:text-emerald-300 font-bold text-xs flex items-center justify-center gap-2 transition"
               >
                 <Sparkles className="w-4 h-4 text-emerald-500" />
-                <span>Autocompletar con Setmio Global ID</span>
+                <span>{t('register.autocomplete', 'Autocompletar con Setmio Global ID')}</span>
               </button>
             )}
           </div>
@@ -312,7 +312,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onOpenRol
 
               <div>
                 <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
-                  Contraseña
+                  {t('auth.passwordLabel', 'Contraseña')}
                 </label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-3 w-4 h-4 text-slate-400" />
@@ -321,7 +321,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onOpenRol
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="••••••••"
+                    placeholder={t('auth.passwordPlaceholder', '••••••••')}
                     className="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-emerald-500"
                   />
                 </div>
@@ -341,22 +341,59 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onOpenRol
               {/* REGISTER STEP 1 */}
               {registerStep === 1 && (
                 <div className="space-y-4 animate-in fade-in duration-150">
-                  {!registrationRole ? <div className="space-y-3"><p className="text-sm font-black text-slate-900 dark:text-white">{t('register.useQuestion', '¿Cómo vas a usar Setmio?')}</p><p className="text-xs text-slate-500">{t('register.profileHint', 'Elige tu perfil para personalizar tu experiencia.')}</p><div className="grid gap-2 sm:grid-cols-2">{registrationRoles.map((role) => <button type="button" key={role.id} onClick={() => setRegistrationRole(role.id)} className="rounded-2xl border border-slate-200 p-4 text-left transition hover:border-emerald-500 hover:bg-emerald-50 dark:border-slate-800 dark:hover:bg-emerald-950/30"><span className="block text-sm font-black">{role.label}</span><span className="mt-1 block text-xs text-slate-500">{role.description}</span></button>)}</div></div> : (<div className="space-y-4"><div className="flex items-center justify-between rounded-xl bg-emerald-50 px-3 py-2 text-xs font-bold text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-300">Perfil: {registrationRoles.find((role) => role.id === registrationRole)?.label}<button type="button" onClick={() => setRegistrationRole(null)} className="underline">Cambiar</button></div><div>
-                    <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
-                      {t('register.fullName', 'Nombre y Apellidos')}
-                    </label>
-                    <div className="relative">
-                      <User className="absolute left-3 top-3 w-4 h-4 text-slate-400" />
-                      <input
-                        type="text"
-                        required
-                        value={fullName}
-                        onChange={(e) => setFullName(e.target.value)}
-                        placeholder={t('register.fullNamePlaceholder', 'Ej. Lucas Rey')}
-                        className="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-emerald-500"
-                      />
+                  {!registrationRole ? (
+                    <div className="space-y-3">
+                      <p className="text-sm font-black text-slate-900 dark:text-white">
+                        {t('register.useQuestion', '¿Cómo vas a usar Setmio?')}
+                      </p>
+                      <p className="text-xs text-slate-500">
+                        {t('register.profileHint', 'Elige tu perfil para personalizar tu experiencia.')}
+                      </p>
+                      <div className="grid gap-2 sm:grid-cols-2">
+                        {registrationRoles.map((role) => (
+                          <button
+                            type="button"
+                            key={role.id}
+                            onClick={() => setRegistrationRole(role.id)}
+                            className="rounded-2xl border border-slate-200 dark:border-slate-800 p-4 text-left transition hover:border-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-950/30"
+                          >
+                            <span className="block text-sm font-black text-slate-900 dark:text-white">
+                              {t('register.roles.' + role.id + '.title')}
+                            </span>
+                            <span className="mt-1 block text-xs text-slate-500 dark:text-slate-400">
+                              {t('register.roles.' + role.id + '.description')}
+                            </span>
+                          </button>
+                        ))}
+                      </div>
                     </div>
-                  </div>
+                  ) : (
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between rounded-xl bg-emerald-50 px-3 py-2 text-xs font-bold text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-300">
+                        <span>
+                          {t('register.profile', 'Perfil:')} {t('register.roles.' + registrationRole + '.title')}
+                        </span>
+                        <button type="button" onClick={() => setRegistrationRole(null)} className="underline">
+                          {t('register.change', 'Cambiar')}
+                        </button>
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
+                          {t('register.fullName', 'Nombre y Apellidos')}
+                        </label>
+                        <div className="relative">
+                          <User className="absolute left-3 top-3 w-4 h-4 text-slate-400" />
+                          <input
+                            type="text"
+                            required
+                            value={fullName}
+                            onChange={(e) => setFullName(e.target.value)}
+                            placeholder={t('register.fullNamePlaceholder', 'Ej. Lucas Rey')}
+                            className="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-emerald-500"
+                          />
+                        </div>
+                      </div>
 
                   <div>
                     <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
@@ -394,7 +431,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onOpenRol
 
                   <div>
                     <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
-{t('auth.passwordLabel', 'Contraseña')}
+                      {t('auth.passwordLabel', 'Contraseña')}
                     </label>
                     <div className="relative">
                       <Lock className="absolute left-3 top-3 w-4 h-4 text-slate-400" />
@@ -403,7 +440,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onOpenRol
                         required
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        placeholder="Mínimo 6 caracteres"
+                        placeholder={t('register.passwordMin', 'Mínimo 6 caracteres')}
                         className="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-emerald-500"
                       />
                     </div>
@@ -413,14 +450,14 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onOpenRol
                     type="button"
                     onClick={() => {
                       if (!fullName || !email || !password) {
-                        triggerDemoToast('Completa los campos', 'Por favor introduce nombre, email y contraseña.', 'warning');
+                        triggerDemoToast(t('register.fillFields', 'Completa los campos'), t('register.fillFieldsDesc', 'Por favor introduce nombre, email y contraseña.'), 'warning');
                         return;
                       }
                       setRegisterStep(2);
                     }}
                     className="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-lg transition flex items-center justify-center gap-2"
                   >
-                    <span>Siguiente: Perfil Deportivo</span>
+                    <span>{t('register.nextSports', 'Siguiente: Perfil Deportivo')}</span>
                     <ArrowRight className="w-4 h-4" />
                   </button>
                   </div>)}
@@ -433,7 +470,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onOpenRol
                   <div>
                     <div className="flex items-center justify-between mb-1">
                       <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
-                        Nivel de Juego Estimado
+                        {t('register.levelEstimated', 'Nivel de Juego Estimado')}
                       </label>
                       <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400 text-sm">
                         {playLevel.toFixed(2)}
@@ -456,7 +493,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onOpenRol
                   <div className="grid grid-cols-2 gap-3">
                     <div>
                       <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
-                        Mano Dominante
+                        {t('register.dominantHand', 'Mano Dominante')}
                       </label>
                       <div className="grid grid-cols-2 gap-2">
                         <button
@@ -468,7 +505,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onOpenRol
                               : 'border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400'
                           }`}
                         >
-                          Diestro
+                          {t('register.rightHanded', 'Diestro')}
                         </button>
                         <button
                           type="button"
@@ -479,14 +516,14 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onOpenRol
                               : 'border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400'
                           }`}
                         >
-                          Zurdo
+                          {t('register.leftHanded', 'Zurdo')}
                         </button>
                       </div>
                     </div>
 
                     <div>
                       <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
-                        Posición Preferida
+                        {t('register.preferredPosition', 'Posición Preferida')}
                       </label>
                       <div className="grid grid-cols-3 gap-1">
                         <button
@@ -498,7 +535,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onOpenRol
                               : 'border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400'
                           }`}
                         >
-                          Drive
+                          {t('register.positionDrive', 'Drive')}
                         </button>
                         <button
                           type="button"
@@ -509,7 +546,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onOpenRol
                               : 'border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400'
                           }`}
                         >
-                          Revés
+                          {t('register.positionReves', 'Revés')}
                         </button>
                         <button
                           type="button"
@@ -520,7 +557,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onOpenRol
                               : 'border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400'
                           }`}
                         >
-                          Ambas
+                          {t('register.positionBoth', 'Ambas')}
                         </button>
                       </div>
                     </div>
@@ -538,10 +575,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onOpenRol
                       <div className="text-xs">
                         <div className="font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
                           <Trophy className="w-3.5 h-3.5 text-amber-500" />
-                          <span>Habilitar perfil de Capitán de Equipo</span>
+                          <span>{t('register.captainTitle', 'Habilitar perfil de Capitán de Equipo')}</span>
                         </div>
                         <div className="text-slate-500 dark:text-slate-400 text-[11px] mt-0.5">
-                          Te permite inscribir y gestionar convocatorias para equipos del club.
+                          {t('register.captainDesc', 'Te permite inscribir y gestionar convocatorias para equipos del club.')}
                         </div>
                       </div>
                     </label>
@@ -554,14 +591,14 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onOpenRol
                       className="w-1/3 py-3 rounded-xl border border-slate-300 dark:border-slate-700 font-bold text-xs text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition flex items-center justify-center gap-1"
                     >
                       <ArrowLeft className="w-4 h-4" />
-                      <span>Atrás</span>
+                      <span>{t('register.back', 'Atrás')}</span>
                     </button>
                     <button
                       type="button"
                       onClick={() => setRegisterStep(3)}
                       className="w-2/3 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-lg transition flex items-center justify-center gap-2"
                     >
-                      <span>Siguiente: Confirmación</span>
+                      <span>{t('register.nextConfirm', 'Siguiente: Confirmación')}</span>
                       <ArrowRight className="w-4 h-4" />
                     </button>
                   </div>
@@ -574,13 +611,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onOpenRol
                   <div className="p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-500/30 space-y-2 text-xs">
                     <div className="font-bold text-emerald-800 dark:text-emerald-300 flex items-center gap-1.5">
                       <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                      <span>Resumen de tu Ficha en {currentTenant.shortName}</span>
+                      <span>{t('register.summaryTitle', 'Resumen de tu Ficha')} en {currentTenant.shortName}</span>
                     </div>
                     <div className="grid grid-cols-2 gap-2 text-slate-700 dark:text-slate-300 text-[11px]">
-                      <div>Jugador: <strong>{fullName}</strong></div>
-                      <div>Nivel: <strong>{playLevel.toFixed(2)}</strong></div>
-                      <div>Posición: <strong>{preferredPosition.toUpperCase()}</strong></div>
-                      <div>Mano: <strong>{dominantHand === 'right' ? 'Diestro' : 'Zurdo'}</strong></div>
+                      <div>{t('register.player', 'Jugador:')} <strong>{fullName}</strong></div>
+                      <div>{t('register.level', 'Nivel:')} <strong>{playLevel.toFixed(2)}</strong></div>
+                      <div>{t('register.position', 'Posición:')} <strong>{preferredPosition === 'drive' ? t('register.positionDrive', 'Drive') : preferredPosition === 'reves' ? t('register.positionReves', 'Revés') : t('register.positionBoth', 'Ambas')}</strong></div>
+                      <div>{t('register.hand', 'Mano:')} <strong>{dominantHand === 'right' ? t('register.rightHanded', 'Diestro') : t('register.leftHanded', 'Zurdo')}</strong></div>
                     </div>
                   </div>
 
@@ -592,7 +629,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onOpenRol
                         onChange={(e) => setNotifyWhatsapp(e.target.checked)}
                         className="mt-0.5 rounded accent-emerald-500"
                       />
-                      <span>Recibir alertas automáticas de partidos abiertos y convocatorias por WhatsApp.</span>
+                      <span>{t('register.notifyWhatsapp', 'Recibir alertas automáticas de partidos abiertos y convocatorias por WhatsApp.')}</span>
                     </label>
 
                     <label className="flex items-start gap-2.5 cursor-pointer text-xs text-slate-700 dark:text-slate-300">
@@ -603,7 +640,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onOpenRol
                         onChange={(e) => setAcceptTerms(e.target.checked)}
                         className="mt-0.5 rounded accent-emerald-500"
                       />
-                      <span>Acepto las políticas de uso de instalaciones y protección de datos del club.</span>
+                      <span>{t('register.acceptTerms', 'Acepto las políticas de uso de instalaciones y protección de datos del club.')}</span>
                     </label>
                   </div>
 
@@ -614,14 +651,14 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onOpenRol
                       className="w-1/3 py-3 rounded-xl border border-slate-300 dark:border-slate-700 font-bold text-xs text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition flex items-center justify-center gap-1"
                     >
                       <ArrowLeft className="w-4 h-4" />
-                      <span>Atr��s</span>
+                      <span>{t('register.back', 'Atrás')}</span>
                     </button>
                     <button
                       type="submit"
                       disabled={loading || !acceptTerms}
                       className="w-2/3 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-lg transition flex items-center justify-center gap-2"
                     >
-                      {loading ? 'Creando Perfil...' : 'Confirmar y Activar Cuenta'}
+                      {loading ? t('register.submitting', 'Creando Perfil...') : t('register.submitConfirm', 'Confirmar y Activar Cuenta')}
                       <CheckCircle2 className="w-4 h-4" />
                     </button>
                   </div>
@@ -649,13 +686,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onOpenRol
             </p>
           ) : (
             <p>
-              ¿Ya tienes cuenta creada?{' '}
+              {t('auth.haveAccount', '¿Ya tienes cuenta creada?')} {' '}
               <button
                 type="button"
                 onClick={() => setMode('login')}
                 className="font-bold text-emerald-600 dark:text-emerald-400 hover:underline"
               >
-                Inicia sesión aquí
+                {t('auth.loginHere', 'Inicia sesión aquí')}
               </button>
             </p>
           )}

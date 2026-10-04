@@ -27,6 +27,7 @@ export const RoleSelectorModal: React.FC<RoleSelectorModalProps> = ({
 
   const roles = [
     {
+      id: 'superadmin',
       role: 'SUPERADMIN' as UserRole,
       title: 'Superadministrador Setmio HQ',
       subtitle: 'Visión y control global de toda la plataforma SaaS',
@@ -37,6 +38,7 @@ export const RoleSelectorModal: React.FC<RoleSelectorModalProps> = ({
       actionView: 'hq' as const,
     },
     {
+      id: 'tenant_owner',
       role: 'TENANT_OWNER' as UserRole,
       title: 'Club Admin / Gerente',
       subtitle: 'Gestión integral del Centro de Pádel San Mateo',
@@ -47,6 +49,7 @@ export const RoleSelectorModal: React.FC<RoleSelectorModalProps> = ({
       actionView: 'admin' as const,
     },
     {
+      id: 'coach_independent',
       role: 'COACH' as UserRole,
       title: 'Profesor Independiente / Cliente',
       subtitle: 'Gestiona tu actividad profesional de forma independiente',
@@ -57,6 +60,7 @@ export const RoleSelectorModal: React.FC<RoleSelectorModalProps> = ({
       actionView: 'coach' as const,
     },
     {
+      id: 'coach_club',
       role: 'COACH' as UserRole,
       title: 'Profesor de Club',
       subtitle: 'Escuela de tecnificación, clases particulares y grupos del club',
@@ -67,6 +71,7 @@ export const RoleSelectorModal: React.FC<RoleSelectorModalProps> = ({
       actionView: 'coach' as const,
     },
     {
+      id: 'player',
       role: 'PLAYER' as UserRole,
       title: 'Jugador / Socio del Club',
       subtitle: 'Experiencia del deportista y cliente en app nativa',
@@ -84,8 +89,8 @@ export const RoleSelectorModal: React.FC<RoleSelectorModalProps> = ({
     setCurrentView(r.actionView);
     onClose();
     triggerDemoToast(
-      `${t('demo.title', 'Entorno Demo')}: ${t(`demo.roles.${r.role}.title`, r.title)}`,
-      t(`demo.roles.${r.role}.access`, `Has ingresado al entorno con perfil y permisos de ${r.badge}.`),
+      `${t('demo.title', 'Entorno Demo')}: ${t('register.roles.' + r.id + '.title')}`,
+      t(`demo.roles.${r.id}.access`, `Has ingresado al entorno con perfil y permisos de ${r.badge}.`),
       'success'
     );
   };
@@ -127,7 +132,7 @@ export const RoleSelectorModal: React.FC<RoleSelectorModalProps> = ({
             const Icon = item.icon;
             return (
               <button
-                key={item.role}
+                key={item.id}
                 onClick={() => handleSelectRole(item)}
                 className="group text-left p-5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 hover:border-emerald-500 dark:hover:border-emerald-500 shadow-xs hover:shadow-lg transition-all duration-200 flex flex-col justify-between space-y-3"
               >
@@ -137,20 +142,20 @@ export const RoleSelectorModal: React.FC<RoleSelectorModalProps> = ({
                       <Icon className="w-5 h-5" />
                     </div>
                     <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
-                      {t(`demo.roles.${item.role}.badge`, item.badge)}
+                      {t(`demo.roles.${item.id}.badge`, item.badge)}
                     </span>
                   </div>
 
                   <h3 className="text-base font-bold text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
-                    {t(`demo.roles.${item.role}.title`, item.title)}
+                    {t('register.roles.' + item.id + '.title')}
                   </h3>
                   <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed">
-                    {t(`demo.roles.${item.role}.description`, item.description)}
+                    {t('register.roles.' + item.id + '.description')}
                   </p>
                 </div>
 
                 <div className="pt-2 border-t border-slate-200/80 dark:border-slate-800/80 flex items-center justify-between text-xs font-bold text-emerald-600 dark:text-emerald-400">
-                  <span>{t('demo.accessAs', 'Acceder como')} {t(`demo.roles.${item.role}.badge`, item.badge)}</span>
+                  <span>{t('demo.accessAs', 'Acceder como')} {t(`demo.roles.${item.id}.badge`, item.badge)}</span>
                   <ArrowRight className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" />
                 </div>
               </button>

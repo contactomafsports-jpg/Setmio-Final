@@ -38,11 +38,13 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
     currentUser,
     setCurrentView,
     switchUserRole,
+    logoutOrExitDemo,
     unreadNotificationsCount,
     markNotificationsAsRead,
     notifications,
     theme,
     toggleTheme,
+    t,
   } = useApp();
 
   const [mobileMoreOpen, setMobileMoreOpen] = useState(false);
@@ -200,9 +202,9 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
           </div>
 
           <button
-            onClick={() => setCurrentView('public')}
-            className="p-1.5 text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg transition"
-            title="Ir a web pública"
+            onClick={logoutOrExitDemo}
+            className="p-1.5 text-rose-500 hover:text-rose-700 dark:hover:text-rose-300 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-lg transition"
+            title="Cerrar Sesión / Salir Demo"
           >
             <LogOut className="w-4 h-4" />
           </button>
@@ -258,6 +260,16 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
             >
               <Eye className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
               <span className="hidden sm:inline">Ver Web Pública</span>
+            </button>
+
+            {/* Cerrar Sesión / Salir Demo */}
+            <button
+              onClick={logoutOrExitDemo}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-50 dark:bg-rose-950/50 hover:bg-rose-100 dark:hover:bg-rose-900/50 text-xs font-bold text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800 transition shadow-sm"
+              title="Cerrar Sesión / Salir Demo"
+            >
+              <LogOut className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400" />
+              <span className="hidden sm:inline">Salir Demo</span>
             </button>
 
             {/* Notifications Toggle */}
@@ -333,7 +345,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
         {/* "Más" Tab Trigger */}
         <button
           onClick={() => setMobileMoreOpen(!mobileMoreOpen)}
-          className={`flex flex-col items-center gap-0.5 py-1 px-3 rounded-xl transition ${
+          className={`flex flex-col items-center gap-0.5 py-1 px-2.5 rounded-xl transition ${
             mobileMoreOpen || moreTabs.some((t) => t.id === adminTab)
               ? 'text-emerald-600 dark:text-emerald-400 font-bold'
               : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
@@ -341,6 +353,16 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
         >
           <MoreHorizontal className="w-5 h-5" />
           <span className="text-[10px]">Más</span>
+        </button>
+
+        {/* Salir Demo Button */}
+        <button
+          onClick={logoutOrExitDemo}
+          className="flex flex-col items-center gap-0.5 py-1 px-2.5 rounded-xl text-rose-600 dark:text-rose-400 hover:text-rose-700 font-semibold transition"
+          title="Cerrar Sesión / Salir Demo"
+        >
+          <LogOut className="w-5 h-5 text-rose-600 dark:text-rose-400" />
+          <span className="text-[10px]">Salir</span>
         </button>
       </nav>
 
@@ -362,6 +384,28 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
             </div>
 
             <div className="space-y-4">
+              <button
+                onClick={() => {
+                  setMobileMoreOpen(false);
+                  logoutOrExitDemo();
+                }}
+                className="w-full p-3 rounded-2xl bg-rose-50 dark:bg-rose-950/60 border border-rose-300 dark:border-rose-800 text-left flex items-center justify-between transition hover:bg-rose-100 dark:hover:bg-rose-900/60"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-xl bg-rose-600 text-white">
+                    <LogOut className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <div className="text-xs font-bold text-rose-950 dark:text-rose-200">
+                      Cerrar Sesión / Salir Demo
+                    </div>
+                    <div className="text-[10px] text-rose-600/90 dark:text-rose-400">
+                      Regresar a la portada principal y resetear sesión activa
+                    </div>
+                  </div>
+                </div>
+                <ChevronRight className="w-4 h-4 text-rose-400" />
+              </button>
               <button
                 onClick={() => {
                   switchUserRole('PLAYER');

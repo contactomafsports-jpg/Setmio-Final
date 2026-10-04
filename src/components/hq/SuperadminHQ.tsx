@@ -22,6 +22,7 @@ import {
   Menu,
   X,
   ChevronRight,
+  LogOut,
 } from 'lucide-react';
 
 export const SuperadminHQ: React.FC = () => {
@@ -35,6 +36,7 @@ export const SuperadminHQ: React.FC = () => {
     triggerDemoToast,
     currentUser,
     switchUserRole,
+    logoutOrExitDemo,
   } = useApp();
 
   const [activeHqTab, setActiveHqTab] = useState<'overview' | 'tenants' | 'plans' | 'domains' | 'audit'>('overview');
@@ -116,6 +118,16 @@ export const SuperadminHQ: React.FC = () => {
           >
             <Plus className="w-4 h-4" />
             <span>Nuevo Club</span>
+          </button>
+
+          {/* Cerrar Sesión / Salir Demo */}
+          <button
+            onClick={logoutOrExitDemo}
+            className="px-3 py-2 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 border border-rose-500/40 text-rose-300 font-bold text-xs flex items-center gap-1.5 transition"
+            title="Cerrar Sesión / Salir Demo"
+          >
+            <LogOut className="w-4 h-4 text-rose-400" />
+            <span>Salir Demo</span>
           </button>
         </div>
       </div>
@@ -531,6 +543,15 @@ export const SuperadminHQ: React.FC = () => {
           <Menu className="w-5 h-5 mb-0.5" />
           <span>Más</span>
         </button>
+
+        <button
+          onClick={logoutOrExitDemo}
+          className="flex flex-col items-center justify-center py-1.5 rounded-xl text-rose-400 hover:text-rose-300 font-semibold"
+          title="Cerrar Sesión / Salir Demo"
+        >
+          <LogOut className="w-5 h-5 mb-0.5 text-rose-400" />
+          <span>Salir</span>
+        </button>
       </nav>
 
       {/* MOBILE MORE DRAWER */}
@@ -618,6 +639,25 @@ export const SuperadminHQ: React.FC = () => {
                   </div>
                 </div>
                 <ChevronRight className="w-4 h-4 text-slate-400" />
+              </button>
+
+              <button
+                onClick={() => {
+                  setShowMoreDrawer(false);
+                  logoutOrExitDemo();
+                }}
+                className="w-full p-3 rounded-2xl bg-rose-950/60 border border-rose-800 text-left flex items-center justify-between text-rose-300"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-xl bg-rose-600 text-white">
+                    <LogOut className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <div className="text-xs font-bold text-rose-200">Cerrar Sesión / Salir Demo</div>
+                    <div className="text-[10px] text-rose-400">Volver a la portada pública principal</div>
+                  </div>
+                </div>
+                <ChevronRight className="w-4 h-4 text-rose-400" />
               </button>
             </div>
           </div>

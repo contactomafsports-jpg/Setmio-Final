@@ -112,6 +112,7 @@ export function App() {
       '/': 'home',
       '/funcionalidades': 'features',
       '/registro': 'home',
+      '/login': 'home',
       '/soluciones': 'solutions',
       '/soluciones/clubes': 'solution_clubs',
       '/soluciones/escuelas': 'solution_schools',
@@ -133,6 +134,9 @@ export function App() {
         setPublicPage(page);
         if (window.location.pathname === '/registro') {
           setRegistrationOpen(true);
+          setAuthOpen(true);
+        } else if (window.location.pathname === '/login') {
+          setRegistrationOpen(false);
           setAuthOpen(true);
         }
       }

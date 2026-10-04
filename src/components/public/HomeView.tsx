@@ -219,7 +219,7 @@ export const HomeView: React.FC = () => {
                     <span className="text-emerald-400 font-bold">{t('home.hero.availableToday', 'Disponible Hoy')}</span>
                   </div>
                   <div className="text-slate-300 text-[11px] font-medium">
-                    {currentTenant.name} · Iluminación LED y césped oficial
+                    {currentTenant.name} · {t('home.hero.courtSpecs', 'Iluminación LED y césped oficial')}
                   </div>
                 </div>
               </div>
@@ -228,8 +228,40 @@ export const HomeView: React.FC = () => {
         </div>
       </section>
 
+      {/* BARRA DE FILTROS DEBAJO DEL HERO */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-4 sm:-mt-6 relative z-30">
+        <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none snap-x">
+          {[
+            { id: 'all', page: 'home' },
+            { id: 'courts', page: 'courts' },
+            { id: 'matches', page: 'matches' },
+            { id: 'tournaments', page: 'tournaments' },
+            { id: 'academy', page: 'academy' },
+            { id: 'teams', page: 'teams' },
+            { id: 'shop', page: 'shop' },
+          ].map((filter) => (
+            <button
+              key={filter.id}
+              onClick={() => {
+                if (filter.page !== 'home') {
+                  setPublicPage(filter.page as any);
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+              }}
+              className={`px-4 py-2 rounded-2xl text-xs font-bold whitespace-nowrap transition shadow-sm border ${
+                filter.id === 'all'
+                  ? 'bg-emerald-600 text-white border-emerald-600 shadow-emerald-600/20'
+                  : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-800 hover:border-emerald-500 hover:text-emerald-600 dark:hover:text-emerald-400'
+              }`}
+            >
+              {t('home.filters.' + filter.id)}
+            </button>
+          ))}
+        </div>
+      </section>
+
       {/* 2. FORMULARIO DE BÚSQUEDA DE DISPONIBILIDAD (Requisito: Las pistas no son lo importante en la home) */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 sm:-mt-10 relative z-20">
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-20">
         <div className="p-6 sm:p-8 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 dark:border-slate-800 pb-4">
             <div>
@@ -292,9 +324,9 @@ export const HomeView: React.FC = () => {
                 onChange={(e) => setSearchPlayersFormat(e.target.value)}
                 className="w-full px-4 py-3 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white text-xs font-bold focus:ring-2 focus:ring-emerald-500 transition"
               >
-                <option value="4">4 Jugadores (Pista Dobles WPT)</option>
-                <option value="2">2 Jugadores (Pista Individual 1 vs 1)</option>
-                <option value="indoor">Pista Indoor Climatizada</option>
+                <option value="4">{t('home.search.players.4', '4 Jugadores (Pista Dobles WPT)')}</option>
+                <option value="2">{t('home.search.players.2', '2 Jugadores (Pista Individual 1 vs 1)')}</option>
+                <option value="indoor">{t('home.search.players.indoor', 'Pista Indoor Climatizada')}</option>
               </select>
             </div>
 
@@ -363,6 +395,49 @@ export const HomeView: React.FC = () => {
         </div>
       </section>
 
+      {/* SECCIÓN VENTAJAS & FUNCIONALIDADES */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+        <div className="text-center max-w-2xl mx-auto space-y-2">
+          <div className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider flex items-center justify-center gap-1.5">
+            <Zap className="w-4 h-4" />
+            <span>{t('home.advantages.eyebrow')}</span>
+          </div>
+          <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
+            {t('home.advantages.title')}
+          </h2>
+          <p className="text-slate-600 dark:text-slate-400 text-xs sm:text-sm">
+            {t('home.advantages.description')}
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          {[
+            { id: 'iot', icon: Zap },
+            { id: 'matches', icon: Users },
+            { id: 'academy', icon: GraduationCap },
+            { id: 'tournaments', icon: Trophy },
+          ].map((item) => {
+            const Icon = item.icon;
+            return (
+              <div
+                key={item.id}
+                className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition space-y-3"
+              >
+                <div className="w-12 h-12 rounded-2xl bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+                  <Icon className="w-6 h-6" />
+                </div>
+                <h3 className="font-bold text-base text-slate-900 dark:text-white">
+                  {t('home.advantages.' + item.id + '.title')}
+                </h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                  {t('home.advantages.' + item.id + '.description')}
+                </p>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
       {/* 3. CONOCE NUESTROS EQUIPOS (VERTICAL LIST + BUTTON) */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
@@ -412,7 +487,7 @@ export const HomeView: React.FC = () => {
                 <div className="min-w-0">
                   <div className="flex items-center gap-2 mb-1">
                     <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 font-bold text-[10px] uppercase tracking-wider">
-                      {team.gender}
+                      {t('home.teams.gender.' + team.gender, team.gender)}
                     </span>
                     <span className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">
                       {t('home.teams.captain', 'Capitán:')} <strong className="text-slate-800 dark:text-slate-200">{team.captain}</strong>
@@ -468,7 +543,7 @@ export const HomeView: React.FC = () => {
                     : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                 }`}
               >
-                Todos
+                {t('home.tournaments.filterAll', 'Todos')}
               </button>
               <button
                 onClick={() => setTournamentFilter('open')}
@@ -478,7 +553,7 @@ export const HomeView: React.FC = () => {
                     : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                 }`}
               >
-                Inscripción Abierta
+                {t('home.tournaments.filterOpen', 'Inscripción Abierta')}
               </button>
               <button
                 onClick={() => setTournamentFilter('progress')}
@@ -488,7 +563,7 @@ export const HomeView: React.FC = () => {
                     : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                 }`}
               >
-                En Curso
+                {t('home.tournaments.filterProgress', 'En Curso')}
               </button>
             </div>
           </div>
@@ -528,7 +603,7 @@ export const HomeView: React.FC = () => {
                     </div>
 
                     <div className="text-slate-500 dark:text-slate-400 text-[11px]">
-                      Premios: <strong className="text-slate-800 dark:text-slate-200">{tournament.prizes}</strong>
+                      {t('home.tournaments.prizes', 'Premios:')} <strong className="text-slate-800 dark:text-slate-200">{tournament.prizes}</strong>
                     </div>
 
                     <div className="flex flex-wrap gap-1.5 pt-1">
@@ -586,7 +661,7 @@ export const HomeView: React.FC = () => {
               {t('home.matches.title', '¿Te falta un jugador? Apúntate a un "Play!"')}
             </h2>
             <p className="text-slate-600 dark:text-slate-400 text-xs sm:text-sm mt-1 max-w-xl">
-              Partidas niveladas con plazas libres para hoy y los próximos días. Únete con un solo clic.
+              {t('home.matches.subtitle', 'Partidas niveladas con plazas libres para hoy y los próximos días. Únete con un solo clic.')}
             </p>
           </div>
 
@@ -611,10 +686,10 @@ export const HomeView: React.FC = () => {
               <div>
                 <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 mb-2">
                   <span className="font-bold text-emerald-700 dark:text-emerald-400">
-                    Nivel {m.minLevel.toFixed(1)} - {m.maxLevel.toFixed(1)}
+                    {t('home.matches.level', 'Nivel')} {m.minLevel.toFixed(1)} - {m.maxLevel.toFixed(1)}
                   </span>
                   <span className="font-mono text-slate-900 dark:text-white font-bold">
-                    {m.pricePerPlayer.toFixed(2)} €/jugador
+                    {m.pricePerPlayer.toFixed(2)} {t('home.matches.pricePlayer', '€/jugador')}
                   </span>
                 </div>
 
@@ -634,7 +709,7 @@ export const HomeView: React.FC = () => {
                 <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800">
                   <div className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 mb-2 flex items-center justify-between">
                     <span>{t('home.matches.available', 'Plazas disponibles:')}</span>
-                    <span className="font-bold text-emerald-600 dark:text-emerald-400">{4 - m.players.length} libres</span>
+                    <span className="font-bold text-emerald-600 dark:text-emerald-400">{4 - m.players.length} {t('home.matches.free', 'libres')}</span>
                   </div>
                   <div className="flex items-center gap-1.5">
                     {[0, 1, 2, 3].map((idx) => (
