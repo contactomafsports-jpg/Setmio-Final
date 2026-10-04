@@ -44,7 +44,9 @@ export const HomeView: React.FC = () => {
     isFavorite,
     triggerDemoToast,
     t,
+    currentLanguage,
   } = useApp();
+  void currentLanguage;
 
   // Multi-court visual selector state
   const [selectedCourtIds, setSelectedCourtIds] = useState<string[]>(['court-1']);

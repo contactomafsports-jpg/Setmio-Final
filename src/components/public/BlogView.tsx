@@ -25,7 +25,9 @@ export const BlogView: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
     setPublicPage,
     currentTenant,
     t,
+    currentLanguage,
   } = useApp();
+  void currentLanguage;
 
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');

@@ -28,7 +28,8 @@ export const FeaturesView: React.FC<FeaturesViewProps> = ({
   onBack,
   onOpenOnboarding,
 }) => {
-  const { setPublicPage, setIsCorporateLanding, t } = useApp();
+  const { setPublicPage, setIsCorporateLanding, t, currentLanguage } = useApp();
+  void currentLanguage;
 
   const handleBack = () => {
     if (onBack) {

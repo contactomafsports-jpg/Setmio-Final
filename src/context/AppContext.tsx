@@ -312,6 +312,7 @@ interface AppContextType {
   setTheme: (theme: ThemeMode) => void;
   toggleTheme: () => void;
   language: SupportedLanguage;
+  currentLanguage: SupportedLanguage;
   setLanguage: (lang: SupportedLanguage) => void;
   t: (key: string, fallback?: string) => string;
 
@@ -1312,6 +1313,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         setTheme,
         toggleTheme,
         language,
+        currentLanguage: language,
         setLanguage,
         t,
 

@@ -3,7 +3,8 @@ import { ArrowLeft } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 
 export function SubpageHeaderNav({ onBack }: { onBack?: () => void }) {
-  const { t } = useApp();
+  const { t, currentLanguage } = useApp();
+  void currentLanguage;
   const handleBack = () => {
     try {
       if (typeof window !== 'undefined' && window.history.length > 1) { window.history.back(); return; }

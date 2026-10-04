@@ -26,7 +26,8 @@ interface AuthModalProps {
 }
 
 export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onOpenRoleModal, initialMode = 'login' }) => {
-  const { currentTenant, switchUserRole, triggerDemoToast, setCurrentView, t } = useApp();
+  const { currentTenant, switchUserRole, triggerDemoToast, setCurrentView, t, currentLanguage } = useApp();
+  void currentLanguage;
 
   const [mode, setMode] = useState<'login' | 'register'>(initialMode);
   useEffect(() => { if (isOpen) setMode(initialMode); }, [initialMode, isOpen]);

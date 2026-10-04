@@ -12,7 +12,8 @@ import {
 } from 'lucide-react';
 
 export const Footer: React.FC = () => {
-  const { currentTenant, courts, setPublicPage, setCurrentView, t } = useApp();
+  const { currentTenant, courts, setPublicPage, setCurrentView, t, currentLanguage } = useApp();
+  void currentLanguage;
 
   const handleNav = (page: PublicPage) => {
     setPublicPage(page);
