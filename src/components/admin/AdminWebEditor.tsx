@@ -107,34 +107,34 @@ export const AdminWebEditor: React.FC = () => {
   };
 
   return (
-    <div className="space-y-8 text-slate-100 max-w-6xl">
+    <div className="space-y-8 text-slate-900 dark:text-slate-100 max-w-6xl">
       {/* Editor Header Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-3xl bg-slate-900 border border-slate-800 shadow-xl">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-xl font-bold text-white">Editor Visual "Mi Web y Mi App"</h1>
+            <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">Editor Visual "Mi Web y Mi App"</h1>
             <span
-              className={`text-[10px] font-mono uppercase px-2 py-0.5 rounded font-bold ${
+              className={`text-[10px] font-mono uppercase px-2 py-0.5 rounded-full font-bold ${
                 publishStatus === 'published'
-                  ? 'bg-emerald-950 text-emerald-400 border border-emerald-800'
-                  : 'bg-amber-950 text-amber-300 border border-amber-800'
+                  ? 'bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800'
+                  : 'bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800'
               }`}
             >
               {publishStatus === 'published' ? 'Publicado en Vivo' : 'Borrador con Cambios Pendientes'}
             </span>
           </div>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 mt-1">
             Personaliza la página de inicio, bloques deportivos y paleta visual controlada.
           </p>
         </div>
 
         <div className="flex items-center gap-2">
           {/* Device toggle */}
-          <div className="flex items-center bg-slate-950 p-1 rounded-xl border border-slate-800">
+          <div className="flex items-center bg-slate-100 dark:bg-slate-950 p-1 rounded-2xl border border-slate-200 dark:border-slate-800">
             <button
               onClick={() => setPreviewDevice('desktop')}
-              className={`p-1.5 rounded-lg text-xs font-semibold flex items-center gap-1 transition ${
-                previewDevice === 'desktop' ? 'bg-slate-800 text-white' : 'text-slate-400'
+              className={`p-1.5 rounded-xl text-xs font-bold flex items-center gap-1 transition ${
+                previewDevice === 'desktop' ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-xs' : 'text-slate-500 hover:text-slate-900 dark:text-slate-400'
               }`}
               title="Vista de Escritorio"
             >
@@ -142,8 +142,8 @@ export const AdminWebEditor: React.FC = () => {
             </button>
             <button
               onClick={() => setPreviewDevice('mobile')}
-              className={`p-1.5 rounded-lg text-xs font-semibold flex items-center gap-1 transition ${
-                previewDevice === 'mobile' ? 'bg-slate-800 text-white' : 'text-slate-400'
+              className={`p-1.5 rounded-xl text-xs font-bold flex items-center gap-1 transition ${
+                previewDevice === 'mobile' ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-xs' : 'text-slate-500 hover:text-slate-900 dark:text-slate-400'
               }`}
               title="Vista Móvil"
             >
@@ -153,7 +153,7 @@ export const AdminWebEditor: React.FC = () => {
 
           <button
             onClick={handleSaveDraft}
-            className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-xs border border-slate-700 flex items-center gap-1.5 transition"
+            className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold text-xs border border-slate-200 dark:border-slate-700 flex items-center gap-1.5 transition active:scale-95"
           >
             <Save className="w-3.5 h-3.5" />
             <span>Guardar Borrador</span>
@@ -161,7 +161,7 @@ export const AdminWebEditor: React.FC = () => {
 
           <button
             onClick={handlePublishLive}
-            className="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs shadow flex items-center gap-1.5 transition"
+            className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs shadow-sm shadow-emerald-600/20 flex items-center gap-1.5 transition active:scale-95"
           >
             <CheckCircle2 className="w-4 h-4" />
             <span>Publicar Cambios</span>
@@ -173,27 +173,27 @@ export const AdminWebEditor: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         {/* Left Settings Panel */}
         <div className="lg:col-span-6 space-y-6">
-          <div className="flex items-center gap-2 bg-slate-900 p-1 rounded-2xl border border-slate-800 text-xs">
+          <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-900 p-1 rounded-2xl border border-slate-200 dark:border-slate-800 text-xs font-bold">
             <button
               onClick={() => setActiveTab('blocks')}
-              className={`flex-1 py-2 text-center font-bold rounded-xl transition ${
-                activeTab === 'blocks' ? 'bg-slate-800 text-white' : 'text-slate-400 hover:text-slate-200'
+              className={`flex-1 py-2 text-center rounded-xl transition ${
+                activeTab === 'blocks' ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-xs' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
               Estructura de Bloques
             </button>
             <button
               onClick={() => setActiveTab('branding')}
-              className={`flex-1 py-2 text-center font-bold rounded-xl transition ${
-                activeTab === 'branding' ? 'bg-slate-800 text-white' : 'text-slate-400 hover:text-slate-200'
+              className={`flex-1 py-2 text-center rounded-xl transition ${
+                activeTab === 'branding' ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-xs' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
               Textos & Paleta
             </button>
             <button
               onClick={() => setActiveTab('pages')}
-              className={`flex-1 py-2 text-center font-bold rounded-xl transition ${
-                activeTab === 'pages' ? 'bg-slate-800 text-white' : 'text-slate-400 hover:text-slate-200'
+              className={`flex-1 py-2 text-center rounded-xl transition ${
+                activeTab === 'pages' ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-xs' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
               Páginas
@@ -201,10 +201,10 @@ export const AdminWebEditor: React.FC = () => {
           </div>
 
           {activeTab === 'pages' && (
-            <div className="p-6 rounded-3xl bg-slate-900 border border-slate-800 space-y-4 shadow-xl">
+            <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-4 shadow-sm">
               <div>
-                <h3 className="text-sm font-bold text-white">Páginas de la web pública</h3>
-                <p className="text-xs text-slate-400 mt-1">Activa las secciones que se muestran en la navegación del club. Los cambios son locales en esta demostración.</p>
+                <h3 className="text-sm font-black text-slate-900 dark:text-white">Páginas de la web pública</h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Activa las secciones que se muestran en la navegación del club. Los cambios son locales en esta demostración.</p>
               </div>
               <div className="space-y-2">
                 {publicPageOptions.map((page) => {
@@ -221,13 +221,13 @@ export const AdminWebEditor: React.FC = () => {
                         updateCurrentTenant({ publicPages: next });
                         setPublishStatus('draft_pending');
                       }}
-                      className="w-full p-3.5 rounded-2xl border border-slate-800 bg-slate-950 flex items-center justify-between gap-4 text-left"
+                      className="w-full p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 flex items-center justify-between gap-4 text-left hover:border-slate-300 dark:hover:border-slate-700 transition"
                     >
                       <span>
-                        <span className="block text-xs font-semibold text-white">{page.title}</span>
-                        <span className="block mt-1 text-[10px] text-slate-400">{page.description}</span>
+                        <span className="block text-xs font-bold text-slate-900 dark:text-white">{page.title}</span>
+                        <span className="block mt-1 text-[10px] text-slate-500 dark:text-slate-400">{page.description}</span>
                       </span>
-                      <span className={`shrink-0 px-2.5 py-1 rounded-full text-[10px] font-bold ${active ? 'bg-emerald-950 text-emerald-300' : 'bg-slate-800 text-slate-400'}`}>
+                      <span className={`shrink-0 px-2.5 py-1 rounded-full text-[10px] font-bold ${active ? 'bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800' : 'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400'}`}>
                         {active ? 'Activa' : 'Oculta'}
                       </span>
                     </button>
@@ -238,13 +238,13 @@ export const AdminWebEditor: React.FC = () => {
           )}
 
           {activeTab === 'blocks' && (
-            <div className="p-6 rounded-3xl bg-slate-900 border border-slate-800 space-y-4 shadow-xl">
+            <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-4 shadow-sm">
               <div>
-                <h3 className="text-sm font-bold text-white flex items-center gap-2">
-                  <Layers className="w-4 h-4 text-emerald-400" />
+                <h3 className="text-sm font-black text-slate-900 dark:text-white flex items-center gap-2">
+                  <Layers className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                   <span>Orden y Visibilidad de Bloques Públicos</span>
                 </h3>
-                <p className="text-xs text-slate-400 mt-0.5">
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                   Reordena las secciones de la página de inicio o activa/desactiva módulos según temporada.
                 </p>
               </div>
@@ -255,16 +255,16 @@ export const AdminWebEditor: React.FC = () => {
                     key={block.id}
                     className={`p-3.5 rounded-2xl border flex items-center justify-between transition ${
                       block.isVisible
-                        ? 'bg-slate-950 border-slate-800 text-white'
-                        : 'bg-slate-950/40 border-slate-800/40 text-slate-500'
+                        ? 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white'
+                        : 'bg-slate-100/60 dark:bg-slate-950/40 border-slate-200/60 dark:border-slate-800/40 text-slate-400'
                     }`}
                   >
                     <div className="flex items-center gap-3">
-                      <span className="w-6 h-6 rounded-lg bg-slate-900 border border-slate-800 text-slate-400 font-mono text-xs flex items-center justify-center font-bold">
+                      <span className="w-6 h-6 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 font-mono text-xs flex items-center justify-center font-bold">
                         {idx + 1}
                       </span>
                       <div>
-                        <div className="text-xs font-semibold">{block.title}</div>
+                        <div className="text-xs font-bold">{block.title}</div>
                         <div className="text-[10px] text-slate-400 font-mono">tipo: {block.type}</div>
                       </div>
                     </div>
@@ -273,7 +273,7 @@ export const AdminWebEditor: React.FC = () => {
                       <button
                         onClick={() => moveBlock(idx, 'up')}
                         disabled={idx === 0}
-                        className="p-1.5 rounded-lg text-slate-400 hover:text-white disabled:opacity-30"
+                        className="p-1.5 rounded-lg text-slate-400 hover:text-slate-900 dark:hover:text-white disabled:opacity-30"
                         title="Subir bloque"
                       >
                         <ArrowUp className="w-4 h-4" />
@@ -281,7 +281,7 @@ export const AdminWebEditor: React.FC = () => {
                       <button
                         onClick={() => moveBlock(idx, 'down')}
                         disabled={idx === pageBlocks.length - 1}
-                        className="p-1.5 rounded-lg text-slate-400 hover:text-white disabled:opacity-30"
+                        className="p-1.5 rounded-lg text-slate-400 hover:text-slate-900 dark:hover:text-white disabled:opacity-30"
                         title="Bajar bloque"
                       >
                         <ArrowDown className="w-4 h-4" />
@@ -290,8 +290,8 @@ export const AdminWebEditor: React.FC = () => {
                         onClick={() => toggleBlockVisibility(block.id)}
                         className={`ml-2 px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase transition ${
                           block.isVisible
-                            ? 'bg-emerald-950 text-emerald-400 border border-emerald-800'
-                            : 'bg-slate-800 text-slate-400'
+                            ? 'bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800'
+                            : 'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
                         }`}
                       >
                         {block.isVisible ? 'Visible' : 'Oculto'}
@@ -304,14 +304,14 @@ export const AdminWebEditor: React.FC = () => {
           )}
 
           {activeTab === 'branding' && (
-            <div className="p-6 rounded-3xl bg-slate-900 border border-slate-800 space-y-5 shadow-xl text-xs">
-              <h3 className="text-sm font-bold text-white flex items-center gap-2">
-                <Palette className="w-4 h-4 text-cyan-400" />
+            <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-5 shadow-sm text-xs">
+              <h3 className="text-sm font-black text-slate-900 dark:text-white flex items-center gap-2">
+                <Palette className="w-4 h-4 text-cyan-600 dark:text-cyan-400" />
                 <span>Textos del Hero & Identidad Gráfica</span>
               </h3>
 
               <div>
-                <label className="block text-slate-400 mb-1 font-medium">Kicker / Badge Superior</label>
+                <label className="block text-slate-700 dark:text-slate-300 mb-1 font-bold">Kicker / Badge Superior</label>
                 <input
                   type="text"
                   value={badgeText}
@@ -319,12 +319,12 @@ export const AdminWebEditor: React.FC = () => {
                     setBadgeText(e.target.value);
                     setPublishStatus('draft_pending');
                   }}
-                  className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white text-xs focus:outline-none focus:border-emerald-500 font-mono"
+                  className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-slate-900 dark:text-white text-xs focus:outline-none focus:border-emerald-500 font-mono"
                 />
               </div>
 
               <div>
-                <label className="block text-slate-400 mb-1 font-medium">Título Principal (Hero)</label>
+                <label className="block text-slate-700 dark:text-slate-300 mb-1 font-bold">Título Principal (Hero)</label>
                 <input
                   type="text"
                   value={heroTitle}
@@ -332,12 +332,12 @@ export const AdminWebEditor: React.FC = () => {
                     setHeroTitle(e.target.value);
                     setPublishStatus('draft_pending');
                   }}
-                  className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white text-xs focus:outline-none focus:border-emerald-500 font-bold"
+                  className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-slate-900 dark:text-white text-xs focus:outline-none focus:border-emerald-500 font-bold"
                 />
               </div>
 
               <div>
-                <label className="block text-slate-400 mb-1 font-medium">Subtítulo Descriptivo</label>
+                <label className="block text-slate-700 dark:text-slate-300 mb-1 font-bold">Subtítulo Descriptivo</label>
                 <textarea
                   rows={3}
                   value={heroSubtitle}
@@ -345,16 +345,16 @@ export const AdminWebEditor: React.FC = () => {
                     setHeroSubtitle(e.target.value);
                     setPublishStatus('draft_pending');
                   }}
-                  className="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-white text-xs focus:outline-none focus:border-emerald-500"
+                  className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl p-3 text-slate-900 dark:text-white text-xs focus:outline-none focus:border-emerald-500"
                 />
               </div>
 
               {/* Manual Custom HEX Codes */}
               <div className="space-y-3 pt-2">
-                <label className="block text-slate-400 font-medium">Personalización Manual de Colores (Códigos HEX)</label>
+                <label className="block text-slate-700 dark:text-slate-300 font-bold">Personalización Manual de Colores (Códigos HEX)</label>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div className="p-3 rounded-2xl bg-slate-950 border border-slate-800 space-y-1.5">
-                    <span className="text-[11px] font-semibold text-slate-300">Color Primario / Marca</span>
+                  <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 space-y-1.5">
+                    <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300">Color Primario / Marca</span>
                     <div className="flex items-center gap-2">
                       <input
                         type="color"
@@ -373,13 +373,13 @@ export const AdminWebEditor: React.FC = () => {
                           setPublishStatus('draft_pending');
                         }}
                         placeholder="#185c43"
-                        className="flex-1 px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white font-mono text-xs focus:outline-none focus:border-emerald-500 uppercase font-bold"
+                        className="flex-1 px-3 py-1.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white font-mono text-xs focus:outline-none focus:border-emerald-500 uppercase font-bold"
                       />
                     </div>
                   </div>
 
-                  <div className="p-3 rounded-2xl bg-slate-950 border border-slate-800 space-y-1.5">
-                    <span className="text-[11px] font-semibold text-slate-300">Color de Acento / Botones</span>
+                  <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 space-y-1.5">
+                    <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300">Color de Acento / Botones</span>
                     <div className="flex items-center gap-2">
                       <input
                         type="color"
@@ -398,7 +398,7 @@ export const AdminWebEditor: React.FC = () => {
                           setPublishStatus('draft_pending');
                         }}
                         placeholder="#c7f36b"
-                        className="flex-1 px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white font-mono text-xs focus:outline-none focus:border-emerald-500 uppercase font-bold"
+                        className="flex-1 px-3 py-1.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white font-mono text-xs focus:outline-none focus:border-emerald-500 uppercase font-bold"
                       />
                     </div>
                   </div>
@@ -407,7 +407,7 @@ export const AdminWebEditor: React.FC = () => {
 
               {/* Predefined controlled palettes */}
               <div className="space-y-2 pt-2">
-                <label className="block text-slate-400 font-medium">Paletas Deportivas Sugeridas</label>
+                <label className="block text-slate-700 dark:text-slate-300 font-bold">Paletas Deportivas Sugeridas</label>
                 <div className="grid grid-cols-2 gap-2">
                   {predefinedPalettes.map((pal) => (
                     <button
@@ -418,10 +418,10 @@ export const AdminWebEditor: React.FC = () => {
                         setAccentColor(pal.accent);
                         setPublishStatus('draft_pending');
                       }}
-                      className="p-2.5 rounded-xl bg-slate-950 border border-slate-800 hover:border-slate-700 text-left transition flex items-center justify-between"
+                      className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 text-left transition flex items-center justify-between"
                     >
                       <div className="min-w-0">
-                        <div className="text-[11px] font-bold text-white truncate">{pal.name}</div>
+                        <div className="text-[11px] font-bold text-slate-900 dark:text-white truncate">{pal.name}</div>
                         <div className="flex items-center gap-1.5 mt-1">
                           <span
                             className="w-3.5 h-3.5 rounded-full"
@@ -434,7 +434,7 @@ export const AdminWebEditor: React.FC = () => {
                         </div>
                       </div>
                       {primaryColor === pal.primary && (
-                        <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                        <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
                       )}
                     </button>
                   ))}
@@ -446,13 +446,13 @@ export const AdminWebEditor: React.FC = () => {
 
         {/* Right Live Preview Canvas */}
         <div className="lg:col-span-6 sticky top-28 space-y-3">
-          <div className="flex items-center justify-between text-xs text-slate-400 px-1">
-            <span className="font-semibold text-white">Vista Previa Dinámica</span>
+          <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 px-1">
+            <span className="font-bold text-slate-900 dark:text-white">Vista Previa Dinámica</span>
             <span>{previewDevice === 'desktop' ? 'Escritorio (1440px)' : 'Móvil (390px)'}</span>
           </div>
 
           <div
-            className={`mx-auto bg-slate-950 rounded-3xl border border-slate-700 overflow-hidden shadow-2xl transition-all duration-300 ${
+            className={`mx-auto bg-slate-950 rounded-3xl border border-slate-300 dark:border-slate-700 overflow-hidden shadow-2xl transition-all duration-300 ${
               previewDevice === 'mobile' ? 'max-w-[340px] h-[580px]' : 'w-full h-[520px]'
             } flex flex-col`}
           >

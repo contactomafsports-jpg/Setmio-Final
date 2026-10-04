@@ -355,13 +355,13 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
       </header>
 
       {/* 2. HERO SECTION CORPORATIVO */}
-      <section ref={reveal} className="scroll-reveal relative overflow-hidden pt-12 pb-20 lg:pt-20 lg:pb-32 bg-slate-950 border-b border-slate-800">
-        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1554068865-24cecd4e34b8?auto=format&fit=crop&w=2000&q=85')] bg-cover bg-center" />
-        <div className="absolute inset-0 bg-[linear-gradient(115deg,rgba(7,20,16,.94),rgba(7,20,16,.78)_48%,rgba(7,20,16,.92))]" />
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-96 bg-[radial-gradient(circle_at_50%_20%,rgba(199,243,107,0.18),transparent_60%)] pointer-events-none" />
+      <section ref={reveal} className="scroll-reveal relative overflow-hidden pt-12 pb-20 lg:pt-20 lg:pb-32 bg-slate-50 dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800">
+        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1554068865-24cecd4e34b8?auto=format&fit=crop&w=2000&q=85')] bg-cover bg-center opacity-15 dark:opacity-100" />
+        <div className="absolute inset-0 bg-gradient-to-b from-white/90 via-slate-50/95 to-slate-100 dark:bg-[linear-gradient(115deg,rgba(7,20,16,.94),rgba(7,20,16,.78)_48%,rgba(7,20,16,.92))]" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-96 bg-[radial-gradient(circle_at_50%_20%,rgba(16,185,129,0.12),transparent_60%)] dark:bg-[radial-gradient(circle_at_50%_20%,rgba(199,243,107,0.18),transparent_60%)] pointer-events-none" />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center space-y-8">
-          <div className="mx-auto max-w-3xl rounded-3xl border border-white/10 bg-white/[0.04] px-5 py-8 backdrop-blur-[2px]">
+          <div className="mx-auto max-w-3xl rounded-3xl border border-slate-200/80 dark:border-white/10 bg-white/95 dark:bg-white/[0.04] px-5 py-8 backdrop-blur-md shadow-xl dark:shadow-none">
           {/* Trust Badge - Updated positioning */}
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-800 text-xs font-bold shadow-xs">
             <Sparkles className="w-4 h-4 text-emerald-500" />
@@ -369,12 +369,12 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
           </div>
 
           {/* Main Headline */}
-          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight text-white max-w-4xl mx-auto leading-[1.1] text-balance">
+          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight text-slate-900 dark:text-white max-w-4xl mx-auto leading-[1.1] text-balance">
             {t('corporate.heroTitle', 'Software de Marca Blanca integral para profesionales del pádel.')}
           </h1>
 
           {/* Subtitle - Exact copy requirement */}
-          <p className="text-base sm:text-xl text-slate-600 dark:text-slate-300 max-w-3xl mx-auto font-normal leading-relaxed text-balance">
+          <p className="text-base sm:text-xl text-slate-700 dark:text-slate-300 max-w-3xl mx-auto font-normal leading-relaxed text-balance">
             {t('home.corporate.heroSubtitle', 'Incluye Web Pública, App de Gestión Interna, App para Personal y Clientes, y Agente de IA para web y redes.')}
           </p>
 
@@ -406,7 +406,7 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
           </div>
 
           {/* Micro-guarantees */}
-          <div className="flex flex-wrap justify-center items-center gap-6 text-xs text-slate-500 dark:text-slate-400 font-medium pt-2">
+          <div className="flex flex-wrap justify-center items-center gap-6 text-xs text-slate-600 dark:text-slate-400 font-semibold pt-2">
             <span className="flex items-center gap-1.5">
               <CheckCircle2 className="w-4 h-4 text-emerald-500" /> {t('home.corporate.guarantee1', 'Sin permanencia')}
             </span>

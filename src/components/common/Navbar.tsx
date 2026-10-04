@@ -123,7 +123,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCart, onOpenAuth, onOpenDe
 
             <button
               onClick={navigateToCorporate}
-              className="hidden xl:inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 text-[11px] font-bold text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition border border-slate-200 dark:border-slate-700"
+              className="hidden xl:inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 text-[11px] font-bold text-slate-700 dark:text-slate-300 hover:text-emerald-700 dark:hover:text-emerald-400 transition border border-slate-200 dark:border-slate-700"
               title="Volver a la plataforma corporativa de Setmio SaaS"
             >
               <span>← Setmio SaaS</span>
@@ -137,10 +137,10 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCart, onOpenAuth, onOpenDe
                   <button
                     key={link.id}
                     onClick={() => handleNavClick(link.id)}
-                    className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors relative ${
+                    className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-colors relative ${
                       isActive
-                        ? 'text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 font-bold'
-                        : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60'
+                        ? 'text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 font-black'
+                        : 'text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60'
                     }`}
                   >
                     {link.label}
@@ -158,7 +158,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCart, onOpenAuth, onOpenDe
               <div className="relative" ref={langMenuRef}>
                 <button
                   onClick={() => setLangDropdownOpen(!langDropdownOpen)}
-                  className="px-2 py-1.5 rounded-xl border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition flex items-center gap-1.5 text-xs font-semibold"
+                  className="px-2 py-1.5 rounded-xl border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition flex items-center gap-1.5 text-xs font-bold"
                   title="Cambiar idioma de la plataforma"
                   aria-label="Seleccionar idioma"
                 >
@@ -183,8 +183,8 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCart, onOpenAuth, onOpenDe
                         }}
                         className={`w-full px-3 py-2 text-xs text-left flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800 transition ${
                           language === l.code
-                            ? 'text-emerald-600 dark:text-emerald-400 font-bold bg-emerald-50/60 dark:bg-emerald-950/40'
-                            : 'text-slate-700 dark:text-slate-300 font-medium'
+                            ? 'text-emerald-700 dark:text-emerald-400 font-bold bg-emerald-50/60 dark:bg-emerald-950/40'
+                            : 'text-slate-800 dark:text-slate-200 font-medium'
                         }`}
                       >
                         <span className="flex items-center gap-2">
@@ -201,7 +201,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCart, onOpenAuth, onOpenDe
               {/* Theme Toggle Button */}
               <button
                 onClick={toggleTheme}
-                className="hidden lg:block p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                className="hidden lg:block p-2 rounded-xl text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                 title={theme === 'dark' ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
                 aria-label="Cambiar tema"
               >
@@ -221,7 +221,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCart, onOpenAuth, onOpenDe
                     onOpenCart();
                   }
                 }}
-                className="relative hidden lg:block p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+                className="relative hidden lg:block p-2 rounded-xl text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition"
                 title={!currentUser ? 'Inicia sesión para ver tus favoritos' : 'Ver carrito'}
                 aria-label="Favoritos o carrito"
               >
@@ -236,7 +236,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCart, onOpenAuth, onOpenDe
               {/* Shopping Cart Drawer Trigger */}
               <button
                 onClick={onOpenCart}
-                className="relative hidden lg:block p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+                className="relative hidden lg:block p-2 rounded-xl text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition"
                 title="Ver cesta de compra"
               >
                 <ShoppingBag className="w-4 h-4" />
@@ -247,12 +247,10 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCart, onOpenAuth, onOpenDe
                 )}
               </button>
 
-
-
               {/* User Account / Login Button */}
               <button
                 onClick={onOpenAuth}
-                className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800/80 hover:bg-slate-50 dark:hover:bg-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-200 transition shadow-sm"
+                className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800/80 hover:bg-slate-50 dark:hover:bg-slate-800 text-xs font-bold text-slate-800 dark:text-slate-200 transition shadow-xs"
               >
                 <User className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                 <span>{currentUser ? currentUser.name.split(' ')[0] : t('nav.myAccount', 'Mi Cuenta')}</span>
@@ -261,7 +259,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCart, onOpenAuth, onOpenDe
               {/* Cerrar Sesión / Salir Demo Button */}
               <button
                 onClick={logoutOrExitDemo}
-                className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-rose-600 dark:text-rose-400 hover:bg-rose-100 dark:hover:bg-rose-900/40 text-xs font-bold transition shadow-sm"
+                className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-300 hover:bg-rose-100 dark:hover:bg-rose-900/60 text-xs font-black transition shadow-xs"
                 title={t('auth.logout', 'Cerrar Sesión / Salir Demo')}
                 aria-label="Cerrar Sesión / Salir Demo"
               >
@@ -272,7 +270,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCart, onOpenAuth, onOpenDe
               {/* Quick Booking CTA */}
               <button
                 onClick={() => handleNavClick('booking')}
-                className="hidden sm:flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 dark:bg-emerald-500 dark:hover:bg-emerald-400 text-white dark:text-slate-950 font-bold text-xs shadow-sm shadow-emerald-600/30 transition hover:scale-[1.02]"
+                className="hidden sm:flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 dark:bg-emerald-500 dark:hover:bg-emerald-400 text-white dark:text-slate-950 font-black text-xs shadow-sm shadow-emerald-600/30 transition hover:scale-[1.02]"
               >
                 <Calendar className="w-3.5 h-3.5" />
                 <span>Reservar Pista</span>
@@ -281,7 +279,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCart, onOpenAuth, onOpenDe
               {/* Mobile Hamburger Toggle */}
               <button
                 onClick={() => setMobileMenuOpen(true)}
-                className="lg:hidden p-2 rounded-xl text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+                className="lg:hidden p-2 rounded-xl text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
                 aria-label="Abrir menú de navegación"
               >
                 <Menu className="w-6 h-6" />
