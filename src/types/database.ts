@@ -405,6 +405,12 @@ export interface BlogPost {
   category: string;
   readingTime: number;
   publishedAt: string;
+  titleKey?: string;
+  excerptKey?: string;
+  summaryKey?: string;
+  authorKey?: string;
+  readingTimeKey?: string;
+  tagsKey?: string;
 }
 
 export interface PageBlock {

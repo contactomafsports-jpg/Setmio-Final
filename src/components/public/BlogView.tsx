@@ -57,11 +57,15 @@ export const BlogView: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
       selectedCategory === 'all' ||
       p.category === activeCat?.categoryMatch ||
       getCategoryFilterId(p.category) === selectedCategory;
-    const postTitle = t('blog.posts.' + p.id + '.title', p.title);
-    const postSummary = t('blog.posts.' + p.id + '.summary', p.summary);
+    const postTitle = t((p as any).titleKey || ('blog.posts.' + p.id + '.title'), p.title);
+    const postSummary = t((p as any).excerptKey || (p as any).summaryKey || ('blog.posts.' + p.id + '.summary'), p.summary);
+    const postAuthor = t((p as any).authorKey || ('blog.posts.' + p.id + '.author'), p.author);
+    const postTags = t((p as any).tagsKey || ('blog.posts.' + p.id + '.tags'), '');
     const matchSearch =
       postTitle.toLowerCase().includes(search.toLowerCase()) ||
       postSummary.toLowerCase().includes(search.toLowerCase()) ||
+      postAuthor.toLowerCase().includes(search.toLowerCase()) ||
+      postTags.toLowerCase().includes(search.toLowerCase()) ||
       p.title.toLowerCase().includes(search.toLowerCase()) ||
       p.summary.toLowerCase().includes(search.toLowerCase());
     return matchCat && matchSearch;
@@ -71,7 +75,7 @@ export const BlogView: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
     if (navigator.share) {
       navigator.share({ title, url: window.location.href }).catch(() => {});
     } else {
-      triggerDemoToast('Enlace Copiado', `Enlace de "${title}" copiado al portapapeles.`, 'info');
+      triggerDemoToast(t('blog.shareCopied', 'Enlace Copiado'), t('blog.shareCopiedDesc', `Enlace de "${title}" copiado al portapapeles.`), 'info');
     }
   };
 
@@ -92,7 +96,7 @@ export const BlogView: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
 
           <header className="space-y-4">
             <div className="flex items-center gap-2 text-xs text-emerald-600 dark:text-emerald-400 font-bold uppercase tracking-wider">
-              <span>{t('blog.filters.' + getCategoryFilterId(selectedArticle.category), selectedArticle.category)}</span>
+              <span>{t('blog.filters.' + getCategoryFilterId(selectedArticle.category), t('blog.categories.' + getCategoryFilterId(selectedArticle.category), selectedArticle.category))}</span>
               <span className="text-slate-400">·</span>
               <span className="text-slate-500 font-normal">
                 {selectedArticle.publishedAt.split('T')[0]}
@@ -100,21 +104,25 @@ export const BlogView: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
             </div>
 
             <h1 className="text-3xl sm:text-5xl font-black text-slate-900 dark:text-white tracking-tight leading-tight">
-              {t('blog.posts.' + selectedArticle.id + '.title', selectedArticle.title)}
+              {t((selectedArticle as any).titleKey || ('blog.posts.' + selectedArticle.id + '.title'), selectedArticle.title)}
             </h1>
 
             <div className="flex items-center justify-between border-y border-slate-200 dark:border-slate-800 py-3 text-xs text-slate-500 dark:text-slate-400">
               <div className="flex items-center gap-2">
                 <User className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                <span className="text-slate-800 dark:text-slate-200 font-semibold">{selectedArticle.author}</span>
+                <span className="text-slate-800 dark:text-slate-200 font-semibold">
+                  {t((selectedArticle as any).authorKey || ('blog.posts.' + selectedArticle.id + '.author'), selectedArticle.author)}
+                </span>
               </div>
               <div className="flex items-center gap-4">
                 <div className="flex items-center gap-1 font-mono">
                   <Clock className="w-4 h-4 text-teal-600 dark:text-cyan-400" />
-                  <span>{selectedArticle.readingTime} {t('blog.readingTime', 'min de lectura')}</span>
+                  <span>
+                    {t((selectedArticle as any).readingTimeKey || ('blog.posts.' + selectedArticle.id + '.readingTime'), `${selectedArticle.readingTime} ${t('blog.readingTime', 'min de lectura')}`)}
+                  </span>
                 </div>
                 <button
-                  onClick={() => handleShare(t('blog.posts.' + selectedArticle.id + '.title', selectedArticle.title))}
+                  onClick={() => handleShare(t((selectedArticle as any).titleKey || ('blog.posts.' + selectedArticle.id + '.title'), selectedArticle.title))}
                   className="p-1.5 rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition"
                   title={t('blog.share', 'Compartir artículo')}
                 >
@@ -122,12 +130,27 @@ export const BlogView: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
                 </button>
               </div>
             </div>
+
+            {/* Tags Badge List */}
+            <div className="flex flex-wrap items-center gap-2 pt-1 text-xs">
+              <span className="text-slate-400 font-semibold">{t('blog.tags', 'Etiquetas')}:</span>
+              {t((selectedArticle as any).tagsKey || ('blog.posts.' + selectedArticle.id + '.tags'), 'Pádel, Técnica, Rendimiento')
+                .split(',')
+                .map((tag: string) => (
+                  <span
+                    key={tag.trim()}
+                    className="px-2.5 py-0.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 text-[10px] font-bold"
+                  >
+                    #{tag.trim()}
+                  </span>
+                ))}
+            </div>
           </header>
 
           <div className="rounded-3xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-xl h-80 sm:h-96">
             <img
               src={selectedArticle.coverImage}
-              alt={t('blog.posts.' + selectedArticle.id + '.title', selectedArticle.title)}
+              alt={t((selectedArticle as any).titleKey || ('blog.posts.' + selectedArticle.id + '.title'), selectedArticle.title)}
               className="w-full h-full object-cover"
             />
           </div>
@@ -135,7 +158,7 @@ export const BlogView: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
           {/* Article Prose Content */}
           <div className="prose prose-slate dark:prose-invert max-w-none text-sm sm:text-base leading-relaxed space-y-6 text-slate-700 dark:text-slate-300">
             <p className="text-lg font-medium text-slate-900 dark:text-slate-100 leading-relaxed border-l-4 border-emerald-500 pl-4">
-              {t('blog.posts.' + selectedArticle.id + '.summary', selectedArticle.summary)}
+              {t((selectedArticle as any).excerptKey || (selectedArticle as any).summaryKey || ('blog.posts.' + selectedArticle.id + '.summary'), selectedArticle.summary)}
             </p>
 
             <p>
@@ -179,7 +202,7 @@ export const BlogView: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
                 {relatedArticles.map((article) => {
                   const filterId = getCategoryFilterId(article.category);
-                  const artTitle = t('blog.posts.' + article.id + '.title', article.title);
+                  const artTitle = t((article as any).titleKey || ('blog.posts.' + article.id + '.title'), article.title);
                   return (
                     <div
                       key={article.id}
@@ -199,7 +222,7 @@ export const BlogView: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
                         </div>
                         <div className="p-4 space-y-2">
                           <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase">
-                            {t('blog.filters.' + filterId, article.category)}
+                            {t('blog.filters.' + filterId, t('blog.categories.' + filterId, article.category))}
                           </span>
                           <h4 className="font-bold text-xs text-slate-900 dark:text-white line-clamp-2 group-hover:text-emerald-600 transition-colors">
                             {artTitle}
@@ -207,7 +230,7 @@ export const BlogView: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
                         </div>
                       </div>
                       <div className="p-4 pt-0 text-[11px] text-slate-400 font-medium">
-                        {article.readingTime} {t('blog.readingTimeShort', 'min de lectura')}
+                        {t((article as any).readingTimeKey || ('blog.posts.' + article.id + '.readingTime'), `${article.readingTime} ${t('blog.readingTimeShort', 'min de lectura')}`)}
                       </div>
                     </div>
                   );
@@ -279,7 +302,7 @@ export const BlogView: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
                     : 'bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-slate-800'
                 }`}
               >
-                {t('blog.filters.' + c.id)}
+                {t('blog.filters.' + c.id, t('blog.categories.' + c.id, c.id))}
               </button>
             ))}
           </div>
@@ -288,8 +311,9 @@ export const BlogView: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredPosts.map((post) => {
               const filterId = getCategoryFilterId(post.category);
-              const postTitle = t('blog.posts.' + post.id + '.title', post.title);
-              const postSummary = t('blog.posts.' + post.id + '.summary', post.summary);
+              const postTitle = t((post as any).titleKey || ('blog.posts.' + post.id + '.title'), post.title);
+              const postSummary = t((post as any).excerptKey || (post as any).summaryKey || ('blog.posts.' + post.id + '.summary'), post.summary);
+              const postAuthor = t((post as any).authorKey || ('blog.posts.' + post.id + '.author'), post.author);
               return (
                 <div
                   key={post.id}
@@ -303,7 +327,7 @@ export const BlogView: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                     <div className="absolute top-3 left-3 px-2.5 py-1 rounded-xl bg-white/90 dark:bg-slate-900/90 text-emerald-700 dark:text-emerald-400 text-[10px] font-bold uppercase tracking-wider backdrop-blur-md border border-slate-200 dark:border-slate-700">
-                      {t('blog.filters.' + filterId, post.category)}
+                      {t('blog.filters.' + filterId, t('blog.categories.' + filterId, post.category))}
                     </div>
                   </div>
 
@@ -312,7 +336,7 @@ export const BlogView: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
                       <div className="flex items-center gap-2 text-[11px] text-slate-400">
                         <span>{post.publishedAt.split('T')[0]}</span>
                         <span>·</span>
-                        <span>{post.readingTime} {t('blog.readingTimeShort', 'min de lectura')}</span>
+                        <span>{t((post as any).readingTimeKey || ('blog.posts.' + post.id + '.readingTime'), `${post.readingTime} ${t('blog.readingTimeShort', 'min de lectura')}`)}</span>
                       </div>
 
                       <h3 className="text-base font-bold text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors line-clamp-2">
@@ -325,7 +349,7 @@ export const BlogView: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
                     </div>
 
                     <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs">
-                      <span className="text-slate-500 font-medium">{t('blog.by', 'Por')} {post.author}</span>
+                      <span className="text-slate-500 font-medium">{t('blog.by', 'Por')} {postAuthor}</span>
                       <span className="text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1 group-hover:translate-x-1 transition-transform">
                         {t('blog.readArticle', 'Leer artículo')} <ArrowRight className="w-3.5 h-3.5" />
                       </span>

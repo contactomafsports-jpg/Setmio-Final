@@ -80,7 +80,6 @@ export function App() {
       window.history.pushState({}, '', path);
       window.dispatchEvent(new PopStateEvent('popstate'));
     }
-    setPublicPage(path === '/' ? 'home' : publicPage);
   };
 
   const closeRegistration = () => {
@@ -126,16 +125,17 @@ export function App() {
       '/precios': 'pricing',
     };
     const syncRoute = () => {
-      const page = routeToPage[window.location.pathname];
+      const pathname = typeof window !== 'undefined' ? window.location.pathname : '/';
+      const page = routeToPage[pathname];
       if (page === 'demo') {
         setPublicPage('home');
         setRoleSelectorOpen(true);
       } else if (page) {
         setPublicPage(page);
-        if (window.location.pathname === '/registro') {
+        if (pathname === '/registro') {
           setRegistrationOpen(true);
           setAuthOpen(true);
-        } else if (window.location.pathname === '/login') {
+        } else if (pathname === '/login') {
           setRegistrationOpen(false);
           setAuthOpen(true);
         }
@@ -147,11 +147,16 @@ export function App() {
   }, [setPublicPage]);
 
   useEffect(() => {
+    if (isCorporateLanding) return;
     const enabled = currentTenant.publicPages ?? ['home', 'courts', 'academy', 'tournaments', 'shop', 'contact'];
-    if (['home', 'courts', 'academy', 'tournaments', 'shop', 'contact'].includes(publicPage) && !enabled.includes(publicPage)) {
+    if (
+      ['home', 'courts', 'academy', 'tournaments', 'shop', 'contact'].includes(publicPage) &&
+      !enabled.includes(publicPage) &&
+      enabled.length > 0
+    ) {
       setPublicPage(enabled[0] as typeof publicPage);
     }
-  }, [currentTenant.publicPages, publicPage, setPublicPage]);
+  }, [isCorporateLanding, currentTenant.publicPages, publicPage, setPublicPage]);
 
   const goHome = () => {
     if (typeof window !== 'undefined' && window.location.pathname !== '/') {

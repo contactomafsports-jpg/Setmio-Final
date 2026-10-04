@@ -51,7 +51,7 @@ export const ContactFAQView: React.FC<{ onBack?: () => void }> = ({ onBack }) =>
     e.preventDefault();
     triggerDemoToast(
       t('contact.toastSuccess', 'Mensaje Enviado'),
-      t('contact.toastSuccessDesc', `Gracias ${formName}. Tu consulta ha sido recibida en recepción de Pádel San Mateo. Te responderemos a ${formEmail}.`),
+      t('contact.toastSuccessDesc', 'Gracias. Tu consulta ha sido recibida en recepción. Te responderemos a la brevedad.'),
       'success'
     );
     setFormName('');
@@ -70,10 +70,10 @@ export const ContactFAQView: React.FC<{ onBack?: () => void }> = ({ onBack }) =>
           <span>{t('contact.eyebrow', 'Contacto & Atención al Jugador')}</span>
         </div>
         <h1 className="text-3xl sm:text-5xl font-black text-slate-900 dark:text-white tracking-tight leading-tight">
-          {t('contact.title', 'Estamos en Narón, Galicia')}
+          {t('contact.title', 'Estamos a tu disposición en el club')}
         </h1>
         <p className="text-slate-600 dark:text-slate-300 text-xs sm:text-sm leading-relaxed">
-          {t('contact.description', 'Ven a conocernos al Polígono Industrial Río do Pozo. Resolveremos cualquier consulta sobre reservas de pistas, escuela federada, torneos o material deportivo.')}
+          {t('contact.description', 'Ven a conocernos a nuestras instalaciones. Resolveremos cualquier consulta sobre reservas de pistas, escuela federada, torneos o material deportivo.')}
         </p>
       </div>
 
@@ -86,8 +86,8 @@ export const ContactFAQView: React.FC<{ onBack?: () => void }> = ({ onBack }) =>
           <h3 className="text-base font-bold text-slate-900 dark:text-white">{t('contact.location', 'Ubicación & Acceso')}</h3>
           <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
             {currentTenant.address}<br />
-            Polígono Industrial Río do Pozo<br />
-            15578 Narón, A Coruña (Galicia)
+            {currentTenant.city || 'Polígono Industrial Río do Pozo'}<br />
+            {t('contact.locationNote', 'Instalaciones cubiertas climatizadas')}
           </p>
           <div className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 pt-1">
             {t('contact.parking', 'Parking privado gratuito vigilado (80 plazas)')}
@@ -100,9 +100,9 @@ export const ContactFAQView: React.FC<{ onBack?: () => void }> = ({ onBack }) =>
           </div>
           <h3 className="text-base font-bold text-slate-900 dark:text-white">{t('contact.hours', 'Horario de Apertura')}</h3>
           <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-            {t('contact.hoursWeekdays', 'Lunes a Viernes:')} <strong>8:00 - 23:30 h</strong><br />
-            {t('contact.hoursSaturday', 'Sábados:')} <strong>8:30 - 23:00 h</strong><br />
-            {t('contact.hoursSunday', 'Domingos y Festivos:')} <strong>9:00 - 22:30 h</strong>
+            {t('contact.hoursWeekdays', 'Lunes a Viernes:')} <strong>{currentTenant.settings.openingHours?.[0]?.hours || '8:00 - 23:30 h'}</strong><br />
+            {t('contact.hoursSaturday', 'Sábados:')} <strong>{t('contact.hoursSaturdayTime', '8:30 - 23:00 h')}</strong><br />
+            {t('contact.hoursSunday', 'Domingos y Festivos:')} <strong>{t('contact.hoursSundayTime', '9:00 - 22:30 h')}</strong>
           </p>
           <div className="text-[11px] font-semibold text-teal-600 dark:text-cyan-400 pt-1">
             {t('contact.shopHours', 'Cafetería y Pro Shop abiertos en horario de pistas')}
@@ -120,7 +120,7 @@ export const ContactFAQView: React.FC<{ onBack?: () => void }> = ({ onBack }) =>
           </p>
           <div className="pt-2">
             <a
-              href={`https://wa.me/34981380000?text=${encodeURIComponent('Hola, me gustaría información sobre las pistas de Pádel San Mateo')}`}
+              href={`https://wa.me/34981380000?text=${encodeURIComponent(t('contact.whatsappPrompt', 'Hola, me gustaría información sobre las pistas de Pádel San Mateo'))}`}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600 text-white font-bold text-xs shadow-sm hover:bg-emerald-500 transition"
@@ -203,7 +203,7 @@ export const ContactFAQView: React.FC<{ onBack?: () => void }> = ({ onBack }) =>
                   required
                   value={formEmail}
                   onChange={(e) => setFormEmail(e.target.value)}
-                  placeholder="tu@email.com"
+                  placeholder={t('contact.emailPlaceholder', 'tu@email.com')}
                   className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
                 />
               </div>
@@ -213,7 +213,7 @@ export const ContactFAQView: React.FC<{ onBack?: () => void }> = ({ onBack }) =>
                   type="tel"
                   value={formPhone}
                   onChange={(e) => setFormPhone(e.target.value)}
-                  placeholder="+34 600..."
+                  placeholder={t('contact.phonePlaceholder', '+34 600...')}
                   className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
                 />
               </div>

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import {
   Tenant,
   UserRole,
@@ -70,6 +70,8 @@ export type PublicPage =
 const PUBLIC_ROUTES: Record<string, PublicPage> = {
   '/': 'home',
   '/funcionalidades': 'features',
+  '/registro': 'home',
+  '/login': 'home',
   '/soluciones': 'solutions',
   '/soluciones/clubes': 'solution_clubs',
   '/soluciones/escuelas': 'solution_schools',
@@ -560,9 +562,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   });
 
-  const toggleTheme = () => {
+  const toggleTheme = useCallback(() => {
     setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
-  };
+  }, []);
 
   // Language state (default 'es' per requirement 40)
   const [language, setLanguageState] = useState<SupportedLanguage>(() => {
@@ -574,23 +576,23 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   });
 
-  const setLanguage = (lang: SupportedLanguage) => {
+  const setLanguage = useCallback((lang: SupportedLanguage) => {
     setLanguageState(lang);
     try {
       localStorage.setItem('setmio_lang', lang);
     } catch {
       // Ignore
     }
-  };
+  }, []);
 
   useEffect(() => {
     document.documentElement.lang = language;
     document.documentElement.dir = language === 'ar' ? 'rtl' : 'ltr';
   }, [language]);
 
-  const t = (key: string, fallback?: string): string => {
+  const t = useCallback((key: string, fallback?: string): string => {
     return TRANSLATIONS[language]?.[key] || TRANSLATIONS.es?.[key] || fallback || key;
-  };
+  }, [language]);
 
   // Sync theme with DOM documentElement
   useEffect(() => {
@@ -629,15 +631,15 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [adminTab, setAdminTabState] = useState<AdminTab>(initialRoute.admin);
   const [playerTab, setPlayerTabState] = useState<PlayerTab>(initialRoute.player);
 
-  const setCurrentView = (view: MainView) => {
+  const setCurrentView = useCallback((view: MainView) => {
     if (view !== 'public') {
       setIsCorporateLanding(false);
     }
     setCurrentViewState(view);
-  };
-  const setPublicPage = (page: PublicPage) => setPublicPageState(page);
-  const setAdminTab = (tab: AdminTab) => setAdminTabState(tab);
-  const setPlayerTab = (tab: PlayerTab) => setPlayerTabState(tab);
+  }, []);
+  const setPublicPage = useCallback((page: PublicPage) => setPublicPageState(page), []);
+  const setAdminTab = useCallback((tab: AdminTab) => setAdminTabState(tab), []);
+  const setPlayerTab = useCallback((tab: PlayerTab) => setPlayerTabState(tab), []);
 
   // Multi-tenant & Plans
   const [tenants, setTenants] = useState<Tenant[]>(() =>
@@ -717,13 +719,18 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
-  if (isCorporateLanding) {
-  const corporatePath = routeForPage[publicPage];
-  if (window.location.pathname !== corporatePath && !window.location.pathname.startsWith('/club/')) {
-  window.history.pushState({}, '', corporatePath);
-  }
-  return;
-  }
+    if (isCorporateLanding) {
+      const corporatePath = routeForPage[publicPage];
+      if (
+        window.location.pathname !== '/registro' &&
+        window.location.pathname !== '/login' &&
+        window.location.pathname !== corporatePath &&
+        !window.location.pathname.startsWith('/club/')
+      ) {
+        window.history.pushState({}, '', corporatePath);
+      }
+      return;
+    }
     const prefix = `/club/${currentTenant.slug}`;
     const path = currentView === 'admin'
       ? `${prefix}${routeForAdminTab[adminTab]}`
@@ -1309,15 +1316,15 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   // Demo Toast
   const [demoToast, setDemoToast] = useState<DemoNotificationToast | null>(null);
 
-  const triggerDemoToast = (
+  const triggerDemoToast = useCallback((
     title: string,
     description: string,
     type: 'info' | 'success' | 'warning' = 'info'
   ) => {
     setDemoToast({ id: `toast-${Date.now()}`, title, description, type });
-  };
+  }, []);
 
-  const clearDemoToast = () => setDemoToast(null);
+  const clearDemoToast = useCallback(() => setDemoToast(null), []);
 
   useEffect(() => {
     if (!demoToast) return;
