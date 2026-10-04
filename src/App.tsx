@@ -257,6 +257,7 @@ export function App() {
               onExploreClub={navigateToClub}
               onOpenDemoRoleModal={() => setRoleSelectorOpen(true)}
               onOpenFeatures={() => { window.history.pushState({}, '', '/funcionalidades'); setPublicPage('features'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+              onOpenOnboarding={() => { window.history.pushState({}, '', '/registro'); window.dispatchEvent(new PopStateEvent('popstate')); setRegistrationOpen(true); setAuthOpen(true); }}
             />
           ) : renderPublicPage()}
         </CorporateLayout>
