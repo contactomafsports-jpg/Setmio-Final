@@ -92,7 +92,7 @@ export const BlogView: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
               <div className="flex items-center gap-4">
                 <div className="flex items-center gap-1 font-mono">
                   <Clock className="w-4 h-4 text-teal-600 dark:text-cyan-400" />
-                  <span>{selectedArticle.readingTime} min de lectura</span>
+                  <span>{selectedArticle.readingTime} {t('blog.readingTime', 'min de lectura')}</span>
                 </div>
                 <button
                   onClick={() => handleShare(selectedArticle.title)}
@@ -200,7 +200,7 @@ export const BlogView: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
               className="flex items-center gap-2 text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition"
             >
               <ArrowLeft className="w-4 h-4" />
-              <span>Volver al listado</span>
+              <span>{t('blog.backToList', 'Volver al listado')}</span>
             </button>
 
             <button
@@ -221,13 +221,13 @@ export const BlogView: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
             <div>
               <div className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
                 <BookOpen className="w-4 h-4" />
-                <span>Actualidad & Consejos de Pádel</span>
+                <span>{t('blog.eyebrow', 'Actualidad & Consejos de Pádel')}</span>
               </div>
               <h1 className="text-3xl sm:text-5xl font-black text-slate-900 dark:text-white tracking-tight mt-1">
-                Blog Oficial {currentTenant.name}
+                {t('blog.title', `Blog Oficial ${currentTenant.name}`)}
               </h1>
               <p className="text-slate-600 dark:text-slate-400 text-xs sm:text-sm mt-2 max-w-xl">
-                Artículos técnicos elaborados por nuestros entrenadores, análisis de biomecánica, crónicas de torneos y novedades del club en Narón.
+                {t('blog.description', 'Artículos técnicos elaborados por nuestros entrenadores, análisis de biomecánica, crónicas de torneos y novedades del club en Narón.')}
               </p>
             </div>
 
@@ -238,7 +238,7 @@ export const BlogView: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Buscar artículo o tema..."
+                placeholder={t('blog.searchPlaceholder', 'Buscar artículo o tema...')}
                 className="w-full pl-9 pr-3 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-emerald-500 font-medium shadow-sm"
               />
             </div>

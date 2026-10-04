@@ -28,6 +28,7 @@ export function CorporateHeader({ onOpenDemo, onOpenAuth, onOpenRegister }: Corp
   const { t, language, setLanguage, theme, toggleTheme } = useApp();
   const close = () => setOpen(false);
   const navigate = (event: React.MouseEvent<HTMLAnchorElement>, path: string) => { event.preventDefault(); close(); window.history.pushState({}, '', path); window.dispatchEvent(new PopStateEvent('popstate')); window.scrollTo({ top: 0, behavior: 'smooth' }); };
+  const openRegistration = () => { close(); window.history.pushState({}, '', '/registro'); window.dispatchEvent(new PopStateEvent('popstate')); onOpenRegister?.(); };
 
   React.useEffect(() => {
     const previousOverflow = document.body.style.overflow;
@@ -53,6 +54,7 @@ export function CorporateHeader({ onOpenDemo, onOpenAuth, onOpenRegister }: Corp
           <a href="/modulos-domotica" onClick={(event) => navigate(event, '/modulos-domotica')} className="hover:text-emerald-600">{t('nav.modules', 'Módulos y domótica')}</a>
           <a href="/blog" onClick={(event) => navigate(event, '/blog')} className="hover:text-emerald-600">{t('nav.blog', 'Blog')}</a>
           <a href="/precios" onClick={(event) => navigate(event, '/precios')} className="hover:text-emerald-600">{t('nav.pricing', 'Precios')}</a>
+          <button type="button" onClick={openRegistration} className="rounded-lg border border-emerald-600 px-3 py-2 text-emerald-700 dark:text-emerald-300">{t('nav.register', 'Registrarse')}</button>
           <button type="button" onClick={onOpenDemo} className="rounded-lg bg-emerald-600 px-3 py-2 text-white">{t('nav.demo', 'Ver demo')}</button>
         </nav>
       </div>
@@ -63,7 +65,7 @@ export function CorporateHeader({ onOpenDemo, onOpenAuth, onOpenRegister }: Corp
           </div>
           <div className="mt-4 grid gap-2 border-t border-slate-200 pt-4 dark:border-slate-800">
             <button type="button" onClick={() => setLanguageMenuOpen((value) => !value)} className="flex items-center justify-between rounded-xl p-3 text-left text-sm font-bold hover:bg-slate-100 dark:hover:bg-slate-900" aria-expanded={languageMenuOpen}><span className="flex items-center gap-3"><Globe className="h-4 w-4 text-emerald-600" /><OfficialFlag code={language} /> {t('nav.language', 'Idioma')}: {SUPPORTED_LANGUAGES.find((item) => item.code === language)?.name ?? t('language.es', 'Español')}</span><span>⌄</span></button>{languageMenuOpen && <div className="grid grid-cols-2 gap-2 rounded-xl bg-slate-50 p-2 dark:bg-slate-900">{SUPPORTED_LANGUAGES.map((item) => <button type="button" key={item.code} onClick={() => { setLanguage(item.code); setLanguageMenuOpen(false); }} className={`rounded-lg px-2 py-2 text-left text-xs font-bold hover:bg-emerald-100 dark:hover:bg-slate-800 ${language === item.code ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300' : ''}`}><OfficialFlag code={item.code} /> <span className="ml-1">{item.name}</span></button>)}</div>}
-            <button type="button" onClick={() => { close(); window.history.pushState({}, '', '/registro'); window.dispatchEvent(new PopStateEvent('popstate')); onOpenRegister?.(); }} className="rounded-xl bg-emerald-600 px-4 py-3 text-sm font-black text-white">{t('nav.register', 'Registrarse')} <ArrowRight className="ml-1 inline h-4 w-4" /></button>
+            <button type="button" onClick={openRegistration} className="rounded-xl bg-emerald-600 px-4 py-3 text-sm font-black text-white">{t('nav.register', 'Registrarse')} <ArrowRight className="ml-1 inline h-4 w-4" /></button>
             <button type="button" onClick={() => { close(); onOpenAuth?.(); }} className="rounded-xl border border-slate-300 px-4 py-3 text-sm font-bold dark:border-slate-700"><Lock className="mr-2 inline h-4 w-4 text-emerald-600" />{t('nav.login', 'Acceso Usuarios')}</button>
           </div>
         </nav>

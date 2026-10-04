@@ -64,7 +64,7 @@ export const TRANSLATIONS: Record<SupportedLanguage, Record<string, string>> = {
     'common.confirm': 'Confirmar',
     'common.delete': 'Eliminar',
     'common.edit': 'Editar',
-    'common.close': 'Cerrar', 'register.step.account': '1. Cuenta', 'register.step.sports': '2. Perfil deportivo', 'register.step.preferences': '3. Preferencias', 'home.availabilityToastTitle': 'Disponibilidad consultada',
+    'common.close': 'Cerrar', 'auth.emailLabel': 'Email o Usuario', 'auth.emailPlaceholder': 'tu-correo@ejemplo.com', 'auth.passwordLabel': 'Contraseña', 'auth.loading': 'Iniciando sesión...', 'auth.submit': 'Entrar a mi Cuenta', 'register.useQuestion': '¿Cómo vas a usar Setmio?', 'register.profileHint': 'Elige tu perfil para personalizar tu experiencia.', 'register.fullName': 'Nombre y Apellidos', 'register.email': 'Correo Electrónico', 'register.phone': 'Teléfono Móvil', 'register.fullNamePlaceholder': 'Ej. Lucas Rey', 'blog.readingTime': 'min de lectura', 'blog.backToList': 'Volver al listado', 'blog.eyebrow': 'Actualidad & Consejos de Pádel', 'blog.description': 'Artículos técnicos elaborados por nuestros entrenadores, análisis de biomecánica, crónicas de torneos y novedades del club en Narón.', 'blog.searchPlaceholder': 'Buscar artículo o tema...', 'register.step.account': '1. Cuenta', 'register.step.sports': '2. Perfil deportivo', 'register.step.preferences': '3. Preferencias', 'home.availabilityToastTitle': 'Disponibilidad consultada',
     'common.back': 'Volver',
     'common.loading': 'Cargando...',
     'common.available': 'Disponible',
@@ -1347,16 +1347,6 @@ export const TRANSLATIONS: Record<SupportedLanguage, Record<string, string>> = {
     'home.tournaments.title': 'البطولات والدورات النشطة',
 },
 };
-
-const COMPLETE_TRANSLATION_KEYS = Object.keys(TRANSLATIONS.es);
-for (const language of SUPPORTED_LANGUAGES.map(({ code }) => code)) {
-  const dictionary = TRANSLATIONS[language];
-  for (const key of COMPLETE_TRANSLATION_KEYS) {
-    if (!dictionary[key]) {
-      dictionary[key] = TRANSLATIONS.en?.[key] || TRANSLATIONS.es[key];
-    }
-  }
-}
 
 export function getTranslation(lang: SupportedLanguage, key: string, fallback?: string): string {
   return TRANSLATIONS[lang]?.[key] || TRANSLATIONS.es?.[key] || fallback || key;
