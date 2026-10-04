@@ -364,16 +364,15 @@ export const AdminCustomers: React.FC = () => {
                   <span>+20€ Recargar Saldo</span>
                 </button>
 
-                <button
-                  onClick={() => {
-                    const cleanPhone = selectedCustomer.phone.replace(/[^\d+]/g, '').replace('+', '');
-                    window.open(`https://wa.me/${cleanPhone}`, '_blank');
-                  }}
+                <a
+                  href={`https://wa.me/${selectedCustomer.phone.replace(/[^\d+]/g, '').replace('+', '')}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition flex items-center gap-1.5"
                 >
                   <MessageCircle className="w-4 h-4" />
                   <span>WhatsApp</span>
-                </button>
+                </a>
               </div>
 
               {/* Requirement: Link/Button to Public Profile */}

@@ -2958,6 +2958,18 @@ export const TRANSLATIONS: Record<SupportedLanguage, Record<string, string>> = {
 },
 };
 
+import { ALL_EXTRA_TRANSLATIONS } from './translations';
+
+// Augment TRANSLATIONS with all 10 language dictionaries
+for (const [lang, dict] of Object.entries(ALL_EXTRA_TRANSLATIONS)) {
+  if (TRANSLATIONS[lang as SupportedLanguage]) {
+    TRANSLATIONS[lang as SupportedLanguage] = {
+      ...TRANSLATIONS[lang as SupportedLanguage],
+      ...dict,
+    };
+  }
+}
+
 export function getTranslation(lang: SupportedLanguage, key: string, fallback?: string): string {
   return TRANSLATIONS[lang]?.[key] || TRANSLATIONS.es?.[key] || fallback || key;
 }

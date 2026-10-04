@@ -79,4 +79,4 @@ export function CorporateHeader({ onOpenDemo, onOpenAuth, onOpenRegister }: Corp
   );
 }
 
-export function CorporateFooter() { const { t } = useApp(); return <footer className="border-t border-slate-800 bg-slate-950 text-slate-400"><div className="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-10 text-xs sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8"><strong className="text-white">SETMIO</strong><span>{t('footer.tagline', 'Software de marca blanca para clubes y profesionales del pádel.')}</span><span>{t('footer.copyright', '©')} {new Date().getFullYear()} Setmio</span></div></footer>; }
+export { CorporateFooter } from '../common/CorporateFooter';

@@ -283,7 +283,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onOpenRol
                 className="w-full mt-4 p-2.5 rounded-xl bg-gradient-to-r from-emerald-500/10 to-teal-500/10 hover:from-emerald-500/20 hover:to-teal-500/20 border border-emerald-500/30 text-emerald-700 dark:text-emerald-300 font-bold text-xs flex items-center justify-center gap-2 transition"
               >
                 <Sparkles className="w-4 h-4 text-emerald-500" />
-                <span>{t('register.autocomplete', 'Autocompletar con Setmio Global ID')}</span>
+                <span>{t('register.autofill_global_id')}</span>
               </button>
             )}
           </div>
@@ -344,10 +344,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onOpenRol
                   {!registrationRole ? (
                     <div className="space-y-3">
                       <p className="text-sm font-black text-slate-900 dark:text-white">
-                        {t('register.useQuestion', '¿Cómo vas a usar Setmio?')}
+                        {t('register.question_use')}
                       </p>
                       <p className="text-xs text-slate-500">
-                        {t('register.profileHint', 'Elige tu perfil para personalizar tu experiencia.')}
+                        {t('register.choose_profile')}
                       </p>
                       <div className="grid gap-2 sm:grid-cols-2">
                         {registrationRoles.map((role) => (
@@ -686,13 +686,12 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onOpenRol
             </p>
           ) : (
             <p>
-              {t('auth.haveAccount', '¿Ya tienes cuenta creada?')} {' '}
               <button
                 type="button"
                 onClick={() => setMode('login')}
                 className="font-bold text-emerald-600 dark:text-emerald-400 hover:underline"
               >
-                {t('auth.loginHere', 'Inicia sesión aquí')}
+                {t('register.already_account')}
               </button>
             </p>
           )}

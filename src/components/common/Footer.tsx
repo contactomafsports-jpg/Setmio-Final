@@ -98,17 +98,17 @@ export const Footer: React.FC = () => {
               </li>
               <li>
                 <button onClick={() => handleNav('matches')} className="hover:text-emerald-400 transition">
-                  Partidos Abiertos Play!
+                  {t('footer.matches', 'Partidos Abiertos Play!')}
                 </button>
               </li>
               <li>
                 <button onClick={() => handleNav('club')} className="hover:text-emerald-400 transition">
-                  Instalaciones & Vestuarios
+                  {t('footer.amenities', 'Instalaciones & Vestuarios')}
                 </button>
               </li>
               <li>
                 <button onClick={() => handleNav('tournaments')} className="hover:text-emerald-400 transition">
-                  Torneos & Ligas
+                  {t('footer.tournaments', 'Torneos & Ligas')}
                 </button>
               </li>
             </ul>
@@ -120,27 +120,27 @@ export const Footer: React.FC = () => {
             <ul className="space-y-2 text-xs">
               <li>
                 <button onClick={() => handleNav('academy')} className="hover:text-emerald-400 transition">
-                  Escuela de Menores
+                  {t('footer.juniorSchool', 'Escuela de Menores')}
                 </button>
               </li>
               <li>
                 <button onClick={() => handleNav('academy')} className="hover:text-emerald-400 transition">
-                  Clases Particulares & Adultos
+                  {t('footer.privateClasses', 'Clases Particulares & Adultos')}
                 </button>
               </li>
               <li>
                 <button onClick={() => handleNav('shop')} className="hover:text-emerald-400 transition">
-                  Tienda Oficial de Pádel
+                  {t('footer.officialShop', 'Tienda Oficial de Pádel')}
                 </button>
               </li>
               <li>
                 <button onClick={() => handleNav('blog')} className="hover:text-emerald-400 transition">
-                  Blog & Consejos Técnicos
+                  {t('footer.blogTips', 'Blog & Consejos Técnicos')}
                 </button>
               </li>
               <li>
                 <button onClick={() => handleNav('contact')} className="hover:text-emerald-400 transition">
-                  Preguntas Frecuentes (FAQ)
+                  {t('footer.faq', 'Preguntas Frecuentes (FAQ)')}
                 </button>
               </li>
             </ul>
@@ -148,11 +148,11 @@ export const Footer: React.FC = () => {
 
           {/* Schedules & Legal */}
           <div className="space-y-3">
-            <h4 className="text-xs font-bold text-white uppercase tracking-wider">Horarios del Club</h4>
+            <h4 className="text-xs font-bold text-white uppercase tracking-wider">{t('footer.clubHours', 'Horarios del Club')}</h4>
             <div className="space-y-1.5 text-xs text-slate-300">
               <div className="flex items-center gap-1.5 text-emerald-400">
                 <Clock className="w-3.5 h-3.5" />
-                <span className="font-semibold text-slate-200">Apertura Diaria:</span>
+                <span className="font-semibold text-slate-200">{t('footer.openingDaily', 'Apertura Diaria:')}</span>
               </div>
               {currentTenant.settings.openingHours.map((h, i) => (
                 <div key={i} className="text-[11px] text-slate-400">
@@ -162,8 +162,8 @@ export const Footer: React.FC = () => {
             </div>
 
             <div className="pt-3 border-t border-slate-900 space-y-1">
-              <div className="text-[11px] text-slate-400">Zona Climatizada & Cafetería</div>
-              <div className="text-[11px] text-slate-400">Aparcamiento Gratuito Vigilado</div>
+              <div className="text-[11px] text-slate-400">{t('footer.climatizedArea', 'Zona Climatizada & Cafetería')}</div>
+              <div className="text-[11px] text-slate-400">{t('footer.freeParking', 'Aparcamiento Gratuito Vigilado')}</div>
             </div>
           </div>
         </div>
@@ -171,27 +171,27 @@ export const Footer: React.FC = () => {
         {/* Bottom copyright & Platform white-label credit */}
         <div className="mt-12 pt-6 border-t border-slate-900 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-slate-400">
           <div>
-            © {new Date().getFullYear()} {currentTenant.name}. Todos los derechos reservados. {currentTenant.address}
+            © {new Date().getFullYear()} {currentTenant.name}. {t('footer.allRightsReserved', 'Todos los derechos reservados.')} {currentTenant.address}
           </div>
 
           <div className="flex items-center gap-4">
             <button onClick={() => handleNav('legal')} className="hover:text-slate-300 transition">
-              Aviso Legal
+              {t('footer.legal', 'Aviso Legal')}
             </button>
             <span>·</span>
             <button onClick={() => handleNav('legal')} className="hover:text-slate-300 transition">
-              Privacidad & Cookies
+              {t('footer.privacy', 'Privacidad & Cookies')}
             </button>
             <span>·</span>
             <button onClick={() => setCurrentView('admin')} className="hover:text-emerald-400 transition">
-              Acceso Gestión
+              {t('footer.adminAccess', 'Acceso Gestión')}
             </button>
           </div>
         </div>
 
         {/* Small subtle white label badge */}
         <div className="mt-4 text-center text-[10px] text-slate-400">
-          Tecnología SaaS impulsada por <span className="font-semibold text-slate-400">Setmio Padel Pro</span> · Software de Marca Blanca para Pádel
+          {t('footer.whiteLabelCredit', 'Tecnología SaaS impulsada por Setmio Padel Pro · Software de Marca Blanca para Pádel')}
         </div>
       </div>
     </footer>

@@ -26,32 +26,32 @@ export const ContactFAQView: React.FC<{ onBack?: () => void }> = ({ onBack }) =>
 
   const faqs = [
     {
-      q: '¿Cómo funciona la cancelación de una pista reservada?',
-      a: `Puedes cancelar tu reserva de forma autónoma desde la web o aplicación hasta con ${currentTenant.settings.cancellationWindowHours} horas de antelación sin coste alguno. El importe abonado se reintegrará automáticamente en tu saldo monedero de socio.`,
+      q: t('contact.faqs.0.q', '¿Cómo funciona la cancelación de una pista reservada?'),
+      a: t('contact.faqs.0.a', `Puedes cancelar tu reserva de forma autónoma desde la web o aplicación hasta con ${currentTenant.settings.cancellationWindowHours} horas de antelación sin coste alguno. El importe abonado se reintegrará automáticamente en tu saldo monedero de socio.`),
     },
     {
-      q: '¿Cómo se encienden las luces y cómo se accede a la pista?',
-      a: 'Nuestras 8 pistas cuentan con automatización IoT inteligente. Al confirmar tu reserva recibirás un código PIN para la cerradura de la puerta. Los focos LED de competición se activarán automáticamente 5 minutos antes del inicio de tu partido y se apagarán al concluir la sesión.',
+      q: t('contact.faqs.1.q', '¿Cómo se encienden las luces y cómo se accede a la pista?'),
+      a: t('contact.faqs.1.a', 'Nuestras 8 pistas cuentan con automatización IoT inteligente. Al confirmar tu reserva recibirás un código PIN para la cerradura de la puerta. Los focos LED de competición se activarán automáticamente 5 minutos antes del inicio de tu partido y se apagarán al concluir la sesión.'),
     },
     {
-      q: '¿Se puede pagar la pista de manera dividida entre los 4 jugadores?',
-      a: 'Sí. Al realizar la reserva puedes activar la opción "Pago Dividido (Split Payment)". Pagas tu cuarta parte y el sistema genera un enlace directo para que tus compañeros completen su pago en menos de 24 horas.',
+      q: t('contact.faqs.2.q', '¿Se puede pagar la pista de manera dividida entre los 4 jugadores?'),
+      a: t('contact.faqs.2.a', 'Sí. Al realizar la reserva puedes activar la opción "Pago Dividido (Split Payment)". Pagas tu cuarta parte y el sistema genera un enlace directo para que tus compañeros completen su pago en menos de 24 horas.'),
     },
     {
-      q: '¿Se pueden probar las palas de la tienda antes de comprarlas?',
-      a: 'Por supuesto. En nuestra tienda física disponemos de palas de test de las principales marcas (Bullpadel, Nox, Babolat, Head). Puedes solicitarlas en recepción para probarlas durante tus partidos en la Pista 1 o en la pista individual.',
+      q: t('contact.faqs.3.q', '¿Se pueden probar las palas de la tienda antes de comprarlas?'),
+      a: t('contact.faqs.3.a', 'Por supuesto. En nuestra tienda física disponemos de palas de test de las principales marcas (Bullpadel, Nox, Babolat, Head). Puedes solicitarlas en recepción para probarlas durante tus partidos en la Pista 1 o en la pista individual.'),
     },
     {
-      q: '¿Disponéis de aparcamiento privado?',
-      a: 'Sí, disponemos de un aparcamiento privado gratuito de más de 80 plazas dentro del recinto de Pádel San Mateo en el Polígono Industrial Río do Pozo (Narón).',
+      q: t('contact.faqs.4.q', '¿Disponéis de aparcamiento privado?'),
+      a: t('contact.faqs.4.a', 'Sí, disponemos de un aparcamiento privado gratuito de más de 80 plazas dentro del recinto de Pádel San Mateo en el Polígono Industrial Río do Pozo (Narón).'),
     },
   ];
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     triggerDemoToast(
-      'Mensaje Enviado',
-      `Gracias ${formName}. Tu consulta ha sido recibida en recepción de Pádel San Mateo. Te responderemos a ${formEmail}.`,
+      t('contact.toastSuccess', 'Mensaje Enviado'),
+      t('contact.toastSuccessDesc', `Gracias ${formName}. Tu consulta ha sido recibida en recepción de Pádel San Mateo. Te responderemos a ${formEmail}.`),
       'success'
     );
     setFormName('');
@@ -100,9 +100,9 @@ export const ContactFAQView: React.FC<{ onBack?: () => void }> = ({ onBack }) =>
           </div>
           <h3 className="text-base font-bold text-slate-900 dark:text-white">{t('contact.hours', 'Horario de Apertura')}</h3>
           <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-            Lunes a Viernes: <strong>8:00 - 23:30 h</strong><br />
-            Sábados: <strong>8:30 - 23:00 h</strong><br />
-            Domingos y Festivos: <strong>9:00 - 22:30 h</strong>
+            {t('contact.hoursWeekdays', 'Lunes a Viernes:')} <strong>8:00 - 23:30 h</strong><br />
+            {t('contact.hoursSaturday', 'Sábados:')} <strong>8:30 - 23:00 h</strong><br />
+            {t('contact.hoursSunday', 'Domingos y Festivos:')} <strong>9:00 - 22:30 h</strong>
           </p>
           <div className="text-[11px] font-semibold text-teal-600 dark:text-cyan-400 pt-1">
             {t('contact.shopHours', 'Cafetería y Pro Shop abiertos en horario de pistas')}
@@ -115,8 +115,8 @@ export const ContactFAQView: React.FC<{ onBack?: () => void }> = ({ onBack }) =>
           </div>
           <h3 className="text-base font-bold text-slate-900 dark:text-white">{t('contact.phone', 'Teléfono & WhatsApp')}</h3>
           <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-            Recepción: <strong>{currentTenant.contactPhone}</strong><br />
-            Email: <strong>{currentTenant.contactEmail}</strong>
+            {t('contact.reception', 'Recepción:')} <strong>{currentTenant.contactPhone}</strong><br />
+            {t('contact.emailLabel', 'Email:')} <strong>{currentTenant.contactEmail}</strong>
           </p>
           <div className="pt-2">
             <a
@@ -197,7 +197,7 @@ export const ContactFAQView: React.FC<{ onBack?: () => void }> = ({ onBack }) =>
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-slate-700 dark:text-slate-300 font-semibold mb-1">Email</label>
+                <label className="block text-slate-700 dark:text-slate-300 font-semibold mb-1">{t('contact.email', 'Email')}</label>
                 <input
                   type="email"
                   required

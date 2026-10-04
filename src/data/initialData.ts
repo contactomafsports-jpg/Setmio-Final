@@ -832,6 +832,42 @@ En Pádel San Mateo hemos analizado cientos de sesiones y detectado los 5 fallos
     readingTime: 4,
     publishedAt: '2026-09-22T09:00:00Z',
   },
+  {
+    id: 'blog-2',
+    tenantId: 'tenant-san-mateo-01',
+    title: 'Césped texturizado Mondo Supercourt XN: ¿por qué marca la diferencia?',
+    slug: 'cesped-texturizado-mondo-supercourt-xn',
+    summary: 'Análisis técnico sobre la superficie oficial del circuito profesional instalada en las pistas cubiertas del club y su impacto en las articulaciones.',
+    content: `El césped monofilamento texturizado Mondo Supercourt XN representa el estándar de oro en las competiciones internacionales de pádel. A diferencia de las fibras tradicionales rectas que requerían hasta 3.000 kg de arena de sílice por pista, este sistema retiene la arena en la base del filamento rizado.
+
+Ventajas biomecánicas demostradas:
+1. **Tracción homogénea y menor abrasión:** Evita bloqueos bruscos de la zapatilla, previniendo lesiones de ligamentos cruzados y meniscos.
+2. **Bote uniforme y predecible:** La bola no patina de forma irregular por exceso de arena acumulada en los fondos.
+3. **Temperatura y humedad controladas:** En nuestras instalaciones cubiertas y climatizadas en Narón, la adherencia se mantiene constante los 365 días del año.`,
+    coverImage: 'https://images.unsplash.com/photo-1526676037777-05a232554f77?auto=format&fit=crop&w=1200&q=80',
+    author: 'Laura Senra · Preparadora Física',
+    category: 'Instalaciones',
+    readingTime: 5,
+    publishedAt: '2026-09-18T10:30:00Z',
+  },
+  {
+    id: 'blog-3',
+    tenantId: 'tenant-san-mateo-01',
+    title: 'Prevención de epicondilitis en pádel: calentamiento y elección de pala',
+    slug: 'prevencion-epicondilitis-padel-calentamiento',
+    summary: 'Guía práctica para cuidar el codo de tenista: ejercicios de fuerza isométrica, grosor del grip y balance adecuado para evitar sobrecargas.',
+    content: `La epicondilalgia lateral, comúnmente llamada codo de tenista o de padelero, es la dolencia más frecuente entre practicantes aficionados de nivel 3.0 a 4.5.
+
+Factores desencadenantes clave:
+1. **Grip demasiado estrecho:** Obliga a cerrar el puño con excesiva tensión durante el golpeo. Colocar 1 o 2 overgrips adicionales alivia inmediatamente la tensión del antebrazo.
+2. **Balance excesivamente alto en la pala:** Las palas en forma de diamante transmiten más vibración torsional al brazo en golpes descentrados. Recomendamos palas con balance medio o redondo para jugadores con molestias.
+3. **Rutina de activación pre-partido:** 5 minutos de estiramientos dinámicos y contracciones isométricas con goma elástica antes de entrar a pista reducen el riesgo en un 70%.`,
+    coverImage: 'https://images.unsplash.com/photo-1517649763962-0c623266ddc0?auto=format&fit=crop&w=1200&q=80',
+    author: 'Dr. Marcos Rey · Fisioterapeuta Deportivo',
+    category: 'Salud & Rendimiento',
+    readingTime: 6,
+    publishedAt: '2026-09-12T16:00:00Z',
+  },
 ];
 
 export const INITIAL_SMART_DEVICES: SmartCourtDevice[] = [

@@ -86,8 +86,8 @@ export const HomeView: React.FC = () => {
   const previewTeams = [
     {
       id: 'team-masculino-1',
-      name: 'Absoluto Masculino A',
-      category: '1ª Categoría Gallega · División de Honor',
+      name: t('home.teams.masculino1.name', 'Absoluto Masculino A'),
+      category: t('home.teams.masculino1.category', '1ª Categoría Gallega · División de Honor'),
       gender: 'masculino',
       photoUrl: 'https://images.unsplash.com/photo-1526676037777-05a232554f77?auto=format&fit=crop&w=600&q=80',
       captain: 'Mateo Varela',
@@ -95,8 +95,8 @@ export const HomeView: React.FC = () => {
     },
     {
       id: 'team-femenino-1',
-      name: 'Absoluto Femenino A',
-      category: '1ª Categoría Gallega · Liga FGP',
+      name: t('home.teams.femenino1.name', 'Absoluto Femenino A'),
+      category: t('home.teams.femenino1.category', '1ª Categoría Gallega · Liga FGP'),
       gender: 'femenino',
       photoUrl: 'https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?auto=format&fit=crop&w=600&q=80',
       captain: 'Rosa Carballo',
@@ -104,8 +104,8 @@ export const HomeView: React.FC = () => {
     },
     {
       id: 'team-veteranos-1',
-      name: 'Veteranos +40',
-      category: 'Liga Interclubes Senior Rías Altas',
+      name: t('home.teams.veteranos1.name', 'Veteranos +40'),
+      category: t('home.teams.veteranos1.category', 'Liga Interclubes Senior Rías Altas'),
       gender: 'masculino',
       photoUrl: 'https://images.unsplash.com/photo-1517649763962-0c623266ddc0?auto=format&fit=crop&w=600&q=80',
       captain: 'Nacho Castro',
@@ -113,8 +113,8 @@ export const HomeView: React.FC = () => {
     },
     {
       id: 'team-menores-1',
-      name: 'Escuela Promesas Junior Sub-16',
-      category: 'Circuito Menores Federación Gallega',
+      name: t('home.teams.menores1.name', 'Escuela Promesas Junior Sub-16'),
+      category: t('home.teams.menores1.category', 'Circuito Menores Federación Gallega'),
       gender: 'menores',
       photoUrl: 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?auto=format&fit=crop&w=600&q=80',
       captain: 'Lucas Rey Jr.',

@@ -32,7 +32,12 @@ export const BlogView: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
-  const categories = ['all', 'Técnica & Táctica', 'Instalaciones', 'Salud & Rendimiento'];
+  const categories = [
+    { id: 'all', categoryMatch: 'all' },
+    { id: 'tecnica', categoryMatch: 'Técnica & Táctica' },
+    { id: 'instalaciones', categoryMatch: 'Instalaciones' },
+    { id: 'salud', categoryMatch: 'Salud & Rendimiento' },
+  ];
 
   const selectedArticle = blogPosts.find((p) => p.id === selectedArticleId);
 
@@ -40,9 +45,23 @@ export const BlogView: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
     ? blogPosts.filter((p) => p.id !== selectedArticle.id).slice(0, 3)
     : [];
 
+  const getCategoryFilterId = (cat: string) => {
+    if (cat === 'Técnica & Táctica') return 'tecnica';
+    if (cat === 'Instalaciones') return 'instalaciones';
+    return 'salud';
+  };
+
   const filteredPosts = blogPosts.filter((p) => {
-    const matchCat = selectedCategory === 'all' || p.category === selectedCategory;
+    const activeCat = categories.find((c) => c.id === selectedCategory);
+    const matchCat =
+      selectedCategory === 'all' ||
+      p.category === activeCat?.categoryMatch ||
+      getCategoryFilterId(p.category) === selectedCategory;
+    const postTitle = t('blog.posts.' + p.id + '.title', p.title);
+    const postSummary = t('blog.posts.' + p.id + '.summary', p.summary);
     const matchSearch =
+      postTitle.toLowerCase().includes(search.toLowerCase()) ||
+      postSummary.toLowerCase().includes(search.toLowerCase()) ||
       p.title.toLowerCase().includes(search.toLowerCase()) ||
       p.summary.toLowerCase().includes(search.toLowerCase());
     return matchCat && matchSearch;
@@ -73,7 +92,7 @@ export const BlogView: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
 
           <header className="space-y-4">
             <div className="flex items-center gap-2 text-xs text-emerald-600 dark:text-emerald-400 font-bold uppercase tracking-wider">
-              <span>{selectedArticle.category}</span>
+              <span>{t('blog.filters.' + getCategoryFilterId(selectedArticle.category), selectedArticle.category)}</span>
               <span className="text-slate-400">·</span>
               <span className="text-slate-500 font-normal">
                 {selectedArticle.publishedAt.split('T')[0]}
@@ -81,7 +100,7 @@ export const BlogView: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
             </div>
 
             <h1 className="text-3xl sm:text-5xl font-black text-slate-900 dark:text-white tracking-tight leading-tight">
-              {selectedArticle.title}
+              {t('blog.posts.' + selectedArticle.id + '.title', selectedArticle.title)}
             </h1>
 
             <div className="flex items-center justify-between border-y border-slate-200 dark:border-slate-800 py-3 text-xs text-slate-500 dark:text-slate-400">
@@ -95,7 +114,7 @@ export const BlogView: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
                   <span>{selectedArticle.readingTime} {t('blog.readingTime', 'min de lectura')}</span>
                 </div>
                 <button
-                  onClick={() => handleShare(selectedArticle.title)}
+                  onClick={() => handleShare(t('blog.posts.' + selectedArticle.id + '.title', selectedArticle.title))}
                   className="p-1.5 rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition"
                   title={t('blog.share', 'Compartir artículo')}
                 >
@@ -108,7 +127,7 @@ export const BlogView: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
           <div className="rounded-3xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-xl h-80 sm:h-96">
             <img
               src={selectedArticle.coverImage}
-              alt={selectedArticle.title}
+              alt={t('blog.posts.' + selectedArticle.id + '.title', selectedArticle.title)}
               className="w-full h-full object-cover"
             />
           </div>
@@ -116,7 +135,7 @@ export const BlogView: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
           {/* Article Prose Content */}
           <div className="prose prose-slate dark:prose-invert max-w-none text-sm sm:text-base leading-relaxed space-y-6 text-slate-700 dark:text-slate-300">
             <p className="text-lg font-medium text-slate-900 dark:text-slate-100 leading-relaxed border-l-4 border-emerald-500 pl-4">
-              {selectedArticle.summary}
+              {t('blog.posts.' + selectedArticle.id + '.summary', selectedArticle.summary)}
             </p>
 
             <p>
@@ -158,37 +177,41 @@ export const BlogView: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                {relatedArticles.map((article) => (
-                  <div
-                    key={article.id}
-                    onClick={() => {
-                      setSelectedArticleId(article.id);
-                      window.scrollTo({ top: 0, behavior: 'smooth' });
-                    }}
-                    className="cursor-pointer rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm hover:shadow-md transition group flex flex-col justify-between"
-                  >
-                    <div>
-                      <div className="relative h-36 w-full overflow-hidden">
-                        <img
-                          src={article.coverImage}
-                          alt={article.title}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform"
-                        />
+                {relatedArticles.map((article) => {
+                  const filterId = getCategoryFilterId(article.category);
+                  const artTitle = t('blog.posts.' + article.id + '.title', article.title);
+                  return (
+                    <div
+                      key={article.id}
+                      onClick={() => {
+                        setSelectedArticleId(article.id);
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                      }}
+                      className="cursor-pointer rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm hover:shadow-md transition group flex flex-col justify-between"
+                    >
+                      <div>
+                        <div className="relative h-36 w-full overflow-hidden">
+                          <img
+                            src={article.coverImage}
+                            alt={artTitle}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                          />
+                        </div>
+                        <div className="p-4 space-y-2">
+                          <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase">
+                            {t('blog.filters.' + filterId, article.category)}
+                          </span>
+                          <h4 className="font-bold text-xs text-slate-900 dark:text-white line-clamp-2 group-hover:text-emerald-600 transition-colors">
+                            {artTitle}
+                          </h4>
+                        </div>
                       </div>
-                      <div className="p-4 space-y-2">
-                        <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase">
-                          {article.category}
-                        </span>
-                        <h4 className="font-bold text-xs text-slate-900 dark:text-white line-clamp-2 group-hover:text-emerald-600 transition-colors">
-                          {article.title}
-                        </h4>
+                      <div className="p-4 pt-0 text-[11px] text-slate-400 font-medium">
+                        {article.readingTime} {t('blog.readingTimeShort', 'min de lectura')}
                       </div>
                     </div>
-                    <div className="p-4 pt-0 text-[11px] text-slate-400 font-medium">
-                      {article.readingTime} {t('blog.readingTime', 'min de lectura')}
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           )}
@@ -248,64 +271,69 @@ export const BlogView: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
           <div className="flex items-center gap-2 overflow-x-auto pb-2 no-scrollbar">
             {categories.map((c) => (
               <button
-                key={c}
-                onClick={() => setSelectedCategory(c)}
+                key={c.id}
+                onClick={() => setSelectedCategory(c.id)}
                 className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition ${
-                  selectedCategory === c
+                  selectedCategory === c.id
                     ? 'bg-emerald-600 text-white shadow-sm'
                     : 'bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-slate-800'
                 }`}
               >
-                {c === 'all' ? t('blog.allTopics', 'Todos los Temas') : t(`blog.category.${c}`, c)}
+                {t('blog.filters.' + c.id)}
               </button>
             ))}
           </div>
 
           {/* Articles Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredPosts.map((post) => (
-              <div
-                key={post.id}
-                className="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 overflow-hidden hover:border-slate-300 dark:hover:border-slate-700 transition flex flex-col justify-between group shadow-sm hover:shadow-md cursor-pointer"
-                onClick={() => setSelectedArticleId(post.id)}
-              >
-                <div className="relative h-48 overflow-hidden">
-                  <img
-                    src={post.coverImage}
-                    alt={post.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                  <div className="absolute top-3 left-3 px-2.5 py-1 rounded-xl bg-white/90 dark:bg-slate-900/90 text-emerald-700 dark:text-emerald-400 text-[10px] font-bold uppercase tracking-wider backdrop-blur-md border border-slate-200 dark:border-slate-700">
-                    {post.category}
+            {filteredPosts.map((post) => {
+              const filterId = getCategoryFilterId(post.category);
+              const postTitle = t('blog.posts.' + post.id + '.title', post.title);
+              const postSummary = t('blog.posts.' + post.id + '.summary', post.summary);
+              return (
+                <div
+                  key={post.id}
+                  className="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 overflow-hidden hover:border-slate-300 dark:hover:border-slate-700 transition flex flex-col justify-between group shadow-sm hover:shadow-md cursor-pointer"
+                  onClick={() => setSelectedArticleId(post.id)}
+                >
+                  <div className="relative h-48 overflow-hidden">
+                    <img
+                      src={post.coverImage}
+                      alt={postTitle}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                    <div className="absolute top-3 left-3 px-2.5 py-1 rounded-xl bg-white/90 dark:bg-slate-900/90 text-emerald-700 dark:text-emerald-400 text-[10px] font-bold uppercase tracking-wider backdrop-blur-md border border-slate-200 dark:border-slate-700">
+                      {t('blog.filters.' + filterId, post.category)}
+                    </div>
                   </div>
-                </div>
 
-                <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2 text-[11px] text-slate-400">
-                      <span>{post.publishedAt.split('T')[0]}</span>
-                      <span>·</span>
-                      <span>{post.readingTime} {t('blog.readingTimeShort', 'min lectura')}</span>
+                  <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2 text-[11px] text-slate-400">
+                        <span>{post.publishedAt.split('T')[0]}</span>
+                        <span>·</span>
+                        <span>{post.readingTime} {t('blog.readingTimeShort', 'min de lectura')}</span>
+                      </div>
+
+                      <h3 className="text-base font-bold text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors line-clamp-2">
+                        {postTitle}
+                      </h3>
+
+                      <p className="text-xs text-slate-600 dark:text-slate-400 line-clamp-2">
+                        {postSummary}
+                      </p>
                     </div>
 
-                    <h3 className="text-base font-bold text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors line-clamp-2">
-                      {post.title}
-                    </h3>
-
-                    <p className="text-xs text-slate-600 dark:text-slate-400 line-clamp-2">
-                      {post.summary}
-                    </p>
-                  </div>
-
-                  <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs">
-                    <span className="text-slate-500 font-medium">{t('blog.by', 'Por')} {post.author}</span>
-                    <span className="text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1 group-hover:translate-x-1 transition-transform">
-                      {t('blog.readArticle', 'Leer artículo')} <ArrowRight className="w-3.5 h-3.5" />
-                    </span>
+                    <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs">
+                      <span className="text-slate-500 font-medium">{t('blog.by', 'Por')} {post.author}</span>
+                      <span className="text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+                        {t('blog.readArticle', 'Leer artículo')} <ArrowRight className="w-3.5 h-3.5" />
+                      </span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       )}

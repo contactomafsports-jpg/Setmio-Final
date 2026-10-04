@@ -107,7 +107,8 @@ export const RoleSelectorModal: React.FC<RoleSelectorModalProps> = ({
         <button
           onClick={onClose}
           className="absolute top-5 right-5 p-2 rounded-xl text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition"
-          aria-label={t('common.close', 'Cerrar')}
+          aria-label={t('demo.close', 'Cerrar selector de demo')}
+          title={t('demo.close', 'Cerrar')}
         >
           <X className="w-5 h-5" />
         </button>
@@ -155,7 +156,7 @@ export const RoleSelectorModal: React.FC<RoleSelectorModalProps> = ({
                 </div>
 
                 <div className="pt-2 border-t border-slate-200/80 dark:border-slate-800/80 flex items-center justify-between text-xs font-bold text-emerald-600 dark:text-emerald-400">
-                  <span>{t('demo.accessAs', 'Acceder como')} {t(`demo.roles.${item.id}.badge`, item.badge)}</span>
+                  <span>{t('demo.tryAs', 'Probar como')} {t(`demo.roles.${item.id}.badge`, item.badge)}</span>
                   <ArrowRight className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" />
                 </div>
               </button>

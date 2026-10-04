@@ -182,7 +182,7 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
               onClick={() => navigatePublicRoute('/funcionalidades', 'features')}
               className="hover:text-emerald-600 dark:hover:text-emerald-400 transition"
             >
-              {t('corporate.discoverFeatures', 'Descubrir funcionalidades')}
+              {t('home.hero.discover_features', 'Descubrir funcionalidades')}
             </button>
             <button onClick={() => navigatePublicRoute('/soluciones', 'solutions')} className="hover:text-emerald-600 dark:hover:text-emerald-400 transition">
               {t('nav.solutions', 'Soluciones')}
@@ -256,7 +256,7 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
               onClick={handleOpenRegister}
               className="hidden sm:inline-flex px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs shadow-md shadow-emerald-600/20 transition items-center gap-1.5"
             >
-              <span>Registrarse</span>
+              <span>{t('nav.register', 'Registrarse')}</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
 
@@ -293,14 +293,14 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
               </div>
               <nav className="flex flex-col gap-1.5 text-sm font-semibold text-slate-800 dark:text-slate-200">
               {[
-                { label: 'Inicio', icon: Home, action: () => navigatePublicRoute('/', 'home') },
-                { label: 'Soluciones', icon: Layers, action: () => navigatePublicRoute('/soluciones', 'solutions') },
-                { label: 'Funcionalidades', icon: Sparkles, action: () => navigatePublicRoute('/funcionalidades', 'features') },
-                { label: 'Módulos y domótica', icon: Sliders, action: () => navigatePublicRoute('/modulos-domotica', 'modules') },
-                { label: 'Blog', icon: BookOpen, action: () => navigatePublicRoute('/blog', 'blog') },
-                { label: 'Ver demo', icon: Play, action: handleOpenDemo },
-                { label: 'Precios', icon: CreditCard, action: () => navigatePublicRoute('/precios', 'pricing') },
-                { label: 'Contacto', icon: Mail, action: () => navigatePublicRoute('/contacto', 'contact') },
+                { label: t('nav.home', 'Inicio'), icon: Home, action: () => navigatePublicRoute('/', 'home') },
+                { label: t('nav.solutions', 'Soluciones'), icon: Layers, action: () => navigatePublicRoute('/soluciones', 'solutions') },
+                { label: t('home.hero.discover_features', 'Descubrir funcionalidades'), icon: Sparkles, action: () => navigatePublicRoute('/funcionalidades', 'features') },
+                { label: t('nav.modules', 'Módulos y domótica'), icon: Sliders, action: () => navigatePublicRoute('/modulos-domotica', 'modules') },
+                { label: t('nav.blog', 'Blog'), icon: BookOpen, action: () => navigatePublicRoute('/blog', 'blog') },
+                { label: t('nav.demo', 'Ver demo'), icon: Play, action: handleOpenDemo },
+                { label: t('nav.pricing', 'Precios'), icon: CreditCard, action: () => navigatePublicRoute('/precios', 'pricing') },
+                { label: t('nav.contact', 'Contacto'), icon: Mail, action: () => navigatePublicRoute('/contacto', 'contact') },
               ].map(({ label, icon: Icon, action }) => (
                 <button key={label} onClick={action} className="flex items-center gap-3 rounded-2xl px-3.5 py-3 text-left hover:bg-slate-100/80 dark:hover:bg-slate-800/70 transition">
                   <Icon className="w-4 h-4 text-emerald-600 dark:text-emerald-400" strokeWidth={1.5} aria-hidden="true" />
@@ -365,7 +365,7 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
           {/* Trust Badge - Updated positioning */}
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-800 text-xs font-bold shadow-xs">
             <Sparkles className="w-4 h-4 text-emerald-500" />
-            <span>Tecnología de Vanguardia para la Industria del Pádel</span>
+            <span>{t('home.corporate.trustBadge', 'Tecnología de Vanguardia para la Industria del Pádel')}</span>
           </div>
 
           {/* Main Headline */}
@@ -375,7 +375,7 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
 
           {/* Subtitle - Exact copy requirement */}
           <p className="text-base sm:text-xl text-slate-600 dark:text-slate-300 max-w-3xl mx-auto font-normal leading-relaxed text-balance">
-            Incluye Web Pública, App de Gestión Interna, App para Personal y Clientes, y Agente de IA para web y redes.
+            {t('home.corporate.heroSubtitle', 'Incluye Web Pública, App de Gestión Interna, App para Personal y Clientes, y Agente de IA para web y redes.')}
           </p>
 
           {/* CTAs Group */}
@@ -385,7 +385,7 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
               className="px-7 py-4 rounded-2xl bg-slate-900 dark:bg-slate-800 hover:bg-slate-800 dark:hover:bg-slate-700 text-white font-black text-sm shadow-xl shadow-slate-900/20 transition hover:scale-[1.02] flex items-center gap-2"
             >
               <Sparkles className="w-4 h-4 text-emerald-400" />
-              <span>{t('corporate.discoverFeatures', 'Descubrir funcionalidades')}</span>
+              <span>{t('home.hero.discover_features', 'Descubrir funcionalidades')}</span>
             </button>
 
             <button
@@ -400,23 +400,21 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
               onClick={handleOpenRegister}
               className="px-6 py-4 rounded-2xl bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-900 dark:text-white font-bold text-sm border border-slate-300 dark:border-slate-700 shadow-md transition flex items-center gap-2"
             >
-              <span>Registrarse</span>
+              <span>{t('nav.register', 'Registrarse')}</span>
               <ArrowRight className="w-4 h-4" />
             </button>
-
-
           </div>
 
           {/* Micro-guarantees */}
           <div className="flex flex-wrap justify-center items-center gap-6 text-xs text-slate-500 dark:text-slate-400 font-medium pt-2">
             <span className="flex items-center gap-1.5">
-              <CheckCircle2 className="w-4 h-4 text-emerald-500" /> Sin permanencia
+              <CheckCircle2 className="w-4 h-4 text-emerald-500" /> {t('home.corporate.guarantee1', 'Sin permanencia')}
             </span>
             <span className="flex items-center gap-1.5">
-              <CheckCircle2 className="w-4 h-4 text-emerald-500" /> Migración de datos en 24h
+              <CheckCircle2 className="w-4 h-4 text-emerald-500" /> {t('home.corporate.guarantee2', 'Migración de datos en 24h')}
             </span>
             <span className="flex items-center gap-1.5">
-              <CheckCircle2 className="w-4 h-4 text-emerald-500" /> Soporte personalizado 365 días
+              <CheckCircle2 className="w-4 h-4 text-emerald-500" /> {t('home.corporate.guarantee3', 'Soporte personalizado 365 días')}
             </span>
           </div>
 
@@ -437,25 +435,25 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
                   </div>
                   <div className="flex items-center gap-2 font-mono text-[10px] text-emerald-400">
                     <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-                    <span>8 pistas activas · 94% ocupación hoy</span>
+                    <span>{t('home.corporate.mockup.active', '8 pistas activas · 94% ocupación hoy')}</span>
                   </div>
                 </div>
 
                 <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-4 text-left">
                   <div className="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-1">
-                    <div className="text-[11px] text-slate-400 font-semibold">Ingresos Reservas Hoy:</div>
+                    <div className="text-[11px] text-slate-400 font-semibold">{t('home.corporate.mockup.revenueLabel', 'Ingresos Reservas Hoy:')}</div>
                     <div className="text-2xl font-black text-white font-mono">1.280,00 €</div>
-                    <div className="text-[10px] text-emerald-400">+28% vs semana anterior</div>
+                    <div className="text-[10px] text-emerald-400">{t('home.corporate.mockup.revenueTrend', '+28% vs semana anterior')}</div>
                   </div>
                   <div className="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-1">
-                    <div className="text-[11px] text-slate-400 font-semibold">Partidos Abiertos ("Play!"):</div>
-                    <div className="text-2xl font-black text-cyan-400 font-mono">12 creados</div>
-                    <div className="text-[10px] text-slate-300">38 jugadores inscritos</div>
+                    <div className="text-[11px] text-slate-400 font-semibold">{t('home.corporate.mockup.matchesLabel', 'Partidos Abiertos ("Play!"):')}</div>
+                    <div className="text-2xl font-black text-cyan-400 font-mono">{t('home.corporate.mockup.matchesCreated', '12 creados')}</div>
+                    <div className="text-[10px] text-slate-300">{t('home.corporate.mockup.playersJoined', '38 jugadores inscritos')}</div>
                   </div>
                   <div className="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-1">
-                    <div className="text-[11px] text-slate-400 font-semibold">Copiloto IA en WhatsApp:</div>
-                    <div className="text-2xl font-black text-emerald-400 font-mono">146 chats</div>
-                    <div className="text-[10px] text-slate-300">Cero llamadas perdidas</div>
+                    <div className="text-[11px] text-slate-400 font-semibold">{t('home.corporate.mockup.aiLabel', 'Copiloto IA en WhatsApp:')}</div>
+                    <div className="text-2xl font-black text-emerald-400 font-mono">{t('home.corporate.mockup.aiChats', '146 chats')}</div>
+                    <div className="text-[10px] text-slate-300">{t('home.corporate.mockup.noLostCalls', 'Cero llamadas perdidas')}</div>
                   </div>
                 </div>
               </div>
@@ -473,9 +471,11 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
                 100%
               </div>
               <div className="text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-300 mt-1">
-                Marca Blanca Integral
+                {t('home.corporate.metric1.title', 'Marca Blanca Integral')}
               </div>
-              <div className="text-[11px] text-slate-500">Tu propio dominio, logo y colores oficiales</div>
+              <div className="text-[11px] text-slate-500">
+                {t('home.corporate.metric1.desc', 'Tu propio dominio, logo y colores oficiales')}
+              </div>
             </div>
 
             <div>
@@ -483,9 +483,11 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
                 -85%
               </div>
               <div className="text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-300 mt-1">
-                Llamadas a Recepción
+                {t('home.corporate.metric2.title', 'Llamadas a Recepción')}
               </div>
-              <div className="text-[11px] text-slate-500">Reservas y pagos 100% automatizados</div>
+              <div className="text-[11px] text-slate-500">
+                {t('home.corporate.metric2.desc', 'Reservas y pagos 100% automatizados')}
+              </div>
             </div>
 
             <div>
@@ -493,9 +495,11 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
                 +32%
               </div>
               <div className="text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-300 mt-1">
-                Ocupación en Horas Valle
+                {t('home.corporate.metric3.title', 'Ocupación en Horas Valle')}
               </div>
-              <div className="text-[11px] text-slate-500">Con partidos nivelados automáticos</div>
+              <div className="text-[11px] text-slate-500">
+                {t('home.corporate.metric3.desc', 'Con partidos nivelados automáticos')}
+              </div>
             </div>
 
             <div>
@@ -503,9 +507,11 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
                 99.98%
               </div>
               <div className="text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-300 mt-1">
-                Disponibilidad SLA
+                {t('home.corporate.metric4.title', 'Disponibilidad SLA')}
               </div>
-              <div className="text-[11px] text-slate-500">Infraestructura Vercel & Supabase Cloud</div>
+              <div className="text-[11px] text-slate-500">
+                {t('home.corporate.metric4.desc', 'Infraestructura Vercel & Supabase Cloud')}
+              </div>
             </div>
           </div>
         </div>
@@ -515,13 +521,13 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
       <section ref={reveal} id="soluciones" className="scroll-reveal py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
         <div className="text-center max-w-3xl mx-auto space-y-3">
           <div className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
-            Arquitectura 360°
+            {t('home.corporate.solutions.eyebrow', 'Arquitectura 360°')}
           </div>
           <h2 className="text-3xl sm:text-5xl font-black tracking-tight text-slate-900 dark:text-white">
-            Una solución diseñada a medida para cada protagonista del pádel
+            {t('home.corporate.solutions.title', 'Una solución diseñada a medida para cada protagonista del pádel')}
           </h2>
           <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400">
-            Conecta la gestión de tus instalaciones, el negocio de tus entrenadores y la pasión de tus jugadores en un único ecosistema sincronizado.
+            {t('home.corporate.solutions.subtitle', 'Conecta la gestión de tus instalaciones, el negocio de tus entrenadores y la pasión de tus jugadores en un único ecosistema sincronizado.')}
           </p>
         </div>
 
@@ -532,31 +538,33 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
               <Building2 className="w-6 h-6" />
             </div>
             <div>
-              <h3 className="text-xl font-black text-slate-900 dark:text-white">Clubes de Pádel</h3>
+              <h3 className="text-xl font-black text-slate-900 dark:text-white">
+                {t('home.corporate.solutions.clubs.title', 'Clubes de Pádel')}
+              </h3>
               <p className="text-xs text-slate-600 dark:text-slate-400 mt-2 leading-relaxed">
-                Control absoluto de instalaciones, socios y facturación con marca blanca completa.
+                {t('home.corporate.solutions.clubs.desc', 'Control absoluto de instalaciones, socios y facturación con marca blanca completa.')}
               </p>
             </div>
             <ul className="space-y-2.5 text-xs text-slate-700 dark:text-slate-300">
               <li className="flex items-start gap-2">
                 <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
-                <span>Cuadrante táctil de pistas con encendido domótico de iluminación LED</span>
+                <span>{t('home.corporate.solutions.clubs.feat1', 'Cuadrante táctil de pistas con encendido domótico de iluminación LED')}</span>
               </li>
               <li className="flex items-start gap-2">
                 <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
-                <span>Split payments (cobro de 1/4 por jugador vía Bizum y tarjeta)</span>
+                <span>{t('home.corporate.solutions.clubs.feat2', 'Split payments (cobro de 1/4 por jugador vía Bizum y tarjeta)')}</span>
               </li>
               <li className="flex items-start gap-2">
                 <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
-                <span>TPV Bar / Cafetería y Tienda oficial con servicio de test de palas</span>
+                <span>{t('home.corporate.solutions.clubs.feat3', 'TPV Bar / Cafetería y Tienda oficial con servicio de test de palas')}</span>
               </li>
               <li className="flex items-start gap-2">
                 <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
-                <span>Gestor de torneos con cuadros automáticos y rankings sociales</span>
+                <span>{t('home.corporate.solutions.clubs.feat4', 'Gestor de torneos con cuadros automáticos y rankings sociales')}</span>
               </li>
             </ul>
             <button onClick={() => navigatePublicRoute('/soluciones/clubes', 'solution_clubs')} className="inline-flex items-center gap-2 text-xs font-black text-emerald-700 dark:text-emerald-400 hover:gap-3 transition-all">
-              Ver solución para clubes <ArrowRight className="w-4 h-4" />
+              {t('home.corporate.solutions.clubs.btn', 'Ver solución para clubes')} <ArrowRight className="w-4 h-4" />
             </button>
           </div>
 
@@ -566,31 +574,33 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
               <GraduationCap className="w-6 h-6" />
             </div>
             <div>
-              <h3 className="text-xl font-black text-slate-900 dark:text-white">Profesores & Academias</h3>
+              <h3 className="text-xl font-black text-slate-900 dark:text-white">
+                {t('home.corporate.solutions.coaches.title', 'Profesores & Academias')}
+              </h3>
               <p className="text-xs text-slate-600 dark:text-slate-400 mt-2 leading-relaxed">
-                Herramientas profesionales para impartir clases, evaluar alumnos y cobrar sin retrasos.
+                {t('home.corporate.solutions.coaches.desc', 'Herramientas profesionales para impartir clases, evaluar alumnos y cobrar sin retrasos.')}
               </p>
             </div>
             <ul className="space-y-2.5 text-xs text-slate-700 dark:text-slate-300">
               <li className="flex items-start gap-2">
                 <Check className="w-4 h-4 text-teal-500 shrink-0 mt-0.5" />
-                <span>Cobro recurrente mensual de cuotas de escuela por tarjeta o domiciliación</span>
+                <span>{t('home.corporate.solutions.coaches.feat1', 'Cobro recurrente mensual de cuotas de escuela por tarjeta o domiciliación')}</span>
               </li>
               <li className="flex items-start gap-2">
                 <Check className="w-4 h-4 text-teal-500 shrink-0 mt-0.5" />
-                <span>Control de asistencia y recuperación de clases canceladas por lluvia</span>
+                <span>{t('home.corporate.solutions.coaches.feat2', 'Control de asistencia y recuperación de clases canceladas')}</span>
               </li>
               <li className="flex items-start gap-2">
                 <Check className="w-4 h-4 text-teal-500 shrink-0 mt-0.5" />
-                <span>Ficha técnica y seguimiento de nivel de juego por alumno</span>
+                <span>{t('home.corporate.solutions.coaches.feat3', 'Ficha técnica y seguimiento de nivel de juego por alumno')}</span>
               </li>
               <li className="flex items-start gap-2">
                 <Check className="w-4 h-4 text-teal-500 shrink-0 mt-0.5" />
-                <span>Portal web privado propio para entrenadores independientes</span>
+                <span>{t('home.corporate.solutions.coaches.feat4', 'Portal web privado propio para entrenadores independientes')}</span>
               </li>
             </ul>
             <button onClick={() => navigatePublicRoute('/soluciones/profesores', 'solution_coaches')} className="inline-flex items-center gap-2 text-xs font-black text-teal-700 dark:text-cyan-400 hover:gap-3 transition-all">
-              Ver solución para profesores <ArrowRight className="w-4 h-4" />
+              {t('home.corporate.solutions.coaches.btn', 'Ver solución para profesores')} <ArrowRight className="w-4 h-4" />
             </button>
           </div>
 
@@ -600,31 +610,33 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
               <Users className="w-6 h-6" />
             </div>
             <div>
-              <h3 className="text-xl font-black text-slate-900 dark:text-white">Jugadores Particulares</h3>
+              <h3 className="text-xl font-black text-slate-900 dark:text-white">
+                {t('home.corporate.solutions.players.title', 'Jugadores Particulares')}
+              </h3>
               <p className="text-xs text-slate-600 dark:text-slate-400 mt-2 leading-relaxed">
-                App PWA instalable sin descargas pesadas para jugar más, competir y mejorar.
+                {t('home.corporate.solutions.players.desc', 'App PWA instalable sin descargas pesadas para jugar más, competir y mejorar.')}
               </p>
             </div>
             <ul className="space-y-2.5 text-xs text-slate-700 dark:text-slate-300">
               <li className="flex items-start gap-2">
                 <Check className="w-4 h-4 text-cyan-500 shrink-0 mt-0.5" />
-                <span>Reserva en 3 clics con selección visual de pistas y compañeros</span>
+                <span>{t('home.corporate.solutions.players.feat1', 'Reserva en 3 clics con selección visual de pistas y compañeros')}</span>
               </li>
               <li className="flex items-start gap-2">
                 <Check className="w-4 h-4 text-cyan-500 shrink-0 mt-0.5" />
-                <span>Partidos abiertos ("Play!") con filtro por nivel exacto y posición</span>
+                <span>{t('home.corporate.solutions.players.feat2', 'Partidos abiertos ("Play!") con filtro por nivel exacto y posición')}</span>
               </li>
               <li className="flex items-start gap-2">
                 <Check className="w-4 h-4 text-cyan-500 shrink-0 mt-0.5" />
-                <span>Inscripción a torneos con búsqueda de pareja en base de socios</span>
+                <span>{t('home.corporate.solutions.players.feat3', 'Inscripción a torneos con búsqueda de pareja en base de socios')}</span>
               </li>
               <li className="flex items-start gap-2">
                 <Check className="w-4 h-4 text-cyan-500 shrink-0 mt-0.5" />
-                <span>Monedero digital recargable y perfil deportivo público compartible</span>
+                <span>{t('home.corporate.solutions.players.feat4', 'Monedero digital recargable y perfil deportivo público compartible')}</span>
               </li>
             </ul>
             <button onClick={() => navigatePublicRoute('/soluciones/jugadores', 'solution_players')} className="inline-flex items-center gap-2 text-xs font-black text-cyan-700 dark:text-cyan-400 hover:gap-3 transition-all">
-              Ver solución para jugadores <ArrowRight className="w-4 h-4" />
+              {t('home.corporate.solutions.players.btn', 'Ver solución para jugadores')} <ArrowRight className="w-4 h-4" />
             </button>
           </div>
 
@@ -634,16 +646,29 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
               <Trophy className="w-6 h-6" />
             </div>
             <div>
-              <h3 className="text-xl font-black text-slate-900 dark:text-white">Jugadores Profesionales</h3>
-              <p className="text-xs text-slate-600 dark:text-slate-400 mt-2 leading-relaxed">Gestiona tu carrera, patrocinios, calendario y comunidad desde un único espacio.</p>
+              <h3 className="text-xl font-black text-slate-900 dark:text-white">
+                {t('home.corporate.solutions.pro.title', 'Jugadores Profesionales')}
+              </h3>
+              <p className="text-xs text-slate-600 dark:text-slate-400 mt-2 leading-relaxed">
+                {t('home.corporate.solutions.pro.desc', 'Gestiona tu carrera, patrocinios, calendario y comunidad desde un único espacio.')}
+              </p>
             </div>
             <ul className="space-y-2.5 text-xs text-slate-700 dark:text-slate-300">
-              <li className="flex items-start gap-2"><Check className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" /><span>Perfil profesional y presencia digital de marca blanca</span></li>
-              <li className="flex items-start gap-2"><Check className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" /><span>Calendario de competición, entrenamientos y objetivos</span></li>
-              <li className="flex items-start gap-2"><Check className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" /><span>Comunidad, contenidos y oportunidades comerciales</span></li>
+              <li className="flex items-start gap-2">
+                <Check className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
+                <span>{t('home.corporate.solutions.pro.feat1', 'Perfil profesional y presencia digital de marca blanca')}</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <Check className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
+                <span>{t('home.corporate.solutions.pro.feat2', 'Calendario de competición, entrenamientos y objetivos')}</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <Check className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
+                <span>{t('home.corporate.solutions.pro.feat3', 'Comunidad, contenidos y oportunidades comerciales')}</span>
+              </li>
             </ul>
             <button onClick={() => navigatePublicRoute('/soluciones/jugadores-profesionales', 'solution_pro_players')} className="inline-flex items-center gap-2 text-xs font-black text-amber-700 dark:text-amber-400 hover:gap-3 transition-all">
-              Ver solución profesional <ArrowRight className="w-4 h-4" />
+              {t('home.corporate.solutions.pro.btn', 'Ver solución profesional')} <ArrowRight className="w-4 h-4" />
             </button>
           </div>
         </div>
@@ -653,12 +678,12 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
       <section ref={reveal} className="scroll-reveal py-20 bg-slate-950 text-white border-y border-slate-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-[.8fr_1.2fr] gap-10 items-center">
           <div className="space-y-5">
-            <div className="text-xs font-bold uppercase tracking-[0.2em] text-emerald-400">Tecnología que se siente en pista</div>
-            <h2 className="text-3xl sm:text-5xl font-black tracking-tight">El juego profesional, dentro de tu operación.</h2>
-            <p className="text-sm sm:text-base text-slate-300 leading-relaxed">Descubre cómo una experiencia digital premium convierte cada reserva, clase y competición en una relación más sólida con tus jugadores.</p>
+            <div className="text-xs font-bold uppercase tracking-[0.2em] text-emerald-400">{t('home.corporate.video.eyebrow', 'Tecnología que se siente en pista')}</div>
+            <h2 className="text-3xl sm:text-5xl font-black tracking-tight">{t('home.corporate.video.title', 'El juego profesional, dentro de tu operación.')}</h2>
+            <p className="text-sm sm:text-base text-slate-300 leading-relaxed">{t('home.corporate.video.description', 'Descubre cómo una experiencia digital premium convierte cada reserva, clase y competición en una relación más sólida con tus jugadores.')}</p>
           </div>
           <div className="overflow-hidden rounded-3xl border border-white/10 bg-slate-900 shadow-2xl aspect-video">
-            <video className="h-full w-full object-cover" autoPlay muted loop playsInline controls preload="metadata" poster="https://images.unsplash.com/photo-1554068865-24cecd4e34b8?auto=format&fit=crop&w=1600&q=80" aria-label="Partido profesional de pádel">
+            <video className="h-full w-full object-cover" autoPlay muted loop playsInline controls preload="metadata" poster="https://images.unsplash.com/photo-1554068865-24cecd4e34b8?auto=format&fit=crop&w=1600&q=80" aria-label={t('home.corporate.video.aria', 'Partido profesional de pádel')}>
               <source src="https://cdn.coverr.co/videos/coverr-a-padel-match-1573/1080p.mp4" type="video/mp4" />
             </video>
           </div>
@@ -670,59 +695,59 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
           <div className="text-center max-w-3xl mx-auto space-y-2">
             <div className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
-              Tecnología de Vanguardia
+              {t('home.corporate.modules.eyebrow', 'Tecnología de Vanguardia')}
             </div>
             <h2 className="text-3xl sm:text-5xl font-black tracking-tight text-slate-900 dark:text-white">
-              Todo lo que tu club necesita en una sola suscripción
+              {t('home.corporate.modules.title', 'Todo lo que tu club necesita en una sola suscripción')}
             </h2>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-3">
               <Zap className="w-6 h-6 text-emerald-500" />
-              <h3 className="font-bold text-base text-slate-900 dark:text-white">Domótica IoT Inteligente</h3>
+              <h3 className="font-bold text-base text-slate-900 dark:text-white">{t('home.corporate.modules.iot.title', 'Domótica IoT Inteligente')}</h3>
               <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-                Enciende las luces de pista 5 minutos antes y apágalas al terminar. Ahorra hasta un 40% en tu factura eléctrica mensual.
+                {t('home.corporate.modules.iot.desc', 'Enciende las luces de pista 5 minutos antes y apágalas al terminar. Ahorra hasta un 40% en tu factura eléctrica mensual.')}
               </p>
             </div>
 
             <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-3">
               <CreditCard className="w-6 h-6 text-teal-500" />
-              <h3 className="font-bold text-base text-slate-900 dark:text-white">Split Payments 1/4</h3>
+              <h3 className="font-bold text-base text-slate-900 dark:text-white">{t('home.corporate.modules.split.title', 'Split Payments 1/4')}</h3>
               <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-                El organizador no tiene que adelantar el dinero. La app envía enlaces de pago a los 4 jugadores por Bizum o tarjeta.
+                {t('home.corporate.modules.split.desc', 'El organizador no tiene que adelantar el dinero. La app envía enlaces de pago a los 4 jugadores por Bizum o tarjeta.')}
               </p>
             </div>
 
             <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-3">
               <Bot className="w-6 h-6 text-purple-500" />
-              <h3 className="font-bold text-base text-slate-900 dark:text-white">Copiloto IA en WhatsApp</h3>
+              <h3 className="font-bold text-base text-slate-900 dark:text-white">{t('home.corporate.modules.ai.title', 'Copiloto IA en WhatsApp')}</h3>
               <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-                Atiende a tus clientes las 24 horas del día por WhatsApp oficial. Informa de pistas libres, tarifas y resuelve dudas automáticamente.
+                {t('home.corporate.modules.ai.desc', 'Atiende a tus clientes las 24 horas del día por WhatsApp oficial. Informa de pistas libres, tarifas y resuelve dudas automáticamente.')}
               </p>
             </div>
 
             <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-3">
               <Trophy className="w-6 h-6 text-amber-500" />
-              <h3 className="font-bold text-base text-slate-900 dark:text-white">Gestor de Torneos & Rankings</h3>
+              <h3 className="font-bold text-base text-slate-900 dark:text-white">{t('home.corporate.modules.tournaments.title', 'Gestor de Torneos & Rankings')}</h3>
               <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-                Cuadros de eliminación, liguillas, pozos y rankings sociales con suma de puntos automática y cartelería descargable.
+                {t('home.corporate.modules.tournaments.desc', 'Cuadros de eliminación, liguillas, pozos y rankings sociales con suma de puntos automática y cartelería descargable.')}
               </p>
             </div>
 
             <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-3">
               <ShoppingBag className="w-6 h-6 text-rose-500" />
-              <h3 className="font-bold text-base text-slate-900 dark:text-white">Tienda & Test Center</h3>
+              <h3 className="font-bold text-base text-slate-900 dark:text-white">{t('home.corporate.modules.shop.title', 'Tienda & Test Center')}</h3>
               <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-                Catálogo con reserva de palas de test para que los jugadores prueben el material en pista antes de comprar en recepción.
+                {t('home.corporate.modules.shop.desc', 'Catálogo con reserva de palas de test para que los jugadores prueben el material en pista antes de comprar en recepción.')}
               </p>
             </div>
 
             <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-3">
               <Globe className="w-6 h-6 text-cyan-500" />
-              <h3 className="font-bold text-base text-slate-900 dark:text-white">Marca Blanca & Dominio Propio</h3>
+              <h3 className="font-bold text-base text-slate-900 dark:text-white">{t('home.corporate.modules.whitelabel.title', 'Marca Blanca & Dominio Propio')}</h3>
               <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-                Conecta tu dominio personalizado (ej: tuclub.com) y adapta los colores, logotipos y textos sin menciones técnicas.
+                {t('home.corporate.modules.whitelabel.desc', 'Conecta tu dominio personalizado (ej: tuclub.com) y adapta los colores, logotipos y textos sin menciones técnicas.')}
               </p>
             </div>
           </div>
@@ -733,19 +758,19 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
       <section id="precios" className="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
         <div className="text-center max-w-3xl mx-auto space-y-3">
           <div className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
-            Tarifas Claras Sin Comisiones Ocultas
+            {t('home.corporate.pricing.eyebrow', 'Tarifas Claras Sin Comisiones Ocultas')}
           </div>
           <h2 className="text-3xl sm:text-5xl font-black tracking-tight text-slate-900 dark:text-white">
-            Planes adaptados a la dimensión real de tu club
+            {t('home.corporate.pricing.title', 'Planes adaptados a la dimensión real de tu club')}
           </h2>
           <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400">
-            Todos los planes incluyen actualizaciones gratuitas, soporte telefónico y app móvil PWA.
+            {t('home.corporate.pricing.subtitle', 'Todos los planes incluyen actualizaciones gratuitas, soporte telefónico y app móvil PWA.')}
           </p>
 
           {/* Billing selector */}
           <div className="flex items-center justify-center gap-3 pt-4">
             <span className={`text-xs font-bold ${billingCycle === 'monthly' ? 'text-slate-900 dark:text-white' : 'text-slate-500'}`}>
-              Facturación Mensual
+              {t('home.corporate.pricing.monthly', 'Facturación Mensual')}
             </span>
             <button
               onClick={() => setBillingCycle(billingCycle === 'monthly' ? 'yearly' : 'monthly')}
@@ -758,7 +783,7 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
               />
             </button>
             <span className={`text-xs font-bold ${billingCycle === 'yearly' ? 'text-slate-900 dark:text-white' : 'text-slate-500'}`}>
-              Facturación Anual <span className="text-emerald-600 dark:text-emerald-400 text-[10px]">(Ahorra 2 meses)</span>
+              {t('home.corporate.pricing.yearly', 'Facturación Anual')} <span className="text-emerald-600 dark:text-emerald-400 text-[10px]">{t('home.corporate.pricing.save', '(Ahorra 2 meses)')}</span>
             </span>
           </div>
         </div>
@@ -767,8 +792,8 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
           {/* Plan 1: Coach */}
           <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex flex-col justify-between shadow-sm">
             <div className="space-y-4">
-              <div className="text-xs font-bold text-slate-500 uppercase">Entrenadores</div>
-              <h3 className="text-xl font-black text-slate-900 dark:text-white">Coach / Academia</h3>
+              <div className="text-xs font-bold text-slate-500 uppercase">{t('home.corporate.pricing.coachBadge', 'Entrenadores')}</div>
+              <h3 className="text-xl font-black text-slate-900 dark:text-white">{t('home.corporate.pricing.coachTitle', 'Coach / Academia')}</h3>
               <div className="flex items-baseline gap-1">
                 <span className="text-3xl font-black text-slate-900 dark:text-white font-mono">
                   {billingCycle === 'yearly' ? '32 €' : '39 €'}
@@ -776,12 +801,12 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
                 <span className="text-xs text-slate-500">/mes</span>
               </div>
               <p className="text-xs text-slate-600 dark:text-slate-400">
-                Para entrenadores individuales y pequeñas escuelas sin instalaciones propias.
+                {t('home.corporate.pricing.coachDesc', 'Para entrenadores individuales y pequeñas escuelas sin instalaciones propias.')}
               </p>
               <ul className="space-y-2 text-xs text-slate-600 dark:text-slate-400 pt-2 border-t border-slate-200 dark:border-slate-800">
-                <li className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-emerald-500" /> Hasta 40 alumnos activos</li>
-                <li className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-emerald-500" /> Cobro recurrente de cuotas</li>
-                <li className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-emerald-500" /> Cuadrante de clases particulares</li>
+                <li className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-emerald-500" /> {t('home.corporate.pricing.coachFeat1', 'Hasta 40 alumnos activos')}</li>
+                <li className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-emerald-500" /> {t('home.corporate.pricing.coachFeat2', 'Cobro recurrente de cuotas')}</li>
+                <li className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-emerald-500" /> {t('home.corporate.pricing.coachFeat3', 'Cuadrante de clases particulares')}</li>
               </ul>
             </div>
             <button
@@ -791,18 +816,18 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
               }}
               className="mt-6 w-full py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 font-bold text-xs hover:bg-slate-100 dark:hover:bg-slate-800 transition"
             >
-              Elegir Coach
+              {t('home.corporate.pricing.coachBtn', 'Elegir Coach')}
             </button>
           </div>
 
           {/* Plan 2: Club Base (Requisito 60-80€/mes) */}
           <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border-2 border-emerald-500 flex flex-col justify-between shadow-xl relative">
             <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full bg-emerald-500 text-white font-black text-[10px] uppercase tracking-wider">
-              Más Demandado
+              {t('home.corporate.pricing.clubBaseBadge', 'Más Demandado')}
             </div>
             <div className="space-y-4">
-              <div className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase">Club Base</div>
-              <h3 className="text-xl font-black text-slate-900 dark:text-white">Plan Club Base</h3>
+              <div className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase">{t('home.corporate.pricing.clubBaseBadgeName', 'Club Base')}</div>
+              <h3 className="text-xl font-black text-slate-900 dark:text-white">{t('home.corporate.pricing.clubBaseTitle', 'Plan Club Base')}</h3>
               <div className="flex items-baseline gap-1">
                 <span className="text-3xl font-black text-emerald-600 dark:text-emerald-400 font-mono">
                   {billingCycle === 'yearly' ? '65 €' : '79 €'}
@@ -810,14 +835,14 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
                 <span className="text-xs text-slate-500">/mes</span>
               </div>
               <p className="text-xs text-slate-600 dark:text-slate-400">
-                Ideal para clubes de hasta 4 pistas que desean informatizar sus reservas y cobros.
+                {t('home.corporate.pricing.clubBaseDesc', 'Ideal para clubes de hasta 4 pistas que desean informatizar sus reservas y cobros.')}
               </p>
               <ul className="space-y-2 text-xs text-slate-600 dark:text-slate-400 pt-2 border-t border-slate-200 dark:border-slate-800">
-                <li className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-emerald-500" /> Hasta 4 pistas</li>
-                <li className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-emerald-500" /> Reservas ilimitadas online</li>
-                <li className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-emerald-500" /> Web y App de marca blanca</li>
-                <li className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-emerald-500" /> Split payments y Bizum</li>
-                <li className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-emerald-500" /> Partidos abiertos "Play!"</li>
+                <li className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-emerald-500" /> {t('home.corporate.pricing.clubBaseFeat1', 'Hasta 4 pistas')}</li>
+                <li className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-emerald-500" /> {t('home.corporate.pricing.clubBaseFeat2', 'Reservas ilimitadas online')}</li>
+                <li className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-emerald-500" /> {t('home.corporate.pricing.clubBaseFeat3', 'Web y App de marca blanca')}</li>
+                <li className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-emerald-500" /> {t('home.corporate.pricing.clubBaseFeat4', 'Split payments y Bizum')}</li>
+                <li className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-emerald-500" /> {t('home.corporate.pricing.clubBaseFeat5', 'Partidos abiertos "Play!"')}</li>
               </ul>
             </div>
             <button
@@ -827,15 +852,15 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
               }}
               className="mt-6 w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md transition"
             >
-              Empezar Club Base
+              {t('home.corporate.pricing.clubBaseBtn', 'Empezar Club Base')}
             </button>
           </div>
 
           {/* Plan 3: Club Pro */}
           <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex flex-col justify-between shadow-sm">
             <div className="space-y-4">
-              <div className="text-xs font-bold text-teal-600 dark:text-cyan-400 uppercase">Club Pro</div>
-              <h3 className="text-xl font-black text-slate-900 dark:text-white">Plan Club Pro</h3>
+              <div className="text-xs font-bold text-teal-600 dark:text-cyan-400 uppercase">{t('home.corporate.pricing.clubProBadgeName', 'Club Pro')}</div>
+              <h3 className="text-xl font-black text-slate-900 dark:text-white">{t('home.corporate.pricing.clubProTitle', 'Plan Club Pro')}</h3>
               <div className="flex items-baseline gap-1">
                 <span className="text-3xl font-black text-slate-900 dark:text-white font-mono">
                   {billingCycle === 'yearly' ? '119 €' : '139 €'}
@@ -843,14 +868,14 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
                 <span className="text-xs text-slate-500">/mes</span>
               </div>
               <p className="text-xs text-slate-600 dark:text-slate-400">
-                Para clubes medianos y grandes que organizan competiciones, escuela y tienda.
+                {t('home.corporate.pricing.clubProDesc', 'Para clubes medianos y grandes que organizan competiciones, escuela y tienda.')}
               </p>
               <ul className="space-y-2 text-xs text-slate-600 dark:text-slate-400 pt-2 border-t border-slate-200 dark:border-slate-800">
-                <li className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-emerald-500" /> Hasta 10 pistas</li>
-                <li className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-emerald-500" /> Gestor de torneos y rankings</li>
-                <li className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-emerald-500" /> Módulo de escuela y academia</li>
-                <li className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-emerald-500" /> Tienda oficial & test center</li>
-                <li className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-emerald-500" /> Domótica IoT de pistas</li>
+                <li className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-emerald-500" /> {t('home.corporate.pricing.clubProFeat1', 'Hasta 10 pistas')}</li>
+                <li className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-emerald-500" /> {t('home.corporate.pricing.clubProFeat2', 'Gestor de torneos y rankings')}</li>
+                <li className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-emerald-500" /> {t('home.corporate.pricing.clubProFeat3', 'Módulo de escuela y academia')}</li>
+                <li className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-emerald-500" /> {t('home.corporate.pricing.clubProFeat4', 'Tienda oficial & test center')}</li>
+                <li className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-emerald-500" /> {t('home.corporate.pricing.clubProFeat5', 'Domótica IoT de pistas')}</li>
               </ul>
             </div>
             <button
@@ -860,15 +885,15 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
               }}
               className="mt-6 w-full py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 font-bold text-xs hover:bg-slate-100 dark:hover:bg-slate-800 transition"
             >
-              Elegir Club Pro
+              {t('home.corporate.pricing.clubProBtn', 'Elegir Club Pro')}
             </button>
           </div>
 
           {/* Plan 4: Elite / Cadenas */}
           <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex flex-col justify-between shadow-sm">
             <div className="space-y-4">
-              <div className="text-xs font-bold text-purple-600 dark:text-purple-400 uppercase">Instalación Élite</div>
-              <h3 className="text-xl font-black text-slate-900 dark:text-white">Plan Élite / Cadena</h3>
+              <div className="text-xs font-bold text-purple-600 dark:text-purple-400 uppercase">{t('home.corporate.pricing.eliteBadge', 'Instalación Élite')}</div>
+              <h3 className="text-xl font-black text-slate-900 dark:text-white">{t('home.corporate.pricing.eliteTitle', 'Plan Élite / Cadena')}</h3>
               <div className="flex items-baseline gap-1">
                 <span className="text-3xl font-black text-slate-900 dark:text-white font-mono">
                   {billingCycle === 'yearly' ? '219 €' : '249 €'}
@@ -876,14 +901,14 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
                 <span className="text-xs text-slate-500">/mes</span>
               </div>
               <p className="text-xs text-slate-600 dark:text-slate-400">
-                Pistas ilimitadas, Copiloto IA 24/7 y soporte de ingeniería prioritario.
+                {t('home.corporate.pricing.eliteDesc', 'Pistas ilimitadas, Copiloto IA 24/7 y soporte de ingeniería prioritario.')}
               </p>
               <ul className="space-y-2 text-xs text-slate-600 dark:text-slate-400 pt-2 border-t border-slate-200 dark:border-slate-800">
-                <li className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-emerald-500" /> Pistas ilimitadas</li>
-                <li className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-emerald-500" /> Copiloto IA 24/7 en WhatsApp</li>
-                <li className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-emerald-500" /> Dominio propio SSL gratuito</li>
-                <li className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-emerald-500" /> TPV Cafetería y POS físico</li>
-                <li className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-emerald-500" /> Integración ERP & API REST</li>
+                <li className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-emerald-500" /> {t('home.corporate.pricing.eliteFeat1', 'Pistas ilimitadas')}</li>
+                <li className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-emerald-500" /> {t('home.corporate.pricing.eliteFeat2', 'Copiloto IA 24/7 en WhatsApp')}</li>
+                <li className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-emerald-500" /> {t('home.corporate.pricing.eliteFeat3', 'Dominio propio SSL gratuito')}</li>
+                <li className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-emerald-500" /> {t('home.corporate.pricing.eliteFeat4', 'TPV Cafetería y POS físico')}</li>
+                <li className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-emerald-500" /> {t('home.corporate.pricing.eliteFeat5', 'Integración ERP & API REST')}</li>
               </ul>
             </div>
             <button
@@ -893,7 +918,7 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
               }}
               className="mt-6 w-full py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 font-bold text-xs hover:bg-slate-100 dark:hover:bg-slate-800 transition"
             >
-              Contactar Élite
+              {t('home.corporate.pricing.eliteBtn', 'Contactar Élite')}
             </button>
           </div>
         </div>
@@ -904,13 +929,13 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
           <div className="text-center max-w-2xl mx-auto space-y-2">
             <div className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
-              Casos Reales & Demos Interactivas
+              {t('home.corporate.demos.eyebrow', 'Casos Reales & Demos Interactivas')}
             </div>
             <h2 className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-white">
-              Explora cómo funciona en clubes reales
+              {t('home.corporate.demos.title', 'Explora cómo funciona en clubes reales')}
             </h2>
             <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400">
-              Accede a la web pública de nuestros clubes clientes o inicia sesión en modo simulación para auditar cada perfil.
+              {t('home.corporate.demos.desc', 'Accede a la web pública de nuestros clubes clientes o inicia sesión en modo simulación para auditar cada perfil.')}
             </p>
           </div>
 
@@ -925,18 +950,18 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent" />
                 <div className="absolute bottom-4 left-4 right-4 text-white">
-                  <div className="font-bold text-sm">Tu club de pádel</div>
-                  <div className="text-xs text-emerald-400">Tu marca · Pistas, socios y operaciones en un solo lugar</div>
+                  <div className="font-bold text-sm">{t('home.corporate.demos.clubTitle', 'Tu club de pádel')}</div>
+                  <div className="text-xs text-emerald-400">{t('home.corporate.demos.clubSubtitle', 'Tu marca · Pistas, socios y operaciones en un solo lugar')}</div>
                 </div>
               </div>
               <p className="text-xs text-slate-600 dark:text-slate-400">
-                Club oficial con escuela federada de adultos y menores, torneos de fin de semana, tienda pro shop con palas de test y cafetería.
+                {t('home.corporate.demos.clubDesc', 'Club oficial con escuela federada de adultos y menores, torneos de fin de semana, tienda pro shop con palas de test y cafetería.')}
               </p>
               <button
                 onClick={() => onExploreClub('sanmateo')}
                 className="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md transition flex items-center justify-center gap-2"
               >
-                <span>Explorar Web Pública del Club</span>
+                <span>{t('home.corporate.demos.btnExplore', 'Explorar Web Pública del Club')}</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
             </div>
@@ -950,18 +975,18 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent" />
                 <div className="absolute bottom-4 left-4 right-4 text-white">
-                  <div className="font-bold text-sm">Martín Sánchez (WPT Pro Player)</div>
-                  <div className="text-xs text-amber-400">FIP Top 20 · Academia de Competición</div>
+                  <div className="font-bold text-sm">{t('home.corporate.demos.proPlayerTitle', 'Martín Sánchez (WPT Pro Player)')}</div>
+                  <div className="text-xs text-amber-400">{t('home.corporate.demos.proBadge', 'FIP Top 20 · Academia de Competición')}</div>
                 </div>
               </div>
               <p className="text-xs text-slate-600 dark:text-slate-400">
-                Ficha deportiva para atletas de élite, clinics de fin de semana, sponsors oficiales y venta de equipación oficial.
+                {t('home.corporate.demos.proDesc', 'Ficha deportiva para atletas de élite, clinics de fin de semana, sponsors oficiales y venta de equipación oficial.')}
               </p>
               <button
                 onClick={() => onExploreClub('martinsanchez')}
                 className="w-full py-3 rounded-xl bg-slate-900 dark:bg-slate-800 hover:bg-slate-800 text-white font-bold text-xs border border-slate-700 transition flex items-center justify-center gap-2"
               >
-                <span>Explorar Web del Atleta</span>
+                <span>{t('home.corporate.demos.btnExploreAthlete', 'Explorar Web del Atleta')}</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
             </div>
@@ -971,97 +996,40 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
           <div className="p-6 rounded-3xl bg-emerald-950/20 border border-emerald-500/30 max-w-4xl mx-auto space-y-4 text-center">
             <h3 className="font-bold text-sm text-slate-900 dark:text-white flex items-center justify-center gap-2">
               <Sliders className="w-4 h-4 text-emerald-500" />
-              <span>Simulador de Roles Setmio (Prueba en Vivo)</span>
+              <span>{t('demo.badge', 'Simulador de Roles Setmio (Prueba en Vivo)')}</span>
             </h3>
             <p className="text-xs text-slate-600 dark:text-slate-400 max-w-xl mx-auto">
-              Haz clic en cualquiera de los perfiles para entrar directamente al software con sus permisos y vistas operativas completas:
+              {t('demo.description', 'Haz clic en cualquiera de los perfiles para entrar directamente al software con sus permisos y vistas operativas completas:')}
             </p>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
               <button
                 onClick={() => handleQuickDemoRole('SUPERADMIN')}
                 className="p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-emerald-500 font-bold text-xs text-slate-900 dark:text-white transition"
               >
-                🏢 Superadmin HQ
+                🏢 {t('register.roles.superadmin.title', 'Superadmin HQ')}
               </button>
               <button
                 onClick={() => handleQuickDemoRole('TENANT_OWNER')}
                 className="p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-emerald-500 font-bold text-xs text-slate-900 dark:text-white transition"
               >
-                🎾 Gerente Club
+                🎾 {t('register.roles.tenant_owner.title', 'Gerente Club')}
               </button>
               <button
                 onClick={() => handleQuickDemoRole('COACH')}
                 className="p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-emerald-500 font-bold text-xs text-slate-900 dark:text-white transition"
               >
-                🎓 Entrenador / Coach
+                🎓 {t('register.roles.coach_club.title', 'Entrenador / Coach')}
               </button>
               <button
                 onClick={() => handleQuickDemoRole('PLAYER')}
                 className="p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-emerald-500 font-bold text-xs text-slate-900 dark:text-white transition"
               >
-                👤 Jugador / Socio
+                👤 {t('register.roles.player.title', 'Jugador / Socio')}
               </button>
             </div>
           </div>
         </div>
       </section>
-
-      {/* 8. FOOTER CORPORATIVO DE SETMIO */}
-      <footer id="contacto" className="bg-slate-950 text-slate-400 py-16 border-t border-slate-800 text-xs">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-4 gap-10">
-          <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-xl bg-emerald-500 flex items-center justify-center text-slate-950 font-black text-sm">
-                S
-              </div>
-              <span className="text-base font-black text-white">SETMIO PADEL PRO</span>
-            </div>
-            <p className="text-slate-400 leading-relaxed text-[11px]">
-              Software de Marca Blanca integral para profesionales del pádel. Incluye Web Pública, App de Gestión Interna, App para Personal y Clientes, y Agente de IA para web y redes.
-            </p>
-            <div className="text-[11px] text-slate-500">
-              Desplegado en producción sobre Vercel Edge & Supabase PostgreSQL.
-            </div>
-          </div>
-
-          <div>
-            <h4 className="font-bold text-white mb-3 text-sm">Soluciones</h4>
-            <ul className="space-y-2 text-[11px]">
-              <li><a href="#soluciones" className="hover:text-white transition">Para Clubes de Pádel</a></li>
-              <li><a href="#soluciones" className="hover:text-white transition">Para Escuelas & Profesores</a></li>
-              <li><a href="#soluciones" className="hover:text-white transition">Para Jugadores (App PWA)</a></li>
-              <li><a href="#modulos" className="hover:text-white transition">Domótica IoT de Pistas</a></li>
-              <li><a href="#modulos" className="hover:text-white transition">Copiloto IA 24/7 en WhatsApp</a></li>
-            </ul>
-          </div>
-
-          <div>
-            <h4 className="font-bold text-white mb-3 text-sm">Plataforma</h4>
-            <ul className="space-y-2 text-[11px]">
-              <li><a href="#precios" className="hover:text-white transition">Planes & Tarifas</a></li>
-              <li><button onClick={() => onExploreClub('sanmateo')} className="hover:text-white transition text-left">Explorar demo de club</button></li>
-              <li><button onClick={onOpenAuth} className="hover:text-white transition text-left">Login Global de Socios</button></li>
-              <li><button onClick={handleOpenRegister} className="hover:text-white transition text-left">Alta de Nuevo Club</button></li>
-            </ul>
-          </div>
-
-          <div>
-            <h4 className="font-bold text-white mb-3 text-sm">Contacto & Soporte</h4>
-            <p className="text-[11px] text-slate-400 mb-2">
-              Atención directa al director del club:
-            </p>
-            <div className="space-y-1.5 text-[11px]">
-              <div className="text-white font-medium">contacto@setmio.com</div>
-              <div>+34 981 38 00 00</div>
-              <div className="text-emerald-400">Soporte técnico 24/7 activo</div>
-            </div>
-          </div>
-        </div>
-
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 pt-6 border-t border-slate-800 text-center text-[11px] text-slate-500">
-          © {new Date().getFullYear()} SETMIO PADEL PRO SaaS. Todos los derechos reservados. Cumplimiento RGPD & Certificación SSL.
-        </div>
-      </footer>
 
       {/* 9. MODAL REGISTRO DE NUEVO CLUB */}
       {registerModalOpen && (
@@ -1070,6 +1038,7 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
             <button
               onClick={() => setRegisterModalOpen(false)}
               className="absolute top-5 right-5 p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition"
+              aria-label={t('common.close', 'Cerrar')}
             >
               <X className="w-5 h-5" />
             </button>
@@ -1077,19 +1046,19 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
             <div className="space-y-2 mb-6">
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-400 text-xs font-bold">
                 <Building2 className="w-3.5 h-3.5" />
-                <span>Alta de Club en Setmio</span>
+                <span>{t('home.corporate.modal.badge', 'Alta de Club en Setmio')}</span>
               </div>
               <h3 className="text-2xl font-black text-slate-900 dark:text-white">
-                Comienza con Setmio
+                {t('home.corporate.modal.title', 'Comienza con Setmio')}
               </h3>
               <p className="text-xs text-slate-600 dark:text-slate-400">
-                Configura tu club en menos de 2 minutos. Sin tarjeta de crédito requerida.
+                {t('home.corporate.modal.subtitle', 'Configura tu club en menos de 2 minutos. Sin tarjeta de crédito requerida.')}
               </p>
             </div>
 
             <form onSubmit={handleRegisterClubSubmit} className="space-y-4 text-xs">
               <div>
-                <label className="block text-slate-700 dark:text-slate-300 mb-1 font-semibold">Nombre Oficial del Club</label>
+                <label className="block text-slate-700 dark:text-slate-300 mb-1 font-semibold">{t('home.corporate.modal.clubNameLabel', 'Nombre Oficial del Club')}</label>
                 <input
                   type="text"
                   required
@@ -1113,7 +1082,7 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-slate-700 dark:text-slate-300 mb-1 font-semibold">Subdominio Setmio</label>
+                  <label className="block text-slate-700 dark:text-slate-300 mb-1 font-semibold">{t('home.corporate.modal.subdomainLabel', 'Subdominio Setmio')}</label>
                   <div className="flex items-center">
                     <input
                       type="text"
@@ -1130,7 +1099,7 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
                 </div>
 
                 <div>
-                  <label className="block text-slate-700 dark:text-slate-300 mb-1 font-semibold">Número de Pistas</label>
+                  <label className="block text-slate-700 dark:text-slate-300 mb-1 font-semibold">{t('home.corporate.modal.courtsLabel', 'Número de Pistas')}</label>
                   <input
                     type="number"
                     min="1"
@@ -1144,7 +1113,7 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
               </div>
 
               <div>
-                <label className="block text-slate-700 dark:text-slate-300 mb-1 font-semibold">Ciudad / Municipio</label>
+                <label className="block text-slate-700 dark:text-slate-300 mb-1 font-semibold">{t('home.corporate.modal.cityLabel', 'Ciudad / Municipio')}</label>
                 <input
                   type="text"
                   required
@@ -1157,7 +1126,7 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-slate-700 dark:text-slate-300 mb-1 font-semibold">Email de Contacto</label>
+                  <label className="block text-slate-700 dark:text-slate-300 mb-1 font-semibold">{t('home.corporate.modal.emailLabel', 'Email de Contacto')}</label>
                   <input
                     type="email"
                     required
@@ -1169,7 +1138,7 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
                 </div>
 
                 <div>
-                  <label className="block text-slate-700 dark:text-slate-300 mb-1 font-semibold">Teléfono / WhatsApp</label>
+                  <label className="block text-slate-700 dark:text-slate-300 mb-1 font-semibold">{t('home.corporate.modal.phoneLabel', 'Teléfono / WhatsApp')}</label>
                   <input
                     type="tel"
                     required
@@ -1187,12 +1156,12 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
                   className="w-full py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-xl shadow-emerald-600/30 transition flex items-center justify-center gap-2"
                 >
                   <CheckCircle2 className="w-4 h-4" />
-                  <span>Activar Mi Club en Setmio (30 Días Gratis)</span>
+                  <span>{t('home.corporate.modal.submitBtn', 'Activar Mi Club en Setmio (30 Días Gratis)')}</span>
                 </button>
               </div>
 
               <p className="text-[10px] text-slate-500 text-center leading-normal">
-                Al registrarte aceptas las Condiciones de Servicio y la Política de Privacidad de Setmio.
+                {t('home.corporate.modal.termsNotice', 'Al registrarte aceptas las Condiciones de Servicio y la Política de Privacidad de Setmio.')}
               </p>
             </form>
           </div>
