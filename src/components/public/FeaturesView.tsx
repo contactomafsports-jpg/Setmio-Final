@@ -45,49 +45,49 @@ export const FeaturesView: React.FC<FeaturesViewProps> = ({
     {
       icon: Globe,
       color: 'from-emerald-500 to-teal-700',
-      title: 'Web Pública de Marca Blanca',
-      subtitle: 'El escaparate digital de tu club en tu propio dominio.',
+      titleKey: 'features.pillars.0.title',
+      subtitleKey: 'features.pillars.0.subtitle',
       features: [
-        'Dominio propio personalizado (ej. padelsanmateo.com) con SSL automático',
-        'Buscador dinámico de disponibilidad de pistas con filtros en tiempo real',
-        'Escuela federada, catálogo de torneos y tienda e-commerce integrada',
-        'Internacionalización multilingüe con banderas oficiales autonómicas',
+        'features.pillars.0.feature.0',
+        'features.pillars.0.feature.1',
+        'features.pillars.0.feature.2',
+        'features.pillars.0.feature.3',
       ],
     },
     {
       icon: Smartphone,
       color: 'from-cyan-500 to-blue-700',
-      title: 'App de Gestión Interna & ERP',
-      subtitle: 'Control total de reservas, cobros, agenda y domótica IoT.',
+      titleKey: 'features.pillars.1.title',
+      subtitleKey: 'features.pillars.1.subtitle',
       features: [
-        'Agenda inteligente con vista de cuadrícula, día y bloqueo automático',
-        'Domótica IoT para encendido automático de luces LED y apertura con PIN',
-        'Cobro split por jugador y pasarela de pago bancaria integrada',
-        'CRM de clientes, control de deudas y bonos monedero virtuales',
+        'features.pillars.1.feature.0',
+        'features.pillars.1.feature.1',
+        'features.pillars.1.feature.2',
+        'features.pillars.1.feature.3',
       ],
     },
     {
       icon: Users,
       color: 'from-indigo-500 to-purple-700',
-      title: 'App para Personal y Clientes',
-      subtitle: 'Experiencia nativa móvil con barra inferior para socios y profesores.',
+      titleKey: 'features.pillars.2.title',
+      subtitleKey: 'features.pillars.2.subtitle',
       features: [
-        'Portal del Jugador con estadísticas, nivel FEP, reservas y partidas abiertas',
-        'Portal del Profesor para gestión de alumnos, grupos y clases sueltas',
-        'Gestión de plantillas y equipos federados destacando al Capitán',
-        'Fichas públicas de jugador independientes con palmarés e historial',
+        'features.pillars.2.feature.0',
+        'features.pillars.2.feature.1',
+        'features.pillars.2.feature.2',
+        'features.pillars.2.feature.3',
       ],
     },
     {
       icon: Bot,
       color: 'from-amber-500 to-orange-700',
-      title: 'Agente de IA para Web y Redes',
-      subtitle: 'Atención 24/7 y desvío inteligente a WhatsApp oficial.',
+      titleKey: 'features.pillars.3.title',
+      subtitleKey: 'features.pillars.3.subtitle',
       features: [
-        'Resolución de dudas sobre pistas, tarifas, disponibilidad y normativas',
-        'Desvío directo con un clic a la conversación de WhatsApp de recepción',
-        'Modal móvil expandido a pantalla completa sin desplazamientos de pantalla',
-        'Configurable en 3 modos: Solo WhatsApp, Solo Agente IA, o Ambos integrados',
+        'features.pillars.3.feature.0',
+        'features.pillars.3.feature.1',
+        'features.pillars.3.feature.2',
+        'features.pillars.3.feature.3',
       ],
     },
   ];
@@ -147,10 +147,10 @@ export const FeaturesView: React.FC<FeaturesViewProps> = ({
                 </div>
                 <div>
                   <h3 className="text-2xl font-black text-slate-900 dark:text-white">
-                    {t(`features.pillars.${i}.title`, pillar.title)}
+                    {t(pillar.titleKey, pillar.titleKey)}
                   </h3>
                   <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-                    {t(`features.pillars.${i}.subtitle`, pillar.subtitle)}
+                    {t(pillar.subtitleKey, pillar.subtitleKey)}
                   </p>
                 </div>
 
@@ -158,7 +158,7 @@ export const FeaturesView: React.FC<FeaturesViewProps> = ({
                   {pillar.features.map((feat, idx) => (
                     <div key={idx} className="flex items-start gap-2.5 text-xs text-slate-700 dark:text-slate-300 leading-relaxed">
                       <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
-                      <span>{t(`features.pillars.${i}.feature.${idx}`, feat)}</span>
+                      <span>{t(feat, feat)}</span>
                     </div>
                   ))}
                 </div>
