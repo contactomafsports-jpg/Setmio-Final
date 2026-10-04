@@ -580,10 +580,10 @@ export const HomeView: React.FC = () => {
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
           <div>
             <div className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
-              Comunidad & Partidos Abiertos
+              {t('home.matches.eyebrow', 'Comunidad & Partidos Abiertos')}
             </div>
             <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight mt-1">
-              ¿Te falta un jugador? Apúntate a un "Play!"
+              {t('home.matches.title', '¿Te falta un jugador? Apúntate a un "Play!"')}
             </h2>
             <p className="text-slate-600 dark:text-slate-400 text-xs sm:text-sm mt-1 max-w-xl">
               Partidas niveladas con plazas libres para hoy y los próximos días. Únete con un solo clic.
@@ -673,10 +673,10 @@ export const HomeView: React.FC = () => {
         <div className="flex items-center justify-between">
           <div>
             <div className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
-              Material Oficial en el Club
+              {t('home.shop.eyebrow', 'Material Oficial en el Club')}
             </div>
             <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight mt-1">
-              Tienda Oficial & Test Center
+              {t('home.shop.title', 'Tienda Oficial & Test Center')}
             </h2>
           </div>
           <button
@@ -732,7 +732,7 @@ export const HomeView: React.FC = () => {
                   className="w-full py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-emerald-600 hover:text-white font-bold text-xs text-slate-900 dark:text-white transition flex items-center justify-center gap-1.5"
                 >
                   <ShoppingBag className="w-3.5 h-3.5" />
-                  <span>Añadir al Carrito</span>
+                  <span>{t('home.shop.add', 'Añadir al Carrito')}</span>
                 </button>
               </div>
             </div>

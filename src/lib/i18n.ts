@@ -840,7 +840,7 @@ const HOME_TRANSLATIONS: Record<SupportedLanguage, Record<string, string>> = {
   ar: { 'home.hero.title': '20 عامًا إلى جانب لاعبي البادل.', 'home.hero.subtitle': 'حجوزات ومباريات وبطولات وأكاديمية. كل ما تحتاجه للاستمتاع بالبادل.', 'home.cta.book': 'احجز الملعب الآن', 'home.cta.matches': 'مباريات مفتوحة ("Play!")', 'home.metric.courts': '8 ملاعب', 'home.metric.academy': 'أكاديمية البادل', 'home.metric.competition': 'المنافسات', 'home.search.eyebrow': 'بحث سريع عن التوافر', 'home.search.title': 'احجز ملعبك في الوقت الفعلي', 'home.search.submit': 'تحقق من التوافر', 'home.teams.title': 'تعرّف على فرقنا', 'home.tournaments.title': 'البطولات والدورات النشطة' }
 };
 
-export function getTranslation(lang: SupportedLanguage, key: string, fallback?: string): string {
+export function translate(lang: SupportedLanguage, key: string, fallback?: string): string {
   const dict = TRANSLATIONS[lang] || TRANSLATIONS.es;
   return HOME_TRANSLATIONS[lang]?.[key] || CORPORATE_TRANSLATIONS[lang]?.[key] || dict[key] || CORPORATE_TRANSLATIONS.en[key] || TRANSLATIONS.en[key] || CORPORATE_TRANSLATIONS.es[key] || TRANSLATIONS.es[key] || fallback || key;
 }
