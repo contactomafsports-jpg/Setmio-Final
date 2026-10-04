@@ -35,7 +35,7 @@ import {
   INITIAL_AUDIT_LOGS,
   INITIAL_PAGE_BLOCKS,
 } from '../data/initialData';
-import { SupportedLanguage, translate } from '../lib/i18n';
+import { SupportedLanguage, TRANSLATIONS } from '../lib/i18n';
 import { checkPermission, PermissionAction, PermissionCheckResult } from '../lib/permissions';
 
 export type MainView = 'public' | 'admin' | 'player' | 'coach' | 'hq';
@@ -587,7 +587,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   }, [language]);
 
   const t = (key: string, fallback?: string): string => {
-    return translate(language, key, fallback);
+    return TRANSLATIONS[language]?.[key] || TRANSLATIONS.es?.[key] || fallback || key;
   };
 
   // Sync theme with DOM documentElement
