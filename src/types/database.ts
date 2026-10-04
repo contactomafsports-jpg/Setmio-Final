@@ -184,6 +184,7 @@ export interface Court {
   id: string;
   tenantId: string;
   name: string;
+  sport?: 'padel' | 'tennis' | 'pickleball';
   courtType: 'indoor' | 'outdoor' | 'covered';
   surface: string; // 'Mondo Supercourt WPT'
   isPanoramic: boolean;
@@ -194,6 +195,9 @@ export interface Court {
   photoUrl: string;
   smartDeviceId?: string;
   isLightOn?: boolean;
+  isDoorOpen?: boolean;
+  isDeviceOnline?: boolean;
+  accessPin?: string;
 }
 
 export interface Booking {

@@ -1,30 +1,35 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useApp, AdminTab } from '../../context/AppContext';
 import {
-  Home,
+  LayoutDashboard,
   Calendar,
   Users,
   Briefcase,
-  MoreHorizontal,
   GraduationCap,
   Trophy,
   ShoppingBag,
   Zap,
-  Coffee,
+  CreditCard,
   Palette,
   Globe,
   Settings,
-  CreditCard,
   Bell,
   Eye,
   LogOut,
   ChevronRight,
   X,
-  Shield,
   Sun,
   Moon,
-  User,
+  Sparkles,
+  CheckCircle2,
+  ChevronDown,
+  Building2,
+  Lock,
+  Unlock,
 } from 'lucide-react';
+import { PrivateMobileNav } from '../common/PrivateMobileNav';
+import { SUPPORTED_LANGUAGES, SupportedLanguage } from '../../lib/i18n';
+import { OfficialFlag } from '../common/OfficialFlag';
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -36,19 +41,24 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
     adminTab,
     setAdminTab,
     currentUser,
-    setCurrentView,
-    switchUserRole,
     logoutOrExitDemo,
     unreadNotificationsCount,
     markNotificationsAsRead,
     notifications,
     theme,
     toggleTheme,
+    language,
+    setLanguage,
+    isClubOpen,
+    toggleClubOpenState,
+    enterWhiteLabelPlayerPreview,
     t,
   } = useApp();
 
   const [mobileMoreOpen, setMobileMoreOpen] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [langDropdownOpen, setLangDropdownOpen] = useState(false);
+  const langRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!mobileMoreOpen) return;
@@ -59,40 +69,83 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
     return () => window.removeEventListener('keydown', closeOnEscape);
   }, [mobileMoreOpen]);
 
-  const mainTabs: { id: AdminTab; label: string; icon: React.ReactNode }[] = [
-    { id: 'dashboard', label: 'Inicio', icon: <Home className="w-5 h-5" /> },
-    { id: 'agenda', label: 'Reservas', icon: <Calendar className="w-5 h-5" /> },
-    { id: 'customers', label: 'Clientes', icon: <Users className="w-5 h-5" /> },
-    { id: 'subscription', label: 'Negocio', icon: <Briefcase className="w-5 h-5" /> },
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (langRef.current && !langRef.current.contains(e.target as Node)) {
+        setLangDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // 4 Main bottom tabs + Más
+  const mainDesktopTabs: { id: AdminTab; label: string; icon: React.ReactNode }[] = [
+    { id: 'dashboard', label: t('club.nav.dashboard', 'Inicio'), icon: <LayoutDashboard className="w-5 h-5" /> },
+    { id: 'agenda', label: t('club.nav.courts', 'Pistas & Reservas'), icon: <Calendar className="w-5 h-5" /> },
+    { id: 'smart_courts', label: t('club.nav.iot', 'Domótica IoT'), icon: <Zap className="w-5 h-5" /> },
+    { id: 'pos_cafe', label: t('club.nav.pos', 'TPV / Caja'), icon: <CreditCard className="w-5 h-5" /> },
   ];
 
+  // Drawer / Sidebar modules
   const moreTabs: { id: AdminTab; label: string; icon: React.ReactNode; desc: string; badge?: string }[] = [
-    { id: 'web_editor', label: 'Editor Web y App', icon: <Palette className="w-5 h-5 text-emerald-500" />, desc: 'Diseño, bloques y marca blanca' },
-    { id: 'teams', label: 'Equipos y plantillas', icon: <Users className="w-5 h-5 text-indigo-500" />, desc: 'Convocatorias y gestión de jugadores' },
-    { id: 'domains', label: 'Mi Web y mi App', icon: <Globe className="w-5 h-5 text-teal-500" />, desc: 'Dominios, DNS y enlaces públicos', badge: 'Prioritario' },
-    { id: 'smart_courts', label: 'Pistas Inteligentes', icon: <Zap className="w-5 h-5 text-amber-500" />, desc: 'Luces automáticas y PIN cerradura', badge: 'IoT' },
-    { id: 'academy', label: 'Escuela y Clases', icon: <GraduationCap className="w-5 h-5 text-purple-500" />, desc: 'Grupos, alumnos y entrenadores' },
-    { id: 'tournaments', label: 'Torneos y Ligas', icon: <Trophy className="w-5 h-5 text-yellow-500" />, desc: 'Cuadros eliminatorios y parejas' },
-    { id: 'shop', label: 'Tienda y Pedidos', icon: <ShoppingBag className="w-5 h-5 text-blue-500" />, desc: 'Catálogo de palas e inventario' },
-    { id: 'pos_cafe', label: 'Cafetería y TPV', icon: <Coffee className="w-5 h-5 text-rose-500" />, desc: 'Caja rápida y barra social', badge: 'TPV' },
-    { id: 'settings', label: 'Configuración Club', icon: <Settings className="w-5 h-5 text-slate-500" />, desc: 'Horarios, políticas y WhatsApp' },
+    {
+      id: 'customers',
+      label: t('club.nav.customers', 'Socios / CRM'),
+      icon: <Users className="w-5 h-5 text-indigo-500" />,
+      desc: 'Base de datos, niveles y monedero',
+    },
+    {
+      id: 'academy',
+      label: t('club.nav.academy', 'Escuela / Entrenadores'),
+      icon: <GraduationCap className="w-5 h-5 text-purple-500" />,
+      desc: 'Grupos, alumnos y entrenadores',
+    },
+    {
+      id: 'tournaments',
+      label: t('club.nav.tournaments', 'Torneos y Ligas'),
+      icon: <Trophy className="w-5 h-5 text-amber-500" />,
+      desc: 'Cuadros eliminatorios y parejas',
+    },
+    {
+      id: 'web_editor',
+      label: t('club.nav.whitelabel', 'Configuración Marca Blanca'),
+      icon: <Palette className="w-5 h-5 text-emerald-500" />,
+      desc: 'Logo, colores oficiales y web del club',
+      badge: 'Marca Blanca',
+    },
+    {
+      id: 'domains',
+      label: t('club.nav.domains', 'Dominios y DNS'),
+      icon: <Globe className="w-5 h-5 text-teal-500" />,
+      desc: 'Tu propio dominio .com con SSL',
+    },
+    {
+      id: 'shop',
+      label: t('club.nav.shop', 'Tienda y Pedidos'),
+      icon: <ShoppingBag className="w-5 h-5 text-blue-500" />,
+      desc: 'Catálogo de palas e inventario',
+    },
+    {
+      id: 'teams',
+      label: t('club.nav.teams', 'Equipos del Club'),
+      icon: <Users className="w-5 h-5 text-cyan-500" />,
+      desc: 'Convocatorias y capitanes',
+    },
+    {
+      id: 'subscription',
+      label: 'Suscripción SaaS (Enterprise)',
+      icon: <Briefcase className="w-5 h-5 text-slate-500" />,
+      desc: 'Plan Enterprise Top activo',
+      badge: 'TOP',
+    },
+    {
+      id: 'settings',
+      label: t('club.nav.settings', 'Configuración Club'),
+      icon: <Settings className="w-5 h-5 text-slate-500" />,
+      desc: 'Horarios, políticas y WhatsApp',
+    },
   ];
-
-  const tabLabels: Record<AdminTab, string> = {
-    dashboard: 'Resumen',
-    agenda: 'Reservas',
-    customers: 'Clientes',
-    teams: 'Equipos y plantillas',
-    subscription: 'Negocio',
-    web_editor: 'Editor Web y App',
-    domains: 'Mi Web y mi App',
-    smart_courts: 'Pistas Inteligentes',
-    academy: 'Escuela y Clases',
-    tournaments: 'Torneos y Ligas',
-    shop: 'Tienda y Pedidos',
-    pos_cafe: 'Cafetería y TPV',
-    settings: 'Configuración Club',
-  };
 
   const handleSelectTab = (tab: AdminTab) => {
     setAdminTab(tab);
@@ -100,51 +153,47 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const currentLangObj = SUPPORTED_LANGUAGES.find((l) => l.code === language) || SUPPORTED_LANGUAGES[0];
+
   return (
-    <div data-admin-shell className="min-h-screen bg-slate-100 text-slate-950 dark:bg-slate-950 dark:text-slate-100 flex flex-col md:flex-row pb-20 md:pb-0 transition-colors duration-200 w-full max-w-full overflow-x-hidden">
-      {/* DESKTOP SIDEBAR */}
+    <div data-admin-shell className="min-h-screen bg-slate-100 text-slate-950 dark:bg-slate-950 dark:text-slate-100 flex flex-col md:flex-row pb-20 md:pb-0 transition-colors duration-200 w-full max-w-full overflow-x-hidden font-sans">
+      {/* DESKTOP SIDEBAR (Marca Setmio B2B SaaS) */}
       <aside className="hidden md:flex flex-col w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 shrink-0">
-        {/* Club Brand in Sidebar */}
+        {/* Setmio SaaS Official Brand Header in Admin */}
         <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
           <div className="flex items-center gap-2.5 min-w-0">
-            {currentTenant.branding.logoUrl ? (
-              <img src={currentTenant.branding.logoUrl} alt="" className="w-8 h-8 rounded-xl bg-white object-contain border border-slate-200 p-1 shrink-0" />
-            ) : (
-              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-700 text-white font-black flex items-center justify-center shrink-0 text-sm shadow-sm">
-                {currentTenant.shortName.split(/\s+/).map((part) => part[0]).join('').slice(0, 2).toUpperCase()}
-              </div>
-            )}
+            {/* Setmio Logo Badge */}
+            <div className="w-9 h-9 rounded-2xl bg-slate-950 border border-emerald-500/40 text-emerald-400 font-black flex items-center justify-center shrink-0 text-sm shadow-sm">
+              <span className="font-extrabold tracking-tighter">SM</span>
+            </div>
             <div className="min-w-0">
-              <div className="font-extrabold text-xs text-slate-900 dark:text-white truncate">{currentTenant.shortName}</div>
-              <div className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold uppercase tracking-wider">Gestión Club</div>
+              <div className="font-black text-xs text-slate-900 dark:text-white truncate tracking-wider">
+                SETMIO PADEL PRO
+              </div>
+              <div className="text-[10px] text-emerald-600 dark:text-emerald-400 font-extrabold uppercase tracking-wider flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                Admin Club (SaaS)
+              </div>
             </div>
           </div>
-
-          <button
-            onClick={() => setCurrentView('public')}
-            className="p-1.5 rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition"
-            title="Ver Web Pública"
-          >
-            <Eye className="w-4 h-4" />
-          </button>
         </div>
 
         {/* Sidebar Navigation */}
-        <div className="flex-1 overflow-y-auto p-3 space-y-6 text-xs">
-          {/* Core Section */}
+        <div className="flex-1 overflow-y-auto p-3 space-y-6 text-xs scrollbar-thin">
+          {/* Main 4 Tabs */}
           <div className="space-y-1">
             <div className="px-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-              Operaciones
+              Operaciones Principales
             </div>
-            {mainTabs.map((tab) => {
+            {mainDesktopTabs.map((tab) => {
               const isActive = adminTab === tab.id;
               return (
                 <button
                   key={tab.id}
                   onClick={() => handleSelectTab(tab.id)}
-                  className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl font-semibold transition ${
+                  className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-2xl font-bold transition ${
                     isActive
-                      ? 'bg-emerald-600 text-white shadow-sm'
+                      ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/20'
                       : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white'
                   }`}
                 >
@@ -158,7 +207,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
           {/* Módulos Especializados */}
           <div className="space-y-1">
             <div className="px-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-              Módulos Especializados
+              Gestión Integral & Marca Blanca
             </div>
             {moreTabs.map((tab) => {
               const isActive = adminTab === tab.id;
@@ -166,9 +215,9 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
                 <button
                   key={tab.id}
                   onClick={() => handleSelectTab(tab.id)}
-                  className={`w-full flex items-center justify-between px-3 py-2 rounded-xl font-medium transition ${
+                  className={`w-full flex items-center justify-between px-3 py-2 rounded-2xl font-medium transition ${
                     isActive
-                      ? 'bg-emerald-600 text-white font-bold shadow-sm'
+                      ? 'bg-emerald-600 text-white font-bold shadow-md'
                       : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white'
                   }`}
                 >
@@ -177,7 +226,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
                     <span className="truncate">{tab.label}</span>
                   </div>
                   {tab.badge && (
-                    <span className={`text-[9px] uppercase px-1.5 py-0.5 rounded font-mono ${isActive ? 'bg-white/20 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-cyan-300'}`}>
+                    <span className={`text-[9px] uppercase px-1.5 py-0.5 rounded font-mono font-bold ${isActive ? 'bg-white/20 text-white' : 'bg-slate-100 dark:bg-slate-800 text-emerald-600 dark:text-emerald-400'}`}>
                       {tab.badge}
                     </span>
                   )}
@@ -197,41 +246,115 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
             />
             <div className="min-w-0">
               <div className="font-bold text-slate-900 dark:text-white truncate text-[11px]">{currentUser.name}</div>
-              <div className="text-[10px] text-slate-500 font-mono">{currentUser.role}</div>
+              <div className="text-[10px] text-emerald-600 dark:text-emerald-400 font-mono font-bold truncate">Club Admin</div>
             </div>
           </div>
 
           <button
             onClick={logoutOrExitDemo}
-            className="p-1.5 text-rose-500 hover:text-rose-700 dark:hover:text-rose-300 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-lg transition"
-            title="Cerrar Sesión / Salir Demo"
+            className="p-1.5 text-rose-500 hover:text-rose-700 dark:hover:text-rose-300 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-xl transition"
+            title={t('club.nav.logout', 'Cerrar Sesión / Salir Demo')}
           >
             <LogOut className="w-4 h-4" />
           </button>
         </div>
       </aside>
 
-      {/* MAIN CONTENT CONTAINER */}
+      {/* MAIN CONTAINER */}
       <div className="flex-1 flex flex-col min-w-0">
-        {/* Top Management Header */}
-        <header className="fixed top-0 left-0 right-0 md:left-64 z-40 h-14 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-4 sm:px-6 flex items-center justify-between">
+        {/* HEADER SUPERIOR NATIVO (Compacto, fijo, con todas las especificaciones de marca) */}
+        <header className="sticky top-0 z-40 h-14 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-3 sm:px-6 flex items-center justify-between gap-2 shadow-xs">
+          {/* Left: Setmio Official Brand & Tab Name */}
           <div className="flex items-center gap-2 min-w-0">
-            <div className="size-2 rounded-full bg-emerald-400 shadow-[0_0_0_4px_rgba(52,211,153,0.12)] shrink-0" />
-            <h1 className="text-sm sm:text-base font-bold text-slate-950 dark:text-white truncate">
-              {tabLabels[adminTab]}
-            </h1>
-            <span className="text-slate-600">·</span>
-            <span className="text-xs text-slate-400 font-medium hidden sm:inline truncate">
-              {currentTenant.shortName}
-            </span>
+            {/* Setmio Official Logo Badge */}
+            <div className="flex items-center gap-2 shrink-0">
+              <div className="w-8 h-8 rounded-xl bg-slate-950 border border-emerald-500/50 text-emerald-400 font-black flex items-center justify-center text-xs shadow-xs">
+                SM
+              </div>
+              <span className="font-black text-xs text-slate-900 dark:text-white tracking-wider hidden sm:inline">
+                SETMIO
+              </span>
+            </div>
+
+            <span className="text-slate-300 dark:text-slate-700 hidden sm:inline">/</span>
+
+            {/* Club Status Switch (Abierto / Cerrado) */}
+            <button
+              type="button"
+              onClick={toggleClubOpenState}
+              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold transition border ${
+                isClubOpen
+                  ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800'
+                  : 'bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 border-rose-200 dark:border-rose-800'
+              }`}
+              title="Conmutar estado del club (Abierto / Cerrado)"
+            >
+              <span className={`w-2 h-2 rounded-full ${isClubOpen ? 'bg-emerald-500 animate-pulse' : 'bg-rose-500'}`} />
+              <span className="text-[11px] font-extrabold">{isClubOpen ? t('club.status.open', 'Abierto') : t('club.status.closed', 'Cerrado')}</span>
+            </button>
           </div>
 
-          <div className="flex items-center gap-2">
-            {/* Theme Toggle Button */}
+          {/* Right: Actions (Idioma 11i18n, Vista Jugador, Theme, Logout) */}
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            {/* Selector de Idioma 11i18n */}
+            <div className="relative" ref={langRef}>
+              <button
+                type="button"
+                onClick={() => setLangDropdownOpen(!langDropdownOpen)}
+                className="flex items-center gap-1 px-2 py-1.5 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition border border-slate-200 dark:border-slate-800"
+                aria-label="Seleccionar idioma"
+              >
+                <OfficialFlag code={currentLangObj.code} />
+                <span className="hidden sm:inline uppercase text-[11px] font-mono">{currentLangObj.code}</span>
+                <ChevronDown className="w-3 h-3 text-slate-400" />
+              </button>
+
+              {langDropdownOpen && (
+                <div className="absolute right-0 mt-1 w-44 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl p-1.5 z-50 animate-in fade-in-50 duration-100 text-xs">
+                  <div className="px-2 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                    Idioma / Language
+                  </div>
+                  {SUPPORTED_LANGUAGES.map((langOpt) => (
+                    <button
+                      key={langOpt.code}
+                      onClick={() => {
+                        setLanguage(langOpt.code);
+                        setLangDropdownOpen(false);
+                      }}
+                      className={`w-full flex items-center gap-2 px-2.5 py-1.5 rounded-xl transition text-left ${
+                        language === langOpt.code
+                          ? 'bg-emerald-600 text-white font-bold'
+                          : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+                      }`}
+                    >
+                      <OfficialFlag code={langOpt.code} />
+                      <span className="truncate">{langOpt.name}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Conmutador "Vista Jugador" (Probar Marca Blanca) */}
             <button
+              type="button"
+              onClick={enterWhiteLabelPlayerPreview}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-emerald-500/15 to-teal-500/15 hover:from-emerald-500/25 hover:to-teal-500/25 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30 text-xs font-black transition active:scale-95 shadow-xs"
+              title="Probar experiencia del socio con la Marca Blanca del Club"
+            >
+              <Eye className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+              <span className="hidden sm:inline">{t('white_label.player_view', 'Vista Jugador')}</span>
+              <span className="px-1 py-0.2 rounded text-[9px] uppercase bg-emerald-600 text-white font-mono hidden md:inline">
+                Marca Blanca
+              </span>
+            </button>
+
+            {/* Theme Toggle */}
+            <button
+              type="button"
               onClick={toggleTheme}
-              className="p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition"
-              title={theme === 'dark' ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
+              className="p-2 rounded-xl text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+              title={theme === 'dark' ? 'Modo claro' : 'Modo oscuro'}
             >
               {theme === 'dark' ? (
                 <Sun className="w-4 h-4 text-amber-400" />
@@ -240,255 +363,109 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
               )}
             </button>
 
-            {/* Quick Switch to Modo Jugador */}
+            {/* Botón Principal "Cerrar Sesión / Salir Demo" con icono LogOut */}
             <button
-              onClick={() => {
-                switchUserRole('PLAYER');
-                setCurrentView('player');
-              }}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 text-xs font-bold text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700 transition"
-              title="Cambiar a Modo Jugador sin cerrar sesión"
-            >
-              <User className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Modo Jugador</span>
-            </button>
-
-            {/* Quick Public Web button */}
-            <button
-              onClick={() => setCurrentView('public')}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-semibold text-slate-800 dark:text-slate-200 border border-slate-300 dark:border-slate-700 transition"
-            >
-              <Eye className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-              <span className="hidden sm:inline">Ver Web Pública</span>
-            </button>
-
-            {/* Cerrar Sesión / Salir Demo */}
-            <button
+              type="button"
               onClick={logoutOrExitDemo}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-50 dark:bg-rose-950/50 hover:bg-rose-100 dark:hover:bg-rose-900/50 text-xs font-bold text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800 transition shadow-sm"
-              title="Cerrar Sesión / Salir Demo"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-50 dark:bg-rose-950/60 hover:bg-rose-100 dark:hover:bg-rose-900/60 text-xs font-black text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800 transition shadow-xs active:scale-95"
+              title={t('club.nav.logout', 'Cerrar Sesión / Salir Demo')}
             >
-              <LogOut className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400" />
-              <span className="hidden sm:inline">Salir Demo</span>
+              <LogOut className="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0" />
+              <span className="hidden sm:inline">{t('club.nav.logout', 'Salir Demo')}</span>
             </button>
-
-            {/* Notifications Toggle */}
-            <div className="relative">
-              <button
-                onClick={() => {
-                  setShowNotifications(!showNotifications);
-                  markNotificationsAsRead();
-                }}
-                className="relative p-2 rounded-xl text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition"
-              >
-                <Bell className="w-4 h-4" />
-                {unreadNotificationsCount > 0 && (
-                  <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
-                )}
-              </button>
-
-              {showNotifications && (
-                <div className="absolute right-0 mt-2 w-80 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-2xl p-4 z-50 text-xs">
-                  <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800 mb-3 font-bold text-slate-900 dark:text-white">
-                    <span>Notificaciones del Club</span>
-                    <button
-                      onClick={() => setShowNotifications(false)}
-                      className="text-slate-400 hover:text-slate-900 dark:hover:text-white"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                  </div>
-                  <div className="space-y-2 max-h-64 overflow-y-auto">
-                    {notifications.map((n) => (
-                      <div key={n.id} className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 space-y-1">
-                        <div className="font-bold text-emerald-600 dark:text-emerald-400 text-[11px]">{n.title}</div>
-                        <div className="text-slate-700 dark:text-slate-300 text-[11px]">{n.message}</div>
-                        <div className="text-slate-400 text-[9px]">{n.timestamp}</div>
-                      </div>
-                    ))}
-                    {notifications.length === 0 && (
-                      <div className="rounded-xl border border-dashed border-slate-300 dark:border-slate-700 p-5 text-center text-slate-500 dark:text-slate-400">
-                        No tienes notificaciones nuevas.
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-            </div>
           </div>
         </header>
 
-        {/* Child Tab Content View */}
-        <main className="flex-1 pt-20 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto bg-[radial-gradient(circle_at_top_right,rgba(16,185,129,0.08),transparent_28%),#f8fafc] dark:bg-slate-950">
+        {/* Content View */}
+        <main className="flex-1 p-3 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto">
           {children}
         </main>
       </div>
 
-      {/* MOBILE NATIVE BOTTOM BAR */}
-      <nav aria-label="Navegación principal del club" className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-t border-slate-200/80 dark:border-slate-800/80 px-2 pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] flex items-center justify-around shadow-[0_-12px_30px_rgba(15,23,42,0.08)]">
-        {mainTabs.map((tab) => {
-          const isActive = adminTab === tab.id && !mobileMoreOpen;
-          return (
-            <button
-              key={tab.id}
-              onClick={() => handleSelectTab(tab.id)}
-              className={`flex flex-col items-center gap-0.5 py-1 px-3 rounded-xl transition ${
-                isActive ? 'text-emerald-600 dark:text-emerald-400 font-bold' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
-              }`}
-            >
-              {tab.icon}
-              <span className="text-[10px]">{tab.label}</span>
-            </button>
-          );
-        })}
+      {/* BARRA INFERIOR FIJA MÓVIL (100% limpia sin cartel flotante) */}
+      <PrivateMobileNav
+        currentTab={adminTab}
+        onSelectTab={handleSelectTab}
+        onMore={() => setMobileMoreOpen(!mobileMoreOpen)}
+        moreOpen={mobileMoreOpen}
+      />
 
-        {/* "Más" Tab Trigger */}
-        <button
-          onClick={() => setMobileMoreOpen(!mobileMoreOpen)}
-          className={`flex flex-col items-center gap-0.5 py-1 px-2.5 rounded-xl transition ${
-            mobileMoreOpen || moreTabs.some((t) => t.id === adminTab)
-              ? 'text-emerald-600 dark:text-emerald-400 font-bold'
-              : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
-          }`}
-        >
-          <MoreHorizontal className="w-5 h-5" />
-          <span className="text-[10px]">Más</span>
-        </button>
-
-        {/* Salir Demo Button */}
-        <button
-          onClick={logoutOrExitDemo}
-          className="flex flex-col items-center gap-0.5 py-1 px-2.5 rounded-xl text-rose-600 dark:text-rose-400 hover:text-rose-700 font-semibold transition"
-          title="Cerrar Sesión / Salir Demo"
-        >
-          <LogOut className="w-5 h-5 text-rose-600 dark:text-rose-400" />
-          <span className="text-[10px]">Salir</span>
-        </button>
-      </nav>
-
-      {/* MOBILE "MÁS" BOTTOM SHEET */}
+      {/* DRAWER TÁCTIL "MÁS" (Menú desplegable) */}
       {mobileMoreOpen && (
-        <div
-          className="md:hidden fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-sm flex flex-col justify-end animate-in fade-in duration-150"
-          onClick={(event) => { if (event.target === event.currentTarget) setMobileMoreOpen(false); }}
-        >
-          <div role="dialog" aria-modal="true" aria-label="Módulos de gestión" className="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-700 rounded-t-3xl p-5 max-h-[80vh] overflow-y-auto space-y-4 shadow-2xl">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
-              <h3 className="text-sm font-bold text-slate-900 dark:text-white">Módulos de Gestión</h3>
+        <div className="md:hidden fixed inset-0 z-50 flex flex-col justify-end bg-slate-950/70 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white dark:bg-slate-900 rounded-t-3xl border-t border-slate-200 dark:border-slate-800 p-5 space-y-4 max-h-[85vh] overflow-y-auto shadow-2xl">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-xl bg-slate-950 text-emerald-400 font-black flex items-center justify-center text-xs">
+                  SM
+                </div>
+                <div>
+                  <div className="font-extrabold text-sm text-slate-900 dark:text-white">
+                    Más Módulos & Herramientas
+                  </div>
+                  <div className="text-[10px] text-slate-500">
+                    Panel Admin de Club · {currentTenant.name}
+                  </div>
+                </div>
+              </div>
               <button
+                type="button"
                 onClick={() => setMobileMoreOpen(false)}
-                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                className="p-1.5 rounded-xl text-slate-500 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <div className="space-y-4">
-              <button
-                onClick={() => {
-                  setMobileMoreOpen(false);
-                  logoutOrExitDemo();
-                }}
-                className="w-full p-3 rounded-2xl bg-rose-50 dark:bg-rose-950/60 border border-rose-300 dark:border-rose-800 text-left flex items-center justify-between transition hover:bg-rose-100 dark:hover:bg-rose-900/60"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-xl bg-rose-600 text-white">
-                    <LogOut className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <div className="text-xs font-bold text-rose-950 dark:text-rose-200">
-                      Cerrar Sesión / Salir Demo
+            {/* Módulos en Drawer */}
+            <div className="grid grid-cols-1 gap-2">
+              {moreTabs.map((tab) => (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => handleSelectTab(tab.id)}
+                  className={`w-full flex items-center justify-between p-3 rounded-2xl border transition text-left ${
+                    adminTab === tab.id
+                      ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-500 text-emerald-950 dark:text-emerald-200'
+                      : 'bg-slate-50 dark:bg-slate-950/50 border-slate-200/80 dark:border-slate-800 text-slate-900 dark:text-white hover:border-slate-300'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-xl bg-white dark:bg-slate-900 shadow-xs">
+                      {tab.icon}
                     </div>
-                    <div className="text-[10px] text-rose-600/90 dark:text-rose-400">
-                      Regresar a la portada principal y resetear sesión activa
-                    </div>
-                  </div>
-                </div>
-                <ChevronRight className="w-4 h-4 text-rose-400" />
-              </button>
-              <button
-                onClick={() => {
-                  switchUserRole('PLAYER');
-                  setCurrentView('player');
-                  setMobileMoreOpen(false);
-                }}
-                className="w-full p-3 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-300 dark:border-emerald-700 text-left flex items-center justify-between transition hover:bg-emerald-100 dark:hover:bg-emerald-900/60"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-xl bg-emerald-600 text-white">
-                    <User className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <div className="text-xs font-bold text-emerald-950 dark:text-emerald-200">
-                      Alternar a Modo Jugador
-                    </div>
-                    <div className="text-[10px] text-emerald-700 dark:text-emerald-400">
-                      Prueba la experiencia de la app de socios y jugadores
+                    <div>
+                      <div className="font-bold text-xs">{tab.label}</div>
+                      <div className="text-[10px] text-slate-500 dark:text-slate-400">{tab.desc}</div>
                     </div>
                   </div>
-                </div>
-                <ChevronRight className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-              </button>
-
-              <p className="text-[11px] leading-relaxed text-slate-500 dark:text-slate-400">
-                Módulos organizados por áreas de gestión del club.
-              </p>
-
-              {[
-                {
-                  title: 'Instalaciones & Automatización',
-                  tabs: moreTabs.filter((t) => ['smart_courts'].includes(t.id)),
-                },
-                {
-                  title: 'Comunidad & Competición',
-                  tabs: moreTabs.filter((t) => ['teams', 'academy', 'tournaments'].includes(t.id)),
-                },
-                {
-                  title: 'Ventas & Restauración',
-                  tabs: moreTabs.filter((t) => ['shop', 'pos_cafe'].includes(t.id)),
-                },
-                {
-                  title: 'Marca Blanca & Configuración',
-                  tabs: moreTabs.filter((t) => ['web_editor', 'domains', 'settings'].includes(t.id)),
-                },
-              ].map((section) => (
-                <div key={section.title} className="space-y-2">
-                  <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-1">
-                    {section.title}
-                  </div>
-                  <div className="grid grid-cols-1 gap-1.5">
-                    {section.tabs.map((tab) => (
-                      <button
-                        key={tab.id}
-                        onClick={() => handleSelectTab(tab.id)}
-                        className={`w-full p-2.5 rounded-2xl border text-left flex items-center justify-between transition ${
-                          adminTab === tab.id
-                            ? 'bg-emerald-50 dark:bg-slate-800 border-emerald-500 text-emerald-900 dark:text-white'
-                            : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300'
-                        }`}
-                      >
-                        <div className="flex items-center gap-3">
-                          <div className="p-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700">
-                            {tab.icon}
-                          </div>
-                          <div>
-                            <div className="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                              <span>{tab.label}</span>
-                              {tab.badge && (
-                                <span className="px-1.5 py-0.2 rounded text-[9px] font-black bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
-                                  {tab.badge}
-                                </span>
-                              )}
-                            </div>
-                            <div className="text-[10px] text-slate-500 dark:text-slate-400">{tab.desc}</div>
-                          </div>
-                        </div>
-                        <ChevronRight className="w-4 h-4 text-slate-400" />
-                      </button>
-                    ))}
-                  </div>
-                </div>
+                  <ChevronRight className="w-4 h-4 text-slate-400 shrink-0" />
+                </button>
               ))}
+            </div>
+
+            {/* Action Buttons in Drawer */}
+            <div className="pt-2 border-t border-slate-100 dark:border-slate-800 space-y-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setMobileMoreOpen(false);
+                  enterWhiteLabelPlayerPreview();
+                }}
+                className="w-full py-3 px-4 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-extrabold text-xs shadow-lg transition flex items-center justify-center gap-2 active:scale-98"
+              >
+                <Eye className="w-4 h-4" />
+                <span>{t('white_label.player_view', 'Probar Vista Jugador (Marca Blanca)')}</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={logoutOrExitDemo}
+                className="w-full py-3 px-4 rounded-2xl bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 font-extrabold text-xs border border-rose-200 dark:border-rose-800 transition flex items-center justify-center gap-2 active:scale-98"
+              >
+                <LogOut className="w-4 h-4 text-rose-600 dark:text-rose-400" />
+                <span>{t('club.nav.logout', 'Cerrar Sesión / Salir de la Demo')}</span>
+              </button>
             </div>
           </div>
         </div>

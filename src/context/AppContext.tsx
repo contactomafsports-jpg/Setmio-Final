@@ -362,8 +362,16 @@ interface AppContextType {
   can: (action: PermissionAction) => PermissionCheckResult;
 
   // Domain Business Data
+  isClubOpen: boolean;
+  toggleClubOpenState: () => void;
+  isWhiteLabelPlayerPreview: boolean;
+  enterWhiteLabelPlayerPreview: () => void;
+  exitWhiteLabelPlayerPreview: () => void;
+
   courts: Court[];
   toggleCourtLight: (courtId: string) => void;
+  openCourtDoor: (courtId: string) => void;
+  toggleDeviceOnline: (courtId: string) => void;
   updateCourtRate: (courtId: string, rate: number) => void;
 
   bookings: Booking[];
@@ -967,6 +975,43 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const isFavorite = (itemId: string) => favorites.includes(itemId);
 
+  // Club Status & White Label Switcher
+  const [isClubOpen, setIsClubOpen] = useState(true);
+  const toggleClubOpenState = () => {
+    setIsClubOpen((prev) => {
+      const next = !prev;
+      triggerDemoToast(
+        t('club.status.toggle', 'Estado del Club'),
+        next ? t('club.status.open_desc', 'Instalaciones abiertas y reservas en marcha.') : t('club.status.closed_desc', 'Club cerrado temporalmente. Solo acceso personal de mantenimiento.'),
+        next ? 'success' : 'warning'
+      );
+      return next;
+    });
+  };
+
+  const [isWhiteLabelPlayerPreview, setIsWhiteLabelPlayerPreview] = useState(false);
+  const enterWhiteLabelPlayerPreview = () => {
+    setIsWhiteLabelPlayerPreview(true);
+    setCurrentUser(ROLE_PROFILES.PLAYER);
+    setCurrentViewState('player');
+    triggerDemoToast(
+      t('white_label.player_view', 'Vista Jugador'),
+      t('white_label.banner_notice', 'Estás probando la app de jugador con la marca blanca del club'),
+      'info'
+    );
+  };
+
+  const exitWhiteLabelPlayerPreview = () => {
+    setIsWhiteLabelPlayerPreview(false);
+    setCurrentUser(ROLE_PROFILES.TENANT_OWNER);
+    setCurrentViewState('admin');
+    triggerDemoToast(
+      'Modo Admin Setmio',
+      'Has vuelto al panel de gestión B2B de Setmio.',
+      'info'
+    );
+  };
+
   // Court Actions
   const toggleCourtLight = (courtId: string) => {
     const perm = can('manage_smart_courts');
@@ -1008,6 +1053,49 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       'Automatización de Pista',
       `Iluminación de ${targetCourt?.name} cambiada a ${newState ? 'ENCENDIDA' : 'APAGADA'}.`,
       'info'
+    );
+  };
+
+  const openCourtDoor = (courtId: string) => {
+    const targetCourt = courts.find((c) => c.id === courtId);
+    const pin = targetCourt?.accessPin || `${Math.floor(1000 + Math.random() * 9000)}#`;
+    setCourts((prev) =>
+      prev.map((c) => (c.id === courtId ? { ...c, isDoorOpen: true } : c))
+    );
+    setAuditLogs((prev) => [
+      {
+        id: `log-${Date.now()}`,
+        timestamp: 'Ahora mismo',
+        actor: currentUser.email,
+        role: currentUser.role,
+        action: 'Apertura de Torno/Puerta IoT',
+        target: targetCourt?.name || courtId,
+        details: `Apertura de acceso remoto ejecutada con PIN ${pin}. Puerta desbloqueada por sensor.`,
+      },
+      ...prev,
+    ]);
+    triggerDemoToast(
+      t('iot.door_unlocked', 'Acceso Desbloqueado'),
+      `${targetCourt?.name || 'Pista'}: Torno y puerta de acceso abiertos. PIN temporal: ${pin}`,
+      'success'
+    );
+    setTimeout(() => {
+      setCourts((prev) =>
+        prev.map((c) => (c.id === courtId ? { ...c, isDoorOpen: false } : c))
+      );
+    }, 6000);
+  };
+
+  const toggleDeviceOnline = (courtId: string) => {
+    setCourts((prev) =>
+      prev.map((c) => (c.id === courtId ? { ...c, isDeviceOnline: c.isDeviceOnline === false } : c))
+    );
+    const targetCourt = courts.find((c) => c.id === courtId);
+    const nextStatus = targetCourt?.isDeviceOnline === false;
+    triggerDemoToast(
+      'Dispositivo IoT ' + (targetCourt?.name || ''),
+      `Telemetría IoT de ${targetCourt?.name || 'pista'} cambiada a ${nextStatus ? 'ONLINE' : 'OFFLINE'}.`,
+      nextStatus ? 'success' : 'warning'
     );
   };
 
@@ -1385,8 +1473,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         isSuperadmin,
         can,
 
+        isClubOpen,
+        toggleClubOpenState,
+        isWhiteLabelPlayerPreview,
+        enterWhiteLabelPlayerPreview,
+        exitWhiteLabelPlayerPreview,
+
         courts,
         toggleCourtLight,
+        openCourtDoor,
+        toggleDeviceOnline,
         updateCourtRate,
 
   bookings,

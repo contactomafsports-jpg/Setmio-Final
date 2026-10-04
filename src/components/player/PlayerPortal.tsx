@@ -52,6 +52,9 @@ export const PlayerPortal: React.FC = () => {
     toggleTheme,
     setCurrentView,
     logoutOrExitDemo,
+    isWhiteLabelPlayerPreview,
+    exitWhiteLabelPlayerPreview,
+    t,
   } = useApp();
 
   const [activePlayerTab, setActivePlayerTab] = useState<
@@ -62,6 +65,10 @@ export const PlayerPortal: React.FC = () => {
   const [publicProfileModalOpen, setPublicProfileModalOpen] = useState(false);
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
   const [tournamentSubTab, setTournamentSubTab] = useState<'inscribed' | 'in_progress' | 'upcoming'>('inscribed');
+
+  const clubDisplayName = isWhiteLabelPlayerPreview ? t('white_label.club_name_preview', 'Padel Club Premier') : currentTenant.name;
+  const clubShortName = isWhiteLabelPlayerPreview ? 'Padel Premier' : currentTenant.shortName;
+  const clubInitials = isWhiteLabelPlayerPreview ? 'PCP' : 'SM';
 
   const normalizedPlayerName = currentUser.name.split(' (')[0].trim().toLocaleLowerCase();
   const myBookings = bookings.filter((booking) =>
@@ -103,8 +110,31 @@ export const PlayerPortal: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 pb-[calc(6rem+env(safe-area-inset-bottom))] transition-colors duration-200 w-full max-w-full overflow-x-hidden">
+      {/* 0. FIXED TOP FLOATING BANNER (When testing White Label Player View) */}
+      {isWhiteLabelPlayerPreview && (
+        <aside
+          aria-label="Banner de conmutación a modo administración"
+          className="sticky top-0 z-50 bg-slate-950/95 backdrop-blur-md border-b border-emerald-500/40 px-4 py-2 text-white shadow-xl flex items-center justify-between gap-3 animate-in slide-in-from-top-2 duration-200"
+        >
+          <div className="flex items-center gap-2 min-w-0 text-xs">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+            <span className="font-bold text-white truncate">
+              {t('white_label.banner_notice', 'Probando app de jugador con Marca Blanca')} · <span className="text-emerald-300 font-extrabold">{clubDisplayName}</span>
+            </span>
+          </div>
+
+          <button
+            type="button"
+            onClick={exitWhiteLabelPlayerPreview}
+            className="shrink-0 px-3.5 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs shadow-md transition hover:scale-105 active:scale-95 flex items-center gap-1.5"
+          >
+            <span>{t('white_label.return_admin', '← Volver a Modo Admin (Setmio)')}</span>
+          </button>
+        </aside>
+      )}
+
       {/* 1. TOP APP HEADER (App Shell Privada) */}
-      <header className="sticky top-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-4 sm:px-6 py-3 shadow-sm">
+      <header className={`sticky ${isWhiteLabelPlayerPreview ? 'top-10' : 'top-0'} z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-4 sm:px-6 py-3 shadow-sm transition-all`}>
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex min-w-0 items-center gap-2 sm:gap-3">
             {/* Mobile Drawer Toggle */}
@@ -118,11 +148,11 @@ export const PlayerPortal: React.FC = () => {
 
             <div className="min-w-0 flex items-center gap-2.5">
               <div className="w-9 h-9 shrink-0 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-700 flex items-center justify-center font-black text-white text-sm shadow">
-                SM
+                {clubInitials}
               </div>
               <div>
-                <div className="font-extrabold text-sm text-slate-900 dark:text-white leading-tight">
-                  {currentTenant.shortName}
+                <div className="font-extrabold text-sm text-slate-900 dark:text-white leading-tight truncate">
+                  {clubShortName}
                 </div>
                 <div className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold uppercase tracking-wider">
                   Área Privada del Jugador

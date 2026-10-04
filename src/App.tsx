@@ -288,13 +288,6 @@ export function App() {
 
   {currentView === 'hq' && <SuperadminHQ />}
 
-      {currentView !== 'public' && (
-        <div className="fixed bottom-4 left-4 right-4 z-[100] mx-auto flex max-w-xl items-center justify-between gap-3 rounded-2xl border border-emerald-400/40 bg-slate-950/95 px-4 py-3 text-white shadow-2xl backdrop-blur-md">
-          <span className="min-w-0 truncate text-xs font-semibold"><span className="mr-1.5 text-emerald-400">●</span>Vista Previa Demo ({currentUser?.name ?? 'Setmio'})</span>
-          <button type="button" onClick={navigateToCorporate} className="shrink-0 rounded-xl bg-white px-3 py-2 text-[11px] font-black text-slate-900 transition hover:bg-emerald-100">Salir de la demo</button>
-        </div>
-      )}
-
       {/* 3. Floating AI Agent (Draggable, session memory, tenant branded) */}
       <DraggableAIAgent />
 
