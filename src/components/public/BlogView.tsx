@@ -139,7 +139,7 @@ export const BlogView: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
 
             <div className="p-6 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 my-8">
               <h4 className="font-bold text-emerald-900 dark:text-emerald-300 text-sm mb-1">
-                Consejo del Entrenador en {currentTenant.name}
+                {t('blog.coachTip', `Consejo del Entrenador en ${currentTenant.name}`)}
               </h4>
               <p className="text-xs text-emerald-800 dark:text-emerald-400 leading-relaxed">
                 "Dedica 15 minutos en el calentamiento a realizar intercambios lentos de bandeja a media pista sin buscar rematar. Calibrarás el bote del césped del club y ganarás confianza en la pala."
@@ -185,7 +185,7 @@ export const BlogView: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
                       </div>
                     </div>
                     <div className="p-4 pt-0 text-[11px] text-slate-400 font-medium">
-                      {article.readingTime} min de lectura
+                      {article.readingTime} {t('blog.readingTime', 'min de lectura')}
                     </div>
                   </div>
                 ))}
@@ -210,7 +210,7 @@ export const BlogView: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
               }}
               className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow transition"
             >
-              Reservar Pista para Practicar
+              {t('blog.bookToPractice', 'Reservar Pista para Practicar')}
             </button>
           </div>
         </article>
@@ -256,7 +256,7 @@ export const BlogView: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
                     : 'bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-slate-800'
                 }`}
               >
-                {c === 'all' ? 'Todos los Temas' : c}
+                {c === 'all' ? t('blog.allTopics', 'Todos los Temas') : t(`blog.category.${c}`, c)}
               </button>
             ))}
           </div>
@@ -285,7 +285,7 @@ export const BlogView: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
                     <div className="flex items-center gap-2 text-[11px] text-slate-400">
                       <span>{post.publishedAt.split('T')[0]}</span>
                       <span>·</span>
-                      <span>{post.readingTime} min lectura</span>
+                      <span>{post.readingTime} {t('blog.readingTimeShort', 'min lectura')}</span>
                     </div>
 
                     <h3 className="text-base font-bold text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors line-clamp-2">

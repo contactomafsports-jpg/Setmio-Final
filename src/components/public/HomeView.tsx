@@ -215,8 +215,8 @@ export const HomeView: React.FC = () => {
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent" />
                 <div className="absolute bottom-5 left-5 right-5 p-4 rounded-2xl bg-slate-900/90 backdrop-blur-md border border-slate-700 text-xs shadow-lg text-white">
                   <div className="flex items-center justify-between mb-1">
-                    <span className="font-bold text-white">Pista 1 Central Panorámica</span>
-                    <span className="text-emerald-400 font-bold">Disponible Hoy</span>
+                    <span className="font-bold text-white">{t('home.hero.courtName', 'Pista 1 Central Panorámica')}</span>
+                    <span className="text-emerald-400 font-bold">{t('home.hero.availableToday', 'Disponible Hoy')}</span>
                   </div>
                   <div className="text-slate-300 text-[11px] font-medium">
                     {currentTenant.name} · Iluminación LED y césped oficial
@@ -276,10 +276,10 @@ export const HomeView: React.FC = () => {
                 onChange={(e) => setSearchTimeSlot(e.target.value)}
                 className="w-full px-4 py-3 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white text-xs font-bold focus:ring-2 focus:ring-emerald-500 transition"
               >
-                <option value="any">Cualquier Horario Disponible</option>
-                <option value="morning">Mañanas (08:30 - 14:00)</option>
-                <option value="afternoon">Tardes (16:00 - 20:00)</option>
-                <option value="evening">Noche Prime (20:00 - 23:30)</option>
+                <option value="any">{t('home.search.anyTime', 'Cualquier Horario Disponible')}</option>
+                <option value="morning">{t('home.search.morning', 'Mañanas (08:30 - 14:00)')}</option>
+                <option value="afternoon">{t('home.search.afternoon', 'Tardes (16:00 - 20:00)')}</option>
+                <option value="evening">{t('home.search.evening', 'Noche Prime (20:00 - 23:30)')}</option>
               </select>
             </div>
 
@@ -495,44 +495,44 @@ export const HomeView: React.FC = () => {
 
           {/* Tournament Carousel Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredTournaments.map((t) => (
+            {filteredTournaments.map((tournament) => (
               <div
-                key={t.id}
+                key={tournament.id}
                 className="rounded-3xl overflow-hidden bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-xl transition-all flex flex-col justify-between"
               >
                 <div>
                   <div className="relative h-48 w-full overflow-hidden">
                     <img
-                      src={t.bannerUrl}
-                      alt={t.title}
+                      src={tournament.bannerUrl}
+                      alt={tournament.title}
                       className="w-full h-full object-cover"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/30 to-transparent" />
                     <div className="absolute top-3 right-3">
                       <span className="px-2.5 py-1 rounded-full bg-emerald-500 text-slate-950 font-black text-[10px] uppercase shadow">
-                        {t.status === 'registration_open' ? 'Inscripción Abierta' : 'Próximamente'}
+                        {tournament.status === 'registration_open' ? t('home.tournaments.open', 'Inscripción Abierta') : t('home.tournaments.upcoming', 'Próximamente')}
                       </span>
                     </div>
                     <div className="absolute bottom-3 left-4 right-4 text-white">
-                      <div className="text-[11px] font-mono text-emerald-400 font-bold">{t.dates}</div>
-                      <h3 className="font-bold text-lg text-white truncate">{t.title}</h3>
+                      <div className="text-[11px] font-mono text-emerald-400 font-bold">{tournament.dates}</div>
+                      <h3 className="font-bold text-lg text-white truncate">{tournament.title}</h3>
                     </div>
                   </div>
 
                   <div className="p-5 space-y-3 text-xs">
                     <div className="flex items-center justify-between text-slate-600 dark:text-slate-400">
-                      <span>Inscripción:</span>
+                      <span>{t('home.tournaments.registration', 'Inscripción:')}</span>
                       <strong className="font-mono text-slate-900 dark:text-white text-sm">
-                        {t.entryFee.toFixed(2)} €/jugador
+                        {tournament.entryFee.toFixed(2)} €/jugador
                       </strong>
                     </div>
 
                     <div className="text-slate-500 dark:text-slate-400 text-[11px]">
-                      Premios: <strong className="text-slate-800 dark:text-slate-200">{t.prizes}</strong>
+                      Premios: <strong className="text-slate-800 dark:text-slate-200">{tournament.prizes}</strong>
                     </div>
 
                     <div className="flex flex-wrap gap-1.5 pt-1">
-                      {t.categories.map((c, idx) => (
+                      {tournament.categories.map((c, idx) => (
                         <span
                           key={idx}
                           className="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-[10px] text-slate-700 dark:text-slate-300 font-semibold"
@@ -552,7 +552,7 @@ export const HomeView: React.FC = () => {
                     }}
                     className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-sm transition flex items-center justify-center gap-1.5"
                   >
-                    <span>Inscribirme al Torneo</span>
+                    <span>{t('home.tournaments.register', 'Inscribirme al Torneo')}</span>
                     <ArrowRight className="w-3.5 h-3.5" />
                   </button>
                 </div>
@@ -568,7 +568,7 @@ export const HomeView: React.FC = () => {
               }}
               className="inline-flex items-center gap-2 text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:underline"
             >
-              <span>Ver todas las competiciones y clasificaciones</span>
+              <span>{t('home.tournaments.all', 'Ver todas las competiciones y clasificaciones')}</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>
@@ -597,7 +597,7 @@ export const HomeView: React.FC = () => {
             }}
             className="flex items-center gap-1.5 text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:underline self-start sm:self-auto"
           >
-            <span>Ver todos los partidos abiertos</span>
+            <span>{t('home.matches.all', 'Ver todos los partidos abiertos')}</span>
             <ChevronRight className="w-4 h-4" />
           </button>
         </div>
@@ -633,7 +633,7 @@ export const HomeView: React.FC = () => {
                 {/* Plazas */}
                 <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800">
                   <div className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 mb-2 flex items-center justify-between">
-                    <span>Plazas disponibles:</span>
+                    <span>{t('home.matches.available', 'Plazas disponibles:')}</span>
                     <span className="font-bold text-emerald-600 dark:text-emerald-400">{4 - m.players.length} libres</span>
                   </div>
                   <div className="flex items-center gap-1.5">
@@ -660,7 +660,7 @@ export const HomeView: React.FC = () => {
                 }}
                 className="w-full py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-sm transition flex items-center justify-center gap-1.5"
               >
-                <span>Unirme a esta Partida</span>
+                <span>{t('home.matches.join', 'Unirme a esta Partida')}</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>
             </div>
@@ -686,7 +686,7 @@ export const HomeView: React.FC = () => {
             }}
             className="flex items-center gap-1 text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:underline"
           >
-            <span>Ver Tienda Completa</span>
+            <span>{t('home.shop.all', 'Ver Tienda Completa')}</span>
             <ChevronRight className="w-4 h-4" />
           </button>
         </div>
