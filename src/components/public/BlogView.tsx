@@ -25,7 +25,9 @@ export const BlogView: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
     setPublicPage,
     currentTenant,
     t,
+    currentLanguage,
   } = useApp();
+  void currentLanguage;
 
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -90,7 +92,7 @@ export const BlogView: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
               <div className="flex items-center gap-4">
                 <div className="flex items-center gap-1 font-mono">
                   <Clock className="w-4 h-4 text-teal-600 dark:text-cyan-400" />
-                  <span>{selectedArticle.readingTime} min de lectura</span>
+                  <span>{selectedArticle.readingTime} {t('blog.readingTime', 'min de lectura')}</span>
                 </div>
                 <button
                   onClick={() => handleShare(selectedArticle.title)}
@@ -137,7 +139,7 @@ export const BlogView: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
 
             <div className="p-6 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 my-8">
               <h4 className="font-bold text-emerald-900 dark:text-emerald-300 text-sm mb-1">
-                Consejo del Entrenador en {currentTenant.name}
+                {t('blog.coachTip', `Consejo del Entrenador en ${currentTenant.name}`)}
               </h4>
               <p className="text-xs text-emerald-800 dark:text-emerald-400 leading-relaxed">
                 "Dedica 15 minutos en el calentamiento a realizar intercambios lentos de bandeja a media pista sin buscar rematar. Calibrarás el bote del césped del club y ganarás confianza en la pala."
@@ -183,7 +185,7 @@ export const BlogView: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
                       </div>
                     </div>
                     <div className="p-4 pt-0 text-[11px] text-slate-400 font-medium">
-                      {article.readingTime} min de lectura
+                      {article.readingTime} {t('blog.readingTime', 'min de lectura')}
                     </div>
                   </div>
                 ))}
@@ -198,7 +200,7 @@ export const BlogView: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
               className="flex items-center gap-2 text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition"
             >
               <ArrowLeft className="w-4 h-4" />
-              <span>Volver al listado</span>
+              <span>{t('blog.backToList', 'Volver al listado')}</span>
             </button>
 
             <button
@@ -208,7 +210,7 @@ export const BlogView: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
               }}
               className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow transition"
             >
-              Reservar Pista para Practicar
+              {t('blog.bookToPractice', 'Reservar Pista para Practicar')}
             </button>
           </div>
         </article>
@@ -219,13 +221,13 @@ export const BlogView: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
             <div>
               <div className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
                 <BookOpen className="w-4 h-4" />
-                <span>Actualidad & Consejos de Pádel</span>
+                <span>{t('blog.eyebrow', 'Actualidad & Consejos de Pádel')}</span>
               </div>
               <h1 className="text-3xl sm:text-5xl font-black text-slate-900 dark:text-white tracking-tight mt-1">
-                Blog Oficial {currentTenant.name}
+                {t('blog.title', `Blog Oficial ${currentTenant.name}`)}
               </h1>
               <p className="text-slate-600 dark:text-slate-400 text-xs sm:text-sm mt-2 max-w-xl">
-                Artículos técnicos elaborados por nuestros entrenadores, análisis de biomecánica, crónicas de torneos y novedades del club en Narón.
+                {t('blog.description', 'Artículos técnicos elaborados por nuestros entrenadores, análisis de biomecánica, crónicas de torneos y novedades del club en Narón.')}
               </p>
             </div>
 
@@ -236,7 +238,7 @@ export const BlogView: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Buscar artículo o tema..."
+                placeholder={t('blog.searchPlaceholder', 'Buscar artículo o tema...')}
                 className="w-full pl-9 pr-3 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-emerald-500 font-medium shadow-sm"
               />
             </div>
@@ -254,7 +256,7 @@ export const BlogView: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
                     : 'bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-slate-800'
                 }`}
               >
-                {c === 'all' ? 'Todos los Temas' : c}
+                {c === 'all' ? t('blog.allTopics', 'Todos los Temas') : t(`blog.category.${c}`, c)}
               </button>
             ))}
           </div>
@@ -283,7 +285,7 @@ export const BlogView: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
                     <div className="flex items-center gap-2 text-[11px] text-slate-400">
                       <span>{post.publishedAt.split('T')[0]}</span>
                       <span>·</span>
-                      <span>{post.readingTime} min lectura</span>
+                      <span>{post.readingTime} {t('blog.readingTimeShort', 'min lectura')}</span>
                     </div>
 
                     <h3 className="text-base font-bold text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors line-clamp-2">

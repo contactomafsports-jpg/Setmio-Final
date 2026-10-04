@@ -15,7 +15,8 @@ import {
 } from 'lucide-react';
 
 export const ContactFAQView: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
-  const { currentTenant, triggerDemoToast, t } = useApp();
+  const { currentTenant, triggerDemoToast, t, currentLanguage } = useApp();
+  void currentLanguage;
 
   const [formName, setFormName] = useState('');
   const [formEmail, setFormEmail] = useState('');

@@ -35,7 +35,7 @@ import {
   INITIAL_AUDIT_LOGS,
   INITIAL_PAGE_BLOCKS,
 } from '../data/initialData';
-import { SupportedLanguage, getTranslation } from '../lib/i18n';
+import { SupportedLanguage, TRANSLATIONS } from '../lib/i18n';
 import { checkPermission, PermissionAction, PermissionCheckResult } from '../lib/permissions';
 
 export type MainView = 'public' | 'admin' | 'player' | 'coach' | 'hq';
@@ -312,6 +312,7 @@ interface AppContextType {
   setTheme: (theme: ThemeMode) => void;
   toggleTheme: () => void;
   language: SupportedLanguage;
+  currentLanguage: SupportedLanguage;
   setLanguage: (lang: SupportedLanguage) => void;
   t: (key: string, fallback?: string) => string;
 
@@ -586,7 +587,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   }, [language]);
 
   const t = (key: string, fallback?: string): string => {
-    return getTranslation(language, key, fallback);
+    return TRANSLATIONS[language]?.[key] || TRANSLATIONS.es?.[key] || fallback || key;
   };
 
   // Sync theme with DOM documentElement
@@ -1312,6 +1313,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         setTheme,
         toggleTheme,
         language,
+        currentLanguage: language,
         setLanguage,
         t,
 

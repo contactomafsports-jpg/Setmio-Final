@@ -75,6 +75,21 @@ export function App() {
   const [roleSelectorOpen, setRoleSelectorOpen] = useState(false);
   const [registrationOpen, setRegistrationOpen] = useState(false);
 
+  const navigatePublic = (path: string) => {
+    if (typeof window !== 'undefined' && window.location.pathname !== path) {
+      window.history.pushState({}, '', path);
+      window.dispatchEvent(new PopStateEvent('popstate'));
+    }
+    setPublicPage(path === '/' ? 'home' : publicPage);
+  };
+
+  const closeRegistration = () => {
+    setAuthOpen(false);
+    setRegistrationOpen(false);
+    navigatePublic('/');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   // PWA Brand splash screen (Only for installed private app sessions)
   const [showSplash, setShowSplash] = useState(() => {
     if (typeof window === 'undefined') return false;
@@ -149,7 +164,7 @@ export function App() {
       case 'home':
         return <HomeView />;
       case 'features':
-        return <FeaturesView onBack={goHome} onOpenDemo={() => setRoleSelectorOpen(true)} />;
+        return <FeaturesView onBack={goHome} />;
       case 'solutions':
       case 'solution_clubs':
       case 'solution_schools':
@@ -242,6 +257,7 @@ export function App() {
               onExploreClub={navigateToClub}
               onOpenDemoRoleModal={() => setRoleSelectorOpen(true)}
               onOpenFeatures={() => { window.history.pushState({}, '', '/funcionalidades'); setPublicPage('features'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+              onOpenOnboarding={() => { window.history.pushState({}, '', '/registro'); window.dispatchEvent(new PopStateEvent('popstate')); setRegistrationOpen(true); setAuthOpen(true); }}
             />
           ) : renderPublicPage()}
         </CorporateLayout>
@@ -287,7 +303,7 @@ export function App() {
       <AuthModal
         isOpen={authOpen}
         initialMode={registrationOpen ? 'register' : 'login'}
-        onClose={() => { setAuthOpen(false); setRegistrationOpen(false); }}
+        onClose={registrationOpen ? closeRegistration : () => setAuthOpen(false)}
         onOpenRoleModal={() => setRoleSelectorOpen(true)}
       />
       <RoleSelectorModal

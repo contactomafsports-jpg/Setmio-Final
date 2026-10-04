@@ -26,18 +26,19 @@ interface AuthModalProps {
 }
 
 export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onOpenRoleModal, initialMode = 'login' }) => {
-  const { currentTenant, switchUserRole, triggerDemoToast, setCurrentView, t } = useApp();
+  const { currentTenant, switchUserRole, triggerDemoToast, setCurrentView, t, currentLanguage } = useApp();
+  void currentLanguage;
 
   const [mode, setMode] = useState<'login' | 'register'>(initialMode);
   useEffect(() => { if (isOpen) setMode(initialMode); }, [initialMode, isOpen]);
   const [registerStep, setRegisterStep] = useState<1 | 2 | 3>(1);
   const [registrationRole, setRegistrationRole] = useState<'club' | 'school' | 'coach' | 'pro' | 'amateur' | null>(null);
   const registrationRoles = [
-    { id: 'club', label: 'Club', description: 'Gestiona pistas, socios y operaciones.' },
-    { id: 'school', label: 'Escuela', description: 'Organiza clases, grupos y alumnos.' },
-    { id: 'coach', label: 'Profesor', description: 'Impulsa tus clases y cobros.' },
-    { id: 'pro', label: 'Jugador Profesional', description: 'Centraliza calendario y oportunidades.' },
-    { id: 'amateur', label: 'Jugador Amateur', description: 'Reserva, juega y mejora.' },
+    { id: 'club', label: t('register.role.club', 'Club'), description: t('register.role.clubDescription', 'Gestiona pistas, socios y operaciones.') },
+    { id: 'school', label: t('register.role.school', 'Escuela'), description: t('register.role.schoolDescription', 'Organiza clases, grupos y alumnos.') },
+    { id: 'coach', label: t('register.role.coach', 'Profesor'), description: t('register.role.coachDescription', 'Impulsa tus clases y cobros.') },
+    { id: 'pro', label: t('register.role.pro', 'Jugador Profesional'), description: t('register.role.proDescription', 'Centraliza calendario y oportunidades.') },
+    { id: 'amateur', label: t('register.role.amateur', 'Jugador Amateur'), description: t('register.role.amateurDescription', 'Reserva, juega y mejora.') },
   ] as const;
 
   // Form Fields
@@ -53,6 +54,14 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onOpenRol
   const [notifyWhatsapp, setNotifyWhatsapp] = useState(true);
 
   const [loading, setLoading] = useState(false);
+  const handleClose = () => {
+    onClose();
+    if (mode === 'register') {
+      window.history.pushState({}, '', '/');
+      window.dispatchEvent(new PopStateEvent('popstate'));
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
 
   if (!isOpen) return null;
 
@@ -114,7 +123,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onOpenRol
           if (error) throw error;
           triggerDemoToast('Registro en Supabase', 'Cuenta creada con éxito. Perfil deportivo vinculado.', 'success');
         }
-        onClose();
+        handleClose();
       } catch (err: unknown) {
         triggerDemoToast('Error de Autenticación', (err as Error)?.message || 'Fallo en la autenticación.', 'warning');
       } finally {
@@ -129,9 +138,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onOpenRol
           `Bienvenido a ${currentTenant.name}. Se ha iniciado sesión con tu perfil deportivo multirrol.`,
           'success'
         );
-        switchUserRole('PLAYER');
-        setCurrentView('player');
-        onClose();
+        handleClose();
       }, 500);
     }
   };
@@ -148,7 +155,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onOpenRol
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm animate-in fade-in duration-150">
       <div className="relative w-full max-w-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl text-slate-900 dark:text-slate-100 max-h-[92vh] overflow-y-auto">
         <button
-          onClick={onClose}
+          aria-label={t('common.close', 'Cerrar')}
+          onClick={handleClose}
           className="absolute top-5 right-5 p-2 rounded-xl text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition"
         >
           <X className="w-5 h-5" />
@@ -159,12 +167,12 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onOpenRol
             SM
           </div>
           <h3 className="text-xl font-black text-slate-900 dark:text-white">
-            {mode === 'login' ? 'Acceso Usuarios Setmio' : 'Crear cuenta Setmio'}
+            {mode === 'login' ? t('auth.titleLogin', 'Acceso Usuarios Setmio') : t('register.title', 'Crear cuenta Setmio')}
           </h3>
           <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
             {mode === 'login'
-              ? 'Accede a tus reservas, partidas abiertas, torneos y monedero'
-              : 'Asistente personalizado paso a paso para configurar tu perfil de juego'}
+              ? t('auth.subtitleLogin', 'Accede a tus reservas, partidas abiertas, torneos y monedero')
+              : t('register.subtitle', 'Asistente personalizado paso a paso para configurar tu perfil de juego')}
           </p>
         </div>
 
@@ -252,13 +260,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onOpenRol
           <div className="mb-6">
             <div className="flex items-center justify-between text-xs font-bold mb-2">
               <span className={registerStep >= 1 ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400'}>
-                1. Cuenta
+                {t('register.step.account', '1. Cuenta')}
               </span>
               <span className={registerStep >= 2 ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400'}>
-                2. Perfil Deportivo
+                {t('register.step.sports', '2. Perfil Deportivo')}
               </span>
               <span className={registerStep >= 3 ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400'}>
-                3. Preferencias
+                {t('register.step.preferences', '3. Preferencias')}
               </span>
             </div>
             <div className="grid grid-cols-3 gap-2">
@@ -287,7 +295,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onOpenRol
             <>
               <div>
                 <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
-                  Email o Usuario
+                  {t('auth.emailLabel', 'Email o Usuario')}
                 </label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-3 w-4 h-4 text-slate-400" />
@@ -296,7 +304,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onOpenRol
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="tu-correo@ejemplo.com"
+                    placeholder={t('auth.emailPlaceholder', 'tu-correo@ejemplo.com')}
                     className="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-emerald-500"
                   />
                 </div>
@@ -324,7 +332,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onOpenRol
                 disabled={loading}
                 className="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-lg transition flex items-center justify-center gap-2"
               >
-                {loading ? 'Iniciando sesión...' : 'Entrar a mi Cuenta'}
+                {loading ? t('auth.loading', 'Iniciando sesión...') : t('auth.submit', 'Entrar a mi Cuenta')}
                 <ArrowRight className="w-4 h-4" />
               </button>
             </>
@@ -333,9 +341,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onOpenRol
               {/* REGISTER STEP 1 */}
               {registerStep === 1 && (
                 <div className="space-y-4 animate-in fade-in duration-150">
-                  {!registrationRole ? <div className="space-y-3"><p className="text-sm font-black text-slate-900 dark:text-white">¿Cómo vas a usar Setmio?</p><p className="text-xs text-slate-500">Elige tu perfil para personalizar tu experiencia.</p><div className="grid gap-2 sm:grid-cols-2">{registrationRoles.map((role) => <button type="button" key={role.id} onClick={() => setRegistrationRole(role.id)} className="rounded-2xl border border-slate-200 p-4 text-left transition hover:border-emerald-500 hover:bg-emerald-50 dark:border-slate-800 dark:hover:bg-emerald-950/30"><span className="block text-sm font-black">{role.label}</span><span className="mt-1 block text-xs text-slate-500">{role.description}</span></button>)}</div></div> : (<div className="space-y-4"><div className="flex items-center justify-between rounded-xl bg-emerald-50 px-3 py-2 text-xs font-bold text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-300">Perfil: {registrationRoles.find((role) => role.id === registrationRole)?.label}<button type="button" onClick={() => setRegistrationRole(null)} className="underline">Cambiar</button></div><div>
+                  {!registrationRole ? <div className="space-y-3"><p className="text-sm font-black text-slate-900 dark:text-white">{t('register.useQuestion', '¿Cómo vas a usar Setmio?')}</p><p className="text-xs text-slate-500">{t('register.profileHint', 'Elige tu perfil para personalizar tu experiencia.')}</p><div className="grid gap-2 sm:grid-cols-2">{registrationRoles.map((role) => <button type="button" key={role.id} onClick={() => setRegistrationRole(role.id)} className="rounded-2xl border border-slate-200 p-4 text-left transition hover:border-emerald-500 hover:bg-emerald-50 dark:border-slate-800 dark:hover:bg-emerald-950/30"><span className="block text-sm font-black">{role.label}</span><span className="mt-1 block text-xs text-slate-500">{role.description}</span></button>)}</div></div> : (<div className="space-y-4"><div className="flex items-center justify-between rounded-xl bg-emerald-50 px-3 py-2 text-xs font-bold text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-300">Perfil: {registrationRoles.find((role) => role.id === registrationRole)?.label}<button type="button" onClick={() => setRegistrationRole(null)} className="underline">Cambiar</button></div><div>
                     <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
-                      Nombre y Apellidos
+                      {t('register.fullName', 'Nombre y Apellidos')}
                     </label>
                     <div className="relative">
                       <User className="absolute left-3 top-3 w-4 h-4 text-slate-400" />
@@ -344,7 +352,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onOpenRol
                         required
                         value={fullName}
                         onChange={(e) => setFullName(e.target.value)}
-                        placeholder="Ej. Lucas Rey"
+                        placeholder={t('register.fullNamePlaceholder', 'Ej. Lucas Rey')}
                         className="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-emerald-500"
                       />
                     </div>
@@ -352,7 +360,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onOpenRol
 
                   <div>
                     <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
-                      Correo Electrónico
+                      {t('register.email', 'Correo Electrónico')}
                     </label>
                     <div className="relative">
                       <Mail className="absolute left-3 top-3 w-4 h-4 text-slate-400" />
@@ -361,7 +369,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onOpenRol
                         required
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        placeholder="tu-correo@ejemplo.com"
+                        placeholder={t('auth.emailPlaceholder', 'tu-correo@ejemplo.com')}
                         className="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-emerald-500"
                       />
                     </div>
@@ -369,7 +377,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onOpenRol
 
                   <div>
                     <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
-                      Teléfono Móvil
+                      {t('register.phone', 'Teléfono Móvil')}
                     </label>
                     <div className="relative">
                       <Phone className="absolute left-3 top-3 w-4 h-4 text-slate-400" />
@@ -386,7 +394,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onOpenRol
 
                   <div>
                     <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
-                      Contraseña
+{t('auth.passwordLabel', 'Contraseña')}
                     </label>
                     <div className="relative">
                       <Lock className="absolute left-3 top-3 w-4 h-4 text-slate-400" />
@@ -606,7 +614,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onOpenRol
                       className="w-1/3 py-3 rounded-xl border border-slate-300 dark:border-slate-700 font-bold text-xs text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition flex items-center justify-center gap-1"
                     >
                       <ArrowLeft className="w-4 h-4" />
-                      <span>Atrás</span>
+                      <span>Atr��s</span>
                     </button>
                     <button
                       type="submit"

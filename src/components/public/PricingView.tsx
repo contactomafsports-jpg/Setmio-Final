@@ -16,7 +16,8 @@ const plans = [
 
 export const PricingView: React.FC<PricingViewProps> = ({ onBack, onOpenDemo }) => {
   const [annual, setAnnual] = useState(false);
-  const { t } = useApp();
+  const { t, currentLanguage } = useApp();
+  void currentLanguage;
 
   return (
     <main className="min-h-[calc(100vh-4rem)] bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100">

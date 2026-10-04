@@ -137,11 +137,7 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
   };
 
   const handleOpenRegister = () => {
-    if (onOpenOnboarding) {
-      onOpenOnboarding();
-    } else {
-      setRegisterModalOpen(true);
-    }
+    onOpenOnboarding?.();
   };
 
   const handleQuickDemoRole = (role: 'SUPERADMIN' | 'TENANT_OWNER' | 'COACH' | 'PLAYER') => {
@@ -1045,7 +1041,7 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
               <li><a href="#precios" className="hover:text-white transition">Planes & Tarifas</a></li>
               <li><button onClick={() => onExploreClub('sanmateo')} className="hover:text-white transition text-left">Explorar demo de club</button></li>
               <li><button onClick={onOpenAuth} className="hover:text-white transition text-left">Login Global de Socios</button></li>
-              <li><button onClick={() => setRegisterModalOpen(true)} className="hover:text-white transition text-left">Alta de Nuevo Club</button></li>
+              <li><button onClick={handleOpenRegister} className="hover:text-white transition text-left">Alta de Nuevo Club</button></li>
             </ul>
           </div>
 

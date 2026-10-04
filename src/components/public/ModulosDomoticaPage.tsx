@@ -9,7 +9,8 @@ interface ModulosDomoticaPageProps {
 }
 
 export function ModulosDomoticaPage({ onBack, onOpenDemo }: ModulosDomoticaPageProps) {
-  const { t } = useApp();
+  const { t, currentLanguage } = useApp();
+  void currentLanguage;
   return (
     <section className="min-h-[70vh] bg-slate-950 px-4 py-16 text-white sm:px-6 lg:px-8">
       <div className="mx-auto max-w-6xl">
