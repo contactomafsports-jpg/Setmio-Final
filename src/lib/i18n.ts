@@ -1348,9 +1348,15 @@ export const TRANSLATIONS: Record<SupportedLanguage, Record<string, string>> = {
 },
 };
 
-
-
-
+const COMPLETE_TRANSLATION_KEYS = Object.keys(TRANSLATIONS.es);
+for (const language of SUPPORTED_LANGUAGES.map(({ code }) => code)) {
+  const dictionary = TRANSLATIONS[language];
+  for (const key of COMPLETE_TRANSLATION_KEYS) {
+    if (!dictionary[key]) {
+      dictionary[key] = TRANSLATIONS.en?.[key] || TRANSLATIONS.es[key];
+    }
+  }
+}
 
 export function getTranslation(lang: SupportedLanguage, key: string, fallback?: string): string {
   return TRANSLATIONS[lang]?.[key] || TRANSLATIONS.es?.[key] || fallback || key;
