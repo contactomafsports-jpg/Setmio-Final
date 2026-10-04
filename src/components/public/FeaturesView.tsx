@@ -21,13 +21,11 @@ import {
 
 interface FeaturesViewProps {
   onBack?: () => void;
-  onOpenDemo?: () => void;
   onOpenOnboarding?: () => void;
 }
 
 export const FeaturesView: React.FC<FeaturesViewProps> = ({
   onBack,
-  onOpenDemo,
   onOpenOnboarding,
 }) => {
   const { setPublicPage, setIsCorporateLanding, t } = useApp();
@@ -98,16 +96,8 @@ export const FeaturesView: React.FC<FeaturesViewProps> = ({
       <div className="flex items-center justify-between">
   <SubpageHeaderNav onBack={handleBack} />
 
-        <div className="flex items-center gap-3">
-          {onOpenDemo && (
-            <button
-              onClick={onOpenDemo}
-              className="px-4 py-2 rounded-xl bg-slate-900 dark:bg-slate-800 hover:bg-slate-800 text-white font-bold text-xs border border-slate-700 transition"
-            >
-              {t('features.demo', 'Ver Demo Interactiva')}
-            </button>
-          )}
-          {onOpenOnboarding && (
+  <div className="flex items-center gap-3">
+  {onOpenOnboarding && (
             <button
               onClick={onOpenOnboarding}
               className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-sm transition"
@@ -164,15 +154,7 @@ export const FeaturesView: React.FC<FeaturesViewProps> = ({
                 </div>
               </div>
 
-              <div className="pt-4 border-t border-slate-100 dark:border-slate-800">
-                <button
-                  onClick={onOpenDemo}
-                  className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition"
-                >
-                  <span>{t('features.tryDemo', 'Probar en la demo')}</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </button>
-              </div>
+  <div className="pt-4 border-t border-slate-100 dark:border-slate-800" />
             </div>
           );
         })}

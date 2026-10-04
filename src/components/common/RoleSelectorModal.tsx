@@ -21,7 +21,7 @@ export const RoleSelectorModal: React.FC<RoleSelectorModalProps> = ({
   isOpen,
   onClose,
 }) => {
-  const { switchUserRole, setCurrentView, triggerDemoToast, setIsCorporateLanding } = useApp();
+  const { switchUserRole, setCurrentView, triggerDemoToast, setIsCorporateLanding, t } = useApp();
 
   if (!isOpen) return null;
 
@@ -84,8 +84,8 @@ export const RoleSelectorModal: React.FC<RoleSelectorModalProps> = ({
     setCurrentView(r.actionView);
     onClose();
     triggerDemoToast(
-      `Entorno Demo: ${r.title}`,
-      `Has ingresado al entorno con perfil y permisos de ${r.badge}.`,
+      `${t('demo.title', 'Entorno Demo')}: ${t(`demo.roles.${r.role}.title`, r.title)}`,
+      t(`demo.roles.${r.role}.access`, `Has ingresado al entorno con perfil y permisos de ${r.badge}.`),
       'success'
     );
   };
@@ -102,7 +102,7 @@ export const RoleSelectorModal: React.FC<RoleSelectorModalProps> = ({
         <button
           onClick={onClose}
           className="absolute top-5 right-5 p-2 rounded-xl text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition"
-          aria-label="Cerrar modal"
+          aria-label={t('common.close', 'Cerrar')}
         >
           <X className="w-5 h-5" />
         </button>
@@ -111,13 +111,13 @@ export const RoleSelectorModal: React.FC<RoleSelectorModalProps> = ({
         <div className="space-y-1 pr-8">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-400 text-xs font-bold">
             <Sparkles className="w-3.5 h-3.5" />
-            <span>Simulador de Roles Setmio</span>
+            <span>{t('demo.badge', 'Simulador de Roles Setmio')}</span>
           </div>
           <h2 id="role-modal-title" className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
-            Selecciona el Rol de Demostración
+            {t('demo.heading', 'Selecciona el Rol de Demostración')}
           </h2>
           <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
-            Explora las interfaces completas y datos reales según cada perfil de usuario en la plataforma.
+            {t('demo.description', 'Explora las interfaces completas y datos reales según cada perfil de usuario en la plataforma.')}
           </p>
         </div>
 
@@ -137,20 +137,20 @@ export const RoleSelectorModal: React.FC<RoleSelectorModalProps> = ({
                       <Icon className="w-5 h-5" />
                     </div>
                     <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
-                      {item.badge}
+                      {t(`demo.roles.${item.role}.badge`, item.badge)}
                     </span>
                   </div>
 
                   <h3 className="text-base font-bold text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
-                    {item.title}
+                    {t(`demo.roles.${item.role}.title`, item.title)}
                   </h3>
                   <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed">
-                    {item.description}
+                    {t(`demo.roles.${item.role}.description`, item.description)}
                   </p>
                 </div>
 
                 <div className="pt-2 border-t border-slate-200/80 dark:border-slate-800/80 flex items-center justify-between text-xs font-bold text-emerald-600 dark:text-emerald-400">
-                  <span>Acceder como {item.badge}</span>
+                  <span>{t('demo.accessAs', 'Acceder como')} {t(`demo.roles.${item.role}.badge`, item.badge)}</span>
                   <ArrowRight className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" />
                 </div>
               </button>
@@ -162,7 +162,7 @@ export const RoleSelectorModal: React.FC<RoleSelectorModalProps> = ({
         <div className="p-3.5 rounded-2xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 text-xs text-emerald-900 dark:text-emerald-300 flex items-center gap-2.5">
           <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
           <span>
-            Los usuarios con rol profesional (Admin o Profesor) pueden conmutar a <strong>Modo Jugador</strong> en cualquier momento con el selector en cabecera.
+            {t('demo.note', 'Los usuarios con rol profesional (Admin o Profesor) pueden conmutar a Modo Jugador en cualquier momento con el selector en cabecera.')}
           </span>
         </div>
       </div>

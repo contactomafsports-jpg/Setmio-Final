@@ -75,6 +75,16 @@ export function App() {
   const [roleSelectorOpen, setRoleSelectorOpen] = useState(false);
   const [registrationOpen, setRegistrationOpen] = useState(false);
 
+  const closeRegistration = () => {
+    setAuthOpen(false);
+    setRegistrationOpen(false);
+    if (typeof window !== 'undefined' && window.location.pathname === '/registro') {
+      window.history.pushState({}, '', '/');
+      window.dispatchEvent(new PopStateEvent('popstate'));
+    }
+    setPublicPage('home');
+  };
+
   // PWA Brand splash screen (Only for installed private app sessions)
   const [showSplash, setShowSplash] = useState(() => {
     if (typeof window === 'undefined') return false;
@@ -149,7 +159,7 @@ export function App() {
       case 'home':
         return <HomeView />;
       case 'features':
-        return <FeaturesView onBack={goHome} onOpenDemo={() => setRoleSelectorOpen(true)} />;
+        return <FeaturesView onBack={goHome} />;
       case 'solutions':
       case 'solution_clubs':
       case 'solution_schools':
@@ -287,7 +297,7 @@ export function App() {
       <AuthModal
         isOpen={authOpen}
         initialMode={registrationOpen ? 'register' : 'login'}
-        onClose={() => { setAuthOpen(false); setRegistrationOpen(false); }}
+        onClose={registrationOpen ? closeRegistration : () => setAuthOpen(false)}
         onOpenRoleModal={() => setRoleSelectorOpen(true)}
       />
       <RoleSelectorModal

@@ -33,11 +33,11 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onOpenRol
   const [registerStep, setRegisterStep] = useState<1 | 2 | 3>(1);
   const [registrationRole, setRegistrationRole] = useState<'club' | 'school' | 'coach' | 'pro' | 'amateur' | null>(null);
   const registrationRoles = [
-    { id: 'club', label: 'Club', description: 'Gestiona pistas, socios y operaciones.' },
-    { id: 'school', label: 'Escuela', description: 'Organiza clases, grupos y alumnos.' },
-    { id: 'coach', label: 'Profesor', description: 'Impulsa tus clases y cobros.' },
-    { id: 'pro', label: 'Jugador Profesional', description: 'Centraliza calendario y oportunidades.' },
-    { id: 'amateur', label: 'Jugador Amateur', description: 'Reserva, juega y mejora.' },
+    { id: 'club', label: t('register.role.club', 'Club'), description: t('register.role.clubDescription', 'Gestiona pistas, socios y operaciones.') },
+    { id: 'school', label: t('register.role.school', 'Escuela'), description: t('register.role.schoolDescription', 'Organiza clases, grupos y alumnos.') },
+    { id: 'coach', label: t('register.role.coach', 'Profesor'), description: t('register.role.coachDescription', 'Impulsa tus clases y cobros.') },
+    { id: 'pro', label: t('register.role.pro', 'Jugador Profesional'), description: t('register.role.proDescription', 'Centraliza calendario y oportunidades.') },
+    { id: 'amateur', label: t('register.role.amateur', 'Jugador Amateur'), description: t('register.role.amateurDescription', 'Reserva, juega y mejora.') },
   ] as const;
 
   // Form Fields
@@ -159,12 +159,12 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onOpenRol
             SM
           </div>
           <h3 className="text-xl font-black text-slate-900 dark:text-white">
-            {mode === 'login' ? 'Acceso Usuarios Setmio' : 'Crear cuenta Setmio'}
+            {mode === 'login' ? t('auth.titleLogin', 'Acceso Usuarios Setmio') : t('register.title', 'Crear cuenta Setmio')}
           </h3>
           <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
             {mode === 'login'
-              ? 'Accede a tus reservas, partidas abiertas, torneos y monedero'
-              : 'Asistente personalizado paso a paso para configurar tu perfil de juego'}
+              ? t('auth.subtitleLogin', 'Accede a tus reservas, partidas abiertas, torneos y monedero')
+              : t('register.subtitle', 'Asistente personalizado paso a paso para configurar tu perfil de juego')}
           </p>
         </div>
 
@@ -606,7 +606,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onOpenRol
                       className="w-1/3 py-3 rounded-xl border border-slate-300 dark:border-slate-700 font-bold text-xs text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition flex items-center justify-center gap-1"
                     >
                       <ArrowLeft className="w-4 h-4" />
-                      <span>Atrás</span>
+                      <span>Atr��s</span>
                     </button>
                     <button
                       type="submit"
