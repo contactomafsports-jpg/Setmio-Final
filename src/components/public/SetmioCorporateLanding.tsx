@@ -355,26 +355,33 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
       </header>
 
       {/* 2. HERO SECTION CORPORATIVO */}
-      <section ref={reveal} className="scroll-reveal relative overflow-hidden pt-12 pb-20 lg:pt-20 lg:pb-32 bg-slate-50 dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800">
-        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1554068865-24cecd4e34b8?auto=format&fit=crop&w=2000&q=85')] bg-cover bg-center opacity-15 dark:opacity-100" />
-        <div className="absolute inset-0 bg-gradient-to-b from-white/90 via-slate-50/95 to-slate-100 dark:bg-[linear-gradient(115deg,rgba(7,20,16,.94),rgba(7,20,16,.78)_48%,rgba(7,20,16,.92))]" />
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-96 bg-[radial-gradient(circle_at_50%_20%,rgba(16,185,129,0.12),transparent_60%)] dark:bg-[radial-gradient(circle_at_50%_20%,rgba(199,243,107,0.18),transparent_60%)] pointer-events-none" />
+      <section ref={reveal} className="scroll-reveal relative overflow-hidden pt-12 pb-20 lg:pt-20 lg:pb-32 bg-slate-950 border-b border-slate-800 text-white">
+        {/* Padel Court Background Image */}
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: "url('https://images.unsplash.com/photo-1554068865-24cecd4e34b8?auto=format&fit=crop&w=2000&q=85')" }}
+          aria-hidden="true"
+        />
+        {/* Dark overlay & Dark Glassmorphism aesthetic always regardless of light/dark mode */}
+        <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-[2px]" aria-hidden="true" />
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/90 via-slate-950/75 to-slate-950" aria-hidden="true" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-96 bg-[radial-gradient(circle_at_50%_20%,rgba(16,185,129,0.22),transparent_65%)] pointer-events-none" aria-hidden="true" />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center space-y-8">
-          <div className="mx-auto max-w-3xl rounded-3xl border border-slate-200/80 dark:border-white/10 bg-white/95 dark:bg-white/[0.04] px-5 py-8 backdrop-blur-md shadow-xl dark:shadow-none">
+          <div className="mx-auto max-w-3xl rounded-3xl border border-white/15 bg-slate-950/65 px-5 py-8 sm:px-8 sm:py-10 backdrop-blur-xl shadow-2xl space-y-6 text-white">
           {/* Trust Badge - Updated positioning */}
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-800 text-xs font-bold shadow-xs">
-            <Sparkles className="w-4 h-4 text-emerald-500" />
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-950/80 text-emerald-300 border border-emerald-500/40 text-xs font-bold shadow-lg backdrop-blur-md">
+            <Sparkles className="w-4 h-4 text-emerald-400" />
             <span>{t('home.corporate.trustBadge', 'Tecnología de Vanguardia para la Industria del Pádel')}</span>
           </div>
 
-          {/* Main Headline */}
-          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight text-slate-900 dark:text-white max-w-4xl mx-auto leading-[1.1] text-balance">
+          {/* Main Headline - ALWAYS WHITE */}
+          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight text-white max-w-4xl mx-auto leading-[1.1] text-balance drop-shadow-sm">
             {t('corporate.heroTitle', 'Software de Marca Blanca integral para profesionales del pádel.')}
           </h1>
 
-          {/* Subtitle - Exact copy requirement */}
-          <p className="text-base sm:text-xl text-slate-700 dark:text-slate-300 max-w-3xl mx-auto font-normal leading-relaxed text-balance">
+          {/* Subtitle - ALWAYS SLATE-200 / WHITE */}
+          <p className="text-base sm:text-xl text-slate-200 max-w-3xl mx-auto font-normal leading-relaxed text-balance">
             {t('home.corporate.heroSubtitle', 'Incluye Web Pública, App de Gestión Interna, App para Personal y Clientes, y Agente de IA para web y redes.')}
           </p>
 
@@ -382,7 +389,7 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
           <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
             <button
               onClick={handleOpenFeaturesClick}
-              className="px-7 py-4 rounded-2xl bg-slate-900 dark:bg-slate-800 hover:bg-slate-800 dark:hover:bg-slate-700 text-white font-black text-sm shadow-xl shadow-slate-900/20 transition hover:scale-[1.02] flex items-center gap-2"
+              className="px-7 py-4 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold text-sm shadow-xl backdrop-blur-md transition hover:scale-[1.02] flex items-center gap-2"
             >
               <Sparkles className="w-4 h-4 text-emerald-400" />
               <span>{t('home.hero.discover_features', 'Descubrir funcionalidades')}</span>
@@ -390,31 +397,31 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
 
             <button
               onClick={handleOpenDemo}
-              className="px-7 py-4 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-sm shadow-xl shadow-emerald-600/30 transition hover:scale-[1.02] flex items-center gap-2"
+              className="px-7 py-4 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-sm shadow-xl shadow-emerald-500/30 transition hover:scale-[1.02] flex items-center gap-2"
             >
-              <Play className="w-4 h-4 fill-white" />
+              <Play className="w-4 h-4 fill-slate-950" />
               <span>{t('nav.demo', 'Ver demo')}</span>
             </button>
 
             <button
               onClick={handleOpenRegister}
-              className="px-6 py-4 rounded-2xl bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-900 dark:text-white font-bold text-sm border border-slate-300 dark:border-slate-700 shadow-md transition flex items-center gap-2"
+              className="px-6 py-4 rounded-2xl bg-slate-900/90 hover:bg-slate-800 text-white font-bold text-sm border border-slate-700 shadow-md transition hover:scale-[1.02] flex items-center gap-2"
             >
               <span>{t('nav.register', 'Registrarse')}</span>
-              <ArrowRight className="w-4 h-4" />
+              <ArrowRight className="w-4 h-4 text-slate-300" />
             </button>
           </div>
 
           {/* Micro-guarantees */}
-          <div className="flex flex-wrap justify-center items-center gap-6 text-xs text-slate-600 dark:text-slate-400 font-semibold pt-2">
+          <div className="flex flex-wrap justify-center items-center gap-6 text-xs text-slate-300 font-semibold pt-2">
             <span className="flex items-center gap-1.5">
-              <CheckCircle2 className="w-4 h-4 text-emerald-500" /> {t('home.corporate.guarantee1', 'Sin permanencia')}
+              <CheckCircle2 className="w-4 h-4 text-emerald-400" /> {t('home.corporate.guarantee1', 'Sin permanencia')}
             </span>
             <span className="flex items-center gap-1.5">
-              <CheckCircle2 className="w-4 h-4 text-emerald-500" /> {t('home.corporate.guarantee2', 'Migración de datos en 24h')}
+              <CheckCircle2 className="w-4 h-4 text-emerald-400" /> {t('home.corporate.guarantee2', 'Migración de datos en 24h')}
             </span>
             <span className="flex items-center gap-1.5">
-              <CheckCircle2 className="w-4 h-4 text-emerald-500" /> {t('home.corporate.guarantee3', 'Soporte personalizado 365 días')}
+              <CheckCircle2 className="w-4 h-4 text-emerald-400" /> {t('home.corporate.guarantee3', 'Soporte personalizado 365 días')}
             </span>
           </div>
 

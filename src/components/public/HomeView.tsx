@@ -149,8 +149,23 @@ export const HomeView: React.FC = () => {
     <div className="space-y-16 lg:space-y-24 pb-20 text-slate-900 dark:text-slate-100 transition-colors duration-200">
       {/* 1. HERO SECTION */}
       <section className="relative overflow-hidden bg-slate-950 pt-12 pb-16 lg:pt-20 lg:pb-28 border-b border-slate-800 text-white">
+        {/* Padel Court Background Image */}
         <div
-          className="absolute inset-0 bg-[radial-gradient(circle_at_75%_20%,rgba(16,185,129,0.22),transparent_35%),linear-gradient(120deg,rgba(15,23,42,0.98),rgba(15,23,42,0.76))]"
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: `url(${currentTenant.branding.heroImageUrl || 'https://images.unsplash.com/photo-1554068865-24cecd4e34b8?auto=format&fit=crop&w=2000&q=85'})` }}
+          aria-hidden="true"
+        />
+        {/* Dark overlay & Dark Glassmorphism aesthetic */}
+        <div
+          className="absolute inset-0 bg-slate-950/80 backdrop-blur-[2px]"
+          aria-hidden="true"
+        />
+        <div
+          className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/90 to-slate-950/70"
+          aria-hidden="true"
+        />
+        <div
+          className="absolute inset-0 bg-[radial-gradient(circle_at_75%_20%,rgba(16,185,129,0.22),transparent_35%)]"
           aria-hidden="true"
         />
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

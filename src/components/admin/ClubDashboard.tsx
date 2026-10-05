@@ -1,29 +1,18 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useApp } from '../../context/AppContext';
 import {
-  TrendingUp,
   Calendar,
   Users,
   DollarSign,
-  Zap,
-  Clock,
   ArrowRight,
-  ShieldCheck,
   CheckCircle2,
-  AlertTriangle,
-  Lock,
-  Unlock,
-  Power,
   Activity,
-  Layers,
   Sparkles,
   CreditCard,
-  ShoppingBag,
-  Flame,
-  Check,
-  RefreshCw,
-  Sliders,
-  Filter,
+  Settings,
+  Receipt,
+  PlusCircle,
+  TrendingUp,
 } from 'lucide-react';
 
 export const ClubDashboard: React.FC = () => {
@@ -32,18 +21,10 @@ export const ClubDashboard: React.FC = () => {
     courts,
     bookings,
     setAdminTab,
-    toggleCourtLight,
-    openCourtDoor,
-    toggleDeviceOnline,
-    triggerDemoToast,
     isClubOpen,
-    toggleClubOpenState,
     enterWhiteLabelPlayerPreview,
     t,
   } = useApp();
-
-  const [sportFilter, setSportFilter] = useState<'all' | 'padel' | 'tennis' | 'pickleball'>('all');
-  const [openingDoorId, setOpeningDoorId] = useState<string | null>(null);
 
   const today = new Date();
   const todayKey = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
@@ -63,29 +44,23 @@ export const ClubDashboard: React.FC = () => {
   const tpvRevenueMonth = 6840.0;
   const totalRevenueMonth = onlineRevenueMonth + tpvRevenueMonth;
 
-  // Real-time IoT metrics
-  const activeCourtsWithLights = courts.filter((c) => c.isLightOn).length;
-  const onlineDevicesCount = courts.filter((c) => c.isDeviceOnline !== false).length;
-  const totalCourtsCount = courts.length;
+  // Occupancy metrics
+  const totalCourtsCount = courts.length || 8;
   const occupiedCourtsCount = 6;
   const occupancyPercentage = Math.round((occupiedCourtsCount / totalCourtsCount) * 100);
 
-  const filteredCourts = courts.filter((c) => {
-    if (sportFilter === 'all') return true;
-    return c.sport === sportFilter;
-  });
-
-  const handleOpenDoor = (courtId: string, courtName: string) => {
-    setOpeningDoorId(courtId);
-    openCourtDoor(courtId);
-    setTimeout(() => {
-      setOpeningDoorId(null);
-    }, 2500);
-  };
+  // Recent POS tickets mock data
+  const recentTickets = [
+    { id: '#1042', time: '14:15', concept: 'Cafetería & 2x Bebidas Isotónicas', amount: 14.5, method: 'Tarjeta' },
+    { id: '#1041', time: '13:40', concept: 'Bote Pelotas Bullpadel Next Pro', amount: 6.5, method: 'Efectivo' },
+    { id: '#1040', time: '12:20', concept: 'Alquiler Test Pala Nox AT10 Genius', amount: 15.0, method: 'Monedero' },
+    { id: '#1039', time: '11:55', concept: '2x Cervezas Especiales + Ración Frutos', amount: 8.5, method: 'Bizum' },
+    { id: '#1038', time: '10:30', concept: 'Grip Wilson Confort Pack x3', amount: 7.0, method: 'Tarjeta' },
+  ];
 
   return (
     <div className="space-y-6 sm:space-y-8 text-slate-900 dark:text-slate-100 max-w-7xl mx-auto">
-      {/* 1. Welcome Enterprise Banner */}
+      {/* 1. Tarjeta Principal de Bienvenida ("Centro de Pádel San Mateo") - SIN botón grande de Domótica IoT */}
       <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950/90 border border-slate-800 p-5 sm:p-7 shadow-2xl text-white">
         <div className="pointer-events-none absolute -right-16 -top-20 size-60 rounded-full bg-emerald-500/15 blur-3xl" />
         <div className="pointer-events-none absolute left-1/3 -bottom-16 size-48 rounded-full bg-cyan-500/10 blur-3xl" />
@@ -109,11 +84,11 @@ export const ClubDashboard: React.FC = () => {
               {currentTenant.name}
             </h1>
             <p className="text-xs sm:text-sm text-slate-200 font-medium max-w-2xl leading-relaxed">
-              {currentTenant.city}, {currentTenant.region} · Todos los módulos conectados en tiempo real: Domótica IoT, TPV Bar, Reservas Online y Marca Blanca.
+              {currentTenant.city}, {currentTenant.region} · Centro de Mandos Operativo: Agenda en tiempo real, control de ingresos y gestión del club.
             </p>
           </div>
 
-          {/* Quick Access CTA Buttons */}
+          {/* Quick Access CTA Buttons (Solo Pistas & Reservas y Vista Jugador, sin botón redundante de IoT) */}
           <div className="flex flex-wrap items-center gap-2.5 shrink-0">
             <button
               onClick={() => setAdminTab('agenda')}
@@ -121,14 +96,6 @@ export const ClubDashboard: React.FC = () => {
             >
               <Calendar className="w-4 h-4" />
               <span>{t('club.nav.courts', 'Pistas & Reservas')}</span>
-            </button>
-
-            <button
-              onClick={() => setAdminTab('smart_courts')}
-              className="px-4 py-2.5 rounded-2xl bg-slate-800/90 hover:bg-slate-700 text-white font-bold text-xs border border-slate-700 transition flex items-center gap-2 active:scale-95"
-            >
-              <Zap className="w-4 h-4 text-amber-400" />
-              <span>{t('club.nav.iot', 'Domótica IoT')}</span>
             </button>
 
             <button
@@ -143,9 +110,9 @@ export const ClubDashboard: React.FC = () => {
         </div>
       </section>
 
-      {/* 2. ENTERPRISE KPI CARDS */}
+      {/* 2. KPIs FINANCIEROS Y OCUPACIÓN EN TIEMPO REAL */}
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-        {/* KPI 1: Ingresos de Hoy & Facturación del Mes */}
+        {/* KPI 1: Ingresos de Hoy */}
         <div className="p-5 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-3 hover:border-emerald-500/50 transition">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
@@ -174,7 +141,34 @@ export const ClubDashboard: React.FC = () => {
           </div>
         </div>
 
-        {/* KPI 2: % Ocupación en Tiempo Real y Horas Punta */}
+        {/* KPI 2: Facturación del Mes */}
+        <div className="p-5 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-3 hover:border-emerald-500/50 transition">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
+              Facturación del Mes
+            </span>
+            <div className="p-2 rounded-2xl bg-emerald-50 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400">
+              <TrendingUp className="w-5 h-5" />
+            </div>
+          </div>
+
+          <div>
+            <div className="text-2xl sm:text-3xl font-black font-mono text-slate-950 dark:text-white">
+              {totalRevenueMonth.toLocaleString('es-ES', { minimumFractionDigits: 0 })} €
+            </div>
+            <div className="text-[11px] text-emerald-600 dark:text-emerald-400 font-bold mt-1 flex items-center gap-1">
+              <span>↑ +18,4%</span>
+              <span className="text-slate-500 dark:text-slate-400 font-normal">vs mes anterior</span>
+            </div>
+          </div>
+
+          <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[11px]">
+            <span className="text-slate-600 dark:text-slate-400 font-semibold">Meta mensual:</span>
+            <span className="font-bold text-slate-800 dark:text-slate-200 font-mono">22.000 € (87%)</span>
+          </div>
+        </div>
+
+        {/* KPI 3: % Ocupación en Tiempo Real */}
         <div className="p-5 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-3 hover:border-emerald-500/50 transition">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
@@ -204,7 +198,7 @@ export const ClubDashboard: React.FC = () => {
           </div>
         </div>
 
-        {/* KPI 3: Próximas Reservas e Incidencias Activas */}
+        {/* KPI 4: Próximas Reservas & Estado Operativo */}
         <div className="p-5 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-3 hover:border-emerald-500/50 transition">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
@@ -220,7 +214,7 @@ export const ClubDashboard: React.FC = () => {
               {todayBookings.length || 18}
             </div>
             <div className="text-[11px] text-slate-600 dark:text-slate-400 mt-1">
-              Partidos y entrenamientos programados para hoy
+              Partidos y entrenamientos para hoy
             </div>
           </div>
 
@@ -232,215 +226,78 @@ export const ClubDashboard: React.FC = () => {
             </span>
           </div>
         </div>
-
-        {/* KPI 4: Resumen de Domótica IoT */}
-        <div className="p-5 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-3 hover:border-emerald-500/50 transition">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
-              {t('club.kpi.iot_summary', 'Domótica IoT')}
-            </span>
-            <div className="p-2 rounded-2xl bg-amber-50 dark:bg-amber-950 text-amber-600 dark:text-amber-400">
-              <Zap className="w-5 h-5" />
-            </div>
-          </div>
-
-          <div>
-            <div className="text-2xl sm:text-3xl font-black font-mono text-amber-600 dark:text-amber-400 flex items-center gap-2">
-              <span>{activeCourtsWithLights} ON</span>
-              <span className="text-xs font-bold text-slate-500 dark:text-slate-400">/ {totalCourtsCount} pistas</span>
-            </div>
-            <div className="text-[11px] text-slate-600 dark:text-slate-400 mt-1">
-              {t('club.kpi.iot_lights_on', 'Luces LED encendidas')}
-            </div>
-          </div>
-
-          <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[11px]">
-            <span className="text-slate-600 dark:text-slate-400 font-semibold">{t('club.kpi.iot_doors_connected', 'Tornos')}:</span>
-            <span className="font-bold text-emerald-600 dark:text-emerald-400">
-              {onlineDevicesCount} online
-            </span>
-          </div>
-        </div>
       </section>
 
-      {/* 3. GESTIÓN DE PISTAS MULTIDEPORTE Y CONTROL DOMÓTICO IoT EN TIEMPO REAL */}
-      <section className="space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 dark:border-slate-800 pb-4">
-          <div>
-            <div className="flex items-center gap-2">
-              <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping" />
-              <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
-                {t('iot.court_controls', 'Control Domótico IoT de Pistas en Tiempo Real')}
-              </h2>
+      {/* 3. ACCESOS RÁPIDOS A MÓDULOS DE GESTIÓN */}
+      <section className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+        <button
+          onClick={() => setAdminTab('agenda')}
+          className="p-4 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-emerald-500/50 transition text-left group shadow-xs"
+        >
+          <div className="flex items-center justify-between mb-3">
+            <div className="p-2.5 rounded-2xl bg-emerald-50 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 group-hover:scale-105 transition-transform">
+              <Calendar className="w-5 h-5" />
             </div>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-              Control táctil estilo iOS/Android de iluminación LED, apertura remota de varchi/puertas e indicador de telemetría por pista.
-            </p>
+            <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-emerald-600 transition" />
           </div>
+          <div className="font-extrabold text-sm text-slate-900 dark:text-white">Agenda de Hoy</div>
+          <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Cuadrícula y ocupación de pistas</div>
+        </button>
 
-          {/* Sport Selector Filters */}
-          <div className="flex items-center gap-1.5 overflow-x-auto p-1 rounded-2xl bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700">
-            {(['all', 'padel', 'tennis', 'pickleball'] as const).map((sport) => (
-              <button
-                key={sport}
-                onClick={() => setSportFilter(sport)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition whitespace-nowrap ${
-                  sportFilter === sport
-                    ? 'bg-white dark:bg-slate-900 text-slate-950 dark:text-white shadow-sm'
-                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-                }`}
-              >
-                {sport === 'all' && 'Todos los Deportes'}
-                {sport === 'padel' && '🎾 Pádel (6)'}
-                {sport === 'tennis' && '🎾 Tenis (1)'}
-                {sport === 'pickleball' && '🏓 Pickleball (1)'}
-              </button>
-            ))}
+        <button
+          onClick={() => setAdminTab('pos_cafe')}
+          className="p-4 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-emerald-500/50 transition text-left group shadow-xs"
+        >
+          <div className="flex items-center justify-between mb-3">
+            <div className="p-2.5 rounded-2xl bg-cyan-50 dark:bg-cyan-950 text-cyan-600 dark:text-cyan-400 group-hover:scale-105 transition-transform">
+              <CreditCard className="w-5 h-5" />
+            </div>
+            <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-cyan-600 transition" />
           </div>
-        </div>
+          <div className="font-extrabold text-sm text-slate-900 dark:text-white">Terminal TPV</div>
+          <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Cobro rápido barra y cafetería</div>
+        </button>
 
-        {/* Multisport Court Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-6">
-          {filteredCourts.map((court) => {
-            const isLightActive = Boolean(court.isLightOn);
-            const isOnline = court.isDeviceOnline !== false;
-            const isOpeningThisDoor = openingDoorId === court.id || court.isDoorOpen;
+        <button
+          onClick={() => setAdminTab('customers')}
+          className="p-4 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-emerald-500/50 transition text-left group shadow-xs"
+        >
+          <div className="flex items-center justify-between mb-3">
+            <div className="p-2.5 rounded-2xl bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 group-hover:scale-105 transition-transform">
+              <Users className="w-5 h-5" />
+            </div>
+            <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-indigo-600 transition" />
+          </div>
+          <div className="font-extrabold text-sm text-slate-900 dark:text-white">Socios / CRM</div>
+          <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Base de datos y monederos</div>
+        </button>
 
-            return (
-              <div
-                key={court.id}
-                className={`relative rounded-3xl p-5 border transition-all duration-300 flex flex-col justify-between space-y-4 shadow-sm ${
-                  isLightActive
-                    ? 'bg-gradient-to-b from-white to-amber-50/40 dark:from-slate-900 dark:to-amber-950/20 border-amber-400/60 dark:border-amber-500/40 shadow-amber-500/5 ring-1 ring-amber-400/30'
-                    : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700'
-                }`}
-              >
-                {/* Court Top Info */}
-                <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="px-2.5 py-1 rounded-xl text-[10px] font-black uppercase tracking-wider bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700">
-                      {court.sport?.toUpperCase() || 'PADEL'} · {court.courtType.toUpperCase()}
-                    </span>
-
-                    {/* IoT Device Online Status Pill */}
-                    <button
-                      onClick={() => toggleDeviceOnline(court.id)}
-                      className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold transition border ${
-                        isOnline
-                          ? 'bg-emerald-50 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 border-emerald-300 dark:border-emerald-800'
-                          : 'bg-rose-50 dark:bg-rose-950/80 text-rose-700 dark:text-rose-300 border-rose-300 dark:border-rose-800'
-                      }`}
-                      title="Haz clic para simular desconexión IoT"
-                    >
-                      <span className={`w-2 h-2 rounded-full ${isOnline ? 'bg-emerald-500 animate-pulse' : 'bg-rose-500'}`} />
-                      <span>
-                        {isOnline ? t('iot.device_online', 'Online') : t('iot.device_offline', 'Offline')}
-                      </span>
-                    </button>
-                  </div>
-
-                  <h3 className="font-extrabold text-base text-slate-950 dark:text-white leading-snug">
-                    {court.name}
-                  </h3>
-                  <p className="text-[11px] text-slate-600 dark:text-slate-400 mt-0.5 line-clamp-1">
-                    {court.surface}
-                  </p>
-                </div>
-
-                {/* Court Image Preview */}
-                <div className="relative h-28 rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800">
-                  <img
-                    src={court.photoUrl}
-                    alt={court.name}
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent" />
-
-                  {/* Status Banner inside photo */}
-                  <div className="absolute bottom-2 left-2 right-2 flex items-center justify-between text-[11px] font-bold text-white">
-                    <span>{court.hourlyRate.toFixed(2)} €/h</span>
-                    <span className="px-2 py-0.5 rounded bg-slate-900/80 backdrop-blur-xs text-[10px] text-emerald-400">
-                      PIN: {court.accessPin || '4821#'}
-                    </span>
-                  </div>
-                </div>
-
-                {/* iOS / Android Style IoT Controls */}
-                <div className="space-y-2.5 pt-2 border-t border-slate-100 dark:border-slate-800/80">
-                  {/* Control 1: LED Light Switch Toggle */}
-                  <div className="flex items-center justify-between p-2.5 rounded-2xl bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800">
-                    <div className="flex items-center gap-2">
-                      <div className={`p-1.5 rounded-xl transition ${isLightActive ? 'bg-amber-400 text-slate-950' : 'bg-slate-200 dark:bg-slate-800 text-slate-500'}`}>
-                        <Zap className="w-4 h-4" />
-                      </div>
-                      <div>
-                        <div className="text-xs font-bold text-slate-900 dark:text-white">
-                          {t('iot.lights_toggle', 'Iluminación LED')}
-                        </div>
-                        <div className="text-[10px] text-slate-500">
-                          {isLightActive ? t('iot.lights_on', 'Encendida') : t('iot.lights_off', 'Apagada')}
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Native tactile Switch */}
-                    <button
-                      type="button"
-                      onClick={() => toggleCourtLight(court.id)}
-                      className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-hidden ${
-                        isLightActive ? 'bg-amber-500' : 'bg-slate-300 dark:bg-slate-700'
-                      }`}
-                      aria-label={`Conmutar luz de ${court.name}`}
-                    >
-                      <span
-                        className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out ${
-                          isLightActive ? 'translate-x-5' : 'translate-x-0'
-                        }`}
-                      />
-                    </button>
-                  </div>
-
-                  {/* Control 2: Door / Turnstile Unlock Button */}
-                  <button
-                    type="button"
-                    onClick={() => handleOpenDoor(court.id, court.name)}
-                    disabled={isOpeningThisDoor}
-                    className={`w-full py-2.5 px-3 rounded-2xl font-bold text-xs flex items-center justify-center gap-2 transition active:scale-[0.98] ${
-                      isOpeningThisDoor
-                        ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/20'
-                        : 'bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-900 dark:text-slate-100 border border-slate-300 dark:border-slate-700'
-                    }`}
-                  >
-                    {isOpeningThisDoor ? (
-                      <>
-                        <Unlock className="w-4 h-4 animate-bounce text-white" />
-                        <span>{t('iot.door_opening', 'Acceso Abierto (PIN Activo)...')}</span>
-                      </>
-                    ) : (
-                      <>
-                        <Lock className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                        <span>{t('iot.door_open', 'Abrir Puerta / Torno')}</span>
-                      </>
-                    )}
-                  </button>
-                </div>
-              </div>
-            );
-          })}
-        </div>
+        <button
+          onClick={() => setAdminTab('settings')}
+          className="p-4 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-emerald-500/50 transition text-left group shadow-xs"
+        >
+          <div className="flex items-center justify-between mb-3">
+            <div className="p-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 group-hover:scale-105 transition-transform">
+              <Settings className="w-5 h-5" />
+            </div>
+            <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-slate-700 dark:group-hover:text-white transition" />
+          </div>
+          <div className="font-extrabold text-sm text-slate-900 dark:text-white">Ajustes del Club</div>
+          <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Tarifas, horarios y personal</div>
+        </button>
       </section>
 
-      {/* 4. PRÓXIMAS RESERVAS Y ACTIVIDAD EN VIVO */}
-      <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Bookings table */}
-        <div className="lg:col-span-2 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 sm:p-6 shadow-sm space-y-4">
+      {/* 4. CENTRO DE MANDOS: AGENDA DE HOY Y ÚLTIMOS TICKETS DE TPV */}
+      <section className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        {/* Columna Izquierda: Agenda de Hoy (Próximas Reservas y Partidos) */}
+        <div className="lg:col-span-7 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 sm:p-6 shadow-sm space-y-4">
           <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
             <div>
               <h3 className="font-black text-base text-slate-900 dark:text-white">
-                Agenda de Partidos Hoy
+                Agenda de Hoy
               </h3>
               <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
-                Reservas y partidas abiertas con código PIN de apertura asignado.
+                Próximos partidos y entrenamientos con código PIN de apertura asignado.
               </p>
             </div>
             <button
@@ -459,7 +316,7 @@ export const ClubDashboard: React.FC = () => {
                 className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950/70 border border-slate-200/80 dark:border-slate-800"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 font-bold flex flex-col items-center justify-center text-[10px]">
+                  <div className="w-11 h-11 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 font-bold flex flex-col items-center justify-center text-[10px] shrink-0 border border-emerald-200 dark:border-emerald-800">
                     <span>{booking.startTime.split('T')[1]?.slice(0, 5) || '18:00'}</span>
                     <span className="text-[9px] opacity-75">{booking.endTime.split('T')[1]?.slice(0, 5) || '19:30'}</span>
                   </div>
@@ -486,31 +343,47 @@ export const ClubDashboard: React.FC = () => {
               </div>
             ))}
           </div>
+
+          <div className="pt-2 flex items-center justify-between">
+            <span className="text-xs text-slate-500 dark:text-slate-400">
+              Mostrando las reservas prioritarias del turno actual
+            </span>
+            <button
+              onClick={() => setAdminTab('agenda')}
+              className="px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 text-xs font-bold text-slate-800 dark:text-slate-200 hover:text-emerald-700 dark:hover:text-emerald-300 transition flex items-center gap-1.5"
+            >
+              <PlusCircle className="w-3.5 h-3.5 text-emerald-500" />
+              <span>Nueva Reserva en Agenda</span>
+            </button>
+          </div>
         </div>
 
-        {/* Quick TPV / POS Widget */}
-        <div className="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 sm:p-6 shadow-sm space-y-4 flex flex-col justify-between">
+        {/* Columna Derecha: Últimos Tickets de TPV & Caja */}
+        <div className="lg:col-span-5 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 sm:p-6 shadow-sm space-y-4 flex flex-col justify-between">
           <div className="space-y-4">
             <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
               <div>
                 <h3 className="font-black text-base text-slate-900 dark:text-white">
-                  Caja Rápida / TPV Bar
+                  Últimos Tickets de TPV
                 </h3>
                 <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
-                  Consumos en barra, alquiler de palas y pelotas.
+                  Consumos en barra, cafetería y venta de material deportivo.
                 </p>
               </div>
               <button
                 onClick={() => setAdminTab('pos_cafe')}
                 className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:text-emerald-600 transition"
+                title="Abrir TPV"
               >
                 <CreditCard className="w-4 h-4" />
               </button>
             </div>
 
+            {/* Total Facturado en Barra Hoy */}
             <div className="p-4 rounded-2xl bg-gradient-to-br from-emerald-500/10 to-teal-500/10 border border-emerald-500/20 space-y-1">
-              <div className="text-xs font-bold text-emerald-700 dark:text-emerald-300">
-                Total Facturado en Barra Hoy
+              <div className="text-xs font-bold text-emerald-700 dark:text-emerald-300 flex items-center justify-between">
+                <span>Total Facturado en Barra Hoy</span>
+                <span className="font-mono text-[11px] font-bold text-slate-500">Caja Activa</span>
               </div>
               <div className="text-3xl font-black font-mono text-slate-950 dark:text-white">
                 {tpvRevenueToday.toFixed(2)} €
@@ -520,27 +393,47 @@ export const ClubDashboard: React.FC = () => {
               </div>
             </div>
 
-            <div className="space-y-2 text-xs">
-              <div className="flex justify-between py-1.5 border-b border-slate-100 dark:border-slate-800">
-                <span className="text-slate-600 dark:text-slate-400 font-medium">Cafetería & Bebidas Isotónicas</span>
-                <span className="font-bold text-slate-900 dark:text-white">245,00 €</span>
+            {/* Listado de tickets recientes */}
+            <div className="space-y-2">
+              <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                Movimientos Recientes en Caja
               </div>
-              <div className="flex justify-between py-1.5 border-b border-slate-100 dark:border-slate-800">
-                <span className="text-slate-600 dark:text-slate-400 font-medium">Tubos Pelotas Bullpadel Next Pro</span>
-                <span className="font-bold text-slate-900 dark:text-white">135,50 €</span>
-              </div>
-              <div className="flex justify-between py-1.5 border-b border-slate-100 dark:border-slate-800">
-                <span className="text-slate-600 dark:text-slate-400 font-medium">Alquiler Test Palas Nox AT10</span>
-                <span className="font-bold text-slate-900 dark:text-white">115,00 €</span>
-              </div>
+              {recentTickets.map((ticket) => (
+                <div
+                  key={ticket.id}
+                  className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 dark:bg-slate-950/60 border border-slate-100 dark:border-slate-800/80 text-xs"
+                >
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <Receipt className="w-4 h-4 text-emerald-500 shrink-0" />
+                    <div className="min-w-0">
+                      <div className="font-bold text-slate-900 dark:text-white truncate">
+                        {ticket.concept}
+                      </div>
+                      <div className="text-[10px] text-slate-500 flex items-center gap-1.5">
+                        <span className="font-mono">{ticket.id}</span>
+                        <span>·</span>
+                        <span>{ticket.time}</span>
+                        <span>·</span>
+                        <span className="px-1.5 py-0.2 rounded bg-slate-200 dark:bg-slate-800 text-[9px] font-semibold text-slate-700 dark:text-slate-300">
+                          {ticket.method}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <span className="font-black font-mono text-slate-900 dark:text-white shrink-0 ml-2">
+                    +{ticket.amount.toFixed(2)} €
+                  </span>
+                </div>
+              ))}
             </div>
           </div>
 
           <button
             onClick={() => setAdminTab('pos_cafe')}
-            className="w-full py-3 rounded-2xl bg-slate-900 dark:bg-slate-800 hover:bg-slate-800 dark:hover:bg-slate-700 text-white font-bold text-xs transition flex items-center justify-center gap-2 active:scale-98"
+            className="w-full py-3 rounded-2xl bg-slate-900 dark:bg-slate-800 hover:bg-slate-800 dark:hover:bg-slate-700 text-white font-bold text-xs transition flex items-center justify-center gap-2 active:scale-98 shadow-md"
           >
-            <span>Abrir Terminal TPV</span>
+            <span>Abrir Terminal TPV / Caja</span>
             <ArrowRight className="w-4 h-4" />
           </button>
         </div>
