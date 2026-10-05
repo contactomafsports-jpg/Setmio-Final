@@ -151,21 +151,21 @@ export const HomeView: React.FC = () => {
       <section className="relative overflow-hidden bg-slate-950 pt-12 pb-16 lg:pt-20 lg:pb-28 border-b border-slate-800 text-white">
         {/* Padel Court Background Image */}
         <div
-          className="absolute inset-0 bg-cover bg-center"
+          className="absolute inset-0 bg-cover bg-center scale-105 transition-transform duration-1000"
           style={{ backgroundImage: `url(${currentTenant.branding.heroImageUrl || 'https://images.unsplash.com/photo-1554068865-24cecd4e34b8?auto=format&fit=crop&w=2000&q=85'})` }}
           aria-hidden="true"
         />
         {/* Dark overlay & Dark Glassmorphism aesthetic */}
         <div
-          className="absolute inset-0 bg-slate-950/80 backdrop-blur-[2px]"
+          className="absolute inset-0 bg-slate-950/60 backdrop-blur-[1px]"
           aria-hidden="true"
         />
         <div
-          className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/90 to-slate-950/70"
+          className="absolute inset-0 bg-gradient-to-r from-slate-950/85 via-slate-950/60 to-slate-950/80"
           aria-hidden="true"
         />
         <div
-          className="absolute inset-0 bg-[radial-gradient(circle_at_75%_20%,rgba(16,185,129,0.22),transparent_35%)]"
+          className="absolute inset-0 bg-[radial-gradient(circle_at_75%_20%,rgba(16,185,129,0.25),transparent_40%)]"
           aria-hidden="true"
         />
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

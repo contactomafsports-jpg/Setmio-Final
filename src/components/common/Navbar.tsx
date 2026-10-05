@@ -256,17 +256,6 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCart, onOpenAuth, onOpenDe
                 <span>{currentUser ? currentUser.name.split(' ')[0] : t('nav.myAccount', 'Mi Cuenta')}</span>
               </button>
 
-              {/* Cerrar Sesión / Salir Demo Button */}
-              <button
-                onClick={logoutOrExitDemo}
-                className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-300 hover:bg-rose-100 dark:hover:bg-rose-900/60 text-xs font-black transition shadow-xs"
-                title={t('auth.logout', 'Cerrar Sesión / Salir Demo')}
-                aria-label="Cerrar Sesión / Salir Demo"
-              >
-                <LogOut className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">{t('auth.exitDemo', 'Salir Demo')}</span>
-              </button>
-
               {/* Quick Booking CTA */}
               <button
                 onClick={() => handleNavClick('booking')}

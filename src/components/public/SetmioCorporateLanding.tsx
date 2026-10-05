@@ -356,16 +356,16 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
 
       {/* 2. HERO SECTION CORPORATIVO */}
       <section ref={reveal} className="scroll-reveal relative overflow-hidden pt-12 pb-20 lg:pt-20 lg:pb-32 bg-slate-950 border-b border-slate-800 text-white">
-        {/* Padel Court Background Image */}
+        {/* Padel Court Background Image - Clearly visible */}
         <div
-          className="absolute inset-0 bg-cover bg-center"
+          className="absolute inset-0 bg-cover bg-center scale-105 transition-transform duration-1000"
           style={{ backgroundImage: "url('https://images.unsplash.com/photo-1554068865-24cecd4e34b8?auto=format&fit=crop&w=2000&q=85')" }}
           aria-hidden="true"
         />
         {/* Dark overlay & Dark Glassmorphism aesthetic always regardless of light/dark mode */}
-        <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-[2px]" aria-hidden="true" />
-        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/90 via-slate-950/75 to-slate-950" aria-hidden="true" />
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-96 bg-[radial-gradient(circle_at_50%_20%,rgba(16,185,129,0.22),transparent_65%)] pointer-events-none" aria-hidden="true" />
+        <div className="absolute inset-0 bg-slate-950/60 backdrop-blur-[1px]" aria-hidden="true" />
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/80 via-slate-950/40 to-slate-950/90" aria-hidden="true" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-96 bg-[radial-gradient(circle_at_50%_20%,rgba(16,185,129,0.25),transparent_65%)] pointer-events-none" aria-hidden="true" />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center space-y-8">
           <div className="mx-auto max-w-3xl rounded-3xl border border-white/15 bg-slate-950/65 px-5 py-8 sm:px-8 sm:py-10 backdrop-blur-xl shadow-2xl space-y-6 text-white">
