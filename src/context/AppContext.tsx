@@ -127,6 +127,8 @@ const routeForPage: Record<PublicPage, string> = {
 const routeForAdminTab: Record<AdminTab, string> = {
   dashboard: '/gestion',
   agenda: '/gestion/reservas',
+  all_bookings: '/gestion/todas-las-reservas',
+  bookings: '/gestion/todas-las-reservas',
   customers: '/gestion/clientes',
   teams: '/gestion/equipos',
   academy: '/gestion/escuela',
@@ -262,6 +264,8 @@ const readRoute = () => {
 export type AdminTab =
   | 'dashboard'
   | 'agenda'
+  | 'all_bookings'
+  | 'bookings'
   | 'customers'
   | 'teams'
   | 'academy'

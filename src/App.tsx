@@ -36,6 +36,7 @@ import { PlayerPublicProfileView } from './components/public/PlayerPublicProfile
 import { AdminLayout } from './components/admin/AdminLayout';
 import { ContextualDashboard } from './components/admin/dashboards/ContextualDashboard';
 import { AdminAgenda } from './components/admin/AdminAgenda';
+import { AllBookingsPage } from './components/admin/AllBookingsPage';
 import { AdminCustomers } from './components/admin/AdminCustomers';
 import { AdminTeams } from './components/admin/AdminTeams';
 import { AdminSchool } from './components/admin/AdminSchool';
@@ -62,6 +63,7 @@ export function App() {
     publicPage,
     setPublicPage,
     adminTab,
+    setAdminTab,
     demoToast,
     clearDemoToast,
     isCorporateLanding,
@@ -225,6 +227,9 @@ export function App() {
         return <ContextualDashboard />;
       case 'agenda':
         return <AdminAgenda />;
+      case 'all_bookings':
+      case 'bookings':
+        return <AllBookingsPage onBackToQuadrant={() => setAdminTab('agenda')} />;
       case 'customers':
         return <AdminCustomers />;
       case 'teams':

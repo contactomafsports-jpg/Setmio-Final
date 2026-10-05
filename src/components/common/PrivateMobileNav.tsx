@@ -47,7 +47,10 @@ export const PrivateMobileNav: React.FC<PrivateMobileNavProps> = ({
     >
       {navItems.map((item) => {
         const Icon = item.icon;
-        const isActive = currentTab === item.id && !moreOpen;
+        const isActive =
+          (currentTab === item.id ||
+            (item.id === 'agenda' && (currentTab === 'all_bookings' || currentTab === 'bookings'))) &&
+          !moreOpen;
         return (
           <button
             key={item.id}

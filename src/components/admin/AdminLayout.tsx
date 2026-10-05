@@ -145,7 +145,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   };
 
   return (
-    <div data-admin-shell className="min-h-screen bg-slate-100 text-slate-950 dark:bg-slate-950 dark:text-slate-100 flex flex-col md:flex-row pb-20 md:pb-0 transition-colors duration-200 w-full max-w-full overflow-x-hidden font-sans">
+    <div data-admin-shell className="min-h-screen bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 flex flex-col md:flex-row pb-20 md:pb-0 transition-colors duration-200 w-full max-w-full overflow-x-hidden font-sans">
       {/* DESKTOP SIDEBAR (Marca Setmio B2B SaaS) */}
       <aside className="hidden md:flex flex-col w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 shrink-0">
         {/* Setmio SaaS Official Brand Header in Admin */}
@@ -175,7 +175,9 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
               Operaciones Principales
             </div>
             {mainDesktopTabs.map((tab) => {
-              const isActive = adminTab === tab.id;
+              const isActive =
+                adminTab === tab.id ||
+                (tab.id === 'agenda' && (adminTab === 'all_bookings' || adminTab === 'bookings'));
               return (
                 <button
                   key={tab.id}

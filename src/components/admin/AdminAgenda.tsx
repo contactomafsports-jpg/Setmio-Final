@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { Booking, Court } from '../../types/database';
+import { ReservationDrawer, ReservationDrawerData } from './ReservationDrawer';
+import { BookingListItem, BookingListItemData } from './BookingListItem';
+import { AllBookingsPage } from './AllBookingsPage';
 import {
   Calendar,
   Clock,
@@ -12,6 +15,7 @@ import {
   Filter,
   CheckCircle2,
   X,
+  ArrowRight,
 } from 'lucide-react';
 
 export const AdminAgenda: React.FC = () => {
@@ -27,8 +31,9 @@ export const AdminAgenda: React.FC = () => {
   } = useApp();
 
   const [currentDate, setCurrentDate] = useState('2026-09-30');
-  const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
+  const [selectedDrawerData, setSelectedDrawerData] = useState<ReservationDrawerData | null>(null);
   const [showNewModal, setShowNewModal] = useState(false);
+  const [showAllBookingsView, setShowAllBookingsView] = useState(false);
 
   // New reservation from reception
   const [newCourtId, setNewCourtId] = useState(courts[0]?.id || 'court-1');
@@ -104,22 +109,83 @@ export const AdminAgenda: React.FC = () => {
     setInvitedPlayer2('');
     setInvitedPlayer3('');
     setInvitedPlayer4('');
+    triggerDemoToast('Reserva Registrada', `Reserva creada con éxito en ${court.name}.`, 'success');
   };
 
+  // Convert Booking to Drawer & BookingListItem format
+  const convertBookingToDrawer = (b: Booking): ReservationDrawerData => {
+    const timeSlot = `${b.startTime.split('T')[1]?.slice(0, 5) || ''} - ${b.endTime.split('T')[1]?.slice(0, 5) || ''}`;
+    let statusText: string = b.status === 'canceled' ? 'Cancelada' : 'Confirmada';
+    if (b.paymentStatus === 'pending' || b.paymentStatus === 'partially_paid') {
+      statusText = 'Pendiente TPV';
+    } else if (b.paymentStatus === 'paid') {
+      statusText = 'Pagado';
+    }
+
+    return {
+      id: b.id,
+      courtId: b.courtId,
+      courtName: b.courtName,
+      courtType: 'Indoor Cristal Pro',
+      startTime: b.startTime.split('T')[1]?.slice(0, 5) || b.startTime,
+      endTime: b.endTime?.split('T')[1]?.slice(0, 5) || '',
+      timeSlot,
+      creatorName: b.creatorName,
+      creatorPhone: '+34 611 22 33 44',
+      creatorMemberNum: 'Socio #SM-408',
+      totalPrice: b.totalPrice,
+      paymentStatus: b.paymentStatus,
+      status: statusText,
+      accessPin: b.accessPin || '4821#',
+      category: b.isSplitPayment ? 'match' : 'private',
+      title: b.isSplitPayment ? 'Pádel Abierto 4.0' : `Reserva ${b.courtName}`,
+      sport: 'Pádel Indoor',
+      participants: b.participants?.map((p) => ({
+        name: p.name,
+        paid: p.paid,
+        amount: p.amount,
+        statusText: p.paid ? 'Pagado' : 'Pendiente TPV',
+      })),
+      notes: b.notes,
+    };
+  };
+
+  // If user navigated to "Todas las Reservas" view
+  if (showAllBookingsView) {
+    return (
+      <AllBookingsPage
+        onBackToQuadrant={() => setShowAllBookingsView(false)}
+        onOpenNewBookingModal={() => setShowNewModal(true)}
+      />
+    );
+  }
+
+  // Filter day's bookings
+  const dayBookings = bookings.filter((b) => b.startTime.startsWith(currentDate));
+
   return (
-    <div className="space-y-6 text-slate-900 dark:text-slate-100">
-      {/* Header & Date Controls */}
+    <div className="space-y-6 text-slate-900 dark:text-slate-100 max-w-7xl mx-auto">
+      {/* ======================================================================
+          1. ENCABEZADO DE PÁGINA (ESTÁNDAR CANÓNICO)
+          ====================================================================== */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">Reservas y Disponibilidad</h2>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Cuadrante de pistas, historial y gestión completa del club</p>
+          <h1 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">
+            Reservas y Disponibilidad
+          </h1>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 mb-4">
+            Cuadrante interactivo y gestión diaria del club
+          </p>
         </div>
 
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-1 text-xs shadow-xs">
+          {/* Controles de Fecha */}
+          <div className="flex items-center gap-1 bg-white dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 rounded-2xl p-1 text-xs shadow-sm">
             <button
+              type="button"
               onClick={() => setCurrentDate('2026-09-29')}
-              className="p-1 rounded text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
+              className="p-1.5 rounded-lg text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-700/60 transition"
+              title="Día anterior"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
@@ -127,19 +193,22 @@ export const AdminAgenda: React.FC = () => {
               type="date"
               value={currentDate}
               onChange={(e) => setCurrentDate(e.target.value)}
-              className="bg-transparent text-slate-900 dark:text-white font-bold text-xs focus:outline-none px-2"
+              className="bg-transparent text-slate-900 dark:text-white font-bold text-xs focus:outline-none px-2 cursor-pointer"
             />
             <button
+              type="button"
               onClick={() => setCurrentDate('2026-10-01')}
-              className="p-1 rounded text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
+              className="p-1.5 rounded-lg text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-700/60 transition"
+              title="Día siguiente"
             >
               <ChevronRight className="w-4 h-4" />
             </button>
           </div>
 
           <button
+            type="button"
             onClick={() => setShowNewModal(true)}
-            className="px-4 py-2.5 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs shadow-sm shadow-emerald-600/20 flex items-center gap-1.5 transition active:scale-95"
+            className="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs shadow-sm flex items-center gap-1.5 transition active:scale-95"
           >
             <Plus className="w-4 h-4" />
             <span>Nueva Reserva</span>
@@ -147,182 +216,200 @@ export const AdminAgenda: React.FC = () => {
         </div>
       </div>
 
-      {/* Calendar Grid Matrix */}
-      <div className="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 overflow-x-auto shadow-sm">
-        <div className="min-w-[900px]">
-          {/* Header Courts Row */}
-          <div className="grid grid-cols-9 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-xs font-semibold text-slate-700 dark:text-slate-300">
-            <div className="p-3 text-center text-slate-500 dark:text-slate-400 font-bold border-r border-slate-200 dark:border-slate-800">
-              Hora
-            </div>
-            {courts.map((court) => (
-              <div
-                key={court.id}
-                className="p-3 border-r border-slate-200 dark:border-slate-800 last:border-r-0 flex flex-col justify-between"
-              >
-                <div className="font-extrabold text-slate-900 dark:text-white truncate text-[11px]">{court.name.split('—')[0]}</div>
-                <div className="flex items-center justify-between text-[10px] text-slate-500 dark:text-slate-400 mt-1">
-                  <span className="font-semibold">{court.hourlyRate}€/h</span>
-                  <button
-                    onClick={() => toggleCourtLight(court.id)}
-                    className={`p-1 rounded transition ${
-                      court.isLightOn ? 'text-amber-500' : 'text-slate-400 hover:text-slate-600 dark:text-slate-600 dark:hover:text-slate-400'
-                    }`}
-                    title="Conmutar focos"
-                  >
-                    <Zap className="w-3.5 h-3.5" />
-                  </button>
+      {/* ======================================================================
+          2. TABLA DE DISPONIBILIDAD (CUADRANTE EN MODO OSCURO CANÓNICO)
+          ====================================================================== */}
+      <div className="bg-white dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 rounded-2xl p-4 shadow-sm overflow-hidden">
+        <div className="overflow-x-auto">
+          <div className="min-w-[900px]">
+            {/* Header Courts Row */}
+            <div className="grid grid-cols-9 border-b border-slate-200 dark:border-slate-700/80 bg-slate-50 dark:bg-slate-900/90 text-xs font-semibold text-slate-700 dark:text-slate-300 rounded-t-xl">
+              <div className="p-3 text-center text-slate-500 dark:text-slate-400 font-bold border-r border-slate-200 dark:border-slate-700/80">
+                Hora
+              </div>
+              {courts.map((court) => (
+                <div
+                  key={court.id}
+                  className="p-3 border-r border-slate-200 dark:border-slate-700/80 last:border-r-0 flex flex-col justify-between"
+                >
+                  <div className="font-extrabold text-slate-900 dark:text-white truncate text-[11px]">
+                    {court.name.split('—')[0]}
+                  </div>
+                  <div className="flex items-center justify-between text-[10px] text-slate-500 dark:text-slate-400 mt-1">
+                    <span className="font-semibold text-emerald-600 dark:text-emerald-400">{court.hourlyRate}€/h</span>
+                    <button
+                      type="button"
+                      onClick={() => toggleCourtLight(court.id)}
+                      className={`p-1 rounded transition ${
+                        court.isLightOn
+                          ? 'text-amber-500 hover:text-amber-400'
+                          : 'text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300'
+                      }`}
+                      title="Conmutar focos"
+                    >
+                      <Zap className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
                 </div>
+              ))}
+            </div>
+
+            {/* Time Rows */}
+            {timeRows.map((time) => (
+              <div
+                key={time}
+                className="grid grid-cols-9 border-b border-slate-100 dark:border-slate-700/50 hover:bg-slate-50/50 dark:hover:bg-slate-900/40 text-xs transition-colors"
+              >
+                {/* Horario en Modo Oscuro: text-slate-200 */}
+                <div className="p-3 text-center font-mono text-slate-700 dark:text-slate-200 font-bold border-r border-slate-200 dark:border-slate-700/80 bg-slate-50/60 dark:bg-slate-900/90 flex items-center justify-center">
+                  {time}
+                </div>
+
+                {courts.map((court) => {
+                  const booking = getBookingForSlot(court.id, time);
+                  return (
+                    <div
+                      key={court.id}
+                      className="p-1.5 border-r border-slate-100 dark:border-slate-700/50 last:border-r-0 min-h-[62px] flex items-center"
+                    >
+                      {booking ? (
+                        /* Celda ocupada: bg-slate-800 en dark mode, borde menta y texto claro */
+                        <button
+                          type="button"
+                          onClick={() => setSelectedDrawerData(convertBookingToDrawer(booking))}
+                          className="w-full h-full p-2 rounded-xl bg-slate-100 dark:bg-slate-800 border border-emerald-500/40 text-left hover:border-emerald-500 dark:hover:border-emerald-400 transition shadow-xs group"
+                        >
+                          <div className="font-bold text-slate-900 dark:text-white truncate text-[11px] group-hover:text-emerald-500 dark:group-hover:text-emerald-400 transition">
+                            {booking.creatorName}
+                          </div>
+                          <div className="text-[10px] text-slate-500 dark:text-slate-300 flex items-center justify-between font-medium mt-0.5">
+                            <span className="font-bold">{booking.totalPrice}€</span>
+                            <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400">
+                              PIN {booking.accessPin || '4821#'}
+                            </span>
+                          </div>
+                        </button>
+                      ) : (
+                        /* Celda libre: Verde Menta oficial Setmio */
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setNewCourtId(court.id);
+                            setNewTime(time);
+                            setShowNewModal(true);
+                          }}
+                          className="w-full h-full rounded-xl border border-dashed border-emerald-500/25 hover:border-emerald-500 hover:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[11px] font-bold transition flex items-center justify-center gap-1 active:scale-95"
+                          title={`Reservar ${court.name} a las ${time}`}
+                        >
+                          <Plus className="w-3 h-3 text-emerald-500" />
+                          <span>Libre</span>
+                        </button>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             ))}
           </div>
-
-          {/* Time Rows */}
-          {timeRows.map((time) => (
-            <div
-              key={time}
-              className="grid grid-cols-9 border-b border-slate-100 dark:border-slate-800/60 hover:bg-slate-50/60 dark:hover:bg-slate-800/20 text-xs transition-colors"
-            >
-              <div className="p-3 text-center font-mono text-slate-500 dark:text-slate-400 font-bold border-r border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/60">
-                {time}
-              </div>
-
-              {courts.map((court) => {
-                const booking = getBookingForSlot(court.id, time);
-                return (
-                  <div
-                    key={court.id}
-                    className="p-1 border-r border-slate-100 dark:border-slate-800/60 last:border-r-0 min-h-[58px] flex items-center"
-                  >
-                    {booking ? (
-                      <button
-                        onClick={() => setSelectedBooking(booking)}
-                        className="w-full h-full p-1.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-300 dark:border-emerald-500/40 text-left hover:border-emerald-500 dark:hover:border-emerald-400 transition shadow-xs"
-                      >
-                        <div className="font-bold text-emerald-900 dark:text-emerald-300 truncate text-[11px]">
-                          {booking.creatorName}
-                        </div>
-                        <div className="text-[10px] text-slate-600 dark:text-slate-400 flex items-center justify-between font-medium">
-                          <span>{booking.totalPrice}€</span>
-                          <span className="font-mono font-bold text-amber-700 dark:text-amber-300">PIN {booking.accessPin}</span>
-                        </div>
-                      </button>
-                    ) : (
-                      <button
-                        onClick={() => {
-                          setNewCourtId(court.id);
-                          setNewTime(time);
-                          setShowNewModal(true);
-                        }}
-                        className="w-full h-full rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800/50 flex items-center justify-center text-slate-400 hover:text-slate-700 dark:text-slate-600 dark:hover:text-slate-300 text-[10px] font-semibold transition"
-                      >
-                        + Libre
-                      </button>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          ))}
         </div>
       </div>
 
-      {/* Reservation history */}
-      <section className="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
-        <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
-          <div><h3 className="font-extrabold text-slate-900 dark:text-white text-sm">Todas las reservas</h3><p className="text-[11px] text-slate-500 dark:text-slate-400">Histórico completo, incluidas canceladas</p></div>
-          <span className="text-[11px] rounded-full bg-slate-100 dark:bg-slate-800 px-2.5 py-1 font-bold text-slate-700 dark:text-slate-300">{bookings.length} registros</span>
+      {/* ======================================================================
+          3. BLOQUE "RESERVAS DEL DÍA"
+          - Muestra el listado de reservas de la jornada actual usando BookingListItem.
+          - Coloca un botón principal destacado en la parte inferior:
+            "Ver Histórico Completo / Todas las Reservas →".
+          ====================================================================== */}
+      <section className="bg-white dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 rounded-2xl p-4 sm:p-5 shadow-sm space-y-4">
+        <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-700/60 pb-3">
+          <div>
+            <h2 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-0.5">
+              RESERVAS DEL DÍA ({dayBookings.length})
+            </h2>
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              Jornada del {currentDate} · Toca cualquier tarjeta para abrir el Drawer operativo
+            </p>
+          </div>
+
+          <span className="text-[11px] px-2.5 py-1 rounded-full font-mono font-bold bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20">
+            {dayBookings.length} en este día
+          </span>
         </div>
-        <div className="divide-y divide-slate-100 dark:divide-slate-800/80">
-          {bookings.map((booking) => (
-            <button key={booking.id} onClick={() => setSelectedBooking(booking)} className="w-full p-4 text-left flex flex-wrap items-center gap-3 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition">
-              <div className="size-9 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center"><Calendar className="w-4 h-4" /></div>
-              <div className="min-w-[150px] flex-1"><div className="text-xs font-bold text-slate-900 dark:text-white">{booking.creatorName}</div><div className="text-[11px] text-slate-500 dark:text-slate-400">{booking.courtName} · {booking.startTime.replace('T', ' ')}</div></div>
-              <span className={`text-[10px] font-bold uppercase ${booking.status === 'canceled' ? 'text-rose-600 dark:text-rose-400' : 'text-emerald-600 dark:text-emerald-400'}`}>{booking.status === 'canceled' ? 'Cancelada' : 'Confirmada'}</span>
-              <span className="text-xs font-mono font-bold text-slate-900 dark:text-slate-300">{booking.totalPrice.toFixed(2)} €</span>
-            </button>
-          ))}
+
+        {/* Listado con el componente unificado BookingListItem */}
+        {dayBookings.length === 0 ? (
+          <div className="py-8 text-center text-slate-400 dark:text-slate-500 text-xs">
+            <Calendar className="w-8 h-8 mx-auto mb-2 text-slate-300 dark:text-slate-600" />
+            No hay reservas registradas para esta fecha. Puedes hacer clic en "+ Libre" para reservar una pista.
+          </div>
+        ) : (
+          <div className="space-y-2.5">
+            {dayBookings.map((b) => {
+              const drawerData = convertBookingToDrawer(b);
+              return (
+                <BookingListItem
+                  key={b.id}
+                  booking={drawerData}
+                  onClick={() => setSelectedDrawerData(drawerData)}
+                />
+              );
+            })}
+          </div>
+        )}
+
+        {/* BOTÓN PRINCIPAL DESTACADO EN LA PARTE INFERIOR */}
+        <div className="pt-2">
+          <button
+            type="button"
+            onClick={() => setShowAllBookingsView(true)}
+            className="w-full py-3 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-700/70 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 hover:text-emerald-600 dark:hover:text-emerald-400 font-bold text-xs transition flex items-center justify-center gap-2 border border-slate-200 dark:border-slate-600/60 shadow-xs cursor-pointer active:scale-98"
+          >
+            <span>Ver Histórico Completo / Todas las Reservas</span>
+            <ArrowRight className="w-4 h-4 text-emerald-500" />
+          </button>
         </div>
       </section>
 
-      {/* Booking Detail Modal */}
-      {selectedBooking && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm animate-in fade-in duration-150">
-          <div className="w-full max-w-sm rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 p-6 shadow-2xl text-slate-900 dark:text-slate-100 space-y-4">
-            <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
-              <h3 className="text-sm font-black text-slate-900 dark:text-white">Detalle de la Reserva</h3>
-              <button
-                onClick={() => setSelectedBooking(null)}
-                className="p-1 text-slate-400 hover:text-slate-900 dark:hover:text-white"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
+      {/* DRAWER OPERATIVO DE DETALLE DE RESERVA */}
+      <ReservationDrawer
+        isOpen={!!selectedDrawerData}
+        reservation={selectedDrawerData}
+        onClose={() => setSelectedDrawerData(null)}
+        onCancelReservation={(id) => {
+          cancelBooking(id);
+          setSelectedDrawerData(null);
+        }}
+      />
 
-            <div className="space-y-2 text-xs">
-              <div className="flex justify-between">
-                <span className="text-slate-500 dark:text-slate-400">Pista:</span>
-                <span className="font-bold text-slate-900 dark:text-white">{selectedBooking.courtName}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-slate-500 dark:text-slate-400">Titular:</span>
-                <span className="text-slate-800 dark:text-slate-200 font-semibold">{selectedBooking.creatorName}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-slate-500 dark:text-slate-400">Horario:</span>
-                <span className="font-mono text-emerald-600 dark:text-emerald-400 font-bold">{selectedBooking.startTime.replace('T', ' ')}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-slate-500 dark:text-slate-400">PIN Cerradura:</span>
-                <span className="font-mono text-amber-600 dark:text-amber-300 font-bold">{selectedBooking.accessPin}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-slate-500 dark:text-slate-400">Total:</span>
-                <span className="font-mono font-black text-slate-900 dark:text-white">{selectedBooking.totalPrice.toFixed(2)} €</span>
-              </div>
-            </div>
-
-            <div className="pt-2 grid grid-cols-2 gap-2">
-              <button
-                onClick={() => {
-                  const nextName = window.prompt('Titular de la reserva', selectedBooking.creatorName);
-                  if (nextName?.trim()) updateBooking(selectedBooking.id, { creatorName: nextName.trim() });
-                  setSelectedBooking(null);
-                }}
-                className="w-full py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 font-bold text-xs transition"
-              >
-                Editar titular
-              </button>
-              <button
-                onClick={() => {
-                  cancelBooking(selectedBooking.id);
-                  setSelectedBooking(null);
-                }}
-                className="w-full py-2.5 rounded-xl bg-rose-50 dark:bg-rose-600/20 hover:bg-rose-100 dark:hover:bg-rose-600/30 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-500/30 font-bold text-xs transition"
-              >
-                Cancelar y Liberar Pista
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* New Reservation Modal */}
+      {/* MODAL NUEVA RESERVA EN MOSTRADOR */}
       {showNewModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm animate-in fade-in duration-150">
-          <div className="w-full max-w-md rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 p-6 shadow-2xl text-slate-900 dark:text-slate-100">
-            <h3 className="text-base font-black text-slate-900 dark:text-white mb-1">Nueva Reserva en Mostrador</h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mb-4">Recepción Pádel San Mateo</p>
+          <div className="w-full max-w-md rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-6 shadow-2xl text-slate-900 dark:text-slate-100">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-700">
+              <div>
+                <h3 className="text-base font-bold text-slate-900 dark:text-white">Nueva Reserva en Mostrador</h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400">Recepción Pádel San Mateo</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowNewModal(false)}
+                className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-lg"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
 
-            <form onSubmit={handleCreateSubmit} className="space-y-3.5 text-xs">
+            <form onSubmit={handleCreateSubmit} className="space-y-3.5 text-xs mt-4">
               <div>
                 <label className="block text-slate-700 dark:text-slate-300 mb-1 font-bold">Tipo de Operación</label>
-                <div className="grid grid-cols-3 gap-1.5 p-1 bg-slate-100 dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-700">
+                <div className="grid grid-cols-3 gap-1.5 p-1 bg-slate-100 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700">
                   <button
                     type="button"
                     onClick={() => setClientType('existing')}
-                    className={`py-1.5 px-2 rounded-xl font-bold text-[11px] transition ${
-                      clientType === 'existing' ? 'bg-emerald-600 text-white shadow-xs' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                    className={`py-1.5 px-2 rounded-lg font-bold text-[11px] transition ${
+                      clientType === 'existing'
+                        ? 'bg-emerald-500 text-white shadow-xs'
+                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                     }`}
                   >
                     Socio Club
@@ -330,8 +417,10 @@ export const AdminAgenda: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setClientType('new')}
-                    className={`py-1.5 px-2 rounded-xl font-bold text-[11px] transition ${
-                      clientType === 'new' ? 'bg-emerald-600 text-white shadow-xs' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                    className={`py-1.5 px-2 rounded-lg font-bold text-[11px] transition ${
+                      clientType === 'new'
+                        ? 'bg-emerald-500 text-white shadow-xs'
+                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                     }`}
                   >
                     Nuevo / Libre
@@ -339,8 +428,10 @@ export const AdminAgenda: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setClientType('block')}
-                    className={`py-1.5 px-2 rounded-xl font-bold text-[11px] transition ${
-                      clientType === 'block' ? 'bg-rose-600 text-white shadow-xs' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                    className={`py-1.5 px-2 rounded-lg font-bold text-[11px] transition ${
+                      clientType === 'block'
+                        ? 'bg-rose-600 text-white shadow-xs'
+                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                     }`}
                   >
                     Bloqueo Pista
@@ -350,11 +441,11 @@ export const AdminAgenda: React.FC = () => {
 
               {clientType === 'existing' && (
                 <div>
-                  <label className="block text-slate-300 mb-1 font-semibold">Socio del Club</label>
+                  <label className="block text-slate-700 dark:text-slate-300 mb-1 font-semibold">Socio del Club</label>
                   <select
                     value={selectedMember}
                     onChange={(e) => setSelectedMember(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-emerald-500 font-medium"
+                    className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 font-medium"
                   >
                     <option value="Carlos Méndez (Socio 108)">Carlos Méndez — Socio #108 (Nivel 3.85)</option>
                     <option value="Rosa Carballo (Socia 042)">Rosa Carballo — Socia #042 (Nivel 3.50)</option>
@@ -368,142 +459,127 @@ export const AdminAgenda: React.FC = () => {
               {clientType === 'new' && (
                 <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <label className="block text-slate-300 mb-1 font-semibold">Nombre Cliente</label>
+                    <label className="block text-slate-700 dark:text-slate-300 mb-1 font-semibold">Nombre Cliente</label>
                     <input
                       type="text"
                       required
                       value={newClientName}
                       onChange={(e) => setNewClientName(e.target.value)}
                       placeholder="Ej. Juan Pérez"
-                      className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-emerald-500"
+                      className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
                     />
                   </div>
                   <div>
-                    <label className="block text-slate-300 mb-1 font-semibold">Teléfono / WhatsApp</label>
+                    <label className="block text-slate-700 dark:text-slate-300 mb-1 font-semibold">Teléfono</label>
                     <input
                       type="tel"
                       value={newClientPhone}
                       onChange={(e) => setNewClientPhone(e.target.value)}
-                      placeholder="+34 600..."
-                      className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-emerald-500"
+                      placeholder="600 000 000"
+                      className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
                     />
                   </div>
                 </div>
               )}
 
-              {clientType === 'block' && (
+              <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <label className="block text-slate-300 mb-1 font-semibold">Motivo del Bloqueo</label>
+                  <label className="block text-slate-700 dark:text-slate-300 mb-1 font-semibold">Pista</label>
+                  <select
+                    value={newCourtId}
+                    onChange={(e) => setNewCourtId(e.target.value)}
+                    className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-slate-900 dark:text-white font-medium"
+                  >
+                    {courts.map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.name} ({c.hourlyRate}€/h)
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-slate-700 dark:text-slate-300 mb-1 font-semibold">Hora Inicio</label>
                   <input
-                    type="text"
-                    required
-                    value={newClientName}
-                    onChange={(e) => setNewClientName(e.target.value)}
-                    placeholder="Ej. Mantenimiento césped o Cuadro de Torneo"
-                    className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-rose-500 font-semibold text-rose-300"
+                    type="time"
+                    value={newTime}
+                    onChange={(e) => setNewTime(e.target.value)}
+                    className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-slate-900 dark:text-white"
                   />
                 </div>
-              )}
+              </div>
 
               <div>
-                <label className="block text-slate-300 mb-1 font-semibold">Duración de la Reserva</label>
+                <label className="block text-slate-700 dark:text-slate-300 mb-1 font-semibold">Duración</label>
                 <div className="grid grid-cols-3 gap-2">
-                  {[60, 90, 120].map((dur) => (
+                  {[60, 90, 120].map((mins) => (
                     <button
-                      key={dur}
+                      key={mins}
                       type="button"
-                      onClick={() => setDurationMinutes(dur as typeof durationMinutes)}
-                      className={`py-1.5 px-2 rounded-xl font-bold border transition text-center ${
-                        durationMinutes === dur
-                          ? 'bg-emerald-500/20 border-emerald-500 text-emerald-300'
-                          : 'border-slate-700 text-slate-400 hover:text-white'
+                      onClick={() => setDurationMinutes(mins as 60 | 90 | 120)}
+                      className={`py-2 rounded-xl border text-xs font-bold transition ${
+                        durationMinutes === mins
+                          ? 'bg-emerald-50 dark:bg-emerald-950/80 border-emerald-500 text-emerald-700 dark:text-emerald-300'
+                          : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400'
                       }`}
                     >
-                      {dur} min {dur === 90 ? '(1h 30m)' : dur === 120 ? '(2 horas)' : '(1 hora)'}
+                      {mins} min
                     </button>
                   ))}
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-slate-300 mb-1 font-semibold">Pista</label>
-                  <select
-                    value={newCourtId}
-                    onChange={(e) => setNewCourtId(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-emerald-500"
-                  >
-                    {courts.map((c) => (
-                      <option key={c.id} value={c.id}>{c.name}</option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-slate-300 mb-1 font-semibold">Hora Inicio</label>
-                  <select
-                    value={newTime}
-                    onChange={(e) => setNewTime(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-emerald-500 font-mono"
-                  >
-                    {timeRows.map((t) => (
-                      <option key={t} value={t}>{t}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
               {clientType !== 'block' && (
-                <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 space-y-2">
-                  <label className="flex items-center gap-2 cursor-pointer font-semibold text-slate-300">
+                <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-slate-700 dark:text-slate-300">Pago Fraccionado (Split 4 Jugadores)</span>
                     <input
                       type="checkbox"
                       checked={newSplit}
                       onChange={(e) => setNewSplit(e.target.checked)}
-                      className="rounded accent-emerald-500 w-4 h-4"
+                      className="w-4 h-4 text-emerald-600 rounded"
                     />
-                    <span>Habilitar Pago Dividido (Split 4 jugadores)</span>
-                  </label>
-
+                  </div>
                   {newSplit && (
                     <div className="space-y-1.5 pt-1 text-[11px]">
-                      <span className="text-slate-400 block font-medium">Invitar compañeros (email o nombre):</span>
+                      <span className="text-slate-400 block font-medium">Invitar compañeros:</span>
                       <input
                         type="text"
                         placeholder="Jugador 2: ej. marcos@email.es"
                         value={invitedPlayer2}
                         onChange={(e) => setInvitedPlayer2(e.target.value)}
-                        className="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-white"
+                        className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1.5 text-slate-900 dark:text-white"
                       />
                       <input
                         type="text"
                         placeholder="Jugador 3: ej. brais@email.es"
                         value={invitedPlayer3}
                         onChange={(e) => setInvitedPlayer3(e.target.value)}
-                        className="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-white"
+                        className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1.5 text-slate-900 dark:text-white"
                       />
                       <input
                         type="text"
                         placeholder="Jugador 4: ej. lucia@email.es"
                         value={invitedPlayer4}
                         onChange={(e) => setInvitedPlayer4(e.target.value)}
-                        className="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-white"
+                        className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1.5 text-slate-900 dark:text-white"
                       />
                     </div>
                   )}
                 </div>
               )}
 
-              <div className="pt-2 flex items-center justify-end gap-2">
+              <div className="pt-2 flex items-center justify-end gap-2 border-t border-slate-100 dark:border-slate-700">
                 <button
                   type="button"
                   onClick={() => setShowNewModal(false)}
-                  className="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 font-semibold hover:bg-slate-700 transition"
+                  className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold hover:bg-slate-200 dark:hover:bg-slate-600 transition"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold transition shadow"
+                  className="px-5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold transition shadow-sm active:scale-95"
                 >
                   Confirmar Reserva
                 </button>
@@ -515,3 +591,5 @@ export const AdminAgenda: React.FC = () => {
     </div>
   );
 };
+
+export default AdminAgenda;

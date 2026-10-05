@@ -103,7 +103,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
 
   return (
     <>
-      <header className="sticky top-0 z-40 h-14 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-3 sm:px-6 flex items-center justify-between gap-2 shadow-xs transition-colors">
+      <header className="sticky top-0 z-50 h-14 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-3 sm:px-6 flex items-center justify-between gap-2 shadow-xs transition-colors">
         {/* Left: IDENTIDAD DE MARCA OFICIAL SETMIO (Isotipo + Texto oficial) - SIN badge Abierto/Cerrado */}
         <div className="flex items-center gap-3 min-w-0">
           <div className="flex items-center gap-2.5">

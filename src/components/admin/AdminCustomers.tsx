@@ -17,6 +17,7 @@ import {
   Calendar,
   MessageCircle,
 } from 'lucide-react';
+import { AdminMemberProfile } from './AdminMemberProfile';
 
 interface CustomerItem {
   id: string;
@@ -139,29 +140,38 @@ export const AdminCustomers: React.FC = () => {
     return matchSearch && matchType;
   });
 
+  if (selectedCustomer) {
+    return (
+      <AdminMemberProfile
+        member={selectedCustomer}
+        onBack={() => setSelectedCustomer(null)}
+      />
+    );
+  }
+
   return (
-    <div className="space-y-6 text-slate-900 dark:text-slate-100 max-w-6xl">
+    <div className="space-y-6 text-slate-900 dark:text-slate-100 max-w-7xl mx-auto">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
-            Directorio de Socios y Clientes
-          </h2>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-            {currentTenant.name} · Haz clic en cualquier jugador para abrir su ficha completa y perfil público
+          <h1 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">
+            Socios & CRM de Jugadores
+          </h1>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 mb-4">
+            Base de datos oficial de {currentTenant.name} · Fichas, monederos, niveles y estadísticas
           </p>
         </div>
 
         <button
           onClick={() => triggerDemoToast('Alta de Socio', 'Formulario de registro presencial abierto en modo demo.', 'info')}
-          className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-sm flex items-center gap-1.5 transition self-start sm:self-auto"
+          className="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs shadow-sm flex items-center gap-1.5 transition self-start sm:self-auto active:scale-95"
         >
           <UserPlus className="w-4 h-4" />
           <span>Nuevo Jugador</span>
         </button>
       </div>
 
-      {/* Filter and search bar with proper light/dark contrast */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
+      {/* Filter and search bar with canonical styling */}
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-4 rounded-2xl bg-white dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 shadow-sm">
         <div className="relative w-full sm:w-72">
           <Search className="absolute left-3 top-2.5 w-4 h-4 text-slate-400" />
           <input
@@ -169,16 +179,16 @@ export const AdminCustomers: React.FC = () => {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Buscar por nombre, email o teléfono..."
-            className="w-full pl-9 pr-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-emerald-500"
+            className="w-full pl-9 pr-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-emerald-500 transition"
           />
         </div>
 
-        <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-950 p-1 rounded-xl border border-slate-200 dark:border-slate-800 text-xs font-semibold">
+        <div className="flex items-center gap-1 bg-slate-50 dark:bg-slate-900 p-1 rounded-xl border border-slate-200/80 dark:border-slate-700/80 text-xs font-semibold">
           <button
             onClick={() => setFilterType('all')}
             className={`px-3 py-1.5 rounded-lg transition ${
               filterType === 'all'
-                ? 'bg-emerald-600 text-white shadow-sm'
+                ? 'bg-emerald-500 text-white shadow-xs'
                 : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
             }`}
           >
@@ -188,7 +198,7 @@ export const AdminCustomers: React.FC = () => {
             onClick={() => setFilterType('members')}
             className={`px-3 py-1.5 rounded-lg transition ${
               filterType === 'members'
-                ? 'bg-emerald-600 text-white shadow-sm'
+                ? 'bg-emerald-500 text-white shadow-xs'
                 : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
             }`}
           >
@@ -198,7 +208,7 @@ export const AdminCustomers: React.FC = () => {
             onClick={() => setFilterType('casual')}
             className={`px-3 py-1.5 rounded-lg transition ${
               filterType === 'casual'
-                ? 'bg-emerald-600 text-white shadow-sm'
+                ? 'bg-emerald-500 text-white shadow-xs'
                 : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
             }`}
           >
@@ -208,7 +218,7 @@ export const AdminCustomers: React.FC = () => {
       </div>
 
       {/* Customers table */}
-      <div className="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
+      <div className="rounded-2xl bg-white dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 overflow-hidden shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
             <thead className="bg-slate-50 dark:bg-slate-950 text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800 uppercase tracking-wider text-[10px] font-bold">
@@ -276,120 +286,6 @@ export const AdminCustomers: React.FC = () => {
           </table>
         </div>
       </div>
-
-      {/* 1. CUSTOMER DETAIL MODAL */}
-      {selectedCustomer && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm animate-in fade-in duration-150">
-          <div className="relative w-full max-w-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl text-slate-900 dark:text-slate-100 max-h-[90vh] overflow-y-auto space-y-6">
-            <button
-              onClick={() => setSelectedCustomer(null)}
-              className="absolute top-5 right-5 p-2 rounded-xl text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition"
-            >
-              <X className="w-5 h-5" />
-            </button>
-
-            <div className="flex items-center gap-4">
-              <img
-                src={selectedCustomer.avatarUrl}
-                alt={selectedCustomer.name}
-                className="w-16 h-16 rounded-2xl object-cover border-2 border-emerald-500 shadow-md"
-              />
-              <div>
-                <div className="flex items-center gap-2">
-                  <h3 className="text-xl font-black text-slate-900 dark:text-white">
-                    {selectedCustomer.name}
-                  </h3>
-                  {selectedCustomer.isMember && (
-                    <span className="px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 font-bold text-[10px] uppercase">
-                      Socio {selectedCustomer.memberNum}
-                    </span>
-                  )}
-                </div>
-                <p className="text-xs text-slate-500 mt-0.5">
-                  Registrado en {currentTenant.name} · {selectedCustomer.phone}
-                </p>
-              </div>
-            </div>
-
-            {/* Quick Metrics Bar */}
-            <div className="grid grid-cols-3 gap-3 p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-center text-xs">
-              <div>
-                <div className="text-slate-400 text-[10px]">Nivel Deportivo</div>
-                <div className="font-mono font-bold text-emerald-600 dark:text-emerald-400 text-base mt-0.5">
-                  {selectedCustomer.level.toFixed(2)}
-                </div>
-              </div>
-              <div>
-                <div className="text-slate-400 text-[10px]">Saldo Monedero</div>
-                <div className="font-mono font-bold text-slate-900 dark:text-white text-base mt-0.5">
-                  {selectedCustomer.balance.toFixed(2)} €
-                </div>
-              </div>
-              <div>
-                <div className="text-slate-400 text-[10px]">Partidos Jugados</div>
-                <div className="font-mono font-bold text-slate-900 dark:text-white text-base mt-0.5">
-                  {selectedCustomer.matches}
-                </div>
-              </div>
-            </div>
-
-            {/* Technical Specs */}
-            <div className="space-y-3 text-xs">
-              <h4 className="font-bold text-slate-900 dark:text-white uppercase tracking-wider text-[11px]">
-                Datos Técnicos del Jugador
-              </h4>
-              <div className="grid grid-cols-2 gap-3 text-slate-600 dark:text-slate-400">
-                <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800">
-                  <span className="text-[10px] text-slate-400">Mano Dominante:</span>
-                  <div className="font-bold text-slate-900 dark:text-white mt-0.5">{selectedCustomer.hand || 'Diestro'}</div>
-                </div>
-                <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800">
-                  <span className="text-[10px] text-slate-400">Posición en Pista:</span>
-                  <div className="font-bold text-slate-900 dark:text-white mt-0.5">{selectedCustomer.position || 'Revés'}</div>
-                </div>
-              </div>
-            </div>
-
-            {/* Action Buttons */}
-            <div className="space-y-3 pt-2">
-              <div className="flex gap-2">
-                <button
-                  onClick={() => {
-                    triggerDemoToast('Recarga Aplicada', `Se han añadido 20.00€ al monedero de ${selectedCustomer.name}.`, 'success');
-                    setSelectedCustomer((prev) => prev ? { ...prev, balance: prev.balance + 20 } : null);
-                  }}
-                  className="flex-1 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 font-bold text-xs text-slate-800 dark:text-slate-200 transition flex items-center justify-center gap-1.5"
-                >
-                  <CreditCard className="w-4 h-4 text-emerald-500" />
-                  <span>+20€ Recargar Saldo</span>
-                </button>
-
-                <a
-                  href={`https://wa.me/${selectedCustomer.phone.replace(/[^\d+]/g, '').replace('+', '')}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition flex items-center gap-1.5"
-                >
-                  <MessageCircle className="w-4 h-4" />
-                  <span>WhatsApp</span>
-                </a>
-              </div>
-
-              {/* Requirement: Link/Button to Public Profile */}
-              <button
-                onClick={() => {
-                  setPublicProfileModalCustomer(selectedCustomer);
-                  setSelectedCustomer(null);
-                }}
-                className="w-full py-3 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs shadow-md transition flex items-center justify-center gap-2"
-              >
-                <ExternalLink className="w-4 h-4" />
-                <span>Ver Perfil Público del Jugador</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* 2. PUBLIC PROFILE MODAL VIEW */}
       {publicProfileModalCustomer && (
