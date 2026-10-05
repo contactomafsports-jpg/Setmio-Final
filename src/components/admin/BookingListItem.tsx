@@ -156,25 +156,25 @@ export const BookingListItem: React.FC<BookingListItemProps> = ({
         </div>
       </div>
 
-      {/* DERECHA (Columna vertical limpia): Arriba precio en negrita, abajo Badge de estado + PIN */}
-      <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-center gap-1 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-100 dark:border-slate-700/50">
-        {/* Arriba: Precio en negrita destacado bien alineado a la derecha */}
-        <div className="font-black font-mono text-base text-slate-900 dark:text-white text-right tracking-tight">
+      {/* DERECHA: Columna vertical limpia: Arriba precio en negrita mono, abajo Badge de estado + Código PIN alineados */}
+      <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-center gap-1.5 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-100 dark:border-slate-800">
+        {/* Arriba: Precio en negrita mono destacado bien alineado a la derecha */}
+        <div className="font-black font-mono text-base text-slate-900 dark:text-white sm:text-right tracking-tight">
           {formatPrice()}
         </div>
 
-        {/* Abajo: Badge de estado + Código PIN */}
+        {/* Abajo: Badge de estado + Código PIN alineados horizontalmente */}
         <div className="flex items-center gap-2">
           <span
-            className={`px-2 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider inline-flex items-center gap-1 border shadow-xs ${statusInfo.style}`}
+            className={`px-2.5 py-0.5 rounded-lg text-[10px] font-black uppercase tracking-wider inline-flex items-center gap-1.5 border shadow-xs whitespace-nowrap ${statusInfo.style}`}
           >
             {statusInfo.icon}
             <span>{statusInfo.label}</span>
           </span>
 
-          <span className="inline-flex items-center gap-1 text-[11px] font-mono font-bold text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-900/60 px-2 py-0.5 rounded-md border border-slate-200/80 dark:border-slate-700/60">
+          <span className="inline-flex items-center gap-1 text-[11px] font-mono font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-900/80 px-2 py-0.5 rounded-lg border border-slate-200/80 dark:border-slate-700/80 whitespace-nowrap">
             <KeyRound className="w-3 h-3 text-amber-500" />
-            <span>PIN <strong className="text-emerald-600 dark:text-emerald-400">{pinCode}</strong></span>
+            <span>PIN: <strong className="text-emerald-600 dark:text-emerald-400 font-extrabold">{pinCode}</strong></span>
           </span>
         </div>
       </div>

@@ -36,6 +36,7 @@ import {
 import { BookingFlow } from '../public/BookingFlow';
 import { OpenMatchesView } from '../public/OpenMatchesView';
 import { PlayerHeader } from './PlayerHeader';
+import { PlayerPublicProfileView } from '../public/PlayerPublicProfileView';
 
 export const PlayerPortal: React.FC = () => {
   const {
@@ -601,48 +602,13 @@ export const PlayerPortal: React.FC = () => {
           </div>
         )}
 
-        {/* PROFILE TAB */}
+        {/* PROFILE TAB (Vista Propio Jugador - Requerimiento 6.B) */}
         {activePlayerTab === 'profile' && (
-          <div className="space-y-6 animate-in fade-in duration-150 max-w-2xl">
-            <div>
-              <h2 className="text-xl font-black text-slate-900 dark:text-white">Ficha del Jugador</h2>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
-                Datos de socio, contacto y preferencias de juego.
-              </p>
-            </div>
-
-            <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-4 text-xs">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <span className="text-slate-400">Nombre Completo:</span>
-                  <div className="font-bold text-slate-900 dark:text-white text-sm mt-0.5">{currentUser.name}</div>
-                </div>
-                <div>
-                  <span className="text-slate-400">Email:</span>
-                  <div className="font-bold text-slate-900 dark:text-white text-sm mt-0.5">{currentUser.email}</div>
-                </div>
-                <div>
-                  <span className="text-slate-400">Nivel Asignado:</span>
-                  <div className="font-bold text-emerald-600 dark:text-emerald-400 text-sm mt-0.5 font-mono">
-                    {currentUser.playLevel.toFixed(2)}
-                  </div>
-                </div>
-                <div>
-                  <span className="text-slate-400">Club Principal:</span>
-                  <div className="font-bold text-slate-900 dark:text-white text-sm mt-0.5">{currentTenant.name}</div>
-                </div>
-              </div>
-
-              <div className="pt-4 border-t border-slate-200 dark:border-slate-800 flex gap-3">
-                <button
-                  onClick={() => setPublicProfileModalOpen(true)}
-                  className="px-4 py-2.5 rounded-xl bg-emerald-600 text-white font-bold text-xs flex items-center gap-1.5"
-                >
-                  <ExternalLink className="w-3.5 h-3.5" />
-                  <span>Ver Mi Perfil Público</span>
-                </button>
-              </div>
-            </div>
+          <div className="space-y-6 animate-in fade-in duration-150">
+            <PlayerPublicProfileView
+              playerId="user-player-carlos"
+              onBack={() => setActivePlayerTab('overview')}
+            />
           </div>
         )}
       </main>
@@ -689,57 +655,19 @@ export const PlayerPortal: React.FC = () => {
 
       {/* 6. MODAL PERFIL PÚBLICO DEL JUGADOR */}
       {publicProfileModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm animate-in fade-in duration-150">
-          <div className="relative w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl text-slate-900 dark:text-slate-100">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm animate-in fade-in duration-150 overflow-y-auto">
+          <div className="relative w-full max-w-4xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl text-slate-900 dark:text-slate-100 my-8">
             <button
               onClick={() => setPublicProfileModalOpen(false)}
-              className="absolute top-4 right-4 p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition"
+              className="absolute top-4 right-4 p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition z-10 cursor-pointer"
+              title="Cerrar Ficha"
             >
               <X className="w-5 h-5" />
             </button>
-
-            <div className="text-center space-y-3 pt-2">
-              <img
-                src={currentUser.avatarUrl}
-                alt={currentUser.name}
-                className="w-24 h-24 rounded-3xl object-cover border-4 border-emerald-500 mx-auto shadow-xl"
-              />
-              <div>
-                <h3 className="text-xl font-black text-slate-900 dark:text-white">{currentUser.name}</h3>
-                <p className="text-xs text-slate-500">{currentTenant.name} · Ficha Federada Verificada</p>
-              </div>
-
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 font-mono font-bold text-xs">
-                <span>Nivel {currentUser.playLevel.toFixed(2)}</span>
-                <span>·</span>
-                <span>Diestro / Revés</span>
-              </div>
-            </div>
-
-            <div className="my-6 grid grid-cols-3 gap-2 p-3 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-center text-xs">
-              <div>
-                <div className="text-slate-400 text-[10px]">Partidos</div>
-                <div className="font-bold text-slate-900 dark:text-white text-base font-mono">34</div>
-              </div>
-              <div>
-                <div className="text-slate-400 text-[10px]">Victorias</div>
-                <div className="font-bold text-emerald-600 text-base font-mono">64%</div>
-              </div>
-              <div>
-                <div className="text-slate-400 text-[10px]">Equipos</div>
-                <div className="font-bold text-slate-900 dark:text-white text-base font-mono">2</div>
-              </div>
-            </div>
-
-            <button
-              onClick={() => {
-                setPublicProfileModalOpen(false);
-                triggerDemoToast('Enlace Copiado', 'Enlace a tu perfil público deportivo copiado al portapapeles.', 'info');
-              }}
-              className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition"
-            >
-              Compartir Perfil Deportivo
-            </button>
+            <PlayerPublicProfileView
+              playerId="user-player-carlos"
+              onBack={() => setPublicProfileModalOpen(false)}
+            />
           </div>
         </div>
       )}

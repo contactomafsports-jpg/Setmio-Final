@@ -444,11 +444,13 @@ export interface SmartCourtDevice {
 
 export interface CafeProduct {
   id: string;
-  tenantId: string;
+  tenantId?: string;
   name: string;
-  category: 'Bebidas' | 'Café' | 'Snacks' | 'Bocadillos' | 'Grip/Pelotas';
+  category: 'Bebidas' | 'Café' | 'Snacks' | 'Bocadillos' | 'Grip/Pelotas' | 'Reserva Pista' | 'Recarga Monedero' | string;
   price: number;
   stock: number;
+  active?: boolean;
+  imageUrl?: string;
 }
 
 export interface AuditLogItem {

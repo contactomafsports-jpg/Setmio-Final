@@ -23,7 +23,6 @@ import { TeamsView } from './components/public/TeamsView';
 import { BlogView } from './components/public/BlogView';
 import { ContactFAQView } from './components/public/ContactFAQView';
 import { LegalView } from './components/public/LegalView';
-import { BrandSplashScreen } from './components/common/BrandSplashScreen';
 import { SetmioCorporateLanding } from './components/public/SetmioCorporateLanding';
 import { FeaturesView } from './components/public/FeaturesView';
 import { PricingView } from './components/public/PricingView';
@@ -36,6 +35,7 @@ import { PlayerPublicProfileView } from './components/public/PlayerPublicProfile
 import { AdminLayout } from './components/admin/AdminLayout';
 import { ContextualDashboard } from './components/admin/dashboards/ContextualDashboard';
 import { AdminAgenda } from './components/admin/AdminAgenda';
+import { AdminCourtsManagement } from './components/admin/AdminCourtsManagement';
 import { AllBookingsPage } from './components/admin/AllBookingsPage';
 import { AdminCustomers } from './components/admin/AdminCustomers';
 import { AdminTeams } from './components/admin/AdminTeams';
@@ -89,23 +89,6 @@ export function App() {
     setRegistrationOpen(false);
     navigatePublic('/');
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  // PWA Brand splash screen (Only for installed private app sessions)
-  const [showSplash, setShowSplash] = useState(() => {
-    if (typeof window === 'undefined') return false;
-    // Do not show on public club web (clean fluid instant load)
-    if (isCorporateLanding) return false;
-    return sessionStorage.getItem('setmio_splash_seen') !== 'true';
-  });
-
-  const handleSplashComplete = () => {
-    setShowSplash(false);
-    try {
-      sessionStorage.setItem('setmio_splash_seen', 'true');
-    } catch {
-      // Ignore
-    }
   };
 
   useEffect(() => {
@@ -227,6 +210,8 @@ export function App() {
         return <ContextualDashboard />;
       case 'agenda':
         return <AdminAgenda />;
+      case 'courts_management':
+        return <AdminCourtsManagement />;
       case 'all_bookings':
       case 'bookings':
         return <AllBookingsPage onBackToQuadrant={() => setAdminTab('agenda')} />;
@@ -259,9 +244,6 @@ export function App() {
 
   return (
     <div className="min-h-screen bg-background text-foreground dark:bg-slate-950 dark:text-slate-100 font-sans selection:bg-emerald-500 selection:text-foreground antialiased transition-colors duration-200">
-      {/* Club/app splash only; Setmio corporate pages render immediately. */}
-      {!isCorporateLanding && showSplash && <BrandSplashScreen onComplete={handleSplashComplete} />}
-
       {/* Main view renderer: Corporate SaaS Landing OR Club View */}
       {currentView === 'public' && (isCorporateLanding ? (
         <CorporateLayout onOpenDemo={() => setRoleSelectorOpen(true)} onOpenAuth={() => setAuthOpen(true)} onOpenRegister={() => { window.history.pushState({}, '', '/registro'); setRegistrationOpen(true); setAuthOpen(true); }}>

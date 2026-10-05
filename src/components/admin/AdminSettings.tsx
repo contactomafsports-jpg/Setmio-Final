@@ -13,10 +13,12 @@ import {
   Sun,
   Moon,
   Laptop,
+  Layers,
+  ArrowRight,
 } from 'lucide-react';
 
 export const AdminSettings: React.FC = () => {
-  const { currentTenant, updateCurrentTenant, triggerDemoToast, theme, setTheme } = useApp();
+  const { currentTenant, updateCurrentTenant, triggerDemoToast, theme, setTheme, setAdminTab, courts } = useApp();
 
   const [whatsappEnabled, setWhatsappEnabled] = useState(currentTenant.settings.whatsappWidgetEnabled);
   const [whatsappNumber, setWhatsappNumber] = useState(currentTenant.whatsappNumber);
@@ -142,6 +144,36 @@ export const AdminSettings: React.FC = () => {
                 <div className="font-bold text-slate-900 dark:text-white">Automático</div>
                 <div className="text-[10px] text-slate-500">Según sistema operativo</div>
               </div>
+            </button>
+          </div>
+        </div>
+
+        {/* Módulo de Gestión de Pistas y Tarifas */}
+        <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-4 shadow-sm">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <div className="flex items-center gap-2">
+                <div className="p-2 rounded-xl bg-emerald-50 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400">
+                  <Layers className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-slate-900 dark:text-white">
+                    Gestión de Pistas & Domótica IoT
+                  </h3>
+                  <p className="text-[11px] text-slate-500 mt-0.5">
+                    {courts.length} pistas configuradas (Indoor/Outdoor), tarifas horarias, relés de focos y pines de torno.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setAdminTab('courts_management')}
+              className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-sm flex items-center justify-center gap-2 transition active:scale-95 cursor-pointer shrink-0"
+            >
+              <span>Abrir Módulo de Pistas</span>
+              <ArrowRight className="w-4 h-4" />
             </button>
           </div>
         </div>

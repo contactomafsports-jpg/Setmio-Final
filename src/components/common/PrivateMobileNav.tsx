@@ -25,7 +25,7 @@ export const PrivateMobileNav: React.FC<PrivateMobileNavProps> = ({
     },
     {
       id: 'agenda' as AdminTab,
-      label: t('club.nav.courts', 'Pistas'),
+      label: t('club.nav.bookings', 'Reservas'),
       icon: Calendar,
     },
     {

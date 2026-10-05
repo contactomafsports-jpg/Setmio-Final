@@ -62,6 +62,7 @@ interface ReservationDrawerProps {
   onOpenTPV?: (reservation: ReservationDrawerData) => void;
   onReassignCourt?: (reservation: ReservationDrawerData) => void;
   onCancelReservation?: (reservationId: string) => void;
+  onOpenPlayerProfile?: (playerName: string) => void;
 }
 
 export const ReservationDrawer: React.FC<ReservationDrawerProps> = ({
@@ -71,10 +72,12 @@ export const ReservationDrawer: React.FC<ReservationDrawerProps> = ({
   onOpenTPV,
   onReassignCourt,
   onCancelReservation,
+  onOpenPlayerProfile,
 }) => {
-  const { currentTenant, courts, setAdminTab, triggerDemoToast, t } = useApp();
+  const { currentTenant, courts, setAdminTab, triggerDemoToast, setPosPendingCharge, t } = useApp();
   const [copiedPin, setCopiedPin] = useState(false);
   const [isReassigning, setIsReassigning] = useState(false);
+  const [tpvChoiceModal, setTpvChoiceModal] = useState(false);
   const [selectedNewCourt, setSelectedNewCourt] = useState(reservation?.courtName || '');
 
   if (!isOpen || !reservation) return null;
@@ -141,12 +144,60 @@ export const ReservationDrawer: React.FC<ReservationDrawerProps> = ({
   };
 
   const handleGoToTPV = () => {
-    onClose();
-    if (onOpenTPV) {
-      onOpenTPV(reservation);
-    } else {
-      setAdminTab('pos_cafe');
+    // If it's a split payment or has multiple participants with pending payments, let receptionist choose
+    const hasUnpaid = participants.some((p) => !p.paid);
+    if (reservation.category === 'match' || reservation.paymentStatus === 'partially_paid' || (hasUnpaid && participants.length > 1)) {
+      setTpvChoiceModal(true);
+      return;
     }
+
+    // Direct full court payment
+    const totalAmount = typeof reservation.totalPrice === 'number' ? reservation.totalPrice : parseFloat(String(reservation.totalPrice)) || 28.0;
+    setPosPendingCharge({
+      id: reservation.id,
+      concept: `Reserva ${reservation.courtName} — Pago Total`,
+      amount: totalAmount,
+      reservationId: reservation.id,
+      courtName: reservation.courtName,
+      type: 'reservation_full',
+    });
+    triggerDemoToast('Cargado en TPV', `Reserva completa de ${reservation.courtName} (${totalAmount.toFixed(2)}€) precargada en la caja.`, 'success');
+    onClose();
+    setAdminTab('pos_cafe');
+  };
+
+  const chargeFullInTPV = () => {
+    const totalAmount = typeof reservation.totalPrice === 'number' ? reservation.totalPrice : parseFloat(String(reservation.totalPrice)) || 28.0;
+    setPosPendingCharge({
+      id: reservation.id,
+      concept: `Reserva ${reservation.courtName} — Pago Total`,
+      amount: totalAmount,
+      reservationId: reservation.id,
+      courtName: reservation.courtName,
+      type: 'reservation_full',
+    });
+    setTpvChoiceModal(false);
+    triggerDemoToast('Cargado en TPV', `Pago completo (${totalAmount.toFixed(2)}€) precargado en la caja TPV.`, 'success');
+    onClose();
+    setAdminTab('pos_cafe');
+  };
+
+  const chargeParticipantInTPV = (p: ReservationDrawerParticipant, index: number) => {
+    const shareAmount = p.amount || 7.0;
+    setPosPendingCharge({
+      id: `${reservation.id}-${index}`,
+      concept: `Reserva ${reservation.courtName} — Cuota ${p.name} (1/4)`,
+      amount: shareAmount,
+      reservationId: reservation.id,
+      participantIndex: index,
+      playerName: p.name,
+      courtName: reservation.courtName,
+      type: 'reservation_split',
+    });
+    setTpvChoiceModal(false);
+    triggerDemoToast('Cargado en TPV', `Cuota de ${p.name} (${shareAmount.toFixed(2)}€) precargada en caja TPV.`, 'success');
+    onClose();
+    setAdminTab('pos_cafe');
   };
 
   const handleConfirmReassign = () => {
@@ -161,6 +212,19 @@ export const ReservationDrawer: React.FC<ReservationDrawerProps> = ({
       }
       triggerDemoToast('Reserva Cancelada', `La reserva de ${reservation.creatorName} ha sido cancelada. Notificación enviada.`, 'info');
       onClose();
+    }
+  };
+
+  const handlePlayerClick = (playerName: string) => {
+    onClose();
+    if (onOpenPlayerProfile) {
+      onOpenPlayerProfile(playerName);
+    } else {
+      const slug = playerName.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-');
+      window.history.pushState({}, '', `/jugadores/${slug}`);
+      window.dispatchEvent(new PopStateEvent('popstate'));
+      setAdminTab('customers');
+      triggerDemoToast('Ficha de Jugador', `Abriendo ficha técnica y perfil de ${playerName}.`, 'info');
     }
   };
 
@@ -214,17 +278,27 @@ export const ReservationDrawer: React.FC<ReservationDrawerProps> = ({
 
         {/* 2. Ficha del Titular de la Reserva y Estado Domótico (Luces / PIN) */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-          {/* Titular */}
-          <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 space-y-1.5">
+          {/* Titular (Clicable -> Ficha de Jugador) */}
+          <div
+            role="button"
+            tabIndex={0}
+            onClick={() => handlePlayerClick(reservation.creatorName)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') handlePlayerClick(reservation.creatorName);
+            }}
+            className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 hover:border-emerald-500/70 hover:bg-emerald-50/30 dark:hover:bg-slate-800 transition cursor-pointer group space-y-1.5 shadow-xs"
+            title={`Ver ficha completa de ${reservation.creatorName}`}
+          >
             <div className="flex items-center justify-between">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                Titular de la Reserva
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition flex items-center gap-1">
+                <span>Titular de la Reserva</span>
+                <span className="text-emerald-500 font-normal">↗</span>
               </span>
               <span className="px-1.5 py-0.2 rounded bg-emerald-100 dark:bg-emerald-950 text-[9px] font-mono font-bold text-emerald-700 dark:text-emerald-300">
                 {reservation.creatorMemberNum || 'Socio #SM-408'}
               </span>
             </div>
-            <div className="font-extrabold text-sm text-slate-900 dark:text-white flex items-center gap-1.5">
+            <div className="font-extrabold text-sm text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 flex items-center gap-1.5 transition">
               <User className="w-4 h-4 text-emerald-500" />
               <span>{reservation.creatorName}</span>
             </div>
@@ -276,7 +350,7 @@ export const ReservationDrawer: React.FC<ReservationDrawerProps> = ({
           </div>
         </div>
 
-        {/* 3. Jugadores Confirmados (Grid con avatares, nivel y estado individual de pago) */}
+        {/* 3. Jugadores Confirmados (Grid con avatares clicables a ficha) */}
         <div className="space-y-2.5">
           <div className="flex items-center justify-between text-xs">
             <span className="font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400 text-[11px]">
@@ -291,15 +365,23 @@ export const ReservationDrawer: React.FC<ReservationDrawerProps> = ({
             {participants.map((p, idx) => (
               <div
                 key={idx}
-                className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 flex items-center justify-between gap-2 text-xs"
+                role="button"
+                tabIndex={0}
+                onClick={() => handlePlayerClick(p.name)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') handlePlayerClick(p.name);
+                }}
+                className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 hover:border-emerald-500/70 hover:bg-emerald-50/30 dark:hover:bg-slate-800 transition flex items-center justify-between gap-2 text-xs cursor-pointer group shadow-xs"
+                title={`Ver ficha completa de ${p.name}`}
               >
                 <div className="flex items-center gap-2.5 min-w-0">
-                  <div className="w-8 h-8 rounded-lg bg-emerald-600 text-white font-black text-xs flex items-center justify-center shrink-0">
+                  <div className="w-8 h-8 rounded-lg bg-emerald-600 text-white font-black text-xs flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform shadow-xs">
                     {p.name.slice(0, 2).toUpperCase()}
                   </div>
                   <div className="min-w-0">
-                    <div className="font-bold text-slate-900 dark:text-white truncate text-xs">
-                      {p.name}
+                    <div className="font-bold text-slate-900 dark:text-white truncate text-xs group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition flex items-center gap-1">
+                      <span>{p.name}</span>
+                      <span className="text-[10px] text-emerald-500 font-normal opacity-0 group-hover:opacity-100 transition-opacity">↗</span>
                     </div>
                     <div className="text-[10px] text-slate-500 dark:text-slate-400">
                       Nivel {p.level?.toFixed(2) || '4.00'} · {p.paymentMethod || 'TPV'}
@@ -400,6 +482,98 @@ export const ReservationDrawer: React.FC<ReservationDrawerProps> = ({
             <span>Cancelar</span>
           </button>
         </div>
+
+        {/* Modal de selección TPV (Pago Total vs Pago Individual de Jugador) */}
+        {tpvChoiceModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-sm animate-in fade-in duration-150">
+            <div className="relative w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl text-slate-900 dark:text-slate-100 space-y-4">
+              <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+                <div className="flex items-center gap-2">
+                  <CreditCard className="w-5 h-5 text-emerald-500" />
+                  <h3 className="text-base font-black text-slate-900 dark:text-white">
+                    Cobrar Reserva en TPV
+                  </h3>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setTpvChoiceModal(false)}
+                  className="p-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <p className="text-xs text-slate-600 dark:text-slate-400">
+                Selecciona si vas a cobrar la pista completa o únicamente la cuota individual del jugador que está en caja:
+              </p>
+
+              {/* Opción 1: Pago Total */}
+              <button
+                type="button"
+                onClick={chargeFullInTPV}
+                className="w-full p-3.5 rounded-2xl bg-emerald-50 dark:bg-emerald-950/50 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 border border-emerald-500/30 text-left transition flex items-center justify-between group"
+              >
+                <div>
+                  <div className="font-bold text-xs text-emerald-800 dark:text-emerald-300">
+                    Pago Total de la Pista (100%)
+                  </div>
+                  <div className="text-[11px] text-slate-500 dark:text-slate-400">
+                    Carga el importe íntegro de la pista en el ticket
+                  </div>
+                </div>
+                <div className="text-base font-black font-mono text-emerald-700 dark:text-emerald-400">
+                  {typeof reservation.totalPrice === 'number' ? `${reservation.totalPrice.toFixed(2)} €` : reservation.totalPrice}
+                </div>
+              </button>
+
+              {/* Opción 2: Pago Dividido por Jugador */}
+              <div className="space-y-2 pt-1">
+                <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                  O cobrar cuota individual (Pago dividido):
+                </div>
+
+                <div className="space-y-1.5 max-h-48 overflow-y-auto pr-1">
+                  {participants.map((p, idx) => (
+                    <button
+                      key={idx}
+                      type="button"
+                      onClick={() => chargeParticipantInTPV(p, idx)}
+                      className="w-full p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-700/80 border border-slate-200 dark:border-slate-700 text-left flex items-center justify-between transition text-xs"
+                    >
+                      <div className="flex items-center gap-2">
+                        <div className="w-6 h-6 rounded-md bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-[10px] flex items-center justify-center">
+                          {p.name.slice(0, 2).toUpperCase()}
+                        </div>
+                        <div>
+                          <div className="font-bold text-slate-900 dark:text-white">{p.name}</div>
+                          <div className="text-[10px] text-slate-500">
+                            {p.paid ? 'Ya pagado (re-imprimir)' : 'Pendiente de cobro en caja'}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="text-right">
+                        <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400">
+                          {(p.amount || 7.0).toFixed(2)} €
+                        </span>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="pt-2 flex justify-end">
+                <button
+                  type="button"
+                  onClick={() => setTpvChoiceModal(false)}
+                  className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs"
+                >
+                  Cancelar
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

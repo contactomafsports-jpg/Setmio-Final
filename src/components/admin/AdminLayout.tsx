@@ -27,6 +27,7 @@ import {
   Lock,
   Unlock,
   User,
+  Layers,
 } from 'lucide-react';
 import { AdminHeader } from './AdminHeader';
 import { PrivateMobileNav } from '../common/PrivateMobileNav';
@@ -73,13 +74,20 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   // 4 Main bottom tabs + Más
   const mainDesktopTabs: { id: AdminTab; label: string; icon: React.ReactNode }[] = [
     { id: 'dashboard', label: t('club.nav.dashboard', 'Inicio'), icon: <LayoutDashboard className="w-5 h-5" /> },
-    { id: 'agenda', label: t('club.nav.courts', 'Pistas & Reservas'), icon: <Calendar className="w-5 h-5" /> },
+    { id: 'agenda', label: t('club.nav.bookings', 'Reservas'), icon: <Calendar className="w-5 h-5" /> },
     { id: 'smart_courts', label: t('club.nav.iot', 'Domótica IoT'), icon: <Zap className="w-5 h-5" /> },
     { id: 'pos_cafe', label: t('club.nav.pos', 'TPV / Caja'), icon: <CreditCard className="w-5 h-5" /> },
   ];
 
   // Drawer / Sidebar modules
   const moreTabs: { id: AdminTab; label: string; icon: React.ReactNode; desc: string; badge?: string }[] = [
+    {
+      id: 'courts_management',
+      label: 'Gestión de Pistas',
+      icon: <Layers className="w-5 h-5 text-emerald-500" />,
+      desc: 'Altas, bajas, tarifas y domótica IoT',
+      badge: 'Nuevo',
+    },
     {
       id: 'customers',
       label: t('club.nav.customers', 'Socios / CRM'),

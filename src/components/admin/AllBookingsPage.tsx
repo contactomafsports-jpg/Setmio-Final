@@ -36,20 +36,21 @@ export const AllBookingsPage: React.FC<AllBookingsPageProps> = ({
   // Filter bookings
   const filteredBookings = useMemo(() => {
     return bookings.filter((b) => {
-      // Search by player name, court, or PIN
+      // Search by player name, court, PIN or date string
       const term = searchTerm.toLowerCase().trim();
       const matchesSearch =
         !term ||
         b.creatorName.toLowerCase().includes(term) ||
         b.courtName.toLowerCase().includes(term) ||
-        (b.accessPin && b.accessPin.toLowerCase().includes(term));
+        (b.accessPin && b.accessPin.toLowerCase().includes(term)) ||
+        b.startTime.toLowerCase().includes(term);
 
-      // Filter by status
+      // Filter by payment status
       let matchesStatus = true;
       if (statusFilter === 'confirmed') {
-        matchesStatus = b.status === 'confirmed' || b.status === 'completed';
+        matchesStatus = b.paymentStatus === 'paid' || (b.status === 'confirmed' && b.paymentStatus !== 'pending' && b.paymentStatus !== 'partially_paid');
       } else if (statusFilter === 'pending') {
-        matchesStatus = b.status === 'pending' || b.paymentStatus === 'pending' || b.paymentStatus === 'partially_paid';
+        matchesStatus = b.paymentStatus === 'pending' || b.paymentStatus === 'partially_paid' || b.status === 'pending';
       } else if (statusFilter === 'canceled') {
         matchesStatus = b.status === 'canceled';
       }
@@ -121,38 +122,38 @@ export const AllBookingsPage: React.FC<AllBookingsPageProps> = ({
 
   return (
     <div className="space-y-6 text-slate-900 dark:text-slate-100 max-w-7xl mx-auto">
-      {/* HEADER DE PÁGINA (ESTÁNDAR CANÓNICO) */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
+      {/* HEADER DE PÁGINA (ESTÁNDAR CANÓNICO SIMPLIFICADO) */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="min-w-0">
+          <div className="flex items-center gap-2">
             {onBackToQuadrant && (
               <button
                 type="button"
                 onClick={onBackToQuadrant}
-                className="p-1 rounded-lg text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition mr-1"
+                className="p-1.5 rounded-xl text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition mr-0.5"
                 title="Volver al cuadrante"
               >
                 <ArrowLeft className="w-4 h-4" />
               </button>
             )}
-            <h1 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">
+            <h1 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white tracking-tight truncate">
               Todas las Reservas
             </h1>
           </div>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-            Histórico completo, buscador en tiempo real y gestión operativa del club
+          <p className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 mt-0.5 truncate">
+            Histórico completo y gestión operativa del club
           </p>
         </div>
 
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-2 self-start sm:self-auto shrink-0">
           {onBackToQuadrant && (
             <button
               type="button"
               onClick={onBackToQuadrant}
-              className="px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold text-xs transition flex items-center gap-1.5"
+              className="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold text-xs transition flex items-center gap-1.5"
             >
               <Calendar className="w-3.5 h-3.5 text-slate-500" />
-              <span>Ver Cuadrante</span>
+              <span>Cuadrante</span>
             </button>
           )}
 
@@ -165,9 +166,8 @@ export const AllBookingsPage: React.FC<AllBookingsPageProps> = ({
                 triggerDemoToast('Nueva Reserva', 'Abriendo formulario de creación de reserva.', 'info');
               }
             }}
-            className="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs shadow-sm flex items-center gap-1.5 transition active:scale-95"
+            className="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-sm flex items-center gap-1.5 transition active:scale-95 cursor-pointer"
           >
-            <Plus className="w-4 h-4" />
             <span>Nueva Reserva</span>
           </button>
         </div>
@@ -175,8 +175,8 @@ export const AllBookingsPage: React.FC<AllBookingsPageProps> = ({
 
       {/* TARJETAS RESUMEN KPIS */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-        <div className="bg-white dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 rounded-2xl p-4 shadow-sm">
-          <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 block mb-1">
+        <div className="bg-white dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 rounded-2xl p-3.5 sm:p-4 shadow-sm">
+          <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 block mb-0.5">
             Total Registradas
           </span>
           <div className="text-xl sm:text-2xl font-black font-mono text-slate-900 dark:text-white">
@@ -184,8 +184,8 @@ export const AllBookingsPage: React.FC<AllBookingsPageProps> = ({
           </div>
         </div>
 
-        <div className="bg-white dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 rounded-2xl p-4 shadow-sm">
-          <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 block mb-1">
+        <div className="bg-white dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 rounded-2xl p-3.5 sm:p-4 shadow-sm">
+          <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 block mb-0.5">
             Confirmadas
           </span>
           <div className="text-xl sm:text-2xl font-black font-mono text-emerald-600 dark:text-emerald-400">
@@ -193,8 +193,8 @@ export const AllBookingsPage: React.FC<AllBookingsPageProps> = ({
           </div>
         </div>
 
-        <div className="bg-white dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 rounded-2xl p-4 shadow-sm">
-          <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 block mb-1">
+        <div className="bg-white dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 rounded-2xl p-3.5 sm:p-4 shadow-sm">
+          <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 block mb-0.5">
             Pendiente TPV
           </span>
           <div className="text-xl sm:text-2xl font-black font-mono text-amber-600 dark:text-amber-400">
@@ -202,8 +202,8 @@ export const AllBookingsPage: React.FC<AllBookingsPageProps> = ({
           </div>
         </div>
 
-        <div className="bg-white dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 rounded-2xl p-4 shadow-sm">
-          <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 block mb-1">
+        <div className="bg-white dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 rounded-2xl p-3.5 sm:p-4 shadow-sm">
+          <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 block mb-0.5">
             Facturación Total
           </span>
           <div className="text-xl sm:text-2xl font-black font-mono text-emerald-600 dark:text-emerald-400">
@@ -212,36 +212,37 @@ export const AllBookingsPage: React.FC<AllBookingsPageProps> = ({
         </div>
       </div>
 
-      {/* BÚSQUEDA Y FILTROS */}
-      <div className="bg-white dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 rounded-2xl p-4 shadow-sm space-y-3">
-        <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+      {/* CONTENEDOR UNIFICADO: BUSCADOR, FILTROS Y LISTA DE RESERVAS */}
+      <div className="bg-white dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 rounded-2xl p-4 sm:p-5 shadow-sm space-y-4">
+        {/* Fila de Filtros y Buscador */}
+        <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3">
           {/* Buscador en tiempo real por nombre de jugador, pista o PIN */}
-          <div className="relative flex-1">
+          <div className="relative flex-1 min-w-0">
             <Search className="absolute left-3 top-2.5 w-4 h-4 text-slate-400" />
             <input
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Buscar por titular, pista o PIN de acceso..."
-              className="w-full pl-9 pr-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-emerald-500 transition"
+              className="w-full pl-9 pr-8 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-emerald-500 transition"
             />
             {searchTerm && (
               <button
                 type="button"
                 onClick={() => setSearchTerm('')}
-                className="absolute right-2.5 top-2.5 text-xs text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                className="absolute right-2.5 top-2.5 text-xs text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
               >
-                Limpiar
+                ✕
               </button>
             )}
           </div>
 
-          {/* Selector de Pista */}
-          <div className="flex items-center gap-2">
+          {/* Selector de Pista y Selector de Fecha Móvil (Flex-wrap anti-overflow) */}
+          <div className="flex flex-wrap sm:flex-nowrap items-center gap-2">
             <select
               value={courtFilter}
               onChange={(e) => setCourtFilter(e.target.value)}
-              className="px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 transition font-medium"
+              className="flex-1 sm:flex-none px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 transition font-medium min-w-[130px]"
             >
               <option value="all">Todas las Pistas</option>
               {courts.map((court) => (
@@ -251,35 +252,37 @@ export const AllBookingsPage: React.FC<AllBookingsPageProps> = ({
               ))}
             </select>
 
-            {/* Selector de Fecha */}
-            <input
-              type="date"
-              value={dateFilter}
-              onChange={(e) => setDateFilter(e.target.value)}
-              className="px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 transition font-medium"
-              title="Filtrar por fecha específica"
-            />
-            {dateFilter && (
-              <button
-                type="button"
-                onClick={() => setDateFilter('')}
-                className="text-[11px] text-slate-500 hover:text-emerald-500 font-bold"
-              >
-                Todas
-              </button>
-            )}
+            {/* Selector de Fecha Responsivo Móvil */}
+            <div className="flex items-center gap-1 flex-1 sm:flex-none min-w-0">
+              <input
+                type="date"
+                value={dateFilter}
+                onChange={(e) => setDateFilter(e.target.value)}
+                className="w-full sm:w-auto px-2.5 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 transition font-medium max-w-[145px]"
+                title="Filtrar por fecha específica"
+              />
+              {dateFilter && (
+                <button
+                  type="button"
+                  onClick={() => setDateFilter('')}
+                  className="text-[11px] text-slate-500 hover:text-emerald-500 font-bold px-1.5 py-1 rounded cursor-pointer shrink-0"
+                >
+                  ✕
+                </button>
+              )}
+            </div>
           </div>
         </div>
 
         {/* Selectores de Estado: Confirmada, Pendiente TPV, Cancelada */}
-        <div className="flex items-center gap-1.5 pt-2 border-t border-slate-100 dark:border-slate-700/60 overflow-x-auto text-xs">
-          <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mr-1">
+        <div className="flex items-center gap-1.5 pt-2 border-t border-slate-100 dark:border-slate-700/60 overflow-x-auto text-xs no-scrollbar">
+          <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mr-1 shrink-0">
             Estado:
           </span>
           <button
             type="button"
             onClick={() => setStatusFilter('all')}
-            className={`px-3 py-1.5 rounded-xl font-bold transition text-xs ${
+            className={`px-3 py-1.5 rounded-xl font-bold transition text-xs shrink-0 cursor-pointer ${
               statusFilter === 'all'
                 ? 'bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 shadow-xs'
                 : 'bg-slate-100 dark:bg-slate-700/70 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
@@ -291,20 +294,20 @@ export const AllBookingsPage: React.FC<AllBookingsPageProps> = ({
           <button
             type="button"
             onClick={() => setStatusFilter('confirmed')}
-            className={`px-3 py-1.5 rounded-xl font-bold transition text-xs flex items-center gap-1.5 ${
+            className={`px-3 py-1.5 rounded-xl font-bold transition text-xs flex items-center gap-1.5 shrink-0 cursor-pointer ${
               statusFilter === 'confirmed'
                 ? 'bg-emerald-600 text-white shadow-xs'
                 : 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 border border-emerald-500/20'
             }`}
           >
             <CheckCircle2 className="w-3.5 h-3.5" />
-            <span>Confirmadas ({confirmedCount})</span>
+            <span>Pagadas / Confirmadas ({confirmedCount})</span>
           </button>
 
           <button
             type="button"
             onClick={() => setStatusFilter('pending')}
-            className={`px-3 py-1.5 rounded-xl font-bold transition text-xs flex items-center gap-1.5 ${
+            className={`px-3 py-1.5 rounded-xl font-bold transition text-xs flex items-center gap-1.5 shrink-0 cursor-pointer ${
               statusFilter === 'pending'
                 ? 'bg-amber-600 text-white shadow-xs'
                 : 'bg-amber-50 dark:bg-amber-950/50 text-amber-800 dark:text-amber-300 hover:bg-amber-100 dark:hover:bg-amber-900/60 border border-amber-500/20'
@@ -317,7 +320,7 @@ export const AllBookingsPage: React.FC<AllBookingsPageProps> = ({
           <button
             type="button"
             onClick={() => setStatusFilter('canceled')}
-            className={`px-3 py-1.5 rounded-xl font-bold transition text-xs flex items-center gap-1.5 ${
+            className={`px-3 py-1.5 rounded-xl font-bold transition text-xs flex items-center gap-1.5 shrink-0 cursor-pointer ${
               statusFilter === 'canceled'
                 ? 'bg-rose-600 text-white shadow-xs'
                 : 'bg-rose-50 dark:bg-rose-950/50 text-rose-700 dark:text-rose-300 hover:bg-rose-100 dark:hover:bg-rose-900/60 border border-rose-500/20'
@@ -327,44 +330,41 @@ export const AllBookingsPage: React.FC<AllBookingsPageProps> = ({
             <span>Canceladas ({bookings.filter((b) => b.status === 'canceled').length})</span>
           </button>
         </div>
-      </div>
 
-      {/* LISTADO COMPLETO DE RESERVAS */}
-      <section className="space-y-2.5">
-        <div className="flex items-center justify-between mb-2">
-          <h2 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-            Listado de Reservas ({filteredBookings.length})
-          </h2>
-          <span className="text-[11px] text-slate-400">
-            Haz clic en cualquier tarjeta para abrir el Drawer operativo
-          </span>
+        {/* LISTADO DE RESERVAS INTEGRADO EN EL MISMO CONTENEDOR */}
+        <div className="pt-2 border-t border-slate-100 dark:border-slate-700/60 space-y-2.5">
+          <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
+            <span className="font-bold uppercase tracking-wider text-[11px]">
+              {filteredBookings.length} {filteredBookings.length === 1 ? 'Reserva' : 'Reservas'} encontradas
+            </span>
+          </div>
+
+          {filteredBookings.length === 0 ? (
+            <div className="p-8 text-center text-slate-400 dark:text-slate-500 text-xs">
+              <Calendar className="w-10 h-10 text-slate-300 dark:text-slate-600 mx-auto mb-2" />
+              <h3 className="font-bold text-sm text-slate-900 dark:text-white">
+                No se encontraron reservas
+              </h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-sm mx-auto">
+                No hay reservas que coincidan con los criterios de búsqueda o filtros seleccionados.
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-2.5">
+              {filteredBookings.map((b) => {
+                const itemData = mapBookingToItemData(b);
+                return (
+                  <BookingListItem
+                    key={b.id}
+                    booking={itemData}
+                    onClick={() => handleOpenBookingDetail(b)}
+                  />
+                );
+              })}
+            </div>
+          )}
         </div>
-
-        {filteredBookings.length === 0 ? (
-          <div className="bg-white dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 rounded-2xl p-8 text-center shadow-sm">
-            <Calendar className="w-10 h-10 text-slate-300 dark:text-slate-600 mx-auto mb-2" />
-            <h3 className="font-bold text-sm text-slate-900 dark:text-white">
-              No se encontraron reservas
-            </h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-sm mx-auto">
-              No hay reservas que coincidan con los criterios de búsqueda o filtros seleccionados.
-            </p>
-          </div>
-        ) : (
-          <div className="space-y-2.5">
-            {filteredBookings.map((b) => {
-              const itemData = mapBookingToItemData(b);
-              return (
-                <BookingListItem
-                  key={b.id}
-                  booking={itemData}
-                  onClick={() => handleOpenBookingDetail(b)}
-                />
-              );
-            })}
-          </div>
-        )}
-      </section>
+      </div>
 
       {/* Bottom Sheet Drawer de Detalle Operativo */}
       <ReservationDrawer

@@ -168,49 +168,48 @@ export const AdminAgenda: React.FC = () => {
       {/* ======================================================================
           1. ENCABEZADO DE PÁGINA (ESTÁNDAR CANÓNICO)
           ====================================================================== */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">
+      <div className="flex items-center justify-between gap-2 sm:gap-4 flex-nowrap">
+        <div className="min-w-0">
+          <h1 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white tracking-tight truncate">
             Reservas y Disponibilidad
           </h1>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 mb-4">
+          <p className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 mt-0.5 truncate hidden sm:block">
             Cuadrante interactivo y gestión diaria del club
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
           {/* Controles de Fecha */}
-          <div className="flex items-center gap-1 bg-white dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 rounded-2xl p-1 text-xs shadow-sm">
+          <div className="flex items-center gap-0.5 sm:gap-1 bg-white dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 rounded-xl px-1 py-0.5 text-xs shadow-xs">
             <button
               type="button"
               onClick={() => setCurrentDate('2026-09-29')}
-              className="p-1.5 rounded-lg text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-700/60 transition"
+              className="p-1 rounded text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-700/60 transition"
               title="Día anterior"
             >
-              <ChevronLeft className="w-4 h-4" />
+              <ChevronLeft className="w-3.5 h-3.5" />
             </button>
             <input
               type="date"
               value={currentDate}
               onChange={(e) => setCurrentDate(e.target.value)}
-              className="bg-transparent text-slate-900 dark:text-white font-bold text-xs focus:outline-none px-2 cursor-pointer"
+              className="bg-transparent text-slate-900 dark:text-white font-bold text-xs focus:outline-none px-1 sm:px-1.5 cursor-pointer max-w-[110px] sm:max-w-none"
             />
             <button
               type="button"
               onClick={() => setCurrentDate('2026-10-01')}
-              className="p-1.5 rounded-lg text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-700/60 transition"
+              className="p-1 rounded text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-700/60 transition"
               title="Día siguiente"
             >
-              <ChevronRight className="w-4 h-4" />
+              <ChevronRight className="w-3.5 h-3.5" />
             </button>
           </div>
 
           <button
             type="button"
             onClick={() => setShowNewModal(true)}
-            className="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs shadow-sm flex items-center gap-1.5 transition active:scale-95"
+            className="px-3 sm:px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-xs transition active:scale-95 shrink-0 whitespace-nowrap cursor-pointer"
           >
-            <Plus className="w-4 h-4" />
             <span>Nueva Reserva</span>
           </button>
         </div>
@@ -316,24 +315,27 @@ export const AdminAgenda: React.FC = () => {
 
       {/* ======================================================================
           3. BLOQUE "RESERVAS DEL DÍA"
-          - Muestra el listado de reservas de la jornada actual usando BookingListItem.
-          - Coloca un botón principal destacado en la parte inferior:
-            "Ver Histórico Completo / Todas las Reservas →".
+          - Cabecera rediseñada: Título a la izquierda, Historial Completo a la derecha en la misma fila superior
           ====================================================================== */}
       <section className="bg-white dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 rounded-2xl p-4 sm:p-5 shadow-sm space-y-4">
-        <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-700/60 pb-3">
-          <div>
-            <h2 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-0.5">
-              RESERVAS DEL DÍA ({dayBookings.length})
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 dark:border-slate-700/60 pb-3">
+          <div className="flex items-center gap-2.5">
+            <h2 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white tracking-tight">
+              Reservas del Día
             </h2>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
-              Jornada del {currentDate} · Toca cualquier tarjeta para abrir el Drawer operativo
-            </p>
+            <span className="px-2.5 py-0.5 rounded-full text-xs font-bold font-mono bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20">
+              {dayBookings.length}
+            </span>
           </div>
 
-          <span className="text-[11px] px-2.5 py-1 rounded-full font-mono font-bold bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20">
-            {dayBookings.length} en este día
-          </span>
+          <button
+            type="button"
+            onClick={() => setShowAllBookingsView(true)}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-700/80 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 hover:text-emerald-600 dark:hover:text-emerald-400 font-bold text-xs transition border border-slate-200/80 dark:border-slate-600/60 shadow-xs cursor-pointer active:scale-95 shrink-0 self-start sm:self-auto"
+          >
+            <span>Historial Completo / Todas las Reservas</span>
+            <ArrowRight className="w-3.5 h-3.5 text-emerald-500" />
+          </button>
         </div>
 
         {/* Listado con el componente unificado BookingListItem */}
@@ -356,18 +358,6 @@ export const AdminAgenda: React.FC = () => {
             })}
           </div>
         )}
-
-        {/* BOTÓN PRINCIPAL DESTACADO EN LA PARTE INFERIOR */}
-        <div className="pt-2">
-          <button
-            type="button"
-            onClick={() => setShowAllBookingsView(true)}
-            className="w-full py-3 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-700/70 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 hover:text-emerald-600 dark:hover:text-emerald-400 font-bold text-xs transition flex items-center justify-center gap-2 border border-slate-200 dark:border-slate-600/60 shadow-xs cursor-pointer active:scale-98"
-          >
-            <span>Ver Histórico Completo / Todas las Reservas</span>
-            <ArrowRight className="w-4 h-4 text-emerald-500" />
-          </button>
-        </div>
       </section>
 
       {/* DRAWER OPERATIVO DE DETALLE DE RESERVA */}

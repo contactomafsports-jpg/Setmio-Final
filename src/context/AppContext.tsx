@@ -127,6 +127,7 @@ const routeForPage: Record<PublicPage, string> = {
 const routeForAdminTab: Record<AdminTab, string> = {
   dashboard: '/gestion',
   agenda: '/gestion/reservas',
+  courts_management: '/gestion/pistas',
   all_bookings: '/gestion/todas-las-reservas',
   bookings: '/gestion/todas-las-reservas',
   customers: '/gestion/clientes',
@@ -264,6 +265,7 @@ const readRoute = () => {
 export type AdminTab =
   | 'dashboard'
   | 'agenda'
+  | 'courts_management'
   | 'all_bookings'
   | 'bookings'
   | 'customers'
@@ -296,6 +298,17 @@ export interface UserSession {
   role: UserRole;
   avatarUrl: string;
   playLevel: number;
+}
+
+export interface PosPendingCharge {
+  id: string;
+  concept: string;
+  amount: number;
+  reservationId?: string;
+  participantIndex?: number;
+  playerName?: string;
+  courtName?: string;
+  type: 'reservation_full' | 'reservation_split' | 'wallet_topup';
 }
 
 export interface DemoNotificationToast {
@@ -373,6 +386,9 @@ interface AppContextType {
   exitWhiteLabelPlayerPreview: () => void;
 
   courts: Court[];
+  addCourt: (courtData: Omit<Court, 'id' | 'tenantId'>) => Court;
+  updateCourt: (courtId: string, updates: Partial<Court>) => void;
+  deleteCourt: (courtId: string) => void;
   toggleCourtLight: (courtId: string) => void;
   openCourtDoor: (courtId: string) => void;
   toggleDeviceOnline: (courtId: string) => void;
@@ -382,6 +398,9 @@ interface AppContextType {
   createBooking: (newBooking: Omit<Booking, 'id' | 'tenantId'>) => Booking;
   updateBooking: (bookingId: string, updates: Partial<Booking>) => void;
   cancelBooking: (bookingId: string) => void;
+  markBookingPaid: (bookingId: string, participantName?: string) => void;
+  posPendingCharge: PosPendingCharge | null;
+  setPosPendingCharge: (charge: PosPendingCharge | null) => void;
 
   openMatches: OpenMatch[];
   createOpenMatch: (match: Omit<OpenMatch, 'id' | 'tenantId'>) => void;
@@ -417,6 +436,9 @@ interface AppContextType {
   generateAccessPin: (deviceId: string) => string;
 
   cafeProducts: CafeProduct[];
+  addCafeProduct: (product: Omit<CafeProduct, 'id'>) => void;
+  updateCafeProduct: (id: string, updates: Partial<CafeProduct>) => void;
+  deleteCafeProduct: (id: string) => void;
   recordCafeSale: (product: CafeProduct, qty: number) => void;
 
   auditLogs: AuditLogItem[];
@@ -1017,6 +1039,37 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   // Court Actions
+  const addCourt = (courtData: Omit<Court, 'id' | 'tenantId'>): Court => {
+    const newCourt: Court = {
+      ...courtData,
+      id: `court-${Date.now()}`,
+      tenantId: currentTenant.id,
+      accessPin: courtData.accessPin || `${Math.floor(1000 + Math.random() * 9000)}#`,
+    };
+    setCourts((prev) => {
+      const updated = [...prev, newCourt];
+      saveDemoState('setmio_demo_courts_v1', updated);
+      return updated;
+    });
+    return newCourt;
+  };
+
+  const updateCourt = (courtId: string, updates: Partial<Court>) => {
+    setCourts((prev) => {
+      const updated = prev.map((c) => (c.id === courtId ? { ...c, ...updates } : c));
+      saveDemoState('setmio_demo_courts_v1', updated);
+      return updated;
+    });
+  };
+
+  const deleteCourt = (courtId: string) => {
+    setCourts((prev) => {
+      const updated = prev.filter((c) => c.id !== courtId);
+      saveDemoState('setmio_demo_courts_v1', updated);
+      return updated;
+    });
+  };
+
   const toggleCourtLight = (courtId: string) => {
     const perm = can('manage_smart_courts');
     if (!perm.allowed) {
@@ -1168,15 +1221,43 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const cancelBooking = (bookingId: string) => {
-  setBookings((prev) =>
-  prev.map((b) => (b.id === bookingId ? { ...b, status: 'canceled' } : b))
-  );
+    setBookings((prev) =>
+      prev.map((b) => (b.id === bookingId ? { ...b, status: 'canceled' } : b))
+    );
     triggerDemoToast(
       'Reserva Cancelada',
       'La reserva ha sido cancelada y la pista queda liberada en la agenda del club.',
       'info'
     );
   };
+
+  const markBookingPaid = (bookingId: string, participantName?: string) => {
+    setBookings((prev) => {
+      const updated = prev.map((b) => {
+        if (b.id !== bookingId) return b;
+        if (!participantName) {
+          return {
+            ...b,
+            paymentStatus: 'paid' as const,
+            participants: b.participants?.map((p) => ({ ...p, paid: true })),
+          };
+        }
+        const updatedParticipants = b.participants?.map((p) =>
+          p.name === participantName ? { ...p, paid: true } : p
+        );
+        const allPaid = updatedParticipants?.every((p) => p.paid);
+        return {
+          ...b,
+          paymentStatus: allPaid ? ('paid' as const) : ('partially_paid' as const),
+          participants: updatedParticipants,
+        };
+      });
+      saveDemoState('setmio_demo_bookings_v1', updated);
+      return updated;
+    });
+  };
+
+  const [posPendingCharge, setPosPendingCharge] = useState<PosPendingCharge | null>(null);
 
   // Open Matches
   const createOpenMatch = (matchData: Omit<OpenMatch, 'id' | 'tenantId'>) => {
@@ -1484,15 +1565,21 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         exitWhiteLabelPlayerPreview,
 
         courts,
+        addCourt,
+        updateCourt,
+        deleteCourt,
         toggleCourtLight,
         openCourtDoor,
         toggleDeviceOnline,
         updateCourtRate,
 
-  bookings,
-  createBooking,
-  updateBooking,
-  cancelBooking,
+        bookings,
+        createBooking,
+        updateBooking,
+        cancelBooking,
+        markBookingPaid,
+        posPendingCharge,
+        setPosPendingCharge,
 
         openMatches,
         createOpenMatch,

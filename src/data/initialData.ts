@@ -968,14 +968,14 @@ export const INITIAL_SMART_DEVICES: SmartCourtDevice[] = [
 ];
 
 export const INITIAL_CAFE_PRODUCTS: CafeProduct[] = [
-  { id: 'c-1', tenantId: 'tenant-san-mateo-01', name: 'Agua Mineral 50cl', category: 'Bebidas', price: 1.2, stock: 120 },
-  { id: 'c-2', tenantId: 'tenant-san-mateo-01', name: 'Powerade Azul / Naranja 50cl', category: 'Bebidas', price: 2.2, stock: 45 },
-  { id: 'c-3', tenantId: 'tenant-san-mateo-01', name: 'Cerveza Estrella Galicia Especial / 0,0', category: 'Bebidas', price: 2.0, stock: 80 },
-  { id: 'c-4', tenantId: 'tenant-san-mateo-01', name: 'Café Espresso 100% Arábica', category: 'Café', price: 1.3, stock: 200 },
-  { id: 'c-5', tenantId: 'tenant-san-mateo-01', name: 'Bocadillo Jamón Ibérico en Pan Rústico', category: 'Bocadillos', price: 4.5, stock: 20 },
-  { id: 'c-6', tenantId: 'tenant-san-mateo-01', name: 'Barrita Proteica 20g Chocolate', category: 'Snacks', price: 2.5, stock: 35 },
-  { id: 'c-7', tenantId: 'tenant-san-mateo-01', name: 'Bote Bolas Head Padel Pro S', category: 'Grip/Pelotas', price: 6.5, stock: 24 },
-  { id: 'c-8', tenantId: 'tenant-san-mateo-01', name: 'Overgrip Individual Wilson Pro Blanco', category: 'Grip/Pelotas', price: 2.0, stock: 50 },
+  { id: 'c-1', tenantId: 'tenant-san-mateo-01', name: 'Agua Mineral 50cl', category: 'Bebidas', price: 1.2, stock: 120, imageUrl: 'https://images.unsplash.com/photo-1548839140-29a749e1bc4e?auto=format&fit=crop&w=400&q=80' },
+  { id: 'c-2', tenantId: 'tenant-san-mateo-01', name: 'Powerade Azul / Naranja 50cl', category: 'Bebidas', price: 2.2, stock: 45, imageUrl: 'https://images.unsplash.com/photo-1551024709-8f23befc6f87?auto=format&fit=crop&w=400&q=80' },
+  { id: 'c-3', tenantId: 'tenant-san-mateo-01', name: 'Cerveza Estrella Galicia Especial / 0,0', category: 'Bebidas', price: 2.0, stock: 80, imageUrl: 'https://images.unsplash.com/photo-1608270546103-979c3d4e0e5a?auto=format&fit=crop&w=400&q=80' },
+  { id: 'c-4', tenantId: 'tenant-san-mateo-01', name: 'Café Espresso 100% Arábica', category: 'Café', price: 1.3, stock: 200, imageUrl: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=400&q=80' },
+  { id: 'c-5', tenantId: 'tenant-san-mateo-01', name: 'Bocadillo Jamón Ibérico en Pan Rústico', category: 'Bocadillos', price: 4.5, stock: 20, imageUrl: 'https://images.unsplash.com/photo-1509722747041-616f39b57569?auto=format&fit=crop&w=400&q=80' },
+  { id: 'c-6', tenantId: 'tenant-san-mateo-01', name: 'Barrita Proteica 20g Chocolate', category: 'Snacks', price: 2.5, stock: 35, imageUrl: 'https://images.unsplash.com/photo-1622484216805-4c0734cba8f0?auto=format&fit=crop&w=400&q=80' },
+  { id: 'c-7', tenantId: 'tenant-san-mateo-01', name: 'Bote Bolas Head Padel Pro S', category: 'Grip/Pelotas', price: 6.5, stock: 24, imageUrl: 'https://images.unsplash.com/photo-1554068865-24cecd4e34b8?auto=format&fit=crop&w=400&q=80' },
+  { id: 'c-8', tenantId: 'tenant-san-mateo-01', name: 'Overgrip Individual Wilson Pro Blanco', category: 'Grip/Pelotas', price: 2.0, stock: 50, imageUrl: 'https://images.unsplash.com/photo-1622163642998-1ea32b0bbc67?auto=format&fit=crop&w=400&q=80' },
 ];
 
 export const INITIAL_AUDIT_LOGS: AuditLogItem[] = [
