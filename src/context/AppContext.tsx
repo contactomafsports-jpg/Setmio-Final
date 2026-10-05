@@ -1390,6 +1390,39 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   // POS Cafetería
+  const addCafeProduct = (product: Omit<CafeProduct, 'id'>) => {
+    const newProd: CafeProduct = {
+      ...product,
+      id: `cafe-prod-${Date.now()}`,
+    };
+    setCafeProducts((prev) => [...prev, newProd]);
+    triggerDemoToast(
+      'Producto Añadido',
+      `"${newProd.name}" ha sido añadido al catálogo de cafetería.`,
+      'success'
+    );
+  };
+
+  const updateCafeProduct = (id: string, updates: Partial<CafeProduct>) => {
+    setCafeProducts((prev) =>
+      prev.map((p) => (p.id === id ? { ...p, ...updates } : p))
+    );
+    triggerDemoToast(
+      'Producto Actualizado',
+      'El producto del TPV ha sido actualizado correctamente.',
+      'info'
+    );
+  };
+
+  const deleteCafeProduct = (id: string) => {
+    setCafeProducts((prev) => prev.filter((p) => p.id !== id));
+    triggerDemoToast(
+      'Producto Eliminado',
+      'El producto ha sido retirado del TPV de cafetería.',
+      'info'
+    );
+  };
+
   const recordCafeSale = (product: CafeProduct, qty: number) => {
     setCafeProducts((prev) =>
       prev.map((p) =>
@@ -1615,6 +1648,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         generateAccessPin,
 
         cafeProducts,
+        addCafeProduct,
+        updateCafeProduct,
+        deleteCafeProduct,
         recordCafeSale,
 
         auditLogs,

@@ -21,6 +21,8 @@ import {
   X,
   Sliders,
   Check,
+  Upload,
+  Image as ImageIcon,
 } from 'lucide-react';
 
 export const AdminCourtsManagement: React.FC = () => {
@@ -229,9 +231,9 @@ export const AdminCourtsManagement: React.FC = () => {
 
         <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-1">
           <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Control Accesos</span>
-          <div className="text-2xl font-black text-emerald-500 font-mono flex items-center gap-2">
+          <div className="text-base sm:text-lg font-black text-emerald-500 font-mono flex items-center gap-1.5 pt-0.5">
             <span>PIN Online</span>
-            <ShieldCheck className="w-5 h-5 text-emerald-500" />
+            <ShieldCheck className="w-4 h-4 text-emerald-500 shrink-0" />
           </div>
           <span className="text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold">Tornos Sincronizados</span>
         </div>
@@ -471,16 +473,76 @@ export const AdminCourtsManagement: React.FC = () => {
               </div>
 
               <div>
-                <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
-                  URL Fotografía Oficial
+                <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                  Fotografía de la Pista (Subida de Imagen o Archivo)
                 </label>
-                <input
-                  type="url"
-                  value={formData.photoUrl}
-                  onChange={(e) => setFormData({ ...formData, photoUrl: e.target.value })}
-                  placeholder="https://..."
-                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
-                />
+                
+                {formData.photoUrl ? (
+                  <div className="relative rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-950 mb-2">
+                    <img
+                      src={formData.photoUrl}
+                      alt="Vista previa de pista"
+                      className="w-full h-36 object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent flex items-end justify-between p-3">
+                      <span className="text-[11px] text-white font-medium truncate">
+                        Imagen seleccionada
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setFormData({ ...formData, photoUrl: '' })}
+                        className="px-2 py-1 rounded-lg bg-rose-600/90 text-white font-bold text-[10px] hover:bg-rose-500 transition cursor-pointer"
+                      >
+                        Cambiar / Quitar
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <label
+                    onDragOver={(e) => e.preventDefault()}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      const file = e.dataTransfer.files?.[0];
+                      if (file && file.type.startsWith('image/')) {
+                        const reader = new FileReader();
+                        reader.onload = (event) => {
+                          if (event.target?.result) {
+                            setFormData({ ...formData, photoUrl: String(event.target.result) });
+                          }
+                        };
+                        reader.readAsDataURL(file);
+                      }
+                    }}
+                    className="flex flex-col items-center justify-center p-5 border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-emerald-500 rounded-2xl cursor-pointer bg-slate-50 dark:bg-slate-950/60 hover:bg-emerald-50/20 transition group text-center"
+                  >
+                    <div className="p-3 rounded-2xl bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 group-hover:text-emerald-500 group-hover:scale-105 transition shadow-xs mb-2">
+                      <Upload className="w-5 h-5" />
+                    </div>
+                    <span className="text-xs font-bold text-slate-800 dark:text-slate-200 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition">
+                      Arrastra y suelta aquí la foto o pulsa para examinar
+                    </span>
+                    <span className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">
+                      Selector directo de archivo de imagen (PNG, JPG, WebP)
+                    </span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          const reader = new FileReader();
+                          reader.onload = (event) => {
+                            if (event.target?.result) {
+                              setFormData({ ...formData, photoUrl: String(event.target.result) });
+                            }
+                          };
+                          reader.readAsDataURL(file);
+                        }
+                      }}
+                    />
+                  </label>
+                )}
               </div>
 
               {/* Checkboxes de características */}

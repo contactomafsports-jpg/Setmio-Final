@@ -19,7 +19,6 @@ const menuItems = [
   [CreditCard, 'nav.pricing', 'Precios', '/precios'],
   [BookOpen, 'nav.blog', 'Blog', '/blog'],
   [Mail, 'nav.contact', 'Contacto', '/contacto'],
-  [Lock, 'nav.login', 'Acceso Club / Login', null],
 ] as const;
 
 export function CorporateHeader({ onOpenDemo, onOpenAuth, onOpenRegister }: CorporateHeaderProps) {
@@ -65,7 +64,7 @@ export function CorporateHeader({ onOpenDemo, onOpenAuth, onOpenRegister }: Corp
           <a href="/contacto" onClick={(event) => navigate(event, '/contacto')} className="text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">{t('nav.contact', 'Contacto')}</a>
           <button type="button" onClick={onOpenAuth} className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 dark:border-slate-700 px-3 py-1.5 text-slate-700 dark:text-slate-200 hover:border-emerald-500 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
             <Lock className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-            <span>Acceso Club / Login</span>
+            <span>{t('nav.login', 'Acceso Clientes / Login')}</span>
           </button>
         </nav>
       </div>
@@ -76,14 +75,6 @@ export function CorporateHeader({ onOpenDemo, onOpenAuth, onOpenRegister }: Corp
               if (key === 'nav.demo') {
                 return (
                   <button key={key} type="button" onClick={() => { close(); onOpenDemo?.(); }} className="flex items-center justify-between rounded-xl p-3 text-left text-slate-800 dark:text-slate-200 hover:bg-emerald-50 dark:hover:bg-slate-900">
-                    <span className="flex items-center gap-3"><Icon className="h-4 w-4 text-emerald-600" />{t(key, label)}</span>
-                    <ArrowRight className="h-4 w-4 text-slate-400" />
-                  </button>
-                );
-              }
-              if (key === 'nav.login') {
-                return (
-                  <button key={key} type="button" onClick={() => { close(); onOpenAuth?.(); }} className="flex items-center justify-between rounded-xl p-3 text-left text-slate-800 dark:text-slate-200 hover:bg-emerald-50 dark:hover:bg-slate-900">
                     <span className="flex items-center gap-3"><Icon className="h-4 w-4 text-emerald-600" />{t(key, label)}</span>
                     <ArrowRight className="h-4 w-4 text-slate-400" />
                   </button>
@@ -100,7 +91,7 @@ export function CorporateHeader({ onOpenDemo, onOpenAuth, onOpenRegister }: Corp
           <div className="mt-4 grid gap-2 border-t border-slate-200 pt-4 dark:border-slate-800">
             <button type="button" onClick={() => setLanguageMenuOpen((value) => !value)} className="flex items-center justify-between rounded-xl p-3 text-left text-sm font-bold text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-900" aria-expanded={languageMenuOpen}><span className="flex items-center gap-3"><Globe className="h-4 w-4 text-emerald-600" /><OfficialFlag code={language} /> {t('nav.language', 'Idioma')}: {SUPPORTED_LANGUAGES.find((item) => item.code === language)?.name ?? t('language.es', 'Español')}</span><span>⌄</span></button>{languageMenuOpen && <div className="grid grid-cols-2 gap-2 rounded-xl bg-slate-50 p-2 dark:bg-slate-900">{SUPPORTED_LANGUAGES.map((item) => <button type="button" key={item.code} onClick={() => { setLanguage(item.code); setLanguageMenuOpen(false); }} className={`rounded-lg px-2 py-2 text-left text-xs font-bold hover:bg-emerald-100 dark:hover:bg-slate-800 ${language === item.code ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300' : 'text-slate-800 dark:text-slate-200'}`}><OfficialFlag code={item.code} /> <span className="ml-1">{item.name}</span></button>)}</div>}
             <button type="button" onClick={handleRegisterClick} className="rounded-xl bg-emerald-600 px-4 py-3 text-sm font-black text-white">{t('nav.register', 'Registrarse')} <ArrowRight className="ml-1 inline h-4 w-4" /></button>
-            <button type="button" onClick={() => { close(); onOpenAuth?.(); }} className="rounded-xl border border-slate-300 px-4 py-3 text-sm font-bold text-slate-800 dark:text-slate-200 dark:border-slate-700"><Lock className="mr-2 inline h-4 w-4 text-emerald-600" />{t('nav.login', 'Acceso Club / Login')}</button>
+            <button type="button" onClick={() => { close(); onOpenAuth?.(); }} className="rounded-xl border border-slate-300 px-4 py-3 text-sm font-bold text-slate-800 dark:text-slate-200 dark:border-slate-700 hover:border-emerald-500 hover:text-emerald-600 transition"><Lock className="mr-2 inline h-4 w-4 text-emerald-600" />{t('nav.login', 'Acceso Clientes / Login')}</button>
           </div>
         </nav>
       </div>}

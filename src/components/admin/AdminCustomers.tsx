@@ -146,6 +146,28 @@ export const AdminCustomers: React.FC = () => {
   const [selectedCustomer, setSelectedCustomer] = useState<CustomerItem | null>(null);
   const [publicProfileModalCustomer, setPublicProfileModalCustomer] = useState<CustomerItem | null>(null);
 
+  React.useEffect(() => {
+    const handleUrlPlayer = () => {
+      const pathname = typeof window !== 'undefined' ? window.location.pathname : '';
+      if (pathname.startsWith('/jugadores/')) {
+        const slug = pathname.replace('/jugadores/', '').toLowerCase();
+        const found = customerList.find(
+          (c) =>
+            c.name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-') === slug ||
+            c.id.toLowerCase() === slug ||
+            c.name.toLowerCase().includes(slug.replace(/-/g, ' '))
+        );
+        if (found) {
+          setSelectedCustomer(found);
+        }
+      }
+    };
+
+    handleUrlPlayer();
+    window.addEventListener('popstate', handleUrlPlayer);
+    return () => window.removeEventListener('popstate', handleUrlPlayer);
+  }, [customerList]);
+
   // New Player Registration Modal State (Bug Fix Requerimiento 7)
   const [isNewPlayerModalOpen, setIsNewPlayerModalOpen] = useState(false);
   const [newPlayerForm, setNewPlayerForm] = useState({

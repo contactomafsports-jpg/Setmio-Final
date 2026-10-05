@@ -15,11 +15,26 @@ import {
   Laptop,
   Layers,
   ArrowRight,
+  Sparkles,
+  Bot,
+  Key,
+  Globe,
+  Share2,
+  Instagram,
+  Facebook,
+  Eye,
+  EyeOff,
+  Check,
+  Send,
+  Sliders,
 } from 'lucide-react';
 
 export const AdminSettings: React.FC = () => {
-  const { currentTenant, updateCurrentTenant, triggerDemoToast, theme, setTheme, setAdminTab, courts } = useApp();
+  const { currentTenant, updateCurrentTenant, triggerDemoToast, theme, setTheme, setAdminTab, courts, language } = useApp();
 
+  const [activeSection, setActiveSection] = useState<'general' | 'ai'>('general');
+
+  // General Settings State
   const [whatsappEnabled, setWhatsappEnabled] = useState(currentTenant.settings.whatsappWidgetEnabled);
   const [whatsappNumber, setWhatsappNumber] = useState(currentTenant.whatsappNumber);
   const [whatsappGreeting, setWhatsappGreeting] = useState(currentTenant.settings.whatsappGreetingMessage);
@@ -35,7 +50,62 @@ export const AdminSettings: React.FC = () => {
   const [contactPhone, setContactPhone] = useState(currentTenant.contactPhone);
   const [address, setAddress] = useState(currentTenant.address);
 
-  const handleSave = (e: React.FormEvent) => {
+  // =========================================================================
+  // REQUERIMIENTO 7: CONFIGURACIÓN DE IA & AGENTES MULTICANAL
+  // =========================================================================
+  // 1. BYOK - Credenciales del Cliente
+  const [aiProvider, setAiProvider] = useState<'gemini' | 'openai' | 'claude'>('gemini');
+  const [aiApiKey, setAiApiKey] = useState('AIzaSyD-SetmioClubPro_Demo_Key_2026');
+  const [aiModel, setAiModel] = useState('gemini-2.5-flash');
+  const [showApiKey, setShowApiKey] = useState(false);
+
+  // 2. Canales de Activación
+  const [channelWeb, setChannelWeb] = useState(true);
+  const [channelWhatsApp, setChannelWhatsApp] = useState(true);
+  const [channelInstagram, setChannelInstagram] = useState(false);
+  const [channelFacebook, setChannelFacebook] = useState(false);
+
+  // 3. Personalización del Agente
+  const [aiTone, setAiTone] = useState<'profesional' | 'cercano' | 'deportivo' | 'formal'>('deportivo');
+  const [aiWelcomeMessage, setAiWelcomeMessage] = useState(
+    `¡Hola! Soy el asistente inteligente de ${currentTenant.name}. Puedo informarte de disponibilidad de pistas, tarifas, horarios de la escuela o ayudarte a reservar. ¿En qué te asesoro hoy?`
+  );
+  const [aiSystemPrompt, setAiSystemPrompt] = useState(
+    `Actúa como el agente oficial y recepcionista deportivo de ${currentTenant.name}. Eres experto en pádel, normas de reserva, niveles de juego y resolución de dudas de socios. Siempre sé cordial, preciso y orienta al usuario hacia la reserva de pista o inscripción en torneos.`
+  );
+  const [aiMultiLanguage, setAiMultiLanguage] = useState(true);
+
+  // Live Playground State
+  const [testInput, setTestInput] = useState('');
+  const [testResponses, setTestResponses] = useState<{ sender: 'user' | 'ai'; text: string }[]>([
+    {
+      sender: 'ai',
+      text: `¡Hola! Asistente activo con modelo ${aiModel} (${aiProvider.toUpperCase()}). ¿Qué duda quieres simular?`,
+    },
+  ]);
+
+  const handleTestSend = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!testInput.trim()) return;
+
+    const query = testInput;
+    setTestResponses((prev) => [...prev, { sender: 'user', text: query }]);
+    setTestInput('');
+
+    setTimeout(() => {
+      let reply = '';
+      if (query.toLowerCase().includes('precio') || query.toLowerCase().includes('tarifa') || query.toLowerCase().includes('pista')) {
+        reply = `En ${currentTenant.name} disponemos de pistas cubiertas de cristal WPT desde 18€/h hasta 30€/h según hora punta. ¿Quieres ver disponibilidad para hoy?`;
+      } else if (query.toLowerCase().includes('clase') || query.toLowerCase().includes('escuela')) {
+        reply = `Nuestra escuela cuenta con grupos de iniciación, perfeccionamiento y competición infantil dirigidos por entrenadores titulados FEP desde 55€/mes.`;
+      } else {
+        reply = `Como asistente con tono ${aiTone} de ${currentTenant.name}, he procesado tu consulta "${query}". Todo está perfectamente configurado con tu clave BYOK (${aiProvider}).`;
+      }
+      setTestResponses((prev) => [...prev, { sender: 'ai', text: reply }]);
+    }, 400);
+  };
+
+  const handleSaveGeneral = (e: React.FormEvent) => {
     e.preventDefault();
     updateCurrentTenant({
       contactEmail,
@@ -55,354 +125,650 @@ export const AdminSettings: React.FC = () => {
 
     triggerDemoToast(
       'Configuración del Club Guardada',
-      'Las políticas de reserva, contacto y botón de WhatsApp se han actualizado.',
+      'Las políticas de reserva, contacto y opciones de visualización se han actualizado.',
+      'success'
+    );
+  };
+
+  const handleSaveAIConfig = (e: React.FormEvent) => {
+    e.preventDefault();
+    triggerDemoToast(
+      'Configuración de IA Guardada',
+      `Clave BYOK (${aiProvider}), canales de activación y tono (${aiTone}) sincronizados con el bot multicanal.`,
       'success'
     );
   };
 
   return (
-    <div className="space-y-8 text-slate-900 dark:text-slate-100 max-w-5xl transition-colors duration-200">
+    <div className="space-y-6 text-slate-900 dark:text-slate-100 max-w-5xl transition-colors duration-200 pb-16">
+      {/* Encabezado */}
       <div>
         <div className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
           Ajustes del Sistema
         </div>
         <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight mt-1">
-          Configuración General de {currentTenant.shortName}
+          Configuración de {currentTenant.shortName}
         </h1>
-        <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 mt-1 max-w-xl">
-          Administra las reglas de negocio de pistas, modo visual (claro/oscuro), datos de contacto oficiales, pasarelas de cobro y widget flotante de WhatsApp.
+        <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 mt-1 max-w-2xl">
+          Administra las reglas de negocio de pistas, modo visual, datos de contacto, pasarelas de pago y configuración del Agente de IA Multicanal.
         </p>
       </div>
 
-      <form onSubmit={handleSave} className="space-y-6 text-xs">
-        {/* Appearance & Theme Setting */}
-        <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-4 shadow-sm">
-          <div className="flex items-center justify-between">
+      {/* Selector de Pestañas: General vs Configuración de IA */}
+      <div className="flex items-center gap-2 border-b border-slate-200 dark:border-slate-800 pb-3">
+        <button
+          type="button"
+          onClick={() => setActiveSection('general')}
+          className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 cursor-pointer ${
+            activeSection === 'general'
+              ? 'bg-emerald-600 text-white shadow-xs'
+              : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800 hover:border-slate-300'
+          }`}
+        >
+          <Settings className="w-4 h-4" />
+          <span>Configuración General</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveSection('ai')}
+          className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 cursor-pointer ${
+            activeSection === 'ai'
+              ? 'bg-emerald-600 text-white shadow-xs'
+              : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800 hover:border-slate-300'
+          }`}
+        >
+          <Sparkles className="w-4 h-4 text-amber-400" />
+          <span>Configuración de IA & Agentes Multicanal</span>
+          <span className="px-1.5 py-0.2 rounded bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 font-mono text-[9px] font-black">
+            NUEVO
+          </span>
+        </button>
+      </div>
+
+      {/* ======================================================================
+          PESTAÑA 1: CONFIGURACIÓN GENERAL (REGLAS, APARIENCIA, PASARELAS)
+          ====================================================================== */}
+      {activeSection === 'general' && (
+        <form onSubmit={handleSaveGeneral} className="space-y-6 text-xs">
+          {/* Appearance & Theme Setting */}
+          <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-4 shadow-sm">
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <Sun className="w-4 h-4 text-amber-500" />
+                <span>Modo Visual & Apariencia</span>
+              </h3>
+              <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold bg-emerald-50 dark:bg-emerald-950 px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800">
+                Selección de Tema
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+              <button
+                type="button"
+                onClick={() => setTheme('light')}
+                className={`p-4 rounded-2xl border text-left flex items-center gap-3 transition cursor-pointer ${
+                  theme === 'light'
+                    ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-500 shadow-sm'
+                    : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 hover:border-slate-300'
+                }`}
+              >
+                <div className="w-8 h-8 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center shrink-0">
+                  <Sun className="w-4 h-4" />
+                </div>
+                <div>
+                  <div className="font-bold text-slate-900 dark:text-white">Modo Claro</div>
+                  <div className="text-[10px] text-slate-500">Recepción / Luz día</div>
+                </div>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setTheme('dark')}
+                className={`p-4 rounded-2xl border text-left flex items-center gap-3 transition cursor-pointer ${
+                  theme === 'dark'
+                    ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-500 shadow-sm'
+                    : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 hover:border-slate-300'
+                }`}
+              >
+                <div className="w-8 h-8 rounded-xl bg-slate-800 text-cyan-300 flex items-center justify-center shrink-0">
+                  <Moon className="w-4 h-4" />
+                </div>
+                <div>
+                  <div className="font-bold text-slate-900 dark:text-white">Modo Oscuro</div>
+                  <div className="text-[10px] text-slate-500">Canónico Slate-900</div>
+                </div>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setTheme('system')}
+                className={`p-4 rounded-2xl border text-left flex items-center gap-3 transition cursor-pointer ${
+                  theme === 'system'
+                    ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-500 shadow-sm'
+                    : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 hover:border-slate-300'
+                }`}
+              >
+                <div className="w-8 h-8 rounded-xl bg-teal-100 text-teal-600 dark:bg-teal-950 flex items-center justify-center shrink-0">
+                  <Laptop className="w-4 h-4" />
+                </div>
+                <div>
+                  <div className="font-bold text-slate-900 dark:text-white">Automático</div>
+                  <div className="text-[10px] text-slate-500">Sigue al sistema</div>
+                </div>
+              </button>
+            </div>
+          </div>
+
+          {/* Contact Details */}
+          <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-4 shadow-sm">
             <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
-              <Sun className="w-4 h-4 text-amber-500" />
-              <span>Modo Visual & Apariencia</span>
+              <Building2 className="w-4 h-4 text-emerald-600" />
+              <span>Datos Oficiales de Contacto del Club</span>
             </h3>
-            <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold bg-emerald-50 dark:bg-emerald-950 px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800">
-              Modo Claro por Defecto
-            </span>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-slate-700 dark:text-slate-300 mb-1 font-semibold">Email de Recepción</label>
+                <input
+                  type="email"
+                  value={contactEmail}
+                  onChange={(e) => setContactEmail(e.target.value)}
+                  className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-slate-700 dark:text-slate-300 mb-1 font-semibold">Teléfono de Pistas</label>
+                <input
+                  type="tel"
+                  value={contactPhone}
+                  onChange={(e) => setContactPhone(e.target.value)}
+                  className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                />
+              </div>
+
+              <div className="sm:col-span-2">
+                <label className="block text-slate-700 dark:text-slate-300 mb-1 font-semibold">Dirección de las Instalaciones</label>
+                <input
+                  type="text"
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
+                  className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                />
+              </div>
+            </div>
           </div>
 
-          <p className="text-slate-600 dark:text-slate-400 text-[11px] leading-relaxed">
-            Personaliza el tema visual de la plataforma. El modo claro es el predeterminado para garantizar máxima legibilidad en recepciones iluminadas y dispositivos móviles.
-          </p>
+          {/* Booking Rules & Advance window */}
+          <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-4 shadow-sm">
+            <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              <Clock className="w-4 h-4 text-teal-600 dark:text-cyan-400" />
+              <span>Políticas de Reserva y Cancelación</span>
+            </h3>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
-            <button
-              type="button"
-              onClick={() => setTheme('light')}
-              className={`p-4 rounded-2xl border text-left flex items-center gap-3 transition ${
-                theme === 'light'
-                  ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-500 shadow-sm'
-                  : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 hover:border-slate-300'
-              }`}
-            >
-              <div className="w-8 h-8 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center shrink-0">
-                <Sun className="w-4 h-4" />
-              </div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div>
-                <div className="font-bold text-slate-900 dark:text-white">Modo Claro</div>
-                <div className="text-[10px] text-slate-500">Predeterminado</div>
+                <label className="block text-slate-700 dark:text-slate-300 mb-1 font-semibold">Días de Antelación</label>
+                <input
+                  type="number"
+                  value={bookingAdvanceDays}
+                  onChange={(e) => setBookingAdvanceDays(parseInt(e.target.value) || 7)}
+                  className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-slate-900 dark:text-white font-mono focus:outline-none focus:border-emerald-500"
+                />
+                <span className="text-[10px] text-slate-500">Días vista en la web</span>
               </div>
-            </button>
 
-            <button
-              type="button"
-              onClick={() => setTheme('dark')}
-              className={`p-4 rounded-2xl border text-left flex items-center gap-3 transition ${
-                theme === 'dark'
-                  ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-500 shadow-sm'
-                  : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 hover:border-slate-300'
-              }`}
-            >
-              <div className="w-8 h-8 rounded-xl bg-slate-800 text-cyan-300 flex items-center justify-center shrink-0">
-                <Moon className="w-4 h-4" />
-              </div>
               <div>
-                <div className="font-bold text-slate-900 dark:text-white">Modo Oscuro</div>
-                <div className="text-[10px] text-slate-500">Alto contraste nocturno</div>
+                <label className="block text-slate-700 dark:text-slate-300 mb-1 font-semibold">Plazo Cancelación Libre</label>
+                <input
+                  type="number"
+                  value={cancellationHours}
+                  onChange={(e) => setCancellationHours(parseInt(e.target.value) || 24)}
+                  className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-slate-900 dark:text-white font-mono focus:outline-none focus:border-emerald-500"
+                />
+                <span className="text-[10px] text-slate-500">Horas antes del turno</span>
               </div>
-            </button>
 
-            <button
-              type="button"
-              onClick={() => setTheme('system')}
-              className={`p-4 rounded-2xl border text-left flex items-center gap-3 transition ${
-                theme === 'system'
-                  ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-500 shadow-sm'
-                  : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 hover:border-slate-300'
-              }`}
-            >
-              <div className="w-8 h-8 rounded-xl bg-teal-100 text-teal-600 dark:bg-teal-950 flex items-center justify-center shrink-0">
-                <Laptop className="w-4 h-4" />
-              </div>
               <div>
-                <div className="font-bold text-slate-900 dark:text-white">Automático</div>
-                <div className="text-[10px] text-slate-500">Según sistema operativo</div>
+                <label className="block text-slate-700 dark:text-slate-300 mb-1 font-semibold">Permitir Pago Dividido</label>
+                <div className="pt-1.5">
+                  <button
+                    type="button"
+                    onClick={() => setSplitPayment(!splitPayment)}
+                    className={`px-3 py-2 rounded-xl font-bold transition w-full text-center ${
+                      splitPayment
+                        ? 'bg-emerald-600 text-white'
+                        : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
+                    }`}
+                  >
+                    {splitPayment ? 'Activado (1/4 por jugador)' : 'Desactivado (100% titular)'}
+                  </button>
+                </div>
               </div>
+            </div>
+          </div>
+
+          {/* Payment Gateways Config */}
+          <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-4 shadow-sm">
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <CreditCard className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                <span>Pasarelas de Cobro de Jugadores (Club Gateway)</span>
+              </h3>
+              <span className="text-[10px] font-mono text-emerald-700 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-950 px-2 py-0.5 rounded border border-emerald-300 dark:border-emerald-800">
+                Operativo
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 space-y-1">
+                <div className="font-bold text-slate-900 dark:text-white">Stripe Connect</div>
+                <div className="text-[10px] text-slate-500">Tarjetas Visa, Mastercard, Apple Pay</div>
+                <div className="text-emerald-600 font-bold text-[10px] pt-1">Conectado</div>
+              </div>
+
+              <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 space-y-1">
+                <div className="font-bold text-slate-900 dark:text-white">Redsys TPV Virtual</div>
+                <div className="text-[10px] text-slate-500">Pasarela bancaria directa española</div>
+                <div className="text-slate-500 text-[10px] pt-1">Listo para producción</div>
+              </div>
+
+              <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 space-y-1">
+                <div className="font-bold text-slate-900 dark:text-white">Bizum Pay</div>
+                <div className="text-[10px] text-slate-500">Cobro instantáneo por número de móvil</div>
+                <div className="text-emerald-600 font-bold text-[10px] pt-1">Habilitado</div>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex justify-end pt-2">
+            <button
+              type="submit"
+              className="px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md transition flex items-center gap-2 cursor-pointer active:scale-95"
+            >
+              <Save className="w-4 h-4" />
+              <span>Guardar Configuración General</span>
             </button>
           </div>
-        </div>
+        </form>
+      )}
 
-        {/* Módulo de Gestión de Pistas y Tarifas */}
-        <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-4 shadow-sm">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div>
-              <div className="flex items-center gap-2">
-                <div className="p-2 rounded-xl bg-emerald-50 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400">
-                  <Layers className="w-5 h-5" />
+      {/* ======================================================================
+          PESTAÑA 2: CONFIGURACIÓN DE IA & AGENTES MULTICANAL (REQUERIMIENTO 7)
+          ====================================================================== */}
+      {activeSection === 'ai' && (
+        <form onSubmit={handleSaveAIConfig} className="space-y-6 text-xs">
+          {/* 1. CREDENCIALES DEL CLIENTE (BYOK - Bring Your Own Key) */}
+          <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-4 shadow-sm">
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold">
+                  <Key className="w-5 h-5" />
                 </div>
                 <div>
                   <h3 className="text-sm font-bold text-slate-900 dark:text-white">
-                    Gestión de Pistas & Domótica IoT
+                    1. Credenciales del Club (BYOK - Bring Your Own Key)
                   </h3>
-                  <p className="text-[11px] text-slate-500 mt-0.5">
-                    {courts.length} pistas configuradas (Indoor/Outdoor), tarifas horarias, relés de focos y pines de torno.
+                  <p className="text-[11px] text-slate-500">
+                    Configura tu propio proveedor de inteligencia artificial o utiliza el motor oficial de Setmio
+                  </p>
+                </div>
+              </div>
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 font-bold border border-emerald-500/20">
+                Conexión Segura
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-slate-700 dark:text-slate-300 mb-1 font-bold">
+                  Proveedor de IA
+                </label>
+                <select
+                  value={aiProvider}
+                  onChange={(e) => {
+                    const p = e.target.value as typeof aiProvider;
+                    setAiProvider(p);
+                    if (p === 'gemini') setAiModel('gemini-2.5-flash');
+                    else if (p === 'openai') setAiModel('gpt-4o');
+                    else setAiModel('claude-3-5-sonnet');
+                  }}
+                  className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-slate-900 dark:text-white font-medium focus:outline-none focus:border-emerald-500"
+                >
+                  <option value="gemini">Google Gemini AI (Recomendado)</option>
+                  <option value="openai">OpenAI (ChatGPT-4o)</option>
+                  <option value="claude">Anthropic Claude</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-slate-700 dark:text-slate-300 mb-1 font-bold">
+                  Modelo de Lenguaje
+                </label>
+                <select
+                  value={aiModel}
+                  onChange={(e) => setAiModel(e.target.value)}
+                  className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-slate-900 dark:text-white font-mono focus:outline-none focus:border-emerald-500"
+                >
+                  {aiProvider === 'gemini' && (
+                    <>
+                      <option value="gemini-2.5-flash">gemini-2.5-flash (Ultra Rápido)</option>
+                      <option value="gemini-2.5-pro">gemini-2.5-pro (Máxima Precisión)</option>
+                    </>
+                  )}
+                  {aiProvider === 'openai' && (
+                    <>
+                      <option value="gpt-4o">gpt-4o (Omni)</option>
+                      <option value="gpt-4o-mini">gpt-4o-mini (Económico)</option>
+                    </>
+                  )}
+                  {aiProvider === 'claude' && (
+                    <>
+                      <option value="claude-3-5-sonnet">claude-3-5-sonnet-20241022</option>
+                      <option value="claude-3-haiku">claude-3-haiku-20240307</option>
+                    </>
+                  )}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-slate-700 dark:text-slate-300 mb-1 font-bold">
+                  Clave API Privada del Club (API Key)
+                </label>
+                <div className="relative">
+                  <input
+                    type={showApiKey ? 'text' : 'password'}
+                    value={aiApiKey}
+                    onChange={(e) => setAiApiKey(e.target.value)}
+                    placeholder="sk-..."
+                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl pl-3 pr-9 py-2 text-slate-900 dark:text-white font-mono focus:outline-none focus:border-emerald-500"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowApiKey(!showApiKey)}
+                    className="absolute right-2.5 top-2.5 text-slate-400 hover:text-slate-700 dark:hover:text-white"
+                  >
+                    {showApiKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* 2. CANALES DE ACTIVACIÓN MULTICANAL */}
+          <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-4 shadow-sm">
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-blue-100 dark:bg-blue-950 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold">
+                  <Share2 className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-slate-900 dark:text-white">
+                    2. Canales de Activación del Agente
+                  </h3>
+                  <p className="text-[11px] text-slate-500">
+                    Habilita o deshabilita la presencia de la IA en cada punto de contacto con jugadores
                   </p>
                 </div>
               </div>
             </div>
 
-            <button
-              type="button"
-              onClick={() => setAdminTab('courts_management')}
-              className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-sm flex items-center justify-center gap-2 transition active:scale-95 cursor-pointer shrink-0"
-            >
-              <span>Abrir Módulo de Pistas</span>
-              <ArrowRight className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-
-        {/* White-label Hero Media Configuration */}
-        <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-4 shadow-sm">
-          <div>
-            <h3 className="text-sm font-bold text-slate-900 dark:text-white">Medio del Hero público</h3>
-            <p className="text-[11px] text-slate-500 mt-1">Elige cómo presentar la cabecera de tu web de marca blanca.</p>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            {[
-              { id: 'image', label: 'Imagen', description: 'Fotografía de pista' },
-              { id: 'video', label: 'Vídeo', description: 'Vídeo en bucle' },
-              { id: 'minimal', label: 'Sin medio / Minimalista', description: 'Degradado limpio' },
-            ].map((option) => (
-              <button key={option.id} type="button" className="p-3 rounded-2xl border border-slate-200 dark:border-slate-700 text-left hover:border-emerald-500 transition">
-                <span className="block text-xs font-bold text-slate-900 dark:text-white">{option.label}</span>
-                <span className="block text-[10px] text-slate-500 mt-1">{option.description}</span>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* WhatsApp Widget Configuration */}
-        <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-4 shadow-sm">
-          <div className="flex items-center justify-between">
-            <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
-              <MessageCircle className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-              <span>Configuración del Botón Flotante de WhatsApp</span>
-            </h3>
-
-            <div className="flex items-center gap-2">
-              <span className="text-slate-500 text-xs">Activar botón:</span>
-              <button
-                type="button"
-                onClick={() => setWhatsappEnabled(!whatsappEnabled)}
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                  whatsappEnabled ? 'bg-emerald-600' : 'bg-slate-300 dark:bg-slate-700'
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+              {/* Web Pública */}
+              <div
+                onClick={() => setChannelWeb(!channelWeb)}
+                className={`p-4 rounded-2xl border transition cursor-pointer flex flex-col justify-between space-y-3 ${
+                  channelWeb
+                    ? 'bg-emerald-50/50 dark:bg-emerald-950/30 border-emerald-500 shadow-xs'
+                    : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 opacity-60'
                 }`}
               >
-                <span
-                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                    whatsappEnabled ? 'translate-x-6' : 'translate-x-1'
-                  }`}
-                />
+                <div className="flex items-center justify-between">
+                  <Globe className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                  <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold font-mono ${
+                    channelWeb ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200' : 'bg-slate-200 text-slate-600'
+                  }`}>
+                    {channelWeb ? 'ACTIVO' : 'PAUSADO'}
+                  </span>
+                </div>
+                <div>
+                  <div className="font-bold text-slate-900 dark:text-white">Web Pública / Landing</div>
+                  <div className="text-[10px] text-slate-500 mt-0.5">Widget interactivo para visitantes</div>
+                </div>
+              </div>
+
+              {/* WhatsApp */}
+              <div
+                onClick={() => setChannelWhatsApp(!channelWhatsApp)}
+                className={`p-4 rounded-2xl border transition cursor-pointer flex flex-col justify-between space-y-3 ${
+                  channelWhatsApp
+                    ? 'bg-emerald-50/50 dark:bg-emerald-950/30 border-emerald-500 shadow-xs'
+                    : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 opacity-60'
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <MessageCircle className="w-5 h-5 text-emerald-500" />
+                  <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold font-mono ${
+                    channelWhatsApp ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200' : 'bg-slate-200 text-slate-600'
+                  }`}>
+                    {channelWhatsApp ? 'ACTIVO' : 'PAUSADO'}
+                  </span>
+                </div>
+                <div>
+                  <div className="font-bold text-slate-900 dark:text-white">WhatsApp Business</div>
+                  <div className="text-[10px] text-slate-500 mt-0.5">Respuestas 24/7 al número oficial</div>
+                </div>
+              </div>
+
+              {/* Instagram */}
+              <div
+                onClick={() => setChannelInstagram(!channelInstagram)}
+                className={`p-4 rounded-2xl border transition cursor-pointer flex flex-col justify-between space-y-3 ${
+                  channelInstagram
+                    ? 'bg-emerald-50/50 dark:bg-emerald-950/30 border-emerald-500 shadow-xs'
+                    : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 opacity-60'
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <Instagram className="w-5 h-5 text-pink-500" />
+                  <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold font-mono ${
+                    channelInstagram ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200' : 'bg-slate-200 text-slate-600'
+                  }`}>
+                    {channelInstagram ? 'ACTIVO' : 'PAUSADO'}
+                  </span>
+                </div>
+                <div>
+                  <div className="font-bold text-slate-900 dark:text-white">Instagram Direct</div>
+                  <div className="text-[10px] text-slate-500 mt-0.5">DMs de torneos y reservas</div>
+                </div>
+              </div>
+
+              {/* Facebook */}
+              <div
+                onClick={() => setChannelFacebook(!channelFacebook)}
+                className={`p-4 rounded-2xl border transition cursor-pointer flex flex-col justify-between space-y-3 ${
+                  channelFacebook
+                    ? 'bg-emerald-50/50 dark:bg-emerald-950/30 border-emerald-500 shadow-xs'
+                    : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 opacity-60'
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <Facebook className="w-5 h-5 text-blue-600" />
+                  <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold font-mono ${
+                    channelFacebook ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200' : 'bg-slate-200 text-slate-600'
+                  }`}>
+                    {channelFacebook ? 'ACTIVO' : 'PAUSADO'}
+                  </span>
+                </div>
+                <div>
+                  <div className="font-bold text-slate-900 dark:text-white">Facebook Messenger</div>
+                  <div className="text-[10px] text-slate-500 mt-0.5">Página de Facebook del Club</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* 3. PERSONALIZACIÓN DEL AGENTE */}
+          <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-4 shadow-sm">
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-purple-100 dark:bg-purple-950 text-purple-600 dark:text-purple-400 flex items-center justify-center font-bold">
+                  <Bot className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-slate-900 dark:text-white">
+                    3. Personalización del Agente & Prompt del Club
+                  </h3>
+                  <p className="text-[11px] text-slate-500">
+                    Ajusta el tono de voz, mensajes de bienvenida e instrucciones maestras de sistema
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Selector de Tono de Voz */}
+            <div>
+              <label className="block text-slate-700 dark:text-slate-300 mb-1.5 font-bold">
+                Tono de Voz del Agente:
+              </label>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                {[
+                  { id: 'profesional', label: 'Profesional', desc: 'Respetuoso, corporativo y formal' },
+                  { id: 'cercano', label: 'Cercano', desc: 'Amable, cálido y empático con socios' },
+                  { id: 'deportivo', label: 'Deportivo', desc: 'Enérgico, dinámico y enfocado en pádel' },
+                  { id: 'formal', label: 'Formal', desc: 'Directo, conciso y de alta precisión' },
+                ].map((tone) => (
+                  <button
+                    key={tone.id}
+                    type="button"
+                    onClick={() => setAiTone(tone.id as typeof aiTone)}
+                    className={`p-3 rounded-2xl border text-left transition cursor-pointer ${
+                      aiTone === tone.id
+                        ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-500 shadow-xs'
+                        : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 hover:border-slate-300'
+                    }`}
+                  >
+                    <div className="font-bold text-slate-900 dark:text-white flex items-center justify-between">
+                      <span>{tone.label}</span>
+                      {aiTone === tone.id && <Check className="w-3.5 h-3.5 text-emerald-600" />}
+                    </div>
+                    <div className="text-[10px] text-slate-500 mt-0.5">{tone.desc}</div>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Mensaje de Bienvenida */}
+            <div>
+              <label className="block text-slate-700 dark:text-slate-300 mb-1 font-bold">
+                Mensaje de Bienvenida Inicial
+              </label>
+              <input
+                type="text"
+                value={aiWelcomeMessage}
+                onChange={(e) => setAiWelcomeMessage(e.target.value)}
+                className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+              />
+              <span className="text-[10px] text-slate-500">Primer mensaje visible al abrir el chat</span>
+            </div>
+
+            {/* Prompt del Sistema del Club */}
+            <div>
+              <label className="block text-slate-700 dark:text-slate-300 mb-1 font-bold">
+                Instrucciones del Sistema (Prompt Maestro del Club)
+              </label>
+              <textarea
+                rows={4}
+                value={aiSystemPrompt}
+                onChange={(e) => setAiSystemPrompt(e.target.value)}
+                className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl p-3 text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 leading-relaxed font-sans"
+              />
+              <span className="text-[10px] text-slate-500">
+                Define aquí las reglas del club, horarios, tarifas especiales y políticas de pistas.
+              </span>
+            </div>
+
+            {/* Toggle Modo Multiidioma Automático */}
+            <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 flex items-center justify-between">
+              <div>
+                <span className="font-bold text-slate-900 dark:text-white block">
+                  Modo Multiidioma Automático
+                </span>
+                <span className="text-[11px] text-slate-500">
+                  Detecta el idioma del jugador (español, gallego, catalán, inglés, etc.) y responde con fluidez nativa.
+                </span>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setAiMultiLanguage(!aiMultiLanguage)}
+                className={`px-3 py-1.5 rounded-xl font-bold transition text-xs ${
+                  aiMultiLanguage
+                    ? 'bg-emerald-600 text-white shadow-xs'
+                    : 'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
+                }`}
+              >
+                {aiMultiLanguage ? 'Activado' : 'Solo Español'}
               </button>
             </div>
           </div>
 
-          <p className="text-slate-600 dark:text-slate-400 text-[11px] leading-relaxed">
-            Personaliza el comportamiento del widget flotante de atención al cliente y soporte entre 3 modalidades operativas:
-          </p>
+          {/* 4. SIMULADOR DE PRUEBA EN VIVO */}
+          <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-3 shadow-sm">
+            <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              <Bot className="w-4 h-4 text-emerald-500" />
+              <span>Simulador de Prueba en Vivo (Playground)</span>
+            </h3>
 
-          {/* 3-Mode Widget Selector */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
-            <button
-              type="button"
-              onClick={() => setChatWidgetMode('whatsapp')}
-              className={`p-3.5 rounded-2xl border text-left transition ${
-                chatWidgetMode === 'whatsapp'
-                  ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-500 shadow-sm'
-                  : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 hover:border-slate-300'
-              }`}
-            >
-              <div className="flex items-center gap-2 mb-1">
-                <MessageCircle className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                <span className="font-bold text-slate-900 dark:text-white">1) Solo WhatsApp</span>
-              </div>
-              <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-normal">
-                Abre chat directo en WhatsApp oficial con mensaje preconfigurado dinámico.
-              </p>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setChatWidgetMode('ai')}
-              className={`p-3.5 rounded-2xl border text-left transition ${
-                chatWidgetMode === 'ai'
-                  ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-500 shadow-sm'
-                  : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 hover:border-slate-300'
-              }`}
-            >
-              <div className="flex items-center gap-2 mb-1">
-                <Zap className="w-4 h-4 text-teal-600 dark:text-cyan-400" />
-                <span className="font-bold text-slate-900 dark:text-white">2) Solo Agente IA</span>
-              </div>
-              <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-normal">
-                Chat flotante estético, no invasivo, con avatar y respuestas automáticas inteligentes.
-              </p>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setChatWidgetMode('both')}
-              className={`p-3.5 rounded-2xl border text-left transition ${
-                chatWidgetMode === 'both'
-                  ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-500 shadow-sm ring-1 ring-emerald-500'
-                  : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 hover:border-slate-300'
-              }`}
-            >
-              <div className="flex items-center gap-2 mb-1">
-                <ShieldCheck className="w-4 h-4 text-purple-600 dark:text-purple-400" />
-                <span className="font-bold text-slate-900 dark:text-white">3) Ambos (Recomendado)</span>
-              </div>
-              <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-normal">
-                Abre agente IA con botón interno para desviar la consulta a WhatsApp si el usuario lo desea.
-              </p>
-            </button>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-            <div>
-              <label className="block text-slate-700 dark:text-slate-300 mb-1 font-semibold">Número de WhatsApp del Club</label>
-              <input
-                type="text"
-                value={whatsappNumber}
-                onChange={(e) => setWhatsappNumber(e.target.value)}
-                placeholder="+34 600 000 000"
-                className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-slate-900 dark:text-white font-mono focus:outline-none focus:border-emerald-500"
-              />
-            </div>
-
-            <div>
-              <label className="block text-slate-700 dark:text-slate-300 mb-1 font-semibold">Mensaje Inicial Automático</label>
-              <input
-                type="text"
-                value={whatsappGreeting}
-                onChange={(e) => setWhatsappGreeting(e.target.value)}
-                placeholder="¡Hola! Quisiera consultar pistas..."
-                className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Booking Rules & Advance window */}
-        <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-4 shadow-sm">
-          <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
-            <Clock className="w-4 h-4 text-teal-600 dark:text-cyan-400" />
-            <span>Políticas de Reserva y Cancelación</span>
-          </h3>
-
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div>
-              <label className="block text-slate-700 dark:text-slate-300 mb-1 font-semibold">Días de Antelación de Reserva</label>
-              <input
-                type="number"
-                value={bookingAdvanceDays}
-                onChange={(e) => setBookingAdvanceDays(parseInt(e.target.value) || 7)}
-                className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-slate-900 dark:text-white font-mono focus:outline-none focus:border-emerald-500"
-              />
-              <span className="text-[10px] text-slate-500">Máximo número de días vista</span>
-            </div>
-
-            <div>
-              <label className="block text-slate-700 dark:text-slate-300 mb-1 font-semibold">Plazo Cancelación Gratuita</label>
-              <input
-                type="number"
-                value={cancellationHours}
-                onChange={(e) => setCancellationHours(parseInt(e.target.value) || 24)}
-                className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-slate-900 dark:text-white font-mono focus:outline-none focus:border-emerald-500"
-              />
-              <span className="text-[10px] text-slate-500">Horas antes del partido</span>
-            </div>
-
-            <div>
-              <label className="block text-slate-700 dark:text-slate-300 mb-1 font-semibold">Permitir Pago Dividido (Split)</label>
-              <div className="pt-2">
-                <button
-                  type="button"
-                  onClick={() => setSplitPayment(!splitPayment)}
-                  className={`px-3 py-1.5 rounded-lg font-semibold transition ${
-                    splitPayment
-                      ? 'bg-emerald-600 text-white'
-                      : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
+            <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 space-y-2.5 max-h-48 overflow-y-auto">
+              {testResponses.map((r, i) => (
+                <div
+                  key={i}
+                  className={`p-2.5 rounded-xl text-xs max-w-[85%] ${
+                    r.sender === 'user'
+                      ? 'ml-auto bg-emerald-600 text-white font-medium'
+                      : 'bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700'
                   }`}
                 >
-                  {splitPayment ? 'Activado (4 Partes)' : 'Desactivado (Pago Único)'}
-                </button>
-              </div>
+                  {r.text}
+                </div>
+              ))}
+            </div>
+
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={testInput}
+                onChange={(e) => setTestInput(e.target.value)}
+                placeholder="Escribe una pregunta para probar el agente (ej: ¿Cuánto cuesta la pista 1?)..."
+                className="flex-1 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 text-xs"
+              />
+              <button
+                type="button"
+                onClick={handleTestSend}
+                className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1.5 transition active:scale-95 cursor-pointer shadow-xs"
+              >
+                <Send className="w-3.5 h-3.5" />
+                <span>Enviar</span>
+              </button>
             </div>
           </div>
-        </div>
 
-        {/* Payment Gateways Config (Stripe / Redsys / Bizum) */}
-        <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-4 shadow-sm">
-          <div className="flex items-center justify-between">
-            <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
-              <CreditCard className="w-4 h-4 text-purple-600 dark:text-purple-400" />
-              <span>Pasarelas de Cobro de Jugadores (Club Gateway)</span>
-            </h3>
-            <span className="text-[10px] font-mono text-emerald-700 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-950 px-2 py-0.5 rounded border border-emerald-300 dark:border-emerald-800">
-              Modo Demostración Activo
-            </span>
+          {/* Botón Guardar */}
+          <div className="flex justify-end pt-2">
+            <button
+              type="submit"
+              className="px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md transition flex items-center gap-2 cursor-pointer active:scale-95"
+            >
+              <Save className="w-4 h-4" />
+              <span>Guardar Configuración de IA Multicanal</span>
+            </button>
           </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 space-y-1">
-              <div className="font-bold text-slate-900 dark:text-white">Stripe Connect</div>
-              <div className="text-[10px] text-slate-500 dark:text-slate-400">Tarjetas Visa, Mastercard, Apple Pay, Google Pay</div>
-              <div className="text-emerald-600 dark:text-emerald-400 font-semibold text-[10px] pt-1">Conectado (Demo)</div>
-            </div>
-
-            <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 space-y-1">
-              <div className="font-bold text-slate-900 dark:text-white">Redsys TPV Virtual</div>
-              <div className="text-[10px] text-slate-500 dark:text-slate-400">Pasarela bancaria directa española (Sabadell / Caixa)</div>
-              <div className="text-slate-500 text-[10px] pt-1">Preparado para producción</div>
-            </div>
-
-            <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 space-y-1">
-              <div className="font-bold text-slate-900 dark:text-white">Bizum Pay</div>
-              <div className="text-[10px] text-slate-500 dark:text-slate-400">Cobro instantáneo mediante número de móvil</div>
-              <div className="text-emerald-600 dark:text-emerald-400 font-semibold text-[10px] pt-1">Habilitado</div>
-            </div>
-          </div>
-        </div>
-
-        {/* Submit Bar */}
-        <div className="flex justify-end pt-2">
-          <button
-            type="submit"
-            className="px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 dark:bg-emerald-500 dark:hover:bg-emerald-400 text-white dark:text-slate-950 font-bold text-xs shadow-md transition flex items-center gap-2"
-          >
-            <Save className="w-4 h-4" />
-            <span>Guardar Configuración General</span>
-          </button>
-        </div>
-      </form>
+        </form>
+      )}
     </div>
   );
 };
+
+export default AdminSettings;

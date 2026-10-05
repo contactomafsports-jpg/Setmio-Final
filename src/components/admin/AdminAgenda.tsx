@@ -318,12 +318,12 @@ export const AdminAgenda: React.FC = () => {
           - Cabecera rediseñada: Título a la izquierda, Historial Completo a la derecha en la misma fila superior
           ====================================================================== */}
       <section className="bg-white dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 rounded-2xl p-4 sm:p-5 shadow-sm space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 dark:border-slate-700/60 pb-3">
-          <div className="flex items-center gap-2.5">
-            <h2 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white tracking-tight">
+        <div className="flex items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-700/60 pb-3">
+          <div className="flex items-center gap-2 min-w-0">
+            <h2 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white tracking-tight whitespace-nowrap">
               Reservas del Día
             </h2>
-            <span className="px-2.5 py-0.5 rounded-full text-xs font-bold font-mono bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20">
+            <span className="px-2 py-0.5 rounded-full text-xs font-bold font-mono bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20">
               {dayBookings.length}
             </span>
           </div>
@@ -331,9 +331,10 @@ export const AdminAgenda: React.FC = () => {
           <button
             type="button"
             onClick={() => setShowAllBookingsView(true)}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-700/80 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 hover:text-emerald-600 dark:hover:text-emerald-400 font-bold text-xs transition border border-slate-200/80 dark:border-slate-600/60 shadow-xs cursor-pointer active:scale-95 shrink-0 self-start sm:self-auto"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-700/80 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 hover:text-emerald-600 dark:hover:text-emerald-400 font-bold text-xs transition border border-slate-200/80 dark:border-slate-600/60 shadow-xs cursor-pointer active:scale-95 shrink-0"
           >
-            <span>Historial Completo / Todas las Reservas</span>
+            <span className="hidden sm:inline">Historial Completo / Todas las Reservas</span>
+            <span className="sm:hidden">Ver Todas</span>
             <ArrowRight className="w-3.5 h-3.5 text-emerald-500" />
           </button>
         </div>
