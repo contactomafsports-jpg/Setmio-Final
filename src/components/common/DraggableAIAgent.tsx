@@ -41,23 +41,6 @@ export const DraggableAIAgent: React.FC = () => {
 
   const widgetMode = currentTenant.settings.chatWidgetMode || 'both';
 
-  // If set to 'whatsapp' only, the unified DraggableAIAgent hides and WhatsAppFloat is rendered
-  if (widgetMode === 'whatsapp') {
-    return null;
-  }
-
-  // Precomputed WhatsApp URL for diverting conversations
-  const cleanPhone = (currentTenant.whatsappNumber || currentTenant.contactPhone || '')
-    .replace(/[^\d+]/g, '')
-    .replace('+', '');
-
-  const greeting = encodeURIComponent(
-    currentTenant.settings.whatsappGreetingMessage ||
-      `¡Hola! Escribo desde la web de ${currentTenant.name}. Quisiera hablar con recepción tras consultar el asistente virtual.`
-  );
-
-  const whatsappDivertUrl = `https://wa.me/${cleanPhone}?text=${greeting}`;
-
   // Restore position from sessionStorage if exists
   useEffect(() => {
     try {
@@ -88,6 +71,24 @@ export const DraggableAIAgent: React.FC = () => {
       };
     }
   }, [aiMessages, isOpen]);
+
+  // In admin view or whatsapp-only mode, the floating AI agent is not rendered
+  // (In admin view, the AI agent is integrated directly in AdminHeader as a bottom sheet drawer)
+  if (widgetMode === 'whatsapp' || currentView === 'admin') {
+    return null;
+  }
+
+  // Precomputed WhatsApp URL for diverting conversations
+  const cleanPhone = (currentTenant.whatsappNumber || currentTenant.contactPhone || '')
+    .replace(/[^\d+]/g, '')
+    .replace('+', '');
+
+  const greeting = encodeURIComponent(
+    currentTenant.settings.whatsappGreetingMessage ||
+      `¡Hola! Escribo desde la web de ${currentTenant.name}. Quisiera hablar con recepción tras consultar el asistente virtual.`
+  );
+
+  const whatsappDivertUrl = `https://wa.me/${cleanPhone}?text=${greeting}`;
 
   // Touch and Mouse Drag handlers
   const handlePointerDown = (e: React.PointerEvent) => {
@@ -131,13 +132,6 @@ export const DraggableAIAgent: React.FC = () => {
 
   // Determine Agent Mode Title
   const getAgentHeader = () => {
-    if (currentView === 'admin' && (currentUser.role === 'TENANT_OWNER' || currentUser.role === 'TENANT_ADMIN')) {
-      return {
-        title: `Copiloto Club ${currentTenant.shortName}`,
-        badge: 'Modo Propietario',
-        subtitle: 'Resúmenes, redacción y gestión de pistas',
-      };
-    }
     if (currentView === 'player') {
       return {
         title: `Coach Personal IA`,

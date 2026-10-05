@@ -152,8 +152,8 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
         <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
           <div className="flex items-center gap-2.5 min-w-0">
             {/* Setmio Logo Badge */}
-            <div className="w-9 h-9 rounded-2xl bg-slate-950 border border-emerald-500/40 text-emerald-400 font-black flex items-center justify-center shrink-0 text-sm shadow-sm">
-              <span className="font-extrabold tracking-tighter">SM</span>
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-700 text-white font-black flex items-center justify-center shrink-0 text-sm shadow-sm select-none">
+              S
             </div>
             <div className="min-w-0">
               <div className="font-black text-xs text-slate-900 dark:text-white truncate tracking-wider">
@@ -277,8 +277,8 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
           <div className="bg-white dark:bg-slate-900 rounded-t-3xl border-t border-slate-200 dark:border-slate-800 p-5 space-y-4 max-h-[85vh] overflow-y-auto shadow-2xl">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl bg-slate-950 text-emerald-400 font-black flex items-center justify-center text-xs">
-                  SM
+                <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-700 text-white font-black flex items-center justify-center text-xs shadow-xs select-none">
+                  S
                 </div>
                 <div>
                   <div className="font-extrabold text-sm text-slate-900 dark:text-white">

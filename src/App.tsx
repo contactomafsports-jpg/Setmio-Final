@@ -289,7 +289,7 @@ export function App() {
   {currentView === 'hq' && <SuperadminHQ />}
 
       {/* 3. Floating AI Agent (Draggable, session memory, tenant branded) */}
-      <DraggableAIAgent />
+      {currentView !== 'admin' && <DraggableAIAgent />}
 
       {/* 4. WhatsApp Floating CTA button */}
       <WhatsAppFloat />
