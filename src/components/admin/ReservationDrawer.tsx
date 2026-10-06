@@ -74,7 +74,7 @@ export const ReservationDrawer: React.FC<ReservationDrawerProps> = ({
   onCancelReservation,
   onOpenPlayerProfile,
 }) => {
-  const { currentTenant, courts, setAdminTab, triggerDemoToast, setPosPendingCharge, t } = useApp();
+  const { currentTenant, courts, setAdminTab, triggerDemoToast, setPosPendingCharge, navigateToPlayerProfile, t } = useApp();
   const [copiedPin, setCopiedPin] = useState(false);
   const [isReassigning, setIsReassigning] = useState(false);
   const [tpvChoiceModal, setTpvChoiceModal] = useState(false);
@@ -220,11 +220,7 @@ export const ReservationDrawer: React.FC<ReservationDrawerProps> = ({
     if (onOpenPlayerProfile) {
       onOpenPlayerProfile(playerName);
     } else {
-      const slug = playerName.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-');
-      window.history.pushState({}, '', `/jugadores/${slug}`);
-      window.dispatchEvent(new PopStateEvent('popstate'));
-      setAdminTab('customers');
-      triggerDemoToast('Ficha de Jugador', `Abriendo ficha técnica y perfil de ${playerName}.`, 'info');
+      navigateToPlayerProfile(playerName);
     }
   };
 

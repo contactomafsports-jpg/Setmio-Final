@@ -30,6 +30,7 @@ import {
   AlertCircle,
   Receipt,
   Calculator,
+  Upload,
 } from 'lucide-react';
 
 interface LinkedChargeMeta {
@@ -378,41 +379,41 @@ export const AdminCafePOS: React.FC = () => {
           </p>
         </div>
 
-        {/* Acciones superiores y Caja: responsive flex wrap */}
-        <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
+        {/* Acciones superiores y Caja: responsive layout anti-solapamiento */}
+        <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2 sm:gap-2.5 w-full lg:w-auto">
           {/* Asignar Reserva / Pago de Jugador */}
           <button
             type="button"
             onClick={() => setAssignModalOpen(true)}
-            className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-xs flex items-center gap-1.5 transition active:scale-95 cursor-pointer shrink-0"
+            className="px-3 sm:px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-xs flex items-center justify-center gap-1.5 transition active:scale-95 cursor-pointer"
           >
-            <Calendar className="w-4 h-4" />
-            <span>Asignar Reserva / Pago</span>
+            <Calendar className="w-4 h-4 shrink-0" />
+            <span className="truncate">Asignar Reserva</span>
           </button>
 
           {/* Reincorporado: Cierre / Arqueo de Caja */}
           <button
             type="button"
             onClick={() => setArqueoModalOpen(true)}
-            className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold text-xs border border-slate-200/80 dark:border-slate-700/80 shadow-xs flex items-center gap-1.5 transition active:scale-95 cursor-pointer shrink-0"
+            className="px-3 sm:px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold text-xs border border-slate-200/80 dark:border-slate-700/80 shadow-xs flex items-center justify-center gap-1.5 transition active:scale-95 cursor-pointer"
           >
-            <Calculator className="w-4 h-4 text-amber-500" />
-            <span>Cierre / Arqueo de Caja</span>
+            <Calculator className="w-4 h-4 text-amber-500 shrink-0" />
+            <span className="truncate">Arqueo de Caja</span>
           </button>
 
           {/* Catálogo de Productos */}
           <button
             type="button"
             onClick={() => setCatalogModalOpen(true)}
-            className="px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs border border-slate-200/80 dark:border-slate-700/80 transition active:scale-95 cursor-pointer flex items-center gap-1.5 shrink-0"
+            className="px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs border border-slate-200/80 dark:border-slate-700/80 transition active:scale-95 cursor-pointer flex items-center justify-center gap-1.5"
             title="Gestionar catálogo y existencias"
           >
-            <Package className="w-4 h-4 text-emerald-500" />
-            <span className="hidden sm:inline">Catálogo</span>
+            <Package className="w-4 h-4 text-emerald-500 shrink-0" />
+            <span>Catálogo</span>
           </button>
 
           {/* Contenedor dinámico del "Total Turno" */}
-          <div className="p-2 sm:px-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800 text-right shadow-xs shrink-0 min-w-[95px]">
+          <div className="p-2 sm:px-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800 text-center sm:text-right shadow-xs flex flex-col justify-center min-w-[95px]">
             <div className="text-[9px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">
               Total Turno
             </div>
@@ -967,14 +968,56 @@ export const AdminCafePOS: React.FC = () => {
               </div>
 
               <div>
-                <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">URL Imagen</label>
-                <input
-                  type="url"
-                  value={productFormData.imageUrl}
-                  onChange={(e) => setProductFormData({ ...productFormData, imageUrl: e.target.value })}
-                  placeholder="https://images.unsplash.com/..."
-                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
-                />
+                <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  Imagen del Producto (URL o Archivo Local)
+                </label>
+                {productFormData.imageUrl && (
+                  <div className="relative mb-2 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-950 h-24 flex items-center justify-center">
+                    <img
+                      src={productFormData.imageUrl}
+                      alt="Vista previa"
+                      className="w-full h-full object-cover"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setProductFormData({ ...productFormData, imageUrl: '' })}
+                      className="absolute top-1.5 right-1.5 p-1 rounded-lg bg-black/60 text-white hover:bg-black transition text-xs"
+                      title="Eliminar imagen"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                )}
+                <div className="flex gap-2">
+                  <input
+                    type="url"
+                    value={productFormData.imageUrl}
+                    onChange={(e) => setProductFormData({ ...productFormData, imageUrl: e.target.value })}
+                    placeholder="URL imagen (https://...)"
+                    className="flex-1 px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                  />
+                  <label className="px-3 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold rounded-xl cursor-pointer flex items-center gap-1 shrink-0 transition text-xs border border-slate-200/80 dark:border-slate-700/80">
+                    <Upload className="w-3.5 h-3.5 text-emerald-500" />
+                    <span>Subir</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          const reader = new FileReader();
+                          reader.onload = (evt) => {
+                            if (evt.target?.result) {
+                              setProductFormData({ ...productFormData, imageUrl: String(evt.target.result) });
+                            }
+                          };
+                          reader.readAsDataURL(file);
+                        }
+                      }}
+                    />
+                  </label>
+                </div>
               </div>
 
               <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex justify-end gap-2">

@@ -25,7 +25,7 @@ export const AllBookingsPage: React.FC<AllBookingsPageProps> = ({
   onBackToQuadrant,
   onOpenNewBookingModal,
 }) => {
-  const { bookings, courts, setAdminTab, triggerDemoToast } = useApp();
+  const { bookings, courts, setAdminTab, triggerDemoToast, navigateToPlayerProfile } = useApp();
 
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'confirmed' | 'pending' | 'canceled'>('all');
@@ -274,61 +274,63 @@ export const AllBookingsPage: React.FC<AllBookingsPageProps> = ({
           </div>
         </div>
 
-        {/* Selectores de Estado: Confirmada, Pendiente TPV, Cancelada */}
-        <div className="flex items-center gap-1.5 pt-2 border-t border-slate-100 dark:border-slate-700/60 overflow-x-auto text-xs no-scrollbar">
-          <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mr-1 shrink-0">
-            Estado:
-          </span>
-          <button
-            type="button"
-            onClick={() => setStatusFilter('all')}
-            className={`px-3 py-1.5 rounded-xl font-bold transition text-xs shrink-0 cursor-pointer ${
-              statusFilter === 'all'
-                ? 'bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 shadow-xs'
-                : 'bg-slate-100 dark:bg-slate-700/70 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
-            }`}
-          >
-            Todas ({bookings.length})
-          </button>
+        {/* Selectores de Estado: Cuadrícula fija sin scroll horizontal y centrada */}
+        <div className="pt-2 border-t border-slate-100 dark:border-slate-700/60 space-y-1.5">
+          <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-0.5">
+            Filtrar por Estado
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+            <button
+              type="button"
+              onClick={() => setStatusFilter('all')}
+              className={`py-2 px-2.5 rounded-xl font-bold transition text-xs flex items-center justify-center text-center cursor-pointer ${
+                statusFilter === 'all'
+                  ? 'bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 shadow-xs'
+                  : 'bg-slate-100 dark:bg-slate-700/70 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+              }`}
+            >
+              Todas ({bookings.length})
+            </button>
 
-          <button
-            type="button"
-            onClick={() => setStatusFilter('confirmed')}
-            className={`px-3 py-1.5 rounded-xl font-bold transition text-xs flex items-center gap-1.5 shrink-0 cursor-pointer ${
-              statusFilter === 'confirmed'
-                ? 'bg-emerald-600 text-white shadow-xs'
-                : 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 border border-emerald-500/20'
-            }`}
-          >
-            <CheckCircle2 className="w-3.5 h-3.5" />
-            <span>Pagadas / Confirmadas ({confirmedCount})</span>
-          </button>
+            <button
+              type="button"
+              onClick={() => setStatusFilter('confirmed')}
+              className={`py-2 px-2.5 rounded-xl font-bold transition text-xs flex items-center justify-center gap-1.5 text-center cursor-pointer ${
+                statusFilter === 'confirmed'
+                  ? 'bg-emerald-600 text-white shadow-xs'
+                  : 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 border border-emerald-500/20'
+              }`}
+            >
+              <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+              <span className="truncate">Pagadas ({confirmedCount})</span>
+            </button>
 
-          <button
-            type="button"
-            onClick={() => setStatusFilter('pending')}
-            className={`px-3 py-1.5 rounded-xl font-bold transition text-xs flex items-center gap-1.5 shrink-0 cursor-pointer ${
-              statusFilter === 'pending'
-                ? 'bg-amber-600 text-white shadow-xs'
-                : 'bg-amber-50 dark:bg-amber-950/50 text-amber-800 dark:text-amber-300 hover:bg-amber-100 dark:hover:bg-amber-900/60 border border-amber-500/20'
-            }`}
-          >
-            <AlertCircle className="w-3.5 h-3.5" />
-            <span>Pendiente TPV ({pendingCount})</span>
-          </button>
+            <button
+              type="button"
+              onClick={() => setStatusFilter('pending')}
+              className={`py-2 px-2.5 rounded-xl font-bold transition text-xs flex items-center justify-center gap-1.5 text-center cursor-pointer ${
+                statusFilter === 'pending'
+                  ? 'bg-amber-600 text-white shadow-xs'
+                  : 'bg-amber-50 dark:bg-amber-950/50 text-amber-800 dark:text-amber-300 hover:bg-amber-100 dark:hover:bg-amber-900/60 border border-amber-500/20'
+              }`}
+            >
+              <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+              <span className="truncate">Pendientes ({pendingCount})</span>
+            </button>
 
-          <button
-            type="button"
-            onClick={() => setStatusFilter('canceled')}
-            className={`px-3 py-1.5 rounded-xl font-bold transition text-xs flex items-center gap-1.5 shrink-0 cursor-pointer ${
-              statusFilter === 'canceled'
-                ? 'bg-rose-600 text-white shadow-xs'
-                : 'bg-rose-50 dark:bg-rose-950/50 text-rose-700 dark:text-rose-300 hover:bg-rose-100 dark:hover:bg-rose-900/60 border border-rose-500/20'
-            }`}
-          >
-            <XCircle className="w-3.5 h-3.5" />
-            <span>Canceladas ({bookings.filter((b) => b.status === 'canceled').length})</span>
-          </button>
+            <button
+              type="button"
+              onClick={() => setStatusFilter('canceled')}
+              className={`py-2 px-2.5 rounded-xl font-bold transition text-xs flex items-center justify-center gap-1.5 text-center cursor-pointer ${
+                statusFilter === 'canceled'
+                  ? 'bg-rose-600 text-white shadow-xs'
+                  : 'bg-rose-50 dark:bg-rose-950/50 text-rose-700 dark:text-rose-300 hover:bg-rose-100 dark:hover:bg-rose-900/60 border border-rose-500/20'
+              }`}
+            >
+              <XCircle className="w-3.5 h-3.5 shrink-0" />
+              <span className="truncate">Canceladas ({bookings.filter((b) => b.status === 'canceled').length})</span>
+            </button>
+          </div>
         </div>
 
         {/* LISTADO DE RESERVAS INTEGRADO EN EL MISMO CONTENEDOR */}
@@ -371,6 +373,10 @@ export const AllBookingsPage: React.FC<AllBookingsPageProps> = ({
         isOpen={!!selectedDrawerBooking}
         reservation={selectedDrawerBooking}
         onClose={() => setSelectedDrawerBooking(null)}
+        onOpenPlayerProfile={(playerName) => {
+          setSelectedDrawerBooking(null);
+          navigateToPlayerProfile(playerName);
+        }}
       />
     </div>
   );

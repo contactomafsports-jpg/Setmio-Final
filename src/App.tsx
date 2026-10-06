@@ -131,6 +131,11 @@ export function App() {
     return () => window.removeEventListener('popstate', syncRoute);
   }, [setPublicPage]);
 
+  // Scroll Reset Obligatorio: Al cambiar de página, vista o pestaña, forzar scroll arriba
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+  }, [currentView, publicPage, adminTab]);
+
   useEffect(() => {
     if (isCorporateLanding) return;
     const enabled = currentTenant.publicPages ?? ['home', 'courts', 'academy', 'tournaments', 'shop', 'contact'];

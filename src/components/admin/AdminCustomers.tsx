@@ -130,7 +130,7 @@ const INITIAL_CUSTOMERS: CustomerItem[] = [
 ];
 
 export const AdminCustomers: React.FC = () => {
-  const { currentTenant, triggerDemoToast } = useApp();
+  const { currentTenant, triggerDemoToast, selectedCustomerId, setSelectedCustomerId } = useApp();
 
   const [customerList, setCustomerList] = useState<CustomerItem[]>(() => {
     try {
@@ -147,10 +147,25 @@ export const AdminCustomers: React.FC = () => {
   const [publicProfileModalCustomer, setPublicProfileModalCustomer] = useState<CustomerItem | null>(null);
 
   React.useEffect(() => {
+    if (selectedCustomerId) {
+      const slug = selectedCustomerId.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-');
+      const found = customerList.find(
+        (c) =>
+          c.id.toLowerCase() === selectedCustomerId.toLowerCase() ||
+          c.name.toLowerCase() === selectedCustomerId.toLowerCase() ||
+          c.name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-') === slug ||
+          c.name.toLowerCase().includes(selectedCustomerId.toLowerCase())
+      );
+      if (found) {
+        setSelectedCustomer(found);
+        return;
+      }
+    }
+
     const handleUrlPlayer = () => {
       const pathname = typeof window !== 'undefined' ? window.location.pathname : '';
-      if (pathname.startsWith('/jugadores/')) {
-        const slug = pathname.replace('/jugadores/', '').toLowerCase();
+      if (pathname.startsWith('/jugadores/') || pathname.startsWith('/gestion/jugadores/')) {
+        const slug = pathname.replace('/gestion/jugadores/', '').replace('/jugadores/', '').toLowerCase();
         const found = customerList.find(
           (c) =>
             c.name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-') === slug ||
@@ -166,7 +181,7 @@ export const AdminCustomers: React.FC = () => {
     handleUrlPlayer();
     window.addEventListener('popstate', handleUrlPlayer);
     return () => window.removeEventListener('popstate', handleUrlPlayer);
-  }, [customerList]);
+  }, [customerList, selectedCustomerId]);
 
   // New Player Registration Modal State (Bug Fix Requerimiento 7)
   const [isNewPlayerModalOpen, setIsNewPlayerModalOpen] = useState(false);
@@ -269,7 +284,13 @@ export const AdminCustomers: React.FC = () => {
     return (
       <AdminMemberProfile
         member={selectedCustomer}
-        onBack={() => setSelectedCustomer(null)}
+        onBack={() => {
+          setSelectedCustomer(null);
+          setSelectedCustomerId(null);
+          if (typeof window !== 'undefined' && window.location.pathname.includes('/jugadores')) {
+            window.history.pushState({}, '', '/gestion/jugadores');
+          }
+        }}
       />
     );
   }

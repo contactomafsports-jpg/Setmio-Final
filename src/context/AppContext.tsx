@@ -229,11 +229,26 @@ const readRoute = () => {
     };
   }
   if (remainingPath === '/gestion' || remainingPath.startsWith('/gestion/')) {
-    const admin = (Object.entries(routeForAdminTab).find(([, route]) => route === remainingPath)?.[0] || 'dashboard') as AdminTab;
+    const admin = (Object.entries(routeForAdminTab).find(([, route]) => route === remainingPath || remainingPath.startsWith(route))?.[0] || 'dashboard') as AdminTab;
     return {
       view: 'admin' as MainView,
       page: 'home' as PublicPage,
       admin,
+      player: 'dashboard' as PlayerTab,
+      clubSlug: activeClubSlug,
+      isCorporate: false,
+    };
+  }
+  if (
+    remainingPath === '/jugadores' ||
+    remainingPath.startsWith('/jugadores/') ||
+    remainingPath === '/gestion/jugadores' ||
+    remainingPath.startsWith('/gestion/jugadores/')
+  ) {
+    return {
+      view: 'admin' as MainView,
+      page: 'home' as PublicPage,
+      admin: 'customers' as AdminTab,
       player: 'dashboard' as PlayerTab,
       clubSlug: activeClubSlug,
       isCorporate: false,
@@ -445,6 +460,11 @@ interface AppContextType {
   notifications: NotificationItem[];
   unreadNotificationsCount: number;
   markNotificationsAsRead: () => void;
+
+  // CRM Player Profile Navigation
+  selectedCustomerId: string | null;
+  setSelectedCustomerId: (id: string | null) => void;
+  navigateToPlayerProfile: (playerNameOrId: string) => void;
 
   // AI Assistant Chat
   aiMessages: AIMessage[];
@@ -1462,6 +1482,29 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
   };
 
+  // CRM Player Profile Navigation
+  const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(null);
+
+  const navigateToPlayerProfile = (playerNameOrId: string) => {
+    const slug = playerNameOrId
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9]+/g, '-');
+    setSelectedCustomerId(playerNameOrId);
+    setCurrentViewState('admin');
+    setAdminTabState('customers');
+    if (typeof window !== 'undefined') {
+      window.history.pushState({}, '', `/gestion/jugadores/${slug}`);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    triggerDemoToast(
+      'Ficha de Jugador',
+      `Abriendo ficha técnica y perfil CRM de ${playerNameOrId}.`,
+      'info'
+    );
+  };
+
   // Floating AI Chat
   const [aiMessages, setAiMessages] = useState<AIMessage[]>([
     {
@@ -1657,6 +1700,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         notifications,
         unreadNotificationsCount,
         markNotificationsAsRead,
+
+        selectedCustomerId,
+        setSelectedCustomerId,
+        navigateToPlayerProfile,
 
         aiMessages,
         sendAIMessage,

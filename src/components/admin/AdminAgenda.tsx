@@ -28,12 +28,46 @@ export const AdminAgenda: React.FC = () => {
     toggleCourtLight,
     currentUser,
     triggerDemoToast,
+    navigateToPlayerProfile,
   } = useApp();
 
   const [currentDate, setCurrentDate] = useState('2026-09-30');
   const [selectedDrawerData, setSelectedDrawerData] = useState<ReservationDrawerData | null>(null);
   const [showNewModal, setShowNewModal] = useState(false);
   const [showAllBookingsView, setShowAllBookingsView] = useState(false);
+  const dateInputRef = React.useRef<HTMLInputElement>(null);
+
+  const stepDate = (days: number) => {
+    const parts = currentDate.split('-').map(Number);
+    const d = new Date(parts[0], parts[1] - 1, parts[2]);
+    d.setDate(d.getDate() + days);
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const dt = String(d.getDate()).padStart(2, '0');
+    setCurrentDate(`${y}-${m}-${dt}`);
+  };
+
+  const formattedDateLabel = React.useMemo(() => {
+    try {
+      const parts = currentDate.split('-').map(Number);
+      const d = new Date(parts[0], parts[1] - 1, parts[2]);
+      const today = new Date();
+      const isToday =
+        d.getFullYear() === today.getFullYear() &&
+        d.getMonth() === today.getMonth() &&
+        d.getDate() === today.getDate();
+      const weekday = d.toLocaleDateString('es-ES', { weekday: 'short' });
+      const month = d.toLocaleDateString('es-ES', { month: 'short' });
+      const capWeekday = weekday.charAt(0).toUpperCase() + weekday.slice(1).replace('.', '');
+      const capMonth = month.charAt(0).toUpperCase() + month.slice(1).replace('.', '');
+      if (isToday) {
+        return `Hoy, ${d.getDate()} ${capMonth}`;
+      }
+      return `${capWeekday}, ${d.getDate()} ${capMonth}`;
+    } catch {
+      return currentDate;
+    }
+  }, [currentDate]);
 
   // New reservation from reception
   const [newCourtId, setNewCourtId] = useState(courts[0]?.id || 'court-1');
@@ -166,49 +200,69 @@ export const AdminAgenda: React.FC = () => {
   return (
     <div className="space-y-6 text-slate-900 dark:text-slate-100 max-w-7xl mx-auto">
       {/* ======================================================================
-          1. ENCABEZADO DE PÁGINA (ESTÁNDAR CANÓNICO)
+          1. ENCABEZADO DE PÁGINA (LAYOUT DE 2 FILAS EN MÓVIL, 1 EN DESKTOP)
           ====================================================================== */}
-      <div className="flex items-center justify-between gap-2 sm:gap-4 flex-nowrap">
-        <div className="min-w-0">
-          <h1 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white tracking-tight truncate">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+        {/* Fila 1 en móvil / Izquierda en desktop: Título sin recortarse */}
+        <div className="w-full sm:w-auto min-w-0">
+          <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
             Reservas y Disponibilidad
           </h1>
-          <p className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 mt-0.5 truncate hidden sm:block">
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 hidden sm:block">
             Cuadrante interactivo y gestión diaria del club
           </p>
         </div>
 
-        <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
-          {/* Controles de Fecha */}
-          <div className="flex items-center gap-0.5 sm:gap-1 bg-white dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 rounded-xl px-1 py-0.5 text-xs shadow-xs">
+        {/* Fila 2 en móvil (Selector a la izquierda, Botón a la derecha) / Derecha en desktop */}
+        <div className="flex items-center justify-between sm:justify-end gap-2.5 w-full sm:w-auto">
+          {/* Selector de Fechas Moderno, Minimalista y Dark/Emerald */}
+          <div className="inline-flex items-center bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-1 shadow-xs transition hover:border-emerald-500/50">
             <button
               type="button"
-              onClick={() => setCurrentDate('2026-09-29')}
-              className="p-1 rounded text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-700/60 transition"
+              onClick={() => stepDate(-1)}
+              className="p-1.5 rounded-xl text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
               title="Día anterior"
             >
-              <ChevronLeft className="w-3.5 h-3.5" />
+              <ChevronLeft className="w-4 h-4" />
             </button>
-            <input
-              type="date"
-              value={currentDate}
-              onChange={(e) => setCurrentDate(e.target.value)}
-              className="bg-transparent text-slate-900 dark:text-white font-bold text-xs focus:outline-none px-1 sm:px-1.5 cursor-pointer max-w-[110px] sm:max-w-none"
-            />
+
+            {/* Pill Central Estilizada */}
+            <div
+              onClick={() => dateInputRef.current?.showPicker ? dateInputRef.current.showPicker() : dateInputRef.current?.focus()}
+              className="relative flex items-center gap-1.5 px-3 py-1 rounded-xl bg-slate-50 dark:bg-slate-800/80 hover:bg-emerald-50 dark:hover:bg-emerald-950/60 text-slate-800 dark:text-slate-200 hover:text-emerald-600 dark:hover:text-emerald-400 cursor-pointer transition select-none"
+              title="Seleccionar otra fecha"
+            >
+              <Calendar className="w-3.5 h-3.5 text-emerald-500" />
+              <span className="text-xs font-bold whitespace-nowrap">
+                {formattedDateLabel}
+              </span>
+              <input
+                ref={dateInputRef}
+                type="date"
+                value={currentDate}
+                onChange={(e) => {
+                  if (e.target.value) setCurrentDate(e.target.value);
+                }}
+                className="absolute inset-0 opacity-0 pointer-events-auto cursor-pointer w-full h-full"
+                aria-label="Seleccionar fecha"
+              />
+            </div>
+
             <button
               type="button"
-              onClick={() => setCurrentDate('2026-10-01')}
-              className="p-1 rounded text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-700/60 transition"
+              onClick={() => stepDate(1)}
+              className="p-1.5 rounded-xl text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
               title="Día siguiente"
             >
-              <ChevronRight className="w-3.5 h-3.5" />
+              <ChevronRight className="w-4 h-4" />
             </button>
           </div>
 
+          {/* Botón Nueva Reserva: Sin icono + redundante */}
           <button
             type="button"
             onClick={() => setShowNewModal(true)}
-            className="px-3 sm:px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-xs transition active:scale-95 shrink-0 whitespace-nowrap cursor-pointer"
+            className="px-4 py-2 rounded-2xl bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-black text-xs shadow-sm transition shrink-0 whitespace-nowrap cursor-pointer"
           >
             <span>Nueva Reserva</span>
           </button>
@@ -369,6 +423,10 @@ export const AdminAgenda: React.FC = () => {
         onCancelReservation={(id) => {
           cancelBooking(id);
           setSelectedDrawerData(null);
+        }}
+        onOpenPlayerProfile={(playerName) => {
+          setSelectedDrawerData(null);
+          navigateToPlayerProfile(playerName);
         }}
       />
 
