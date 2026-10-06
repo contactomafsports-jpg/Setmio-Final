@@ -132,7 +132,7 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
     if (onOpenDemoRoleModal) {
       onOpenDemoRoleModal();
     } else {
-      triggerDemoToast('Selector de Demo', 'Abriendo selector de roles...', 'info');
+      triggerDemoToast(t('demo.selectorToastTitle', 'Demo selector'), t('demo.selectorToastDescription', 'Opening role selector...'), 'info');
     }
   };
 
@@ -144,7 +144,7 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
     switchUserRole(role);
     const view = role === 'SUPERADMIN' ? 'hq' : role === 'TENANT_OWNER' ? 'admin' : role === 'COACH' ? 'coach' : 'player';
     setCurrentView(view);
-    triggerDemoToast('Demo Setmio', `Abriendo experiencia de ${view}...`, 'info');
+    triggerDemoToast(t('demo.experienceToastTitle', 'Setmio Demo'), `${t('demo.experienceToastDescription', 'Opening the')} ${view} ${t('demo.experienceToastSuffix', 'experience...')}`, 'info');
   };
 
   const handleOpenFeaturesClick = () => {
