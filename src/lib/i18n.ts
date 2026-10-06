@@ -2810,7 +2810,7 @@ export const TRANSLATIONS: Record<SupportedLanguage, Record<string, string>> = {
     "home.search.players.indoor": "ملعب داخلي مكيّف",
     "home.search.submit": "التحقق من التوفر",
     "home.search.featured": "المرافق المميزة:",
-    "home.search.all": "عر�� الكل",
+    "home.search.all": "عر���� الكل",
     "home.search.book": "حجز →",
     "home.teams.eyebrow": "المنافسة والنادي",
     "home.teams.title": "تعرف على فِرقنا",
@@ -3013,6 +3013,19 @@ for (const [lang, dict] of Object.entries(ALL_EXTRA_TRANSLATIONS)) {
       ...dict,
     };
   }
+}
+
+/** English is the canonical secondary fallback for every supported language. */
+export const fallbackLng: SupportedLanguage[] = ['en', 'es'];
+
+// Keep every public key available in every dictionary. A missing localized value
+// therefore resolves to English instead of leaking a Spanish source string.
+const englishDictionary = TRANSLATIONS.en;
+for (const language of SUPPORTED_LANGUAGES) {
+  TRANSLATIONS[language.code] = {
+    ...englishDictionary,
+    ...TRANSLATIONS[language.code],
+  };
 }
 
 // Some dictionaries contain untranslated Spanish copies. Multi-word strings identical

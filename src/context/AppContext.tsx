@@ -35,7 +35,7 @@ import {
   INITIAL_AUDIT_LOGS,
   INITIAL_PAGE_BLOCKS,
 } from '../data/initialData';
-import { SupportedLanguage, TRANSLATIONS } from '../lib/i18n';
+import { fallbackLng, SupportedLanguage, TRANSLATIONS } from '../lib/i18n';
 import { checkPermission, PermissionAction, PermissionCheckResult } from '../lib/permissions';
 
 export type MainView = 'public' | 'admin' | 'player' | 'coach' | 'hq';
@@ -730,10 +730,15 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   }, [language]);
 
   const t = useCallback((key: string, fallback?: string): string => {
-    if (language === 'es') {
-      return TRANSLATIONS.es?.[key] || fallback || key;
+    const localizedValue = TRANSLATIONS[language]?.[key];
+    if (localizedValue) return localizedValue;
+
+    for (const fallbackLanguage of fallbackLng) {
+      const fallbackValue = TRANSLATIONS[fallbackLanguage]?.[key];
+      if (fallbackValue) return fallbackValue;
     }
-    return TRANSLATIONS[language]?.[key] || TRANSLATIONS.en?.[key] || fallback || key;
+
+    return fallback || key;
   }, [language]);
 
   // Modals state
