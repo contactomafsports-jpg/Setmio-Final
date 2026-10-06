@@ -182,7 +182,7 @@ export const CorporateFooter: React.FC<CorporateFooterProps> = ({ minimized = fa
                   onClick={() => navigateTo('/para-jugadores', 'players_app')}
                   className="hover:text-cyan-400 transition text-left font-medium text-slate-300"
                 >
-                  Para Jugadores Particulares (App PWA)
+                  Para Jugadores Particulares
                 </button>
               </li>
             </ul>

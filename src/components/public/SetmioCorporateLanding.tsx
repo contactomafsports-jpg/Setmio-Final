@@ -56,8 +56,8 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
     currentTenant,
     tenants,
     plans,
-    theme,
-    toggleTheme,
+    corporateTheme,
+    toggleCorporateTheme,
     language,
     setLanguage,
     switchUserRole,
@@ -244,11 +244,11 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
 
             {/* Theme Toggle */}
             <button
-              onClick={toggleTheme}
-              className="p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
-              title={theme === 'dark' ? 'Modo claro' : 'Modo oscuro'}
+              onClick={toggleCorporateTheme}
+              className="p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+              title={corporateTheme === 'dark' ? 'Modo claro' : 'Modo oscuro'}
             >
-              {theme === 'dark' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-slate-700" />}
+              {corporateTheme === 'dark' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-slate-700" />}
             </button>
 
             {/* Button: Registrarse (Lleva al onboarding asistido) */}
@@ -785,7 +785,7 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-[.8fr_1.2fr] gap-10 items-center">
           <div className="space-y-5">
             <div className="text-xs font-bold uppercase tracking-[0.2em] text-emerald-400">Eficiencia y Automatización Real</div>
-            <h2 className="text-3xl sm:text-5xl font-black tracking-tight">Beneficios operativos reales para tu gestión diaria</h2>
+            <h2 className="text-3xl sm:text-5xl font-black tracking-tight">Beneficios operativos reales para la gestión diaria de tu club</h2>
             <p className="text-sm sm:text-base text-slate-300 leading-relaxed">
               Descubre cómo una infraestructura de software moderna ahorra cientos de horas en recepción, elimina las reservas no cobradas mediante pasarelas automatizadas y multiplica la ocupación en horas valle sin intervención manual.
             </p>
@@ -821,7 +821,7 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
                 Ecosistema Modular Integral
               </div>
               <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-slate-900 dark:text-white">
-                Módulos principales incluidos en la plataforma
+                Todo lo que tu club necesita en una sola suscripción
               </h2>
               <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 max-w-2xl">
                 Herramientas diseñadas para operar de forma unificada: gestión de pistas, escuela, competiciones, domótica, TPV y marca blanca en una sola infraestructura sin fricción.
@@ -831,10 +831,10 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
             <button
               type="button"
               onClick={() => navigatePublicRoute('/modulos', 'features')}
-              className="shrink-0 px-6 py-3.5 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white dark:bg-emerald-600 dark:hover:bg-emerald-500 font-bold text-xs shadow-md transition-all flex items-center gap-2 hover:gap-3 cursor-pointer"
+              className="shrink-0 px-6 py-3.5 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white dark:bg-emerald-600 dark:hover:bg-emerald-500 font-bold text-xs shadow-md transition-all flex items-center gap-2 hover:gap-3 cursor-pointer active:scale-95"
             >
               <Sliders className="w-4 h-4 text-emerald-400 dark:text-white" />
-              <span>Ver todos los Módulos y Funcionalidades</span>
+              <span>Ver todo</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>

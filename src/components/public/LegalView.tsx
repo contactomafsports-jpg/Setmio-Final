@@ -1,13 +1,18 @@
 import React from 'react';
 import { useApp } from '../../context/AppContext';
 import { Shield, FileText, Lock } from 'lucide-react';
+import { SubpageHeaderNav } from './SubpageHeaderNav';
 
-export const LegalView: React.FC = () => {
+export const LegalView: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
   const { currentTenant } = useApp();
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-12 text-slate-900 dark:text-slate-100 transition-colors duration-200">
-      <div>
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-10 text-slate-900 dark:text-slate-100 transition-colors duration-200">
+      <div className="flex items-center justify-start">
+        <SubpageHeaderNav onBack={onBack} />
+      </div>
+
+      <div className="text-left space-y-2">
         <div className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
           Transparencia & Cumplimiento Legal
         </div>

@@ -6,6 +6,7 @@ import {
   Users,
   CheckCircle2,
   ArrowRight,
+  ArrowLeft,
   Zap,
   ShieldCheck,
   CreditCard,
@@ -21,6 +22,7 @@ import {
   Clock,
   ChevronRight,
   TrendingUp,
+  Check,
 } from 'lucide-react';
 import { SubpageHeaderNav } from './SubpageHeaderNav';
 import { useApp } from '../../context/AppContext';
@@ -33,13 +35,12 @@ export interface SolucionesPageProps {
   onOpenRole?: (roleId: string) => void;
 }
 
-export type SolutionRoleKey = 'clubes' | 'profesores' | 'profesionales' | 'jugadores';
+export type ProfessionalRoleKey = 'clubes' | 'profesores' | 'profesionales';
 
 interface RoleDetailData {
-  id: SolutionRoleKey;
+  id: ProfessionalRoleKey;
   badge: string;
-  productLine: 'Setmio Pro' | 'Setmio Player';
-  productLineColor: string;
+  productLine: string;
   icon: React.ComponentType<{ className?: string }>;
   title: string;
   subtitle: string;
@@ -67,12 +68,11 @@ interface RoleDetailData {
   demoCta: string;
 }
 
-const ROLES_DATA: Record<SolutionRoleKey, RoleDetailData> = {
+const PROFESSIONAL_ROLES_DATA: Record<ProfessionalRoleKey, RoleDetailData> = {
   clubes: {
     id: 'clubes',
     badge: 'Clubes & Complejos Deportivos',
     productLine: 'Setmio Pro',
-    productLineColor: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30',
     icon: Building2,
     title: 'Setmio Pro para Clubes de Pádel y Centros Deportivos',
     subtitle: 'El sistema operativo integral para automatizar cuadrantes, luces LED, cobros e ingresos sin intermediarios.',
@@ -95,7 +95,7 @@ const ROLES_DATA: Record<SolutionRoleKey, RoleDetailData> = {
           'Bloqueo preventivo instantáneo por mantenimiento, lluvia o celebración de torneos oficiales.',
           'Soporte multi-sede con gestión centralizada desde un único panel administrativo.',
         ],
-        technicalDetail: 'Arquitectura basada en Server-Sent Events (SSE) y WebSockets con renderizado reactivo a <50ms.',
+        technicalDetail: 'Arquitectura reactiva basada en Server-Sent Events (SSE) y WebSockets con renderizado a <50ms.',
       },
       {
         icon: Zap,
@@ -158,266 +158,176 @@ const ROLES_DATA: Record<SolutionRoleKey, RoleDetailData> = {
 
   profesores: {
     id: 'profesores',
-    badge: 'Profesores, Monitores & Academias',
+    badge: 'Escuelas & Academias de Pádel',
     productLine: 'Setmio Pro',
-    productLineColor: 'bg-teal-500/10 text-teal-600 dark:text-cyan-400 border-teal-500/30',
     icon: GraduationCap,
-    title: 'Setmio Pro para Profesores y Academias de Pádel',
-    subtitle: 'Planificación docente, fichas metodológicas de nivel técnico y cobro automatizado de cuotas escolares.',
+    title: 'Setmio Pro para Profesores, Entrenadores y Escuelas',
+    subtitle: 'Gestión académica, cobros recurrentes de cuotas mensuales y control técnico del progreso deportivo.',
     heroDescription:
-      'La herramienta definitiva para coordinadores de escuela de club y entrenadores profesionales autónomos. Organiza grupos de nivel homogéneo, pasa lista en pista desde tu smartphone con un clic, gestiona listas de espera y domicilia cuotas mensuales SEPA sin errores bancarios.',
+      'Creado para coordinadores de escuela, academias de menores y profesores particulares de pádel. Automatiza la domiciliación de mensualidades, gestiona sustituciones docentes y evalúa el nivel de juego con evaluaciones técnicas que fidelizan a tus alumnos.',
     metrics: [
-      { value: '99%', label: 'Cobro Puntual de Cuotas', sub: 'Automatización de remesas SEPA y cobros por tarjeta' },
-      { value: '+35%', label: 'Retención de Alumnos', sub: 'Seguimiento visible de progreso y feedback técnico' },
-      { value: '0 errores', label: 'Conflictos en Pistas', sub: 'Reserva automática vinculada a cuadrante docente' },
-      { value: '1 clic', label: 'Control de Asistencia', sub: 'Pase de lista digital en pista desde cualquier móvil' },
+      { value: '100%', label: 'Cobro Puntual de Cuotas', sub: 'Remesas automáticas por tarjeta o recibo bancario' },
+      { value: '-90%', label: 'Tiempo en Organización', sub: 'Grupos nivelados y calendarios trimestrales automáticos' },
+      { value: '+45%', label: 'Retención de Alumnos', sub: 'Fichas técnicas con objetivos pedagógicos visibles' },
+      { value: '0 €', label: 'Comisiones de Gestión', sub: 'Todo el ingreso va directo a la cuenta de la escuela' },
     ],
     pillars: [
       {
         icon: Calendar,
-        title: 'Planificación Docente & Calendario de Grupos',
+        title: 'Gestión de Grupos, Niveles y Horarios Docentes',
         description:
-          'Configura temporadas completas, cursos trimestrales y clases particulares individuales o por parejas con asignación visual de pistas y profesores.',
+          'Planifica cursos trimestrales, mensuales o clinics intensivos. Asigna pistas, fija ratios de 3 o 4 alumnos por monitor y gestiona recuperaciones por lluvia en un clic.',
         bullets: [
-          'Gestión de grupos homogéneos por edad (menores/adultos) y nivel decimal (ej. 2.5 a 3.0).',
-          'Sustituciones automáticas por lluvia o ausencias con lista de espera en tiempo real.',
-          'Portal del profesor para consultar horarios semanales y alumnos asignados.',
+          'Filtro de grupos por edades (menores, iniciación, perfeccionamiento y competición).',
+          'Control de asistencia en pista desde la app del profesor con pase de lista táctil.',
+          'Lista de espera automática que cubre vacantes libres en cuanto un alumno se da de baja.',
         ],
-        technicalDetail: 'Algoritmo de detección de solapamientos entre pistas docentes y reservas de alquiler libre.',
+        technicalDetail: 'Motor de emparejamiento por nivel decimal que garantiza homogeneidad técnica en cada grupo.',
       },
       {
         icon: CreditCard,
-        title: 'Cobro Recurrente de Cuotas & Remesas SEPA',
+        title: 'Cobro Recurrente de Mensualidades sin Esfuerzo',
         description:
-          'Olvídate de perseguir a los alumnos para el cobro de la mensualidad. Genera archivos bancarios oficiales o cargos en tarjeta con reintentos automáticos.',
+          'Despídete de perseguir a los alumnos en la pista. El sistema domicilia la cuota el día 1 de cada mes por tarjeta o remesa bancaria SEPA.',
         bullets: [
-          'Generación de remesas bancarias SEPA XML (Norma 19 / ISO 20022) en un clic.',
-          'Cobro recurrente por tarjeta de crédito con gestión inteligente de tarjetas vencidas.',
-          'Desglose automático de liquidaciones de honorarios para cada profesor colaborador.',
+          'Facturación automática con envío de recibo digital por email al tutor o alumno.',
+          'Cobro prorrateado para incorporaciones a mitad de mes.',
+          'Descuentos automáticos para hermanos o socios del club.',
         ],
-        technicalDetail: 'Validación algorítmica de cuentas bancarias IBAN/BIC conforme a estándares bancarios europeos.',
+        technicalDetail: 'Emisión automática de ficheros SEPA XML (norma 19) e integración con pasarela de suscripciones recurrentes.',
       },
       {
-        icon: TrendingUp,
-        title: 'Ficha Técnica Deportiva & Nivelación Decimal',
+        icon: BarChart3,
+        title: 'Ficha Técnica Deportiva y Evaluación Continua',
         description:
-          'Evalúa y documenta la evolución técnica y táctica de cada alumno con métricas objetivas reconocidas por federaciones y escuelas de alto rendimiento.',
+          'Aporta valor real a tus clases. Registra el progreso técnico (bandeja, víbora, salida de pared, táctica) y compártelo con el alumno desde su perfil privado.',
         bullets: [
-          'Evaluación pormenorizada por golpes: bandeja, víbora, remate x3, bajada de pared y volea.',
-          'Historial de evolución con notas del entrenador y objetivos personalizados.',
-          'Certificado de nivel decimal deportivo para garantizar partidos nivelados.',
+          'Notas metodológicas y asignación de tareas técnicas para el próximo entrenamiento.',
+          'Historial de partidos de entrenamiento y evolución de nivel decimal.',
+          'Informe de rendimiento semestral descargable en PDF para padres de menores.',
         ],
-        technicalDetail: 'Matriz técnica adaptable a los estándares metodológicos de la FEP y Premier Padel.',
+        technicalDetail: 'Gráficos de radar de habilidades y seguimiento de objetivos con cálculo estadístico de progresión.',
       },
       {
         icon: Smartphone,
-        title: 'Portal de Alumnos y Comunicación con Familias',
+        title: 'Portal Web Propio para Entrenadores Independientes',
         description:
-          'Canal de comunicación profesional que centraliza avisos de escuela, recibos descargables y cambios de horario sin saturar grupos de mensajería.',
+          'Si eres entrenador particular sin club fijo, Setmio te ofrece tu propio portal web de marca blanca para que tus clientes reserven tus clases particulares.',
         bullets: [
-          'Avisos urgentes por SMS y notificaciones sobre suspensiones por climatología adversa.',
-          'Área privada para padres con seguimiento del alumno menor y descarga de facturas.',
-          'Solicitud de recuperaciones de clase sujetas a política configurable por la escuela.',
+          'Agenda pública con tus horas disponibles para clases particulares.',
+          'Cobro anticipado obligatorio de la clase particular para evitar cancelaciones de última hora.',
+          'Sincronización bidireccional con tu calendario personal de Google Calendar o Apple Calendar.',
         ],
-        technicalDetail: 'Notificaciones push en web móvil y correo transaccional autenticado SPF/DKIM.',
+        technicalDetail: 'Integración iCal con feeds en tiempo real para evitar solapamientos con tu agenda privada.',
       },
     ],
     technicalSpecs: [
-      { category: 'Gestión Bancaria SEPA', description: 'Generación de cuadernos bancarios estándar ISO 20022', badge: 'Norma 19 SEPA XML' },
-      { category: 'Nivelación Deportiva', description: 'Algoritmo ponderado de nivel decimal (1.00 - 7.00)', badge: 'Algoritmo Dinámico' },
-      { category: 'Acceso en Pista', description: 'Interfaz táctil optimizada para uso en smartphone al aire libre', badge: 'Mobile-First' },
-      { category: 'Liquidación Docente', description: 'Cálculo automático de honorarios por hora y retenciones', badge: 'Módulo Fiscal Pro' },
+      { category: 'Motor de Facturación', description: 'Cobro recurrente mensual/trimestral con reintentos inteligentes', badge: 'SEPA / Stripe Billing' },
+      { category: 'Sincronización Docente', description: 'Agenda sincronizada con calendarios externos mediante protocolo iCal', badge: 'iCal / Google Sync' },
+      { category: 'App del Profesor', description: 'Control de asistencia táctil y fichas técnicas accesible desde smartphone', badge: 'Mobile Web App' },
+      { category: 'Gestión de Menores', description: 'Vinculación de tutores legales con consentimiento RGPD de menores', badge: 'Cumplimiento Legal' },
     ],
     workflowSteps: [
-      { step: '01', title: 'Configuración de Cursos', desc: 'Define niveles, ratios de alumnos por monitor y precios de matrícula.' },
-      { step: '02', title: 'Asignación de Pistas y Monitores', desc: 'El sistema bloquea pistas docentes y confirma plazas a alumnos inscritos.' },
-      { step: '03', title: 'Impartición y Control en Pista', desc: 'Pasa lista desde el móvil en pista y evalúa el progreso técnico del alumno.' },
-      { step: '04', title: 'Cobro Automatizado a Fin de Mes', desc: 'Las cuotas se cobran solas y los alumnos reciben sus facturas digitales.' },
+      { step: '01', title: 'Inscripción y Nivelación', desc: 'El alumno o tutor se inscribe online y el sistema lo ubica en el grupo pedagógico adecuado.' },
+      { step: '02', title: 'Automatización de Cobro', desc: 'La cuota mensual se cobra automáticamente sin necesidad de transferencias manuales.' },
+      { step: '03', title: 'Entrenamiento y Asistencia', desc: 'El profesor pasa lista en pista y registra observaciones técnicas en 30 segundos.' },
+      { step: '04', title: 'Informe de Evolución', desc: 'El alumno consulta su informe de progreso deportivo en su perfil móvil privado.' },
     ],
-    roiTitle: 'Rentabilidad Operativa para Directores de Academia y Monitores',
+    roiTitle: 'Ventajas Competitivas para Escuelas y Profesores',
     roiBullets: [
-      'Reducción drástica del 90% en tiempo dedicado a contabilidad y reclamación de impagados.',
-      'Control de aforos que evita pérdidas económicas por clases sobredimensionadas o infrautilizadas.',
-      'Mayor prestigio profesional y captación de nuevos alumnos con portal web de marca propia.',
-      'Trazabilidad absoluta del rendimiento laboral y de ingresos por cada monitor de la plantilla.',
+      'Eliminación total de bajas por impago y cobro garantizado el primer día de cada mes.',
+      'Ahorro de más de 12 horas mensuales en confección de horarios y cuadre de grupos.',
+      'Profesionalización de la imagen docente frente a alumnos y padres de familia.',
+      'Incremento de ingresos por captación de nuevos alumnos mediante lista de espera automatizada.',
     ],
-    demoCta: 'Solicitar Demo para Profesores y Academias',
+    demoCta: 'Solicitar Demo para Escuelas y Entrenadores',
   },
 
   profesionales: {
     id: 'profesionales',
-    badge: 'Atletas Profesionales & Jugadores WPT',
+    badge: 'Jugadores Profesionales & WPT / Premier',
     productLine: 'Setmio Pro',
-    productLineColor: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30',
     icon: Trophy,
     title: 'Setmio Pro para Jugadores Profesionales de Pádel',
-    subtitle: 'Gestión de carrera de élite, catálogo de sponsors, agenda FIP/Premier Padel y portal oficial de atleta.',
+    subtitle: 'Tu plataforma digital oficial de marca propia para gestionar patrocinios, calendarios FIP y clinics.',
     heroDescription:
-      'Diseñado para jugadores del circuito internacional profesional (Premier Padel, FIP Tour, A1Padel). Centraliza tus compromisos contractuales de patrocinio, vende plazas para tus clinics de fin de semana con pasarela propia y ofrece a tus seguidores un portal oficial de máxima categoría.',
+      'Orientado a atletas profesionales de circuitos Premier Padel, A1 Padel y FIP. Centraliza tu presencia digital de élite, ofrece a tus sponsors una vitrina tecnológica con métricas de visibilidad y comercializa clinics y exhibiciones directamente sin agencias intermediarias.',
     metrics: [
-      { value: '100%', label: 'Control de Marca Personal', sub: 'Presencia web de élite con dominio propio sin intermediarios' },
-      { value: '+45%', label: 'Ingresos por Clinics & VIP', sub: 'Gestión y cobro directo de eventos privados y exhibiciones' },
-      { value: '0 %', label: 'Comisiones de Venta', sub: 'Tienda de material y ropa firmada directa para el atleta' },
-      { value: '24/7', label: 'Visibilidad de Patrocinadores', sub: 'Espacio de alta fidelidad para marcas y contratos de sponsor' },
+      { value: '100%', label: 'Marca Personal Exclusiva', sub: 'Dominio propio y estética oficial de atleta de élite' },
+      { value: '0%', label: 'Comisiones a Intermediarios', sub: 'Venta directa de clinics y productos oficiales' },
+      { value: '+60%', label: 'Retorno a Patrocinadores', sub: 'Espacios dinámicos y métricas de impacto comercial' },
+      { value: '24/7', label: 'Agenda y Torneos en Vivo', sub: 'Resultados y retransmisiones accesibles para tu afición' },
     ],
     pillars: [
-      {
-        icon: Smartphone,
-        title: 'Portal Oficial Web con Dominio Propio',
-        description:
-          'Una web oficial de máxima resolución con tu identidad corporativa, biografía oficial, palmarés deportivo, ranking FIP actualizado y agenda de torneos.',
-        bullets: [
-          'Diseño visual exclusivo adaptado a tus colores e isotipo personal.',
-          'Prensa, dossier de patrocinio descargable y formulario directo para contrataciones.',
-          'Galería multimedia de torneos y sesiones fotográficas oficiales.',
-        ],
-        technicalDetail: 'Hosting CDN mundial con rendimiento de carga ultra-rápido (<0.8s) y certificado SSL gratuito.',
-      },
-      {
-        icon: ShieldCheck,
-        title: 'Gestión y Escaparate de Patrocinadores',
-        description:
-          'Ofrece a tus marcas de pala, textil, calzado y sponsors corporativos un espacio digital prémium que justifica su inversión publicitaria.',
-        bullets: [
-          'Espacio destacado de sponsors con enlaces de afiliados y códigos de descuento.',
-          'Métricas de visitas e impacto digital para presentar en renovaciones de contrato.',
-          'Protección estricta de exclusividades por categoría comercial.',
-        ],
-        technicalDetail: 'Seguimiento de conversiones y clics mediante analytics respetuosos con la privacidad.',
-      },
-      {
-        icon: Calendar,
-        title: 'Booking de Clinics, Exhibiciones & Eventos VIP',
-        description:
-          'Permite que clubes de cualquier parte del mundo soliciten y contraten fechas para exhibiciones, partidos pro-am y clinics formativos de fin de semana.',
-        bullets: [
-          'Calendario público de disponibilidad coordinado con tu agenda de torneos FIP.',
-          'Reserva de fecha con pago de señal bancaria previo para garantizar el compromiso.',
-          'Contrato de prestación de servicios con cláusulas de desplazamiento y alojamiento.',
-        ],
-        technicalDetail: 'Pasarela internacional multidivisa compatible con tarjetas de todo el mundo y transferencias.',
-      },
       {
         icon: Trophy,
-        title: 'Tienda Oficial de Merchandising Exclusivo',
+        title: 'Presencia Digital Oficial de Marca Blanca',
         description:
-          'Vende directamente a tus fans camisetas firmadas, palas de edición especial y merchandising oficial sin pagar comisiones a plataformas externas.',
+          'Una web oficial de alto impacto estético con tu propio nombre de dominio, biografías deportivas, palmarés oficial y galería multimedia de torneos.',
         bullets: [
-          'Catálogo de productos exclusivos para coleccionistas y seguidores fieles.',
-          'Cobro seguro con Stripe Checkout y notificación de pedido a tu equipo logístico.',
-          'Venta de entradas VIP para palcos de torneos y sesiones Meet & Greet.',
+          'Diseño responsive premium adaptado a los estándares de las grandes marcas internacionales.',
+          'Sección interactiva con tu pala oficial, zapatillas, patrocinadores de indumentaria y partners.',
+          'Canal de comunicación directo con tu club de fans y aficionados de todo el mundo.',
         ],
-        technicalDetail: 'Integración e-commerce ligera con pasarela de pagos directos a la cuenta bancaria del jugador.',
+        technicalDetail: 'Despliegue sobre CDN global de baja latencia con optimización SEO para indexación en Google.',
       },
-    ],
-    technicalSpecs: [
-      { category: 'Sincronización de Torneos', description: 'Feed oficial de calendario Premier Padel y FIP Tour', badge: 'API Calendarios FIP' },
-      { category: 'Pagos Internacionales', description: 'Cobro en múltiples divisas con liquidación bancaria directa', badge: 'Stripe Connect Global' },
-      { category: 'Rendimiento y CDN', description: 'Entrega de imágenes y contenido multimedia de alta fidelidad', badge: 'Edge CDN Global' },
-      { category: 'Seguridad de Datos', description: 'Protección estricta de agenda privada y contratos comerciales', badge: 'Cifrado AES-256' },
-    ],
-    workflowSteps: [
-      { step: '01', title: 'Lanzamiento de Portal Oficial', desc: 'Configura tu web de atleta con sponsors, biografía y palmarés.' },
-      { step: '02', title: 'Publicación de Agenda y Clinics', desc: 'Indica torneos confirmados y fechas disponibles para eventos VIP.' },
-      { step: '03', title: 'Contratación Directa de Clubes', desc: 'Clubes y empresas contratan clinics abonando la señal de reserva.' },
-      { step: '04', title: 'Monetización sin Intermediarios', desc: 'Recibe los ingresos directos por sponsors, clinics y merchandising.' },
-    ],
-    roiTitle: 'Maximización del Valor de Marca para Jugadores de Élite',
-    roiBullets: [
-      'Independencia comercial absoluta frente a intermediarios para la gestión de exhibiciones.',
-      'Herramienta tangible para negociar aumentos en contratos de patrocinio mostrando métricas.',
-      'Canal directo de ingresos recurrentes a través de merchandising oficial y masterclasses.',
-      'Posicionamiento de imagen profesional y de prestigio en el ecosistema mundial del pádel.',
-    ],
-    demoCta: 'Solicitar Demo para Jugadores Profesionales',
-  },
-
-  jugadores: {
-    id: 'jugadores',
-    badge: 'Jugadores Particulares & Amateurs',
-    productLine: 'Setmio Player',
-    productLineColor: 'bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border-cyan-500/30',
-    icon: Users,
-    title: 'Setmio Player para Jugadores Particulares y Amateurs',
-    subtitle: 'La app móvil diseñada para reservar en 15 segundos, encontrar compañeros de tu nivel y jugar sin fricción.',
-    heroDescription:
-      'El producto creado exclusivamente para los jugadores apasionados del pádel. Olvídate de llamar por teléfono para reservar pista, reclamar Bizums a tus amigos o jugar partidos descompensados. Con Setmio Player, tu móvil es tu cuadrante, tu monedero y la llave que enciende las luces de tu pista.',
-    metrics: [
-      { value: '< 15s', label: 'Tiempo de Reserva', sub: 'Cuadrante en tiempo real con selección visual de pista y horario' },
-      { value: '1.0 - 7.0', label: 'Nivel Decimal Dinámico', sub: 'Equilibrio matemático de parejas en partidos abiertos' },
-      { value: '1/4 Split', label: 'Pago Dividido por Jugador', sub: 'Cada compañero paga únicamente su parte de la pista' },
-      { value: '0 esperas', label: 'Apertura Domótica por PIN', sub: 'Entrada y focos automatizados sin pasar por mostrador' },
-    ],
-    pillars: [
       {
         icon: Calendar,
-        title: 'Reserva Rápida en Tus Clubes Favoritos',
+        title: 'Calendario Oficial de Torneos FIP y Premier Padel',
         description:
-          'Consulta la disponibilidad en vivo de pistas cubiertas, exteriores o panorámicas con precios claros y confirmación instantánea sin intermediarios.',
+          'Mantén a tus seguidores y patrocinadores al día de tu agenda competitiva internacional con fechas, sedes, cuadros de juego y retransmisiones.',
         bullets: [
-          'Cuadrante interactivo en tiempo real con filtro por horario, club y tipo de pista.',
-          'Reserva recurrente fija para tu partida semanal con tus amigos habituales.',
-          'Cancelación flexible según la política configurada por tu club de referencia.',
+          'Cuenta atrás interactiva para el próximo torneo del circuito.',
+          'Enlaces directos a streaming de partidos y marcadores en directo.',
+          'Historial de victorias, ranking mundial FIP y puntos acumulados en la temporada.',
         ],
-        technicalDetail: 'Consultas en tiempo real mediante caché ultra-rápida y actualización de slots en milisegundos.',
-      },
-      {
-        icon: Users,
-        title: 'Partidos Abiertos con Nivel Dinámico (Play!)',
-        description:
-          '¿Te falta un cuarto jugador? Únete a partidos abiertos filtrados por tu nivel decimal exacto (ej. 3.75) y tu posición preferida en la pista.',
-        bullets: [
-          'Filtro por posición: drive, revés o indistinto para partidos siempre nivelados.',
-          'Chat integrado del partido para coordinar detalles con los compañeros.',
-          'Actualización de tu nivel deportivo al introducir el resultado del partido.',
-        ],
-        technicalDetail: 'Algoritmo ELO adaptado a pádel por parejas que recalcula el rating tras cada enfrentamiento.',
+        technicalDetail: 'Módulo de torneos con soporte para streaming embebido de YouTube y marcadores en vivo.',
       },
       {
         icon: CreditCard,
-        title: 'Pago Dividido Automático (Split Payment)',
+        title: 'Venta de Clinics, Exhibiciones y Masterclasses',
         description:
-          'Nunca más tendrás que adelantar el importe total de la pista ni perseguir a tus amigos para que te hagan un Bizum.',
+          'Monetiza tus días libres entre torneos. Organiza clinics exclusivos para clubes, masterclasses VIP para empresas y gestiona la venta de plazas online.',
         bullets: [
-          'Cada jugador paga su 25% de la pista desde su propio smartphone.',
-          'Monedero digital de club recargable con bonos automáticos que regalan saldo.',
-          'Múltiples métodos de pago: Bizum, tarjeta de crédito bancaria o monedero.',
+          'Pasarela de cobro directa a tu cuenta bancaria sin comisiones abusivas de agencias.',
+          'Límite de plazas por evento con confirmación automática y código QR de acceso.',
+          'Gestión de contratos y facturación para clubes anfitriones de tus exhibiciones.',
         ],
-        technicalDetail: 'Cálculo dinámico de importes fraccionados con tolerancia a pagos mixtos por saldo y tarjeta.',
+        technicalDetail: 'Pasarela PCI-DSS con soporte multidivisa para eventos en España, Europa y Latinoamérica.',
       },
       {
-        icon: Zap,
-        title: 'Tu Teléfono es la Llave del Club (Domótica IoT)',
+        icon: Smartphone,
+        title: 'Tienda Oficial de Merchandising y Palas Firmadas',
         description:
-          'Disfruta de la máxima autonomía. Al confirmar tu reserva, tu aplicación genera el código PIN y código QR para acceder al club y activar los focos.',
+          'Vende directamente tu equipación oficial, camisetas de juego firmadas y palas de edición especial con envío internacional.',
         bullets: [
-          'Apertura de la puerta exterior, tornos y cancela de pista con tu código único.',
-          'Los focos LED de tu pista se encienden solos a la hora exacta de tu partido.',
-          'Acceso 24/7 sin necesidad de que haya personal presente en la instalación.',
+          'Catálogo de productos exclusivos con autentificación de firma.',
+          'Control de inventario y cálculo de gastos de envío internacional.',
+          'Integración con pasarelas de pago seguro con tarjeta y Apple Pay.',
         ],
-        technicalDetail: 'Códigos PIN temporales de 4 dígitos sincronizados con los controladores IP de la pista.',
+        technicalDetail: 'Motor e-commerce ligero integrado con pasarela de pago segura y trazabilidad de envíos.',
       },
     ],
     technicalSpecs: [
-      { category: 'Matchmaking Deportivo', description: 'Emparejamiento por posición y nivel decimal (1.00 - 7.00)', badge: 'Algoritmo Play!' },
-      { category: 'Monedero Digital', description: 'Saldo prepago con bonificaciones del club y recarga instantánea', badge: 'Wallet Integrado' },
-      { category: 'Acceso Domótico', description: 'Generación de códigos PIN y QR vinculados a la reserva', badge: 'IoT Smart Access' },
-      { category: 'Estadísticas Pro', description: 'Historial de partidos, porcentaje de victorias y rivales habituales', badge: 'Ficha de Atleta' },
+      { category: 'Rendimiento Web', description: 'Puntuación 100/100 en Google Core Web Vitals para máxima velocidad', badge: 'Edge CDN' },
+      { category: 'Pasarela Global', description: 'Cobro multidivisa (EUR, USD, GBP) con liquidación directa', badge: 'Stripe International' },
+      { category: 'Métricas de Sponsors', description: 'Analítica de clics y visualizaciones de logotipos de patrocinadores', badge: 'Analytics Pro' },
+      { category: 'Streaming en Directo', description: 'Integración nativa con señales de streaming de YouTube y Twitch', badge: 'Live Video' },
     ],
     workflowSteps: [
-      { step: '01', title: 'Selección de Pista en 15s', desc: 'Elige club, día y hora en el cuadrante interactivo desde tu smartphone.' },
-      { step: '02', title: 'Invita a Amigos o Abre Plazas', desc: 'Añade a tus compañeros habituales o permite que se unan jugadores de tu nivel.' },
-      { step: '03', title: 'Cada Jugador Paga su Parte', desc: 'El sistema cobra a cada participante su fracción de pista por monedero o tarjeta.' },
-      { step: '04', title: 'Abre y Juega con tu PIN', desc: 'Introduce tu código en la puerta de la pista, la luz se enciende sola y ¡a jugar!' },
+      { step: '01', title: 'Configuración de Marca Oficial', desc: 'Activamos tu web con tus colores oficiales, biografía y logotipos de sponsors.' },
+      { step: '02', title: 'Publicación de Agenda y Torneos', desc: 'Tu equipo o mánager actualiza el calendario de competición en 2 minutos.' },
+      { step: '03', title: 'Lanzamiento de Clinics y Eventos', desc: 'Publica fechas de masterclasses y recibe los pagos de plazas en tu banco.' },
+      { step: '04', title: 'Reportes para Patrocinadores', desc: 'Genera informes de impacto y visibilidad para presentar en renovaciones de contratos.' },
     ],
-    roiTitle: 'Beneficios Reales para Jugadores Particulares y Amateurs',
+    roiTitle: 'Beneficios Comerciales para Atletas Profesionales',
     roiBullets: [
-      'Ahorro total de tiempo en la organización de partidos semanales.',
-      'Cero discusiones económicas: cada jugador responde de su pago de forma individual.',
-      'Garantía de partidos competitivos gracias a la nivelación decimal sin sorpresas.',
-      'Autonomía total para jugar a cualquier hora, incluso en clubes sin personal en mostrador.',
+      'Independencia total de intermediarios en la comercialización de eventos y clinics.',
+      'Justificación demostrable del valor publicitario ofrecido a las marcas patrocinadoras.',
+      'Canal de venta directo de merchandising de alta rentabilidad.',
+      'Consolidación de tu imagen de marca personal en el ecosistema mundial del pádel.',
     ],
-    demoCta: 'Probar Experiencia Setmio Player',
+    demoCta: 'Solicitar Demo para Jugadores Profesionales',
   },
 };
 
@@ -430,51 +340,49 @@ export function SolucionesPage({
 }: SolucionesPageProps) {
   const { setPublicPage, triggerDemoToast } = useApp();
 
-  const getInitialRole = (): SolutionRoleKey => {
-    if (roleId === 'escuelas' || roleId === 'schools') return 'profesores';
-    if (roleId && roleId in ROLES_DATA) return roleId as SolutionRoleKey;
-    if (typeof window !== 'undefined') {
-      const path = window.location.pathname;
-      if (path.includes('clubes')) return 'clubes';
-      if (path.includes('profesores') || path.includes('escuelas')) return 'profesores';
-      if (path.includes('jugadores-profesionales') || path.includes('profesionales')) return 'profesionales';
-      if (path.includes('jugadores') || path.includes('para-jugadores')) return 'jugadores';
-    }
-    return 'clubes';
+  const resolveSelectedRole = (): ProfessionalRoleKey | null => {
+    if (roleId === 'clubes') return 'clubes';
+    if (roleId === 'profesores' || roleId === 'escuelas' || roleId === 'schools') return 'profesores';
+    if (roleId === 'profesionales' || roleId === 'pro_players') return 'profesionales';
+    return null;
   };
 
-  const [activeRoleKey, setActiveRoleKey] = useState<SolutionRoleKey>(getInitialRole);
+  const [selectedRoleKey, setSelectedRoleKey] = useState<ProfessionalRoleKey | null>(resolveSelectedRole);
 
   useEffect(() => {
-    if (roleId && roleId in ROLES_DATA) {
-      setActiveRoleKey(roleId as SolutionRoleKey);
-    }
+    const resolved = resolveSelectedRole();
+    setSelectedRoleKey(resolved);
   }, [roleId]);
 
-  const activeRole = ROLES_DATA[activeRoleKey] || ROLES_DATA.clubes;
-
-  const handleRoleChange = (key: SolutionRoleKey) => {
-    setActiveRoleKey(key);
+  const handleSelectRole = (key: ProfessionalRoleKey) => {
+    setSelectedRoleKey(key);
     if (onOpenRole) {
       onOpenRole(key);
     }
     if (typeof window !== 'undefined') {
-      const pathMap: Record<SolutionRoleKey, string> = {
+      const pathMap: Record<ProfessionalRoleKey, string> = {
         clubes: '/soluciones/clubes',
         profesores: '/soluciones/profesores',
         profesionales: '/soluciones/jugadores-profesionales',
-        jugadores: '/para-jugadores',
       };
       window.history.pushState({}, '', pathMap[key]);
     }
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleDemoClick = () => {
+  const handleBackToGrid = () => {
+    setSelectedRoleKey(null);
+    if (typeof window !== 'undefined') {
+      window.history.pushState({}, '', '/soluciones');
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleDemoClick = (roleBadge?: string) => {
     if (onOpenDemo) {
       onOpenDemo();
     } else {
-      triggerDemoToast('Demo Guiada', `Iniciando demostración interactiva para ${activeRole.badge}`, 'info');
+      triggerDemoToast('Demo Guiada', `Iniciando demostración interactiva para ${roleBadge || 'profesionales'}`, 'info');
     }
   };
 
@@ -487,284 +395,479 @@ export function SolucionesPage({
     }
   };
 
+  const navigateToPlayerDetails = () => {
+    if (typeof window !== 'undefined') {
+      window.history.pushState({}, '', '/para-jugadores');
+      window.dispatchEvent(new PopStateEvent('popstate'));
+    }
+    setPublicPage('players_app');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // --- VISTA DETALLADA DEL ROL SELECCIONADO ---
+  if (selectedRoleKey) {
+    const activeRole = PROFESSIONAL_ROLES_DATA[selectedRoleKey];
+    const Icon = activeRole.icon;
+
+    return (
+      <main className="min-h-[calc(100vh-5rem)] bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 py-8 sm:py-12 px-4 sm:px-6 lg:px-8 transition-colors duration-200">
+        <div className="max-w-7xl mx-auto space-y-12">
+          {/* Navigation Button alineado a la izquierda */}
+          <div className="flex items-center justify-between">
+            <button
+              type="button"
+              onClick={handleBackToGrid}
+              className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-bold text-slate-700 shadow-xs transition hover:border-emerald-400 hover:text-emerald-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200 dark:hover:text-emerald-400 cursor-pointer active:scale-95"
+            >
+              <ArrowLeft className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+              <span>Volver a Soluciones</span>
+            </button>
+
+            <span className="text-xs font-bold text-slate-500 dark:text-slate-400 hidden sm:inline">
+              Setmio Pro · {activeRole.badge}
+            </span>
+          </div>
+
+          {/* Hero Header Detallado (Alineado limpiamente a la izquierda) */}
+          <section className="relative overflow-hidden rounded-3xl bg-slate-50 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 p-8 sm:p-12 lg:p-16 shadow-sm dark:shadow-2xl">
+            <div className="relative z-10 max-w-4xl space-y-6 text-left">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 font-bold text-xs uppercase tracking-wider border border-emerald-500/20">
+                <Icon className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                <span>{activeRole.badge}</span>
+              </div>
+
+              <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-slate-900 dark:text-white leading-tight">
+                {activeRole.title}
+              </h1>
+
+              <p className="text-lg sm:text-xl font-medium text-emerald-600 dark:text-emerald-400 leading-snug">
+                {activeRole.subtitle}
+              </p>
+
+              <p className="text-slate-600 dark:text-slate-300 text-sm sm:text-base leading-relaxed font-normal">
+                {activeRole.heroDescription}
+              </p>
+
+              <div className="flex flex-wrap items-center gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => handleDemoClick(activeRole.badge)}
+                  className="inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs sm:text-sm transition shadow-lg shadow-emerald-600/20 active:scale-95 cursor-pointer"
+                >
+                  <Play className="w-4 h-4 fill-white" />
+                  <span>{activeRole.demoCta}</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleRegisterClick}
+                  className="inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-900 dark:text-white font-bold text-xs sm:text-sm border border-slate-300 dark:border-slate-700 transition active:scale-95 cursor-pointer"
+                >
+                  <span>Dar de Alta Directa</span>
+                  <ArrowRight className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                </button>
+              </div>
+            </div>
+          </section>
+
+          {/* Métricas y KPIs de Impacto */}
+          <section className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+            {activeRole.metrics.map((m, idx) => (
+              <div
+                key={idx}
+                className="p-6 rounded-3xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 space-y-1.5 shadow-xs"
+              >
+                <div className="text-3xl sm:text-4xl font-black font-mono text-emerald-600 dark:text-emerald-400">
+                  {m.value}
+                </div>
+                <div className="text-xs sm:text-sm font-black text-slate-900 dark:text-white">
+                  {m.label}
+                </div>
+                <div className="text-[11px] text-slate-500 dark:text-slate-400 leading-tight">
+                  {m.sub}
+                </div>
+              </div>
+            ))}
+          </section>
+
+          {/* 4 Pilares de la Solución con Profundidad Técnica */}
+          <section className="space-y-6">
+            <div className="space-y-1 text-left">
+              <span className="text-xs font-black uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
+                Arquitectura Funcional
+              </span>
+              <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
+                Pilares Tecnológicos y Operativos
+              </h2>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {activeRole.pillars.map((pillar, idx) => {
+                const PillarIcon = pillar.icon;
+                return (
+                  <div
+                    key={idx}
+                    className="p-8 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-5 shadow-xs hover:border-emerald-500/50 hover:shadow-lg transition-all duration-200 flex flex-col justify-between"
+                  >
+                    <div className="space-y-3">
+                      <div className="w-12 h-12 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold">
+                        <PillarIcon className="w-6 h-6" />
+                      </div>
+                      <h3 className="text-xl font-black text-slate-900 dark:text-white">
+                        {pillar.title}
+                      </h3>
+                      <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                        {pillar.description}
+                      </p>
+                      <ul className="space-y-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+                        {pillar.bullets.map((b, bIdx) => (
+                          <li key={bIdx} className="flex items-start gap-2 text-xs text-slate-700 dark:text-slate-300">
+                            <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
+                            <span>{b}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800/80 text-[11px] text-slate-500 dark:text-slate-400">
+                      <strong className="text-slate-800 dark:text-slate-200">Especificación técnica: </strong>
+                      {pillar.technicalDetail}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+
+          {/* Workflow Operativo Paso a Paso */}
+          <section className="space-y-6">
+            <div className="space-y-1 text-left">
+              <span className="text-xs font-black uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
+                Flujo de Trabajo
+              </span>
+              <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
+                ¿Cómo opera el sistema en el día a día?
+              </h2>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {activeRole.workflowSteps.map((wf) => (
+                <div
+                  key={wf.step}
+                  className="p-6 rounded-3xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 space-y-3 relative shadow-xs"
+                >
+                  <span className="text-2xl font-black font-mono text-emerald-600 dark:text-emerald-400">
+                    {wf.step}
+                  </span>
+                  <h4 className="text-sm font-bold text-slate-900 dark:text-white">
+                    {wf.title}
+                  </h4>
+                  <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                    {wf.desc}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          {/* Especificaciones Técnicas y Cumplimiento */}
+          <section className="p-8 rounded-3xl bg-slate-50 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 space-y-6">
+            <div className="flex items-center gap-2">
+              <ShieldCheck className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+              <h3 className="text-lg font-black text-slate-900 dark:text-white">
+                Ficha Técnica de Integración y Cumplimiento
+              </h3>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {activeRole.technicalSpecs.map((spec, sIdx) => (
+                <div key={sIdx} className="p-4 rounded-2xl bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 space-y-1.5 shadow-xs">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400">{spec.category}</span>
+                    <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-400 border border-emerald-500/20">
+                      {spec.badge}
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-700 dark:text-slate-300 font-medium">
+                    {spec.description}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          {/* ROI y Retorno Comercial */}
+          <section className="p-8 sm:p-10 rounded-3xl bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800/60 space-y-6">
+            <div className="space-y-1">
+              <span className="text-xs font-black uppercase tracking-wider text-emerald-700 dark:text-emerald-400">
+                Rentabilidad Demostrable
+              </span>
+              <h3 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
+                {activeRole.roiTitle}
+              </h3>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {activeRole.roiBullets.map((bullet, idx) => (
+                <div key={idx} className="flex items-start gap-3">
+                  <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+                  <span className="text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed font-medium">
+                    {bullet}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            <div className="pt-4 flex flex-wrap items-center gap-3">
+              <button
+                type="button"
+                onClick={() => handleDemoClick(activeRole.badge)}
+                className="px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition cursor-pointer shadow-md active:scale-95"
+              >
+                Solicitar Demostración Guiada
+              </button>
+              <button
+                type="button"
+                onClick={handleBackToGrid}
+                className="px-5 py-3 rounded-xl bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 font-bold text-xs border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer active:scale-95"
+              >
+                Ver Otras Soluciones
+              </button>
+            </div>
+          </section>
+        </div>
+      </main>
+    );
+  }
+
+  // --- VISTA PRINCIPAL: CUADRÍCULA DE TARJETAS RESUMEN DE SOLUCIONES ---
   return (
-    <main className="min-h-[calc(100vh-5rem)] bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 py-8 sm:py-12 px-4 sm:px-6 lg:px-8 transition-colors">
-      <div className="max-w-7xl mx-auto space-y-10 sm:space-y-12">
+    <main className="min-h-[calc(100vh-5rem)] bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 py-8 sm:py-12 px-4 sm:px-6 lg:px-8 transition-colors duration-200">
+      <div className="max-w-7xl mx-auto space-y-12">
         {/* Navigation Button alineado a la izquierda */}
         <div className="flex items-center justify-start">
           <SubpageHeaderNav onBack={onBack} />
         </div>
 
-        {/* Header Superior y Selector de Roles Tabs */}
-        <div className="space-y-6">
-          <div className="max-w-3xl space-y-3">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-xs font-black uppercase tracking-widest">
-              <Layers className="w-3.5 h-3.5" />
-              <span>Soluciones Especializadas por Perfil</span>
-            </div>
-            <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-slate-900 dark:text-white leading-tight">
-              Una plataforma diseñada para cada protagonista del pádel
-            </h1>
-            <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 leading-relaxed">
-              Explora en profundidad la arquitectura técnica, los flujos operativos reales y los beneficios comerciales adaptados específicamente a tu función.
-            </p>
+        {/* Header Superior (Alineado limpiamente a la izquierda) */}
+        <div className="space-y-4 max-w-3xl text-left">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-700 dark:text-emerald-400 text-xs font-black uppercase tracking-widest">
+            <Layers className="w-3.5 h-3.5" />
+            <span>Soluciones Especializadas por Perfil Profesional</span>
           </div>
 
-          {/* Navegación por Pestañas de Roles */}
-          <div className="flex flex-wrap gap-2.5 sm:gap-3 p-1.5 bg-slate-100 dark:bg-slate-900/90 rounded-2xl border border-slate-200 dark:border-slate-800">
-            {(Object.keys(ROLES_DATA) as SolutionRoleKey[]).map((key) => {
-              const role = ROLES_DATA[key];
-              const Icon = role.icon;
-              const isActive = activeRoleKey === key;
-              return (
-                <button
-                  key={key}
-                  type="button"
-                  onClick={() => handleRoleChange(key)}
-                  className={`flex-1 min-w-[150px] sm:min-w-0 flex items-center justify-center gap-2.5 px-4 py-3 rounded-xl font-bold text-xs sm:text-sm transition-all duration-200 cursor-pointer ${
-                    isActive
-                      ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-md border border-slate-200/80 dark:border-slate-700 font-black'
-                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white/50 dark:hover:bg-slate-800/50'
-                  }`}
-                >
-                  <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-emerald-600 dark:text-emerald-400' : ''}`} />
-                  <span className="truncate">{role.badge}</span>
-                </button>
-              );
-            })}
-          </div>
+          <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-slate-900 dark:text-white leading-tight">
+            Una plataforma diseñada para cada protagonista del pádel
+          </h1>
+
+          <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 leading-relaxed">
+            Descubre las soluciones de software de gestión integral y marca blanca diseñadas a medida para instalaciones deportivas, academias docentes y atletas profesionales de élite.
+          </p>
         </div>
 
-        {/* HERO ESPECÍFICO DEL ROL SELECCIONADO */}
-        <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-slate-950 to-slate-900 text-white p-8 sm:p-12 lg:p-14 border border-slate-800 shadow-2xl">
-          <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute bottom-0 left-1/4 w-80 h-80 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
-
-          <div className="relative z-10 space-y-8">
-            <div className="space-y-4 max-w-4xl">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border text-xs font-black uppercase tracking-wider backdrop-blur-md bg-white/5 border-white/15">
-                <activeRole.icon className="w-4 h-4 text-emerald-400" />
-                <span className="text-emerald-300 font-bold">{activeRole.productLine}</span>
-                <span className="text-slate-500">·</span>
-                <span className="text-slate-200">{activeRole.badge}</span>
+        {/* Cuadrícula de Tarjetas Resumen para cada rol profesional (Setmio Pro) */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch">
+          {/* Tarjeta 1: Clubes de Pádel */}
+          <article className="p-8 rounded-3xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-6 shadow-sm hover:border-emerald-500 hover:shadow-xl transition-all duration-300 flex flex-col justify-between group">
+            <div className="space-y-5">
+              <div className="flex items-center justify-between">
+                <div className="w-12 h-12 rounded-2xl bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold group-hover:scale-105 transition-transform">
+                  <Building2 className="w-6 h-6" />
+                </div>
+                <span className="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20">
+                  Setmio Pro
+                </span>
               </div>
 
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-tight">
-                {activeRole.title}
-              </h2>
-
-              <p className="text-base sm:text-lg text-emerald-200 font-semibold leading-relaxed">
-                {activeRole.subtitle}
-              </p>
-
-              <p className="text-sm sm:text-base text-slate-300 leading-relaxed max-w-3xl">
-                {activeRole.heroDescription}
-              </p>
-            </div>
-
-            {/* Métricas de Impacto Operativo del Rol */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 pt-4 border-t border-slate-800/80">
-              {activeRole.metrics.map((m, idx) => (
-                <div key={idx} className="p-4 sm:p-5 rounded-2xl bg-white/5 border border-white/10 space-y-1">
-                  <div className="text-2xl sm:text-3xl font-black font-mono text-emerald-400">
-                    {m.value}
-                  </div>
-                  <div className="text-xs sm:text-sm font-bold text-white">
-                    {m.label}
-                  </div>
-                  <div className="text-[11px] text-slate-400 leading-tight">
-                    {m.sub}
-                  </div>
+              <div>
+                <div className="text-[11px] font-black uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
+                  Instalaciones & Complejos
                 </div>
-              ))}
+                <h2 className="text-2xl font-black text-slate-900 dark:text-white mt-1">
+                  Clubes de Pádel
+                </h2>
+                <p className="text-xs text-slate-600 dark:text-slate-400 mt-2.5 leading-relaxed">
+                  Control absoluto de cuadrante de pistas, socios y facturación con marca blanca completa, automatización domótica de luces LED y cero comisiones por reserva.
+                </p>
+              </div>
+
+              <ul className="space-y-2.5 text-xs text-slate-700 dark:text-slate-300 border-t border-slate-200/80 dark:border-slate-800 pt-4">
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
+                  <span>Cuadrante táctil de pistas con encendido domótico de iluminación LED</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
+                  <span>Split payments (cobro de 1/4 por jugador vía Bizum y tarjeta)</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
+                  <span>TPV Bar / Cafetería, arqueos de caja y tienda pro-shop con palas de test</span>
+                </li>
+              </ul>
             </div>
 
-            {/* CTAs del Rol */}
-            <div className="pt-2 flex flex-wrap items-center gap-4">
+            <div className="pt-4 border-t border-slate-200/80 dark:border-slate-800">
               <button
                 type="button"
-                onClick={handleDemoClick}
-                className="inline-flex items-center gap-2.5 px-6 sm:px-8 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black text-xs sm:text-sm shadow-xl shadow-emerald-500/25 transition-all duration-200 hover:scale-[1.02] cursor-pointer"
+                onClick={() => handleSelectRole('clubes')}
+                className="w-full py-3.5 px-4 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs transition-all shadow-md shadow-emerald-600/20 flex items-center justify-center gap-2 cursor-pointer active:scale-95"
               >
-                <Play className="w-4 h-4 fill-slate-950" />
-                <span>{activeRole.demoCta}</span>
+                <span>Ver Solución Detallada para Clubes</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            </div>
+          </article>
+
+          {/* Tarjeta 2: Profesores y Academias */}
+          <article className="p-8 rounded-3xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-6 shadow-sm hover:border-teal-500 hover:shadow-xl transition-all duration-300 flex flex-col justify-between group">
+            <div className="space-y-5">
+              <div className="flex items-center justify-between">
+                <div className="w-12 h-12 rounded-2xl bg-teal-100 dark:bg-teal-950 text-teal-600 dark:text-cyan-400 flex items-center justify-center font-bold group-hover:scale-105 transition-transform">
+                  <GraduationCap className="w-6 h-6" />
+                </div>
+                <span className="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-teal-500/10 text-teal-700 dark:text-cyan-400 border border-teal-500/20">
+                  Setmio Pro
+                </span>
+              </div>
+
+              <div>
+                <div className="text-[11px] font-black uppercase tracking-wider text-teal-600 dark:text-cyan-400">
+                  Escuelas & Entrenadores
+                </div>
+                <h2 className="text-2xl font-black text-slate-900 dark:text-white mt-1">
+                  Profesores y Academias
+                </h2>
+                <p className="text-xs text-slate-600 dark:text-slate-400 mt-2.5 leading-relaxed">
+                  Herramientas profesionales para impartir clases particulares y grupales, evaluar la evolución técnica del alumno y automatizar cobros recurrentes de cuotas.
+                </p>
+              </div>
+
+              <ul className="space-y-2.5 text-xs text-slate-700 dark:text-slate-300 border-t border-slate-200/80 dark:border-slate-800 pt-4">
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-teal-500 shrink-0 mt-0.5" />
+                  <span>Cobro recurrente mensual de cuotas de escuela por domiciliación o tarjeta</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-teal-500 shrink-0 mt-0.5" />
+                  <span>Control de asistencia en pista, asignación docente y lista de espera</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-teal-500 shrink-0 mt-0.5" />
+                  <span>Portal web propio para entrenadores particulares y personal trainers</span>
+                </li>
+              </ul>
+            </div>
+
+            <div className="pt-4 border-t border-slate-200/80 dark:border-slate-800">
+              <button
+                type="button"
+                onClick={() => handleSelectRole('profesores')}
+                className="w-full py-3.5 px-4 rounded-2xl bg-teal-600 hover:bg-teal-500 text-white font-black text-xs transition-all shadow-md shadow-teal-600/20 flex items-center justify-center gap-2 cursor-pointer active:scale-95"
+              >
+                <span>Ver Solución Detallada para Profesores</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            </div>
+          </article>
+
+          {/* Tarjeta 3: Jugadores Profesionales */}
+          <article className="p-8 rounded-3xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-6 shadow-sm hover:border-amber-500 hover:shadow-xl transition-all duration-300 flex flex-col justify-between group">
+            <div className="space-y-5">
+              <div className="flex items-center justify-between">
+                <div className="w-12 h-12 rounded-2xl bg-amber-100 dark:bg-amber-950 text-amber-600 dark:text-amber-400 flex items-center justify-center font-bold group-hover:scale-105 transition-transform">
+                  <Trophy className="w-6 h-6" />
+                </div>
+                <span className="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20">
+                  Setmio Pro
+                </span>
+              </div>
+
+              <div>
+                <div className="text-[11px] font-black uppercase tracking-wider text-amber-600 dark:text-amber-400">
+                  Atletas Premier Padel & FIP
+                </div>
+                <h2 className="text-2xl font-black text-slate-900 dark:text-white mt-1">
+                  Jugadores Profesionales
+                </h2>
+                <p className="text-xs text-slate-600 dark:text-slate-400 mt-2.5 leading-relaxed">
+                  Gestiona tu carrera deportiva de élite, catálogo de patrocinadores, agenda oficial de torneos FIP y relación directa con sponsors y afición.
+                </p>
+              </div>
+
+              <ul className="space-y-2.5 text-xs text-slate-700 dark:text-slate-300 border-t border-slate-200/80 dark:border-slate-800 pt-4">
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
+                  <span>Perfil oficial de atleta y presencia web de marca blanca de alta fidelidad</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
+                  <span>Calendario de torneos internacionales, clinics de fin de semana y patrocinios</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
+                  <span>Tienda de equipación oficial firmada y venta de entradas VIP a exhibiciones</span>
+                </li>
+              </ul>
+            </div>
+
+            <div className="pt-4 border-t border-slate-200/80 dark:border-slate-800">
+              <button
+                type="button"
+                onClick={() => handleSelectRole('profesionales')}
+                className="w-full py-3.5 px-4 rounded-2xl bg-amber-600 hover:bg-amber-500 text-white font-black text-xs transition-all shadow-md shadow-amber-600/20 flex items-center justify-center gap-2 cursor-pointer active:scale-95"
+              >
+                <span>Ver Solución para Jugadores Pro</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            </div>
+          </article>
+        </div>
+
+        {/* CTA Destacado hacia Setmio Player (Amateurs y Jugadores Particulares) */}
+        <section className="rounded-3xl bg-gradient-to-r from-slate-900 via-slate-850 to-cyan-950 border border-cyan-500/30 p-8 sm:p-12 text-white shadow-xl relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-80 h-80 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
+
+          <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-8">
+            <div className="space-y-4 max-w-2xl text-left">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/20 text-cyan-300 font-bold text-xs uppercase tracking-wider border border-cyan-500/30">
+                <Users className="w-4 h-4 text-cyan-400" />
+                <span>Setmio Player · Para Jugadores Particulares y Amateurs</span>
+              </div>
+
+              <h2 className="text-2xl sm:text-4xl font-black tracking-tight text-white leading-tight">
+                ¿Buscas la experiencia como jugador para reservar y jugar?
+              </h2>
+
+              <p className="text-slate-300 text-xs sm:text-sm leading-relaxed">
+                Setmio Player es el portal móvil creado para que los aficionados al pádel reserven pista en segundos, se unan a partidos abiertos nivelados por rating decimal, dividan el pago con amigos y abran la pista con el móvil.
+              </p>
+            </div>
+
+            <div className="shrink-0 flex flex-col sm:flex-row lg:flex-col gap-3">
+              <button
+                type="button"
+                onClick={navigateToPlayerDetails}
+                className="px-8 py-4 rounded-2xl bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-400 hover:to-teal-400 text-slate-950 font-black text-xs sm:text-sm shadow-xl shadow-cyan-500/25 transition-all duration-200 hover:scale-[1.02] flex items-center justify-center gap-2 cursor-pointer active:scale-95"
+              >
+                <span>Conocer Setmio Player</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
 
               <button
                 type="button"
-                onClick={handleRegisterClick}
-                className="inline-flex items-center gap-2 px-6 sm:px-8 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl bg-white/10 hover:bg-white/15 text-white border border-white/20 font-bold text-xs sm:text-sm transition-all duration-200 cursor-pointer"
+                onClick={() => handleDemoClick('Jugadores')}
+                className="px-6 py-3.5 rounded-2xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs border border-white/20 transition flex items-center justify-center gap-2 cursor-pointer active:scale-95"
               >
-                <span>Registrarse Ahora</span>
+                <Play className="w-3.5 h-3.5 fill-white" />
+                <span>Ver Demo Player</span>
               </button>
             </div>
-          </div>
-        </section>
-
-        {/* 4 PILARES OPERATIVOS Y TÉCNICOS DETALLADOS */}
-        <section className="space-y-6">
-          <div className="space-y-2">
-            <h3 className="text-xs font-black uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
-              Pilares Funcionales y Operativos
-            </h3>
-            <h4 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">
-              Capacidades avanzadas diseñadas para tu día a día
-            </h4>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
-            {activeRole.pillars.map((pillar, idx) => {
-              const PillarIcon = pillar.icon;
-              return (
-                <div
-                  key={idx}
-                  className="p-7 sm:p-8 rounded-3xl bg-slate-50/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 space-y-5 hover:border-emerald-500/50 hover:shadow-xl transition-all duration-200 flex flex-col justify-between"
-                >
-                  <div className="space-y-4">
-                    <div className="w-12 h-12 rounded-2xl bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold">
-                      <PillarIcon className="w-6 h-6" />
-                    </div>
-
-                    <h5 className="text-xl font-black text-slate-900 dark:text-white">
-                      {pillar.title}
-                    </h5>
-
-                    <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-                      {pillar.description}
-                    </p>
-
-                    <ul className="space-y-2.5 text-xs text-slate-700 dark:text-slate-300 pt-2 border-t border-slate-200 dark:border-slate-800">
-                      {pillar.bullets.map((b, bIdx) => (
-                        <li key={bIdx} className="flex items-start gap-2">
-                          <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
-                          <span>{b}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  <div className="p-3.5 rounded-xl bg-white dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800/80 text-[11px] text-slate-500 dark:text-slate-400 font-mono flex items-center gap-2">
-                    <Cpu className="w-4 h-4 text-emerald-500 shrink-0" />
-                    <span className="truncate">{pillar.technicalDetail}</span>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </section>
-
-        {/* ESPECIFICACIONES TÉCNICAS Y ARQUITECTURA */}
-        <section className="rounded-3xl p-8 sm:p-10 bg-slate-900 text-white border border-slate-800 space-y-6">
-          <div className="space-y-2">
-            <div className="text-xs font-bold uppercase tracking-wider text-emerald-400">
-              Arquitectura e Integraciones
-            </div>
-            <h4 className="text-2xl sm:text-3xl font-black text-white">
-              Especificaciones Técnicas Certificadas
-            </h4>
-            <p className="text-xs sm:text-sm text-slate-400">
-              Infraestructura construida bajo estándares de alta disponibilidad, seguridad bancaria y compatibilidad de hardware.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {activeRole.technicalSpecs.map((spec, sIdx) => (
-              <div key={sIdx} className="p-5 rounded-2xl bg-slate-950 border border-slate-800/90 space-y-2.5">
-                <span className="inline-block px-2.5 py-1 rounded-md bg-emerald-500/20 text-emerald-400 text-[10px] font-black uppercase font-mono">
-                  {spec.badge}
-                </span>
-                <div className="font-bold text-sm text-white">{spec.category}</div>
-                <div className="text-xs text-slate-400 leading-relaxed">{spec.description}</div>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* FLUJO OPERATIVO EN EL DÍA A DÍA */}
-        <section className="space-y-6">
-          <div className="space-y-2">
-            <h3 className="text-xs font-black uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
-              Flujo de Trabajo Operativo
-            </h3>
-            <h4 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">
-              Cómo funciona en tu día a día en 4 sencillos pasos
-            </h4>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {activeRole.workflowSteps.map((wf, wIdx) => (
-              <div
-                key={wIdx}
-                className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-3 relative overflow-hidden"
-              >
-                <div className="text-3xl font-black font-mono text-emerald-500/40">
-                  {wf.step}
-                </div>
-                <h5 className="font-bold text-base text-slate-900 dark:text-white">
-                  {wf.title}
-                </h5>
-                <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-                  {wf.desc}
-                </p>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* RETORNO DE INVERSIÓN Y BENEFICIOS COMERCIALES */}
-        <section className="rounded-3xl p-8 sm:p-10 bg-gradient-to-r from-emerald-900/40 via-slate-900 to-teal-950/40 border border-emerald-500/30 text-white space-y-6">
-          <div className="space-y-2 max-w-2xl">
-            <div className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-emerald-400">
-              <BarChart3 className="w-4 h-4" />
-              <span>Retorno de Inversión Comprobado</span>
-            </div>
-            <h4 className="text-2xl sm:text-3xl font-black text-white">
-              {activeRole.roiTitle}
-            </h4>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {activeRole.roiBullets.map((roi, rIdx) => (
-              <div key={rIdx} className="p-4 rounded-2xl bg-white/5 border border-white/10 flex items-start gap-3">
-                <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
-                <span className="text-xs sm:text-sm text-slate-200 leading-relaxed">{roi}</span>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* CTA FINAL DE LA PÁGINA */}
-        <section className="text-center py-12 rounded-3xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-6">
-          <div className="max-w-2xl mx-auto space-y-3 px-4">
-            <h4 className="text-2xl sm:text-4xl font-black text-slate-900 dark:text-white">
-              ¿Listo para comprobarlo en directo?
-            </h4>
-            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-              Prueba la demo interactiva guiada con datos simulados del perfil de {activeRole.badge} o agenda una llamada con nuestros ingenieros.
-            </p>
-          </div>
-
-          <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
-            <button
-              type="button"
-              onClick={handleDemoClick}
-              className="px-8 py-4 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs sm:text-sm shadow-xl shadow-emerald-600/20 transition-all hover:scale-[1.02] cursor-pointer flex items-center gap-2"
-            >
-              <Play className="w-4 h-4 fill-white" />
-              <span>{activeRole.demoCta}</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={handleRegisterClick}
-              className="px-8 py-4 rounded-2xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 font-bold text-xs sm:text-sm text-slate-800 dark:text-slate-200 transition-all cursor-pointer"
-            >
-              <span>Registrarse Sin Permanencia</span>
-            </button>
           </div>
         </section>
       </div>
     </main>
   );
 }
+
+export default SolucionesPage;

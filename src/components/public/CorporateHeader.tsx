@@ -25,7 +25,7 @@ export function CorporateHeader({ onOpenDemo, onOpenAuth, onOpenRegister }: Corp
   const [open, setOpen] = React.useState(false);
   const [languageMenuOpen, setLanguageMenuOpen] = React.useState(false);
   const langRef = React.useRef<HTMLDivElement>(null);
-  const { t, language, setLanguage, theme, toggleTheme } = useApp();
+  const { t, language, setLanguage, corporateTheme, toggleCorporateTheme } = useApp();
   const close = () => setOpen(false);
   const navigate = (event: React.MouseEvent<HTMLAnchorElement>, path: string) => {
     event.preventDefault();
@@ -104,11 +104,11 @@ export function CorporateHeader({ onOpenDemo, onOpenAuth, onOpenRegister }: Corp
 
           <button
             type="button"
-            onClick={toggleTheme}
+            onClick={toggleCorporateTheme}
             className="rounded-xl p-2 text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800 cursor-pointer"
-            aria-label={theme === 'dark' ? 'Activar modo claro' : 'Activar modo oscuro'}
+            aria-label={corporateTheme === 'dark' ? 'Activar modo claro' : 'Activar modo oscuro'}
           >
-            {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+            {corporateTheme === 'dark' ? <Sun className="h-5 w-5 text-amber-400" /> : <Moon className="h-5 w-5" />}
           </button>
 
           <button

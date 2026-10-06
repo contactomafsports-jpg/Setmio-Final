@@ -776,9 +776,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const currentTenant = tenants.find((t) => t.id === currentTenantId) || tenants[0];
 
   // --- AISLAMIENTO DE TEMA SEGÚN ENTORNO ---
-  // El Panel Admin siempre mantiene de forma fija su modo oscuro canónico
+  // El Panel Admin / HQ siempre mantiene de forma fija su modo oscuro canónico
   const theme: ThemeMode =
-    currentView === 'admin'
+    currentView === 'admin' || currentView === 'hq'
       ? 'dark'
       : isCorporateLanding
       ? corporateTheme
@@ -786,7 +786,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const setTheme = useCallback(
     (mode: ThemeMode) => {
-      if (currentView === 'admin') return; // Admin siempre modo oscuro canónico
+      if (currentView === 'admin' || currentView === 'hq') return; // Admin siempre modo oscuro canónico
       if (isCorporateLanding) {
         setCorporateTheme(mode);
       } else {
@@ -797,7 +797,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   );
 
   const toggleTheme = useCallback(() => {
-    if (currentView === 'admin') return; // Admin siempre modo oscuro canónico
+    if (currentView === 'admin' || currentView === 'hq') return; // Admin siempre modo oscuro canónico
     if (isCorporateLanding) {
       toggleCorporateTheme();
     } else {
@@ -809,7 +809,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   useEffect(() => {
     const root = document.documentElement;
 
-    if (currentView === 'admin') {
+    if (currentView === 'admin' || currentView === 'hq') {
       root.classList.add('dark');
       root.classList.remove('light');
       return;

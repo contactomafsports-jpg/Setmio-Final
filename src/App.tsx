@@ -248,7 +248,7 @@ export function App() {
       case 'contact':
         return <ContactFAQView onBack={goHome} />;
       case 'legal':
-        return <LegalView />;
+        return <LegalView onBack={goHome} />;
       default:
         return <HomeView />;
     }

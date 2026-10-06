@@ -157,28 +157,28 @@ export const FeaturesView: React.FC<FeaturesViewProps> = ({
   return (
     <main className="min-h-[calc(100vh-4rem)] bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 py-10 transition-colors">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
-        {/* Navigation & Header */}
+        {/* Navigation & Action */}
         <div className="flex items-center justify-between">
           <SubpageHeaderNav onBack={handleBack} />
 
           {onOpenOnboarding && (
             <button
               onClick={onOpenOnboarding}
-              className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md transition cursor-pointer"
+              className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md transition cursor-pointer active:scale-95"
             >
               {t('features.register', 'Activar Mi Club')}
             </button>
           )}
         </div>
 
-        {/* Hero */}
-        <div className="text-center space-y-4 max-w-3xl mx-auto">
+        {/* Hero alineado a la izquierda */}
+        <div className="text-left space-y-4 max-w-3xl">
           <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-800 text-xs font-bold">
             <Layers className="w-4 h-4 text-emerald-500" />
             <span>Módulos de Software SaaS Setmio</span>
           </div>
 
-          <h1 className="text-4xl sm:text-5xl font-black text-slate-900 dark:text-white tracking-tight">
+          <h1 className="text-4xl sm:text-5xl font-black text-slate-900 dark:text-white tracking-tight leading-tight">
             Módulos y Funcionalidades de <span className="text-emerald-600 dark:text-emerald-400">Setmio</span>
           </h1>
 

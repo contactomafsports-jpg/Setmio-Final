@@ -16,6 +16,8 @@ import {
   ChevronRight,
   Clock,
   MapPin,
+  Check,
+  Play,
 } from 'lucide-react';
 import { SubpageHeaderNav } from './SubpageHeaderNav';
 import { useApp } from '../../context/AppContext';
@@ -29,8 +31,7 @@ interface ParaJugadoresPageProps {
 export function ParaJugadoresPage({ onBack, onOpenDemo, onOpenRegister }: ParaJugadoresPageProps) {
   const { t, setCurrentView } = useApp();
 
-  const handleDownloadApp = () => {
-    // Navigate to player portal demo or install prompt
+  const handleOpenPlayerPortal = () => {
     setCurrentView('player');
     window.scrollTo({ top: 0, behavior: 'instant' });
   };
@@ -38,157 +39,164 @@ export function ParaJugadoresPage({ onBack, onOpenDemo, onOpenRegister }: ParaJu
   const playerFeatures = [
     {
       icon: Calendar,
-      title: 'Reserva en menos de 15 segundos',
+      title: 'Reserva Rápida en Menos de 15 Segundos',
       description:
-        'Olvídate de llamar por teléfono o cruzar mensajes de WhatsApp. Consulta disponibilidad en tiempo real en todos tus clubes favoritos y reserva tu pista con un toque.',
-      highlight: 'Disponibilidad 24/7',
-      roleBadge: 'Alquiler: Jugador',
+        'Consulta disponibilidad de pistas cubiertas, panorámicas o exteriores en tiempo real. Selecciona turno, divide el pago y recibe tu confirmación instantánea sin intermediarios ni llamadas.',
+      highlight: 'Cuadrante en Tiempo Real',
+      roleBadge: 'Reservas 24/7',
+      technicalDetail: 'Prevención de colisiones de reserva por microsegundo y confirmación inmediata.',
     },
     {
       icon: Users,
-      title: 'Partidos Abiertos por Nivel',
+      title: 'Partidos Abiertos con Nivel Dinámico (Play!)',
       description:
-        '¿Te falta un cuarto jugador? Únete a partidos abiertos filtrados por tu nivel dinámico (1.0 a 7.0). El sistema equilibra parejas para partidos siempre competitivos.',
-      highlight: 'Level Matchmaking',
-      roleBadge: 'Partidos: Jugador',
+        '¿Te falta un cuarto jugador para tu partida? Crea o únete a partidos abiertos filtrados por tu nivel decimal exacto (ej. 3.75) y tu posición preferida en pista (drive, revés o indistinto).',
+      highlight: 'Algoritmo Matchmaking',
+      roleBadge: 'Partidos Nivelados',
+      technicalDetail: 'Algoritmo ELO adaptado a pádel por parejas que recalcula el rating tras cada partido.',
     },
     {
       icon: Wallet,
-      title: 'Pago Dividido y Monedero Club',
+      title: 'Pago Dividido Automático (Split Payments)',
       description:
-        'Paga únicamente tu parte de la pista directamente desde tu saldo o tarjeta. Recarga tu monedero con bonificaciones exclusivas del club y olvídate de deudas entre amigos.',
-      highlight: 'Cero morosidad',
-      roleBadge: 'Finanzas: Jugador',
-    },
-    {
-      icon: Trophy,
-      title: 'Historial, Ranking y Estadísticas',
-      description:
-        'Accede a tu ficha deportiva completa: porcentaje de victorias, evolución de nivel, compañero más frecuente, rival habitual y posición en el ranking oficial del club.',
-      highlight: 'Estadísticas Pro',
-      roleBadge: 'Competición: Jugador',
+        'Cada jugador paga su 25% de la pista directamente desde su propio móvil por Bizum, tarjeta o monedero virtual. Olvídate para siempre de perseguir a tus amigos para que te paguen.',
+      highlight: 'Cero Deudas',
+      roleBadge: '1/4 por Jugador',
+      technicalDetail: 'Liquidación directa al banco del club sin retención de fondos ni comisiones a jugadores.',
     },
     {
       icon: Zap,
-      title: 'Acceso y Focos Automatizados (IoT)',
+      title: 'Tu Teléfono es la Llave del Club (Domótica IoT)',
       description:
-        'Tu móvil es la llave del club. Abre puertas, tornos y activa la iluminación LED de tu pista automáticamente con código PIN o QR vinculado a tu reserva.',
-      highlight: 'Autonomía Total',
-      roleBadge: 'Domótica: Jugador',
+        'Al confirmar tu reserva, tu aplicación genera automáticamente el código PIN y código QR para abrir tornos, cancelas de pista y encender los focos LED en el horario exacto del partido.',
+      highlight: 'Pistas Autónomas',
+      roleBadge: 'Acceso Inteligente',
+      technicalDetail: 'Integración nativa con relés industriales y cerraduras electrónicas IP con tolerancia offline.',
+    },
+    {
+      icon: Trophy,
+      title: 'Ficha Deportiva, Nivel y Estadísticas Pro',
+      description:
+        'Accede a tu historial deportivo completo: porcentaje de victorias, evolución de nivel decimal, compañero más frecuente, rival habitual y posición en el ranking oficial del club.',
+      highlight: 'Rating Decimal',
+      roleBadge: 'Competición & Ranking',
+      technicalDetail: 'Registro pormenorizado de enfrentamientos y métricas de rendimiento por temporada.',
     },
     {
       icon: Activity,
-      title: 'Inscripción a Torneos y Pozos',
+      title: 'Inscripción a Torneos, Pozos y Ligas Sociales',
       description:
-        'Inscríbete junto a tu pareja en torneos federados, ligas de fin de semana y pozos americanos. Consulta cuadros de juego en vivo, horarios y actas de partidos.',
-      highlight: 'Ligas & Torneos',
-      roleBadge: 'Torneos: Jugador',
+        'Inscríbete junto a tu pareja en torneos federados, ligas regulares de fin de semana y pozos americanos. Consulta cuadros de juego en vivo, horarios de partidos y resultados al instante.',
+      highlight: 'Cuadros en Directo',
+      roleBadge: 'Torneos Oficiales',
+      technicalDetail: 'Generación automática de cuadros de eliminatorias y publicación de actas en tiempo real.',
     },
   ];
 
   return (
-    <main className="min-h-[calc(100vh-5rem)] bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 px-4 py-8 sm:px-6 lg:px-8 lg:py-16 transition-colors">
-      <div className="mx-auto max-w-6xl">
-        <SubpageHeaderNav onBack={onBack} />
+    <main className="min-h-[calc(100vh-5rem)] bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 px-4 py-8 sm:px-6 lg:px-8 lg:py-16 transition-colors duration-200">
+      <div className="mx-auto max-w-6xl space-y-12">
+        {/* Navigation Button alineado a la izquierda */}
+        <div className="flex items-center justify-start">
+          <SubpageHeaderNav onBack={onBack} />
+        </div>
 
-        {/* Hero Section para Jugadores */}
-        <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-slate-800 to-emerald-950 text-white p-8 sm:p-12 lg:p-16 border border-slate-800 shadow-2xl mb-12">
-          {/* Decorative glows */}
-          <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute bottom-0 left-1/3 w-64 h-64 bg-teal-500/10 rounded-full blur-2xl pointer-events-none" />
+        {/* Hero Section para Jugadores (Alineado limpiamente a la izquierda) */}
+        <section className="relative overflow-hidden rounded-3xl bg-slate-50 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 p-8 sm:p-12 lg:p-16 shadow-sm dark:shadow-2xl">
+          <div className="absolute top-0 right-0 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
 
           <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-            <div className="lg:col-span-7 space-y-6">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-xs uppercase tracking-wider border border-emerald-500/30">
-                <Smartphone className="w-4 h-4 text-emerald-400" />
-                <span>Setmio Player App · Para Jugadores de Pádel</span>
+            <div className="lg:col-span-7 space-y-6 text-left">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-cyan-500/10 text-cyan-700 dark:text-cyan-400 font-bold text-xs uppercase tracking-wider border border-cyan-500/20">
+                <Users className="w-4 h-4 text-cyan-600 dark:text-cyan-400" />
+                <span>Setmio Player · Para Jugadores Particulares y Amateurs</span>
               </div>
 
-              <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-tight">
+              <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-slate-900 dark:text-white leading-tight">
                 Juega más al pádel. <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400">
-                  Sin esperas ni llamadas.
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-600 via-teal-600 to-emerald-600 dark:from-cyan-400 dark:via-teal-300 dark:to-emerald-400">
+                  Sin esperas, llamadas ni deudas.
                 </span>
               </h1>
 
-              <p className="text-slate-300 text-base sm:text-lg leading-relaxed max-w-xl">
-                La aplicación móvil diseñada para que encuentres pista, completes partidos por nivel, pagues tu parte y compitas con tus amigos en los mejores clubes.
+              <p className="text-slate-600 dark:text-slate-300 text-base sm:text-lg leading-relaxed max-w-xl font-normal">
+                El portal móvil definitivo para los apasionados del pádel. Encuentra pista en tus clubes favoritos, completa partidos con compañeros de tu mismo nivel, divide el pago y abre la pista con tu móvil.
               </p>
 
               <div className="flex flex-wrap items-center gap-3 pt-2">
                 <button
                   type="button"
-                  onClick={handleDownloadApp}
-                  className="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-sm transition shadow-lg shadow-emerald-500/25 active:scale-95 cursor-pointer"
+                  onClick={handleOpenPlayerPortal}
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-6 sm:px-8 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-400 hover:to-teal-400 text-slate-950 font-black text-xs sm:text-sm shadow-xl shadow-cyan-500/20 hover:shadow-cyan-500/35 transition-all duration-200 hover:scale-[1.02] cursor-pointer text-center active:scale-95"
                 >
-                  <Smartphone className="w-4 h-4" />
-                  <span>Probar App de Jugador</span>
-                  <ArrowRight className="w-4 h-4" />
+                  <Smartphone className="w-4 h-4 shrink-0" />
+                  <span>Conocer Setmio Player</span>
+                  <ArrowRight className="w-4 h-4 shrink-0" />
                 </button>
 
                 <button
                   type="button"
                   onClick={onOpenDemo}
-                  className="inline-flex items-center gap-2 px-5 py-3.5 rounded-2xl bg-white/10 hover:bg-white/20 text-white font-bold text-sm border border-white/20 transition active:scale-95 cursor-pointer backdrop-blur-xs"
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl sm:rounded-2xl bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-900 dark:text-white font-bold text-xs sm:text-sm border border-slate-300 dark:border-slate-700 transition active:scale-95 cursor-pointer"
                 >
-                  <span>Ver Demo Completa</span>
+                  <Play className="w-3.5 h-3.5 fill-current" />
+                  <span>Ver Demo Guiada</span>
                 </button>
               </div>
 
-              <div className="pt-4 flex flex-wrap items-center gap-6 text-xs text-slate-400">
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                  <span>Acceso Móvil Instantáneo</span>
+              <div className="pt-2 flex flex-wrap items-center gap-6 text-xs text-slate-500 dark:text-slate-400 font-semibold">
+                <div className="flex items-center gap-1.5">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                  <span>Reserva en 15 segundos</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                  <span>Nivel Oficial 1.0 - 7.0</span>
+                <div className="flex items-center gap-1.5">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                  <span>Nivel Decimal 1.0 - 7.0</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                  <span>Pago Seguro Stripe / Bizum</span>
+                <div className="flex items-center gap-1.5">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                  <span>Split Payment con Bizum</span>
                 </div>
               </div>
             </div>
 
             {/* Mobile App Mockup Preview */}
             <div className="lg:col-span-5 flex justify-center">
-              <div className="w-full max-w-[300px] rounded-3xl bg-slate-900 border-4 border-slate-700/80 p-4 shadow-2xl space-y-3 relative">
+              <div className="w-full max-w-[320px] rounded-3xl bg-slate-900 text-white border-4 border-slate-700/80 p-5 shadow-2xl space-y-3.5 relative">
                 <div className="flex items-center justify-between text-[11px] font-mono text-slate-400 border-b border-slate-800 pb-2">
-                  <span>9:41</span>
-                  <span className="text-emerald-400 font-bold">SETMIO PLAY</span>
+                  <span>19:30</span>
+                  <span className="text-cyan-400 font-bold">SETMIO PLAYER</span>
                   <span>100% 🔋</span>
                 </div>
 
-                <div className="p-3 rounded-2xl bg-emerald-950/60 border border-emerald-500/30 text-xs">
+                <div className="p-3.5 rounded-2xl bg-cyan-950/60 border border-cyan-500/30 text-xs space-y-1.5">
                   <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-bold uppercase text-emerald-400">Próximo Partido</span>
+                    <span className="text-[10px] font-bold uppercase text-cyan-400">Próximo Partido</span>
                     <span className="px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-[9px] font-bold">Confirmado</span>
                   </div>
-                  <div className="font-black text-white mt-1">Hoy 19:30 - 21:00</div>
+                  <div className="font-black text-white text-sm">Hoy 19:30 - 21:00</div>
                   <div className="text-[11px] text-slate-300">Pista 1 Central · Pádel San Mateo</div>
-                  <div className="mt-2 pt-2 border-t border-emerald-800/40 flex items-center justify-between text-[10px] text-emerald-300">
-                    <span>PIN de acceso: <strong>#4829</strong></span>
-                    <span>Tu cuota: <strong>7.00 € (Pagado)</strong></span>
+                  <div className="pt-2 border-t border-cyan-800/40 flex items-center justify-between text-[10px] text-cyan-300">
+                    <span>PIN de acceso: <strong className="font-mono text-white text-xs">#4829</strong></span>
+                    <span>Tu parte: <strong className="text-emerald-400">7,00 €</strong> (Pagado)</span>
                   </div>
                 </div>
 
-                <div className="p-3 rounded-2xl bg-slate-800/80 border border-slate-700 text-xs space-y-1.5">
-                  <div className="text-[10px] font-bold uppercase text-slate-400">Mi Rendimiento</div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-slate-300">Nivel Dinámico</span>
-                    <span className="font-black text-emerald-400">3.85 ⭐</span>
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="p-3 rounded-2xl bg-slate-800/80 border border-slate-700 text-center">
+                    <span className="text-[10px] uppercase text-slate-400 font-bold block">Nivel Deportivo</span>
+                    <span className="text-lg font-black text-cyan-400 font-mono">3.85 ⭐</span>
                   </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-slate-300">Tasa de Victorias</span>
-                    <span className="font-bold text-white">68% (+4 racha)</span>
+                  <div className="p-3 rounded-2xl bg-slate-800/80 border border-slate-700 text-center">
+                    <span className="text-[10px] uppercase text-slate-400 font-bold block">Saldo Monedero</span>
+                    <span className="text-lg font-black text-emerald-400 font-mono">45,00 €</span>
                   </div>
                 </div>
 
                 <button
                   type="button"
-                  onClick={handleDownloadApp}
-                  className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition text-center shadow-xs cursor-pointer"
+                  onClick={handleOpenPlayerPortal}
+                  className="w-full py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-400 hover:to-teal-400 text-slate-950 font-black text-xs transition text-center shadow-md cursor-pointer active:scale-95"
                 >
                   Abrir Portal del Jugador
                 </button>
@@ -199,32 +207,32 @@ export function ParaJugadoresPage({ onBack, onOpenDemo, onOpenRegister }: ParaJu
 
         {/* Grid de Funcionalidades para Jugadores */}
         <section className="space-y-6">
-          <div className="text-center max-w-2xl mx-auto space-y-2">
-            <span className="text-xs font-black uppercase tracking-[0.2em] text-emerald-600 dark:text-emerald-400">
+          <div className="text-left space-y-1">
+            <span className="text-xs font-black uppercase tracking-wider text-cyan-600 dark:text-cyan-400">
               Experiencia del Jugador
             </span>
-            <h2 className="text-2xl sm:text-4xl font-black text-slate-900 dark:text-white tracking-tight">
-              Todo lo que necesitas para tu partido
+            <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
+              Todo lo que necesitas para tu partido semanal
             </h2>
-            <p className="text-slate-600 dark:text-slate-400 text-sm">
+            <p className="text-slate-600 dark:text-slate-400 text-xs sm:text-sm">
               Diseñado pensando exclusivamente en la agilidad del jugador amateur y competitivo.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {playerFeatures.map((feat) => {
               const Icon = feat.icon;
               return (
                 <div
                   key={feat.title}
-                  className="rounded-3xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/80 p-6 flex flex-col justify-between hover:border-emerald-500/50 transition shadow-xs group"
+                  className="rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-7 flex flex-col justify-between hover:border-cyan-500/50 hover:shadow-lg transition-all duration-200 group shadow-xs"
                 >
-                  <div className="space-y-3">
+                  <div className="space-y-4">
                     <div className="flex items-center justify-between">
-                      <div className="w-10 h-10 rounded-2xl bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center group-hover:scale-105 transition-transform">
+                      <div className="w-11 h-11 rounded-2xl bg-cyan-50 dark:bg-slate-800 text-cyan-600 dark:text-cyan-400 flex items-center justify-center group-hover:scale-105 transition-transform">
                         <Icon className="w-5 h-5" />
                       </div>
-                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
+                      <span className="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
                         {feat.roleBadge}
                       </span>
                     </div>
@@ -238,8 +246,8 @@ export function ParaJugadoresPage({ onBack, onOpenDemo, onOpenRegister }: ParaJu
                     </p>
                   </div>
 
-                  <div className="pt-4 mt-4 border-t border-slate-200/80 dark:border-slate-800 flex items-center justify-between text-xs">
-                    <span className="font-bold text-emerald-600 dark:text-emerald-400">
+                  <div className="pt-4 mt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs">
+                    <span className="font-bold text-cyan-600 dark:text-cyan-400">
                       {feat.highlight}
                     </span>
                     <CheckCircle2 className="w-4 h-4 text-emerald-500" />
@@ -251,25 +259,25 @@ export function ParaJugadoresPage({ onBack, onOpenDemo, onOpenRegister }: ParaJu
         </section>
 
         {/* CTA Banner Final */}
-        <section className="mt-12 rounded-3xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-8 text-center space-y-4">
+        <section className="rounded-3xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 p-8 sm:p-10 text-center space-y-4">
           <h3 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
             ¿Gestionas un club o escuela de pádel?
           </h3>
-          <p className="text-slate-600 dark:text-slate-400 text-sm max-w-xl mx-auto">
-            Descubre cómo Setmio conecta la aplicación del jugador con tu sistema de reservas, TPV, escuela y domótica para aumentar tus ingresos y ahorrar horas de gestión.
+          <p className="text-slate-600 dark:text-slate-400 text-xs sm:text-sm max-w-xl mx-auto leading-relaxed">
+            Descubre cómo Setmio conecta la experiencia del jugador con tu sistema de gestión de cuadrante, domótica IoT y facturación para aumentar tus ingresos sin esfuerzo.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
             <button
               type="button"
               onClick={onBack}
-              className="px-5 py-2.5 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold text-xs hover:bg-slate-800 transition cursor-pointer"
+              className="px-6 py-3 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold text-xs hover:bg-slate-800 transition cursor-pointer active:scale-95"
             >
               Ver Soluciones para Clubes
             </button>
             <button
               type="button"
-              onClick={handleDownloadApp}
-              className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition cursor-pointer"
+              onClick={handleOpenPlayerPortal}
+              className="px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition cursor-pointer shadow-md active:scale-95"
             >
               Entrar al Portal del Jugador
             </button>
@@ -279,3 +287,5 @@ export function ParaJugadoresPage({ onBack, onOpenDemo, onOpenRegister }: ParaJu
     </main>
   );
 }
+
+export default ParaJugadoresPage;
