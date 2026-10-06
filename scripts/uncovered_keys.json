@@ -1,0 +1,4270 @@
+{
+  "auth.loginHere": {
+    "en": "Log in here",
+    "es": "Inicia sesión aquí",
+    "langs": [
+      "gl"
+    ]
+  },
+  "blog.categories.tecnica": {
+    "en": "Technique & Tactics",
+    "es": "Técnica & Táctica",
+    "langs": [
+      "gl",
+      "pt"
+    ]
+  },
+  "blog.filters.tecnica": {
+    "en": "Technique & Tactics",
+    "es": "Técnica & Táctica",
+    "langs": [
+      "gl",
+      "pt"
+    ]
+  },
+  "blog.posts.blog-1.readingTime": {
+    "en": "4 min read",
+    "es": "4 min de lectura",
+    "langs": [
+      "gl",
+      "ca",
+      "va"
+    ]
+  },
+  "blog.posts.blog-2.author": {
+    "en": "Laura Senra · Fitness Coach",
+    "es": "Laura Senra · Preparadora Física",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "pt"
+    ]
+  },
+  "blog.posts.blog-2.readingTime": {
+    "en": "5 min read",
+    "es": "5 min de lectura",
+    "langs": [
+      "gl",
+      "ca",
+      "va"
+    ]
+  },
+  "blog.posts.blog-3.author": {
+    "en": "Dr. Marcos Rey · Sports Physiotherapist",
+    "es": "Dr. Marcos Rey · Fisioterapeuta Deportivo",
+    "langs": [
+      "gl"
+    ]
+  },
+  "blog.posts.blog-3.readingTime": {
+    "en": "6 min read",
+    "es": "6 min de lectura",
+    "langs": [
+      "gl",
+      "ca",
+      "va"
+    ]
+  },
+  "blog.readingTime": {
+    "en": "min read",
+    "es": "min de lectura",
+    "langs": [
+      "gl",
+      "ca",
+      "va"
+    ]
+  },
+  "blog.readingTimeShort": {
+    "en": "min read",
+    "es": "min de lectura",
+    "langs": [
+      "gl",
+      "ca",
+      "va"
+    ]
+  },
+  "club.nav.domains": {
+    "en": "Domains & DNS",
+    "es": "Dominios y DNS",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de"
+    ]
+  },
+  "club.nav.shop": {
+    "en": "Shop & Inventory",
+    "es": "Tienda y Pedidos",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de"
+    ]
+  },
+  "club.nav.teams": {
+    "en": "Club Teams & Rosters",
+    "es": "Equipos y Plantillas",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de"
+    ]
+  },
+  "contact.hours": {
+    "en": "Opening Hours",
+    "es": "Horario de Apertura",
+    "langs": [
+      "gl"
+    ]
+  },
+  "contact.phone": {
+    "en": "Phone & WhatsApp",
+    "es": "Teléfono & WhatsApp",
+    "langs": [
+      "gl"
+    ]
+  },
+  "contact.whatsapp": {
+    "en": "Chat on WhatsApp",
+    "es": "Chatear por WhatsApp",
+    "langs": [
+      "gl"
+    ]
+  },
+  "corporateContact.partners.action": {
+    "en": "Contact Management",
+    "es": "Contactar con Dirección",
+    "langs": [
+      "gl",
+      "eu"
+    ]
+  },
+  "corporateContact.support.title": {
+    "en": "Technical Support & IoT Hardware",
+    "es": "Soporte Técnico & Hardware IoT",
+    "langs": [
+      "gl",
+      "eu"
+    ]
+  },
+  "demo.close": {
+    "en": "Close",
+    "es": "Cerrar",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "demo.description": {
+    "en": "Explore complete interfaces and real data across each user profile on the platform.",
+    "es": "Explora las interfaces completas y datos reales según cada perfil de usuario en la plataforma.",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "demo.experienceToastDescription": {
+    "en": "Opening the",
+    "es": "Abriendo experiencia de",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "demo.experienceToastSuffix": {
+    "en": "experience...",
+    "es": "...",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "demo.heading": {
+    "en": "Select Demo User Role",
+    "es": "Selecciona el Rol de Demostración",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "demo.note": {
+    "en": "Users with professional roles (Admin or Coach) can switch to Player Mode at any time using the header toggle.",
+    "es": "Los usuarios con rol profesional (Admin o Profesor) pueden conmutar a Modo Jugador en cualquier momento con el selector en cabecera.",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "demo.roles.coach_club.access": {
+    "en": "You entered the demo environment with Club Coach permissions.",
+    "es": "Has ingresado al entorno con perfil y permisos de Profesor de Club.",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "demo.roles.coach_club.badge": {
+    "en": "Club Coach",
+    "es": "Profesor de Club",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "demo.roles.coach_independent.access": {
+    "en": "You entered the demo environment with Client Coach permissions.",
+    "es": "Has ingresado al entorno con perfil y permisos de Profesor Cliente.",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "demo.roles.coach_independent.badge": {
+    "en": "Client Coach",
+    "es": "Profesor Cliente",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "demo.roles.player.access": {
+    "en": "You entered the demo environment with Player Area permissions.",
+    "es": "Has ingresado al entorno con perfil y permisos de Área Jugador.",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "demo.roles.player.badge": {
+    "en": "Player Area",
+    "es": "Área Jugador",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "demo.roles.player_amateur.access": {
+    "en": "You entered the demo environment with Player Area permissions.",
+    "es": "Has ingresado al entorno con perfil y permisos de Área Jugador.",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "demo.roles.player_amateur.badge": {
+    "en": "Player Area",
+    "es": "Área Jugador",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "demo.roles.superadmin.access": {
+    "en": "You entered the demo environment with Global Platform permissions.",
+    "es": "Has ingresado al entorno con perfil y permisos de Plataforma Global.",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "demo.roles.superadmin.badge": {
+    "en": "Global Platform",
+    "es": "Plataforma Global",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "demo.roles.tenant_owner.access": {
+    "en": "You entered the demo environment with Club Management permissions.",
+    "es": "Has ingresado al entorno con perfil y permisos de Gestión Club.",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "demo.roles.tenant_owner.badge": {
+    "en": "Club Management",
+    "es": "Gestión Club",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "demo.selectorToastDescription": {
+    "en": "Opening role selector...",
+    "es": "Abriendo selector de roles...",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "demo.selectorToastTitle": {
+    "en": "Demo selector",
+    "es": "Selector de demo",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "demo.title": {
+    "en": "Demo Environment",
+    "es": "Entorno Demo",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "demo.tryAs": {
+    "en": "Try as",
+    "es": "Probar como",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "domotica.module.dom-accesos.badge": {
+    "en": "Autonomous Entry",
+    "es": "Acceso Autónomo",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "domotica.module.dom-accesos.desc": {
+    "en": "Heavy-duty electric locks and pedestrian turnstiles connected to the cloud. Each player receives a temporary PIN code valid strictly during their slot.",
+    "es": "Cerraduras electrónicas y tornos peatonales de alta resistencia conectados a la nube. Cada jugador recibe en su móvil un PIN temporal o QR válido exclusivamente durante su horario reservado.",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "domotica.module.dom-accesos.kpi": {
+    "en": "24/7 unstaffed operation",
+    "es": "Operación 24/7 sin personal",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "domotica.module.dom-accesos.specs.0": {
+    "en": "Court unlocking without reception staff presence",
+    "es": "Apertura de pistas sin necesidad de personal en recepción",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "domotica.module.dom-accesos.specs.1": {
+    "en": "Automatic unlock 10 minutes prior to match start",
+    "es": "Desbloqueo automático 10 minutos antes del inicio del turno",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "domotica.module.dom-accesos.specs.2": {
+    "en": "Audit logs capturing exact millisecond of entry",
+    "es": "Registro de auditoría con fecha y milisegundo de entrada",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "domotica.module.dom-accesos.specs.3": {
+    "en": "Native compatibility with exterior gates and glass doors",
+    "es": "Integración nativa con cancelas exteriores y puertas de cristal",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "domotica.module.dom-accesos.title": {
+    "en": "PIN & Dynamic QR Code Access Control",
+    "es": "Control de Accesos por PIN y Código QR Dinámico",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "domotica.module.dom-clima.badge": {
+    "en": "Court Comfort",
+    "es": "Confort en Pista",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "domotica.module.dom-clima.desc": {
+    "en": "IoT environmental sensors tracking temperature, relative humidity, and dew point in indoor arenas. Automated dehumidification to keep glass walls dry.",
+    "es": "Sondas IoT de temperatura, humedad relativa y punto de rocío en naves indoor. Activación inteligente de aerotermia y deshumidificadores para evitar cristales empañados.",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "domotica.module.dom-clima.kpi": {
+    "en": "100% dry glass walls",
+    "es": "Cristales 100% secos",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "domotica.module.dom-clima.specs.0": {
+    "en": "Zero glass fogging ensuring crisp ball rebounds",
+    "es": "Prevención total de condensación en vidrios para rebotes limpios",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "domotica.module.dom-clima.specs.1": {
+    "en": "Heating or cooling tailored to real-time occupancy",
+    "es": "Encendido de calefacción o aire acondicionado según ocupación real",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "domotica.module.dom-clima.specs.2": {
+    "en": "Continuous CO2 and air quality telemetry",
+    "es": "Telemetría continua de calidad del aire y niveles de CO2",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "domotica.module.dom-clima.specs.3": {
+    "en": "Weather-forecast adaptive schedule adjustments",
+    "es": "Ajuste automático según previsión meteorológica exterior",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "domotica.module.dom-clima.title": {
+    "en": "Climate Control, Heat Pumps & Anti-Condensation Sensors",
+    "es": "Climatización, Aerotermia y Sensores Antihumedad",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "domotica.module.dom-cuadro.badge": {
+    "en": "Connected Hardware",
+    "es": "Hardware Conectado",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "domotica.module.dom-cuadro.desc": {
+    "en": "DIN-rail IoT controllers mounted in the club's main breaker panel. Engineered to European industrial standards for heavy continuous switching.",
+    "es": "Módulos de carril DIN instalados directamente en el cuadro eléctrico general del club. Fabricados bajo normativa europea para soportar cargas continuas y maniobras exigentes.",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "domotica.module.dom-cuadro.kpi": {
+    "en": "Live kWh power telemetry",
+    "es": "Telemetría kWh en vivo",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "domotica.module.dom-cuadro.specs.0": {
+    "en": "Dual wired Gigabit Ethernet with 4G LTE cellular failover",
+    "es": "Conexión dual Ethernet cableada y respaldo 4G LTE",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "domotica.module.dom-cuadro.specs.1": {
+    "en": "Live per-court kWh power consumption metering",
+    "es": "Medición de consumo eléctrico en kWh en tiempo real por pista",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "domotica.module.dom-cuadro.specs.2": {
+    "en": "Emergency power cutoff and remote breaker reset from admin panel",
+    "es": "Corte de emergencia y rearme automático desde el panel admin",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "domotica.module.dom-cuadro.specs.3": {
+    "en": "Compatible with existing electrical wiring without civil works",
+    "es": "Compatibles con cualquier instalación eléctrica existente sin obras",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "domotica.module.dom-cuadro.title": {
+    "en": "Smart Electrical Panels & Industrial Relays",
+    "es": "Cuadros Eléctricos Inteligentes y Relés Industriales",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "domotica.module.dom-luces.badge": {
+    "en": "LED Efficiency",
+    "es": "Eficiencia LED",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "domotica.module.dom-luces.desc": {
+    "en": "Seamless sync with booking calendar. LED competition floods turn on 5 minutes before the match and turn off automatically after play.",
+    "es": "Sincronización milimétrica con el cuadrante de reservas. Los proyectores LED se activan automáticamente 5 minutos antes del turno y se apagan al finalizar.",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "domotica.module.dom-luces.kpi": {
+    "en": "-40% electricity consumption",
+    "es": "-40% en consumo de luz",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "domotica.module.dom-luces.specs.0": {
+    "en": "Soft start/stop preventing power surges and glare",
+    "es": "Encendido y apagado suave (sin picos de tensión ni deslumbramiento)",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "domotica.module.dom-luces.specs.1": {
+    "en": "5-minute courtesy buffer after match end",
+    "es": "Margen de cortesía de 5 minutos al finalizar el partido",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "domotica.module.dom-luces.specs.2": {
+    "en": "Manual override from mobile app for maintenance staff",
+    "es": "Control remoto manual desde app móvil para personal de mantenimiento",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "domotica.module.dom-luces.specs.3": {
+    "en": "Proven electricity bill savings of up to 40% monthly",
+    "es": "Ahorro comprobado de hasta un 40% en la factura eléctrica mensual",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "domotica.module.dom-luces.title": {
+    "en": "Automated LED Spotlight Activation & Scheduling",
+    "es": "Encendido y Apagado Automático de Focos LED",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "domotica.module.dom-radar.badge": {
+    "en": "Real-Time Tracking",
+    "es": "Control en Tiempo Real",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "domotica.module.dom-radar.desc": {
+    "en": "Volumetric microwave sensors detecting whether players are physically on court, freeing up unused courts or notifying reception in case of no-shows.",
+    "es": "Sensores volumétricos microondas que monitorizan si los jugadores están efectivamente disputando el partido, liberando la pista o alertando a recepción en caso de no-show.",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "domotica.module.dom-radar.kpi": {
+    "en": "Instant court reclamation",
+    "es": "Liberación de pistas libres",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "domotica.module.dom-radar.specs.0": {
+    "en": "Non-invasive detection without facial recognition or invasive cameras",
+    "es": "Detección no invasiva sin reconocimiento facial ni cámaras invasivas",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "domotica.module.dom-radar.specs.1": {
+    "en": "Automated notification after 15 minutes of absence",
+    "es": "Aviso a recepción tras 15 minutos de incomparecencia",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "domotica.module.dom-radar.specs.2": {
+    "en": "Unauthorized after-hours play detection",
+    "es": "Control de juego no autorizado fuera de horario reservado",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "domotica.module.dom-radar.specs.3": {
+    "en": "Industrial encrypted low-latency MQTT communications",
+    "es": "Comunicación por protocolo industrial MQTT cifrado de baja latencia",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "domotica.module.dom-radar.title": {
+    "en": "Microwave Court Occupancy Radar & No-Show Detection",
+    "es": "Radar de Pista Ocupada y Detección de Presencia",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "domotica.module.dom-video.badge": {
+    "en": "Viral Experience",
+    "es": "Experiencia Viral",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "domotica.module.dom-video.desc": {
+    "en": "Continuous loop recording system with physical wireless push-button on the net post. Press the button after an epic rally to instantly clip and receive the video.",
+    "es": "Sistema de grabación continua en bucle con pulsador físico inalámbrico instalado en el poste de la red. Cuando un jugador hace un punto épico, pulsa el botón y el clip se recorta y se envía a su app.",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "domotica.module.dom-video.kpi": {
+    "en": "+400% social engagement",
+    "es": "+400% engagement social",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "domotica.module.dom-video.specs.0": {
+    "en": "Full HD 60fps recording with wide-angle glass optics",
+    "es": "Grabación en resolución Full HD 60fps con lente gran angular",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "domotica.module.dom-video.specs.1": {
+    "en": "Automated 30-second highlight generation (20s before + 10s after)",
+    "es": "Generación automática de clip de 30 segundos (20s antes + 10s después)",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "domotica.module.dom-video.specs.2": {
+    "en": "Branded watermark with club logo and sponsors",
+    "es": "Marca de agua con logotipo y patrocinadores del club",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "domotica.module.dom-video.specs.3": {
+    "en": "Optional YouTube live stream broadcast integration",
+    "es": "Opción de retransmisión en directo por streaming en YouTube",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "domotica.module.dom-video.title": {
+    "en": "Instant Replay Cameras & On-Court Highlight Buttons",
+    "es": "Cámaras de Repetición y Highlights con Pulsador en Pista",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "footer.booking": {
+    "en": "Book Court Online",
+    "es": "Reservar Pista Online",
+    "langs": [
+      "gl",
+      "ca",
+      "va"
+    ]
+  },
+  "footer.contactSupportActive": {
+    "en": "24/7 technical support active",
+    "es": "Soporte técnico 24/7 activo",
+    "langs": [
+      "gl"
+    ]
+  },
+  "footer.contactTitle": {
+    "en": "Contact & Support",
+    "es": "Contacto & Soporte",
+    "langs": [
+      "gl",
+      "fr"
+    ]
+  },
+  "footer.faq": {
+    "en": "Frequently Asked Questions (FAQ)",
+    "es": "Preguntas Frecuentes (FAQ)",
+    "langs": [
+      "gl"
+    ]
+  },
+  "footer.platformDemo": {
+    "en": "Explore Demo by Role",
+    "es": "Explorar demo por rol",
+    "langs": [
+      "gl"
+    ]
+  },
+  "footer.privateClasses": {
+    "en": "Private & Adult Lessons",
+    "es": "Clases Particulares & Adultos",
+    "langs": [
+      "gl"
+    ]
+  },
+  "footer.solutionsAi": {
+    "en": "24/7 WhatsApp AI Copilot",
+    "es": "Copiloto IA 24/7 en WhatsApp",
+    "langs": [
+      "gl"
+    ]
+  },
+  "footer.solutionsIot": {
+    "en": "IoT Court Automation",
+    "es": "Domótica IoT de Pistas",
+    "langs": [
+      "gl"
+    ]
+  },
+  "footer.tournaments": {
+    "en": "Tournaments & Leagues",
+    "es": "Torneos & Ligas",
+    "langs": [
+      "gl"
+    ]
+  },
+  "home.advantages.iot.title": {
+    "en": "IoT Smart Courts & LED Lights",
+    "es": "Domótica IoT & Luces LED",
+    "langs": [
+      "gl"
+    ]
+  },
+  "home.advantages.tournaments.title": {
+    "en": "Tournaments & Leagues",
+    "es": "Torneos & Competición",
+    "langs": [
+      "gl"
+    ]
+  },
+  "home.corporate.demos.proBadge": {
+    "en": "FIP Top 20 · Competition Academy",
+    "es": "FIP Top 20 · Academia de Competición",
+    "langs": [
+      "gl"
+    ]
+  },
+  "home.corporate.guarantee2": {
+    "en": "Data migration in 24h",
+    "es": "Migración de datos en 24h",
+    "langs": [
+      "gl"
+    ]
+  },
+  "home.corporate.guarantee3": {
+    "en": "Personalized 365-day support",
+    "es": "Soporte personalizado 365 días",
+    "langs": [
+      "gl"
+    ]
+  },
+  "home.corporate.metric3.desc": {
+    "en": "Boosted with automated level-balanced matches",
+    "es": "Con partidos nivelados automáticos",
+    "langs": [
+      "gl"
+    ]
+  },
+  "home.corporate.mockup.aiLabel": {
+    "en": "WhatsApp AI Copilot:",
+    "es": "Copiloto IA en WhatsApp:",
+    "langs": [
+      "gl"
+    ]
+  },
+  "home.corporate.mockup.revenueTrend": {
+    "en": "+28% vs previous week",
+    "es": "+28% vs semana anterior",
+    "langs": [
+      "gl",
+      "pt"
+    ]
+  },
+  "home.corporate.modal.badge": {
+    "en": "New Club Registration",
+    "es": "Alta de Club en Setmio",
+    "langs": [
+      "gl"
+    ]
+  },
+  "home.corporate.modal.courtsLabel": {
+    "en": "Number of Courts",
+    "es": "Número de Pistas",
+    "langs": [
+      "gl"
+    ]
+  },
+  "home.corporate.modal.phoneLabel": {
+    "en": "Phone / WhatsApp",
+    "es": "Teléfono / WhatsApp",
+    "langs": [
+      "gl"
+    ]
+  },
+  "home.corporate.modules.ai.title": {
+    "en": "24/7 WhatsApp AI Copilot",
+    "es": "Copiloto IA en WhatsApp",
+    "langs": [
+      "gl"
+    ]
+  },
+  "home.corporate.pricing.clubBaseFeat2": {
+    "en": "Unlimited online bookings",
+    "es": "Reservas ilimitadas online",
+    "langs": [
+      "gl"
+    ]
+  },
+  "home.corporate.pricing.clubBaseTitle": {
+    "en": "Club Base Plan",
+    "es": "Plan Club Base",
+    "langs": [
+      "gl"
+    ]
+  },
+  "home.corporate.pricing.clubProFeat5": {
+    "en": "Smart IoT court automation",
+    "es": "Domótica IoT de pistas",
+    "langs": [
+      "gl"
+    ]
+  },
+  "home.corporate.pricing.clubProTitle": {
+    "en": "Club Pro Plan",
+    "es": "Plan Club Pro",
+    "langs": [
+      "gl"
+    ]
+  },
+  "home.corporate.pricing.coachTitle": {
+    "en": "Coach / Academy",
+    "es": "Coach / Academia",
+    "langs": [
+      "gl",
+      "pt"
+    ]
+  },
+  "home.corporate.pricing.eliteFeat2": {
+    "en": "24/7 WhatsApp AI Copilot",
+    "es": "Copiloto IA 24/7 en WhatsApp",
+    "langs": [
+      "gl"
+    ]
+  },
+  "home.corporate.pricing.eliteFeat5": {
+    "en": "ERP & REST API integrations",
+    "es": "Integración ERP & API REST",
+    "langs": [
+      "gl"
+    ]
+  },
+  "home.corporate.solutions.coaches.btn": {
+    "en": "View coach solution",
+    "es": "Ver solución para profesores",
+    "langs": [
+      "gl"
+    ]
+  },
+  "home.corporate.solutions.coaches.title": {
+    "en": "Coaches & Academies",
+    "es": "Profesores & Academias",
+    "langs": [
+      "gl"
+    ]
+  },
+  "home.corporate.solutions.pro.btn": {
+    "en": "View pro solution",
+    "es": "Ver solución profesional",
+    "langs": [
+      "gl"
+    ]
+  },
+  "home.corporate.video.aria": {
+    "en": "Professional padel match",
+    "es": "Partido profesional de pádel",
+    "langs": [
+      "gl"
+    ]
+  },
+  "home.demo.badge": {
+    "en": "Interactive Role-Based Demos",
+    "es": "Demos Interactivas y Personalizadas por Rol",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "home.demo.roleClub": {
+    "en": "Club Managers",
+    "es": "Gerentes de Club",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "home.demo.roleCoaches": {
+    "en": "Coaches & Academies",
+    "es": "Profesores & Academias",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "home.demo.rolePlayers": {
+    "en": "Players & Members",
+    "es": "Jugadores & Socios",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "home.demo.rolePro": {
+    "en": "Professional Players",
+    "es": "Jugadores Profesionales",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "home.demo.title": {
+    "en": "Request a Guided Demo or Test the System by Role",
+    "es": "Solicita una Demo Guiada o Prueba el Sistema por Rol",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "home.matches.join": {
+    "en": "Join this Match",
+    "es": "Unirme a esta Partida",
+    "langs": [
+      "gl"
+    ]
+  },
+  "home.search.afternoon": {
+    "en": "Afternoons (16:00 - 20:00)",
+    "es": "Tardes (16:00 - 20:00)",
+    "langs": [
+      "gl",
+      "ca",
+      "pt"
+    ]
+  },
+  "home.search.catalog": {
+    "en": "View 8-court catalogue",
+    "es": "Ver catálogo de 8 pistas",
+    "langs": [
+      "gl"
+    ]
+  },
+  "home.search.players.indoor": {
+    "en": "Indoor Climate-Controlled Court",
+    "es": "Pista Indoor Climatizada",
+    "langs": [
+      "gl"
+    ]
+  },
+  "home.teams.masculino1.name": {
+    "en": "Men's Open A",
+    "es": "Absoluto Masculino A",
+    "langs": [
+      "gl",
+      "pt"
+    ]
+  },
+  "language.es": {
+    "en": "Spanish",
+    "es": "Español",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "modules.access.title": {
+    "en": "PIN Code Access Control",
+    "es": "Control de Acceso por PIN",
+    "langs": [
+      "gl"
+    ]
+  },
+  "nav.themeLight": {
+    "en": "Switch to light mode",
+    "es": "Activar modo claro",
+    "langs": [
+      "gl"
+    ]
+  },
+  "playerPage.ctaDemo": {
+    "en": "Watch Guided Demo",
+    "es": "Ver Demo Guiada",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "playerPage.f1.badge": {
+    "en": "24/7 Bookings",
+    "es": "Reservas 24/7",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "playerPage.f1.desc": {
+    "en": "Check real-time availability of indoor, panoramic, or outdoor courts. Choose your slot, split the fee, and receive instant confirmation without phone calls.",
+    "es": "Consulta disponibilidad de pistas cubiertas, panorámicas o exteriores en tiempo real. Selecciona turno, divide el pago y recibe tu confirmación instantánea sin intermediarios ni llamadas.",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "playerPage.f1.highlight": {
+    "en": "Real-Time Schedule",
+    "es": "Cuadrante en Tiempo Real",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "playerPage.f1.tech": {
+    "en": "Sub-millisecond collision prevention and instant confirmation.",
+    "es": "Prevención de colisiones de reserva por microsegundo y confirmación inmediata.",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "playerPage.f1.title": {
+    "en": "Fast Booking in Under 15 Seconds",
+    "es": "Reserva Rápida en Menos de 15 Segundos",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "playerPage.f2.badge": {
+    "en": "Balanced Games",
+    "es": "Partidos Nivelados",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "playerPage.f2.desc": {
+    "en": "Need a fourth player? Create or join open matches filtered by your exact decimal rating (e.g. 3.75) and preferred court side (drive, backhand, or either).",
+    "es": "¿Te falta un cuarto jugador para tu partida? Crea o únete a partidos abiertos filtrados por tu nivel decimal exacto (ej. 3.75) y tu posición preferida en pista (drive, revés o indistinto).",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "playerPage.f2.highlight": {
+    "en": "Matchmaking Algorithm",
+    "es": "Algoritmo Matchmaking",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "playerPage.f2.tech": {
+    "en": "Pair-adapted ELO algorithm that recalculates ratings after every match.",
+    "es": "Algoritmo ELO adaptado a pádel por parejas que recalcula el rating tras cada partido.",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "playerPage.f2.title": {
+    "en": "Open Matches with Dynamic Rating (Play!)",
+    "es": "Partidos Abiertos con Nivel Dinámico (Play!)",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "playerPage.f3.badge": {
+    "en": "1/4 per Player",
+    "es": "1/4 por Jugador",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "playerPage.f3.desc": {
+    "en": "Each player pays their 25% share directly from their smartphone via mobile pay, credit card, or club wallet. Never chase friends for money again.",
+    "es": "Cada jugador paga su 25% de la pista directamente desde su propio móvil por Bizum, tarjeta o monedero virtual. Olvídate para siempre de perseguir a tus amigos para que te paguen.",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "playerPage.f3.highlight": {
+    "en": "Zero Arrears",
+    "es": "Cero Deudas",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "playerPage.f3.tech": {
+    "en": "Direct settlement to the club's bank with zero commission withheld from players.",
+    "es": "Liquidación directa al banco del club sin retención de fondos ni comisiones a jugadores.",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "playerPage.f3.title": {
+    "en": "Automated Split Payments",
+    "es": "Pago Dividido Automático (Split Payments)",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "playerPage.f4.badge": {
+    "en": "Intelligent Access",
+    "es": "Acceso Inteligente",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "playerPage.f4.desc": {
+    "en": "Upon booking confirmation, your app instantly generates a PIN and QR code to unlock pedestrian gates, court doors, and activate LED lighting on schedule.",
+    "es": "Al confirmar tu reserva, tu aplicación genera automáticamente el código PIN y código QR para abrir tornos, cancelas de pista y encender los focos LED en el horario exacto del partido.",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "playerPage.f4.highlight": {
+    "en": "Smart Courts",
+    "es": "Pistas Autónomas",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "playerPage.f4.tech": {
+    "en": "Native industrial relay and cloud lock integration with offline failover.",
+    "es": "Integración nativa con relés industriales y cerraduras electrónicas IP con tolerancia offline.",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "playerPage.f4.title": {
+    "en": "Your Phone is the Club Key (IoT Domotics)",
+    "es": "Tu Teléfono es la Llave del Club (Domótica IoT)",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "playerPage.f5.badge": {
+    "en": "Competition & Rank",
+    "es": "Competición & Ranking",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "playerPage.f5.desc": {
+    "en": "Access your full sporting record: win rate, decimal rating progression, most frequent teammate, common rival, and club ranking standings.",
+    "es": "Accede a tu historial deportivo completo: porcentaje de victorias, evolución de nivel decimal, compañero más frecuente, rival habitual y posición en el ranking oficial del club.",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "playerPage.f5.highlight": {
+    "en": "Decimal Rating",
+    "es": "Rating Decimal",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "playerPage.f5.tech": {
+    "en": "Granular head-to-head match records and seasonal performance metrics.",
+    "es": "Registro pormenorizado de enfrentamientos y métricas de rendimiento por temporada.",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "playerPage.f5.title": {
+    "en": "Player Card, Skill Level & Pro Stats",
+    "es": "Ficha Deportiva, Nivel y Estadísticas Pro",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "playerPage.f6.badge": {
+    "en": "Official Events",
+    "es": "Torneos Oficiales",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "playerPage.f6.desc": {
+    "en": "Register with your partner for federated tournaments, weekend social leagues, and American rounds. View live brackets, game times, and scores on the fly.",
+    "es": "Inscríbete junto a tu pareja en torneos federados, ligas regulares de fin de semana y pozos americanos. Consulta cuadros de juego en vivo, horarios de partidos y resultados al instante.",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "playerPage.f6.highlight": {
+    "en": "Live Brackets",
+    "es": "Cuadros en Directo",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "playerPage.f6.tech": {
+    "en": "Automated single-elimination bracket generation and real-time score publishing.",
+    "es": "Generación automática de cuadros de eliminatorias y publicación de actas en tiempo real.",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "playerPage.f6.title": {
+    "en": "Tournament, Pool & Social League Entry",
+    "es": "Inscripción a Torneos, Pozos y Ligas Sociales",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "playerPage.stat1": {
+    "en": "Book in 15 seconds",
+    "es": "Reserva en 15 segundos",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "playerPage.stat2": {
+    "en": "Decimal Rating 1.0 - 7.0",
+    "es": "Nivel Decimal 1.0 - 7.0",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "playerPage.stat3": {
+    "en": "Split Payment Ready",
+    "es": "Split Payment con Bizum",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "playerPage.subtitle": {
+    "en": "The definitive mobile portal for padel lovers. Find courts at your favorite clubs, complete games with teammates of your exact level, split payments, and open courts with your phone.",
+    "es": "El portal móvil definitivo para los apasionados del pádel. Encuentra pista en tus clubes favoritos, completa partidos con compañeros de tu mismo nivel, divide el pago y abre la pista con tu móvil.",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "playerPage.title": {
+    "en": "Play more padel.",
+    "es": "Juega más al pádel.",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "playerPage.titleHighlight": {
+    "en": "No waiting, no calls, no debts.",
+    "es": "Sin esperas, llamadas ni deudas.",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "register.captainTitle": {
+    "en": "Enable Team Captain Profile",
+    "es": "Habilitar perfil de Capitán de Equipo",
+    "langs": [
+      "gl"
+    ]
+  },
+  "register.level.advanced": {
+    "en": "Advanced (4.5 - 5.0)",
+    "es": "Avanzado (4.5 - 5.0)",
+    "langs": [
+      "gl"
+    ]
+  },
+  "register.level.beginner": {
+    "en": "Beginner (1.0 - 2.0)",
+    "es": "Principiante (1.0 - 2.0)",
+    "langs": [
+      "gl",
+      "it"
+    ]
+  },
+  "register.level.competition": {
+    "en": "Competition (5.0 - 5.5)",
+    "es": "Competición (5.0 - 5.5)",
+    "langs": [
+      "gl"
+    ]
+  },
+  "register.level.intermediate": {
+    "en": "Intermediate / Club Level (3.5 - 4.0)",
+    "es": "Intermedio / Nivel Club (3.5 - 4.0)",
+    "langs": [
+      "gl"
+    ]
+  },
+  "register.level.intermediateHigh": {
+    "en": "Upper Intermediate (3.5 - 4.0)",
+    "es": "Intermedio Avanzado (3.5 - 4.0)",
+    "langs": [
+      "gl"
+    ]
+  },
+  "register.level.pro": {
+    "en": "High Competition / Pro (5.5+)",
+    "es": "Alta Competición / Pro (5.5+)",
+    "langs": [
+      "gl"
+    ]
+  },
+  "register.passwordMin": {
+    "en": "Minimum 6 characters",
+    "es": "Mínimo 6 caracteres",
+    "langs": [
+      "gl"
+    ]
+  },
+  "register.roles.coach_club.title": {
+    "en": "Club Coach",
+    "es": "Profesor de Club",
+    "langs": [
+      "gl"
+    ]
+  },
+  "register.step.sports": {
+    "en": "2. Sports profile",
+    "es": "2. Perfil deportivo",
+    "langs": [
+      "gl"
+    ]
+  },
+  "solutions.detail.complianceTitle": {
+    "en": "Integration & Compliance Data Sheet",
+    "es": "Ficha Técnica de Integración y Cumplimiento",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "solutions.detail.techSpec": {
+    "en": "Technical specification:",
+    "es": "Especificación técnica:",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "solutions.detail.workflowEyebrow": {
+    "en": "Operational Workflow",
+    "es": "Flujo de Trabajo",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "solutions.detail.workflowTitle": {
+    "en": "How does the system operate on a daily basis?",
+    "es": "¿Cómo opera el sistema en el día a día?",
+    "langs": [
+      "gl",
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "club.kpi.iot_doors_connected": {
+    "en": "Turnstiles & doors connected",
+    "es": "Tornos y varchi automatizados",
+    "langs": [
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de"
+    ]
+  },
+  "club.kpi.iot_lights_on": {
+    "en": "LED lights on",
+    "es": "Luces LED encendidas",
+    "langs": [
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de"
+    ]
+  },
+  "club.kpi.iot_summary": {
+    "en": "IoT Court Automation",
+    "es": "Resumen Domótica IoT",
+    "langs": [
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de"
+    ]
+  },
+  "club.kpi.occupancy_rate": {
+    "en": "Real-Time Occupancy",
+    "es": "% Ocupación en Tiempo Real",
+    "langs": [
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de"
+    ]
+  },
+  "club.kpi.revenue_month": {
+    "en": "Monthly Turnover",
+    "es": "Facturación del Mes",
+    "langs": [
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de"
+    ]
+  },
+  "club.kpi.revenue_today": {
+    "en": "Revenue Today",
+    "es": "Ingresos de Hoy",
+    "langs": [
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de"
+    ]
+  },
+  "club.nav.academy": {
+    "en": "Academy & Coaches",
+    "es": "Escuela / Entrenadores",
+    "langs": [
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de"
+    ]
+  },
+  "club.nav.dashboard": {
+    "en": "Dashboard",
+    "es": "Inicio",
+    "langs": [
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "club.nav.logout": {
+    "en": "Sign Out / Exit Demo",
+    "es": "Cerrar Sesión / Salir Demo",
+    "langs": [
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de"
+    ]
+  },
+  "club.nav.more": {
+    "en": "More",
+    "es": "Más",
+    "langs": [
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de"
+    ]
+  },
+  "club.nav.pos": {
+    "en": "POS & Cashier",
+    "es": "TPV / Caja",
+    "langs": [
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de"
+    ]
+  },
+  "club.nav.tournaments": {
+    "en": "Tournaments & Leagues",
+    "es": "Torneos y Ligas",
+    "langs": [
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de"
+    ]
+  },
+  "club.nav.whitelabel": {
+    "en": "White Label Settings",
+    "es": "Configuración de Marca Blanca",
+    "langs": [
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de"
+    ]
+  },
+  "club.status.closed": {
+    "en": "Closed",
+    "es": "Cerrado",
+    "langs": [
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de"
+    ]
+  },
+  "club.status.closed_desc": {
+    "en": "Club temporarily closed. Maintenance access only.",
+    "es": "Club cerrado temporalmente. Solo acceso personal de mantenimiento.",
+    "langs": [
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de"
+    ]
+  },
+  "club.status.open": {
+    "en": "Open",
+    "es": "Abierto",
+    "langs": [
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de"
+    ]
+  },
+  "club.status.open_desc": {
+    "en": "Facilities open to players and active bookings.",
+    "es": "Instalaciones abiertas y reservas en marcha.",
+    "langs": [
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de"
+    ]
+  },
+  "club.status.toggle": {
+    "en": "Club Status",
+    "es": "Estado del Club",
+    "langs": [
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de"
+    ]
+  },
+  "corporateContact.sales.action": {
+    "en": "Book 20-min Demo",
+    "es": "Agendar Demo de 20 min",
+    "langs": [
+      "ca",
+      "va",
+      "eu",
+      "pt"
+    ]
+  },
+  "home.corporate.demos.btnExplore": {
+    "en": "Explore Club Public Website",
+    "es": "Explorar Web Pública del Club",
+    "langs": [
+      "ca",
+      "va"
+    ]
+  },
+  "home.corporate.metric1.title": {
+    "en": "100% White Label",
+    "es": "Marca Blanca Integral",
+    "langs": [
+      "ca",
+      "va",
+      "de"
+    ]
+  },
+  "home.corporate.metric4.desc": {
+    "en": "Powered by Vercel Edge & Supabase Cloud",
+    "es": "Infraestructura Vercel & Supabase Cloud",
+    "langs": [
+      "ca",
+      "va"
+    ]
+  },
+  "iot.court_controls": {
+    "en": "Court Automation Controls",
+    "es": "Controles Domótica de Pista",
+    "langs": [
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de"
+    ]
+  },
+  "iot.door_open": {
+    "en": "Open Door / Turnstile",
+    "es": "Abrir Puerta / Torno",
+    "langs": [
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de"
+    ]
+  },
+  "iot.door_opening": {
+    "en": "Opening access...",
+    "es": "Abriendo acceso...",
+    "langs": [
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de"
+    ]
+  },
+  "iot.multisport.padel": {
+    "en": "Padel",
+    "es": "Pádel",
+    "langs": [
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "iot.multisport.tennis": {
+    "en": "Tennis",
+    "es": "Tenis",
+    "langs": [
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "pricing.plans.professional.name": {
+    "en": "Professional",
+    "es": "Profesional",
+    "langs": [
+      "ca",
+      "va",
+      "de"
+    ]
+  },
+  "white_label.banner_notice": {
+    "en": "You are testing the player app with the club white label",
+    "es": "Estás probando la app de jugador con la marca blanca del club",
+    "langs": [
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de"
+    ]
+  },
+  "white_label.player_view": {
+    "en": "Player View",
+    "es": "Vista Jugador",
+    "langs": [
+      "ca",
+      "va",
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de"
+    ]
+  },
+  "corporateContact.faqSubtitle": {
+    "en": "Everything you need to know about migration, hardware, and pricing.",
+    "es": "Todo lo que necesitas saber sobre migración, hardware y modelo de negocio.",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "corporateContact.faqs.0.a": {
+    "en": "Our engineering team handles 100% of your member base, booking histories, and financial data migration in less than 24 hours without disrupting club operations.",
+    "es": "Nuestro equipo de ingeniería se encarga del 100% de la migración de tu base de socios, historiales y reservas en menos de 24 horas sin interrumpir la operación habitual de tu club.",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "corporateContact.faqs.0.q": {
+    "en": "How does data migration work from our current software?",
+    "es": "¿Cómo es el proceso de migración de datos desde nuestro software actual?",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "corporateContact.faqs.1.q": {
+    "en": "How long does it take to install court lighting and access domotics?",
+    "es": "¿Cuánto tiempo requiere la instalación de la domótica de luces y accesos?",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "corporateContact.faqs.3.a": {
+    "en": "Yes. Your club gets its own branded web and mobile app featuring your logo, official colors, and custom domain (e.g. yourclub.com) with no third-party branding.",
+    "es": "Sí. Tu club dispondrá de su propia web y app corporativa con tu logotipo, colores oficiales y dominio dedicado (ej. tuclub.com), sin referencias visibles a proveedores externos.",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "corporateContact.faqs.3.q": {
+    "en": "Does the software include a white-label mobile app for our members?",
+    "es": "¿El software incluye aplicación móvil de marca blanca para nuestros socios?",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "corporateContact.faqs.4.a": {
+    "en": "We provide custom phone and video training for desk staff and management, plus priority technical support 365 days a year.",
+    "es": "Ofrecemos formación telefónica y por videollamada personalizada para gerencia y personal de mostrador, además de soporte técnico prioritario los 365 días del año.",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "corporateContact.faqs.4.q": {
+    "en": "What training and tech support do our staff and managers receive?",
+    "es": "¿Qué formación y soporte técnico recibe nuestro equipo de recepción?",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "corporateContact.form.title": {
+    "en": "Request a Club Digitalization Study or Contact Us",
+    "es": "Solicita un Estudio de Digitalización o Contacta con Nosotros",
+    "langs": [
+      "eu"
+    ]
+  },
+  "corporateContact.partners.desc": {
+    "en": "Custom API integrations, regional federation agreements, and international multi-venue deployments.",
+    "es": "Integraciones API a medida, acuerdos federativos e implantaciones multi-sede a escala internacional.",
+    "langs": [
+      "eu"
+    ]
+  },
+  "corporateContact.partners.title": {
+    "en": "Alliances, Chains & Federations",
+    "es": "Alianzas, Cadenas & Federaciones",
+    "langs": [
+      "eu"
+    ]
+  },
+  "corporateContact.sales.desc": {
+    "en": "Consulting for club managers, committees, and academies. Personalized demo in under 24 hours.",
+    "es": "Asesoramiento para comités, gerentes de club y academias. Demo personalizada en menos de 24h.",
+    "langs": [
+      "eu"
+    ]
+  },
+  "corporateContact.sales.title": {
+    "en": "Sales & Software Demos",
+    "es": "Ventas & Demostraciones",
+    "langs": [
+      "eu"
+    ]
+  },
+  "corporateContact.subtitle": {
+    "en": "Our team of sports management consultants and software engineers is at your service to advise you on IoT domotics, data migration, and custom plans.",
+    "es": "Nuestro equipo de consultores y especialistas en software deportivo está a tu disposición para asesorarte sobre domótica IoT, migración de datos y planes a medida.",
+    "langs": [
+      "eu"
+    ]
+  },
+  "corporateContact.support.action": {
+    "en": "WhatsApp Technical Channel",
+    "es": "Canal Técnico WhatsApp",
+    "langs": [
+      "eu",
+      "pt"
+    ]
+  },
+  "corporateContact.support.desc": {
+    "en": "Technical assistance for electrical panels, IP relays, access turnstiles, and payment gateways.",
+    "es": "Asistencia técnica para cuadros eléctricos, relés IP, tornos de acceso y pasarelas bancarias.",
+    "langs": [
+      "eu"
+    ]
+  },
+  "corporateContact.title": {
+    "en": "Let's talk about the digital future of your padel club",
+    "es": "Hablemos sobre el futuro digital de tu club de pádel",
+    "langs": [
+      "eu"
+    ]
+  },
+  "corporateContact.toastSuccess": {
+    "en": "Corporate Request Sent",
+    "es": "Solicitud Corporativa Enviada",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "domotica.auditClub": {
+    "en": "Audit my club",
+    "es": "Auditar mi club",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "domotica.bannerCta": {
+    "en": "Request Free Domotics Assessment",
+    "es": "Solicitar Estudio de Domótica Gratuito",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de"
+    ]
+  },
+  "domotica.bannerSub": {
+    "en": "Our certified engineers inspect your electrical panels and deliver preconfigured controllers ready to plug and play.",
+    "es": "Nuestros ingenieros evalúan la instalación eléctrica de tu club y preparan los cuadros de mando preconfigurados para conectar y funcionar.",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "domotica.bannerTitle": {
+    "en": "Want to automate your club's padel courts?",
+    "es": "¿Quieres automatizar las pistas de tu club?",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de"
+    ]
+  },
+  "domotica.catalogTitle": {
+    "en": "Available IoT Hardware & Automation",
+    "es": "Hardware y Automatizaciones IoT Disponibles",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de"
+    ]
+  },
+  "domotica.closed": {
+    "en": "Closed",
+    "es": "Cerrado",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "domotica.compatible": {
+    "en": "Compatible with Schneider, Finder, and Shelly relays",
+    "es": "Compatible con relés Schneider, Finder y Shelly",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "domotica.ledOn": {
+    "en": "Turned On (400 Lux)",
+    "es": "Encendido (400 Lux)",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de"
+    ]
+  },
+  "domotica.pinError": {
+    "en": "Invalid PIN. Try #4829 or #1234.",
+    "es": "PIN incorrecto. Prueba con #4829 o #1234.",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "domotica.pinPlaceholder": {
+    "en": "Enter PIN (e.g. 4829)",
+    "es": "Introduce PIN (ej: 4829)",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de"
+    ]
+  },
+  "domotica.pinSuccess": {
+    "en": "Valid PIN (#4829). Door unlocked for 10 seconds.",
+    "es": "PIN correcto (#4829). Puerta abierta durante 10 segundos.",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "domotica.simSubtitle": {
+    "en": "See how the smart court reacts when a player interacts with access doors and lighting.",
+    "es": "Comprueba cómo reacciona la pista inteligente cuando un jugador interactúa con el sistema de acceso y luces.",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "domotica.status": {
+    "en": "Status: ",
+    "es": "Estado: ",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de"
+    ]
+  },
+  "domotica.subtitle": {
+    "en": "Connect your management software directly to LED lights, access turnstiles, replay cameras, and court climate systems. Turnkey industrial automation installable in under 48 hours.",
+    "es": "Conecta tu software de gestión directamente con las luces LED, tornos de acceso, cámaras de repetición y sistemas de climatización de tus pistas. Automatización industrial llave en mano instalable en menos de 48 horas.",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "domotica.titleHighlight": {
+    "en": "Open 24 hours with zero reception overhead.",
+    "es": "Abre las 24 horas sin costes de recepción.",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de"
+    ]
+  },
+  "domotica.turnOnLights": {
+    "en": "Turn On Lights",
+    "es": "Encender Focos",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de"
+    ]
+  },
+  "domotica.turnstileTitle": {
+    "en": "Court Turnstile / Door",
+    "es": "Torno / Puerta de Pista",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de"
+    ]
+  },
+  "domotica.unlocked": {
+    "en": "Unlocked (Open)",
+    "es": "Desbloqueado (Abierto)",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de"
+    ]
+  },
+  "features.domoticaBadge": {
+    "en": "Hardware & Smart Courts",
+    "es": "Hardware & Pistas Inteligentes",
+    "langs": [
+      "eu"
+    ]
+  },
+  "features.domoticaDesc": {
+    "en": "Discover our exclusive IoT Domotics module for LED lighting automation, temporary PIN door unlocking, and instant replay video cameras.",
+    "es": "Descubre nuestro módulo exclusivo de Domótica IoT para control de iluminación LED, aperturas por PIN temporal y cámaras de repetición.",
+    "langs": [
+      "eu"
+    ]
+  },
+  "features.domoticaTitle": {
+    "en": "Looking to automate lights and door locks?",
+    "es": "¿Buscas automatizar luces y cerraduras?",
+    "langs": [
+      "eu"
+    ]
+  },
+  "features.mainSubtitle": {
+    "en": "A modular, connected platform to streamline sports management, automate bookings and payments, and deliver the best padel experience to your players.",
+    "es": "Una plataforma modular y conectada para profesionalizar la gestión deportiva, automatizar reservas y cobros, y ofrecer a tus jugadores la mejor experiencia del pádel.",
+    "langs": [
+      "eu"
+    ]
+  },
+  "features.module.0.desc": {
+    "en": "Visual schedule engine optimized for touch screens and mobile devices. Manage indoor, outdoor, and single courts with dynamic peak/off-peak pricing.",
+    "es": "Motor de cuadrante visual optimizado para dispositivos táctiles y móviles. Gestiona pistas cubiertas, exteriores e individuales con tarifas dinámicas por franja horaria.",
+    "langs": [
+      "eu"
+    ]
+  },
+  "features.module.0.f.0": {
+    "en": "Automated 4-player fee splitting (Split Payments)",
+    "es": "División automática de pago entre 4 jugadores (Split Payments)",
+    "langs": [
+      "eu"
+    ]
+  },
+  "features.module.0.f.1": {
+    "en": "Configurable cancellation policies with deposit and penalty rules",
+    "es": "Políticas de cancelación con penalización y fianza configurables",
+    "langs": [
+      "eu"
+    ]
+  },
+  "features.module.0.f.2": {
+    "en": "Instant sync preventing double bookings and schedule collisions",
+    "es": "Sincronización instantánea sin solapamientos ni reservas duplicadas",
+    "langs": [
+      "eu"
+    ]
+  },
+  "features.module.0.f.3": {
+    "en": "Weekly recurring member match slots management",
+    "es": "Gestión de partidas fijas semanales de abonados",
+    "langs": [
+      "eu"
+    ]
+  },
+  "features.module.0.title": {
+    "en": "Real-Time Booking Quadrant & Availability",
+    "es": "Cuadrante de Reservas & Disponibilidad en Tiempo Real",
+    "langs": [
+      "eu"
+    ]
+  },
+  "features.module.1.badge": {
+    "en": "Academy & Clinics",
+    "es": "Escuela & Clinics",
+    "langs": [
+      "eu"
+    ]
+  },
+  "features.module.1.desc": {
+    "en": "Structure monthly and term courses, clinics, and private 1-on-1 coaching. Automated coach payroll calculations and lesson allocation.",
+    "es": "Estructuración de cursos mensuales, trimestrales y clases sueltas particulares. Asignación de profesores con cálculo automático de liquidaciones.",
+    "langs": [
+      "eu",
+      "ar",
+      "fr",
+      "de"
+    ]
+  },
+  "features.module.1.f.0": {
+    "en": "Attendance tracking and weather-related rain makeup classes",
+    "es": "Control de asistencia y recuperación de clases canceladas por lluvia",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "features.module.1.f.1": {
+    "en": "Tiered tuition rates for members vs non-members",
+    "es": "Cuotas diferenciadas para socios y no socios",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "features.module.1.f.2": {
+    "en": "Automated waitlists with instant vacancy notifications",
+    "es": "Listas de espera automáticas con aviso instantáneo de vacantes",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "features.module.1.f.3": {
+    "en": "Technical skill progress reports and dynamic student rating",
+    "es": "Ficha de progreso técnico y nivel dinámico por alumno",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "features.module.1.title": {
+    "en": "Academy, Courses & Student Management",
+    "es": "Academia, Cursos & Gestión de Alumnos",
+    "langs": [
+      "eu"
+    ]
+  },
+  "features.module.2.badge": {
+    "en": "Bar & Pro Shop",
+    "es": "Ventas en Barra",
+    "langs": [
+      "eu"
+    ]
+  },
+  "features.module.2.desc": {
+    "en": "Fast point-of-sale terminal with visual beverage menus and sports gear catalog. Charge purchases directly to court bookings or member wallets.",
+    "es": "Punto de venta táctil con cartas visuales de bebidas y material deportivo. Carga consumos directamente a la reserva de pista o al saldo del monedero del socio.",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "features.module.2.f.0": {
+    "en": "Cash register balancing and daily shift closure audits",
+    "es": "Cierre y arqueo de caja con desglose de formas de pago",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "features.module.2.f.1": {
+    "en": "Native thermal receipt printing integration",
+    "es": "Impresión térmica nativa de tickets de caja",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "features.module.2.f.2": {
+    "en": "Real-time stock alerts for balls, grips, test rackets, and consumables",
+    "es": "Control de stock de bolas, grips, palas de test y consumibles",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "features.module.2.f.3": {
+    "en": "Split payment with credit card, cash, or mobile pay",
+    "es": "Cobro combinado con tarjeta bancaria, efectivo o Bizum",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "features.module.2.title": {
+    "en": "Touch POS for Café, Bar & Pro Shop",
+    "es": "TPV Táctil de Bar, Cafetería & Pro Shop",
+    "langs": [
+      "eu"
+    ]
+  },
+  "features.module.3.desc": {
+    "en": "Organize weekend tournaments, corporate leagues, and American rounds. Automated single-elimination and consolation bracket generation.",
+    "es": "Organización de torneos de fin de semana, ligas regulares de empresa y pozos americanos. Generación automática de cuadros de eliminatorias y consolación.",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "features.module.3.f.0": {
+    "en": "Online team entry with upfront payment collection",
+    "es": "Inscripciones online con cobro anticipado de la cuota de pareja",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "features.module.3.f.1": {
+    "en": "Live schedule publishing and real-time score updates on club web",
+    "es": "Publicación de horarios y resultados en vivo en la web del club",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "features.module.3.f.2": {
+    "en": "Club ladder rankings with social and federated point calculation",
+    "es": "Rankings del club con cálculo de puntos federados o sociales",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "features.module.3.f.3": {
+    "en": "Official match sheet export and PDF bracket publishing",
+    "es": "Generación y exportación de cuadros oficiales y actas",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "features.module.3.title": {
+    "en": "Tournament, League & Ranking Manager",
+    "es": "Gestor de Torneos, Ligas & Rankings",
+    "langs": [
+      "eu"
+    ]
+  },
+  "features.module.4.badge": {
+    "en": "Player Loyalty",
+    "es": "Fidelización",
+    "langs": [
+      "eu"
+    ]
+  },
+  "features.module.4.desc": {
+    "en": "Unified customer database with match logs, head-to-head (H2H) stats, favorite racket, court side preference, and digital member wallet.",
+    "es": "Base de datos unificada de clientes con historial de partidos, balance cara a cara (H2H), pala favorita, posición habitual y monedero virtual recargable.",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "features.module.4.f.0": {
+    "en": "Prepaid digital wallet with promotional bonus top-ups",
+    "es": "Monedero digital con bonificaciones por recarga anticipada",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "features.module.4.f.1": {
+    "en": "Member tier segmentation (family, individual, junior, senior)",
+    "es": "Segmentación por cuotas de socio (familiar, individual, jubilado)",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "features.module.4.f.2": {
+    "en": "Frequent partner and common rival analytics",
+    "es": "Métricas de compañero más frecuente y rival habitual",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "features.module.4.f.3": {
+    "en": "Customer booking history and cancellation audit log",
+    "es": "Auditoría de reservas y cancelaciones por usuario",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "features.module.4.title": {
+    "en": "Sports CRM & Player Performance Profile",
+    "es": "CRM Deportivo & Ficha Técnica del Jugador",
+    "langs": [
+      "eu"
+    ]
+  },
+  "features.module.5.badge": {
+    "en": "Administration",
+    "es": "Administración",
+    "langs": [
+      "eu",
+      "fr"
+    ]
+  },
+  "features.module.5.desc": {
+    "en": "Complete club financial automation: collect monthly member dues, issue official tax invoices, and export accounting data in one click.",
+    "es": "Automatización financiera para clubes: cobro de cuotas mensuales de abonados, emisión de facturas oficiales con IVA desglosado y exportación contable.",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "features.module.5.f.0": {
+    "en": "SEPA XML direct debit remittance generation (Core & B2B)",
+    "es": "Generación de archivos de remesas bancarias SEPA XML (Core / B2B)",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "features.module.5.f.1": {
+    "en": "Automated PDF corporate tax invoices for corporate clients",
+    "es": "Emisión y descarga de facturas en PDF para clientes de empresa",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "features.module.5.f.2": {
+    "en": "Delinquency tracking and automated re-billing of returned debits",
+    "es": "Control estricto de morosidad y cobro automático de recibos devueltos",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "features.module.5.f.3": {
+    "en": "Integrated reconciliation with Stripe, Redsys, and card terminals",
+    "es": "Conciliación con pasarelas de pago Stripe, Redsys y TPV físico",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "features.module.5.title": {
+    "en": "Invoicing, Recurring Fees & SEPA Direct Debit",
+    "es": "Facturación, Cuotas Recurrentes & Remesas SEPA",
+    "langs": [
+      "eu"
+    ]
+  },
+  "features.module.6.desc": {
+    "en": "Intelligent conversational bot handling member inquiries on your official website and WhatsApp. Provides instant court availability and pricing.",
+    "es": "Asistente conversacional inteligente que atiende consultas de clientes en tu web y WhatsApp oficial. Informa de disponibilidad de pistas y tarifas automáticamente.",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "features.module.6.f.0": {
+    "en": "Bring Your Own Key (BYOK) support for custom LLM API keys",
+    "es": "Soporte Bring Your Own Key (BYOK) para claves API propias",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "features.module.6.f.1": {
+    "en": "Multichannel support: Official Web, WhatsApp, and Instagram",
+    "es": "Activación por canales: Web oficial, WhatsApp e Instagram",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "features.module.6.f.2": {
+    "en": "Customizable brand tone of voice (formal, friendly, athletic)",
+    "es": "Tono de voz configurable (profesional, cercano, deportivo)",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "features.module.6.f.3": {
+    "en": "Native multilingual support for tourists and international members",
+    "es": "Soporte multiidioma nativo para atender a turistas y socios internacionales",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "features.module.6.title": {
+    "en": "Omnichannel AI Assistant (BYOK)",
+    "es": "Copiloto de IA Multicanal (BYOK)",
+    "langs": [
+      "eu"
+    ]
+  },
+  "features.module.7.badge": {
+    "en": "Your Own Brand",
+    "es": "Tu Propia Marca",
+    "langs": [
+      "eu"
+    ]
+  },
+  "features.module.7.desc": {
+    "en": "Your club on its own custom domain (yourclub.com), corporate colors, crest, and installable iOS and Android app without App Store fees.",
+    "es": "Tu club con su propio dominio web (tuclub.com), colores corporativos, logotipo y app instalable en iPhone y Android sin pagar comisiones a tiendas de apps.",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "features.module.7.f.0": {
+    "en": "Custom domain connection with automated free SSL certificate",
+    "es": "Conexión de dominio propio con certificado SSL gratuito",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "features.module.7.f.1": {
+    "en": "Ultra-fast progressive web app installable in 1 tap on home screen",
+    "es": "App web de alta velocidad instalable en 1 toque en la pantalla de inicio",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "features.module.7.f.2": {
+    "en": "100% white-label with zero third-party branding marks",
+    "es": "Sin menciones técnicas a plataformas intermediarias",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "features.module.7.f.3": {
+    "en": "Responsive layout optimized for smartphones, tablets, and kiosks",
+    "es": "Diseño responsive adaptado a cualquier dispositivo y pantalla",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "features.module.7.title": {
+    "en": "Complete White-Label & Corporate Mobile App",
+    "es": "Marca Blanca Integral & App Móvil Corporativa",
+    "langs": [
+      "eu"
+    ]
+  },
+  "features.register": {
+    "en": "Activate My Club",
+    "es": "Activar Mi Club",
+    "langs": [
+      "eu"
+    ]
+  },
+  "home.corporate.demoTitle": {
+    "en": "Request a Guided Demo or Test by Role",
+    "es": "Solicita una Demo Guiada o Prueba el Sistema por Rol",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "pricing.cycleYearlyDiscount": {
+    "en": "Save 20%",
+    "es": "Ahorra 20%",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr"
+    ]
+  },
+  "pricing.tiers.club_base.badge": {
+    "en": "Most Popular",
+    "es": "Más Demandado",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "pricing.tiers.club_base.cta": {
+    "en": "Start with Club Base",
+    "es": "Empezar con Club Base",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr"
+    ]
+  },
+  "pricing.tiers.club_base.desc": {
+    "en": "Ideal for padel clubs up to 4 courts wanting to digitize bookings and automate payments.",
+    "es": "Ideal para clubes de pádel de hasta 4 pistas que desean informatizar sus reservas y automatizar cobros.",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "pricing.tiers.club_base.f1": {
+    "en": "Up to 4 padel courts",
+    "es": "Hasta 4 pistas de pádel",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "pricing.tiers.club_base.f2": {
+    "en": "Unlimited commission-free online bookings",
+    "es": "Reservas online ilimitadas sin comisiones",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "pricing.tiers.club_base.f3": {
+    "en": "White-label web and mobile app",
+    "es": "Web y App móvil de marca blanca",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "pricing.tiers.club_base.f4": {
+    "en": "Split Payments (1/4 per player)",
+    "es": "Split Payments (1/4 por jugador)",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "pricing.tiers.club_base.f6": {
+    "en": "Priority technical assistance via WhatsApp",
+    "es": "Soporte técnico prioritario por WhatsApp",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "pricing.tiers.club_pro.badge": {
+    "en": "Growing Clubs",
+    "es": "Clubes en Crecimiento",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "pricing.tiers.club_pro.cta": {
+    "en": "Choose Pro Plan",
+    "es": "Elegir Plan Pro",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr"
+    ]
+  },
+  "pricing.tiers.club_pro.desc": {
+    "en": "For full clubs with coaching academy, official tournaments, café bar, and IoT court domotics.",
+    "es": "Para clubes completos con escuela, torneos oficiales, bar cafetería y automatización domótica de pistas.",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "pricing.tiers.club_pro.f2": {
+    "en": "Full Academy and Coaching school module",
+    "es": "Módulo completo de Escuela y Academias",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "pricing.tiers.club_pro.f4": {
+    "en": "PIN and dynamic QR door unlocking",
+    "es": "Apertura de pistas por PIN y Código QR",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "pricing.tiers.club_pro.f5": {
+    "en": "Touch POS for Bar, Café, and Pro Shop",
+    "es": "TPV Táctil de Bar, Cafetería y Tienda",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "pricing.tiers.club_pro.f6": {
+    "en": "Tournament, League & Ladder Ranking manager",
+    "es": "Gestor de Torneos, Ligas y Rankings FEP",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "pricing.tiers.coach.badge": {
+    "en": "Coaches & Academies",
+    "es": "Entrenadores & Academias",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "pricing.tiers.coach.cta": {
+    "en": "Choose Coach Plan",
+    "es": "Elegir Plan Coach",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr"
+    ]
+  },
+  "pricing.tiers.coach.desc": {
+    "en": "For independent coaches, fitness trainers, and freelance academies without fixed venues.",
+    "es": "Para entrenadores individuales, preparadores físicos y pequeñas escuelas sin instalaciones propias.",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "pricing.tiers.coach.f1": {
+    "en": "Up to 40 concurrent active students",
+    "es": "Hasta 40 alumnos activos simultáneos",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "pricing.tiers.coach.f2": {
+    "en": "Recurring monthly tuition fee billing",
+    "es": "Cobro recurrente mensual de cuotas",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "pricing.tiers.coach.f4": {
+    "en": "Technical progress & player skill rating",
+    "es": "Ficha técnica y seguimiento de nivel de juego",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "pricing.tiers.coach.f5": {
+    "en": "Dedicated coach website portal",
+    "es": "Portal web propio del profesor",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "pricing.tiers.enterprise.badge": {
+    "en": "Chains & Franchises",
+    "es": "Cadenas & Franquicias",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "pricing.tiers.enterprise.desc": {
+    "en": "Custom solution for multi-venue sports centers, padel chains, and regional federations.",
+    "es": "Solución a medida para grandes complejos deportivos, cadenas multi-club y federaciones de pádel.",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "pricing.tiers.enterprise.f1": {
+    "en": "Centralized multi-facility management",
+    "es": "Gestión multi-sede centralizada",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "pricing.tiers.enterprise.f2": {
+    "en": "Custom branded domain (yourclub.com)",
+    "es": "Dominio propio personalizado (tuclub.com)",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "pricing.tiers.enterprise.f3": {
+    "en": "API integrations with industrial turnstiles & access gates",
+    "es": "Integración API con tornos y cerraduras industriales",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "pricing.tiers.enterprise.f4": {
+    "en": "Electronic invoicing and SEPA XML bank debits",
+    "es": "Facturación electrónica y remesas SEPA bancarias",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "pricing.tiers.enterprise.f5": {
+    "en": "Dedicated account manager and on-site onboarding",
+    "es": "Gestor de cuenta y onboarding presencial dedicado",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "pricing.tiers.enterprise.f6": {
+    "en": "Guaranteed 99.9% uptime SLA agreement",
+    "es": "SLA garantizado del 99.9% de disponibilidad",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "pricing.toggleCycle": {
+    "en": "Toggle monthly and annual billing",
+    "es": "Alternar facturación mensual y anual",
+    "langs": [
+      "eu",
+      "ar",
+      "pt",
+      "fr",
+      "de",
+      "it"
+    ]
+  },
+  "ai.askPlaceholder": {
+    "en": "Ask about availability, academy, tournaments...",
+    "es": "Pregunta sobre disponibilidad, escuela, torneos...",
+    "langs": [
+      "ar"
+    ]
+  },
+  "booking.paymentMode": {
+    "en": "4. Payment Mode & Players",
+    "es": "4. Modalidad de Pago y Compañeros",
+    "langs": [
+      "ar"
+    ]
+  },
+  "booking.selectCourt": {
+    "en": "2. Select Court",
+    "es": "2. Elige Pista",
+    "langs": [
+      "ar"
+    ]
+  },
+  "booking.selectDate": {
+    "en": "1. Select Date & Duration",
+    "es": "1. Selecciona Fecha y Duración",
+    "langs": [
+      "ar"
+    ]
+  },
+  "booking.selectTime": {
+    "en": "3. Available Time Slot",
+    "es": "3. Horario Disponible",
+    "langs": [
+      "ar"
+    ]
+  },
+  "common.date": {
+    "en": "Date",
+    "es": "Fecha",
+    "langs": [
+      "ar",
+      "fr"
+    ]
+  },
+  "common.delete": {
+    "en": "Delete",
+    "es": "Eliminar",
+    "langs": [
+      "ar"
+    ]
+  },
+  "common.details": {
+    "en": "Details",
+    "es": "Detalles",
+    "langs": [
+      "ar",
+      "de"
+    ]
+  },
+  "common.edit": {
+    "en": "Edit",
+    "es": "Editar",
+    "langs": [
+      "ar"
+    ]
+  },
+  "common.loading": {
+    "en": "Loading...",
+    "es": "Cargando...",
+    "langs": [
+      "ar"
+    ]
+  },
+  "common.publish": {
+    "en": "Publish",
+    "es": "Publicar",
+    "langs": [
+      "ar"
+    ]
+  },
+  "common.time": {
+    "en": "Time",
+    "es": "Horario",
+    "langs": [
+      "ar"
+    ]
+  },
+  "role.RECEPTION": {
+    "en": "Front Desk",
+    "es": "Recepción",
+    "langs": [
+      "ar"
+    ]
+  },
+  "role.STAFF": {
+    "en": "Staff Member",
+    "es": "Empleado",
+    "langs": [
+      "ar"
+    ]
+  },
+  "role.STORE_MANAGER": {
+    "en": "Store Manager",
+    "es": "Gerente Tienda",
+    "langs": [
+      "ar"
+    ]
+  },
+  "role.TOURNAMENT_ORGANIZER": {
+    "en": "Tournament Director",
+    "es": "Organizador Torneos",
+    "langs": [
+      "ar"
+    ]
+  },
+  "tenant.ONLINE_STORE": {
+    "en": "Online Padel Store",
+    "es": "Tienda Especializada",
+    "langs": [
+      "ar"
+    ]
+  },
+  "tenant.PROFESSIONAL": {
+    "en": "Sports Professional",
+    "es": "Profesional del Pádel",
+    "langs": [
+      "ar"
+    ]
+  },
+  "tenant.PRO_PLAYER": {
+    "en": "Pro Athlete / Player",
+    "es": "Jugador Profesional",
+    "langs": [
+      "ar"
+    ]
+  },
+  "tenant.TOURNAMENT_ORGANIZER": {
+    "en": "Tournament Circuit",
+    "es": "Organizador de Torneos",
+    "langs": [
+      "ar"
+    ]
+  },
+  "home.corporate.modal.emailLabel": {
+    "en": "Contact Email",
+    "es": "Email de Contacto",
+    "langs": [
+      "pt"
+    ]
+  },
+  "home.corporate.modules.iot.title": {
+    "en": "Smart IoT Court Automation",
+    "es": "Domótica IoT Inteligente",
+    "langs": [
+      "pt"
+    ]
+  },
+  "blog.posts.blog-2.tags": {
+    "en": "Courts, WPT, Mondo, Maintenance",
+    "es": "Pistas, WPT, Mondo, Mantenimiento",
+    "langs": [
+      "fr"
+    ]
+  },
+  "blog.tags": {
+    "en": "Tags",
+    "es": "Etiquetas",
+    "langs": [
+      "fr"
+    ]
+  },
+  "footer.solutionsTitle": {
+    "en": "Solutions",
+    "es": "Soluciones",
+    "langs": [
+      "fr"
+    ]
+  },
+  "nav.contact": {
+    "en": "Contact",
+    "es": "Contacto",
+    "langs": [
+      "fr"
+    ]
+  },
+  "nav.solutions": {
+    "en": "Solutions",
+    "es": "Soluciones",
+    "langs": [
+      "fr"
+    ]
+  },
+  "domotica.module.dom-pantallas.badge": {
+    "en": "Digital Signage",
+    "es": "Señalética Digital",
+    "langs": [
+      "de",
+      "it"
+    ]
+  },
+  "home.corporate.pricing.elitePlanTitle": {
+    "en": "Enterprise White-Label",
+    "es": "Enterprise Marca Blanca",
+    "langs": [
+      "de",
+      "it"
+    ]
+  },
+  "register.position": {
+    "en": "Position:",
+    "es": "Posición:",
+    "langs": [
+      "de"
+    ]
+  },
+  "role.TENANT_ADMIN": {
+    "en": "Manager",
+    "es": "Administrador",
+    "langs": [
+      "de",
+      "it"
+    ]
+  },
+  "auth.passwordLabel": {
+    "en": "Password",
+    "es": "Contraseña",
+    "langs": [
+      "it"
+    ]
+  },
+  "blog.categories.salud": {
+    "en": "Health & Performance",
+    "es": "Salute & Prestazione",
+    "langs": [
+      "it"
+    ]
+  },
+  "contact.reception": {
+    "en": "Reception:",
+    "es": "Recepción:",
+    "langs": [
+      "it"
+    ]
+  },
+  "nav.home": {
+    "en": "Home",
+    "es": "Inicio",
+    "langs": [
+      "it"
+    ]
+  },
+  "register.step.account": {
+    "en": "1. Account",
+    "es": "1. Cuenta",
+    "langs": [
+      "it"
+    ]
+  },
+  "role.SUPERADMIN": {
+    "en": "Superadmin HQ",
+    "es": "Superadministrador HQ",
+    "langs": [
+      "it"
+    ]
+  }
+}

@@ -432,161 +432,119 @@ export function SolucionesPage({
 
         {/* Cuadrícula de Tarjetas Resumen para cada rol profesional (Setmio Pro) */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch">
-          {/* Tarjeta 1: Clubes de Pádel */}
-          <article className="p-8 rounded-3xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-6 shadow-sm hover:border-emerald-500 hover:shadow-xl transition-all duration-300 flex flex-col justify-between group">
-            <div className="space-y-5">
-              <div className="flex items-center justify-between">
-                <div className="w-12 h-12 rounded-2xl bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold group-hover:scale-105 transition-transform">
-                  <Building2 className="w-6 h-6" />
-                </div>
-                <span className="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20">
-                  Setmio Pro
-                </span>
-              </div>
-
-              <div>
-                <div className="text-[11px] font-black uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
-                  {t('solutions.cardClubsBadge', 'Instalaciones & Complejos')}
-                </div>
-                <h2 className="text-2xl font-black text-slate-900 dark:text-white mt-1">
-                  {t('solutions.cardClubsTitle', 'Clubes de Pádel')}
-                </h2>
-                <p className="text-xs text-slate-600 dark:text-slate-400 mt-2.5 leading-relaxed">
-                  {t('solutions.cardClubsDesc', 'Control absoluto de cuadrante de pistas, socios y facturación con marca blanca completa, automatización domótica de luces LED y cero comisiones por reserva.')}
-                </p>
-              </div>
-
-              <ul className="space-y-2.5 text-xs text-slate-700 dark:text-slate-300 border-t border-slate-200/80 dark:border-slate-800 pt-4">
-                <li className="flex items-start gap-2">
-                  <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
-                  <span>{t('solutions.clubs.f1')}</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
-                  <span>{t('solutions.clubs.f2')}</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
-                  <span>{t('solutions.clubs.f3')}</span>
-                </li>
-              </ul>
-            </div>
-
-            <div className="pt-4 border-t border-slate-200/80 dark:border-slate-800">
-              <button
-                type="button"
-                onClick={() => handleSelectRole('clubes')}
-                className="w-full py-3.5 px-4 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs transition-all shadow-md shadow-emerald-600/20 flex items-center justify-center gap-2 cursor-pointer active:scale-95"
+          {[
+            {
+              id: 'clubes' as ProfessionalRoleKey,
+              itemKey: 'item_1',
+              icon: Building2,
+              badgeKey: 'solutions.cardClubsBadge',
+              titleKey: 'solutions.cardClubsTitle',
+              descKey: 'solutions.cardClubsDesc',
+              btnKey: 'solutions.cardClubsBtn',
+              f1Key: 'solutions.clubs.f1',
+              f2Key: 'solutions.clubs.f2',
+              f3Key: 'solutions.clubs.f3',
+              borderHover: 'hover:border-emerald-500',
+              iconBg: 'bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400',
+              badgeBg: 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/20',
+              tagColor: 'text-emerald-600 dark:text-emerald-400',
+              checkColor: 'text-emerald-500',
+              btnBg: 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-600/20',
+            },
+            {
+              id: 'profesores' as ProfessionalRoleKey,
+              itemKey: 'item_2',
+              icon: GraduationCap,
+              badgeKey: 'solutions.cardSchoolsBadge',
+              titleKey: 'solutions.cardSchoolsTitle',
+              descKey: 'solutions.cardSchoolsDesc',
+              btnKey: 'solutions.cardSchoolsBtn',
+              f1Key: 'solutions.schools.f1',
+              f2Key: 'solutions.schools.f2',
+              f3Key: 'solutions.schools.f3',
+              borderHover: 'hover:border-teal-500',
+              iconBg: 'bg-teal-100 dark:bg-teal-950 text-teal-600 dark:text-cyan-400',
+              badgeBg: 'bg-teal-500/10 text-teal-700 dark:text-cyan-400 border-teal-500/20',
+              tagColor: 'text-teal-600 dark:text-cyan-400',
+              checkColor: 'text-teal-500',
+              btnBg: 'bg-teal-600 hover:bg-teal-500 text-white shadow-teal-600/20',
+            },
+            {
+              id: 'profesionales' as ProfessionalRoleKey,
+              itemKey: 'item_3',
+              icon: Trophy,
+              badgeKey: 'solutions.cardProBadge',
+              titleKey: 'solutions.cardProTitle',
+              descKey: 'solutions.cardProDesc',
+              btnKey: 'solutions.cardProBtn',
+              f1Key: 'solutions.pro.f1',
+              f2Key: 'solutions.pro.f2',
+              f3Key: 'solutions.pro.f3',
+              borderHover: 'hover:border-cyan-500',
+              iconBg: 'bg-cyan-100 dark:bg-cyan-950 text-cyan-600 dark:text-cyan-400',
+              badgeBg: 'bg-cyan-500/10 text-cyan-700 dark:text-cyan-400 border-cyan-500/20',
+              tagColor: 'text-cyan-600 dark:text-cyan-400',
+              checkColor: 'text-cyan-500',
+              btnBg: 'bg-cyan-600 hover:bg-cyan-500 text-white shadow-cyan-600/20',
+            },
+          ].map((role) => {
+            const Icon = role.icon;
+            return (
+              <article
+                key={role.id}
+                className={`p-8 rounded-3xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-6 shadow-sm ${role.borderHover} hover:shadow-xl transition-all duration-300 flex flex-col justify-between group`}
               >
-                <span>{t('solutions.cardClubsBtn', 'Ver Solución Detallada para Clubes')}</span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
-            </div>
-          </article>
+                <div className="space-y-5">
+                  <div className="flex items-center justify-between">
+                    <div className={`w-12 h-12 rounded-2xl ${role.iconBg} flex items-center justify-center font-bold group-hover:scale-105 transition-transform`}>
+                      <Icon className="w-6 h-6" />
+                    </div>
+                    <span className={`px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${role.badgeBg} border`}>
+                      Setmio Pro
+                    </span>
+                  </div>
 
-          {/* Tarjeta 2: Profesores y Academias */}
-          <article className="p-8 rounded-3xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-6 shadow-sm hover:border-teal-500 hover:shadow-xl transition-all duration-300 flex flex-col justify-between group">
-            <div className="space-y-5">
-              <div className="flex items-center justify-between">
-                <div className="w-12 h-12 rounded-2xl bg-teal-100 dark:bg-teal-950 text-teal-600 dark:text-cyan-400 flex items-center justify-center font-bold group-hover:scale-105 transition-transform">
-                  <GraduationCap className="w-6 h-6" />
+                  <div>
+                    <div className={`text-[11px] font-black uppercase tracking-wider ${role.tagColor}`}>
+                      {t(`solutions.${role.itemKey}.badge`)}
+                    </div>
+                    <h2 className="text-2xl font-black text-slate-900 dark:text-white mt-1">
+                      {t(`solutions.${role.itemKey}.title`)}
+                    </h2>
+                    <p className="text-xs text-slate-600 dark:text-slate-400 mt-2.5 leading-relaxed">
+                      {t(`solutions.${role.itemKey}.desc`)}
+                    </p>
+                  </div>
+
+                  <ul className="space-y-2.5 text-xs text-slate-700 dark:text-slate-300 border-t border-slate-200/80 dark:border-slate-800 pt-4">
+                    <li className="flex items-start gap-2">
+                      <Check className={`w-4 h-4 ${role.checkColor} shrink-0 mt-0.5`} />
+                      <span>{t(`solutions.${role.itemKey}.f1`)}</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Check className={`w-4 h-4 ${role.checkColor} shrink-0 mt-0.5`} />
+                      <span>{t(`solutions.${role.itemKey}.f2`)}</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Check className={`w-4 h-4 ${role.checkColor} shrink-0 mt-0.5`} />
+                      <span>{t(`solutions.${role.itemKey}.f3`)}</span>
+                    </li>
+                  </ul>
                 </div>
-                <span className="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-teal-500/10 text-teal-700 dark:text-cyan-400 border border-teal-500/20">
-                  Setmio Pro
-                </span>
-              </div>
 
-              <div>
-                <div className="text-[11px] font-black uppercase tracking-wider text-teal-600 dark:text-cyan-400">
-                  {t('solutions.cardSchoolsBadge', 'Escuelas & Entrenadores')}
+                <div className="pt-4 border-t border-slate-200/80 dark:border-slate-800">
+                  <button
+                    type="button"
+                    onClick={() => handleSelectRole(role.id)}
+                    className={`w-full py-3.5 px-4 rounded-2xl ${role.btnBg} font-black text-xs transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer active:scale-95`}
+                  >
+                    <span>{t(`solutions.${role.itemKey}.btn`)}</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
                 </div>
-                <h2 className="text-2xl font-black text-slate-900 dark:text-white mt-1">
-                  {t('solutions.cardSchoolsTitle', 'Profesores y Academias')}
-                </h2>
-                <p className="text-xs text-slate-600 dark:text-slate-400 mt-2.5 leading-relaxed">
-                  {t('solutions.cardSchoolsDesc', 'Herramientas profesionales para impartir clases particulares y grupales, evaluar la evolución técnica del alumno y automatizar cobros recurrentes de cuotas.')}
-                </p>
-              </div>
-
-              <ul className="space-y-2.5 text-xs text-slate-700 dark:text-slate-300 border-t border-slate-200/80 dark:border-slate-800 pt-4">
-                <li className="flex items-start gap-2">
-                  <Check className="w-4 h-4 text-teal-500 shrink-0 mt-0.5" />
-                  <span>{t('solutions.schools.f1')}</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Check className="w-4 h-4 text-teal-500 shrink-0 mt-0.5" />
-                  <span>{t('solutions.schools.f2')}</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Check className="w-4 h-4 text-teal-500 shrink-0 mt-0.5" />
-                  <span>{t('solutions.schools.f3')}</span>
-                </li>
-              </ul>
-            </div>
-
-            <div className="pt-4 border-t border-slate-200/80 dark:border-slate-800">
-              <button
-                type="button"
-                onClick={() => handleSelectRole('profesores')}
-                className="w-full py-3.5 px-4 rounded-2xl bg-teal-600 hover:bg-teal-500 text-white font-black text-xs transition-all shadow-md shadow-teal-600/20 flex items-center justify-center gap-2 cursor-pointer active:scale-95"
-              >
-                <span>{t('solutions.cardSchoolsBtn', 'Ver Solución para Escuelas y Profesores')}</span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
-            </div>
-          </article>
-
-          {/* Tarjeta 3: Jugadores Profesionales */}
-          <article className="p-8 rounded-3xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-6 shadow-sm hover:border-cyan-500 hover:shadow-xl transition-all duration-300 flex flex-col justify-between group">
-            <div className="space-y-5">
-              <div className="flex items-center justify-between">
-                <div className="w-12 h-12 rounded-2xl bg-cyan-100 dark:bg-cyan-950 text-cyan-600 dark:text-cyan-400 flex items-center justify-center font-bold group-hover:scale-105 transition-transform">
-                  <Trophy className="w-6 h-6" />
-                </div>
-                <span className="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-cyan-500/10 text-cyan-700 dark:text-cyan-400 border border-cyan-500/20">
-                  Setmio Pro
-                </span>
-              </div>
-
-              <div>
-                <div className="text-[11px] font-black uppercase tracking-wider text-cyan-600 dark:text-cyan-400">
-                  {t('solutions.cardProBadge', 'Atletas de Competición')}
-                </div>
-                <h2 className="text-2xl font-black text-slate-900 dark:text-white mt-1">
-                  {t('solutions.cardProTitle', 'Jugadores Profesionales')}
-                </h2>
-                <p className="text-xs text-slate-600 dark:text-slate-400 mt-2.5 leading-relaxed">
-                  {t('solutions.cardProDesc', 'Web oficial personal de marca blanca para gestionar patrocinios, contratos, agenda de torneos FIP/Premier Padel y venta directa de clinics y exhibiciones.')}
-                </p>
-              </div>
-
-              <ul className="space-y-2.5 text-xs text-slate-700 dark:text-slate-300 border-t border-slate-200/80 dark:border-slate-800 pt-4">
-                <li className="flex items-start gap-2">
-                  <Check className="w-4 h-4 text-cyan-500 shrink-0 mt-0.5" />
-                  <span>{t('solutions.pro.f1')}</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Check className="w-4 h-4 text-cyan-500 shrink-0 mt-0.5" />
-                  <span>{t('solutions.pro.f2')}</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Check className="w-4 h-4 text-cyan-500 shrink-0 mt-0.5" />
-                  <span>{t('solutions.pro.f3')}</span>
-                </li>
-              </ul>
-            </div>
-
-            <div className="pt-4 border-t border-slate-200/80 dark:border-slate-800">
-              <button
-                type="button"
-                onClick={() => handleSelectRole('profesionales')}
-                className="w-full py-3.5 px-4 rounded-2xl bg-cyan-600 hover:bg-cyan-500 text-white font-black text-xs transition-all shadow-md shadow-cyan-600/20 flex items-center justify-center gap-2 cursor-pointer active:scale-95"
-              >
-                <span>{t('solutions.cardProBtn', 'Ver Solución para Jugadores Pro')}</span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
-            </div>
-          </article>
+              </article>
+            );
+          })}
         </div>
       </div>
     </main>

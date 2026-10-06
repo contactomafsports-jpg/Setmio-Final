@@ -337,8 +337,8 @@ export const BlogView: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
               </h1>
               <p className="text-base sm:text-lg text-slate-600 dark:text-slate-300 leading-relaxed font-normal max-w-2xl">
                 {isCorporateLanding
-                  ? t('corporateBlog.subtitle', 'Artículos técnicos elaborados por entrenadores titulados, análisis de biomecánica, crónicas de torneos y novedades del club.')
-                  : t('blog.description', 'Artículos técnicos elaborados por nuestros entrenadores, análisis de biomecánica, crónicas de torneos y novedades del club en Narón.')}
+                  ? t('corporateBlog.subtitle', t('blog.subtitle', 'Artículos técnicos elaborados por entrenadores titulados, análisis de biomecánica, crónicas de torneos y novedades del club.'))
+                  : t('blog.description', t('blog.subtitle', 'Artículos técnicos elaborados por nuestros entrenadores, análisis de biomecánica, crónicas de torneos y novedades del club en Narón.'))}
               </p>
             </div>
 

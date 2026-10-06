@@ -230,7 +230,7 @@ export const PricingView: React.FC<PricingViewProps> = ({ onBack, onOpenDemo, on
               onClick={handleAction}
               className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition cursor-pointer shadow-md text-center active:scale-95"
             >
-              <span>{t('home.corporate.demoBtn', 'Solicitar Demo o Alta Directa')}</span>
+              <span>{t('pricing.finalCta', 'Solicitar Demo o Alta Directa')}</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>

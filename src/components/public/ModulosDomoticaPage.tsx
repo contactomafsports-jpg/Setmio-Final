@@ -27,17 +27,18 @@ interface ModulosDomoticaPageProps {
 
 export interface DomoticaModuleMeta {
   id: string;
+  itemKey: string;
   icon: React.ComponentType<{ className?: string }>;
   specsCount: number;
 }
 
 const DOMOTICA_MODULES_META: DomoticaModuleMeta[] = [
-  { id: 'dom-luces', icon: Lightbulb, specsCount: 4 },
-  { id: 'dom-accesos', icon: LockKeyhole, specsCount: 4 },
-  { id: 'dom-video', icon: Video, specsCount: 4 },
-  { id: 'dom-clima', icon: Thermometer, specsCount: 4 },
-  { id: 'dom-radar', icon: Wifi, specsCount: 4 },
-  { id: 'dom-pantallas', icon: Sliders, specsCount: 4 },
+  { id: 'dom-luces', itemKey: 'item_1', icon: Lightbulb, specsCount: 4 },
+  { id: 'dom-accesos', itemKey: 'item_2', icon: LockKeyhole, specsCount: 4 },
+  { id: 'dom-video', itemKey: 'item_3', icon: Video, specsCount: 4 },
+  { id: 'dom-clima', itemKey: 'item_4', icon: Thermometer, specsCount: 4 },
+  { id: 'dom-radar', itemKey: 'item_5', icon: Wifi, specsCount: 4 },
+  { id: 'dom-pantallas', itemKey: 'item_6', icon: Sliders, specsCount: 4 },
 ];
 
 export function ModulosDomoticaPage({ onBack, onOpenDemo }: ModulosDomoticaPageProps) {
@@ -267,16 +268,16 @@ export function ModulosDomoticaPage({ onBack, onOpenDemo }: ModulosDomoticaPageP
                       </div>
 
                       <span className="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20">
-                        {t(`domotica.module.${item.id}.badge`)}
+                        {t(`domotica.hardware.${item.itemKey}.badge`)}
                       </span>
                     </div>
 
                     <div>
                       <h3 className="text-base font-black text-slate-900 dark:text-white leading-snug">
-                        {t(`domotica.module.${item.id}.title`)}
+                        {t(`domotica.hardware.${item.itemKey}.title`)}
                       </h3>
                       <p className="text-xs text-slate-600 dark:text-slate-400 mt-2 leading-relaxed">
-                        {t(`domotica.module.${item.id}.desc`)}
+                        {t(`domotica.hardware.${item.itemKey}.desc`)}
                       </p>
                     </div>
 
@@ -284,7 +285,7 @@ export function ModulosDomoticaPage({ onBack, onOpenDemo }: ModulosDomoticaPageP
                       {Array.from({ length: item.specsCount }).map((_, idx) => (
                         <div key={idx} className="flex items-start gap-2 text-[11px] text-slate-600 dark:text-slate-300">
                           <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
-                          <span>{t(`domotica.module.${item.id}.specs.${idx}`)}</span>
+                          <span>{t(`domotica.hardware.${item.itemKey}.specs.${idx}`)}</span>
                         </div>
                       ))}
                     </div>
@@ -292,7 +293,7 @@ export function ModulosDomoticaPage({ onBack, onOpenDemo }: ModulosDomoticaPageP
 
                   <div className="pt-4 mt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs">
                     <span className="font-mono font-bold text-emerald-700 dark:text-emerald-400">
-                      {t(`domotica.module.${item.id}.kpi`)}
+                      {t(`domotica.hardware.${item.itemKey}.kpi`)}
                     </span>
                     <button
                       type="button"
