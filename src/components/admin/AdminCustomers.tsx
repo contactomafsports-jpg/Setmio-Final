@@ -155,24 +155,9 @@ export const AdminCustomers: React.FC = () => {
   const [publicProfileModalCustomer, setPublicProfileModalCustomer] = useState<CustomerItem | null>(null);
 
   React.useEffect(() => {
-    if (selectedCustomerId) {
-      const slug = selectedCustomerId.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-');
-      const found = customerList.find(
-        (c) =>
-          c.id.toLowerCase() === selectedCustomerId.toLowerCase() ||
-          c.name.toLowerCase() === selectedCustomerId.toLowerCase() ||
-          c.name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-') === slug ||
-          c.name.toLowerCase().includes(selectedCustomerId.toLowerCase())
-      );
-      if (found) {
-        setSelectedCustomer(found);
-        return;
-      }
-    }
-
     const handleUrlPlayer = () => {
       const pathname = typeof window !== 'undefined' ? window.location.pathname : '';
-      // Si la URL es la lista general (/socios, /crm, /gestion/jugadores, /jugadores sin slug), no abrir ficha
+      // Si la URL es la lista general (/socios, /crm, /gestion/jugadores, /jugadores sin slug), forzar lista general
       if (
         pathname === '/socios' ||
         pathname === '/crm' ||
@@ -195,7 +180,22 @@ export const AdminCustomers: React.FC = () => {
           );
           if (found) {
             setSelectedCustomer(found);
+            return;
           }
+        }
+      }
+
+      if (selectedCustomerId) {
+        const slug = selectedCustomerId.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-');
+        const found = customerList.find(
+          (c) =>
+            c.id.toLowerCase() === selectedCustomerId.toLowerCase() ||
+            c.name.toLowerCase() === selectedCustomerId.toLowerCase() ||
+            c.name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-') === slug ||
+            c.name.toLowerCase().includes(selectedCustomerId.toLowerCase())
+        );
+        if (found) {
+          setSelectedCustomer(found);
         }
       }
     };
@@ -204,6 +204,16 @@ export const AdminCustomers: React.FC = () => {
     window.addEventListener('popstate', handleUrlPlayer);
     return () => window.removeEventListener('popstate', handleUrlPlayer);
   }, [customerList, selectedCustomerId, setSelectedCustomerId]);
+
+  const handleSelectCustomer = (customer: CustomerItem) => {
+    setSelectedCustomer(customer);
+    setSelectedCustomerId(customer.id);
+    const slug = customer.name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-');
+    if (typeof window !== 'undefined') {
+      window.history.pushState({}, '', `/gestion/jugadores/${slug}`);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
 
   // New Player Registration Modal State (Bug Fix Requerimiento 7)
   const [isNewPlayerModalOpen, setIsNewPlayerModalOpen] = useState(false);
@@ -434,7 +444,7 @@ export const AdminCustomers: React.FC = () => {
                       />
                       <div>
                         <div
-                          onClick={() => setSelectedCustomer(customer)}
+                          onClick={() => handleSelectCustomer(customer)}
                           className="font-bold text-slate-900 dark:text-white hover:text-emerald-600 dark:hover:text-emerald-400 cursor-pointer"
                         >
                           {customer.name}
@@ -471,7 +481,7 @@ export const AdminCustomers: React.FC = () => {
                   <td className="py-3 px-4 text-right space-x-2">
                     <button
                       type="button"
-                      onClick={() => setSelectedCustomer(customer)}
+                      onClick={() => handleSelectCustomer(customer)}
                       className="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-700 hover:bg-emerald-500 hover:text-white text-slate-700 dark:text-slate-200 text-xs font-bold transition"
                     >
                       Ver Ficha CRM

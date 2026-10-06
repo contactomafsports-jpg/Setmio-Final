@@ -30,6 +30,7 @@ import { ModulosDomoticaPage } from './components/public/ModulosDomoticaPage';
 import { SolucionesPage } from './components/public/SolucionesPage';
 import { CorporateLayout } from './components/public/CorporateLayout';
 import { PlayerPublicProfileView } from './components/public/PlayerPublicProfileView';
+import { ParaJugadoresPage } from './components/public/ParaJugadoresPage';
 
 // Admin views
 import { AdminLayout } from './components/admin/AdminLayout';
@@ -59,6 +60,7 @@ import { CheckCircle2, AlertTriangle, Info, X } from 'lucide-react';
 export function App() {
   const {
     currentView,
+    setCurrentView,
     currentTenant,
     publicPage,
     setPublicPage,
@@ -101,8 +103,11 @@ export function App() {
       '/soluciones/clubes': 'solution_clubs',
       '/soluciones/escuelas': 'solution_schools',
       '/soluciones/profesores': 'solution_coaches',
-      '/soluciones/jugadores': 'solution_players',
+      '/soluciones/jugadores': 'players_app',
       '/soluciones/jugadores-profesionales': 'solution_pro_players',
+      '/para-jugadores': 'players_app',
+      '/jugadores': 'players_app',
+      '/modulos': 'modules',
       '/modulos-domotica': 'modules',
       '/demo': 'demo',
       '/blog': 'blog',
@@ -111,6 +116,44 @@ export function App() {
     };
     const syncRoute = () => {
       const pathname = typeof window !== 'undefined' ? window.location.pathname : '/';
+
+      // URLs de gestión interna
+      if (pathname === '/gestion/ajustes/ia' || pathname.endsWith('/ia')) {
+        setCurrentView('admin');
+        setAdminTab('settings');
+        return;
+      }
+      if (pathname.startsWith('/gestion/jugadores/')) {
+        setCurrentView('admin');
+        setAdminTab('customers');
+        return;
+      }
+      if (pathname.startsWith('/gestion/torneos/')) {
+        setCurrentView('admin');
+        setAdminTab('tournaments');
+        return;
+      }
+      if (pathname === '/gestion/escuela') {
+        setCurrentView('admin');
+        setAdminTab('academy');
+        return;
+      }
+      if (pathname === '/gestion/tpv') {
+        setCurrentView('admin');
+        setAdminTab('pos_cafe');
+        return;
+      }
+      if (pathname === '/gestion/tienda') {
+        setCurrentView('admin');
+        setAdminTab('shop');
+        return;
+      }
+      if (pathname === '/gestion/equipos') {
+        setCurrentView('admin');
+        setAdminTab('teams');
+        return;
+      }
+
       const page = routeToPage[pathname];
       if (page === 'demo') {
         setPublicPage('home');
@@ -129,7 +172,7 @@ export function App() {
     syncRoute();
     window.addEventListener('popstate', syncRoute);
     return () => window.removeEventListener('popstate', syncRoute);
-  }, [setPublicPage]);
+  }, [setPublicPage, setCurrentView, setAdminTab]);
 
   // Scroll Reset Obligatorio: Al cambiar de página, vista o pestaña, forzar scroll arriba
   useEffect(() => {
@@ -171,6 +214,8 @@ export function App() {
       case 'solution_players':
       case 'solution_pro_players':
         return <SolucionesPage onOpenRegister={() => { setAuthOpen(true); }} roleId={publicPage === 'solution_clubs' ? 'clubes' : publicPage === 'solution_schools' ? 'escuelas' : publicPage === 'solution_coaches' ? 'profesores' : publicPage === 'solution_players' ? 'jugadores' : publicPage === 'solution_pro_players' ? 'profesionales' : undefined} onOpenRole={(roleId) => setPublicPage(`solution_${roleId === 'clubes' ? 'clubs' : roleId === 'escuelas' ? 'schools' : roleId === 'profesores' ? 'coaches' : roleId === 'jugadores' ? 'players' : 'pro_players'}` as typeof publicPage)} onBack={goHome} onOpenDemo={() => setRoleSelectorOpen(true)} />;
+      case 'players_app':
+        return <ParaJugadoresPage onBack={goHome} onOpenDemo={() => setRoleSelectorOpen(true)} onOpenRegister={() => { setRegistrationOpen(true); setAuthOpen(true); }} />;
       case 'modules':
         return <ModulosDomoticaPage onBack={goHome} onOpenDemo={() => setRoleSelectorOpen(true)} />;
       case 'demo':

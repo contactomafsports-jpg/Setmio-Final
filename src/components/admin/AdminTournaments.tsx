@@ -30,6 +30,33 @@ export const AdminTournaments: React.FC = () => {
   const [activeAdminSubTab, setActiveAdminSubTab] = useState<'tournaments' | 'rankings' | 'draws' | 'inscriptions'>('tournaments');
   const [selectedTournament, setSelectedTournament] = useState<Tournament>(tournaments[0]);
   const [posterModalUrl, setPosterModalUrl] = useState<string | null>(null);
+  const [tournamentSearch, setTournamentSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'registration_open' | 'in_progress' | 'completed'>('all');
+
+  // URL Sync for /gestion/torneos/[id]
+  React.useEffect(() => {
+    const handleUrlTournament = () => {
+      const pathname = typeof window !== 'undefined' ? window.location.pathname : '';
+      if (pathname.startsWith('/gestion/torneos/')) {
+        const idOrSlug = pathname.replace('/gestion/torneos/', '').trim().toLowerCase();
+        if (idOrSlug) {
+          const found = tournaments.find(
+            (t) =>
+              t.id.toLowerCase() === idOrSlug ||
+              t.title.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-') === idOrSlug ||
+              t.title.toLowerCase().includes(idOrSlug.replace(/-/g, ' '))
+          );
+          if (found) {
+            setSelectedTournament(found);
+            setActiveAdminSubTab('draws');
+          }
+        }
+      }
+    };
+    handleUrlTournament();
+    window.addEventListener('popstate', handleUrlTournament);
+    return () => window.removeEventListener('popstate', handleUrlTournament);
+  }, [tournaments]);
 
   // New Tournament Modal State
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -239,8 +266,67 @@ export const AdminTournaments: React.FC = () => {
       {/* 3. TAB 1: TORNEOS ACTIVOS LIST & CARDS */}
       {activeAdminSubTab === 'tournaments' && (
         <div className="space-y-6 animate-in fade-in duration-150">
+          {/* Barra de Filtros y Buscador de Competiciones */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+            <div className="relative flex-1 max-w-md">
+              <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                placeholder="Buscar torneo por título, formato o ranking..."
+                value={tournamentSearch}
+                onChange={(e) => setTournamentSearch(e.target.value)}
+                className="w-full pl-9 pr-4 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+              />
+            </div>
+
+            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+              <button
+                type="button"
+                onClick={() => setStatusFilter('all')}
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition whitespace-nowrap cursor-pointer ${
+                  statusFilter === 'all'
+                    ? 'bg-emerald-600 text-white'
+                    : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800'
+                }`}
+              >
+                Todos ({tournaments.length})
+              </button>
+              <button
+                type="button"
+                onClick={() => setStatusFilter('registration_open')}
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition whitespace-nowrap cursor-pointer ${
+                  statusFilter === 'registration_open'
+                    ? 'bg-emerald-600 text-white'
+                    : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800'
+                }`}
+              >
+                Inscripción Abierta
+              </button>
+              <button
+                type="button"
+                onClick={() => setStatusFilter('in_progress')}
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition whitespace-nowrap cursor-pointer ${
+                  statusFilter === 'in_progress'
+                    ? 'bg-emerald-600 text-white'
+                    : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800'
+                }`}
+              >
+                En Juego
+              </button>
+            </div>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {tournaments.map((t) => (
+            {tournaments
+              .filter((t) => {
+                const matchSearch =
+                  t.title.toLowerCase().includes(tournamentSearch.toLowerCase()) ||
+                  t.description.toLowerCase().includes(tournamentSearch.toLowerCase()) ||
+                  (t.rankingCategory && t.rankingCategory.toLowerCase().includes(tournamentSearch.toLowerCase()));
+                const matchStatus = statusFilter === 'all' || t.status === statusFilter;
+                return matchSearch && matchStatus;
+              })
+              .map((t) => (
               <div
                 key={t.id}
                 className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition space-y-4 flex flex-col justify-between"
@@ -290,19 +376,23 @@ export const AdminTournaments: React.FC = () => {
                     onClick={() => {
                       setSelectedTournament(t);
                       setActiveAdminSubTab('draws');
+                      if (typeof window !== 'undefined') {
+                        window.history.pushState({}, '', `/gestion/torneos/${t.id}`);
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                      }
                     }}
-                    className="flex-1 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition text-center"
+                    className="flex-1 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition text-center cursor-pointer shadow-xs"
                   >
-                    Ver Cuadros & Horarios
+                    Ver Cuadros, Fases & Horarios
                   </button>
 
                   {/* Poster Visor Button */}
                   <button
                     onClick={() => setPosterModalUrl(t.bannerUrl)}
-                    className="px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold text-xs border border-slate-200 dark:border-slate-700 transition flex items-center gap-1.5"
+                    className="px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold text-xs border border-slate-200 dark:border-slate-700 transition flex items-center gap-1.5 cursor-pointer"
                     title="Ver cartel oficial a pantalla completa"
                   >
-                    <Eye className="w-4 h-4 text-cyan-500" />
+                    <Eye className="w-4 h-4 text-emerald-500" />
                     <span>Cartel</span>
                   </button>
                 </div>

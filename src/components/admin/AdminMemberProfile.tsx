@@ -57,7 +57,7 @@ interface AdminMemberProfileProps {
 }
 
 export const AdminMemberProfile: React.FC<AdminMemberProfileProps> = ({ member, onBack }) => {
-  const { currentUser, currentTenant, triggerDemoToast } = useApp();
+  const { currentUser, currentTenant, triggerDemoToast, setAdminTab } = useApp();
 
   // Role detection
   const isAdmin =
@@ -69,6 +69,9 @@ export const AdminMemberProfile: React.FC<AdminMemberProfileProps> = ({ member, 
   const isSelf =
     currentUser.role === 'PLAYER' &&
     (currentUser.email === member.email || currentUser.name === member.name);
+
+  // Both Admin and the Player themselves can edit racket, level, position, hand and contact info
+  const canEdit = isAdmin || isSelf;
 
   // If viewing as external rival / public, hide financial details
   const isPublicRival = !isAdmin && !isSelf;
@@ -100,6 +103,7 @@ export const AdminMemberProfile: React.FC<AdminMemberProfileProps> = ({ member, 
     hand: memberData.hand || 'Diestro',
     status: memberData.status || 'Activo (Al día)',
     racket: memberData.racket || 'Bullpadel Vertex 04 2026',
+    racketBrand: memberData.racketBrand || 'Bullpadel',
   });
 
   // Wallet Recharge & Checkout Gateway State
@@ -113,16 +117,39 @@ export const AdminMemberProfile: React.FC<AdminMemberProfileProps> = ({ member, 
   const lostMatches = memberData.matches - wonMatches;
   const streak = '+4 Victorias';
 
-  // Level Evolution
+  // Metrics: Compañero más frecuente, Rival habitual, Ranking del Club
+  const frequentPartner = {
+    name: 'Mateo Varela',
+    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80',
+    level: 5.5,
+    matchesTogether: 18,
+    winRateTogether: 78,
+  };
+
+  const habitualRival = {
+    name: 'David Castro',
+    avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=200&q=80',
+    level: 4.1,
+    h2hMatches: 14,
+    balance: '8V - 6D',
+  };
+
+  const clubRanking = {
+    rank: 7,
+    totalPlayers: 240,
+    category: '1ª Categoría Club',
+    points: 2450,
+  };
+
   const levelHistory = [
-    { month: 'Jun', level: 3.50, height: '40%' },
-    { month: 'Jul', level: 3.60, height: '55%' },
-    { month: 'Ago', level: 3.70, height: '70%' },
-    { month: 'Sep', level: 3.80, height: '85%' },
+    { month: 'Jun', level: 3.4, height: '45%' },
+    { month: 'Jul', level: 3.55, height: '60%' },
+    { month: 'Ago', level: 3.65, height: '70%' },
+    { month: 'Sep', level: 3.75, height: '82%' },
     { month: 'Oct', level: memberData.level, height: '95%' },
   ];
 
-  // Match History with Court Photo
+  // Match History with 4 distinct players (Team 1 vs Team 2), photos, and score
   const matchHistory = [
     {
       id: 'm-1',
@@ -133,8 +160,14 @@ export const AdminMemberProfile: React.FC<AdminMemberProfileProps> = ({ member, 
       result: 'Victoria',
       score: '6-4, 7-5',
       isWin: true,
-      partner: 'Mateo Varela',
-      opponents: 'Juan P. / Carlos S.',
+      team1: [
+        { name: memberData.name, avatar: memberData.avatarUrl || 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=150&q=80', level: memberData.level },
+        { name: 'Mateo Varela', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80', level: 5.5 },
+      ],
+      team2: [
+        { name: 'Juan Pena', avatar: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=150&q=80', level: 3.9 },
+        { name: 'Carlos Soto', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=150&q=80', level: 4.0 },
+      ],
       type: 'Partida Abierta Level 4.0',
       paid: true,
       amount: '7.00 €',
@@ -148,8 +181,14 @@ export const AdminMemberProfile: React.FC<AdminMemberProfileProps> = ({ member, 
       result: 'Victoria',
       score: '6-3, 3-6, 7-6(4)',
       isWin: true,
-      partner: 'Lucas Piñeiro',
-      opponents: 'David C. / Alberto M.',
+      team1: [
+        { name: memberData.name, avatar: memberData.avatarUrl || 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=150&q=80', level: memberData.level },
+        { name: 'Lucas Piñeiro', avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=150&q=80', level: 3.85 },
+      ],
+      team2: [
+        { name: 'David Castro', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=150&q=80', level: 4.1 },
+        { name: 'Alberto Morales', avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=150&q=80', level: 4.0 },
+      ],
       type: 'Partido Privado Socios',
       paid: true,
       amount: '7.00 €',
@@ -163,8 +202,14 @@ export const AdminMemberProfile: React.FC<AdminMemberProfileProps> = ({ member, 
       result: 'Derrota',
       score: '4-6, 5-7',
       isWin: false,
-      partner: 'Mateo Varela',
-      opponents: 'Sergio R. / Marcos B.',
+      team1: [
+        { name: memberData.name, avatar: memberData.avatarUrl || 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=150&q=80', level: memberData.level },
+        { name: 'Mateo Varela', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80', level: 5.5 },
+      ],
+      team2: [
+        { name: 'Sergio Ramos', avatar: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=150&q=80', level: 4.5 },
+        { name: 'Marcos Blanco', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=150&q=80', level: 4.3 },
+      ],
       type: 'Liga Social de Primavera',
       paid: true,
       amount: '8.00 €',
@@ -178,8 +223,14 @@ export const AdminMemberProfile: React.FC<AdminMemberProfileProps> = ({ member, 
       result: 'Victoria',
       score: '6-2, 6-3',
       isWin: true,
-      partner: 'Diego Soto',
-      opponents: 'Manuel G. / Jorge L.',
+      team1: [
+        { name: memberData.name, avatar: memberData.avatarUrl || 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=150&q=80', level: memberData.level },
+        { name: 'Diego Soto', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=150&q=80', level: 3.9 },
+      ],
+      team2: [
+        { name: 'Manuel Gómez', avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=150&q=80', level: 3.6 },
+        { name: 'Jorge López', avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=150&q=80', level: 3.8 },
+      ],
       type: 'Partido Amistoso Reto',
       paid: true,
       amount: '6.50 €',
@@ -189,7 +240,7 @@ export const AdminMemberProfile: React.FC<AdminMemberProfileProps> = ({ member, 
   // Tournaments History
   const tournamentHistory = [
     {
-      id: 't-1',
+      id: 'tourn-1',
       name: 'I Open Primavera Pádel San Mateo 2026',
       date: 'Sep 2026',
       category: '2ª Categoría Masculina',
@@ -199,7 +250,7 @@ export const AdminMemberProfile: React.FC<AdminMemberProfileProps> = ({ member, 
       badge: '🥈 Plata',
     },
     {
-      id: 't-2',
+      id: 'tourn-2',
       name: 'Torneo Nocturno Estrella Galicia Pro',
       date: 'Ago 2026',
       category: '3ª Categoría Oro',
@@ -209,7 +260,7 @@ export const AdminMemberProfile: React.FC<AdminMemberProfileProps> = ({ member, 
       badge: '🏆 Oro',
     },
     {
-      id: 't-3',
+      id: 'tourn-3',
       name: 'Liga Autonómica Gallega FGP — Fase Interclubes',
       date: 'Jul 2026',
       category: 'Federado 1ª División Club',
@@ -347,7 +398,7 @@ export const AdminMemberProfile: React.FC<AdminMemberProfileProps> = ({ member, 
             {isAdmin ? 'Vista Admin' : isSelf ? 'Mi Perfil' : 'Perfil Público'}
           </span>
 
-          {isAdmin && (
+          {canEdit && (
             <button
               type="button"
               onClick={() => {
@@ -361,6 +412,7 @@ export const AdminMemberProfile: React.FC<AdminMemberProfileProps> = ({ member, 
                   hand: memberData.hand || 'Diestro',
                   status: memberData.status || 'Activo (Al día)',
                   racket: memberData.racket || 'Bullpadel Vertex 04 2026',
+                  racketBrand: memberData.racketBrand || 'Bullpadel',
                 });
                 setIsEditModalOpen(true);
               }}
@@ -586,65 +638,209 @@ export const AdminMemberProfile: React.FC<AdminMemberProfileProps> = ({ member, 
         </div>
       </section>
 
-      {/* 6. CARRUSEL HORIZONTAL DE ÚLTIMOS PARTIDOS (Requerimiento 6.2) */}
-      <section className="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 p-5 shadow-sm space-y-3">
+      {/* 5.5 MÉTRICAS DEPORTIVAS CLAVE: Compañero más frecuente, Rival habitual, Ranking del Club */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+        {/* Compañero más frecuente */}
+        <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-2">
+          <div className="flex items-center justify-between text-xs">
+            <span className="font-extrabold text-[10px] uppercase tracking-wider text-slate-500 dark:text-slate-400">
+              Compañero más frecuente
+            </span>
+            <span className="font-mono text-xs font-bold text-emerald-600 dark:text-emerald-400">
+              {frequentPartner.matchesTogether} partidos
+            </span>
+          </div>
+          <div className="flex items-center gap-3">
+            <img
+              src={frequentPartner.avatar}
+              alt={frequentPartner.name}
+              className="w-10 h-10 rounded-xl object-cover ring-2 ring-emerald-500/40"
+            />
+            <div className="min-w-0">
+              <div className="font-bold text-slate-900 dark:text-white truncate text-xs">
+                {frequentPartner.name}
+              </div>
+              <div className="text-[11px] text-slate-500 dark:text-slate-400">
+                Nivel {frequentPartner.level.toFixed(2)} · {frequentPartner.winRateTogether}% victorias juntos
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Rival habitual */}
+        <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-2">
+          <div className="flex items-center justify-between text-xs">
+            <span className="font-extrabold text-[10px] uppercase tracking-wider text-slate-500 dark:text-slate-400">
+              Rival habitual
+            </span>
+            <span className="font-mono text-xs font-bold text-amber-600 dark:text-amber-400">
+              {habitualRival.h2hMatches} cruces
+            </span>
+          </div>
+          <div className="flex items-center gap-3">
+            <img
+              src={habitualRival.avatar}
+              alt={habitualRival.name}
+              className="w-10 h-10 rounded-xl object-cover ring-2 ring-amber-500/40"
+            />
+            <div className="min-w-0">
+              <div className="font-bold text-slate-900 dark:text-white truncate text-xs">
+                {habitualRival.name}
+              </div>
+              <div className="text-[11px] text-slate-500 dark:text-slate-400">
+                Nivel {habitualRival.level.toFixed(2)} · Balance: {habitualRival.balance}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Ranking del Club */}
+        <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-2">
+          <div className="flex items-center justify-between text-xs">
+            <span className="font-extrabold text-[10px] uppercase tracking-wider text-slate-500 dark:text-slate-400">
+              Ranking del Club
+            </span>
+            <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20 font-mono">
+              Top 3%
+            </span>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 text-slate-950 font-black text-sm flex items-center justify-center shadow-xs">
+              #{clubRanking.rank}
+            </div>
+            <div className="min-w-0">
+              <div className="font-bold text-slate-900 dark:text-white text-xs">
+                {clubRanking.category}
+              </div>
+              <div className="text-[11px] text-slate-500 dark:text-slate-400 font-mono">
+                {clubRanking.points} Pts oficiales · de {clubRanking.totalPlayers} socios
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 6. CARRUSEL HORIZONTAL DE PARTIDOS DISPUTADOS (Atraviesa contenedor de lado a lado con 4 jugadores por tarjeta) */}
+      <section className="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 p-5 shadow-sm space-y-4">
         <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2.5">
           <div className="flex items-center gap-2">
             <Activity className="w-4 h-4 text-emerald-500" />
             <h3 className="font-bold text-sm text-slate-900 dark:text-white">
-              Últimos Partidos Disputados
+              Historial de Partidos Disputados
             </h3>
           </div>
 
           <button
             type="button"
             onClick={() => setAllMatchesModalOpen(true)}
-            className="text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1 cursor-pointer"
+            className="px-3 py-1 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-xs font-bold text-slate-800 dark:text-slate-200 transition flex items-center gap-1 cursor-pointer"
           >
-            <span>Ver todos los partidos</span>
+            <span>Ver todo</span>
             <ChevronRight className="w-3.5 h-3.5" />
           </button>
         </div>
 
-        {/* Carrusel en scroll horizontal */}
-        <div className="flex items-center gap-3 overflow-x-auto pb-2 no-scrollbar">
+        {/* Carrusel edge-to-edge atravesando el contenedor con 4 tarjetas de jugadores y marcador */}
+        <div className="-mx-5 px-5 overflow-x-auto no-scrollbar flex items-stretch gap-3.5 pb-2">
           {matchHistory.map((m) => (
             <div
               key={m.id}
-              className="min-w-[270px] max-w-[270px] p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800 space-y-2.5 shrink-0 shadow-xs hover:border-emerald-500/50 transition"
+              className="min-w-[320px] max-w-[320px] p-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800 space-y-3 shrink-0 shadow-xs hover:border-emerald-500/50 transition flex flex-col justify-between"
             >
-              <div className="flex items-center justify-between text-xs">
-                <span className={`px-2 py-0.5 rounded-md text-[10px] font-black uppercase ${
-                  m.isWin
-                    ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300'
-                    : 'bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300'
-                }`}>
-                  {m.result}
-                </span>
-                <span className="font-mono font-bold text-xs text-slate-900 dark:text-white">
-                  {m.score}
-                </span>
-              </div>
+              {/* Cabecera del partido: Resultado, Marcador y Pista */}
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span
+                    className={`px-2 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider ${
+                      m.isWin
+                        ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300'
+                        : 'bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300'
+                    }`}
+                  >
+                    {m.result}
+                  </span>
+                  <span className="font-mono font-black text-sm text-slate-900 dark:text-white">
+                    {m.score}
+                  </span>
+                </div>
 
-              {/* Court photo preview */}
-              <div className="relative h-20 rounded-xl overflow-hidden bg-slate-800">
-                <img src={m.courtImage} alt={m.court} className="w-full h-full object-cover opacity-80" />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent flex items-end p-2">
-                  <span className="text-[10px] font-bold text-white truncate">{m.court}</span>
+                <div className="text-[11px] text-slate-500 dark:text-slate-400 flex items-center justify-between mb-2">
+                  <span className="truncate">{m.court}</span>
+                  <span className="font-mono text-[10px] shrink-0">{m.date}</span>
                 </div>
               </div>
 
-              <div className="text-[11px] text-slate-500 space-y-0.5">
-                <div>Pareja: <strong className="text-slate-700 dark:text-slate-300">{m.partner}</strong></div>
-                <div className="truncate">vs {m.opponents}</div>
-                <div className="text-[10px] text-slate-400">{m.date} · {m.time}</div>
+              {/* 4 Jugadores: Pareja 1 vs Pareja 2 con Fotos y Nivel */}
+              <div className="space-y-2 pt-1 border-t border-slate-200/60 dark:border-slate-800">
+                {/* Pareja 1 */}
+                <div className="space-y-1">
+                  <span className="text-[9px] uppercase font-bold text-emerald-600 dark:text-emerald-400 block tracking-wider">
+                    Pareja 1 {m.isWin && '⭐ Ganadores'}
+                  </span>
+                  <div className="grid grid-cols-2 gap-1.5">
+                    {m.team1.map((p, idx) => (
+                      <div
+                        key={idx}
+                        className="flex items-center gap-1.5 p-1 rounded-lg bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800 min-w-0"
+                      >
+                        <img
+                          src={p.avatar}
+                          alt={p.name}
+                          className="w-6 h-6 rounded-md object-cover shrink-0"
+                        />
+                        <div className="min-w-0">
+                          <div className="text-[11px] font-bold text-slate-800 dark:text-slate-200 truncate leading-tight">
+                            {p.name.split(' ')[0]}
+                          </div>
+                          <div className="text-[9px] text-slate-400 font-mono leading-none">
+                            Nv {p.level.toFixed(1)}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Separador VS */}
+                <div className="text-center text-[9px] font-black text-slate-400 uppercase tracking-widest my-0.5">
+                  vs
+                </div>
+
+                {/* Pareja 2 */}
+                <div className="space-y-1">
+                  <span className="text-[9px] uppercase font-bold text-slate-400 block tracking-wider">
+                    Pareja 2 {!m.isWin && '⭐ Ganadores'}
+                  </span>
+                  <div className="grid grid-cols-2 gap-1.5">
+                    {m.team2.map((p, idx) => (
+                      <div
+                        key={idx}
+                        className="flex items-center gap-1.5 p-1 rounded-lg bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800 min-w-0"
+                      >
+                        <img
+                          src={p.avatar}
+                          alt={p.name}
+                          className="w-6 h-6 rounded-md object-cover shrink-0"
+                        />
+                        <div className="min-w-0">
+                          <div className="text-[11px] font-bold text-slate-800 dark:text-slate-200 truncate leading-tight">
+                            {p.name.split(' ')[0]}
+                          </div>
+                          <div className="text-[9px] text-slate-400 font-mono leading-none">
+                            Nv {p.level.toFixed(1)}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
             </div>
           ))}
         </div>
       </section>
 
-      {/* 7. SECCIÓN DE TORNEOS DISPUTADOS (Requerimiento 6.2) */}
+      {/* 7. SECCIÓN DE TORNEOS DISPUTADOS (Clic en torneo navega a sus detalles /gestion/torneos/[id]) */}
       <section className="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 p-5 shadow-sm space-y-3">
         <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2.5">
           <div className="flex items-center gap-2">
@@ -662,15 +858,45 @@ export const AdminMemberProfile: React.FC<AdminMemberProfileProps> = ({ member, 
           {tournamentHistory.map((t) => (
             <div
               key={t.id}
-              className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800 space-y-1.5"
+              role="button"
+              tabIndex={0}
+              onClick={() => {
+                setAdminTab('tournaments');
+                if (typeof window !== 'undefined') {
+                  window.history.pushState({}, '', `/gestion/torneos/${t.id}`);
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+                triggerDemoToast(
+                  'Competición Oficial',
+                  `Abriendo detalles, cuadros y horarios de "${t.name}".`,
+                  'info'
+                );
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  setAdminTab('tournaments');
+                  if (typeof window !== 'undefined') {
+                    window.history.pushState({}, '', `/gestion/torneos/${t.id}`);
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }
+                }
+              }}
+              className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800 hover:border-emerald-500/70 hover:bg-emerald-50/20 dark:hover:bg-slate-900/80 space-y-1.5 transition cursor-pointer group"
+              title="Haz clic para ver detalles del torneo, cuadros y horarios"
             >
               <div className="flex items-center justify-between">
                 <span className="text-base">{t.badge}</span>
-                <span className="text-[10px] font-mono text-slate-400 font-bold">{t.date}</span>
+                <span className="text-[10px] font-mono text-slate-400 font-bold group-hover:text-emerald-500 transition">
+                  {t.date} ↗
+                </span>
               </div>
-              <div className="font-bold text-slate-900 dark:text-white line-clamp-1">{t.name}</div>
-              <div className="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium">{t.position}</div>
-              <div className="text-[10px] text-slate-500">
+              <div className="font-bold text-slate-900 dark:text-white line-clamp-1 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition">
+                {t.name}
+              </div>
+              <div className="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium">
+                {t.position}
+              </div>
+              <div className="text-[10px] text-slate-500 dark:text-slate-400">
                 Pareja en torneo: <strong className="text-slate-700 dark:text-slate-300">{t.partner}</strong>
               </div>
             </div>
@@ -754,7 +980,7 @@ export const AdminMemberProfile: React.FC<AdminMemberProfileProps> = ({ member, 
                       <span className="text-slate-400 font-normal">· {m.court}</span>
                     </div>
                     <div className="text-slate-500 mt-0.5">
-                      Pareja: <strong>{m.partner}</strong> vs {m.opponents} · {m.date} ({m.time})
+                      Pareja: <strong>{m.team1.map((p) => p.name).join(' & ')}</strong> vs {m.team2.map((p) => p.name).join(' & ')} · {m.date} ({m.time})
                     </div>
                   </div>
                   <div className="text-right font-mono font-bold text-slate-700 dark:text-slate-300">

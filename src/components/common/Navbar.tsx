@@ -39,6 +39,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCart, onOpenAuth, onOpenDe
     currentUser,
     publicPage,
     setPublicPage,
+    setCurrentView,
     cart,
     favorites,
     theme,
@@ -245,6 +246,20 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCart, onOpenAuth, onOpenDe
                     {cartItemsCount}
                   </span>
                 )}
+              </button>
+
+              {/* Volver a App Admin */}
+              <button
+                type="button"
+                onClick={() => {
+                  setCurrentView('admin');
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white dark:bg-slate-800 dark:hover:bg-slate-700 text-xs font-bold border border-slate-700 hover:border-emerald-500 transition shadow-xs cursor-pointer active:scale-95"
+                title="Volver a la App de Gestión del Club"
+              >
+                <Building2 className="w-3.5 h-3.5 text-emerald-400" />
+                <span>Volver a App Admin</span>
               </button>
 
               {/* User Account / Login Button */}
@@ -495,6 +510,20 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCart, onOpenAuth, onOpenDe
                   <span>Modo Oscuro</span>
                 </button>
               </div>
+
+              {/* Volver a App Admin (Mobile) */}
+              <button
+                type="button"
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  setCurrentView('admin');
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                className="w-full py-2.5 px-3 rounded-xl bg-slate-900 dark:bg-slate-800 text-white font-bold text-xs flex items-center justify-center gap-2 border border-slate-700 hover:border-emerald-500 shadow-xs active:scale-95"
+              >
+                <Building2 className="w-4 h-4 text-emerald-400" />
+                <span>Volver a App Admin</span>
+              </button>
 
               {/* Commercial Actions: Registrarse vs Contratar Club */}
               <div className="space-y-2 pt-1">

@@ -14,25 +14,38 @@ const menuItems = [
   [Home, 'nav.home', 'Inicio', '/'],
   [Layers, 'nav.solutions', 'Soluciones', '/soluciones'],
   [Sliders, 'nav.features', 'Funcionalidades', '/funcionalidades'],
-  [Zap, 'nav.modules', 'Módulos y Domótica', '/modulos-domotica'],
+  [Zap, 'nav.modules', 'Módulos y Domótica', '/modulos'],
   [Play, 'nav.demo', 'Ver Demo', '/demo'],
   [CreditCard, 'nav.pricing', 'Precios', '/precios'],
   [BookOpen, 'nav.blog', 'Blog', '/blog'],
   [Mail, 'nav.contact', 'Contacto', '/contacto'],
+  [Lock, 'nav.clubAccess', 'Acceso Club', '/login'],
 ] as const;
 
 export function CorporateHeader({ onOpenDemo, onOpenAuth, onOpenRegister }: CorporateHeaderProps) {
   const [open, setOpen] = React.useState(false);
   const [languageMenuOpen, setLanguageMenuOpen] = React.useState(false);
   const langRef = React.useRef<HTMLDivElement>(null);
-  const { t, language, setLanguage, theme, toggleTheme } = useApp();
+  const { t, language, setLanguage, theme, toggleTheme, setCurrentView } = useApp();
   const close = () => setOpen(false);
-  const navigate = (event: React.MouseEvent<HTMLAnchorElement>, path: string) => { event.preventDefault(); close(); window.history.pushState({}, '', path); window.dispatchEvent(new PopStateEvent('popstate')); window.scrollTo({ top: 0, behavior: 'smooth' }); };
+  const navigate = (event: React.MouseEvent<HTMLAnchorElement>, path: string) => {
+    event.preventDefault();
+    close();
+    window.history.pushState({}, '', path);
+    window.dispatchEvent(new PopStateEvent('popstate'));
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  };
   const handleRegisterClick = () => {
     close();
     window.history.pushState({}, '', '/registro');
     window.dispatchEvent(new PopStateEvent('popstate'));
     onOpenRegister?.();
+  };
+
+  const handleReturnToAdmin = () => {
+    close();
+    setCurrentView('admin');
+    window.scrollTo({ top: 0, behavior: 'instant' });
   };
 
   React.useEffect(() => {
@@ -44,27 +57,135 @@ export function CorporateHeader({ onOpenDemo, onOpenAuth, onOpenRegister }: Corp
   return (
     <header className="sticky top-0 z-50 border-b border-slate-200 dark:border-slate-800 bg-white/90 backdrop-blur-md dark:bg-slate-900/90 text-slate-900 dark:text-white transition-colors duration-200">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        <button type="button" onClick={() => { close(); window.history.pushState({}, '', '/'); window.dispatchEvent(new PopStateEvent('popstate')); }} className="flex items-center gap-2 font-black tracking-tight text-slate-900 dark:text-white">
-          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-700 text-white">S</span> SETMIO
+        <button
+          type="button"
+          onClick={() => {
+            close();
+            window.history.pushState({}, '', '/');
+            window.dispatchEvent(new PopStateEvent('popstate'));
+            window.scrollTo({ top: 0, behavior: 'instant' });
+          }}
+          className="flex items-center gap-2 font-black tracking-tight text-slate-900 dark:text-white cursor-pointer"
+        >
+          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-700 text-white shadow-md shadow-emerald-500/20">
+            S
+          </span>
+          <span>SETMIO</span>
         </button>
-        <div className="flex items-center gap-1">
-          <div ref={langRef} className={`relative ${open ? 'hidden lg:block' : 'block'}`}><button type="button" onClick={() => setLanguageMenuOpen((value) => !value)} aria-expanded={languageMenuOpen} aria-label={t('nav.language', 'Idioma')} className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-2 py-2 text-xs font-bold text-slate-800 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"><OfficialFlag code={language} />{SUPPORTED_LANGUAGES.find((item) => item.code === language)?.name}</button>{languageMenuOpen && <div className="absolute right-0 top-11 z-50 grid w-52 gap-1 rounded-xl border border-slate-200 bg-white p-2 shadow-xl dark:border-slate-700 dark:bg-slate-900">{SUPPORTED_LANGUAGES.map((item) => <button type="button" key={item.code} onClick={() => { setLanguage(item.code); setLanguageMenuOpen(false); }} className={`flex items-center gap-2 rounded-lg px-2 py-2 text-left text-xs font-bold hover:bg-emerald-50 dark:hover:bg-slate-800 ${language === item.code ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300' : 'text-slate-800 dark:text-slate-200'}`}><OfficialFlag code={item.code as SupportedLanguage} />{item.name}</button>)}</div>}</div>
-          <button type="button" onClick={toggleTheme} className="rounded-xl p-2 text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800" aria-label={theme === 'dark' ? 'Activar modo claro' : 'Activar modo oscuro'}>{theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}</button>
-          <button type="button" onClick={onOpenAuth} className="rounded-xl p-2 text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800" aria-label="Acceso Usuarios"><Lock className="h-5 w-5" /></button>
-          <button type="button" onClick={() => setOpen((value) => !value)} className="rounded-xl p-2 text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800" aria-label={open ? 'Cerrar menú' : 'Abrir menú'} aria-expanded={open}>{open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}</button>
+
+        <div className="flex items-center gap-1 sm:gap-2">
+          {/* Volver a App Admin (Conmutación Web/App requerida) */}
+          <button
+            type="button"
+            onClick={handleReturnToAdmin}
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-bold bg-slate-900 hover:bg-slate-800 text-white dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-700 hover:border-emerald-500 transition shadow-xs cursor-pointer active:scale-95"
+            title="Volver a la App de Gestión del Club"
+          >
+            <span className="hidden sm:inline">Volver a App Admin</span>
+            <span className="sm:hidden">App</span>
+          </button>
+
+          <div ref={langRef} className={`relative ${open ? 'hidden lg:block' : 'block'}`}>
+            <button
+              type="button"
+              onClick={() => setLanguageMenuOpen((value) => !value)}
+              aria-expanded={languageMenuOpen}
+              aria-label={t('nav.language', 'Idioma')}
+              className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-2 py-2 text-xs font-bold text-slate-800 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 cursor-pointer"
+            >
+              <OfficialFlag code={language} />
+              <span className="hidden sm:inline uppercase text-[11px] font-mono">{language}</span>
+            </button>
+            {languageMenuOpen && (
+              <div className="absolute right-0 top-11 z-50 grid w-52 gap-1 rounded-xl border border-slate-200 bg-white p-2 shadow-xl dark:border-slate-700 dark:bg-slate-900">
+                {SUPPORTED_LANGUAGES.map((item) => (
+                  <button
+                    type="button"
+                    key={item.code}
+                    onClick={() => {
+                      setLanguage(item.code);
+                      setLanguageMenuOpen(false);
+                    }}
+                    className={`flex items-center gap-2 rounded-lg px-2 py-2 text-left text-xs font-bold hover:bg-emerald-50 dark:hover:bg-slate-800 ${
+                      language === item.code
+                        ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300'
+                        : 'text-slate-800 dark:text-slate-200'
+                    }`}
+                  >
+                    <OfficialFlag code={item.code as SupportedLanguage} />
+                    {item.name}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <button
+            type="button"
+            onClick={toggleTheme}
+            className="rounded-xl p-2 text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800 cursor-pointer"
+            aria-label={theme === 'dark' ? 'Activar modo claro' : 'Activar modo oscuro'}
+          >
+            {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+          </button>
+
+          <button
+            type="button"
+            onClick={onOpenAuth}
+            className="rounded-xl p-2 text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800 cursor-pointer"
+            aria-label="Acceso Club"
+          >
+            <Lock className="h-5 w-5" />
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setOpen((value) => !value)}
+            className="rounded-xl p-2 text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800 cursor-pointer lg:hidden"
+            aria-label={open ? 'Cerrar menú' : 'Abrir menú'}
+            aria-expanded={open}
+          >
+            {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </button>
         </div>
-        <nav className="hidden items-center gap-3.5 text-xs font-bold lg:flex text-slate-700 dark:text-slate-300" aria-label="Navegación corporativa">
-          <a href="/" onClick={(event) => navigate(event, '/')} className="text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">{t('nav.home', 'Inicio')}</a>
-          <a href="/soluciones" onClick={(event) => navigate(event, '/soluciones')} className="text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">{t('nav.solutions', 'Soluciones')}</a>
-          <a href="/funcionalidades" onClick={(event) => navigate(event, '/funcionalidades')} className="text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">{t('nav.features', 'Funcionalidades')}</a>
-          <a href="/modulos-domotica" onClick={(event) => navigate(event, '/modulos-domotica')} className="text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">{t('nav.modules', 'Módulos y Domótica')}</a>
-          <button type="button" onClick={onOpenDemo} className="rounded-lg bg-emerald-600/10 hover:bg-emerald-600 hover:text-white text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 px-3 py-1.5 transition-colors font-bold">{t('nav.demo', 'Ver Demo')}</button>
-          <a href="/precios" onClick={(event) => navigate(event, '/precios')} className="text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">{t('nav.pricing', 'Precios')}</a>
-          <a href="/blog" onClick={(event) => navigate(event, '/blog')} className="text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">{t('nav.blog', 'Blog')}</a>
-          <a href="/contacto" onClick={(event) => navigate(event, '/contacto')} className="text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">{t('nav.contact', 'Contacto')}</a>
-          <button type="button" onClick={onOpenAuth} className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 dark:border-slate-700 px-3 py-1.5 text-slate-700 dark:text-slate-200 hover:border-emerald-500 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+
+        {/* Desktop Navigation Links: Menú Canónico de 9 elementos */}
+        <nav className="hidden items-center gap-2.5 xl:gap-3 text-xs font-bold lg:flex text-slate-700 dark:text-slate-300" aria-label="Navegación corporativa">
+          <a href="/" onClick={(event) => navigate(event, '/')} className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+            {t('nav.home', '1. Inicio')}
+          </a>
+          <a href="/soluciones" onClick={(event) => navigate(event, '/soluciones')} className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+            {t('nav.solutions', '2. Soluciones')}
+          </a>
+          <a href="/funcionalidades" onClick={(event) => navigate(event, '/funcionalidades')} className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+            {t('nav.features', '3. Funcionalidades')}
+          </a>
+          <a href="/modulos" onClick={(event) => navigate(event, '/modulos')} className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+            {t('nav.modules', '4. Módulos y Domótica')}
+          </a>
+          <button
+            type="button"
+            onClick={onOpenDemo}
+            className="rounded-lg bg-emerald-600/10 hover:bg-emerald-600 hover:text-white text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 px-2.5 py-1.5 transition-colors font-bold cursor-pointer"
+          >
+            {t('nav.demo', '5. Ver Demo')}
+          </button>
+          <a href="/precios" onClick={(event) => navigate(event, '/precios')} className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+            {t('nav.pricing', '6. Precios')}
+          </a>
+          <a href="/blog" onClick={(event) => navigate(event, '/blog')} className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+            {t('nav.blog', '7. Blog')}
+          </a>
+          <a href="/contacto" onClick={(event) => navigate(event, '/contacto')} className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+            {t('nav.contact', '8. Contacto')}
+          </a>
+          <button
+            type="button"
+            onClick={onOpenAuth}
+            className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 dark:border-slate-700 px-3 py-1.5 text-slate-800 dark:text-slate-100 hover:border-emerald-500 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors cursor-pointer"
+          >
             <Lock className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-            <span>{t('nav.login', 'Acceso Clientes / Login')}</span>
+            <span>{t('nav.clubAccess', '9. Acceso Club')}</span>
           </button>
         </nav>
       </div>

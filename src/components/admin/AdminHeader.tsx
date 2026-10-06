@@ -12,6 +12,7 @@ import {
   X,
   Send,
   Minimize2,
+  Globe,
 } from 'lucide-react';
 import { SUPPORTED_LANGUAGES } from '../../lib/i18n';
 import { OfficialFlag } from '../common/OfficialFlag';
@@ -34,6 +35,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
     setLanguage,
     setAdminTab,
     currentTenant,
+    navigateToClub,
     aiMessages,
     sendAIMessage,
     isAiThinking,
@@ -123,8 +125,20 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
           </div>
         </div>
 
-        {/* Right: Acciones (Idioma, Tema, Asistente IA, Avatar con Dropdown) - SIN OJO DE VISTA JUGADOR Y SIN BOTÓN ROJO DE LOGOUT */}
+        {/* Right: Acciones (Ver Web del Club, Idioma, Tema, Asistente IA, Avatar con Dropdown) */}
         <div className="flex items-center gap-1.5 sm:gap-2">
+          {/* Conmutación: Ver Web del Club */}
+          <button
+            type="button"
+            onClick={() => navigateToClub(currentTenant.slug)}
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-bold bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 hover:border-emerald-500 hover:text-emerald-600 dark:hover:text-emerald-400 transition shadow-xs cursor-pointer active:scale-95"
+            title="Ver la página web pública del club"
+          >
+            <Globe className="w-3.5 h-3.5 text-emerald-500" />
+            <span className="hidden md:inline">Ver Web del Club</span>
+            <span className="md:hidden">Web</span>
+          </button>
+
           {/* Selector de Idioma */}
           <div className="relative" ref={langRef}>
             <button

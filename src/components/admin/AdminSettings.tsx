@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
 import {
   Settings,
@@ -27,6 +27,7 @@ import {
   Check,
   Send,
   Sliders,
+  X,
 } from 'lucide-react';
 
 export interface DaySchedule {
@@ -50,6 +51,82 @@ export const AdminSettings: React.FC = () => {
   const { currentTenant, updateCurrentTenant, triggerDemoToast, theme, setTheme, setAdminTab, courts, language } = useApp();
 
   const [activeSection, setActiveSection] = useState<'general' | 'ai'>('general');
+
+  // URL route sync for /gestion/ajustes/ia
+  useEffect(() => {
+    const handleUrlSettings = () => {
+      const pathname = typeof window !== 'undefined' ? window.location.pathname : '';
+      if (pathname === '/gestion/ajustes/ia' || pathname.endsWith('/ia')) {
+        setActiveSection('ai');
+      } else if (pathname === '/gestion/ajustes' || pathname === '/gestion/configuracion') {
+        setActiveSection('general');
+      }
+    };
+    handleUrlSettings();
+    window.addEventListener('popstate', handleUrlSettings);
+    return () => window.removeEventListener('popstate', handleUrlSettings);
+  }, []);
+
+  // Modal: Bloqueo de Pistas por Rangos de Fecha y Hora
+  const [isLockoutModalOpen, setIsLockoutModalOpen] = useState(false);
+  const [courtBlocks, setCourtBlocks] = useState([
+    {
+      id: 'blk-1',
+      courtName: 'Todas las Pistas',
+      startDate: '2026-10-15',
+      endDate: '2026-10-15',
+      startTime: '08:00',
+      endTime: '14:00',
+      reason: 'Mantenimiento: Cepillado y reposición de arena sílice WPT',
+      notifyRefund: true,
+    },
+    {
+      id: 'blk-2',
+      courtName: 'Pista 1 Central',
+      startDate: '2026-10-24',
+      endDate: '2026-10-25',
+      startTime: '09:00',
+      endTime: '21:00',
+      reason: 'Torneo Oficial: I Open Primavera Pádel San Mateo',
+      notifyRefund: true,
+    },
+  ]);
+
+  const [newBlockForm, setNewBlockForm] = useState({
+    courtName: 'Todas las Pistas',
+    startDate: new Date().toISOString().split('T')[0],
+    endDate: new Date().toISOString().split('T')[0],
+    startTime: '10:00',
+    endTime: '14:00',
+    reason: 'Mantenimiento Preventivo',
+    notifyRefund: true,
+  });
+
+  const handleCreateCourtBlock = (e: React.FormEvent) => {
+    e.preventDefault();
+    const created = {
+      id: `blk-${Date.now()}`,
+      courtName: newBlockForm.courtName,
+      startDate: newBlockForm.startDate,
+      endDate: newBlockForm.endDate,
+      startTime: newBlockForm.startTime,
+      endTime: newBlockForm.endTime,
+      reason: newBlockForm.reason,
+      notifyRefund: newBlockForm.notifyRefund,
+    };
+    setCourtBlocks((prev) => [created, ...prev]);
+    setIsLockoutModalOpen(false);
+    triggerDemoToast(
+      'Pistas Bloqueadas',
+      `Bloqueo programado para ${created.courtName} del ${created.startDate} (${created.startTime} - ${created.endTime}).`,
+      'warning'
+    );
+  };
+
+  const handleRemoveCourtBlock = (id: string) => {
+    setCourtBlocks((prev) => prev.filter((b) => b.id !== id));
+    triggerDemoToast('Bloqueo Eliminado', 'El rango horario de la pista vuelve a estar disponible para reservas.', 'info');
+  };
 
   // General Settings State
   const [whatsappEnabled, setWhatsappEnabled] = useState(currentTenant.settings.whatsappWidgetEnabled);
@@ -479,6 +556,67 @@ export const AdminSettings: React.FC = () => {
             </div>
           </div>
 
+          {/* Bloqueo de Pistas por Rangos de Fecha y Hora */}
+          <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-4 shadow-sm">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 dark:border-slate-800 pb-3">
+              <div>
+                <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                  <ShieldCheck className="w-4 h-4 text-amber-500" />
+                  <span>Bloqueo de Pistas por Rangos de Fecha y Hora</span>
+                </h3>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                  Inhabilita reservas en pistas completas o individuales para torneos, mantenimiento, clinics o eventos privados.
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setIsLockoutModalOpen(true)}
+                className="px-3.5 py-2 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs transition flex items-center gap-1.5 cursor-pointer self-start sm:self-auto shadow-xs"
+              >
+                <span>+ Programar Bloqueo de Pista</span>
+              </button>
+            </div>
+
+            {/* Lista de Bloqueos Activos */}
+            <div className="space-y-2.5">
+              {courtBlocks.length === 0 ? (
+                <div className="text-center py-6 text-xs text-slate-400">
+                  No hay bloqueos programados actualmente. Todas las pistas operan según su horario regular.
+                </div>
+              ) : (
+                courtBlocks.map((blk) => (
+                  <div
+                    key={blk.id}
+                    className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs"
+                  >
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="px-2 py-0.5 rounded-md bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 font-bold text-[10px] uppercase">
+                          {blk.courtName}
+                        </span>
+                        <span className="font-bold text-slate-900 dark:text-white">
+                          {blk.startDate} {blk.startDate !== blk.endDate && `al ${blk.endDate}`} · ({blk.startTime} a {blk.endTime})
+                        </span>
+                      </div>
+                      <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
+                        Motivo: <strong>{blk.reason}</strong>
+                      </div>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveCourtBlock(blk.id)}
+                      className="px-3 py-1.5 rounded-xl bg-white dark:bg-slate-800 hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-950/50 dark:hover:text-rose-400 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs transition cursor-pointer self-start sm:self-auto"
+                    >
+                      Desbloquear Pista
+                    </button>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+
           {/* Payment Gateways Config */}
           <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-4 shadow-sm">
             <div className="flex items-center justify-between">
@@ -896,6 +1034,152 @@ export const AdminSettings: React.FC = () => {
             </button>
           </div>
         </form>
+      )}
+
+      {/* =====================================================================
+          MODAL: BLOQUEO DE PISTAS POR RANGOS DE FECHA Y HORA
+          ===================================================================== */}
+      {isLockoutModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-sm animate-in fade-in duration-150">
+          <div className="relative w-full max-w-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl text-slate-900 dark:text-slate-100 space-y-4 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="w-5 h-5 text-amber-500" />
+                <h3 className="text-base font-black text-slate-900 dark:text-white">
+                  Programar Bloqueo de Pistas
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsLockoutModalOpen(false)}
+                className="p-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateCourtBlock} className="space-y-3.5 text-xs">
+              <div>
+                <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  Pistas Afectadas
+                </label>
+                <select
+                  value={newBlockForm.courtName}
+                  onChange={(e) => setNewBlockForm({ ...newBlockForm, courtName: e.target.value })}
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                >
+                  <option value="Todas las Pistas">Todas las Pistas del Club</option>
+                  {courts.map((c) => (
+                    <option key={c.id} value={c.name}>
+                      {c.name} ({c.courtType})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                    Fecha Desde
+                  </label>
+                  <input
+                    type="date"
+                    required
+                    value={newBlockForm.startDate}
+                    onChange={(e) => setNewBlockForm({ ...newBlockForm, startDate: e.target.value })}
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                    Fecha Hasta
+                  </label>
+                  <input
+                    type="date"
+                    required
+                    value={newBlockForm.endDate}
+                    onChange={(e) => setNewBlockForm({ ...newBlockForm, endDate: e.target.value })}
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                    Hora Inicio
+                  </label>
+                  <input
+                    type="time"
+                    required
+                    value={newBlockForm.startTime}
+                    onChange={(e) => setNewBlockForm({ ...newBlockForm, startTime: e.target.value })}
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white font-mono focus:outline-none focus:border-emerald-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                    Hora Fin
+                  </label>
+                  <input
+                    type="time"
+                    required
+                    value={newBlockForm.endTime}
+                    onChange={(e) => setNewBlockForm({ ...newBlockForm, endTime: e.target.value })}
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white font-mono focus:outline-none focus:border-emerald-500"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  Motivo del Bloqueo
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Ej: Mantenimiento, Torneo Oficial o Evento Privado"
+                  value={newBlockForm.reason}
+                  onChange={(e) => setNewBlockForm({ ...newBlockForm, reason: e.target.value })}
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                />
+              </div>
+
+              <div className="p-3 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/50 space-y-1">
+                <label className="flex items-center gap-2 cursor-pointer font-bold text-amber-900 dark:text-amber-200">
+                  <input
+                    type="checkbox"
+                    checked={newBlockForm.notifyRefund}
+                    onChange={(e) => setNewBlockForm({ ...newBlockForm, notifyRefund: e.target.checked })}
+                    className="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500"
+                  />
+                  <span>Cancelar reservas afectadas y reembolsar saldo al monedero</span>
+                </label>
+                <p className="text-[11px] text-amber-700 dark:text-amber-300">
+                  Si un socio ya tenía reserva en este rango, se le notificará por WhatsApp y se le devolverá el 100% a su saldo.
+                </p>
+              </div>
+
+              <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setIsLockoutModalOpen(false)}
+                  className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold transition"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-bold transition shadow-xs"
+                >
+                  Confirmar Bloqueo
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
       )}
     </div>
   );
