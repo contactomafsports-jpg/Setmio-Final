@@ -58,10 +58,8 @@ export function CorporateHeader({ onOpenDemo, onOpenAuth, onOpenRegister }: Corp
   }, [open]);
 
   return (
-    <header className={`sticky top-0 z-50 w-full max-w-full border-b transition-all duration-200 ${
-      scrolled
-        ? 'border-slate-200 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md shadow-sm'
-        : 'border-slate-200/80 dark:border-slate-800/80 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md shadow-xs'
+    <header className={`fixed top-0 left-0 right-0 z-50 w-full max-w-full border-b border-slate-200 dark:border-slate-800 bg-white/90 dark:bg-slate-950/90 backdrop-blur-md transition-shadow duration-200 ${
+      scrolled ? 'shadow-sm' : 'shadow-none'
     } text-slate-900 dark:text-white`}>
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <button

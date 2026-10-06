@@ -25,9 +25,9 @@
 }
 
 * { box-sizing: border-box; }
-html, body, #root { min-height: 100%; margin: 0; max-width: 100%; overflow-x: hidden; }
+html, body, #root { min-height: 100%; margin: 0; max-width: 100%; overflow-x: clip; }
 html { background: var(--color-background); scroll-padding-top: 5rem; }
-body { margin: 0; min-width: 320px; background: var(--color-background); color: var(--color-foreground); overflow-x: hidden; }
+body { margin: 0; min-width: 320px; background: var(--color-background); color: var(--color-foreground); overflow-x: clip; }
 button, input, select, textarea { font: inherit; }
 button { -webkit-tap-highlight-color: transparent; }
 button, [role="button"], a { transition-property: transform, color, background-color, border-color, box-shadow, opacity; transition-duration: 150ms; }

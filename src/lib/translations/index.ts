@@ -12,6 +12,7 @@ import { DOMOTICA_TRANSLATIONS } from './domoticaTranslations';
 import { PLAYER_PAGE_TRANSLATIONS } from './playerPageTranslations';
 import { DEMO_ROLES_TRANSLATIONS } from './demoRolesTranslations';
 import { PUBLIC_SITE_FIXES_TRANSLATIONS } from './publicSiteFixesTranslations';
+import { PUBLIC_I18N_COMPLETION_TRANSLATIONS } from './publicI18nCompletionTranslations';
 
 const baseTranslations: Record<string, Record<string, string>> = {
   es: esTranslations,
@@ -42,6 +43,7 @@ for (const [lang, dict] of Object.entries(baseTranslations)) {
     ...(PLAYER_PAGE_TRANSLATIONS[lang] || {}),
     ...(DEMO_ROLES_TRANSLATIONS[lang] || {}),
     ...(PUBLIC_SITE_FIXES_TRANSLATIONS[lang] || {}),
+    ...(PUBLIC_I18N_COMPLETION_TRANSLATIONS[lang] || {}),
   };
 }
 

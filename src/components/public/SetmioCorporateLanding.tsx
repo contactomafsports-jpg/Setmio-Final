@@ -264,10 +264,10 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
             <button
               onClick={onOpenAuth}
               className="p-2 sm:px-3 sm:py-2 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 transition flex items-center gap-1.5"
-              title="Acceso de usuarios registrados"
+              title={t('nav.accessTitle')}
             >
               <Lock className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-              <span className="hidden sm:inline">Acceso</span>
+              <span className="hidden sm:inline">{t('nav.access')}</span>
             </button>
 
             {/* Mobile Hamburger Toggle Button */}
@@ -313,7 +313,7 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
 
             <div className="mt-3 border-t border-slate-200/70 pt-3 dark:border-slate-800">
               <button type="button" onClick={() => setMobileLanguageOpen((open) => !open)} className="flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left text-sm font-semibold text-slate-800 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800" aria-expanded={mobileLanguageOpen}>
-                <span className="flex items-center gap-2"><Globe className="h-4 w-4 text-emerald-600" strokeWidth={1.5} /> Idioma: {SUPPORTED_LANGUAGES.find((item) => item.code === language)?.name ?? 'Español'}</span>
+                <span className="flex items-center gap-2"><Globe className="h-4 w-4 text-emerald-600" strokeWidth={1.5} /> {t('nav.languageLabel')} {SUPPORTED_LANGUAGES.find((item) => item.code === language)?.name ?? 'Español'}</span>
                 <ChevronDown className={`h-4 w-4 transition-transform ${mobileLanguageOpen ? 'rotate-180' : ''}`} />
               </button>
               {mobileLanguageOpen && (
@@ -335,7 +335,7 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
                 }}
                 className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-black shadow-md flex items-center justify-center gap-2"
               >
-                <span>Registrarse</span>
+                <span>{t('nav.signUp')}</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>
               <button
@@ -346,7 +346,7 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
                 className="w-full py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center justify-center gap-2"
               >
                 <Lock className="w-3.5 h-3.5 text-emerald-600" />
-                <span>Acceso Usuarios</span>
+                <span>{t('nav.userAccess')}</span>
               </button>
             </div>
             </div>
@@ -1129,7 +1129,7 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
                 <input
                   type="text"
                   required
-                  placeholder="ej. Narón (A Coruña)"
+                  placeholder={t('home.corporate.modal.cityPlaceholder')}
                   value={clubCity}
                   onChange={(e) => setClubCity(e.target.value)}
                   className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-3.5 py-2.5 text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"

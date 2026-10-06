@@ -205,7 +205,7 @@ export function SolucionesPage({
                 {titleText}
               </h1>
 
-              <p className="text-base sm:text-lg text-slate-600 dark:text-slate-400 leading-relaxed font-normal max-w-3xl">
+              <p className="text-base sm:text-lg text-slate-600 dark:text-slate-400 leading-relaxed max-w-2xl">
                 {subtitleText}
               </p>
 
@@ -424,7 +424,7 @@ export function SolucionesPage({
             {t('solutions.mainTitle', 'Una plataforma diseñada para cada protagonista del pádel')}
           </h1>
 
-          <p className="text-base sm:text-lg text-slate-600 dark:text-slate-400 leading-relaxed font-normal max-w-2xl">
+          <p className="text-base sm:text-lg text-slate-600 dark:text-slate-400 leading-relaxed max-w-2xl">
             {t('solutions.mainSubtitle', 'Descubre las soluciones de software de gestión integral y marca blanca diseñadas a medida para instalaciones deportivas, academias docentes y atletas profesionales de élite.')}
           </p>
         </div>
