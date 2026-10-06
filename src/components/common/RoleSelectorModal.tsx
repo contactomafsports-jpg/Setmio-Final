@@ -17,6 +17,14 @@ interface RoleSelectorModalProps {
   onClose: () => void;
 }
 
+interface DemoRoleConfig {
+  id: string;
+  role: UserRole;
+  icon: React.ComponentType<{ className?: string }>;
+  color: string;
+  actionView: 'hq' | 'admin' | 'coach' | 'player';
+}
+
 export const RoleSelectorModal: React.FC<RoleSelectorModalProps> = ({
   isOpen,
   onClose,
@@ -25,72 +33,54 @@ export const RoleSelectorModal: React.FC<RoleSelectorModalProps> = ({
 
   if (!isOpen) return null;
 
-  const roles = [
+  const rolesMeta: DemoRoleConfig[] = [
     {
       id: 'superadmin',
       role: 'SUPERADMIN' as UserRole,
-      title: 'Superadministrador Setmio HQ',
-      subtitle: 'Visión y control global de toda la plataforma SaaS',
-      badge: 'Plataforma Global',
       icon: ShieldCheck,
       color: 'from-purple-600 to-indigo-700',
-      description: 'Acceso a métricas de todas las sedes, gestión de planes, empresas, pasarela de envíos y dominios.',
-      actionView: 'hq' as const,
+      actionView: 'hq',
     },
     {
       id: 'tenant_owner',
       role: 'TENANT_OWNER' as UserRole,
-      title: 'Club Admin / Gerente',
-      subtitle: 'Gestión integral del Centro de Pádel San Mateo',
-      badge: 'Gestión Club',
       icon: Building2,
       color: 'from-emerald-600 to-teal-700',
-      description: 'Agenda de pistas, domótica IoT de luces y puertas, torneos, cobros, CRM y configuración del club.',
-      actionView: 'admin' as const,
+      actionView: 'admin',
     },
     {
       id: 'coach_independent',
       role: 'COACH' as UserRole,
-      title: 'Profesor Independiente / Cliente',
-      subtitle: 'Gestiona tu actividad profesional de forma independiente',
-      badge: 'Profesor Cliente',
       icon: GraduationCap,
       color: 'from-sky-600 to-cyan-700',
-      description: 'Agenda propia, alumnos, clases particulares, cobros y presencia profesional sin depender de un club.',
-      actionView: 'coach' as const,
+      actionView: 'coach',
     },
     {
       id: 'coach_club',
       role: 'COACH' as UserRole,
-      title: 'Profesor de Club',
-      subtitle: 'Escuela de tecnificación, clases particulares y grupos del club',
-      badge: 'Profesor de Club',
       icon: GraduationCap,
       color: 'from-indigo-600 to-blue-700',
-      description: 'Gestión de alumnos, grupos periódicos, clases sueltas, plazas libres y CRM multisede.',
-      actionView: 'coach' as const,
+      actionView: 'coach',
     },
     {
       id: 'player',
       role: 'PLAYER' as UserRole,
-      title: 'Jugador / Socio del Club',
-      subtitle: 'Experiencia del deportista y cliente en app nativa',
-      badge: 'Área Jugador',
       icon: User,
       color: 'from-cyan-600 to-emerald-600',
-      description: 'Reservas de pistas, partidas abiertas Play!, torneos inscritos, nivel deportivo y ficha de jugador.',
-      actionView: 'player' as const,
+      actionView: 'player',
     },
   ];
 
-  const handleSelectRole = (r: (typeof roles)[0]) => {
+  const handleSelectRole = (r: DemoRoleConfig) => {
     setIsCorporateLanding(false);
     switchUserRole(r.role);
     setCurrentView(r.actionView);
     onClose();
+    const roleTitle = t(`register.roles.${r.id}.title`);
+    const roleBadge = t(`demo.roles.${r.id}.badge`);
     triggerDemoToast(
-      `${t('demo.title', 'Entorno Demo')}: ${t('register.roles.' + r.id + '.title')}`,
-      t(`demo.roles.${r.id}.access`, `Has ingresado al entorno con perfil y permisos de ${r.badge}.`),
+      `${t('demo.title', 'Entorno Demo')}: ${roleTitle}`,
+      t(`demo.roles.${r.id}.access`, `${t('demo.accessAs', 'Has ingresado como')} ${roleBadge}.`),
       'success'
     );
   };
@@ -106,7 +96,7 @@ export const RoleSelectorModal: React.FC<RoleSelectorModalProps> = ({
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-5 right-5 p-2 rounded-xl text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+          className="absolute top-5 right-5 p-2 rounded-xl text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
           aria-label={t('demo.close', 'Cerrar selector de demo')}
           title={t('demo.close', 'Cerrar')}
         >
@@ -129,13 +119,16 @@ export const RoleSelectorModal: React.FC<RoleSelectorModalProps> = ({
 
         {/* Roles Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {roles.map((item) => {
+          {rolesMeta.map((item) => {
             const Icon = item.icon;
+            const badgeText = t(`demo.roles.${item.id}.badge`);
+            const titleText = t(`register.roles.${item.id}.title`);
+            const descText = t(`register.roles.${item.id}.description`);
             return (
               <button
                 key={item.id}
                 onClick={() => handleSelectRole(item)}
-                className="group text-left p-5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 hover:border-emerald-500 dark:hover:border-emerald-500 shadow-xs hover:shadow-lg transition-all duration-200 flex flex-col justify-between space-y-3"
+                className="group text-left p-5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 hover:border-emerald-500 dark:hover:border-emerald-500 shadow-xs hover:shadow-lg transition-all duration-200 flex flex-col justify-between space-y-3 cursor-pointer"
               >
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
@@ -143,20 +136,20 @@ export const RoleSelectorModal: React.FC<RoleSelectorModalProps> = ({
                       <Icon className="w-5 h-5" />
                     </div>
                     <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
-                      {t(`demo.roles.${item.id}.badge`, item.badge)}
+                      {badgeText}
                     </span>
                   </div>
 
                   <h3 className="text-base font-bold text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
-                    {t('register.roles.' + item.id + '.title')}
+                    {titleText}
                   </h3>
                   <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed">
-                    {t('register.roles.' + item.id + '.description')}
+                    {descText}
                   </p>
                 </div>
 
                 <div className="pt-2 border-t border-slate-200/80 dark:border-slate-800/80 flex items-center justify-between text-xs font-bold text-emerald-600 dark:text-emerald-400">
-                  <span>{t('demo.tryAs', 'Probar como')} {t(`demo.roles.${item.id}.badge`, item.badge)}</span>
+                  <span>{t('demo.tryAs', 'Probar como')} {badgeText}</span>
                   <ArrowRight className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" />
                 </div>
               </button>

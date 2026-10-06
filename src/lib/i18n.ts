@@ -3016,5 +3016,8 @@ for (const [lang, dict] of Object.entries(ALL_EXTRA_TRANSLATIONS)) {
 }
 
 export function getTranslation(lang: SupportedLanguage, key: string, fallback?: string): string {
-  return TRANSLATIONS[lang]?.[key] || TRANSLATIONS.es?.[key] || fallback || key;
+  if (lang === 'es') {
+    return TRANSLATIONS.es?.[key] || fallback || key;
+  }
+  return TRANSLATIONS[lang]?.[key] || TRANSLATIONS.en?.[key] || fallback || key;
 }

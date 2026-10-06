@@ -730,7 +730,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   }, [language]);
 
   const t = useCallback((key: string, fallback?: string): string => {
-    return TRANSLATIONS[language]?.[key] || TRANSLATIONS.es?.[key] || fallback || key;
+    if (language === 'es') {
+      return TRANSLATIONS.es?.[key] || fallback || key;
+    }
+    return TRANSLATIONS[language]?.[key] || TRANSLATIONS.en?.[key] || fallback || key;
   }, [language]);
 
   // Modals state

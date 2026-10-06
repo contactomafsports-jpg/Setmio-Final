@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
 import { BlogPost } from '../../types/database';
 import { SubpageHeaderNav } from './SubpageHeaderNav';
@@ -33,6 +33,23 @@ export const BlogView: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
+  // Sincronizar navegación con el historial del navegador (soporte completo de retroceso y avance)
+  useEffect(() => {
+    const syncArticleFromUrl = () => {
+      if (typeof window === 'undefined') return;
+      const params = new URLSearchParams(window.location.search);
+      const articleIdFromParam = params.get('id');
+      if (articleIdFromParam) {
+        setSelectedArticleId(articleIdFromParam);
+      } else if (window.location.pathname === '/blog') {
+        setSelectedArticleId(null);
+      }
+    };
+
+    window.addEventListener('popstate', syncArticleFromUrl);
+    return () => window.removeEventListener('popstate', syncArticleFromUrl);
+  }, [setSelectedArticleId]);
+
   const categories = [
     { id: 'all', categoryMatch: 'all' },
     { id: 'tecnica', categoryMatch: 'Técnica & Táctica' },
@@ -58,6 +75,7 @@ export const BlogView: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
       selectedCategory === 'all' ||
       p.category === activeCat?.categoryMatch ||
       getCategoryFilterId(p.category) === selectedCategory;
+
     const postTitle = t((p as any).titleKey || ('blog.posts.' + p.id + '.title'), p.title);
     const postSummary = t((p as any).excerptKey || (p as any).summaryKey || ('blog.posts.' + p.id + '.summary'), p.summary);
     const postAuthor = t((p as any).authorKey || ('blog.posts.' + p.id + '.author'), p.author);
@@ -72,29 +90,70 @@ export const BlogView: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
     return matchCat && matchSearch;
   });
 
+  const handleBackToList = () => {
+    setSelectedArticleId(null);
+    if (typeof window !== 'undefined') {
+      window.history.pushState({}, '', '/blog');
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleBackFromBlog = () => {
+    if (selectedArticleId) {
+      handleBackToList();
+      return;
+    }
+    if (onBack) {
+      onBack();
+      return;
+    }
+    if (typeof window !== 'undefined' && window.history.length > 1 && window.location.pathname !== '/') {
+      window.history.back();
+      return;
+    }
+    if (typeof window !== 'undefined') {
+      window.history.pushState({}, '', '/');
+      window.dispatchEvent(new PopStateEvent('popstate'));
+      setPublicPage('home');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  const handleSelectArticle = (id: string) => {
+    setSelectedArticleId(id);
+    if (typeof window !== 'undefined') {
+      window.history.pushState({ articleId: id }, '', `/blog?id=${id}`);
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const handleShare = (title: string) => {
     if (navigator.share) {
       navigator.share({ title, url: window.location.href }).catch(() => {});
     } else {
-      triggerDemoToast(t('blog.shareCopied', 'Enlace Copiado'), t('blog.shareCopiedDesc', `Enlace de "${title}" copiado al portapapeles.`), 'info');
+      triggerDemoToast(
+        t('blog.shareCopied', 'Enlace Copiado'),
+        t('blog.shareCopiedDesc', `Enlace de "${title}" copiado al portapapeles.`),
+        'info'
+      );
     }
   };
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 text-slate-900 dark:text-slate-100 transition-colors duration-200">
-      <SubpageHeaderNav onBack={onBack} />
+      {/* Botón superior de retorno siempre conectado a la navegación correcta */}
+      {selectedArticle ? (
+        <SubpageHeaderNav
+          onBack={handleBackToList}
+          label={t('blog.back', 'Volver a Todos los Artículos')}
+        />
+      ) : (
+        <SubpageHeaderNav onBack={handleBackFromBlog} />
+      )}
+
       {/* If an article is selected, show Full Article Reader View */}
       {selectedArticle ? (
         <article className="max-w-4xl mx-auto space-y-8 animate-in fade-in duration-150">
-          {/* Aesthetic Back Button */}
-          <button
-            onClick={() => setSelectedArticleId(null)}
-            className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 text-xs font-bold text-slate-800 dark:text-slate-200 shadow-sm transition"
-          >
-            <ArrowLeft className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-            <span>{t('blog.back', 'Volver a Todos los Artículos')}</span>
-          </button>
-
           <header className="space-y-4">
             <div className="flex items-center gap-2 text-xs text-emerald-600 dark:text-emerald-400 font-bold uppercase tracking-wider">
               <span>{t('blog.filters.' + getCategoryFilterId(selectedArticle.category), t('blog.categories.' + getCategoryFilterId(selectedArticle.category), selectedArticle.category))}</span>
@@ -123,8 +182,9 @@ export const BlogView: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
                   </span>
                 </div>
                 <button
+                  type="button"
                   onClick={() => handleShare(t((selectedArticle as any).titleKey || ('blog.posts.' + selectedArticle.id + '.title'), selectedArticle.title))}
-                  className="p-1.5 rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+                  className="p-1.5 rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
                   title={t('blog.share', 'Compartir artículo')}
                 >
                   <Share2 className="w-4 h-4" />
@@ -207,10 +267,7 @@ export const BlogView: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
                   return (
                     <div
                       key={article.id}
-                      onClick={() => {
-                        setSelectedArticleId(article.id);
-                        window.scrollTo({ top: 0, behavior: 'smooth' });
-                      }}
+                      onClick={() => handleSelectArticle(article.id)}
                       className="cursor-pointer rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm hover:shadow-md transition group flex flex-col justify-between"
                     >
                       <div>
@@ -243,19 +300,21 @@ export const BlogView: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
           {/* Footer Back & CTA */}
           <div className="pt-8 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between">
             <button
-              onClick={() => setSelectedArticleId(null)}
-              className="flex items-center gap-2 text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition"
+              type="button"
+              onClick={handleBackToList}
+              className="flex items-center gap-2 text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition cursor-pointer"
             >
               <ArrowLeft className="w-4 h-4" />
               <span>{t('blog.backToList', 'Volver al listado')}</span>
             </button>
 
             <button
+              type="button"
               onClick={() => {
                 setPublicPage('booking');
                 window.scrollTo({ top: 0, behavior: 'smooth' });
               }}
-              className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow transition"
+              className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow transition cursor-pointer active:scale-95"
             >
               {t('blog.bookToPractice', 'Reservar Pista para Practicar')}
             </button>
@@ -299,9 +358,10 @@ export const BlogView: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
           <div className="flex items-center gap-2 overflow-x-auto pb-2 no-scrollbar">
             {categories.map((c) => (
               <button
+                type="button"
                 key={c.id}
                 onClick={() => setSelectedCategory(c.id)}
-                className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition ${
+                className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition cursor-pointer ${
                   selectedCategory === c.id
                     ? 'bg-emerald-600 text-white shadow-sm'
                     : 'bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-slate-800'
@@ -323,7 +383,7 @@ export const BlogView: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
                 <div
                   key={post.id}
                   className="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 overflow-hidden hover:border-slate-300 dark:hover:border-slate-700 transition flex flex-col justify-between group shadow-sm hover:shadow-md cursor-pointer"
-                  onClick={() => setSelectedArticleId(post.id)}
+                  onClick={() => handleSelectArticle(post.id)}
                 >
                   <div className="relative h-48 overflow-hidden">
                     <img
@@ -369,3 +429,5 @@ export const BlogView: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
     </div>
   );
 };
+
+export default BlogView;

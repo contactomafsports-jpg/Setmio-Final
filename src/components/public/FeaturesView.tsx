@@ -39,119 +39,15 @@ export const FeaturesView: React.FC<FeaturesViewProps> = ({
     }
   };
 
-  const softwareModules = [
-    {
-      icon: Calendar,
-      title: 'Cuadrante de Reservas & Disponibilidad en Tiempo Real',
-      badge: 'Reservas 24/7',
-      color: 'from-emerald-500 to-teal-700',
-      description:
-        'Motor de cuadrante visual optimizado para dispositivos táctiles y móviles. Gestiona pistas cubiertas, exteriores e individuales con tarifas dinámicas por franja horaria.',
-      features: [
-        'División automática de pago entre 4 jugadores (Split Payments)',
-        'Políticas de cancelación con penalización y fianza configurables',
-        'Sincronización instantánea sin solapamientos ni reservas duplicadas',
-        'Gestión de partidas fijas semanales de abonados',
-      ],
-    },
-    {
-      icon: GraduationCap,
-      title: 'Academia, Cursos & Gestión de Alumnos',
-      badge: 'Escuela & Clinics',
-      color: 'from-cyan-500 to-blue-700',
-      description:
-        'Estructuración de cursos mensuales, trimestrales y clases sueltas particulares. Asignación de profesores con cálculo automático de liquidaciones.',
-      features: [
-        'Control de asistencia y recuperación de clases canceladas por lluvia',
-        'Cuotas diferenciadas para socios y no socios',
-        'Listas de espera automáticas con aviso instantáneo de vacantes',
-        'Ficha de progreso técnico y nivel dinámico por alumno',
-      ],
-    },
-    {
-      icon: Coffee,
-      title: 'TPV Táctil de Bar, Cafetería & Pro Shop',
-      badge: 'Ventas en Barra',
-      color: 'from-emerald-500 to-teal-700',
-      description:
-        'Punto de venta táctil con cartas visuales de bebidas y material deportivo. Carga consumos directamente a la reserva de pista o al saldo del monedero del socio.',
-      features: [
-        'Cierre y arqueo de caja con desglose de formas de pago',
-        'Impresión térmica nativa de tickets de caja',
-        'Control de stock de bolas, grips, palas de test y consumibles',
-        'Cobro combinado con tarjeta bancaria, efectivo o Bizum',
-      ],
-    },
-    {
-      icon: Trophy,
-      title: 'Gestor de Torneos, Ligas & Rankings',
-      badge: 'Competición Oficial',
-      color: 'from-purple-500 to-pink-700',
-      description:
-        'Organización de torneos de fin de semana, ligas regulares de empresa y pozos americanos. Generación automática de cuadros de eliminatorias y consolación.',
-      features: [
-        'Inscripciones online con cobro anticipado de la cuota de pareja',
-        'Publicación de horarios y resultados en vivo en la web del club',
-        'Rankings del club con cálculo de puntos federados o sociales',
-        'Generación y exportación de cuadros oficiales y actas',
-      ],
-    },
-    {
-      icon: Users,
-      title: 'CRM Deportivo & Ficha Técnica del Jugador',
-      badge: 'Fidelización',
-      color: 'from-blue-500 to-indigo-700',
-      description:
-        'Base de datos unificada de clientes con historial de partidos, balance cara a cara (H2H), pala favorita, posición habitual y monedero virtual recargable.',
-      features: [
-        'Monedero digital con bonificaciones por recarga anticipada',
-        'Segmentación por cuotas de socio (familiar, individual, jubilado)',
-        'Métricas de compañero más frecuente y rival habitual',
-        'Auditoría de reservas y cancelaciones por usuario',
-      ],
-    },
-    {
-      icon: CreditCard,
-      title: 'Facturación, Cuotas Recurrentes & Remesas SEPA',
-      badge: 'Administración',
-      color: 'from-emerald-600 to-teal-800',
-      description:
-        'Automatización financiera para clubes: cobro de cuotas mensuales de abonados, emisión de facturas oficiales con IVA desglosado y exportación contable.',
-      features: [
-        'Generación de archivos de remesas bancarias SEPA XML (Core / B2B)',
-        'Emisión y descarga de facturas en PDF para clientes de empresa',
-        'Control estricto de morosidad y cobro automático de recibos devueltos',
-        'Conciliación con pasarelas de pago Stripe, Redsys y TPV físico',
-      ],
-    },
-    {
-      icon: Bot,
-      title: 'Copiloto de IA Multicanal (BYOK)',
-      badge: 'Atención 24/7',
-      color: 'from-violet-500 to-purple-800',
-      description:
-        'Asistente conversacional inteligente que atiende consultas de clientes en tu web y WhatsApp oficial. Informa de disponibilidad de pistas y tarifas automáticamente.',
-      features: [
-        'Soporte Bring Your Own Key (BYOK) para claves API propias',
-        'Activación por canales: Web oficial, WhatsApp e Instagram',
-        'Tono de voz configurable (profesional, cercano, deportivo)',
-        'Soporte multiidioma nativo para atender a turistas y socios internacionales',
-      ],
-    },
-    {
-      icon: Globe,
-      title: 'Marca Blanca Integral & App Móvil Corporativa',
-      badge: 'Tu Propia Marca',
-      color: 'from-teal-500 to-cyan-700',
-      description:
-        'Tu club con su propio dominio web (tuclub.com), colores corporativos, logotipo y app instalable en iPhone y Android sin pagar comisiones a tiendas de apps.',
-      features: [
-        'Conexión de dominio propio con certificado SSL gratuito',
-        'App web de alta velocidad instalable en 1 toque en la pantalla de inicio',
-        'Sin menciones técnicas a plataformas intermediarias',
-        'Diseño responsive adaptado a cualquier dispositivo y pantalla',
-      ],
-    },
+  const softwareModulesMeta = [
+    { id: 0, icon: Calendar, color: 'from-emerald-500 to-teal-700', bulletCount: 4 },
+    { id: 1, icon: GraduationCap, color: 'from-cyan-500 to-blue-700', bulletCount: 4 },
+    { id: 2, icon: Coffee, color: 'from-emerald-500 to-teal-700', bulletCount: 4 },
+    { id: 3, icon: Trophy, color: 'from-purple-500 to-pink-700', bulletCount: 4 },
+    { id: 4, icon: Users, color: 'from-blue-500 to-indigo-700', bulletCount: 4 },
+    { id: 5, icon: CreditCard, color: 'from-emerald-600 to-teal-800', bulletCount: 4 },
+    { id: 6, icon: Bot, color: 'from-violet-500 to-purple-800', bulletCount: 4 },
+    { id: 7, icon: Globe, color: 'from-teal-500 to-cyan-700', bulletCount: 4 },
   ];
 
   return (
@@ -189,11 +85,11 @@ export const FeaturesView: React.FC<FeaturesViewProps> = ({
 
         {/* Modules Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {softwareModules.map((item, idx) => {
+          {softwareModulesMeta.map((item) => {
             const Icon = item.icon;
             return (
               <article
-                key={idx}
+                key={item.id}
                 className="p-8 rounded-3xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-xl transition-all duration-300 space-y-6 flex flex-col justify-between hover:border-emerald-500/50"
               >
                 <div className="space-y-4">
@@ -202,24 +98,24 @@ export const FeaturesView: React.FC<FeaturesViewProps> = ({
                       <Icon className="w-6 h-6" />
                     </div>
                     <span className="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
-                      {t(`features.module.${idx}.badge`, item.badge)}
+                      {t(`features.module.${item.id}.badge`)}
                     </span>
                   </div>
 
                   <div>
                     <h2 className="text-xl font-black text-slate-900 dark:text-white">
-                      {t(`features.module.${idx}.title`, item.title)}
+                      {t(`features.module.${item.id}.title`)}
                     </h2>
                     <p className="text-xs text-slate-600 dark:text-slate-400 mt-2 leading-relaxed">
-                      {t(`features.module.${idx}.desc`, item.description)}
+                      {t(`features.module.${item.id}.desc`)}
                     </p>
                   </div>
 
                   <ul className="space-y-2.5 pt-2 border-t border-slate-200/80 dark:border-slate-800 text-xs text-slate-700 dark:text-slate-300">
-                    {item.features.map((feat, fIdx) => (
+                    {Array.from({ length: item.bulletCount }).map((_, fIdx) => (
                       <li key={fIdx} className="flex items-start gap-2">
                         <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
-                        <span>{t(`features.module.${idx}.f.${fIdx}`, feat)}</span>
+                        <span>{t(`features.module.${item.id}.f.${fIdx}`)}</span>
                       </li>
                     ))}
                   </ul>

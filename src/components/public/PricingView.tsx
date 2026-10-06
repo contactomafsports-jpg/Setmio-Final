@@ -13,79 +13,38 @@ export const PricingView: React.FC<PricingViewProps> = ({ onBack, onOpenDemo, on
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('monthly');
   const { t } = useApp();
 
-  const pricingTiers = [
+  const pricingTierConfigs = [
     {
       id: 'coach',
-      badge: t('pricing.tiers.coach.badge', 'Entrenadores & Academias'),
-      name: t('pricing.tiers.coach.name', 'Plan Coach'),
       priceMonthly: 39,
       priceYearly: 32,
-      description: t('pricing.tiers.coach.desc', 'Para entrenadores individuales, preparadores físicos y pequeñas escuelas sin instalaciones propias.'),
-      features: [
-        t('pricing.tiers.coach.f1', 'Hasta 40 alumnos activos simultáneos'),
-        t('pricing.tiers.coach.f2', 'Cobro recurrente mensual de cuotas'),
-        t('pricing.tiers.coach.f3', 'Cuadrante táctil de clases particulares'),
-        t('pricing.tiers.coach.f4', 'Ficha técnica y seguimiento de nivel de juego'),
-        t('pricing.tiers.coach.f5', 'Portal web propio del profesor'),
-      ],
+      featureCount: 5,
       featured: false,
-      ctaText: t('pricing.tiers.coach.cta', 'Elegir Plan Coach'),
+      badgeHighlight: false,
     },
     {
       id: 'club_base',
-      badge: t('pricing.tiers.club_base.badge', 'Más Demandado'),
-      badgeHighlight: true,
-      name: t('pricing.tiers.club_base.name', 'Plan Club Base'),
       priceMonthly: 79,
       priceYearly: 65,
-      description: t('pricing.tiers.club_base.desc', 'Ideal para clubes de pádel de hasta 4 pistas que desean informatizar sus reservas y automatizar cobros.'),
-      features: [
-        t('pricing.tiers.club_base.f1', 'Hasta 4 pistas de pádel'),
-        t('pricing.tiers.club_base.f2', 'Reservas online ilimitadas sin comisiones'),
-        t('pricing.tiers.club_base.f3', 'Web y App móvil de marca blanca'),
-        t('pricing.tiers.club_base.f4', 'Split Payments (1/4 por jugador)'),
-        t('pricing.tiers.club_base.f5', 'Control básico de socios e ingresos'),
-        t('pricing.tiers.club_base.f6', 'Soporte técnico prioritario por WhatsApp'),
-      ],
+      featureCount: 6,
       featured: true,
-      ctaText: t('pricing.tiers.club_base.cta', 'Empezar con Club Base'),
+      badgeHighlight: true,
     },
     {
       id: 'club_pro',
-      badge: t('pricing.tiers.club_pro.badge', 'Clubes en Crecimiento'),
-      name: t('pricing.tiers.club_pro.name', 'Plan Club Pro'),
       priceMonthly: 149,
       priceYearly: 119,
-      description: t('pricing.tiers.club_pro.desc', 'Para clubes completos con escuela, torneos oficiales, bar cafetería y automatización domótica de pistas.'),
-      features: [
-        t('pricing.tiers.club_pro.f1', 'Pistas ilimitadas'),
-        t('pricing.tiers.club_pro.f2', 'Módulo completo de Escuela y Academias'),
-        t('pricing.tiers.club_pro.f3', 'Domótica IoT (Encendido automático de luces LED)'),
-        t('pricing.tiers.club_pro.f4', 'Apertura de pistas por PIN y Código QR'),
-        t('pricing.tiers.club_pro.f5', 'TPV Táctil de Bar, Cafetería y Tienda'),
-        t('pricing.tiers.club_pro.f6', 'Gestor de Torneos, Ligas y Rankings FEP'),
-        t('pricing.tiers.club_pro.f7', 'Copiloto IA 24/7 en WhatsApp oficial'),
-      ],
+      featureCount: 7,
       featured: false,
-      ctaText: t('pricing.tiers.club_pro.cta', 'Elegir Plan Pro'),
+      badgeHighlight: false,
     },
     {
       id: 'enterprise',
-      badge: t('pricing.tiers.enterprise.badge', 'Cadenas & Franquicias'),
-      name: t('pricing.tiers.enterprise.name', 'Plan Enterprise'),
       priceMonthly: null,
       priceYearly: null,
-      description: t('pricing.tiers.enterprise.desc', 'Solución a medida para grandes complejos deportivos, cadenas multi-club y federaciones de pádel.'),
-      features: [
-        t('pricing.tiers.enterprise.f1', 'Gestión multi-sede centralizada'),
-        t('pricing.tiers.enterprise.f2', 'Dominio propio personalizado (tuclub.com)'),
-        t('pricing.tiers.enterprise.f3', 'Integración API con tornos y cerraduras industriales'),
-        t('pricing.tiers.enterprise.f4', 'Facturación electrónica y remesas SEPA bancarias'),
-        t('pricing.tiers.enterprise.f5', 'Gestor de cuenta y onboarding presencial dedicado'),
-        t('pricing.tiers.enterprise.f6', 'SLA garantizado del 99.9% de disponibilidad'),
-      ],
+      featureCount: 6,
       featured: false,
-      ctaText: t('pricing.tiers.enterprise.cta', 'Contactar con Setmio'),
+      badgeHighlight: false,
     },
   ];
 
@@ -160,7 +119,7 @@ export const PricingView: React.FC<PricingViewProps> = ({ onBack, onOpenDemo, on
 
         {/* Grid de Precios con Cada Tarjeta y su Interior Estrictamente Centrados */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch">
-          {pricingTiers.map((tier) => {
+          {pricingTierConfigs.map((tier) => {
             const price = billingCycle === 'yearly' ? tier.priceYearly : tier.priceMonthly;
 
             return (
@@ -181,21 +140,21 @@ export const PricingView: React.FC<PricingViewProps> = ({ onBack, onOpenDemo, on
                         : 'bg-slate-200/80 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
                     }`}
                   >
-                    {tier.badge}
+                    {t(`pricing.tiers.${tier.id}.badge`)}
                   </span>
                 </div>
 
                 {/* Contenido Principal de la Tarjeta Estrictamente Centrado */}
                 <div className="w-full space-y-4 flex flex-col items-center justify-center text-center">
                   <h2 className="text-2xl font-black text-slate-900 dark:text-white text-center w-full">
-                    {tier.name}
+                    {t(`pricing.tiers.${tier.id}.name`)}
                   </h2>
 
                   {/* Precio Centrado */}
                   <div className="flex items-baseline justify-center gap-1 border-b border-slate-100 dark:border-slate-800/80 pb-4 w-full text-center">
                     {price === null ? (
                       <span className="text-3xl font-black text-slate-900 dark:text-white tracking-tight text-center">
-                        {t('pricing.customPrice', 'A medida')}
+                        {t('pricing.customPrice')}
                       </span>
                     ) : (
                       <>
@@ -203,7 +162,7 @@ export const PricingView: React.FC<PricingViewProps> = ({ onBack, onOpenDemo, on
                           {price}€
                         </span>
                         <span className="text-xs text-slate-500 dark:text-slate-400 font-semibold text-center">
-                          {t('pricing.perMonth', '/mes')}
+                          {t('pricing.perMonth')}
                         </span>
                       </>
                     )}
@@ -211,18 +170,18 @@ export const PricingView: React.FC<PricingViewProps> = ({ onBack, onOpenDemo, on
 
                   {/* Descripción Centrada */}
                   <p className="text-xs text-slate-600 dark:text-slate-400 min-h-12 leading-relaxed text-center px-1 w-full">
-                    {tier.description}
+                    {t(`pricing.tiers.${tier.id}.desc`)}
                   </p>
 
                   {/* Lista de Características Centrada */}
                   <ul className="w-full space-y-3 pt-3 border-t border-slate-100 dark:border-slate-800/80 flex flex-col items-center justify-center text-center">
-                    {tier.features.map((feature, idx) => (
+                    {Array.from({ length: tier.featureCount }).map((_, idx) => (
                       <li
                         key={idx}
                         className="text-xs text-slate-700 dark:text-slate-300 flex items-center justify-center gap-2 text-center w-full"
                       >
                         <Check className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-                        <span className="text-center">{feature}</span>
+                        <span className="text-center">{t(`pricing.tiers.${tier.id}.f${idx + 1}`)}</span>
                       </li>
                     ))}
                   </ul>
@@ -239,7 +198,7 @@ export const PricingView: React.FC<PricingViewProps> = ({ onBack, onOpenDemo, on
                         : 'bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-900 dark:text-white border border-slate-300 dark:border-slate-700'
                     }`}
                   >
-                    <span>{tier.ctaText}</span>
+                    <span>{t(`pricing.tiers.${tier.id}.cta`)}</span>
                     <ArrowRight className="w-3.5 h-3.5" />
                   </button>
                 </div>

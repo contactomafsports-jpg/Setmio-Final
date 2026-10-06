@@ -22,6 +22,7 @@ import { ShopView } from './components/public/ShopView';
 import { TeamsView } from './components/public/TeamsView';
 import { BlogView } from './components/public/BlogView';
 import { ContactFAQView } from './components/public/ContactFAQView';
+import { ClubContactFAQView } from './components/public/ClubContactFAQView';
 import { LegalView } from './components/public/LegalView';
 import { SetmioCorporateLanding } from './components/public/SetmioCorporateLanding';
 import { FeaturesView } from './components/public/FeaturesView';
@@ -246,7 +247,7 @@ export function App() {
       case 'article':
         return <BlogView onBack={goHome} />;
       case 'contact':
-        return <ContactFAQView onBack={goHome} />;
+        return isCorporateLanding ? <ContactFAQView onBack={goHome} /> : <ClubContactFAQView onBack={goHome} />;
       case 'legal':
         return <LegalView onBack={goHome} />;
       default:

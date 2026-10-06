@@ -23,10 +23,20 @@ const menuItems = [
 
 export function CorporateHeader({ onOpenDemo, onOpenAuth, onOpenRegister }: CorporateHeaderProps) {
   const [open, setOpen] = React.useState(false);
+  const [scrolled, setScrolled] = React.useState(false);
   const [languageMenuOpen, setLanguageMenuOpen] = React.useState(false);
   const langRef = React.useRef<HTMLDivElement>(null);
   const { t, language, setLanguage, corporateTheme, toggleCorporateTheme } = useApp();
   const close = () => setOpen(false);
+
+  React.useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 10);
+    };
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
   const navigate = (event: React.MouseEvent<HTMLAnchorElement>, path: string) => {
     event.preventDefault();
     close();
@@ -48,7 +58,11 @@ export function CorporateHeader({ onOpenDemo, onOpenAuth, onOpenRegister }: Corp
   }, [open]);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-slate-200 dark:border-slate-800 bg-white/90 backdrop-blur-md dark:bg-slate-900/90 text-slate-900 dark:text-white transition-colors duration-200">
+    <header className={`sticky top-0 z-50 w-full max-w-full border-b transition-all duration-200 ${
+      scrolled
+        ? 'border-slate-200 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md shadow-sm'
+        : 'border-slate-200/80 dark:border-slate-800/80 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md shadow-xs'
+    } text-slate-900 dark:text-white`}>
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <button
           type="button"
