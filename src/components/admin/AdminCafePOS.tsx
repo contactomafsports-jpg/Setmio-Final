@@ -446,50 +446,54 @@ export const AdminCafePOS: React.FC = () => {
             ))}
           </div>
 
-          {/* Touch item cards con Imagen de Vista Previa y Stock */}
+          {/* Touch item cards con Imagen de Vista Previa Arriba y Badge de Categoría Superpuesto */}
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
             {filteredProducts.map((prod) => (
               <button
                 key={prod.id}
                 type="button"
                 onClick={() => addItemToPOS(prod)}
-                className="p-3 rounded-2xl bg-white dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 hover:border-emerald-500/50 text-left transition flex flex-col justify-between group shadow-xs hover:scale-[1.01] active:scale-[0.99] cursor-pointer min-h-[140px]"
+                className="p-2.5 rounded-2xl bg-white dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 hover:border-emerald-500/50 text-left transition flex flex-col group shadow-xs hover:scale-[1.01] active:scale-[0.99] cursor-pointer overflow-hidden"
               >
-                <div className="flex gap-2.5 items-start">
+                {/* 1. Imagen Superior con Badges Superpuestos */}
+                <div className="relative w-full h-28 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-700/50 shrink-0">
                   {prod.imageUrl ? (
                     <img
                       src={prod.imageUrl}
                       alt={prod.name}
-                      className="w-12 h-12 rounded-xl object-cover shrink-0 bg-slate-100 dark:bg-slate-700 border border-slate-200/80 dark:border-slate-700"
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                   ) : (
-                    <div className="w-12 h-12 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 border border-emerald-500/20">
-                      <Coffee className="w-5 h-5" />
+                    <div className="w-full h-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+                      <Coffee className="w-8 h-8 opacity-60" />
                     </div>
                   )}
 
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center justify-between gap-1">
-                      <span className="text-[9px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider truncate">
-                        {prod.category}
-                      </span>
-                      <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-slate-100 dark:bg-slate-700/60 text-slate-600 dark:text-slate-300 shrink-0">
-                        {prod.stock} ud.
-                      </span>
-                    </div>
-                    <div className="font-bold text-xs text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition mt-0.5 line-clamp-2 leading-tight">
-                      {prod.name}
-                    </div>
-                  </div>
+                  {/* Badge de Categoría Superpuesto en esquina superior izquierda */}
+                  <span className="absolute top-1.5 left-1.5 px-2 py-0.5 rounded-md bg-slate-900/80 backdrop-blur-xs text-[9px] font-bold text-white uppercase tracking-wider shadow-xs">
+                    {prod.category}
+                  </span>
+
+                  {/* Badge de Stock en esquina superior derecha */}
+                  <span className="absolute top-1.5 right-1.5 px-1.5 py-0.5 rounded-md bg-white/90 dark:bg-slate-900/90 backdrop-blur-xs text-[9px] font-mono font-bold text-slate-800 dark:text-slate-200 shadow-xs">
+                    {prod.stock} ud.
+                  </span>
                 </div>
 
-                <div className="flex items-center justify-between pt-2 mt-2 border-t border-slate-100 dark:border-slate-700/50">
-                  <span className="font-mono font-bold text-xs text-slate-900 dark:text-white">
-                    {prod.price.toFixed(2)} €
-                  </span>
-                  <span className="p-1 rounded-lg bg-slate-100 dark:bg-slate-700 group-hover:bg-emerald-500 group-hover:text-white transition">
-                    <Plus className="w-3.5 h-3.5" />
-                  </span>
+                {/* 2. Información Inferior: Título y Precio/Botón en estructura vertical */}
+                <div className="flex flex-col flex-1 justify-between pt-2">
+                  <div className="font-bold text-xs text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition line-clamp-1 leading-snug">
+                    {prod.name}
+                  </div>
+
+                  <div className="flex items-center justify-between pt-1.5 mt-1.5 border-t border-slate-100 dark:border-slate-700/60">
+                    <span className="font-mono font-black text-xs text-emerald-600 dark:text-emerald-400">
+                      {prod.price.toFixed(2)} €
+                    </span>
+                    <span className="p-1 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 group-hover:bg-emerald-500 group-hover:text-white transition">
+                      <Plus className="w-3.5 h-3.5" />
+                    </span>
+                  </div>
                 </div>
               </button>
             ))}

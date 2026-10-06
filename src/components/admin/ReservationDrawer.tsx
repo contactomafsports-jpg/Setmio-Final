@@ -220,7 +220,7 @@ export const ReservationDrawer: React.FC<ReservationDrawerProps> = ({
     if (onOpenPlayerProfile) {
       onOpenPlayerProfile(playerName);
     } else {
-      navigateToPlayerProfile(playerName);
+      navigateToPlayerProfile(playerName, 'agenda');
     }
   };
 

@@ -130,7 +130,15 @@ const INITIAL_CUSTOMERS: CustomerItem[] = [
 ];
 
 export const AdminCustomers: React.FC = () => {
-  const { currentTenant, triggerDemoToast, selectedCustomerId, setSelectedCustomerId } = useApp();
+  const {
+    currentTenant,
+    triggerDemoToast,
+    selectedCustomerId,
+    setSelectedCustomerId,
+    playerOriginTab,
+    setPlayerOriginTab,
+    setAdminTab,
+  } = useApp();
 
   const [customerList, setCustomerList] = useState<CustomerItem[]>(() => {
     try {
@@ -164,16 +172,30 @@ export const AdminCustomers: React.FC = () => {
 
     const handleUrlPlayer = () => {
       const pathname = typeof window !== 'undefined' ? window.location.pathname : '';
+      // Si la URL es la lista general (/socios, /crm, /gestion/jugadores, /jugadores sin slug), no abrir ficha
+      if (
+        pathname === '/socios' ||
+        pathname === '/crm' ||
+        pathname === '/gestion/jugadores' ||
+        pathname === '/jugadores'
+      ) {
+        setSelectedCustomer(null);
+        setSelectedCustomerId(null);
+        return;
+      }
+
       if (pathname.startsWith('/jugadores/') || pathname.startsWith('/gestion/jugadores/')) {
-        const slug = pathname.replace('/gestion/jugadores/', '').replace('/jugadores/', '').toLowerCase();
-        const found = customerList.find(
-          (c) =>
-            c.name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-') === slug ||
-            c.id.toLowerCase() === slug ||
-            c.name.toLowerCase().includes(slug.replace(/-/g, ' '))
-        );
-        if (found) {
-          setSelectedCustomer(found);
+        const slug = pathname.replace('/gestion/jugadores/', '').replace('/jugadores/', '').toLowerCase().trim();
+        if (slug) {
+          const found = customerList.find(
+            (c) =>
+              c.name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-') === slug ||
+              c.id.toLowerCase() === slug ||
+              c.name.toLowerCase().includes(slug.replace(/-/g, ' '))
+          );
+          if (found) {
+            setSelectedCustomer(found);
+          }
         }
       }
     };
@@ -181,7 +203,7 @@ export const AdminCustomers: React.FC = () => {
     handleUrlPlayer();
     window.addEventListener('popstate', handleUrlPlayer);
     return () => window.removeEventListener('popstate', handleUrlPlayer);
-  }, [customerList, selectedCustomerId]);
+  }, [customerList, selectedCustomerId, setSelectedCustomerId]);
 
   // New Player Registration Modal State (Bug Fix Requerimiento 7)
   const [isNewPlayerModalOpen, setIsNewPlayerModalOpen] = useState(false);
@@ -287,8 +309,20 @@ export const AdminCustomers: React.FC = () => {
         onBack={() => {
           setSelectedCustomer(null);
           setSelectedCustomerId(null);
-          if (typeof window !== 'undefined' && window.location.pathname.includes('/jugadores')) {
+          if (playerOriginTab) {
+            const origin = playerOriginTab;
+            setPlayerOriginTab(null);
+            setAdminTab(origin);
+            if (typeof window !== 'undefined') {
+              const originRoute = origin === 'agenda' ? '/gestion/reservas' : '/gestion';
+              window.history.pushState({}, '', originRoute);
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+            return;
+          }
+          if (typeof window !== 'undefined') {
             window.history.pushState({}, '', '/gestion/jugadores');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
           }
         }}
       />

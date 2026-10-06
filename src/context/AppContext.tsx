@@ -50,6 +50,7 @@ export type PublicPage =
   | 'solution_coaches'
   | 'solution_players'
   | 'solution_pro_players'
+  | 'players_app'
   | 'modules'
   | 'demo'
   | 'player_profile'
@@ -78,6 +79,8 @@ const PUBLIC_ROUTES: Record<string, PublicPage> = {
   '/soluciones/profesores': 'solution_coaches',
   '/soluciones/jugadores': 'solution_players',
   '/soluciones/jugadores-profesionales': 'solution_pro_players',
+  '/jugadores-app': 'players_app',
+  '/para-jugadores': 'players_app',
   '/modulos-domotica': 'modules',
   '/demo': 'demo',
   '/precios': 'pricing',
@@ -105,6 +108,7 @@ const routeForPage: Record<PublicPage, string> = {
   solution_coaches: '/soluciones/profesores',
   solution_players: '/soluciones/jugadores',
   solution_pro_players: '/soluciones/jugadores-profesionales',
+  players_app: '/para-jugadores',
   modules: '/modulos-domotica',
   demo: '/demo',
   pricing: '/precios',
@@ -141,6 +145,7 @@ const routeForAdminTab: Record<AdminTab, string> = {
   domains: '/gestion/dominios',
   subscription: '/gestion/negocio',
   settings: '/gestion/configuracion',
+  invoicing: '/gestion/facturacion',
 };
 
 const routeForPlayerTab: Record<PlayerTab, string> = {
@@ -243,12 +248,32 @@ const readRoute = () => {
     remainingPath === '/jugadores' ||
     remainingPath.startsWith('/jugadores/') ||
     remainingPath === '/gestion/jugadores' ||
-    remainingPath.startsWith('/gestion/jugadores/')
+    remainingPath.startsWith('/gestion/jugadores/') ||
+    remainingPath === '/socios' ||
+    remainingPath.startsWith('/socios/') ||
+    remainingPath === '/crm' ||
+    remainingPath.startsWith('/crm/') ||
+    remainingPath === '/gestion/clientes'
   ) {
     return {
       view: 'admin' as MainView,
       page: 'home' as PublicPage,
       admin: 'customers' as AdminTab,
+      player: 'dashboard' as PlayerTab,
+      clubSlug: activeClubSlug,
+      isCorporate: false,
+    };
+  }
+  if (
+    remainingPath === '/facturacion' ||
+    remainingPath.startsWith('/facturacion/') ||
+    remainingPath === '/gestion/facturacion' ||
+    remainingPath.startsWith('/gestion/facturacion/')
+  ) {
+    return {
+      view: 'admin' as MainView,
+      page: 'home' as PublicPage,
+      admin: 'invoicing' as AdminTab,
       player: 'dashboard' as PlayerTab,
       clubSlug: activeClubSlug,
       isCorporate: false,
@@ -290,6 +315,7 @@ export type AdminTab =
   | 'shop'
   | 'smart_courts'
   | 'pos_cafe'
+  | 'invoicing'
   | 'web_editor'
   | 'domains'
   | 'subscription'
@@ -464,7 +490,9 @@ interface AppContextType {
   // CRM Player Profile Navigation
   selectedCustomerId: string | null;
   setSelectedCustomerId: (id: string | null) => void;
-  navigateToPlayerProfile: (playerNameOrId: string) => void;
+  playerOriginTab: AdminTab | null;
+  setPlayerOriginTab: (tab: AdminTab | null) => void;
+  navigateToPlayerProfile: (playerNameOrId: string, originTab?: AdminTab) => void;
 
   // AI Assistant Chat
   aiMessages: AIMessage[];
@@ -1484,13 +1512,17 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   // CRM Player Profile Navigation
   const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(null);
+  const [playerOriginTab, setPlayerOriginTab] = useState<AdminTab | null>(null);
 
-  const navigateToPlayerProfile = (playerNameOrId: string) => {
+  const navigateToPlayerProfile = (playerNameOrId: string, originTab?: AdminTab) => {
     const slug = playerNameOrId
       .toLowerCase()
       .normalize('NFD')
       .replace(/[\u0300-\u036f]/g, '')
       .replace(/[^a-z0-9]+/g, '-');
+    if (originTab) {
+      setPlayerOriginTab(originTab);
+    }
     setSelectedCustomerId(playerNameOrId);
     setCurrentViewState('admin');
     setAdminTabState('customers');
@@ -1703,6 +1735,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
         selectedCustomerId,
         setSelectedCustomerId,
+        playerOriginTab,
+        setPlayerOriginTab,
         navigateToPlayerProfile,
 
         aiMessages,

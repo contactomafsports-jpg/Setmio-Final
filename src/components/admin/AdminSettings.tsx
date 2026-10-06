@@ -29,6 +29,23 @@ import {
   Sliders,
 } from 'lucide-react';
 
+export interface DaySchedule {
+  day: string;
+  isOpen: boolean;
+  openTime: string;
+  closeTime: string;
+}
+
+const DEFAULT_WEEKLY_SCHEDULE: DaySchedule[] = [
+  { day: 'Lunes', isOpen: true, openTime: '08:00', closeTime: '23:30' },
+  { day: 'Martes', isOpen: true, openTime: '08:00', closeTime: '23:30' },
+  { day: 'Miércoles', isOpen: true, openTime: '08:00', closeTime: '23:30' },
+  { day: 'Jueves', isOpen: true, openTime: '08:00', closeTime: '23:30' },
+  { day: 'Viernes', isOpen: true, openTime: '08:00', closeTime: '23:30' },
+  { day: 'Sábado', isOpen: true, openTime: '09:00', closeTime: '22:00' },
+  { day: 'Domingo', isOpen: true, openTime: '09:00', closeTime: '21:30' },
+];
+
 export const AdminSettings: React.FC = () => {
   const { currentTenant, updateCurrentTenant, triggerDemoToast, theme, setTheme, setAdminTab, courts, language } = useApp();
 
@@ -49,6 +66,16 @@ export const AdminSettings: React.FC = () => {
   const [contactEmail, setContactEmail] = useState(currentTenant.contactEmail);
   const [contactPhone, setContactPhone] = useState(currentTenant.contactPhone);
   const [address, setAddress] = useState(currentTenant.address);
+
+  // Horarios de Apertura y Cierre Semanal
+  const [weeklySchedule, setWeeklySchedule] = useState<DaySchedule[]>(() => {
+    try {
+      const saved = localStorage.getItem('setmio_club_weekly_schedule');
+      return saved ? JSON.parse(saved) : DEFAULT_WEEKLY_SCHEDULE;
+    } catch {
+      return DEFAULT_WEEKLY_SCHEDULE;
+    }
+  });
 
   // =========================================================================
   // REQUERIMIENTO 7: CONFIGURACIÓN DE IA & AGENTES MULTICANAL
@@ -107,6 +134,12 @@ export const AdminSettings: React.FC = () => {
 
   const handleSaveGeneral = (e: React.FormEvent) => {
     e.preventDefault();
+    try {
+      localStorage.setItem('setmio_club_weekly_schedule', JSON.stringify(weeklySchedule));
+    } catch {
+      // Ignore
+    }
+
     updateCurrentTenant({
       contactEmail,
       contactPhone,
@@ -125,7 +158,7 @@ export const AdminSettings: React.FC = () => {
 
     triggerDemoToast(
       'Configuración del Club Guardada',
-      'Las políticas de reserva, contacto y opciones de visualización se han actualizado.',
+      'Horarios semanales de apertura, políticas de reserva y datos de contacto actualizados.',
       'success'
     );
   };
@@ -346,6 +379,103 @@ export const AdminSettings: React.FC = () => {
                   </button>
                 </div>
               </div>
+            </div>
+          </div>
+
+          {/* Horarios de Apertura y Cierre Semanal del Club (Requerimiento 2.1) */}
+          <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-4 shadow-sm">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-3">
+              <div>
+                <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                  <Clock className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                  <span>Horarios de Apertura y Cierre Semanal del Club</span>
+                </h3>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                  Configura la hora de apertura y cierre por cada día de la semana. Las pistas y la web sincronizarán los turnos automáticamente.
+                </p>
+              </div>
+
+              {/* Botón de acción rápida: aplicar a todos */}
+              <button
+                type="button"
+                onClick={() => {
+                  const base = weeklySchedule[0] || { openTime: '08:00', closeTime: '23:30' };
+                  setWeeklySchedule(prev => prev.map(d => ({ ...d, openTime: base.openTime, closeTime: base.closeTime })));
+                  triggerDemoToast('Horarios Sincronizados', `Aplicado horario de ${base.openTime} a ${base.closeTime} a toda la semana.`, 'info');
+                }}
+                className="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-[11px] transition self-start sm:self-auto cursor-pointer"
+              >
+                Copiar Lunes a Toda la Semana
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-2.5">
+              {weeklySchedule.map((item, idx) => (
+                <div
+                  key={item.day}
+                  className={`p-3 rounded-2xl border transition flex flex-col justify-between ${
+                    item.isOpen
+                      ? 'bg-slate-50/70 dark:bg-slate-950/70 border-slate-200 dark:border-slate-800'
+                      : 'bg-rose-50/50 dark:bg-rose-950/20 border-rose-200 dark:border-rose-900/50 opacity-80'
+                  }`}
+                >
+                  <div className="flex items-center justify-between gap-1 mb-2">
+                    <span className="font-black text-xs text-slate-900 dark:text-white">
+                      {item.day}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const updated = [...weeklySchedule];
+                        updated[idx].isOpen = !updated[idx].isOpen;
+                        setWeeklySchedule(updated);
+                      }}
+                      className={`px-2 py-0.5 rounded-md text-[10px] font-bold transition cursor-pointer ${
+                        item.isOpen
+                          ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400'
+                          : 'bg-rose-100 dark:bg-rose-950 text-rose-700 dark:text-rose-400'
+                      }`}
+                    >
+                      {item.isOpen ? 'Abierto' : 'Cerrado'}
+                    </button>
+                  </div>
+
+                  {item.isOpen ? (
+                    <div className="space-y-1.5">
+                      <div>
+                        <span className="text-[10px] text-slate-400 block font-semibold">Apertura</span>
+                        <input
+                          type="time"
+                          value={item.openTime}
+                          onChange={(e) => {
+                            const updated = [...weeklySchedule];
+                            updated[idx].openTime = e.target.value;
+                            setWeeklySchedule(updated);
+                          }}
+                          className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-2 py-1 text-xs font-mono text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                        />
+                      </div>
+                      <div>
+                        <span className="text-[10px] text-slate-400 block font-semibold">Cierre</span>
+                        <input
+                          type="time"
+                          value={item.closeTime}
+                          onChange={(e) => {
+                            const updated = [...weeklySchedule];
+                            updated[idx].closeTime = e.target.value;
+                            setWeeklySchedule(updated);
+                          }}
+                          className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-2 py-1 text-xs font-mono text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                        />
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="py-5 text-center text-[11px] font-bold text-rose-500 dark:text-rose-400">
+                      Cerrado
+                    </div>
+                  )}
+                </div>
+              ))}
             </div>
           </div>
 
