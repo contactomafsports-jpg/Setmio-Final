@@ -104,7 +104,8 @@ export function SolucionesPage({
   roleId,
   onOpenRole,
 }: SolucionesPageProps) {
-  const { setPublicPage, triggerDemoToast, t } = useApp();
+  const { setPublicPage, triggerDemoToast, t, language } = useApp();
+  void language;
 
   const resolveSelectedRole = (): ProfessionalRoleKey | null => {
     if (roleId === 'clubes') return 'clubes';
@@ -510,15 +511,15 @@ export function SolucionesPage({
               <ul className="space-y-2.5 text-xs text-slate-700 dark:text-slate-300 border-t border-slate-200/80 dark:border-slate-800 pt-4">
                 <li className="flex items-start gap-2">
                   <Check className="w-4 h-4 text-teal-500 shrink-0 mt-0.5" />
-                  <span>{t('solutions.schools.f1', 'Gestión de grupos por nivel decimal (1.0 a 7.0) y calendarios docentes')}</span>
+                  <span>{t('solutions.schools.f1')}</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <Check className="w-4 h-4 text-teal-500 shrink-0 mt-0.5" />
-                  <span>{t('solutions.schools.f2', 'Control de asistencia en pista desde tablet o smartphone con pase de lista')}</span>
+                  <span>{t('solutions.schools.f2')}</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <Check className="w-4 h-4 text-teal-500 shrink-0 mt-0.5" />
-                  <span>{t('solutions.schools.f3', 'Cobros recurrentes mensuales domiciliados por tarjeta y recibo bancario SEPA')}</span>
+                  <span>{t('solutions.schools.f3')}</span>
                 </li>
               </ul>
             </div>
@@ -562,15 +563,15 @@ export function SolucionesPage({
               <ul className="space-y-2.5 text-xs text-slate-700 dark:text-slate-300 border-t border-slate-200/80 dark:border-slate-800 pt-4">
                 <li className="flex items-start gap-2">
                   <Check className="w-4 h-4 text-cyan-500 shrink-0 mt-0.5" />
-                  <span>{t('solutions.pro.f1', 'Portal oficial bajo tu propio dominio (ej. tunombre.com) de alta gama')}</span>
+                  <span>{t('solutions.pro.f1')}</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <Check className="w-4 h-4 text-cyan-500 shrink-0 mt-0.5" />
-                  <span>{t('solutions.pro.f2', 'Media kit digital para marcas, sponsors técnicos y contratos de patrocinio')}</span>
+                  <span>{t('solutions.pro.f2')}</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <Check className="w-4 h-4 text-cyan-500 shrink-0 mt-0.5" />
-                  <span>{t('solutions.pro.f3', 'Venta y reserva directa de clinics, exhibiciones privadas y masterclasses VIP')}</span>
+                  <span>{t('solutions.pro.f3')}</span>
                 </li>
               </ul>
             </div>

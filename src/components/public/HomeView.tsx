@@ -44,8 +44,10 @@ export const HomeView: React.FC = () => {
     isFavorite,
     triggerDemoToast,
     t,
+    language,
     currentLanguage,
   } = useApp();
+  void language;
   void currentLanguage;
 
   // Multi-court visual selector state
@@ -86,38 +88,38 @@ export const HomeView: React.FC = () => {
   const previewTeams = [
     {
       id: 'team-masculino-1',
-      name: t('home.teams.masculino1.name'),
-      category: t('home.teams.masculino1.category'),
+      name: t('home.teams.masculino1.name', 'Primer Equipo Masculino'),
+      category: t('home.teams.masculino1.category', '1ª División Autonómica'),
       gender: 'masculino',
       photoUrl: 'https://images.unsplash.com/photo-1526676037777-05a232554f77?auto=format&fit=crop&w=600&q=80',
-      captain: t('home.teams.masculino1.captain'),
+      captain: t('home.teams.masculino1.captain', 'Carlos Martínez'),
       rosterCount: 8,
     },
     {
       id: 'team-femenino-1',
-      name: t('home.teams.femenino1.name'),
-      category: t('home.teams.femenino1.category'),
+      name: t('home.teams.femenino1.name', 'Primer Equipo Femenino'),
+      category: t('home.teams.femenino1.category', '1ª División Autonómica'),
       gender: 'femenino',
       photoUrl: 'https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?auto=format&fit=crop&w=600&q=80',
-      captain: t('home.teams.femenino1.captain'),
+      captain: t('home.teams.femenino1.captain', 'Laura Gómez'),
       rosterCount: 8,
     },
     {
       id: 'team-veteranos-1',
-      name: t('home.teams.veteranos1.name'),
-      category: t('home.teams.veteranos1.category'),
+      name: t('home.teams.veteranos1.name', 'Equipo Veteranos +40'),
+      category: t('home.teams.veteranos1.category', 'Liga Interclubes Veteranos'),
       gender: 'masculino',
       photoUrl: 'https://images.unsplash.com/photo-1517649763962-0c623266ddc0?auto=format&fit=crop&w=600&q=80',
-      captain: t('home.teams.veteranos1.captain'),
+      captain: t('home.teams.veteranos1.captain', 'Marcos Suárez'),
       rosterCount: 6,
     },
     {
       id: 'team-menores-1',
-      name: t('home.teams.menores1.name'),
-      category: t('home.teams.menores1.category'),
+      name: t('home.teams.menores1.name', 'Cantera & Menores Sub-16'),
+      category: t('home.teams.menores1.category', 'Campeonato Promesas'),
       gender: 'menores',
       photoUrl: 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?auto=format&fit=crop&w=600&q=80',
-      captain: t('home.teams.menores1.captain'),
+      captain: t('home.teams.menores1.captain', 'David Rivas'),
       rosterCount: 6,
     },
   ];

@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
+import { i18n } from '../../i18n';
 import {
   Sparkles,
   Trophy,
@@ -222,6 +223,7 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
                     <button
                       key={l.code}
                       onClick={() => {
+                        i18n.changeLanguage(l.code);
                         setLanguage(l.code);
                         setLangDropdownOpen(false);
                       }}
@@ -319,7 +321,7 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
               {mobileLanguageOpen && (
                 <div className="mt-1 space-y-1 rounded-xl bg-slate-50 p-2 dark:bg-slate-900">
                   {SUPPORTED_LANGUAGES.map((item) => (
-                    <button key={item.code} type="button" onClick={() => { setLanguage(item.code); setMobileLanguageOpen(false); }} className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-xs font-semibold transition ${language === item.code ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300' : 'text-slate-700 hover:bg-white dark:text-slate-300 dark:hover:bg-slate-800'}`} aria-pressed={language === item.code}>
+                    <button key={item.code} type="button" onClick={() => { i18n.changeLanguage(item.code); setLanguage(item.code); setMobileLanguageOpen(false); }} className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-xs font-semibold transition ${language === item.code ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300' : 'text-slate-700 hover:bg-white dark:text-slate-300 dark:hover:bg-slate-800'}`} aria-pressed={language === item.code}>
                       <span className="flex items-center gap-2"><span>{item.flag}</span>{item.name}</span><span className="font-mono uppercase text-[10px] text-slate-400">{item.code}</span>
                     </button>
                   ))}

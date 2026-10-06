@@ -2,6 +2,7 @@ import React from 'react';
 import { ArrowRight, BookOpen, CreditCard, Globe, Home, Layers, Lock, Mail, Menu, Moon, Play, Sliders, Sparkles, Sun, X, Zap } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { SUPPORTED_LANGUAGES, SupportedLanguage } from '../../lib/i18n';
+import { i18n } from '../../i18n';
 import { OfficialFlag } from '../common/OfficialFlag';
 
 interface CorporateHeaderProps {
@@ -97,6 +98,7 @@ export function CorporateHeader({ onOpenDemo, onOpenAuth, onOpenRegister }: Corp
                     type="button"
                     key={item.code}
                     onClick={() => {
+                      i18n.changeLanguage(item.code);
                       setLanguage(item.code);
                       setLanguageMenuOpen(false);
                     }}
@@ -205,7 +207,7 @@ export function CorporateHeader({ onOpenDemo, onOpenAuth, onOpenRegister }: Corp
             })}
           </div>
           <div className="mt-4 grid gap-2 border-t border-slate-200 pt-4 dark:border-slate-800">
-            <button type="button" onClick={() => setLanguageMenuOpen((value) => !value)} className="flex items-center justify-between rounded-xl p-3 text-left text-sm font-bold text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-900" aria-expanded={languageMenuOpen}><span className="flex items-center gap-3"><Globe className="h-4 w-4 text-emerald-600" /><OfficialFlag code={language} /> {t('nav.language', 'Idioma')}: {SUPPORTED_LANGUAGES.find((item) => item.code === language)?.name ?? t('language.es', 'Español')}</span><span>⌄</span></button>{languageMenuOpen && <div className="grid grid-cols-2 gap-2 rounded-xl bg-slate-50 p-2 dark:bg-slate-900">{SUPPORTED_LANGUAGES.map((item) => <button type="button" key={item.code} onClick={() => { setLanguage(item.code); setLanguageMenuOpen(false); }} className={`rounded-lg px-2 py-2 text-left text-xs font-bold hover:bg-emerald-100 dark:hover:bg-slate-800 ${language === item.code ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300' : 'text-slate-800 dark:text-slate-200'}`}><OfficialFlag code={item.code} /> <span className="ml-1">{item.name}</span></button>)}</div>}
+            <button type="button" onClick={() => setLanguageMenuOpen((value) => !value)} className="flex items-center justify-between rounded-xl p-3 text-left text-sm font-bold text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-900" aria-expanded={languageMenuOpen}><span className="flex items-center gap-3"><Globe className="h-4 w-4 text-emerald-600" /><OfficialFlag code={language} /> {t('nav.language', 'Idioma')}: {SUPPORTED_LANGUAGES.find((item) => item.code === language)?.name ?? t('language.es', 'Español')}</span><span>⌄</span></button>{languageMenuOpen && <div className="grid grid-cols-2 gap-2 rounded-xl bg-slate-50 p-2 dark:bg-slate-900">{SUPPORTED_LANGUAGES.map((item) => <button type="button" key={item.code} onClick={() => { i18n.changeLanguage(item.code); setLanguage(item.code); setLanguageMenuOpen(false); }} className={`rounded-lg px-2 py-2 text-left text-xs font-bold hover:bg-emerald-100 dark:hover:bg-slate-800 ${language === item.code ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300' : 'text-slate-800 dark:text-slate-200'}`}><OfficialFlag code={item.code} /> <span className="ml-1">{item.name}</span></button>)}</div>}
             <button type="button" onClick={handleRegisterClick} className="rounded-xl bg-emerald-600 px-4 py-3 text-sm font-black text-white">{t('nav.register', 'Registrarse')} <ArrowRight className="ml-1 inline h-4 w-4" /></button>
             <button type="button" onClick={() => { close(); onOpenAuth?.(); }} className="rounded-xl border border-slate-300 px-4 py-3 text-sm font-bold text-slate-800 dark:text-slate-200 dark:border-slate-700 hover:border-emerald-500 hover:text-emerald-600 transition"><Lock className="mr-2 inline h-4 w-4 text-emerald-600" />{t('nav.userAccess', 'Acceso Usuarios / Socios')}</button>
           </div>

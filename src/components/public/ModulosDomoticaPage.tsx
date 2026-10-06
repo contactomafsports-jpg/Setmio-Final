@@ -41,7 +41,8 @@ const DOMOTICA_MODULES_META: DomoticaModuleMeta[] = [
 ];
 
 export function ModulosDomoticaPage({ onBack, onOpenDemo }: ModulosDomoticaPageProps) {
-  const { t } = useApp();
+  const { t, language } = useApp();
+  void language;
 
   // Estados interactivos para el simulador de hardware en vivo
   const [simCourtLight, setSimCourtLight] = useState<boolean>(true);

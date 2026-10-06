@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useApp, PublicPage } from '../../context/AppContext';
 import { SUPPORTED_LANGUAGES, SupportedLanguage } from '../../lib/i18n';
+import { i18n } from '../../i18n';
 import {
   Menu,
   X,
@@ -82,12 +83,12 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCart, onOpenAuth, onOpenDe
   const currentLangOption = SUPPORTED_LANGUAGES.find((l) => l.code === language) || SUPPORTED_LANGUAGES[0];
 
   const mainNavLinks: { id: PublicPage; label: string; icon: React.ReactNode }[] = [
-    { id: 'home', label: 'Inicio', icon: null },
-    { id: 'courts', label: 'Pistas', icon: <Sparkles className="w-4 h-4" /> },
-    { id: 'academy', label: 'Escuela', icon: <GraduationCap className="w-4 h-4" /> },
-    { id: 'tournaments', label: 'Torneos', icon: <Trophy className="w-4 h-4" /> },
-    { id: 'shop', label: 'Tienda', icon: <Store className="w-4 h-4" /> },
-    { id: 'contact', label: 'Contacto', icon: <MapPin className="w-4 h-4" /> },
+    { id: 'home', label: t('nav.home', 'Inicio'), icon: null },
+    { id: 'courts', label: t('nav.courts', 'Pistas'), icon: <Sparkles className="w-4 h-4" /> },
+    { id: 'academy', label: t('nav.academy', 'Escuela'), icon: <GraduationCap className="w-4 h-4" /> },
+    { id: 'tournaments', label: t('nav.tournaments', 'Torneos'), icon: <Trophy className="w-4 h-4" /> },
+    { id: 'shop', label: t('nav.shop', 'Tienda'), icon: <Store className="w-4 h-4" /> },
+    { id: 'contact', label: t('nav.contact', 'Contacto'), icon: <MapPin className="w-4 h-4" /> },
   ];
   const enabledPublicPages = currentTenant.publicPages ?? ['home', 'courts', 'academy', 'tournaments', 'shop', 'contact'];
   const visibleMainNavLinks = mainNavLinks.filter((link) => enabledPublicPages.includes(link.id));
@@ -179,6 +180,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCart, onOpenAuth, onOpenDe
                       <button
                         key={l.code}
                         onClick={() => {
+                          i18n.changeLanguage(l.code);
                           setLanguage(l.code);
                           setLangDropdownOpen(false);
                         }}
@@ -339,10 +341,10 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCart, onOpenAuth, onOpenDe
               <nav aria-label="Navegación del club" className="space-y-1">
                 <div className="px-2 text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Club</div>
                 {[
-                  { id: 'booking' as PublicPage, label: 'Reservar Pista' },
-                  { id: 'matches' as PublicPage, label: 'Partidos Abiertos' },
-                  { id: 'academy' as PublicPage, label: 'Escuela' },
-                  { id: 'tournaments' as PublicPage, label: 'Competición' },
+                  { id: 'booking' as PublicPage, label: t('nav.bookCourt', 'Reservar Pista') },
+                  { id: 'matches' as PublicPage, label: t('nav.matches', 'Partidos Abiertos') },
+                  { id: 'academy' as PublicPage, label: t('nav.academy', 'Escuela') },
+                  { id: 'tournaments' as PublicPage, label: t('nav.tournaments', 'Competición') },
                 ].map((link) => (
                   <button
                     key={link.id}
@@ -358,7 +360,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCart, onOpenAuth, onOpenDe
                   className="w-full flex items-center justify-center gap-2 rounded-xl bg-slate-900 px-3 py-2.5 text-sm font-bold text-white hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-200 transition active:scale-[0.98]"
                 >
                   <User className="w-4 h-4" />
-                  Registro / Acceso
+                  {t('nav.register', 'Registro / Acceso')}
                 </button>
               </nav>
 
@@ -372,9 +374,9 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCart, onOpenAuth, onOpenDe
                     <Calendar className="w-4 h-4 text-white" />
                   </div>
                   <div className="text-left">
-                    <div className="text-sm font-extrabold">Reservar Pista</div>
+                    <div className="text-sm font-extrabold">{t('nav.bookCourt', 'Reservar Pista')}</div>
                     <div className="text-[10px] text-emerald-100 font-normal">
-                      8 pistas · Disponibilidad inmediata
+                      {t('home.hero.courtSpecs', '8 pistas · Disponibilidad inmediata')}
                     </div>
                   </div>
                 </div>
@@ -384,12 +386,12 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCart, onOpenAuth, onOpenDe
               {/* Category 1: Instalaciones & Padel */}
               <div className="space-y-1">
                 <div className="px-2 text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">
-                  Instalaciones & Club
+                  {t('nav.facilitiesClub', 'Instalaciones & Club')}
                 </div>
                 {[
-                  { id: 'home', label: 'Inicio', desc: 'Resumen y bienvenida al club' },
-                  { id: 'club', label: 'El Club', desc: 'Historia, servicios e instalaciones' },
-                  { id: 'courts', label: 'Pistas & Tarifas', desc: '8 pistas WPT panorámicas' },
+                  { id: 'home', label: t('nav.home', 'Inicio'), desc: t('nav.descHome', 'Resumen y bienvenida al club') },
+                  { id: 'club', label: t('nav.club', 'El Club'), desc: t('nav.descClub', 'Historia, servicios e instalaciones') },
+                  { id: 'courts', label: t('nav.courts', 'Pistas & Tarifas'), desc: t('nav.descCourts', '8 pistas WPT panorámicas') },
                 ].map((item) => {
                   const isActive = publicPage === item.id;
                   return (
@@ -415,12 +417,12 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCart, onOpenAuth, onOpenDe
               {/* Category 2: Partidos & Formación */}
               <div className="space-y-1">
                 <div className="px-2 text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">
-                  Comunidad & Competición
+                  {t('nav.communityComp', 'Comunidad & Competición')}
                 </div>
                 {[
-                  { id: 'matches', label: 'Partidos Abiertos "Play!"', desc: 'Únete por nivel o crea tu partida' },
-                  { id: 'academy', label: 'Escuela de Pádel', desc: 'Entrenadores FEP, grupos y particulares' },
-                  { id: 'tournaments', label: 'Torneos & Ligas', desc: 'Cuadros, brackets e inscripciones' },
+                  { id: 'matches', label: t('nav.matches', 'Partidos Abiertos "Play!"'), desc: t('nav.descMatches', 'Únete por nivel o crea tu partida') },
+                  { id: 'academy', label: t('nav.academy', 'Escuela de Pádel'), desc: t('nav.descAcademy', 'Entrenadores FEP, grupos y particulares') },
+                  { id: 'tournaments', label: t('nav.tournaments', 'Torneos & Ligas'), desc: t('nav.descTournaments', 'Cuadros, brackets e inscripciones') },
                 ].map((item) => {
                   const isActive = publicPage === item.id;
                   return (
@@ -446,13 +448,13 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCart, onOpenAuth, onOpenDe
               {/* Category 3: Tienda & Más */}
               <div className="space-y-1">
                 <div className="px-2 text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">
-                  Servicios Oficiales
+                  {t('nav.officialServices', 'Servicios Oficiales')}
                 </div>
                 {[
-                  { id: 'shop', label: 'Pro Shop Oficial', desc: 'Palas con test en pista, calzado y textil', count: cartItemsCount },
-                  { id: 'blog', label: 'Blog & Consejos', desc: 'Técnica, táctica y torneos' },
-                  { id: 'demo', label: 'Ver Demo', desc: 'Conoce la experiencia Setmio' },
-                  { id: 'contact', label: 'Contacto & Ubicación', desc: 'Horarios, teléfono y WhatsApp' },
+                  { id: 'shop', label: t('nav.shop', 'Pro Shop Oficial'), desc: t('nav.descShop', 'Palas con test en pista, calzado y textil'), count: cartItemsCount },
+                  { id: 'blog', label: t('nav.blog', 'Blog & Consejos'), desc: t('nav.descBlog', 'Técnica, táctica y torneos') },
+                  { id: 'demo', label: t('nav.demo', 'Ver Demo'), desc: t('nav.descDemo', 'Conoce la experiencia Setmio') },
+                  { id: 'contact', label: t('nav.contact', 'Contacto & Ubicación'), desc: t('nav.descContact', 'Horarios, teléfono y WhatsApp') },
                 ].map((item) => {
                   const isActive = publicPage === item.id;
                   return (
@@ -496,7 +498,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCart, onOpenAuth, onOpenDe
                   }`}
                 >
                   <Sun className="w-3.5 h-3.5 text-amber-500" />
-                  <span>Modo Claro</span>
+                  <span>{t('nav.themeLight', 'Modo Claro')}</span>
                 </button>
                 <button
                   onClick={() => setTheme('dark')}
@@ -507,7 +509,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCart, onOpenAuth, onOpenDe
                   }`}
                 >
                   <Moon className="w-3.5 h-3.5 text-cyan-400" />
-                  <span>Modo Oscuro</span>
+                  <span>{t('nav.themeDark', 'Modo Oscuro')}</span>
                 </button>
               </div>
 
@@ -522,7 +524,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCart, onOpenAuth, onOpenDe
                 className="w-full py-2.5 px-3 rounded-xl bg-slate-900 dark:bg-slate-800 text-white font-bold text-xs flex items-center justify-center gap-2 border border-slate-700 hover:border-emerald-500 shadow-xs active:scale-95"
               >
                 <Building2 className="w-4 h-4 text-emerald-400" />
-                <span>Volver a App Admin</span>
+                <span>{t('nav.adminApp', 'Volver a App Admin')}</span>
               </button>
 
               {/* Commercial Actions: Registrarse vs Contratar Club */}
@@ -536,7 +538,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCart, onOpenAuth, onOpenDe
                     className="py-2.5 px-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-xs font-bold text-slate-800 dark:text-slate-100 flex items-center justify-center gap-1.5 shadow-sm"
                   >
                     <User className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-                    <span>Registrarse / Cuenta</span>
+                    <span>{t('nav.register', 'Registrarse / Cuenta')}</span>
                   </button>
 
                   <button
@@ -547,7 +549,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCart, onOpenAuth, onOpenDe
                     className="py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-sm"
                   >
                     <Building2 className="w-3.5 h-3.5" />
-                    <span>Activar Club / Pro</span>
+                    <span>{t('nav.activateClub', 'Activar Club / Pro')}</span>
                   </button>
                 </div>
 
@@ -560,7 +562,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCart, onOpenAuth, onOpenDe
                   className="w-full py-2.5 px-3 rounded-xl bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800 text-xs font-bold text-rose-700 dark:text-rose-300 flex items-center justify-center gap-1.5 transition"
                 >
                   <LogOut className="w-4 h-4 text-rose-600 dark:text-rose-400" />
-                  <span>Cerrar Sesión / Salir Demo</span>
+                  <span>{t('nav.logoutOrDemo', 'Cerrar Sesión / Salir Demo')}</span>
                 </button>
               </div>
 

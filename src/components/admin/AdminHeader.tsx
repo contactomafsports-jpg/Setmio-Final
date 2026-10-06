@@ -15,6 +15,7 @@ import {
   Globe,
 } from 'lucide-react';
 import { SUPPORTED_LANGUAGES } from '../../lib/i18n';
+import { i18n } from '../../i18n';
 import { OfficialFlag } from '../common/OfficialFlag';
 
 interface AdminHeaderProps {
@@ -161,6 +162,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
                   <button
                     key={langOpt.code}
                     onClick={() => {
+                      i18n.changeLanguage(langOpt.code);
                       setLanguage(langOpt.code);
                       setLangDropdownOpen(false);
                     }}

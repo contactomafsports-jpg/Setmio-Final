@@ -11,7 +11,8 @@ interface PricingViewProps {
 
 export const PricingView: React.FC<PricingViewProps> = ({ onBack, onOpenDemo, onOpenRegister }) => {
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('monthly');
-  const { t } = useApp();
+  const { t, language } = useApp();
+  void language;
 
   const pricingTierConfigs = [
     {

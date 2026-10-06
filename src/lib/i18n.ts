@@ -3004,8 +3004,9 @@ export const TRANSLATIONS: Record<SupportedLanguage, Record<string, string>> = {
 };
 
 import { ALL_EXTRA_TRANSLATIONS } from './translations';
+import { LOCALES } from '../locales';
 
-// Augment TRANSLATIONS with all 10 language dictionaries
+// Augment TRANSLATIONS with all language dictionaries
 for (const [lang, dict] of Object.entries(ALL_EXTRA_TRANSLATIONS)) {
   if (TRANSLATIONS[lang as SupportedLanguage]) {
     TRANSLATIONS[lang as SupportedLanguage] = {
@@ -3013,19 +3014,6 @@ for (const [lang, dict] of Object.entries(ALL_EXTRA_TRANSLATIONS)) {
       ...dict,
     };
   }
-}
-
-/** English is the only fallback for every supported language. */
-export const fallbackLng: SupportedLanguage[] = ['en'];
-
-// Keep every public key available in every dictionary. A missing localized value
-// therefore resolves to English instead of leaking a Spanish source string.
-const englishDictionary = TRANSLATIONS.en;
-for (const language of SUPPORTED_LANGUAGES) {
-  TRANSLATIONS[language.code] = {
-    ...englishDictionary,
-    ...TRANSLATIONS[language.code],
-  };
 }
 
 // Some dictionaries contain untranslated Spanish copies. Multi-word strings identical
@@ -3041,6 +3029,19 @@ for (const lang of Object.keys(TRANSLATIONS) as SupportedLanguage[]) {
     }
   }
 }
+
+// Ensure 100% complete coverage across all 11 supported languages from canonical LOCALES
+for (const [lang, dict] of Object.entries(LOCALES)) {
+  if (TRANSLATIONS[lang as SupportedLanguage]) {
+    TRANSLATIONS[lang as SupportedLanguage] = {
+      ...TRANSLATIONS[lang as SupportedLanguage],
+      ...dict,
+    };
+  }
+}
+
+/** English is the primary fallback for supported languages. */
+export const fallbackLng: SupportedLanguage[] = ['en'];
 
 export function getTranslation(lang: SupportedLanguage, key: string, fallback?: string): string {
   if (lang === 'es') {

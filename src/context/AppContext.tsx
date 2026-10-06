@@ -36,6 +36,8 @@ import {
   INITIAL_PAGE_BLOCKS,
 } from '../data/initialData';
 import { fallbackLng, SupportedLanguage, TRANSLATIONS } from '../lib/i18n';
+import { i18n } from '../i18n';
+import { LOCALES } from '../locales';
 import { checkPermission, PermissionAction, PermissionCheckResult } from '../lib/permissions';
 
 export type MainView = 'public' | 'admin' | 'player' | 'coach' | 'hq';
@@ -383,6 +385,7 @@ interface AppContextType {
   currentLanguage: SupportedLanguage;
   setLanguage: (lang: SupportedLanguage) => void;
   t: (key: string, fallback?: string) => string;
+  i18n: typeof i18n;
 
   // Search & Onboarding modals
   searchModalOpen: boolean;
@@ -705,36 +708,93 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     });
   }, []);
 
-  // Language state (default 'es' per requirement 40)
+  // Language state synchronized with i18n
+  const normalizeSupportedLanguage = (code?: string | null): SupportedLanguage | null => {
+    if (!code) return null;
+    const clean = code.split('-')[0].trim().toLowerCase() as SupportedLanguage;
+    const valid: SupportedLanguage[] = ['es', 'en', 'gl', 'ca', 'va', 'eu', 'ar', 'pt', 'fr', 'de', 'it'];
+    return valid.includes(clean) ? clean : null;
+  };
+
   const [language, setLanguageState] = useState<SupportedLanguage>(() => {
     try {
-      const saved = localStorage.getItem('setmio_lang') as SupportedLanguage;
-      return saved || 'es';
-    } catch {
-      return 'es';
-    }
-  });
-
-  const setLanguage = useCallback((lang: SupportedLanguage) => {
-    setLanguageState(lang);
-    try {
-      localStorage.setItem('setmio_lang', lang);
+      const saved = normalizeSupportedLanguage(localStorage.getItem('setmio_lang'));
+      if (saved) return saved;
     } catch {
       // Ignore
     }
+    if (i18n) {
+      const i18nLang = normalizeSupportedLanguage(i18n.resolvedLanguage || i18n.language);
+      if (i18nLang) return i18nLang;
+    }
+    if (typeof navigator !== 'undefined') {
+      const navLang = normalizeSupportedLanguage(navigator.language);
+      if (navLang) return navLang;
+    }
+    return 'es';
+  });
+
+  const setLanguage = useCallback((lang: SupportedLanguage | string) => {
+    const valid = normalizeSupportedLanguage(lang) || 'es';
+    setLanguageState(valid);
+    try {
+      localStorage.setItem('setmio_lang', valid);
+    } catch {
+      // Ignore
+    }
+    if (i18n && typeof i18n.changeLanguage === 'function' && i18n.language !== valid) {
+      i18n.changeLanguage(valid);
+    }
   }, []);
+
+  // Listen to external i18n language changes (e.g. i18n.changeLanguage or useTranslation)
+  useEffect(() => {
+    if (!i18n || typeof i18n.on !== 'function') return;
+    const handleLanguageChanged = (newLng: string) => {
+      const norm = normalizeSupportedLanguage(newLng);
+      if (norm && norm !== language) {
+        setLanguageState(norm);
+        try {
+          localStorage.setItem('setmio_lang', norm);
+        } catch {
+          // Ignore
+        }
+      }
+    };
+    i18n.on('languageChanged', handleLanguageChanged);
+    return () => {
+      i18n.off('languageChanged', handleLanguageChanged);
+    };
+  }, [language]);
 
   useEffect(() => {
     document.documentElement.lang = language;
     document.documentElement.dir = language === 'ar' ? 'rtl' : 'ltr';
+    if (i18n && typeof i18n.changeLanguage === 'function' && i18n.language !== language) {
+      i18n.changeLanguage(language);
+    }
   }, [language]);
 
   const t = useCallback((key: string, fallback?: string): string => {
+    // 1. Check canonical LOCALES dictionary for current language
+    const localVal = LOCALES[language as keyof typeof LOCALES]?.[key];
+    if (localVal) return localVal;
+
+    // 2. Check react-i18next instance
+    if (i18n && i18n.isInitialized) {
+      const i18nVal = i18n.t(key, { lng: language, defaultValue: '' });
+      if (i18nVal && i18nVal !== key) {
+        return i18nVal;
+      }
+    }
+
+    // 3. Check legacy TRANSLATIONS dictionary
     const localizedValue = TRANSLATIONS[language]?.[key];
     if (localizedValue) return localizedValue;
 
+    // 4. Fallback to English
     for (const fallbackLanguage of fallbackLng) {
-      const fallbackValue = TRANSLATIONS[fallbackLanguage]?.[key];
+      const fallbackValue = LOCALES[fallbackLanguage as keyof typeof LOCALES]?.[key] || TRANSLATIONS[fallbackLanguage]?.[key];
       if (fallbackValue) return fallbackValue;
     }
 
@@ -1734,6 +1794,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         currentLanguage: language,
         setLanguage,
         t,
+        i18n,
 
         searchModalOpen,
         setSearchModalOpen,
