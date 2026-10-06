@@ -458,15 +458,15 @@ export function SolucionesPage({
               <ul className="space-y-2.5 text-xs text-slate-700 dark:text-slate-300 border-t border-slate-200/80 dark:border-slate-800 pt-4">
                 <li className="flex items-start gap-2">
                   <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
-                  <span>{t('home.pro.clubsF1', 'Cuadrante táctil de pistas con encendido domótico de iluminación LED')}</span>
+                  <span>{t('solutions.clubs.f1', 'Cuadrante táctil de pistas con encendido domótico de iluminación LED')}</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
-                  <span>{t('home.pro.clubsF2', 'Split payments (cobro de 1/4 por jugador vía Bizum y tarjeta)')}</span>
+                  <span>{t('solutions.clubs.f2', 'Split payments (cobro de 1/4 por jugador vía Bizum y tarjeta)')}</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
-                  <span>{t('home.pro.clubsF3', 'TPV Bar / Cafetería, arqueos de caja y tienda pro-shop con palas de test')}</span>
+                  <span>{t('solutions.clubs.f3', 'TPV Bar / Cafetería, arqueos de caja y tienda pro-shop con palas de test')}</span>
                 </li>
               </ul>
             </div>
@@ -510,15 +510,15 @@ export function SolucionesPage({
               <ul className="space-y-2.5 text-xs text-slate-700 dark:text-slate-300 border-t border-slate-200/80 dark:border-slate-800 pt-4">
                 <li className="flex items-start gap-2">
                   <Check className="w-4 h-4 text-teal-500 shrink-0 mt-0.5" />
-                  <span>{t('home.pro.schoolsF1', 'Gestión de grupos por nivel decimal (1.0 a 7.0) y calendarios docentes')}</span>
+                  <span>{t('solutions.schools.f1', 'Gestión de grupos por nivel decimal (1.0 a 7.0) y calendarios docentes')}</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <Check className="w-4 h-4 text-teal-500 shrink-0 mt-0.5" />
-                  <span>{t('home.pro.schoolsF2', 'Control de asistencia en pista desde tablet o smartphone con pase de lista')}</span>
+                  <span>{t('solutions.schools.f2', 'Control de asistencia en pista desde tablet o smartphone con pase de lista')}</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <Check className="w-4 h-4 text-teal-500 shrink-0 mt-0.5" />
-                  <span>{t('home.pro.schoolsF3', 'Cobros recurrentes mensuales domiciliados por tarjeta y recibo bancario SEPA')}</span>
+                  <span>{t('solutions.schools.f3', 'Cobros recurrentes mensuales domiciliados por tarjeta y recibo bancario SEPA')}</span>
                 </li>
               </ul>
             </div>
@@ -562,15 +562,15 @@ export function SolucionesPage({
               <ul className="space-y-2.5 text-xs text-slate-700 dark:text-slate-300 border-t border-slate-200/80 dark:border-slate-800 pt-4">
                 <li className="flex items-start gap-2">
                   <Check className="w-4 h-4 text-cyan-500 shrink-0 mt-0.5" />
-                  <span>{t('home.pro.playersF1', 'Portal oficial bajo tu propio dominio (ej. tunombre.com) de alta gama')}</span>
+                  <span>{t('solutions.pro.f1', 'Portal oficial bajo tu propio dominio (ej. tunombre.com) de alta gama')}</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <Check className="w-4 h-4 text-cyan-500 shrink-0 mt-0.5" />
-                  <span>{t('home.pro.playersF2', 'Media kit digital para marcas, sponsors técnicos y contratos de patrocinio')}</span>
+                  <span>{t('solutions.pro.f2', 'Media kit digital para marcas, sponsors técnicos y contratos de patrocinio')}</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <Check className="w-4 h-4 text-cyan-500 shrink-0 mt-0.5" />
-                  <span>{t('home.pro.playersF3', 'Venta y reserva directa de clinics, exhibiciones privadas y masterclasses VIP')}</span>
+                  <span>{t('solutions.pro.f3', 'Venta y reserva directa de clinics, exhibiciones privadas y masterclasses VIP')}</span>
                 </li>
               </ul>
             </div>

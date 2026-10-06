@@ -120,7 +120,7 @@ export function CorporateHeader({ onOpenDemo, onOpenAuth, onOpenRegister }: Corp
             type="button"
             onClick={toggleCorporateTheme}
             className="rounded-xl p-2 text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800 cursor-pointer"
-            aria-label={corporateTheme === 'dark' ? 'Activar modo claro' : 'Activar modo oscuro'}
+            aria-label={corporateTheme === 'dark' ? t('nav.themeLight') : t('nav.themeDark')}
           >
             {corporateTheme === 'dark' ? <Sun className="h-5 w-5 text-amber-400" /> : <Moon className="h-5 w-5" />}
           </button>
@@ -129,8 +129,8 @@ export function CorporateHeader({ onOpenDemo, onOpenAuth, onOpenRegister }: Corp
             type="button"
             onClick={onOpenAuth}
             className="rounded-xl p-2 text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800 cursor-pointer"
-            aria-label="Acceso Usuarios / Socios"
-            title="Acceso Usuarios / Socios"
+            aria-label={t('nav.userAccess', 'Acceso Usuarios / Socios')}
+            title={t('nav.userAccess', 'Acceso Usuarios / Socios')}
           >
             <Lock className="h-5 w-5" />
           </button>
@@ -139,7 +139,7 @@ export function CorporateHeader({ onOpenDemo, onOpenAuth, onOpenRegister }: Corp
             type="button"
             onClick={() => setOpen((value) => !value)}
             className="rounded-xl p-2 text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800 cursor-pointer lg:hidden"
-            aria-label={open ? 'Cerrar menú' : 'Abrir menú'}
+            aria-label={open ? t('nav.closeMenu') : t('nav.openMenu')}
             aria-expanded={open}
           >
             {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -147,7 +147,7 @@ export function CorporateHeader({ onOpenDemo, onOpenAuth, onOpenRegister }: Corp
         </div>
 
         {/* Desktop Navigation Links */}
-        <nav className="hidden items-center gap-3 xl:gap-4 text-xs font-bold lg:flex text-slate-700 dark:text-slate-300" aria-label="Navegación corporativa">
+        <nav className="hidden items-center gap-3 xl:gap-4 text-xs font-bold lg:flex text-slate-700 dark:text-slate-300" aria-label={t('nav.mainNav', 'Navegación principal')}>
           <a href="/" onClick={(event) => navigate(event, '/')} className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
             {t('nav.home', 'Inicio')}
           </a>
@@ -187,7 +187,7 @@ export function CorporateHeader({ onOpenDemo, onOpenAuth, onOpenRegister }: Corp
         </nav>
       </div>
       {open && <div className="fixed inset-0 top-16 overscroll-none bg-slate-950/40" onClick={close}>
-        <nav className="max-h-[calc(100dvh-4rem)] overflow-y-auto overscroll-contain bg-white p-5 shadow-2xl dark:bg-slate-950 text-slate-900 dark:text-slate-100" onClick={(event) => event.stopPropagation()} aria-label="Menú corporativo móvil">
+        <nav className="max-h-[calc(100dvh-4rem)] overflow-y-auto overscroll-contain bg-white p-5 shadow-2xl dark:bg-slate-950 text-slate-900 dark:text-slate-100" onClick={(event) => event.stopPropagation()} aria-label={t('nav.mobileMenu', 'Menú móvil')}>
           <div className="grid gap-1 text-sm font-bold">
             {menuItems.map(([Icon, key, label, href]) => {
               if (key === 'nav.demo') {
