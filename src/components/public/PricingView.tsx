@@ -16,76 +16,76 @@ export const PricingView: React.FC<PricingViewProps> = ({ onBack, onOpenDemo, on
   const pricingTiers = [
     {
       id: 'coach',
-      badge: 'Entrenadores & Academias',
-      name: 'Plan Coach',
+      badge: t('pricing.tiers.coach.badge', 'Entrenadores & Academias'),
+      name: t('pricing.tiers.coach.name', 'Plan Coach'),
       priceMonthly: 39,
       priceYearly: 32,
-      description: 'Para entrenadores individuales, preparadores físicos y pequeñas escuelas sin instalaciones propias.',
+      description: t('pricing.tiers.coach.desc', 'Para entrenadores individuales, preparadores físicos y pequeñas escuelas sin instalaciones propias.'),
       features: [
-        'Hasta 40 alumnos activos simultáneos',
-        'Cobro recurrente mensual de cuotas',
-        'Cuadrante táctil de clases particulares',
-        'Ficha técnica y seguimiento de nivel de juego',
-        'Portal web propio del profesor',
+        t('pricing.tiers.coach.f1', 'Hasta 40 alumnos activos simultáneos'),
+        t('pricing.tiers.coach.f2', 'Cobro recurrente mensual de cuotas'),
+        t('pricing.tiers.coach.f3', 'Cuadrante táctil de clases particulares'),
+        t('pricing.tiers.coach.f4', 'Ficha técnica y seguimiento de nivel de juego'),
+        t('pricing.tiers.coach.f5', 'Portal web propio del profesor'),
       ],
       featured: false,
-      ctaText: 'Elegir Plan Coach',
+      ctaText: t('pricing.tiers.coach.cta', 'Elegir Plan Coach'),
     },
     {
       id: 'club_base',
-      badge: 'Más Demandado',
+      badge: t('pricing.tiers.club_base.badge', 'Más Demandado'),
       badgeHighlight: true,
-      name: 'Plan Club Base',
+      name: t('pricing.tiers.club_base.name', 'Plan Club Base'),
       priceMonthly: 79,
       priceYearly: 65,
-      description: 'Ideal para clubes de pádel de hasta 4 pistas que desean informatizar sus reservas y automatizar cobros.',
+      description: t('pricing.tiers.club_base.desc', 'Ideal para clubes de pádel de hasta 4 pistas que desean informatizar sus reservas y automatizar cobros.'),
       features: [
-        'Hasta 4 pistas de pádel',
-        'Reservas online ilimitadas sin comisiones',
-        'Web y App móvil de marca blanca',
-        'Split Payments (1/4 por jugador)',
-        'Control básico de socios e ingresos',
-        'Soporte técnico prioritario por WhatsApp',
+        t('pricing.tiers.club_base.f1', 'Hasta 4 pistas de pádel'),
+        t('pricing.tiers.club_base.f2', 'Reservas online ilimitadas sin comisiones'),
+        t('pricing.tiers.club_base.f3', 'Web y App móvil de marca blanca'),
+        t('pricing.tiers.club_base.f4', 'Split Payments (1/4 por jugador)'),
+        t('pricing.tiers.club_base.f5', 'Control básico de socios e ingresos'),
+        t('pricing.tiers.club_base.f6', 'Soporte técnico prioritario por WhatsApp'),
       ],
       featured: true,
-      ctaText: 'Empezar con Club Base',
+      ctaText: t('pricing.tiers.club_base.cta', 'Empezar con Club Base'),
     },
     {
       id: 'club_pro',
-      badge: 'Clubes en Crecimiento',
-      name: 'Plan Club Pro',
+      badge: t('pricing.tiers.club_pro.badge', 'Clubes en Crecimiento'),
+      name: t('pricing.tiers.club_pro.name', 'Plan Club Pro'),
       priceMonthly: 149,
       priceYearly: 119,
-      description: 'Para clubes completos con escuela, torneos oficiales, bar cafetería y automatización domótica de pistas.',
+      description: t('pricing.tiers.club_pro.desc', 'Para clubes completos con escuela, torneos oficiales, bar cafetería y automatización domótica de pistas.'),
       features: [
-        'Pistas ilimitadas',
-        'Módulo completo de Escuela y Academias',
-        'Domótica IoT (Encendido automático de luces LED)',
-        'Apertura de pistas por PIN y Código QR',
-        'TPV Táctil de Bar, Cafetería y Tienda',
-        'Gestor de Torneos, Ligas y Rankings FEP',
-        'Copiloto IA 24/7 en WhatsApp oficial',
+        t('pricing.tiers.club_pro.f1', 'Pistas ilimitadas'),
+        t('pricing.tiers.club_pro.f2', 'Módulo completo de Escuela y Academias'),
+        t('pricing.tiers.club_pro.f3', 'Domótica IoT (Encendido automático de luces LED)'),
+        t('pricing.tiers.club_pro.f4', 'Apertura de pistas por PIN y Código QR'),
+        t('pricing.tiers.club_pro.f5', 'TPV Táctil de Bar, Cafetería y Tienda'),
+        t('pricing.tiers.club_pro.f6', 'Gestor de Torneos, Ligas y Rankings FEP'),
+        t('pricing.tiers.club_pro.f7', 'Copiloto IA 24/7 en WhatsApp oficial'),
       ],
       featured: false,
-      ctaText: 'Elegir Plan Pro',
+      ctaText: t('pricing.tiers.club_pro.cta', 'Elegir Plan Pro'),
     },
     {
       id: 'enterprise',
-      badge: 'Cadenas & Franquicias',
-      name: 'Plan Enterprise',
+      badge: t('pricing.tiers.enterprise.badge', 'Cadenas & Franquicias'),
+      name: t('pricing.tiers.enterprise.name', 'Plan Enterprise'),
       priceMonthly: null,
       priceYearly: null,
-      description: 'Solución a medida para grandes complejos deportivos, cadenas multi-club y federaciones de pádel.',
+      description: t('pricing.tiers.enterprise.desc', 'Solución a medida para grandes complejos deportivos, cadenas multi-club y federaciones de pádel.'),
       features: [
-        'Gestión multi-sede centralizada',
-        'Dominio propio personalizado (tuclub.com)',
-        'Integración API con tornos y cerraduras industriales',
-        'Facturación electrónica y remesas SEPA bancarias',
-        'Gestor de cuenta y onboarding presencial dedicado',
-        'SLA garantizado del 99.9% de disponibilidad',
+        t('pricing.tiers.enterprise.f1', 'Gestión multi-sede centralizada'),
+        t('pricing.tiers.enterprise.f2', 'Dominio propio personalizado (tuclub.com)'),
+        t('pricing.tiers.enterprise.f3', 'Integración API con tornos y cerraduras industriales'),
+        t('pricing.tiers.enterprise.f4', 'Facturación electrónica y remesas SEPA bancarias'),
+        t('pricing.tiers.enterprise.f5', 'Gestor de cuenta y onboarding presencial dedicado'),
+        t('pricing.tiers.enterprise.f6', 'SLA garantizado del 99.9% de disponibilidad'),
       ],
       featured: false,
-      ctaText: 'Contactar con Setmio',
+      ctaText: t('pricing.tiers.enterprise.cta', 'Contactar con Setmio'),
     },
   ];
 
@@ -110,15 +110,15 @@ export const PricingView: React.FC<PricingViewProps> = ({ onBack, onOpenDemo, on
           <div className="max-w-3xl mx-auto space-y-4 text-center flex flex-col items-center justify-center">
             <div className="inline-flex items-center justify-center gap-2 px-3.5 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs font-black uppercase tracking-widest border border-emerald-500/20 text-center">
               <Sparkles className="w-3.5 h-3.5" />
-              <span>Tarifas Transparentes · Sin Comisiones Ocultas</span>
+              <span>{t('pricing.heroBadge', 'Tarifas Transparentes · Sin Comisiones Ocultas')}</span>
             </div>
 
             <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-slate-900 dark:text-white leading-tight text-center">
-              Planes adaptados a la dimensión real de tu club
+              {t('pricing.heroTitle', 'Planes adaptados a la dimensión real de tu club')}
             </h1>
 
-            <p className="text-base sm:text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto leading-relaxed text-center">
-              Todos los planes incluyen actualizaciones gratuitas, soporte telefónico, web pública y app móvil de marca blanca sin intermediarios.
+            <p className="text-base sm:text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto leading-relaxed text-center font-normal">
+              {t('pricing.heroSubtitle', 'Sin permanencia, sin comisiones por pista reservada y con soporte técnico telefónico los 365 días del año. Elige el plan que mejor se ajuste a tu volumen de pistas.')}
             </p>
 
             {/* Selector de Periodo de Facturación Estrictamente Centrado */}
@@ -128,14 +128,14 @@ export const PricingView: React.FC<PricingViewProps> = ({ onBack, onOpenDemo, on
                   billingCycle === 'monthly' ? 'text-slate-900 dark:text-white font-black' : 'text-slate-500 dark:text-slate-400'
                 }`}
               >
-                Facturación Mensual
+                {t('pricing.cycleMonthly', 'Facturación Mensual')}
               </span>
 
               <button
                 type="button"
                 onClick={() => setBillingCycle(billingCycle === 'monthly' ? 'yearly' : 'monthly')}
                 className="relative w-14 h-7 rounded-full bg-emerald-600 transition p-0.5 cursor-pointer shadow-inner focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
-                aria-label="Alternar facturación mensual y anual"
+                aria-label={t('pricing.toggleCycle', 'Alternar facturación mensual y anual')}
               >
                 <span
                   className={`block w-6 h-6 rounded-full bg-white transition-transform duration-200 shadow-md ${
@@ -149,9 +149,9 @@ export const PricingView: React.FC<PricingViewProps> = ({ onBack, onOpenDemo, on
                   billingCycle === 'yearly' ? 'text-slate-900 dark:text-white font-black' : 'text-slate-500 dark:text-slate-400'
                 }`}
               >
-                <span>Facturación Anual</span>
+                <span>{t('pricing.cycleYearly', 'Facturación Anual')}</span>
                 <span className="px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 font-black text-[10px] tracking-wide border border-emerald-500/30">
-                  Ahorra 2 meses (20%)
+                  {t('pricing.cycleYearlyDiscount', 'Ahorra 2 meses (20%)')}
                 </span>
               </span>
             </div>
@@ -195,7 +195,7 @@ export const PricingView: React.FC<PricingViewProps> = ({ onBack, onOpenDemo, on
                   <div className="flex items-baseline justify-center gap-1 border-b border-slate-100 dark:border-slate-800/80 pb-4 w-full text-center">
                     {price === null ? (
                       <span className="text-3xl font-black text-slate-900 dark:text-white tracking-tight text-center">
-                        A medida
+                        {t('pricing.customPrice', 'A medida')}
                       </span>
                     ) : (
                       <>
@@ -203,7 +203,7 @@ export const PricingView: React.FC<PricingViewProps> = ({ onBack, onOpenDemo, on
                           {price}€
                         </span>
                         <span className="text-xs text-slate-500 dark:text-slate-400 font-semibold text-center">
-                          /mes
+                          {t('pricing.perMonth', '/mes')}
                         </span>
                       </>
                     )}
@@ -257,11 +257,11 @@ export const PricingView: React.FC<PricingViewProps> = ({ onBack, onOpenDemo, on
           </div>
 
           <h3 className="text-xl font-black text-slate-900 dark:text-white text-center w-full">
-            Garantía Setmio: 30 Días de Prueba Sin Compromiso
+            {t('home.prefooter.badge', 'Garantía Setmio: 30 Días de Prueba Sin Compromiso')}
           </h3>
 
           <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed text-center w-full max-w-xl mx-auto">
-            Configuramos tu club, importamos tu base de socios y te formamos a ti y a tu equipo de recepción de forma completamente gratuita. Sin contratos de permanencia ni costes de alta ocultos.
+            {t('home.prefooter.subtitle', 'Configuramos tu club, importamos tu base de socios y te formamos a ti y a tu equipo de recepción de forma completamente gratuita. Sin contratos de permanencia ni costes de alta ocultos.')}
           </p>
 
           <div className="pt-2 flex justify-center text-center">
@@ -270,7 +270,7 @@ export const PricingView: React.FC<PricingViewProps> = ({ onBack, onOpenDemo, on
               onClick={handleAction}
               className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition cursor-pointer shadow-md text-center active:scale-95"
             >
-              <span>Solicitar Demo o Alta Directa</span>
+              <span>{t('home.corporate.demoBtn', 'Solicitar Demo o Alta Directa')}</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>

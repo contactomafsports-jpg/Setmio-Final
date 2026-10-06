@@ -168,18 +168,18 @@ export function ModulosDomoticaPage({ onBack, onOpenDemo }: ModulosDomoticaPageP
           <div className="relative z-10 max-w-3xl space-y-6 text-left">
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 font-bold text-xs uppercase tracking-wider border border-emerald-500/30">
               <Zap className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-              <span>Domótica & Pistas Autónomas Setmio IoT</span>
+              <span>{t('domotica.eyebrow', 'Domótica & Pistas Autónomas Setmio IoT')}</span>
             </div>
 
             <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-slate-900 dark:text-white leading-tight">
-              Pistas de pádel autónomas. <br />
+              {t('domotica.title', 'Pistas de pádel autónomas.')} <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 dark:from-emerald-400 dark:via-teal-300 dark:to-cyan-400">
-                Abre las 24 horas sin costes de recepción.
+                {t('domotica.titleHighlight', 'Abre las 24 horas sin costes de recepción.')}
               </span>
             </h1>
 
             <p className="text-slate-600 dark:text-slate-300 text-base sm:text-lg leading-relaxed font-normal">
-              Conecta tu software de gestión directamente con las luces LED, tornos de acceso, cámaras de repetición y sistemas de climatización de tus pistas. Automatización industrial llave en mano instalable en menos de 48 horas.
+              {t('domotica.subtitle', 'Conecta tu software de gestión directamente con las luces LED, tornos de acceso, cámaras de repetición y sistemas de climatización de tus pistas. Automatización industrial llave en mano instalable en menos de 48 horas.')}
             </p>
 
             <div className="flex flex-wrap items-center gap-3 pt-2">
@@ -188,13 +188,13 @@ export function ModulosDomoticaPage({ onBack, onOpenDemo }: ModulosDomoticaPageP
                 onClick={onOpenDemo}
                 className="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-sm transition shadow-lg shadow-emerald-600/20 active:scale-95 cursor-pointer"
               >
-                <span>Solicitar Demo de Domótica</span>
+                <span>{t('domotica.ctaDemo', 'Solicitar Demo de Domótica')}</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
 
               <div className="flex items-center gap-2 px-4 py-3 rounded-2xl bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-xs text-slate-700 dark:text-slate-300 shadow-xs">
                 <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
-                <span>Compatible con relés Schneider, Finder y Shelly</span>
+                <span>{t('domotica.compatible', 'Compatible con relés Schneider, Finder y Shelly')}</span>
               </div>
             </div>
           </div>
@@ -207,17 +207,17 @@ export function ModulosDomoticaPage({ onBack, onOpenDemo }: ModulosDomoticaPageP
               <div className="flex items-center gap-2">
                 <Cpu className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                 <h3 className="text-lg font-black text-slate-900 dark:text-white">
-                  Simulador en Vivo: Pista 1 Central (Control IoT)
+                  {t('domotica.simTitle', 'Simulador en Vivo: Pista 1 Central (Control IoT)')}
                 </h3>
               </div>
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                Comprueba cómo reacciona la pista inteligente cuando un jugador interactúa con el sistema de acceso y luces.
+                {t('domotica.simSubtitle', 'Comprueba cómo reacciona la pista inteligente cuando un jugador interactúa con el sistema de acceso y luces.')}
               </p>
             </div>
 
             <span className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-400 border border-emerald-500/30 flex items-center gap-2 self-start sm:self-auto">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
-              MQTT Broker Conectado (Ping: 14ms)
+              {t('domotica.mqttBadge', 'MQTT Broker Conectado (Ping: 14ms)')}
             </span>
           </div>
 
@@ -236,9 +236,9 @@ export function ModulosDomoticaPage({ onBack, onOpenDemo }: ModulosDomoticaPageP
                     <Lightbulb className="w-5 h-5" />
                   </div>
                   <div>
-                    <h4 className="text-sm font-bold text-slate-900 dark:text-white">Iluminación LED Pista</h4>
+                    <h4 className="text-sm font-bold text-slate-900 dark:text-white">{t('domotica.ledTitle', 'Iluminación LED Pista')}</h4>
                     <span className="text-[11px] text-slate-500 dark:text-slate-400">
-                      Estado: {simCourtLight ? 'Encendido (400 Lux)' : 'Apagado (Standby 0W)'}
+                      {t('domotica.status', 'Estado: ')} {simCourtLight ? t('domotica.ledOn', 'Encendido (400 Lux)') : t('domotica.ledOff', 'Apagado (Standby 0W)')}
                     </span>
                   </div>
                 </div>
@@ -253,13 +253,13 @@ export function ModulosDomoticaPage({ onBack, onOpenDemo }: ModulosDomoticaPageP
                   }`}
                 >
                   <Power className="w-3.5 h-3.5" />
-                  <span>{simCourtLight ? 'Apagar Focos' : 'Encender Focos'}</span>
+                  <span>{simCourtLight ? t('domotica.turnOffLights', 'Apagar Focos') : t('domotica.turnOnLights', 'Encender Focos')}</span>
                 </button>
               </div>
 
               <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800 text-[11px] text-slate-600 dark:text-slate-400 flex items-center justify-between">
-                <span>Horario programado:</span>
-                <span className="font-mono text-emerald-600 dark:text-emerald-400 font-bold">19:25 a 21:05 (Reserva actual)</span>
+                <span>{t('domotica.scheduledTime', 'Horario programado:')}</span>
+                <span className="font-mono text-emerald-600 dark:text-emerald-400 font-bold">{t('domotica.scheduledDetail', '19:25 a 21:05 (Reserva actual)')}</span>
               </div>
             </div>
 
@@ -277,9 +277,9 @@ export function ModulosDomoticaPage({ onBack, onOpenDemo }: ModulosDomoticaPageP
                     <LockKeyhole className="w-5 h-5" />
                   </div>
                   <div>
-                    <h4 className="text-sm font-bold text-slate-900 dark:text-white">Torno / Puerta de Pista</h4>
+                    <h4 className="text-sm font-bold text-slate-900 dark:text-white">{t('domotica.turnstileTitle', 'Torno / Puerta de Pista')}</h4>
                     <span className="text-[11px] text-slate-500 dark:text-slate-400">
-                      Estado: {!simDoorLocked ? 'Desbloqueado (Abierto)' : 'Bloqueado con PIN'}
+                      {t('domotica.status', 'Estado: ')} {!simDoorLocked ? t('domotica.unlocked', 'Desbloqueado (Abierto)') : t('domotica.locked', 'Bloqueado con PIN')}
                     </span>
                   </div>
                 </div>
@@ -291,7 +291,7 @@ export function ModulosDomoticaPage({ onBack, onOpenDemo }: ModulosDomoticaPageP
                       : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
                   }`}
                 >
-                  {!simDoorLocked ? 'Pase Autorizado' : 'Cerrado'}
+                  {!simDoorLocked ? t('domotica.authorized', 'Pase Autorizado') : t('domotica.closed', 'Cerrado')}
                 </span>
               </div>
 
@@ -299,7 +299,7 @@ export function ModulosDomoticaPage({ onBack, onOpenDemo }: ModulosDomoticaPageP
                 <input
                   type="text"
                   maxLength={4}
-                  placeholder="Introduce PIN (ej: 4829)"
+                  placeholder={t('domotica.pinPlaceholder', 'Introduce PIN (ej: 4829)')}
                   value={simKeyInput}
                   onChange={(e) => setSimKeyInput(e.target.value)}
                   className="flex-1 px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 font-mono text-xs focus:outline-none focus:border-emerald-500 text-center"
@@ -308,19 +308,19 @@ export function ModulosDomoticaPage({ onBack, onOpenDemo }: ModulosDomoticaPageP
                   type="submit"
                   className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition cursor-pointer active:scale-95"
                 >
-                  Validar PIN
+                  {t('domotica.validatePin', 'Validar PIN')}
                 </button>
               </form>
 
               {simAccessSuccess === true && (
                 <div className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5 animate-in fade-in">
                   <CheckCircle2 className="w-3.5 h-3.5" />
-                  <span>PIN correcto (#4829). Puerta abierta durante 10 segundos.</span>
+                  <span>{t('domotica.pinSuccess', 'PIN correcto (#4829). Puerta abierta durante 10 segundos.')}</span>
                 </div>
               )}
               {simAccessSuccess === false && (
                 <div className="text-[11px] font-bold text-rose-600 dark:text-rose-400 flex items-center gap-1.5 animate-in fade-in">
-                  <span>PIN incorrecto. Prueba con #4829 o #1234.</span>
+                  <span>{t('domotica.pinError', 'PIN incorrecto. Prueba con #4829 o #1234.')}</span>
                 </div>
               )}
             </div>
@@ -331,10 +331,10 @@ export function ModulosDomoticaPage({ onBack, onOpenDemo }: ModulosDomoticaPageP
         <section className="space-y-6">
           <div className="space-y-1 text-left">
             <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
-              Hardware y Automatizaciones IoT Disponibles
+              {t('domotica.catalogTitle', 'Hardware y Automatizaciones IoT Disponibles')}
             </h2>
             <p className="text-xs text-slate-500 dark:text-slate-400">
-              Dispositivos certificados e integrados de forma nativa con el motor de reservas de Setmio.
+              {t('domotica.catalogSub', 'Dispositivos certificados e integrados de forma nativa con el motor de reservas de Setmio.')}
             </p>
           </div>
 
@@ -353,16 +353,16 @@ export function ModulosDomoticaPage({ onBack, onOpenDemo }: ModulosDomoticaPageP
                       </div>
 
                       <span className="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20">
-                        {item.badge}
+                        {t(`domotica.module.${item.id}.badge`, item.badge)}
                       </span>
                     </div>
 
                     <div>
                       <h3 className="text-base font-black text-slate-900 dark:text-white leading-snug">
-                        {item.title}
+                        {t(`domotica.module.${item.id}.title`, item.title)}
                       </h3>
                       <p className="text-xs text-slate-600 dark:text-slate-400 mt-2 leading-relaxed">
-                        {item.description}
+                        {t(`domotica.module.${item.id}.desc`, item.description)}
                       </p>
                     </div>
 
@@ -370,20 +370,20 @@ export function ModulosDomoticaPage({ onBack, onOpenDemo }: ModulosDomoticaPageP
                       {item.specs.map((spec, idx) => (
                         <div key={idx} className="flex items-start gap-2 text-[11px] text-slate-600 dark:text-slate-300">
                           <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
-                          <span>{spec}</span>
+                          <span>{t(`domotica.module.${item.id}.specs.${idx}`, spec)}</span>
                         </div>
                       ))}
                     </div>
                   </div>
 
                   <div className="pt-4 mt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs">
-                    <span className="font-mono font-bold text-emerald-700 dark:text-emerald-400">{item.savingKpi}</span>
+                    <span className="font-mono font-bold text-emerald-700 dark:text-emerald-400">{t(`domotica.module.${item.id}.kpi`, item.savingKpi)}</span>
                     <button
                       type="button"
                       onClick={onOpenDemo}
                       className="text-[11px] font-bold text-slate-600 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-white transition flex items-center gap-1 cursor-pointer"
                     >
-                      <span>Auditar mi club</span>
+                      <span>{t('domotica.auditClub', 'Auditar mi club')}</span>
                       <ArrowRight className="w-3 h-3" />
                     </button>
                   </div>
@@ -396,10 +396,10 @@ export function ModulosDomoticaPage({ onBack, onOpenDemo }: ModulosDomoticaPageP
         {/* Banner de Auditoría Técnica de Domótica */}
         <section className="rounded-3xl bg-gradient-to-r from-emerald-900 via-slate-900 to-teal-900 border border-emerald-500/30 p-8 sm:p-10 text-center space-y-4 shadow-xl text-white">
           <h3 className="text-2xl sm:text-3xl font-black text-white">
-            ¿Quieres automatizar las pistas de tu club?
+            {t('domotica.bannerTitle', '¿Quieres automatizar las pistas de tu club?')}
           </h3>
           <p className="text-sm text-slate-200 max-w-2xl mx-auto leading-relaxed">
-            Nuestros ingenieros evalúan la instalación eléctrica de tu club y preparan los cuadros de mando preconfigurados para conectar y funcionar.
+            {t('domotica.bannerSub', 'Nuestros ingenieros evalúan la instalación eléctrica de tu club y preparan los cuadros de mando preconfigurados para conectar y funcionar.')}
           </p>
           <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
             <button
@@ -407,7 +407,7 @@ export function ModulosDomoticaPage({ onBack, onOpenDemo }: ModulosDomoticaPageP
               onClick={onOpenDemo}
               className="px-6 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs transition cursor-pointer shadow-lg shadow-emerald-500/20 active:scale-95"
             >
-              Solicitar Estudio de Domótica Gratuito
+              {t('domotica.bannerCta', 'Solicitar Estudio de Domótica Gratuito')}
             </button>
           </div>
         </section>

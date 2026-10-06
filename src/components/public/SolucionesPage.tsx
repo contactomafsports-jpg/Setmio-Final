@@ -338,7 +338,7 @@ export function SolucionesPage({
   roleId,
   onOpenRole,
 }: SolucionesPageProps) {
-  const { setPublicPage, triggerDemoToast } = useApp();
+  const { setPublicPage, triggerDemoToast, t } = useApp();
 
   const resolveSelectedRole = (): ProfessionalRoleKey | null => {
     if (roleId === 'clubes') return 'clubes';
@@ -420,7 +420,7 @@ export function SolucionesPage({
               className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-bold text-slate-700 shadow-xs transition hover:border-emerald-400 hover:text-emerald-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200 dark:hover:text-emerald-400 cursor-pointer active:scale-95"
             >
               <ArrowLeft className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
-              <span>Volver a Soluciones</span>
+              <span>{t('common.back', 'Volver a Soluciones')}</span>
             </button>
 
             <span className="text-xs font-bold text-slate-500 dark:text-slate-400 hidden sm:inline">
@@ -433,19 +433,19 @@ export function SolucionesPage({
             <div className="relative z-10 max-w-4xl space-y-6 text-left">
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 font-bold text-xs uppercase tracking-wider border border-emerald-500/20">
                 <Icon className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                <span>{activeRole.badge}</span>
+                <span>{t(`solutions.${activeRole.id}.badge`, activeRole.badge)}</span>
               </div>
 
               <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-slate-900 dark:text-white leading-tight">
-                {activeRole.title}
+                {t(`solutions.${activeRole.id}.detailTitle`, activeRole.title)}
               </h1>
 
               <p className="text-lg sm:text-xl font-medium text-emerald-600 dark:text-emerald-400 leading-snug">
-                {activeRole.subtitle}
+                {t(`solutions.${activeRole.id}.detailSubtitle`, activeRole.subtitle)}
               </p>
 
               <p className="text-slate-600 dark:text-slate-300 text-sm sm:text-base leading-relaxed font-normal">
-                {activeRole.heroDescription}
+                {t(`solutions.${activeRole.id}.heroDesc`, activeRole.heroDescription)}
               </p>
 
               <div className="flex flex-wrap items-center gap-3 pt-2">
@@ -455,7 +455,7 @@ export function SolucionesPage({
                   className="inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs sm:text-sm transition shadow-lg shadow-emerald-600/20 active:scale-95 cursor-pointer"
                 >
                   <Play className="w-4 h-4 fill-white" />
-                  <span>{activeRole.demoCta}</span>
+                  <span>{t(`solutions.${activeRole.id}.demoCta`, activeRole.demoCta)}</span>
                 </button>
 
                 <button
@@ -463,7 +463,7 @@ export function SolucionesPage({
                   onClick={handleRegisterClick}
                   className="inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-900 dark:text-white font-bold text-xs sm:text-sm border border-slate-300 dark:border-slate-700 transition active:scale-95 cursor-pointer"
                 >
-                  <span>Dar de Alta Directa</span>
+                  <span>{t('nav.register', 'Dar de Alta Directa')}</span>
                   <ArrowRight className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                 </button>
               </div>
@@ -481,10 +481,10 @@ export function SolucionesPage({
                   {m.value}
                 </div>
                 <div className="text-xs sm:text-sm font-black text-slate-900 dark:text-white">
-                  {m.label}
+                  {t(`solutions.${activeRole.id}.metrics.${idx}.label`, m.label)}
                 </div>
                 <div className="text-[11px] text-slate-500 dark:text-slate-400 leading-tight">
-                  {m.sub}
+                  {t(`solutions.${activeRole.id}.metrics.${idx}.sub`, m.sub)}
                 </div>
               </div>
             ))}
@@ -494,10 +494,10 @@ export function SolucionesPage({
           <section className="space-y-6">
             <div className="space-y-1 text-left">
               <span className="text-xs font-black uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
-                Arquitectura Funcional
+                {t('solutions.detail.pillarsEyebrow', 'Arquitectura Funcional')}
               </span>
               <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
-                Pilares Tecnológicos y Operativos
+                {t('solutions.detail.pillarsTitle', 'Pilares Tecnológicos y Operativos')}
               </h2>
             </div>
 
@@ -514,24 +514,24 @@ export function SolucionesPage({
                         <PillarIcon className="w-6 h-6" />
                       </div>
                       <h3 className="text-xl font-black text-slate-900 dark:text-white">
-                        {pillar.title}
+                        {t(`solutions.${activeRole.id}.pillars.${idx}.title`, pillar.title)}
                       </h3>
                       <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-                        {pillar.description}
+                        {t(`solutions.${activeRole.id}.pillars.${idx}.desc`, pillar.description)}
                       </p>
                       <ul className="space-y-2 pt-2 border-t border-slate-100 dark:border-slate-800">
                         {pillar.bullets.map((b, bIdx) => (
                           <li key={bIdx} className="flex items-start gap-2 text-xs text-slate-700 dark:text-slate-300">
                             <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
-                            <span>{b}</span>
+                            <span>{t(`solutions.${activeRole.id}.pillars.${idx}.b.${bIdx}`, b)}</span>
                           </li>
                         ))}
                       </ul>
                     </div>
 
                     <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800/80 text-[11px] text-slate-500 dark:text-slate-400">
-                      <strong className="text-slate-800 dark:text-slate-200">Especificación técnica: </strong>
-                      {pillar.technicalDetail}
+                      <strong className="text-slate-800 dark:text-slate-200">{t('solutions.detail.techSpec', 'Especificación técnica:')} </strong>
+                      {t(`solutions.${activeRole.id}.pillars.${idx}.tech`, pillar.technicalDetail)}
                     </div>
                   </div>
                 );
@@ -543,15 +543,15 @@ export function SolucionesPage({
           <section className="space-y-6">
             <div className="space-y-1 text-left">
               <span className="text-xs font-black uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
-                Flujo de Trabajo
+                {t('solutions.detail.workflowEyebrow', 'Flujo de Trabajo')}
               </span>
               <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
-                ¿Cómo opera el sistema en el día a día?
+                {t('solutions.detail.workflowTitle', '¿Cómo opera el sistema en el día a día?')}
               </h2>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {activeRole.workflowSteps.map((wf) => (
+              {activeRole.workflowSteps.map((wf, wfIdx) => (
                 <div
                   key={wf.step}
                   className="p-6 rounded-3xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 space-y-3 relative shadow-xs"
@@ -560,10 +560,10 @@ export function SolucionesPage({
                     {wf.step}
                   </span>
                   <h4 className="text-sm font-bold text-slate-900 dark:text-white">
-                    {wf.title}
+                    {t(`solutions.${activeRole.id}.workflow.${wfIdx}.title`, wf.title)}
                   </h4>
                   <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-                    {wf.desc}
+                    {t(`solutions.${activeRole.id}.workflow.${wfIdx}.desc`, wf.desc)}
                   </p>
                 </div>
               ))}
@@ -575,7 +575,7 @@ export function SolucionesPage({
             <div className="flex items-center gap-2">
               <ShieldCheck className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
               <h3 className="text-lg font-black text-slate-900 dark:text-white">
-                Ficha Técnica de Integración y Cumplimiento
+                {t('solutions.detail.complianceTitle', 'Ficha Técnica de Integración y Cumplimiento')}
               </h3>
             </div>
 
@@ -583,13 +583,15 @@ export function SolucionesPage({
               {activeRole.technicalSpecs.map((spec, sIdx) => (
                 <div key={sIdx} className="p-4 rounded-2xl bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 space-y-1.5 shadow-xs">
                   <div className="flex items-center justify-between">
-                    <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400">{spec.category}</span>
+                    <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400">
+                      {t(`solutions.${activeRole.id}.specs.${sIdx}.category`, spec.category)}
+                    </span>
                     <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-400 border border-emerald-500/20">
                       {spec.badge}
                     </span>
                   </div>
                   <p className="text-xs text-slate-700 dark:text-slate-300 font-medium">
-                    {spec.description}
+                    {t(`solutions.${activeRole.id}.specs.${sIdx}.desc`, spec.description)}
                   </p>
                 </div>
               ))}
@@ -600,10 +602,10 @@ export function SolucionesPage({
           <section className="p-8 sm:p-10 rounded-3xl bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800/60 space-y-6">
             <div className="space-y-1">
               <span className="text-xs font-black uppercase tracking-wider text-emerald-700 dark:text-emerald-400">
-                Rentabilidad Demostrable
+                {t('solutions.detail.roiEyebrow', 'Rentabilidad Demostrable')}
               </span>
               <h3 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
-                {activeRole.roiTitle}
+                {t(`solutions.${activeRole.id}.roiTitle`, activeRole.roiTitle)}
               </h3>
             </div>
 
@@ -612,7 +614,7 @@ export function SolucionesPage({
                 <div key={idx} className="flex items-start gap-3">
                   <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
                   <span className="text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed font-medium">
-                    {bullet}
+                    {t(`solutions.${activeRole.id}.roi.${idx}`, bullet)}
                   </span>
                 </div>
               ))}
@@ -624,14 +626,14 @@ export function SolucionesPage({
                 onClick={() => handleDemoClick(activeRole.badge)}
                 className="px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition cursor-pointer shadow-md active:scale-95"
               >
-                Solicitar Demostración Guiada
+                {t('solutions.detail.demoBtn', 'Solicitar Demostración Guiada')}
               </button>
               <button
                 type="button"
                 onClick={handleBackToGrid}
                 className="px-5 py-3 rounded-xl bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 font-bold text-xs border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer active:scale-95"
               >
-                Ver Otras Soluciones
+                {t('solutions.detail.otherSolutionsBtn', 'Ver Otras Soluciones')}
               </button>
             </div>
           </section>
@@ -653,15 +655,15 @@ export function SolucionesPage({
         <div className="space-y-4 max-w-3xl text-left">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-700 dark:text-emerald-400 text-xs font-black uppercase tracking-widest">
             <Layers className="w-3.5 h-3.5" />
-            <span>Soluciones Especializadas por Perfil Profesional</span>
+            <span>{t('solutions.eyebrowBadge', 'Soluciones Especializadas por Perfil Profesional')}</span>
           </div>
 
           <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-slate-900 dark:text-white leading-tight">
-            Una plataforma diseñada para cada protagonista del pádel
+            {t('solutions.mainTitle', 'Una plataforma diseñada para cada protagonista del pádel')}
           </h1>
 
-          <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 leading-relaxed">
-            Descubre las soluciones de software de gestión integral y marca blanca diseñadas a medida para instalaciones deportivas, academias docentes y atletas profesionales de élite.
+          <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 leading-relaxed font-normal">
+            {t('solutions.mainSubtitle', 'Descubre las soluciones de software de gestión integral y marca blanca diseñadas a medida para instalaciones deportivas, academias docentes y atletas profesionales de élite.')}
           </p>
         </div>
 
@@ -681,28 +683,28 @@ export function SolucionesPage({
 
               <div>
                 <div className="text-[11px] font-black uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
-                  Instalaciones & Complejos
+                  {t('solutions.cardClubsBadge', 'Instalaciones & Complejos')}
                 </div>
                 <h2 className="text-2xl font-black text-slate-900 dark:text-white mt-1">
-                  Clubes de Pádel
+                  {t('solutions.cardClubsTitle', 'Clubes de Pádel')}
                 </h2>
                 <p className="text-xs text-slate-600 dark:text-slate-400 mt-2.5 leading-relaxed">
-                  Control absoluto de cuadrante de pistas, socios y facturación con marca blanca completa, automatización domótica de luces LED y cero comisiones por reserva.
+                  {t('solutions.cardClubsDesc', 'Control absoluto de cuadrante de pistas, socios y facturación con marca blanca completa, automatización domótica de luces LED y cero comisiones por reserva.')}
                 </p>
               </div>
 
               <ul className="space-y-2.5 text-xs text-slate-700 dark:text-slate-300 border-t border-slate-200/80 dark:border-slate-800 pt-4">
                 <li className="flex items-start gap-2">
                   <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
-                  <span>Cuadrante táctil de pistas con encendido domótico de iluminación LED</span>
+                  <span>{t('home.pro.clubsF1', 'Cuadrante táctil de pistas con encendido domótico de iluminación LED')}</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
-                  <span>Split payments (cobro de 1/4 por jugador vía Bizum y tarjeta)</span>
+                  <span>{t('home.pro.clubsF2', 'Split payments (cobro de 1/4 por jugador vía Bizum y tarjeta)')}</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
-                  <span>TPV Bar / Cafetería, arqueos de caja y tienda pro-shop con palas de test</span>
+                  <span>{t('home.pro.clubsF3', 'TPV Bar / Cafetería, arqueos de caja y tienda pro-shop con palas de test')}</span>
                 </li>
               </ul>
             </div>
@@ -713,7 +715,7 @@ export function SolucionesPage({
                 onClick={() => handleSelectRole('clubes')}
                 className="w-full py-3.5 px-4 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs transition-all shadow-md shadow-emerald-600/20 flex items-center justify-center gap-2 cursor-pointer active:scale-95"
               >
-                <span>Ver Solución Detallada para Clubes</span>
+                <span>{t('solutions.cardClubsBtn', 'Ver Solución Detallada para Clubes')}</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
             </div>
@@ -733,28 +735,28 @@ export function SolucionesPage({
 
               <div>
                 <div className="text-[11px] font-black uppercase tracking-wider text-teal-600 dark:text-cyan-400">
-                  Escuelas & Entrenadores
+                  {t('solutions.cardSchoolsBadge', 'Escuelas & Entrenadores')}
                 </div>
                 <h2 className="text-2xl font-black text-slate-900 dark:text-white mt-1">
-                  Profesores y Academias
+                  {t('solutions.cardSchoolsTitle', 'Profesores y Academias')}
                 </h2>
                 <p className="text-xs text-slate-600 dark:text-slate-400 mt-2.5 leading-relaxed">
-                  Herramientas profesionales para impartir clases particulares y grupales, evaluar la evolución técnica del alumno y automatizar cobros recurrentes de cuotas.
+                  {t('solutions.cardSchoolsDesc', 'Herramientas profesionales para impartir clases particulares y grupales, evaluar la evolución técnica del alumno y automatizar cobros recurrentes de cuotas.')}
                 </p>
               </div>
 
               <ul className="space-y-2.5 text-xs text-slate-700 dark:text-slate-300 border-t border-slate-200/80 dark:border-slate-800 pt-4">
                 <li className="flex items-start gap-2">
                   <Check className="w-4 h-4 text-teal-500 shrink-0 mt-0.5" />
-                  <span>Cobro recurrente mensual de cuotas de escuela por domiciliación o tarjeta</span>
+                  <span>{t('home.pro.coachesF1', 'Cobro recurrente mensual de cuotas de escuela por domiciliación o tarjeta')}</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <Check className="w-4 h-4 text-teal-500 shrink-0 mt-0.5" />
-                  <span>Control de asistencia en pista, asignación docente y lista de espera</span>
+                  <span>{t('home.pro.coachesF2', 'Control de asistencia en pista, asignación docente y lista de espera')}</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <Check className="w-4 h-4 text-teal-500 shrink-0 mt-0.5" />
-                  <span>Portal web propio para entrenadores particulares y personal trainers</span>
+                  <span>{t('home.pro.coachesF4', 'Portal web propio para entrenadores particulares y personal trainers')}</span>
                 </li>
               </ul>
             </div>
@@ -765,48 +767,48 @@ export function SolucionesPage({
                 onClick={() => handleSelectRole('profesores')}
                 className="w-full py-3.5 px-4 rounded-2xl bg-teal-600 hover:bg-teal-500 text-white font-black text-xs transition-all shadow-md shadow-teal-600/20 flex items-center justify-center gap-2 cursor-pointer active:scale-95"
               >
-                <span>Ver Solución Detallada para Profesores</span>
+                <span>{t('solutions.cardSchoolsBtn', 'Ver Solución Detallada para Profesores')}</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
             </div>
           </article>
 
           {/* Tarjeta 3: Jugadores Profesionales */}
-          <article className="p-8 rounded-3xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-6 shadow-sm hover:border-amber-500 hover:shadow-xl transition-all duration-300 flex flex-col justify-between group">
+          <article className="p-8 rounded-3xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-6 shadow-sm hover:border-emerald-500 hover:shadow-xl transition-all duration-300 flex flex-col justify-between group">
             <div className="space-y-5">
               <div className="flex items-center justify-between">
-                <div className="w-12 h-12 rounded-2xl bg-amber-100 dark:bg-amber-950 text-amber-600 dark:text-amber-400 flex items-center justify-center font-bold group-hover:scale-105 transition-transform">
+                <div className="w-12 h-12 rounded-2xl bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold group-hover:scale-105 transition-transform">
                   <Trophy className="w-6 h-6" />
                 </div>
-                <span className="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20">
+                <span className="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20">
                   Setmio Pro
                 </span>
               </div>
 
               <div>
-                <div className="text-[11px] font-black uppercase tracking-wider text-amber-600 dark:text-amber-400">
-                  Atletas Premier Padel & FIP
+                <div className="text-[11px] font-black uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
+                  {t('solutions.cardProBadge', 'Atletas Premier Padel & FIP')}
                 </div>
                 <h2 className="text-2xl font-black text-slate-900 dark:text-white mt-1">
-                  Jugadores Profesionales
+                  {t('solutions.cardProTitle', 'Jugadores Profesionales')}
                 </h2>
                 <p className="text-xs text-slate-600 dark:text-slate-400 mt-2.5 leading-relaxed">
-                  Gestiona tu carrera deportiva de élite, catálogo de patrocinadores, agenda oficial de torneos FIP y relación directa con sponsors y afición.
+                  {t('solutions.cardProDesc', 'Gestiona tu carrera deportiva de élite, catálogo de patrocinadores, agenda oficial de torneos FIP y relación directa con sponsors y afición.')}
                 </p>
               </div>
 
               <ul className="space-y-2.5 text-xs text-slate-700 dark:text-slate-300 border-t border-slate-200/80 dark:border-slate-800 pt-4">
                 <li className="flex items-start gap-2">
-                  <Check className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
-                  <span>Perfil oficial de atleta y presencia web de marca blanca de alta fidelidad</span>
+                  <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
+                  <span>{t('home.pro.proPlayersF1', 'Perfil oficial de atleta y presencia web de marca blanca de alta fidelidad')}</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <Check className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
-                  <span>Calendario de torneos internacionales, clinics de fin de semana y patrocinios</span>
+                  <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
+                  <span>{t('home.pro.proPlayersF2', 'Calendario de torneos internacionales, clinics de fin de semana y patrocinios')}</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <Check className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
-                  <span>Tienda de equipación oficial firmada y venta de entradas VIP a exhibiciones</span>
+                  <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
+                  <span>{t('home.pro.proPlayersF3', 'Tienda de equipación oficial firmada y venta de entradas VIP a exhibiciones')}</span>
                 </li>
               </ul>
             </div>
@@ -815,9 +817,9 @@ export function SolucionesPage({
               <button
                 type="button"
                 onClick={() => handleSelectRole('profesionales')}
-                className="w-full py-3.5 px-4 rounded-2xl bg-amber-600 hover:bg-amber-500 text-white font-black text-xs transition-all shadow-md shadow-amber-600/20 flex items-center justify-center gap-2 cursor-pointer active:scale-95"
+                className="w-full py-3.5 px-4 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs transition-all shadow-md shadow-emerald-600/20 flex items-center justify-center gap-2 cursor-pointer active:scale-95"
               >
-                <span>Ver Solución para Jugadores Pro</span>
+                <span>{t('solutions.cardProBtn', 'Ver Solución para Jugadores Pro')}</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
             </div>
@@ -832,15 +834,15 @@ export function SolucionesPage({
             <div className="space-y-4 max-w-2xl text-left">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/20 text-cyan-300 font-bold text-xs uppercase tracking-wider border border-cyan-500/30">
                 <Users className="w-4 h-4 text-cyan-400" />
-                <span>Setmio Player · Para Jugadores Particulares y Amateurs</span>
+                <span>{t('solutions.playerBannerBadge', 'Setmio Player · Para Jugadores Particulares y Amateurs')}</span>
               </div>
 
               <h2 className="text-2xl sm:text-4xl font-black tracking-tight text-white leading-tight">
-                ¿Buscas la experiencia como jugador para reservar y jugar?
+                {t('solutions.playerBannerTitle', '¿Buscas la experiencia como jugador para reservar y jugar?')}
               </h2>
 
               <p className="text-slate-300 text-xs sm:text-sm leading-relaxed">
-                Setmio Player es el portal móvil creado para que los aficionados al pádel reserven pista en segundos, se unan a partidos abiertos nivelados por rating decimal, dividan el pago con amigos y abran la pista con el móvil.
+                {t('solutions.playerBannerDesc', 'Setmio Player es el portal móvil creado para que los aficionados al pádel reserven pista en segundos, se unan a partidos abiertos nivelados por rating decimal, dividan el pago con amigos y abran la pista con el móvil.')}
               </p>
             </div>
 
@@ -850,7 +852,7 @@ export function SolucionesPage({
                 onClick={navigateToPlayerDetails}
                 className="px-8 py-4 rounded-2xl bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-400 hover:to-teal-400 text-slate-950 font-black text-xs sm:text-sm shadow-xl shadow-cyan-500/25 transition-all duration-200 hover:scale-[1.02] flex items-center justify-center gap-2 cursor-pointer active:scale-95"
               >
-                <span>Conocer Setmio Player</span>
+                <span>{t('solutions.playerBannerBtn', 'Conocer Setmio Player')}</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
 
@@ -860,7 +862,7 @@ export function SolucionesPage({
                 className="px-6 py-3.5 rounded-2xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs border border-white/20 transition flex items-center justify-center gap-2 cursor-pointer active:scale-95"
               >
                 <Play className="w-3.5 h-3.5 fill-white" />
-                <span>Ver Demo Player</span>
+                <span>{t('solutions.playerBannerDemo', 'Ver Demo Player')}</span>
               </button>
             </div>
           </div>

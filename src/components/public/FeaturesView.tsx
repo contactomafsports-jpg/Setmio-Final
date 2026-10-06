@@ -72,7 +72,7 @@ export const FeaturesView: React.FC<FeaturesViewProps> = ({
       icon: Coffee,
       title: 'TPV Táctil de Bar, Cafetería & Pro Shop',
       badge: 'Ventas en Barra',
-      color: 'from-amber-500 to-orange-700',
+      color: 'from-emerald-500 to-teal-700',
       description:
         'Punto de venta táctil con cartas visuales de bebidas y material deportivo. Carga consumos directamente a la reserva de pista o al saldo del monedero del socio.',
       features: [
@@ -175,15 +175,15 @@ export const FeaturesView: React.FC<FeaturesViewProps> = ({
         <div className="text-left space-y-4 max-w-3xl">
           <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-800 text-xs font-bold">
             <Layers className="w-4 h-4 text-emerald-500" />
-            <span>Módulos de Software SaaS Setmio</span>
+            <span>{t('features.eyebrow', 'Módulos de Software SaaS Setmio')}</span>
           </div>
 
-          <h1 className="text-4xl sm:text-5xl font-black text-slate-900 dark:text-white tracking-tight leading-tight">
-            Módulos y Funcionalidades de <span className="text-emerald-600 dark:text-emerald-400">Setmio</span>
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-slate-900 dark:text-white tracking-tight leading-tight">
+            {t('features.mainTitle', 'Módulos y Funcionalidades de Setmio')}
           </h1>
 
-          <p className="text-slate-600 dark:text-slate-300 text-base leading-relaxed">
-            Una plataforma modular y conectada para profesionalizar la gestión deportiva, automatizar reservas y cobros, y ofrecer a tus jugadores la mejor experiencia del pádel.
+          <p className="text-slate-600 dark:text-slate-300 text-base sm:text-lg leading-relaxed font-normal">
+            {t('features.mainSubtitle', 'Una plataforma modular y conectada para profesionalizar la gestión deportiva, automatizar reservas y cobros, y ofrecer a tus jugadores la mejor experiencia del pádel.')}
           </p>
         </div>
 
@@ -202,16 +202,16 @@ export const FeaturesView: React.FC<FeaturesViewProps> = ({
                       <Icon className="w-6 h-6" />
                     </div>
                     <span className="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
-                      {item.badge}
+                      {t(`features.module.${idx}.badge`, item.badge)}
                     </span>
                   </div>
 
                   <div>
                     <h2 className="text-xl font-black text-slate-900 dark:text-white">
-                      {item.title}
+                      {t(`features.module.${idx}.title`, item.title)}
                     </h2>
                     <p className="text-xs text-slate-600 dark:text-slate-400 mt-2 leading-relaxed">
-                      {item.description}
+                      {t(`features.module.${idx}.desc`, item.description)}
                     </p>
                   </div>
 
@@ -219,7 +219,7 @@ export const FeaturesView: React.FC<FeaturesViewProps> = ({
                     {item.features.map((feat, fIdx) => (
                       <li key={fIdx} className="flex items-start gap-2">
                         <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
-                        <span>{feat}</span>
+                        <span>{t(`features.module.${idx}.f.${fIdx}`, feat)}</span>
                       </li>
                     ))}
                   </ul>
@@ -232,10 +232,10 @@ export const FeaturesView: React.FC<FeaturesViewProps> = ({
         {/* CTA to Domótica */}
         <section className="rounded-3xl bg-gradient-to-r from-slate-900 via-slate-800 to-emerald-950 border border-emerald-500/30 p-8 sm:p-10 text-white flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl">
           <div className="space-y-2 text-center md:text-left">
-            <span className="text-xs font-bold text-emerald-400 uppercase tracking-widest">Hardware & Pistas Inteligentes</span>
-            <h3 className="text-2xl font-black">¿Buscas automatizar luces y cerraduras?</h3>
+            <span className="text-xs font-bold text-emerald-400 uppercase tracking-widest">{t('features.domoticaBadge', 'Hardware & Pistas Inteligentes')}</span>
+            <h3 className="text-2xl font-black">{t('features.domoticaTitle', '¿Buscas automatizar luces y cerraduras?')}</h3>
             <p className="text-xs text-slate-300 max-w-xl">
-              Descubre nuestro módulo exclusivo de Domótica IoT para control de iluminación LED, aperturas por PIN temporal y cámaras de repetición.
+              {t('features.domoticaDesc', 'Descubre nuestro módulo exclusivo de Domótica IoT para control de iluminación LED, aperturas por PIN temporal y cámaras de repetición.')}
             </p>
           </div>
 
@@ -246,9 +246,9 @@ export const FeaturesView: React.FC<FeaturesViewProps> = ({
               setPublicPage('modules');
               window.scrollTo({ top: 0, behavior: 'instant' });
             }}
-            className="px-6 py-3.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs transition flex items-center gap-2 shrink-0 cursor-pointer shadow-lg shadow-emerald-500/20"
+            className="px-6 py-3.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs transition flex items-center gap-2 shrink-0 cursor-pointer shadow-lg shadow-emerald-500/20 active:scale-95"
           >
-            <span>Ver Domótica & Automatizaciones</span>
+            <span>{t('features.domoticaBtn', 'Ver Módulos de Domótica IoT')}</span>
             <ArrowRight className="w-4 h-4" />
           </button>
         </section>

@@ -3,6 +3,8 @@ import { glTranslations, caTranslations, vaTranslations, euTranslations } from '
 import { ptTranslations, frTranslations, deTranslations, arTranslations } from './pt_fr_de_ar';
 import { itTranslations } from './it';
 import { SECONDARY_PAGES_TRANSLATIONS } from './secondaryPages';
+import { CORPORATE_TRANSLATIONS } from './corporateTranslations';
+import { EXTENDED_CORPORATE_TRANSLATIONS } from './extendedCorporateTranslations';
 
 const baseTranslations: Record<string, Record<string, string>> = {
   es: esTranslations,
@@ -24,5 +26,7 @@ for (const [lang, dict] of Object.entries(baseTranslations)) {
   ALL_EXTRA_TRANSLATIONS[lang] = {
     ...dict,
     ...(SECONDARY_PAGES_TRANSLATIONS[lang] || {}),
+    ...(CORPORATE_TRANSLATIONS[lang] || {}),
+    ...(EXTENDED_CORPORATE_TRANSLATIONS[lang] || {}),
   };
 }

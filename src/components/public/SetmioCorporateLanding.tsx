@@ -529,131 +529,143 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
         <div className="text-center max-w-3xl mx-auto space-y-3">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs font-black uppercase tracking-widest border border-emerald-500/20">
             <Sparkles className="w-3.5 h-3.5" />
-            <span>Setmio Pro · Software de Gestión Profesional</span>
+            <span>{t('home.pro.badge', 'Setmio Pro · Software de Gestión Profesional')}</span>
           </div>
           <h2 className="text-3xl sm:text-5xl font-black tracking-tight text-slate-900 dark:text-white">
-            Una solución profesional diseñada a medida para cada protagonista del pádel
+            {t('home.pro.title', 'Una solución profesional diseñada a medida para cada protagonista del pádel')}
           </h2>
           <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400">
-            Digitaliza la operación integral de tus instalaciones, profesionaliza la academia de tus entrenadores y gestiona la carrera de atletas de élite en una infraestructura única y sin comisiones.
+            {t('home.pro.subtitle', 'Digitaliza la operación integral de tus instalaciones, profesionaliza la academia de tus entrenadores y gestiona la carrera de atletas de élite en una infraestructura única y sin comisiones.')}
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Card 1: Clubes */}
-          <div className="p-8 rounded-3xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-6 shadow-sm hover:border-emerald-500 hover:shadow-xl transition-all duration-300">
-            <div className="w-12 h-12 rounded-2xl bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold">
-              <Building2 className="w-6 h-6" />
+          <div className="p-8 rounded-3xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-6 shadow-sm hover:border-emerald-500 hover:shadow-xl transition-all duration-300 flex flex-col justify-between">
+            <div className="space-y-4">
+              <div className="w-12 h-12 rounded-2xl bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold">
+                <Building2 className="w-6 h-6" />
+              </div>
+              <div>
+                <div className="text-[11px] font-black uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
+                  {t('home.pro.clubsBadge', 'Para Instalaciones Deportivas')}
+                </div>
+                <h3 className="text-2xl font-black text-slate-900 dark:text-white mt-1">
+                  {t('home.pro.clubsTitle', 'Clubes de Pádel')}
+                </h3>
+                <p className="text-xs text-slate-600 dark:text-slate-400 mt-2 leading-relaxed">
+                  {t('home.pro.clubsDesc', 'Control absoluto de instalaciones, socios y facturación con marca blanca completa, automatización domótica y cero comisiones por reserva.')}
+                </p>
+              </div>
+              <ul className="space-y-2.5 text-xs text-slate-700 dark:text-slate-300 border-t border-slate-200/70 dark:border-slate-800 pt-4">
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
+                  <span>{t('home.pro.clubsF1', 'Cuadrante táctil de pistas con encendido domótico de iluminación LED')}</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
+                  <span>{t('home.pro.clubsF2', 'Split payments (cobro de 1/4 por jugador vía Bizum y tarjeta de crédito)')}</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
+                  <span>{t('home.pro.clubsF3', 'TPV Bar / Cafetería, arqueos de caja y tienda pro-shop con palas de test')}</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
+                  <span>{t('home.pro.clubsF4', 'Gestor de torneos oficiales, ligas sociales, pozos americanos y rankings')}</span>
+                </li>
+              </ul>
             </div>
-            <div>
-              <div className="text-[11px] font-black uppercase tracking-wider text-emerald-600 dark:text-emerald-400">Para Instalaciones Deportivas</div>
-              <h3 className="text-2xl font-black text-slate-900 dark:text-white mt-1">
-                Clubes de Pádel
-              </h3>
-              <p className="text-xs text-slate-600 dark:text-slate-400 mt-2 leading-relaxed">
-                Control absoluto de instalaciones, socios y facturación con marca blanca completa, automatización domótica y cero comisiones por reserva.
-              </p>
-            </div>
-            <ul className="space-y-2.5 text-xs text-slate-700 dark:text-slate-300 border-t border-slate-200/70 dark:border-slate-800 pt-4">
-              <li className="flex items-start gap-2">
-                <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
-                <span>Cuadrante táctil de pistas con encendido domótico de iluminación LED</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
-                <span>Split payments (cobro de 1/4 por jugador vía Bizum y tarjeta de crédito)</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
-                <span>TPV Bar / Cafetería, arqueos de caja y tienda pro-shop con palas de test</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
-                <span>Gestor de torneos oficiales, ligas sociales, pozos americanos y rankings</span>
-              </li>
-            </ul>
-            <button onClick={() => navigatePublicRoute('/soluciones/clubes', 'solution_clubs')} className="inline-flex items-center gap-2 text-xs font-black text-emerald-700 dark:text-emerald-400 hover:gap-3 transition-all pt-2">
-              <span>Explorar solución para clubes</span> <ArrowRight className="w-4 h-4" />
+            <button onClick={() => navigatePublicRoute('/soluciones/clubes', 'solution_clubs')} className="inline-flex items-center gap-2 text-xs font-black text-emerald-700 dark:text-emerald-400 hover:gap-3 transition-all pt-4">
+              <span>{t('home.pro.clubsExplore', 'Explorar solución para clubes')}</span> <ArrowRight className="w-4 h-4" />
             </button>
           </div>
 
           {/* Card 2: Profesores y Academias */}
-          <div className="p-8 rounded-3xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-6 shadow-sm hover:border-teal-500 hover:shadow-xl transition-all duration-300">
-            <div className="w-12 h-12 rounded-2xl bg-teal-100 dark:bg-teal-950 text-teal-600 dark:text-cyan-400 flex items-center justify-center font-bold">
-              <GraduationCap className="w-6 h-6" />
+          <div className="p-8 rounded-3xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-6 shadow-sm hover:border-teal-500 hover:shadow-xl transition-all duration-300 flex flex-col justify-between">
+            <div className="space-y-4">
+              <div className="w-12 h-12 rounded-2xl bg-teal-100 dark:bg-teal-950 text-teal-600 dark:text-cyan-400 flex items-center justify-center font-bold">
+                <GraduationCap className="w-6 h-6" />
+              </div>
+              <div>
+                <div className="text-[11px] font-black uppercase tracking-wider text-teal-600 dark:text-cyan-400">
+                  {t('home.pro.coachesBadge', 'Para Entrenadores & Escuelas')}
+                </div>
+                <h3 className="text-2xl font-black text-slate-900 dark:text-white mt-1">
+                  {t('home.pro.coachesTitle', 'Profesores y Academias')}
+                </h3>
+                <p className="text-xs text-slate-600 dark:text-slate-400 mt-2 leading-relaxed">
+                  {t('home.pro.coachesDesc', 'Herramientas profesionales para impartir clases particulares y grupales, evaluar la evolución técnica del alumno y automatizar cobros recurrentes.')}
+                </p>
+              </div>
+              <ul className="space-y-2.5 text-xs text-slate-700 dark:text-slate-300 border-t border-slate-200/70 dark:border-slate-800 pt-4">
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-teal-500 shrink-0 mt-0.5" />
+                  <span>{t('home.pro.coachesF1', 'Cobro recurrente mensual o trimestral de cuotas de escuela por domiciliación o tarjeta')}</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-teal-500 shrink-0 mt-0.5" />
+                  <span>{t('home.pro.coachesF2', 'Control de asistencia en pista, asignación docente y lista de espera inteligente')}</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-teal-500 shrink-0 mt-0.5" />
+                  <span>{t('home.pro.coachesF3', 'Ficha técnica de nivel deportivo, historial de partidos y notas metodológicas')}</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-teal-500 shrink-0 mt-0.5" />
+                  <span>{t('home.pro.coachesF4', 'Portal web propio del profesor para entrenadores individuales y personal trainers')}</span>
+                </li>
+              </ul>
             </div>
-            <div>
-              <div className="text-[11px] font-black uppercase tracking-wider text-teal-600 dark:text-cyan-400">Para Entrenadores & Escuelas</div>
-              <h3 className="text-2xl font-black text-slate-900 dark:text-white mt-1">
-                Profesores y Academias
-              </h3>
-              <p className="text-xs text-slate-600 dark:text-slate-400 mt-2 leading-relaxed">
-                Herramientas profesionales para impartir clases particulares y grupales, evaluar la evolución técnica del alumno y automatizar cobros recurrentes.
-              </p>
-            </div>
-            <ul className="space-y-2.5 text-xs text-slate-700 dark:text-slate-300 border-t border-slate-200/70 dark:border-slate-800 pt-4">
-              <li className="flex items-start gap-2">
-                <Check className="w-4 h-4 text-teal-500 shrink-0 mt-0.5" />
-                <span>Cobro recurrente mensual o trimestral de cuotas de escuela por domiciliación o tarjeta</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <Check className="w-4 h-4 text-teal-500 shrink-0 mt-0.5" />
-                <span>Control de asistencia en pista, asignación docente y lista de espera inteligente</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <Check className="w-4 h-4 text-teal-500 shrink-0 mt-0.5" />
-                <span>Ficha técnica de nivel deportivo, historial de partidos y notas metodológicas</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <Check className="w-4 h-4 text-teal-500 shrink-0 mt-0.5" />
-                <span>Portal web propio del profesor para entrenadores individuales y personal trainers</span>
-              </li>
-            </ul>
-            <button onClick={() => navigatePublicRoute('/soluciones/profesores', 'solution_coaches')} className="inline-flex items-center gap-2 text-xs font-black text-teal-700 dark:text-cyan-400 hover:gap-3 transition-all pt-2">
-              <span>Explorar solución para profesores</span> <ArrowRight className="w-4 h-4" />
+            <button onClick={() => navigatePublicRoute('/soluciones/profesores', 'solution_coaches')} className="inline-flex items-center gap-2 text-xs font-black text-teal-700 dark:text-cyan-400 hover:gap-3 transition-all pt-4">
+              <span>{t('home.pro.coachesExplore', 'Explorar solución para profesores')}</span> <ArrowRight className="w-4 h-4" />
             </button>
           </div>
 
-          {/* Card 3: Jugadores Profesionales */}
-          <div className="p-8 rounded-3xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-6 shadow-sm hover:border-amber-500 hover:shadow-xl transition-all duration-300">
-            <div className="w-12 h-12 rounded-2xl bg-amber-100 dark:bg-amber-950 text-amber-600 dark:text-amber-400 flex items-center justify-center font-bold">
-              <Trophy className="w-6 h-6" />
+          {/* Card 3: Jugadores Profesionales (Corregido a paleta canónica Setmio: emerald/teal sin tonos naranjas) */}
+          <div className="p-8 rounded-3xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-6 shadow-sm hover:border-emerald-500 hover:shadow-xl transition-all duration-300 flex flex-col justify-between">
+            <div className="space-y-4">
+              <div className="w-12 h-12 rounded-2xl bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold">
+                <Trophy className="w-6 h-6" />
+              </div>
+              <div>
+                <div className="text-[11px] font-black uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
+                  {t('home.pro.proPlayersBadge', 'Atletas Premier Padel & FIP')}
+                </div>
+                <h3 className="text-2xl font-black text-slate-900 dark:text-white mt-1">
+                  {t('home.pro.proPlayersTitle', 'Jugadores Profesionales')}
+                </h3>
+                <p className="text-xs text-slate-600 dark:text-slate-400 mt-2 leading-relaxed">
+                  {t('home.pro.proPlayersDesc', 'Gestiona tu carrera deportiva de élite, catálogo de patrocinadores, agenda oficial de torneos FIP y relación directa con sponsors y afición.')}
+                </p>
+              </div>
+              <ul className="space-y-2.5 text-xs text-slate-700 dark:text-slate-300 border-t border-slate-200/70 dark:border-slate-800 pt-4">
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
+                  <span>{t('home.pro.proPlayersF1', 'Perfil oficial de atleta y presencia web de marca blanca de alta fidelidad')}</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
+                  <span>{t('home.pro.proPlayersF2', 'Calendario de torneos internacionales, clinics de fin de semana y patrocinios')}</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
+                  <span>{t('home.pro.proPlayersF3', 'Tienda de equipación oficial firmada y venta de entradas VIP a exhibiciones')}</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
+                  <span>{t('home.pro.proPlayersF4', 'Estadísticas deportivas, rankings oficiales FIP y difusión multimedia')}</span>
+                </li>
+              </ul>
             </div>
-            <div>
-              <div className="text-[11px] font-black uppercase tracking-wider text-amber-600 dark:text-amber-400">Atletas WPT / Premier Padel</div>
-              <h3 className="text-2xl font-black text-slate-900 dark:text-white mt-1">
-                Jugadores Profesionales
-              </h3>
-              <p className="text-xs text-slate-600 dark:text-slate-400 mt-2 leading-relaxed">
-                Gestiona tu carrera deportiva de élite, catálogo de patrocinadores, agenda oficial de torneos FIP y relación directa con sponsors y afición.
-              </p>
-            </div>
-            <ul className="space-y-2.5 text-xs text-slate-700 dark:text-slate-300 border-t border-slate-200/70 dark:border-slate-800 pt-4">
-              <li className="flex items-start gap-2">
-                <Check className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
-                <span>Perfil oficial de atleta y presencia web de marca blanca de alta fidelidad</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <Check className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
-                <span>Calendario de torneos internacionales, clinics de fin de semana y patrocinios</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <Check className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
-                <span>Tienda de equipación oficial firmada y venta de entradas VIP a exhibiciones</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <Check className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
-                <span>Estadísticas deportivas, rankings oficiales FIP y difusión multimedia</span>
-              </li>
-            </ul>
-            <button onClick={() => navigatePublicRoute('/soluciones/jugadores-profesionales', 'solution_pro_players')} className="inline-flex items-center gap-2 text-xs font-black text-amber-700 dark:text-amber-400 hover:gap-3 transition-all pt-2">
-              <span>Explorar solución profesional</span> <ArrowRight className="w-4 h-4" />
+            <button onClick={() => navigatePublicRoute('/soluciones/jugadores-profesionales', 'solution_pro_players')} className="inline-flex items-center gap-2 text-xs font-black text-emerald-700 dark:text-emerald-400 hover:gap-3 transition-all pt-4">
+              <span>{t('home.pro.proPlayersExplore', 'Explorar solución profesional')}</span> <ArrowRight className="w-4 h-4" />
             </button>
           </div>
         </div>
       </section>
 
-      {/* SECCIÓN INDEPENDIENTE: SETMIO PLAYER (JUGADORES PARTICULARES / AMATEURS) */}
+      {/* SECCIÓN INDEPENDIENTE: SETMIO PLAYER (JUGADORES PARTICULARES / AMATEURS) CON IMAGEN REAL DE PÁDEL */}
       <section ref={reveal} id="setmio-player" className="scroll-reveal py-20 bg-gradient-to-b from-slate-900 to-slate-950 text-white border-y border-slate-800 relative overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(6,182,212,0.15),transparent_50%)] pointer-events-none" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12 relative z-10">
@@ -661,55 +673,55 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
             <div className="space-y-6">
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-black uppercase tracking-widest">
                 <Users className="w-3.5 h-3.5" />
-                <span>Setmio Player · Para Jugadores Particulares y Amateurs</span>
+                <span>{t('home.player.badge', 'Setmio Player · Para Jugadores Particulares y Amateurs')}</span>
               </div>
               
               <h2 className="text-3xl sm:text-5xl font-black tracking-tight text-white leading-tight">
-                La experiencia definitiva para los apasionados del pádel
+                {t('home.player.title', 'La experiencia definitiva para los apasionados del pádel')}
               </h2>
               
               <p className="text-slate-300 text-base leading-relaxed">
-                Diseñado exclusivamente para que los jugadores particulares reserven pista en menos de 15 segundos, encuentren rivales de su nivel exacto, gestionen su monedero digital y compitan en los torneos de su club.
+                {t('home.player.subtitle', 'Diseñado exclusivamente para que los jugadores particulares reserven pista en menos de 15 segundos, encuentren rivales de su nivel exacto, gestionen su monedero digital y compitan en los torneos de su club.')}
               </p>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
                 <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-1.5">
                   <div className="text-cyan-400 font-bold text-sm flex items-center gap-2">
                     <CheckCircle2 className="w-4 h-4 text-cyan-400" />
-                    <span>Reserva en 3 clics</span>
+                    <span>{t('home.player.f1Title', 'Reserva en 3 clics')}</span>
                   </div>
                   <p className="text-xs text-slate-400">
-                    Cuadrante interactivo en tiempo real con selección visual de compañeros y split payment.
+                    {t('home.player.f1Desc', 'Cuadrante interactivo en tiempo real con selección visual de compañeros y split payment.')}
                   </p>
                 </div>
 
                 <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-1.5">
                   <div className="text-cyan-400 font-bold text-sm flex items-center gap-2">
                     <CheckCircle2 className="w-4 h-4 text-cyan-400" />
-                    <span>Partidos Abiertos ("Play!")</span>
+                    <span>{t('home.player.f2Title', 'Partidos Abiertos ("Play!")')}</span>
                   </div>
                   <p className="text-xs text-slate-400">
-                    Únete a partidas niveladas por nivel decimal (ej. 3.75) y posición de revés o drive.
+                    {t('home.player.f2Desc', 'Únete a partidas niveladas por nivel decimal (ej. 3.75) y posición de revés o drive.')}
                   </p>
                 </div>
 
                 <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-1.5">
                   <div className="text-cyan-400 font-bold text-sm flex items-center gap-2">
                     <CheckCircle2 className="w-4 h-4 text-cyan-400" />
-                    <span>Monedero Digital & Bonus</span>
+                    <span>{t('home.player.f3Title', 'Monedero Digital & Bonus')}</span>
                   </div>
                   <p className="text-xs text-slate-400">
-                    Recarga saldo con bonificaciones automáticas del club y paga sin sacar la tarjeta bancaria.
+                    {t('home.player.f3Desc', 'Recarga saldo con bonificaciones automáticas del club y paga sin sacar la tarjeta bancaria.')}
                   </p>
                 </div>
 
                 <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-1.5">
                   <div className="text-cyan-400 font-bold text-sm flex items-center gap-2">
                     <CheckCircle2 className="w-4 h-4 text-cyan-400" />
-                    <span>Acceso Domótico QR / PIN</span>
+                    <span>{t('home.player.f4Title', 'Acceso Domótico QR / PIN')}</span>
                   </div>
                   <p className="text-xs text-slate-400">
-                    Apertura instantánea de puertas y encendido de focos sin pasar por mostrador.
+                    {t('home.player.f4Desc', 'Apertura instantánea de puertas y encendido de focos sin pasar por mostrador.')}
                   </p>
                 </div>
               </div>
@@ -720,59 +732,61 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
                   onClick={() => navigatePublicRoute('/para-jugadores', 'players_app')}
                   className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-400 hover:to-teal-400 text-slate-950 font-black text-xs sm:text-sm shadow-xl shadow-cyan-500/20 hover:shadow-cyan-500/35 transition-all duration-200 hover:scale-[1.02] cursor-pointer text-center"
                 >
-                  <span>Conocer Setmio Player</span>
+                  <span>{t('home.player.btn', 'Conocer Setmio Player')}</span>
                   <ArrowRight className="w-4 h-4 shrink-0" />
                 </button>
               </div>
             </div>
 
-            {/* Mockup visual representativo para Player */}
-            <div className="relative">
-              <div className="rounded-3xl bg-slate-900 border border-slate-800 p-6 shadow-2xl space-y-6">
-                <div className="flex items-center justify-between border-b border-slate-800 pb-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-2xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center font-black">
-                      🎾
-                    </div>
-                    <div>
-                      <div className="text-sm font-black text-white">Setmio Player App</div>
-                      <div className="text-[11px] text-slate-400">Portal móvil de reservas y competición</div>
-                    </div>
-                  </div>
-                  <span className="px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-400 text-[10px] font-black uppercase">
-                    Modo Activo
-                  </span>
-                </div>
+            {/* Recurso visual de alta fidelidad: Jugador real de pádel en pista interactuando con Setmio Player */}
+            <div className="relative group">
+              <div className="relative rounded-3xl overflow-hidden border border-slate-700/80 shadow-2xl bg-slate-950 aspect-[4/3] sm:aspect-[16/11]">
+                <img
+                  src="https://images.unsplash.com/photo-1622163642998-1ea32b0bbc67?auto=format&fit=crop&w=1200&q=80"
+                  alt="Jugador real de pádel en pista de competición interactuando con Setmio Player"
+                  className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 filter brightness-95"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent" />
 
-                <div className="space-y-3">
-                  <div className="p-4 rounded-2xl bg-slate-950/80 border border-slate-800/80 flex items-center justify-between">
-                    <div>
-                      <div className="text-[10px] text-slate-400 uppercase font-bold">Próximo Partido Confirmado</div>
-                      <div className="text-sm font-bold text-white mt-0.5">Pista 2 Panorámica · 19:30h</div>
-                      <div className="text-xs text-cyan-400 mt-0.5">Nivel medio 3.8 · Luz domótica incluida</div>
+                {/* Overlay Card: App Setmio Player en tiempo real */}
+                <div className="absolute bottom-4 left-4 right-4 sm:bottom-6 sm:left-6 sm:right-6 p-4 sm:p-5 rounded-2xl bg-slate-900/90 backdrop-blur-md border border-white/15 shadow-2xl space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-cyan-500 to-teal-500 text-slate-950 flex items-center justify-center font-black text-xs">
+                        SP
+                      </div>
+                      <div>
+                        <div className="text-xs font-black text-white">{t('home.player.cardTitle', 'Setmio Player App')}</div>
+                        <div className="text-[10px] text-slate-400">{t('home.player.cardSubtitle', 'Portal móvil de reservas y competición')}</div>
+                      </div>
                     </div>
-                    <div className="w-12 h-12 rounded-xl bg-slate-800 flex flex-col items-center justify-center text-center">
-                      <span className="text-[10px] text-slate-400 uppercase">PIN</span>
-                      <span className="font-mono text-sm font-black text-emerald-400">8241</span>
-                    </div>
+                    <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 text-[10px] font-black uppercase">
+                      {t('common.active247', 'Activo 24/7')}
+                    </span>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="p-3.5 rounded-2xl bg-slate-950/80 border border-slate-800 text-center">
-                      <div className="text-[10px] text-slate-400 font-bold uppercase">Nivel Deportivo</div>
-                      <div className="text-xl font-black text-white font-mono mt-1">3.85</div>
-                      <div className="text-[10px] text-emerald-400 mt-0.5">Top 15% del Club</div>
+                  <div className="grid grid-cols-2 gap-2 pt-1 text-[11px]">
+                    <div className="p-2.5 rounded-xl bg-slate-950/70 border border-white/10 flex items-center justify-between">
+                      <div>
+                        <div className="text-[9px] text-slate-400 font-bold uppercase">{t('home.player.nextMatch', 'Próximo Partido')}</div>
+                        <div className="text-xs font-bold text-white mt-0.5">{t('home.player.courtInfo', 'Pista 2 Panorámica')}</div>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-[9px] text-cyan-400 font-mono font-bold">19:30h</span>
+                      </div>
                     </div>
-                    <div className="p-3.5 rounded-2xl bg-slate-950/80 border border-slate-800 text-center">
-                      <div className="text-[10px] text-slate-400 font-bold uppercase">Saldo Monedero</div>
-                      <div className="text-xl font-black text-cyan-400 font-mono mt-1">45,00 €</div>
-                      <div className="text-[10px] text-slate-400 mt-0.5">+5€ recarga bono</div>
+
+                    <div className="p-2.5 rounded-xl bg-slate-950/70 border border-white/10 flex items-center justify-between">
+                      <div>
+                        <div className="text-[9px] text-slate-400 font-bold uppercase">{t('home.player.pinLabel', 'PIN Domótica')}</div>
+                        <div className="font-mono text-sm font-black text-emerald-400">8241</div>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-[9px] text-slate-400 font-bold uppercase">{t('home.player.levelLabel', 'Nivel')}</span>
+                        <div className="font-mono text-xs font-black text-white">3.85</div>
+                      </div>
                     </div>
                   </div>
-                </div>
-
-                <div className="p-4 rounded-2xl bg-cyan-950/40 border border-cyan-500/30 text-xs text-cyan-200 text-center leading-relaxed">
-                  "Tu perfil deportivo público, partidos con compañeros habituales y acceso a torneos sin esperas."
                 </div>
               </div>
             </div>
@@ -780,31 +794,35 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
         </div>
       </section>
 
-      {/* 5. VÍDEO DESTACADO DE PÁDEL - BENEFICIOS OPERATIVOS */}
-      <section ref={reveal} className="scroll-reveal py-20 bg-slate-950 text-white border-y border-slate-800">
+      {/* 5. VÍDEO DESTACADO DE PÁDEL - BENEFICIOS OPERATIVOS (100% Adaptado a Modo Claro y Modo Oscuro) */}
+      <section ref={reveal} className="scroll-reveal py-20 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white border-y border-slate-200 dark:border-slate-800 transition-colors duration-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-[.8fr_1.2fr] gap-10 items-center">
           <div className="space-y-5">
-            <div className="text-xs font-bold uppercase tracking-[0.2em] text-emerald-400">Eficiencia y Automatización Real</div>
-            <h2 className="text-3xl sm:text-5xl font-black tracking-tight">Beneficios operativos reales para la gestión diaria de tu club</h2>
-            <p className="text-sm sm:text-base text-slate-300 leading-relaxed">
-              Descubre cómo una infraestructura de software moderna ahorra cientos de horas en recepción, elimina las reservas no cobradas mediante pasarelas automatizadas y multiplica la ocupación en horas valle sin intervención manual.
+            <div className="text-xs font-bold uppercase tracking-[0.2em] text-emerald-600 dark:text-emerald-400">
+              {t('home.corporate.benefitsEyebrow', 'Eficiencia y Automatización Real')}
+            </div>
+            <h2 className="text-3xl sm:text-5xl font-black tracking-tight text-slate-900 dark:text-white">
+              {t('home.corporate.benefitsTitle', 'Beneficios operativos reales para la gestión diaria de tu club')}
+            </h2>
+            <p className="text-sm sm:text-base text-slate-600 dark:text-slate-300 leading-relaxed font-normal">
+              {t('home.corporate.benefitsDesc', 'Descubre cómo una infraestructura de software moderna ahorra cientos de horas en recepción, elimina las reservas no cobradas mediante pasarelas automatizadas y multiplica la ocupación en horas valle sin intervención manual.')}
             </p>
-            <div className="space-y-2 pt-2 text-xs text-slate-300">
-              <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span>Hasta 40% de ahorro energético en luz de pistas con control domótico IoT</span>
+            <div className="space-y-2.5 pt-2 text-xs text-slate-700 dark:text-slate-300">
+              <div className="flex items-center gap-2.5">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                <span>{t('home.corporate.benefitsList1', 'Hasta 40% de ahorro energético en luz de pistas con control domótico IoT')}</span>
               </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span>Cobro garantizado del 100% de la pista antes de que los 4 jugadores pisen el césped</span>
+              <div className="flex items-center gap-2.5">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                <span>{t('home.corporate.benefitsList2', 'Cobro garantizado del 100% de la pista antes de que los 4 jugadores pisen el césped')}</span>
               </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span>Cero llamadas perdidas gracias al asistente inteligente en WhatsApp oficial</span>
+              <div className="flex items-center gap-2.5">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                <span>{t('home.corporate.benefitsList3', 'Cero llamadas perdidas gracias al copiloto inteligente en WhatsApp oficial')}</span>
               </div>
             </div>
           </div>
-          <div className="overflow-hidden rounded-3xl border border-white/10 bg-slate-900 shadow-2xl aspect-video">
+          <div className="overflow-hidden rounded-3xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900 shadow-2xl aspect-video">
             <video className="h-full w-full object-cover" autoPlay muted loop playsInline controls preload="metadata" poster="https://images.unsplash.com/photo-1554068865-24cecd4e34b8?auto=format&fit=crop&w=1600&q=80" aria-label="Beneficios operativos reales de la plataforma de pádel">
               <source src="https://cdn.coverr.co/videos/coverr-a-padel-match-1573/1080p.mp4" type="video/mp4" />
             </video>
@@ -818,13 +836,13 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
           <div className="flex flex-col sm:flex-row items-center justify-between gap-6 pb-2">
             <div className="space-y-2 text-center sm:text-left">
               <div className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
-                Ecosistema Modular Integral
+                {t('home.modules.badge', 'Ecosistema Modular Integral')}
               </div>
               <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-slate-900 dark:text-white">
-                Todo lo que tu club necesita en una sola suscripción
+                {t('home.modules.title', 'Todo lo que tu club necesita en una sola suscripción')}
               </h2>
               <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 max-w-2xl">
-                Herramientas diseñadas para operar de forma unificada: gestión de pistas, escuela, competiciones, domótica, TPV y marca blanca en una sola infraestructura sin fricción.
+                {t('home.modules.subtitle', 'Herramientas diseñadas para operar de forma unificada: gestión de pistas, escuela, competiciones, domótica, TPV y marca blanca en una sola infraestructura sin fricción.')}
               </p>
             </div>
 
@@ -834,7 +852,7 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
               className="shrink-0 px-6 py-3.5 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white dark:bg-emerald-600 dark:hover:bg-emerald-500 font-bold text-xs shadow-md transition-all flex items-center gap-2 hover:gap-3 cursor-pointer active:scale-95"
             >
               <Sliders className="w-4 h-4 text-emerald-400 dark:text-white" />
-              <span>Ver todo</span>
+              <span>{t('home.modules.viewAll', 'Ver todo')}</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>
@@ -844,9 +862,9 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
               <div className="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold">
                 <Zap className="w-5 h-5" />
               </div>
-              <h3 className="font-bold text-base text-slate-900 dark:text-white">Domótica IoT & Automatizaciones</h3>
+              <h3 className="font-bold text-base text-slate-900 dark:text-white">{t('home.modules.m1.title', 'Domótica IoT & Automatizaciones')}</h3>
               <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-                Control de encendido y apagado de luces LED sincronizado con el calendario de partidos y apertura de puertas por código PIN y QR temporal.
+                {t('home.modules.m1.desc', 'Control de encendido y apagado de luces LED sincronizado con el calendario de partidos y apertura de puertas por código PIN y QR temporal.')}
               </p>
             </div>
 
@@ -854,9 +872,9 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
               <div className="w-10 h-10 rounded-xl bg-teal-100 dark:bg-teal-950 text-teal-600 dark:text-cyan-400 flex items-center justify-center font-bold">
                 <CreditCard className="w-5 h-5" />
               </div>
-              <h3 className="font-bold text-base text-slate-900 dark:text-white">Pagos Divididos (Split Payments)</h3>
+              <h3 className="font-bold text-base text-slate-900 dark:text-white">{t('home.modules.m2.title', 'Pagos Divididos (Split Payments)')}</h3>
               <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-                Cobro fraccionado a 1/4 por jugador mediante Bizum y tarjeta. Monedero recargable de socios con bonificaciones automáticas.
+                {t('home.modules.m2.desc', 'Cobro fraccionado a 1/4 por jugador mediante Bizum y tarjeta. Monedero recargable de socios con bonificaciones automáticas.')}
               </p>
             </div>
 
@@ -864,9 +882,9 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
               <div className="w-10 h-10 rounded-xl bg-purple-100 dark:bg-purple-950 text-purple-600 dark:text-purple-400 flex items-center justify-center font-bold">
                 <Bot className="w-5 h-5" />
               </div>
-              <h3 className="font-bold text-base text-slate-900 dark:text-white">Copiloto de Atención 24/7 en WhatsApp</h3>
+              <h3 className="font-bold text-base text-slate-900 dark:text-white">{t('home.modules.m3.title', 'Copiloto de Atención 24/7 en WhatsApp')}</h3>
               <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-                Asistente inteligente conectado a la API oficial de WhatsApp para consultar disponibilidad de pistas, responder dudas frecuentes y formalizar reservas.
+                {t('home.modules.m3.desc', 'Asistente inteligente conectado a la API oficial de WhatsApp para consultar disponibilidad de pistas, responder dudas frecuentes y formalizar reservas.')}
               </p>
             </div>
 
@@ -874,9 +892,9 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
               <div className="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-950 text-amber-600 dark:text-amber-400 flex items-center justify-center font-bold">
                 <Trophy className="w-5 h-5" />
               </div>
-              <h3 className="font-bold text-base text-slate-900 dark:text-white">Gestor de Torneos, Ligas y Pozos</h3>
+              <h3 className="font-bold text-base text-slate-900 dark:text-white">{t('home.modules.m4.title', 'Gestor de Torneos, Ligas y Pozos')}</h3>
               <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-                Cuadros de competición automáticos, pools americanos, fases de grupos y rankings dinámicos por categorías federadas o sociales.
+                {t('home.modules.m4.desc', 'Cuadros de competición automáticos, pools americanos, fases de grupos y rankings dinámicos por categorías federadas o sociales.')}
               </p>
             </div>
 
@@ -884,9 +902,9 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
               <div className="w-10 h-10 rounded-xl bg-rose-100 dark:bg-rose-950 text-rose-600 dark:text-rose-400 flex items-center justify-center font-bold">
                 <ShoppingBag className="w-5 h-5" />
               </div>
-              <h3 className="font-bold text-base text-slate-900 dark:text-white">TPV Físico, Bar y Test Center</h3>
+              <h3 className="font-bold text-base text-slate-900 dark:text-white">{t('home.modules.m5.title', 'TPV Físico, Bar y Test Center')}</h3>
               <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-                Terminal punto de venta táctil para cafetería y tienda de material, control de stock en tiempo real, arqueos de caja y prueba de palas en pista.
+                {t('home.modules.m5.desc', 'Terminal punto de venta táctil para cafetería y tienda de material, control de stock en tiempo real, arqueos de caja y prueba de palas en pista.')}
               </p>
             </div>
 
@@ -894,9 +912,9 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
               <div className="w-10 h-10 rounded-xl bg-cyan-100 dark:bg-cyan-950 text-cyan-600 dark:text-cyan-400 flex items-center justify-center font-bold">
                 <Globe className="w-5 h-5" />
               </div>
-              <h3 className="font-bold text-base text-slate-900 dark:text-white">Marca Blanca & Dominio Propio</h3>
+              <h3 className="font-bold text-base text-slate-900 dark:text-white">{t('home.modules.m6.title', 'Marca Blanca & Dominio Propio')}</h3>
               <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-                Web pública personalizada, app móvil corporativa con colores e isotipo propios, sin menciones a intermediarios y con dominio web dedicado.
+                {t('home.modules.m6.desc', 'Web pública personalizada, app móvil corporativa con colores e isotipo propios, sin menciones a intermediarios y con dominio web dedicado.')}
               </p>
             </div>
           </div>
@@ -909,15 +927,15 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10 relative z-10 text-center">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-black uppercase tracking-widest">
             <Play className="w-3.5 h-3.5 fill-emerald-400" />
-            <span>Demos Interactivas y Personalizadas por Rol</span>
+            <span>{t('home.demo.badge', 'Demos Interactivas y Personalizadas por Rol')}</span>
           </div>
 
           <div className="space-y-4 max-w-3xl mx-auto">
             <h2 className="text-3xl sm:text-5xl font-black tracking-tight text-white leading-tight">
-              Solicita una Demo Guiada o Prueba el Sistema por Rol
+              {t('home.corporate.demoTitle', 'Solicita una Demo Guiada o Prueba el Sistema por Rol')}
             </h2>
             <p className="text-sm sm:text-base text-slate-300 leading-relaxed max-w-2xl mx-auto">
-              Comprueba de primera mano el potencial de Setmio antes de tomar cualquier decisión. Selecciona tu perfil y experimenta el cuadrante táctil, la domótica en directo y el portal web en tiempo real.
+              {t('home.corporate.demoDesc', 'Comprueba de primera mano el potencial de Setmio antes de tomar cualquier decisión. Selecciona tu perfil y experimenta el cuadrante táctil, la domótica en directo y el portal web en tiempo real.')}
             </p>
           </div>
 
@@ -925,23 +943,23 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
           <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
             <div className="px-4 py-2.5 rounded-xl bg-slate-900/90 border border-slate-800 text-xs text-slate-300 flex items-center gap-2 shadow-xs">
               <Building2 className="w-4 h-4 text-emerald-400 shrink-0" />
-              <span className="font-bold">Gerentes de Club</span>
+              <span className="font-bold">{t('home.demo.roleClub', 'Gerentes de Club')}</span>
             </div>
             <div className="px-4 py-2.5 rounded-xl bg-slate-900/90 border border-slate-800 text-xs text-slate-300 flex items-center gap-2 shadow-xs">
               <GraduationCap className="w-4 h-4 text-teal-400 shrink-0" />
-              <span className="font-bold">Profesores & Academias</span>
+              <span className="font-bold">{t('home.demo.roleCoaches', 'Profesores & Academias')}</span>
             </div>
             <div className="px-4 py-2.5 rounded-xl bg-slate-900/90 border border-slate-800 text-xs text-slate-300 flex items-center gap-2 shadow-xs">
               <Users className="w-4 h-4 text-cyan-400 shrink-0" />
-              <span className="font-bold">Jugadores & Socios</span>
+              <span className="font-bold">{t('home.demo.rolePlayers', 'Jugadores & Socios')}</span>
             </div>
             <div className="px-4 py-2.5 rounded-xl bg-slate-900/90 border border-slate-800 text-xs text-slate-300 flex items-center gap-2 shadow-xs">
-              <Trophy className="w-4 h-4 text-amber-400 shrink-0" />
-              <span className="font-bold">Jugadores Profesionales</span>
+              <Trophy className="w-4 h-4 text-emerald-400 shrink-0" />
+              <span className="font-bold">{t('home.demo.rolePro', 'Jugadores Profesionales')}</span>
             </div>
           </div>
 
-          {/* Único Botón Principal que abre el modal interactivo con selección de roles */}
+          {/* Botón Principal "Ver demo" de Alto Contraste que abre el Modal de Selección de Roles */}
           <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
             <button
               type="button"
@@ -952,10 +970,10 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
                   setLocalDemoModalOpen(true);
                 }
               }}
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-3 px-8 sm:px-10 py-4 sm:py-4.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black text-sm shadow-xl shadow-emerald-500/25 transition-all duration-200 hover:scale-[1.03] cursor-pointer"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-3 px-8 sm:px-10 py-4 sm:py-4.5 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-sm shadow-xl shadow-emerald-500/25 transition-all duration-200 hover:scale-[1.03] cursor-pointer"
             >
               <Play className="w-4 h-4 fill-slate-950" />
-              <span>Solicitar Demo Interactiva</span>
+              <span>{t('home.corporate.demoBtn', 'Ver demo')}</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>
@@ -968,15 +986,15 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-8 relative z-10">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/15 border border-white/20 text-white text-xs font-black uppercase tracking-widest backdrop-blur-sm">
             <CheckCircle2 className="w-4 h-4 text-white" />
-            <span>Empieza Hoy Mismo · 30 Días de Prueba Sin Compromiso</span>
+            <span>{t('home.prefooter.badge', 'Empieza Hoy Mismo · 30 Días de Prueba Sin Compromiso')}</span>
           </div>
 
           <h2 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-tight">
-            ¿Listo para llevar la gestión de tu club al siguiente nivel?
+            {t('home.prefooter.title', '¿Listo para llevar la gestión de tu club al siguiente nivel?')}
           </h2>
 
           <p className="text-base sm:text-lg text-emerald-100 max-w-2xl mx-auto leading-relaxed">
-            Sin permanencias, sin comisiones por pista reservada y con soporte técnico telefónico los 365 días del año. Migramos los datos de tu club en menos de 24 horas.
+            {t('home.prefooter.subtitle', 'Sin permanencias, sin comisiones por pista reservada y con soporte técnico telefónico los 365 días del año. Migramos los datos de tu club en menos de 24 horas.')}
           </p>
 
           <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
@@ -985,17 +1003,23 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
               onClick={handleOpenRegister}
               className="px-8 py-4 rounded-2xl bg-white hover:bg-slate-100 text-slate-950 font-black text-sm shadow-2xl shadow-slate-950/20 transition-all hover:scale-[1.03] flex items-center gap-2 cursor-pointer"
             >
-              <span>Registrar mi Club Ahora</span>
+              <span>{t('home.prefooter.startBtn', 'Crear Cuenta de Club Gratis')}</span>
               <ArrowRight className="w-4 h-4" />
             </button>
 
             <button
               type="button"
-              onClick={() => setLocalDemoModalOpen(true)}
+              onClick={() => {
+                if (onOpenDemoRoleModal) {
+                  onOpenDemoRoleModal();
+                } else {
+                  setLocalDemoModalOpen(true);
+                }
+              }}
               className="px-8 py-4 rounded-2xl bg-emerald-700/80 hover:bg-emerald-700 text-white border border-emerald-400/40 font-bold text-sm shadow-xl transition-all hover:scale-[1.03] flex items-center gap-2 cursor-pointer"
             >
               <Play className="w-4 h-4 fill-white" />
-              <span>Ver Demo Interactiva</span>
+              <span>{t('home.corporate.demoBtn', 'Ver demo')}</span>
             </button>
           </div>
 

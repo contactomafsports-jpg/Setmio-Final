@@ -26,6 +26,7 @@ export const BlogView: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
     currentTenant,
     t,
     currentLanguage,
+    isCorporateLanding,
   } = useApp();
   void currentLanguage;
 
@@ -103,7 +104,7 @@ export const BlogView: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
               </span>
             </div>
 
-            <h1 className="text-3xl sm:text-5xl font-black text-slate-900 dark:text-white tracking-tight leading-tight">
+            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-slate-900 dark:text-white tracking-tight leading-tight">
               {t((selectedArticle as any).titleKey || ('blog.posts.' + selectedArticle.id + '.title'), selectedArticle.title)}
             </h1>
 
@@ -263,29 +264,33 @@ export const BlogView: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
       ) : (
         /* Blog List View */
         <div className="space-y-10">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-            <div>
-              <div className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
-                <BookOpen className="w-4 h-4" />
-                <span>{t('blog.eyebrow', 'Actualidad & Consejos de Pádel')}</span>
+          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
+            <div className="space-y-4 max-w-3xl text-left">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-700 dark:text-emerald-400 text-xs font-black uppercase tracking-widest">
+                <BookOpen className="w-3.5 h-3.5" />
+                <span>{t('corporateBlog.eyebrow', t('blog.eyebrow', 'Actualidad & Consejos de Pádel'))}</span>
               </div>
-              <h1 className="text-3xl sm:text-5xl font-black text-slate-900 dark:text-white tracking-tight mt-1">
-                {t('blog.title', `Blog Oficial ${currentTenant.name}`)}
+              <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-slate-900 dark:text-white tracking-tight leading-tight">
+                {isCorporateLanding
+                  ? t('corporateBlog.title', 'Blog Oficial y Tendencias del Pádel')
+                  : t('blog.title', `Blog Oficial ${currentTenant.name}`)}
               </h1>
-              <p className="text-slate-600 dark:text-slate-400 text-xs sm:text-sm mt-2 max-w-xl">
-                {t('blog.description', 'Artículos técnicos elaborados por nuestros entrenadores, análisis de biomecánica, crónicas de torneos y novedades del club en Narón.')}
+              <p className="text-base sm:text-lg text-slate-600 dark:text-slate-300 leading-relaxed font-normal max-w-2xl">
+                {isCorporateLanding
+                  ? t('corporateBlog.subtitle', 'Artículos técnicos elaborados por entrenadores titulados, análisis de biomecánica, crónicas de torneos y novedades del club.')
+                  : t('blog.description', 'Artículos técnicos elaborados por nuestros entrenadores, análisis de biomecánica, crónicas de torneos y novedades del club en Narón.')}
               </p>
             </div>
 
             {/* Search Input */}
-            <div className="relative w-full md:w-64">
-              <Search className="absolute left-3 top-2.5 w-4 h-4 text-slate-400" />
+            <div className="relative w-full lg:w-72 shrink-0">
+              <Search className="absolute left-3.5 top-3 w-4 h-4 text-slate-400" />
               <input
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder={t('blog.searchPlaceholder', 'Buscar artículo o tema...')}
-                className="w-full pl-9 pr-3 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-emerald-500 font-medium shadow-sm"
+                className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl text-xs sm:text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-emerald-500 font-medium shadow-xs"
               />
             </div>
           </div>
