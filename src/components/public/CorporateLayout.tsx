@@ -34,7 +34,7 @@ export function CorporateLayout({
   return (
     <div className="min-h-screen bg-white text-slate-900 dark:bg-slate-950 dark:text-slate-100 flex flex-col justify-between">
       <CorporateHeader onOpenDemo={onOpenDemo} onOpenAuth={onOpenAuth} onOpenRegister={onOpenRegister} />
-      <main className="flex-1">{children}</main>
+      <main className="flex-1 pt-16">{children}</main>
       <CorporateFooter minimized={shouldMinimize} />
     </div>
   );

@@ -171,7 +171,7 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
               </div>
               {/* Hidden on mobile, only visible on md+ screens */}
               <p className="hidden md:block text-[10px] text-slate-500 dark:text-slate-400 font-medium truncate">
-                Software de Marca Blanca para Profesionales del Pádel
+                {t('corporate.tagline', 'Software de Marca Blanca para Profesionales del Pádel')}
               </p>
             </div>
           </div>
@@ -202,7 +202,7 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
               <button
                 onClick={() => setLangDropdownOpen(!langDropdownOpen)}
                 className="p-1.5 sm:px-2.5 sm:py-1.5 rounded-xl border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition flex items-center gap-1.5 text-xs font-bold"
-                title="Cambiar idioma con banderas oficiales"
+                title={t('nav.language')}
                 aria-label={t('nav.language')}
               >
                 <OfficialFlag code={language} className="w-4 h-3 sm:w-5 sm:h-3.5" />
@@ -264,10 +264,10 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
             <button
               onClick={onOpenAuth}
               className="p-2 sm:px-3 sm:py-2 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 transition flex items-center gap-1.5"
-              title="Acceso de usuarios registrados"
+              title={t('nav.accessTitle')}
             >
               <Lock className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-              <span className="hidden sm:inline">Acceso</span>
+              <span className="hidden sm:inline">{t('nav.access')}</span>
             </button>
 
             {/* Mobile Hamburger Toggle Button */}
@@ -313,7 +313,7 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
 
             <div className="mt-3 border-t border-slate-200/70 pt-3 dark:border-slate-800">
               <button type="button" onClick={() => setMobileLanguageOpen((open) => !open)} className="flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left text-sm font-semibold text-slate-800 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800" aria-expanded={mobileLanguageOpen}>
-                <span className="flex items-center gap-2"><Globe className="h-4 w-4 text-emerald-600" strokeWidth={1.5} /> Idioma: {SUPPORTED_LANGUAGES.find((item) => item.code === language)?.name ?? 'Español'}</span>
+                <span className="flex items-center gap-2"><Globe className="h-4 w-4 text-emerald-600" strokeWidth={1.5} /> {t('nav.languageLabel')} {SUPPORTED_LANGUAGES.find((item) => item.code === language)?.name ?? 'Español'}</span>
                 <ChevronDown className={`h-4 w-4 transition-transform ${mobileLanguageOpen ? 'rotate-180' : ''}`} />
               </button>
               {mobileLanguageOpen && (
@@ -335,7 +335,7 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
                 }}
                 className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-black shadow-md flex items-center justify-center gap-2"
               >
-                <span>Registrarse</span>
+                <span>{t('nav.signUp')}</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>
               <button
@@ -346,7 +346,7 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
                 className="w-full py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center justify-center gap-2"
               >
                 <Lock className="w-3.5 h-3.5 text-emerald-600" />
-                <span>Acceso Usuarios</span>
+                <span>{t('nav.userAccess')}</span>
               </button>
             </div>
             </div>
@@ -921,65 +921,6 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
         </div>
       </section>
 
-      {/* 6. SECCIÓN DE LLAMADA A LA ACCIÓN (CTA) PARA SOLICITAR DEMO */}
-      <section ref={reveal} id="demos" className="scroll-reveal py-20 lg:py-24 bg-gradient-to-b from-slate-900 via-slate-950 to-slate-900 text-white border-t border-slate-800 relative overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(16,185,129,0.14),transparent_65%)] pointer-events-none" />
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10 relative z-10 text-center">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-black uppercase tracking-widest">
-            <Play className="w-3.5 h-3.5 fill-emerald-400" />
-            <span>{t('home.demo.badge', 'Demos Interactivas y Personalizadas por Rol')}</span>
-          </div>
-
-          <div className="space-y-4 max-w-3xl mx-auto">
-            <h2 className="text-3xl sm:text-5xl font-black tracking-tight text-white leading-tight">
-              {t('home.corporate.demoTitle', 'Solicita una Demo Guiada o Prueba el Sistema por Rol')}
-            </h2>
-            <p className="text-sm sm:text-base text-slate-300 leading-relaxed max-w-2xl mx-auto">
-              {t('home.corporate.demoDesc', 'Comprueba de primera mano el potencial de Setmio antes de tomar cualquier decisión. Selecciona tu perfil y experimenta el cuadrante táctil, la domótica en directo y el portal web en tiempo real.')}
-            </p>
-          </div>
-
-          {/* Badges de Roles para Demostración */}
-          <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
-            <div className="px-4 py-2.5 rounded-xl bg-slate-900/90 border border-slate-800 text-xs text-slate-300 flex items-center gap-2 shadow-xs">
-              <Building2 className="w-4 h-4 text-emerald-400 shrink-0" />
-              <span className="font-bold">{t('home.demo.roleClub', 'Gerentes de Club')}</span>
-            </div>
-            <div className="px-4 py-2.5 rounded-xl bg-slate-900/90 border border-slate-800 text-xs text-slate-300 flex items-center gap-2 shadow-xs">
-              <GraduationCap className="w-4 h-4 text-teal-400 shrink-0" />
-              <span className="font-bold">{t('home.demo.roleCoaches', 'Profesores & Academias')}</span>
-            </div>
-            <div className="px-4 py-2.5 rounded-xl bg-slate-900/90 border border-slate-800 text-xs text-slate-300 flex items-center gap-2 shadow-xs">
-              <Users className="w-4 h-4 text-cyan-400 shrink-0" />
-              <span className="font-bold">{t('home.demo.rolePlayers', 'Jugadores & Socios')}</span>
-            </div>
-            <div className="px-4 py-2.5 rounded-xl bg-slate-900/90 border border-slate-800 text-xs text-slate-300 flex items-center gap-2 shadow-xs">
-              <Trophy className="w-4 h-4 text-emerald-400 shrink-0" />
-              <span className="font-bold">{t('home.demo.rolePro', 'Jugadores Profesionales')}</span>
-            </div>
-          </div>
-
-          {/* Botón Principal "Ver demo" de Alto Contraste que abre el Modal de Selección de Roles */}
-          <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
-            <button
-              type="button"
-              onClick={() => {
-                if (onOpenDemoRoleModal) {
-                  onOpenDemoRoleModal();
-                } else {
-                  setLocalDemoModalOpen(true);
-                }
-              }}
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-3 px-8 sm:px-10 py-4 sm:py-4.5 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-sm shadow-xl shadow-emerald-500/25 transition-all duration-200 hover:scale-[1.03] cursor-pointer"
-            >
-              <Play className="w-4 h-4 fill-slate-950" />
-              <span>{t('home.corporate.demoBtn', 'Ver demo')}</span>
-              <ArrowRight className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-      </section>
-
       {/* 8. LLAMADA A LA ACCIÓN FINAL PRE-FOOTER (REGISTRO DIRECTO) */}
       <section ref={reveal} className="scroll-reveal py-20 bg-emerald-600 text-white relative overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_left,rgba(255,255,255,0.15),transparent_50%)] pointer-events-none" />
@@ -1025,13 +966,13 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
 
           <div className="flex flex-wrap justify-center items-center gap-6 text-xs text-emerald-100 font-semibold pt-4">
             <span className="flex items-center gap-1.5">
-              <Check className="w-4 h-4 text-white" /> Configuración en 2 minutos
+              <Check className="w-4 h-4 text-white" aria-hidden="true" /> {t('home.prefooter.trust.setup', 'Configuración en 2 minutos')}
             </span>
             <span className="flex items-center gap-1.5">
-              <Check className="w-4 h-4 text-white" /> Sin tarjeta de crédito
+              <Check className="w-4 h-4 text-white" aria-hidden="true" /> {t('home.prefooter.trust.noCard', 'Sin tarjeta de crédito')}
             </span>
             <span className="flex items-center gap-1.5">
-              <Check className="w-4 h-4 text-white" /> Cancela en cualquier momento
+              <Check className="w-4 h-4 text-white" aria-hidden="true" /> {t('home.prefooter.trust.cancel', 'Cancela en cualquier momento')}
             </span>
           </div>
         </div>
@@ -1129,7 +1070,7 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
                 <input
                   type="text"
                   required
-                  placeholder="ej. Narón (A Coruña)"
+                  placeholder={t('home.corporate.modal.cityPlaceholder')}
                   value={clubCity}
                   onChange={(e) => setClubCity(e.target.value)}
                   className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-3.5 py-2.5 text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
