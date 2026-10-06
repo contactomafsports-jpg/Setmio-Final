@@ -35,6 +35,7 @@ import {
 } from 'lucide-react';
 import { SupportedLanguage, SUPPORTED_LANGUAGES } from '../../lib/i18n';
 import { OfficialFlag } from '../common/OfficialFlag';
+import { RoleSelectorModal } from '../common/RoleSelectorModal';
 
 interface SetmioCorporateLandingProps {
   onOpenAuth: () => void;
@@ -68,11 +69,10 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
   } = useApp();
 
   const [registerModalOpen, setRegisterModalOpen] = useState(false);
+  const [localDemoModalOpen, setLocalDemoModalOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [langDropdownOpen, setLangDropdownOpen] = useState(false);
   const [mobileLanguageOpen, setMobileLanguageOpen] = useState(false);
-  const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('monthly');
-  const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null);
   const [clubName, setClubName] = useState('');
   const [clubSlug, setClubSlug] = useState('');
   const [clubCourts, setClubCourts] = useState(4);
@@ -524,519 +524,500 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
         </div>
       </section>
 
-      {/* 4. SOLUCIONES POR PERFIL (Clubes, Profesores, Jugadores) */}
+      {/* 4. SETMIO PRO: SOLUCIONES PROFESIONALES */}
       <section ref={reveal} id="soluciones" className="scroll-reveal py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
         <div className="text-center max-w-3xl mx-auto space-y-3">
-          <div className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
-            {t('home.corporate.solutions.eyebrow', 'Arquitectura 360°')}
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs font-black uppercase tracking-widest border border-emerald-500/20">
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>Setmio Pro · Software de Gestión Profesional</span>
           </div>
           <h2 className="text-3xl sm:text-5xl font-black tracking-tight text-slate-900 dark:text-white">
-            {t('home.corporate.solutions.title', 'Una solución diseñada a medida para cada protagonista del pádel')}
+            Una solución profesional diseñada a medida para cada protagonista del pádel
           </h2>
           <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400">
-            {t('home.corporate.solutions.subtitle', 'Conecta la gestión de tus instalaciones, el negocio de tus entrenadores y la pasión de tus jugadores en un único ecosistema sincronizado.')}
+            Digitaliza la operación integral de tus instalaciones, profesionaliza la academia de tus entrenadores y gestiona la carrera de atletas de élite en una infraestructura única y sin comisiones.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Card 1: Clubes */}
-          <div className="p-8 rounded-3xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-6 shadow-sm hover:border-emerald-500 transition">
+          <div className="p-8 rounded-3xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-6 shadow-sm hover:border-emerald-500 hover:shadow-xl transition-all duration-300">
             <div className="w-12 h-12 rounded-2xl bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold">
               <Building2 className="w-6 h-6" />
             </div>
             <div>
-              <h3 className="text-xl font-black text-slate-900 dark:text-white">
-                {t('home.corporate.solutions.clubs.title', 'Clubes de Pádel')}
+              <div className="text-[11px] font-black uppercase tracking-wider text-emerald-600 dark:text-emerald-400">Para Instalaciones Deportivas</div>
+              <h3 className="text-2xl font-black text-slate-900 dark:text-white mt-1">
+                Clubes de Pádel
               </h3>
               <p className="text-xs text-slate-600 dark:text-slate-400 mt-2 leading-relaxed">
-                {t('home.corporate.solutions.clubs.desc', 'Control absoluto de instalaciones, socios y facturación con marca blanca completa.')}
+                Control absoluto de instalaciones, socios y facturación con marca blanca completa, automatización domótica y cero comisiones por reserva.
               </p>
             </div>
-            <ul className="space-y-2.5 text-xs text-slate-700 dark:text-slate-300">
+            <ul className="space-y-2.5 text-xs text-slate-700 dark:text-slate-300 border-t border-slate-200/70 dark:border-slate-800 pt-4">
               <li className="flex items-start gap-2">
                 <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
-                <span>{t('home.corporate.solutions.clubs.feat1', 'Cuadrante táctil de pistas con encendido domótico de iluminación LED')}</span>
+                <span>Cuadrante táctil de pistas con encendido domótico de iluminación LED</span>
               </li>
               <li className="flex items-start gap-2">
                 <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
-                <span>{t('home.corporate.solutions.clubs.feat2', 'Split payments (cobro de 1/4 por jugador vía Bizum y tarjeta)')}</span>
+                <span>Split payments (cobro de 1/4 por jugador vía Bizum y tarjeta de crédito)</span>
               </li>
               <li className="flex items-start gap-2">
                 <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
-                <span>{t('home.corporate.solutions.clubs.feat3', 'TPV Bar / Cafetería y Tienda oficial con servicio de test de palas')}</span>
+                <span>TPV Bar / Cafetería, arqueos de caja y tienda pro-shop con palas de test</span>
               </li>
               <li className="flex items-start gap-2">
                 <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
-                <span>{t('home.corporate.solutions.clubs.feat4', 'Gestor de torneos con cuadros automáticos y rankings sociales')}</span>
+                <span>Gestor de torneos oficiales, ligas sociales, pozos americanos y rankings</span>
               </li>
             </ul>
-            <button onClick={() => navigatePublicRoute('/soluciones/clubes', 'solution_clubs')} className="inline-flex items-center gap-2 text-xs font-black text-emerald-700 dark:text-emerald-400 hover:gap-3 transition-all">
-              {t('home.corporate.solutions.clubs.btn', 'Ver solución para clubes')} <ArrowRight className="w-4 h-4" />
+            <button onClick={() => navigatePublicRoute('/soluciones/clubes', 'solution_clubs')} className="inline-flex items-center gap-2 text-xs font-black text-emerald-700 dark:text-emerald-400 hover:gap-3 transition-all pt-2">
+              <span>Explorar solución para clubes</span> <ArrowRight className="w-4 h-4" />
             </button>
           </div>
 
-          {/* Card 2: Profesores */}
-          <div className="p-8 rounded-3xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-6 shadow-sm hover:border-emerald-500 transition">
+          {/* Card 2: Profesores y Academias */}
+          <div className="p-8 rounded-3xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-6 shadow-sm hover:border-teal-500 hover:shadow-xl transition-all duration-300">
             <div className="w-12 h-12 rounded-2xl bg-teal-100 dark:bg-teal-950 text-teal-600 dark:text-cyan-400 flex items-center justify-center font-bold">
               <GraduationCap className="w-6 h-6" />
             </div>
             <div>
-              <h3 className="text-xl font-black text-slate-900 dark:text-white">
-                {t('home.corporate.solutions.coaches.title', 'Profesores & Academias')}
+              <div className="text-[11px] font-black uppercase tracking-wider text-teal-600 dark:text-cyan-400">Para Entrenadores & Escuelas</div>
+              <h3 className="text-2xl font-black text-slate-900 dark:text-white mt-1">
+                Profesores y Academias
               </h3>
               <p className="text-xs text-slate-600 dark:text-slate-400 mt-2 leading-relaxed">
-                {t('home.corporate.solutions.coaches.desc', 'Herramientas profesionales para impartir clases, evaluar alumnos y cobrar sin retrasos.')}
+                Herramientas profesionales para impartir clases particulares y grupales, evaluar la evolución técnica del alumno y automatizar cobros recurrentes.
               </p>
             </div>
-            <ul className="space-y-2.5 text-xs text-slate-700 dark:text-slate-300">
+            <ul className="space-y-2.5 text-xs text-slate-700 dark:text-slate-300 border-t border-slate-200/70 dark:border-slate-800 pt-4">
               <li className="flex items-start gap-2">
                 <Check className="w-4 h-4 text-teal-500 shrink-0 mt-0.5" />
-                <span>{t('home.corporate.solutions.coaches.feat1', 'Cobro recurrente mensual de cuotas de escuela por tarjeta o domiciliación')}</span>
+                <span>Cobro recurrente mensual o trimestral de cuotas de escuela por domiciliación o tarjeta</span>
               </li>
               <li className="flex items-start gap-2">
                 <Check className="w-4 h-4 text-teal-500 shrink-0 mt-0.5" />
-                <span>{t('home.corporate.solutions.coaches.feat2', 'Control de asistencia y recuperación de clases canceladas')}</span>
+                <span>Control de asistencia en pista, asignación docente y lista de espera inteligente</span>
               </li>
               <li className="flex items-start gap-2">
                 <Check className="w-4 h-4 text-teal-500 shrink-0 mt-0.5" />
-                <span>{t('home.corporate.solutions.coaches.feat3', 'Ficha técnica y seguimiento de nivel de juego por alumno')}</span>
+                <span>Ficha técnica de nivel deportivo, historial de partidos y notas metodológicas</span>
               </li>
               <li className="flex items-start gap-2">
                 <Check className="w-4 h-4 text-teal-500 shrink-0 mt-0.5" />
-                <span>{t('home.corporate.solutions.coaches.feat4', 'Portal web privado propio para entrenadores independientes')}</span>
+                <span>Portal web propio del profesor para entrenadores individuales y personal trainers</span>
               </li>
             </ul>
-            <button onClick={() => navigatePublicRoute('/soluciones/profesores', 'solution_coaches')} className="inline-flex items-center gap-2 text-xs font-black text-teal-700 dark:text-cyan-400 hover:gap-3 transition-all">
-              {t('home.corporate.solutions.coaches.btn', 'Ver solución para profesores')} <ArrowRight className="w-4 h-4" />
+            <button onClick={() => navigatePublicRoute('/soluciones/profesores', 'solution_coaches')} className="inline-flex items-center gap-2 text-xs font-black text-teal-700 dark:text-cyan-400 hover:gap-3 transition-all pt-2">
+              <span>Explorar solución para profesores</span> <ArrowRight className="w-4 h-4" />
             </button>
           </div>
 
-          {/* Card 3: Jugadores */}
-          <div className="p-8 rounded-3xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-6 shadow-sm hover:border-emerald-500 transition">
-            <div className="w-12 h-12 rounded-2xl bg-cyan-100 dark:bg-cyan-950 text-cyan-600 dark:text-cyan-400 flex items-center justify-center font-bold">
-              <Users className="w-6 h-6" />
-            </div>
-            <div>
-              <h3 className="text-xl font-black text-slate-900 dark:text-white">
-                {t('home.corporate.solutions.players.title', 'Jugadores Particulares')}
-              </h3>
-              <p className="text-xs text-slate-600 dark:text-slate-400 mt-2 leading-relaxed">
-                {t('home.corporate.solutions.players.desc', 'App PWA instalable sin descargas pesadas para jugar más, competir y mejorar.')}
-              </p>
-            </div>
-            <ul className="space-y-2.5 text-xs text-slate-700 dark:text-slate-300">
-              <li className="flex items-start gap-2">
-                <Check className="w-4 h-4 text-cyan-500 shrink-0 mt-0.5" />
-                <span>{t('home.corporate.solutions.players.feat1', 'Reserva en 3 clics con selección visual de pistas y compañeros')}</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <Check className="w-4 h-4 text-cyan-500 shrink-0 mt-0.5" />
-                <span>{t('home.corporate.solutions.players.feat2', 'Partidos abiertos ("Play!") con filtro por nivel exacto y posición')}</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <Check className="w-4 h-4 text-cyan-500 shrink-0 mt-0.5" />
-                <span>{t('home.corporate.solutions.players.feat3', 'Inscripción a torneos con búsqueda de pareja en base de socios')}</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <Check className="w-4 h-4 text-cyan-500 shrink-0 mt-0.5" />
-                <span>{t('home.corporate.solutions.players.feat4', 'Monedero digital recargable y perfil deportivo público compartible')}</span>
-              </li>
-            </ul>
-            <button onClick={() => navigatePublicRoute('/soluciones/jugadores', 'solution_players')} className="inline-flex items-center gap-2 text-xs font-black text-cyan-700 dark:text-cyan-400 hover:gap-3 transition-all">
-              {t('home.corporate.solutions.players.btn', 'Ver solución para jugadores')} <ArrowRight className="w-4 h-4" />
-            </button>
-          </div>
-
-          {/* Card 4: Jugadores profesionales */}
-          <div className="p-8 rounded-3xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-6 shadow-sm hover:border-emerald-500 transition">
+          {/* Card 3: Jugadores Profesionales */}
+          <div className="p-8 rounded-3xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-6 shadow-sm hover:border-amber-500 hover:shadow-xl transition-all duration-300">
             <div className="w-12 h-12 rounded-2xl bg-amber-100 dark:bg-amber-950 text-amber-600 dark:text-amber-400 flex items-center justify-center font-bold">
               <Trophy className="w-6 h-6" />
             </div>
             <div>
-              <h3 className="text-xl font-black text-slate-900 dark:text-white">
-                {t('home.corporate.solutions.pro.title', 'Jugadores Profesionales')}
+              <div className="text-[11px] font-black uppercase tracking-wider text-amber-600 dark:text-amber-400">Atletas WPT / Premier Padel</div>
+              <h3 className="text-2xl font-black text-slate-900 dark:text-white mt-1">
+                Jugadores Profesionales
               </h3>
               <p className="text-xs text-slate-600 dark:text-slate-400 mt-2 leading-relaxed">
-                {t('home.corporate.solutions.pro.desc', 'Gestiona tu carrera, patrocinios, calendario y comunidad desde un único espacio.')}
+                Gestiona tu carrera deportiva de élite, catálogo de patrocinadores, agenda oficial de torneos FIP y relación directa con sponsors y afición.
               </p>
             </div>
-            <ul className="space-y-2.5 text-xs text-slate-700 dark:text-slate-300">
+            <ul className="space-y-2.5 text-xs text-slate-700 dark:text-slate-300 border-t border-slate-200/70 dark:border-slate-800 pt-4">
               <li className="flex items-start gap-2">
                 <Check className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
-                <span>{t('home.corporate.solutions.pro.feat1', 'Perfil profesional y presencia digital de marca blanca')}</span>
+                <span>Perfil oficial de atleta y presencia web de marca blanca de alta fidelidad</span>
               </li>
               <li className="flex items-start gap-2">
                 <Check className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
-                <span>{t('home.corporate.solutions.pro.feat2', 'Calendario de competición, entrenamientos y objetivos')}</span>
+                <span>Calendario de torneos internacionales, clinics de fin de semana y patrocinios</span>
               </li>
               <li className="flex items-start gap-2">
                 <Check className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
-                <span>{t('home.corporate.solutions.pro.feat3', 'Comunidad, contenidos y oportunidades comerciales')}</span>
+                <span>Tienda de equipación oficial firmada y venta de entradas VIP a exhibiciones</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <Check className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
+                <span>Estadísticas deportivas, rankings oficiales FIP y difusión multimedia</span>
               </li>
             </ul>
-            <button onClick={() => navigatePublicRoute('/soluciones/jugadores-profesionales', 'solution_pro_players')} className="inline-flex items-center gap-2 text-xs font-black text-amber-700 dark:text-amber-400 hover:gap-3 transition-all">
-              {t('home.corporate.solutions.pro.btn', 'Ver solución profesional')} <ArrowRight className="w-4 h-4" />
+            <button onClick={() => navigatePublicRoute('/soluciones/jugadores-profesionales', 'solution_pro_players')} className="inline-flex items-center gap-2 text-xs font-black text-amber-700 dark:text-amber-400 hover:gap-3 transition-all pt-2">
+              <span>Explorar solución profesional</span> <ArrowRight className="w-4 h-4" />
             </button>
           </div>
         </div>
       </section>
 
-      {/* 5. VÍDEO DESTACADO DE PÁDEL */}
+      {/* SECCIÓN INDEPENDIENTE: SETMIO PLAYER (JUGADORES PARTICULARES / AMATEURS) */}
+      <section ref={reveal} id="setmio-player" className="scroll-reveal py-20 bg-gradient-to-b from-slate-900 to-slate-950 text-white border-y border-slate-800 relative overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(6,182,212,0.15),transparent_50%)] pointer-events-none" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12 relative z-10">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div className="space-y-6">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-black uppercase tracking-widest">
+                <Users className="w-3.5 h-3.5" />
+                <span>Setmio Player · Para Jugadores Particulares y Amateurs</span>
+              </div>
+              
+              <h2 className="text-3xl sm:text-5xl font-black tracking-tight text-white leading-tight">
+                La experiencia definitiva para los apasionados del pádel
+              </h2>
+              
+              <p className="text-slate-300 text-base leading-relaxed">
+                Diseñado exclusivamente para que los jugadores particulares reserven pista en menos de 15 segundos, encuentren rivales de su nivel exacto, gestionen su monedero digital y compitan en los torneos de su club.
+              </p>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-1.5">
+                  <div className="text-cyan-400 font-bold text-sm flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-cyan-400" />
+                    <span>Reserva en 3 clics</span>
+                  </div>
+                  <p className="text-xs text-slate-400">
+                    Cuadrante interactivo en tiempo real con selección visual de compañeros y split payment.
+                  </p>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-1.5">
+                  <div className="text-cyan-400 font-bold text-sm flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-cyan-400" />
+                    <span>Partidos Abiertos ("Play!")</span>
+                  </div>
+                  <p className="text-xs text-slate-400">
+                    Únete a partidas niveladas por nivel decimal (ej. 3.75) y posición de revés o drive.
+                  </p>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-1.5">
+                  <div className="text-cyan-400 font-bold text-sm flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-cyan-400" />
+                    <span>Monedero Digital & Bonus</span>
+                  </div>
+                  <p className="text-xs text-slate-400">
+                    Recarga saldo con bonificaciones automáticas del club y paga sin sacar la tarjeta bancaria.
+                  </p>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-1.5">
+                  <div className="text-cyan-400 font-bold text-sm flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-cyan-400" />
+                    <span>Acceso Domótico QR / PIN</span>
+                  </div>
+                  <p className="text-xs text-slate-400">
+                    Apertura instantánea de puertas y encendido de focos sin pasar por mostrador.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-4 pt-4">
+                <button
+                  type="button"
+                  onClick={() => navigatePublicRoute('/para-jugadores', 'players_app')}
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-400 hover:to-teal-400 text-slate-950 font-black text-xs sm:text-sm shadow-xl shadow-cyan-500/20 hover:shadow-cyan-500/35 transition-all duration-200 hover:scale-[1.02] cursor-pointer text-center"
+                >
+                  <span>Conocer Setmio Player</span>
+                  <ArrowRight className="w-4 h-4 shrink-0" />
+                </button>
+              </div>
+            </div>
+
+            {/* Mockup visual representativo para Player */}
+            <div className="relative">
+              <div className="rounded-3xl bg-slate-900 border border-slate-800 p-6 shadow-2xl space-y-6">
+                <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-2xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center font-black">
+                      🎾
+                    </div>
+                    <div>
+                      <div className="text-sm font-black text-white">Setmio Player App</div>
+                      <div className="text-[11px] text-slate-400">Portal móvil de reservas y competición</div>
+                    </div>
+                  </div>
+                  <span className="px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-400 text-[10px] font-black uppercase">
+                    Modo Activo
+                  </span>
+                </div>
+
+                <div className="space-y-3">
+                  <div className="p-4 rounded-2xl bg-slate-950/80 border border-slate-800/80 flex items-center justify-between">
+                    <div>
+                      <div className="text-[10px] text-slate-400 uppercase font-bold">Próximo Partido Confirmado</div>
+                      <div className="text-sm font-bold text-white mt-0.5">Pista 2 Panorámica · 19:30h</div>
+                      <div className="text-xs text-cyan-400 mt-0.5">Nivel medio 3.8 · Luz domótica incluida</div>
+                    </div>
+                    <div className="w-12 h-12 rounded-xl bg-slate-800 flex flex-col items-center justify-center text-center">
+                      <span className="text-[10px] text-slate-400 uppercase">PIN</span>
+                      <span className="font-mono text-sm font-black text-emerald-400">8241</span>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="p-3.5 rounded-2xl bg-slate-950/80 border border-slate-800 text-center">
+                      <div className="text-[10px] text-slate-400 font-bold uppercase">Nivel Deportivo</div>
+                      <div className="text-xl font-black text-white font-mono mt-1">3.85</div>
+                      <div className="text-[10px] text-emerald-400 mt-0.5">Top 15% del Club</div>
+                    </div>
+                    <div className="p-3.5 rounded-2xl bg-slate-950/80 border border-slate-800 text-center">
+                      <div className="text-[10px] text-slate-400 font-bold uppercase">Saldo Monedero</div>
+                      <div className="text-xl font-black text-cyan-400 font-mono mt-1">45,00 €</div>
+                      <div className="text-[10px] text-slate-400 mt-0.5">+5€ recarga bono</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-cyan-950/40 border border-cyan-500/30 text-xs text-cyan-200 text-center leading-relaxed">
+                  "Tu perfil deportivo público, partidos con compañeros habituales y acceso a torneos sin esperas."
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 5. VÍDEO DESTACADO DE PÁDEL - BENEFICIOS OPERATIVOS */}
       <section ref={reveal} className="scroll-reveal py-20 bg-slate-950 text-white border-y border-slate-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-[.8fr_1.2fr] gap-10 items-center">
           <div className="space-y-5">
-            <div className="text-xs font-bold uppercase tracking-[0.2em] text-emerald-400">{t('home.corporate.video.eyebrow', 'Tecnología que se siente en pista')}</div>
-            <h2 className="text-3xl sm:text-5xl font-black tracking-tight">{t('home.corporate.video.title', 'El juego profesional, dentro de tu operación.')}</h2>
-            <p className="text-sm sm:text-base text-slate-300 leading-relaxed">{t('home.corporate.video.description', 'Descubre cómo una experiencia digital premium convierte cada reserva, clase y competición en una relación más sólida con tus jugadores.')}</p>
+            <div className="text-xs font-bold uppercase tracking-[0.2em] text-emerald-400">Eficiencia y Automatización Real</div>
+            <h2 className="text-3xl sm:text-5xl font-black tracking-tight">Beneficios operativos reales para tu gestión diaria</h2>
+            <p className="text-sm sm:text-base text-slate-300 leading-relaxed">
+              Descubre cómo una infraestructura de software moderna ahorra cientos de horas en recepción, elimina las reservas no cobradas mediante pasarelas automatizadas y multiplica la ocupación en horas valle sin intervención manual.
+            </p>
+            <div className="space-y-2 pt-2 text-xs text-slate-300">
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                <span>Hasta 40% de ahorro energético en luz de pistas con control domótico IoT</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                <span>Cobro garantizado del 100% de la pista antes de que los 4 jugadores pisen el césped</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                <span>Cero llamadas perdidas gracias al asistente inteligente en WhatsApp oficial</span>
+              </div>
+            </div>
           </div>
           <div className="overflow-hidden rounded-3xl border border-white/10 bg-slate-900 shadow-2xl aspect-video">
-            <video className="h-full w-full object-cover" autoPlay muted loop playsInline controls preload="metadata" poster="https://images.unsplash.com/photo-1554068865-24cecd4e34b8?auto=format&fit=crop&w=1600&q=80" aria-label={t('home.corporate.video.aria', 'Partido profesional de pádel')}>
+            <video className="h-full w-full object-cover" autoPlay muted loop playsInline controls preload="metadata" poster="https://images.unsplash.com/photo-1554068865-24cecd4e34b8?auto=format&fit=crop&w=1600&q=80" aria-label="Beneficios operativos reales de la plataforma de pádel">
               <source src="https://cdn.coverr.co/videos/coverr-a-padel-match-1573/1080p.mp4" type="video/mp4" />
             </video>
           </div>
         </div>
       </section>
 
-      {/* 6. MÓDULOS TECNOLÓGICOS DIFERENCIALES */}
+      {/* 6. MÓDULOS DE LA SUSCRIPCIÓN (Enfoque neutro + Botón a Módulos) */}
       <section id="modulos" className="py-20 bg-slate-50 dark:bg-slate-900/50 border-y border-slate-200 dark:border-slate-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
-          <div className="text-center max-w-3xl mx-auto space-y-2">
-            <div className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
-              {t('home.corporate.modules.eyebrow', 'Tecnología de Vanguardia')}
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-6 pb-2">
+            <div className="space-y-2 text-center sm:text-left">
+              <div className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
+                Ecosistema Modular Integral
+              </div>
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-slate-900 dark:text-white">
+                Módulos principales incluidos en la plataforma
+              </h2>
+              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 max-w-2xl">
+                Herramientas diseñadas para operar de forma unificada: gestión de pistas, escuela, competiciones, domótica, TPV y marca blanca en una sola infraestructura sin fricción.
+              </p>
             </div>
-            <h2 className="text-3xl sm:text-5xl font-black tracking-tight text-slate-900 dark:text-white">
-              {t('home.corporate.modules.title', 'Todo lo que tu club necesita en una sola suscripción')}
-            </h2>
+
+            <button
+              type="button"
+              onClick={() => navigatePublicRoute('/modulos', 'features')}
+              className="shrink-0 px-6 py-3.5 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white dark:bg-emerald-600 dark:hover:bg-emerald-500 font-bold text-xs shadow-md transition-all flex items-center gap-2 hover:gap-3 cursor-pointer"
+            >
+              <Sliders className="w-4 h-4 text-emerald-400 dark:text-white" />
+              <span>Ver todos los Módulos y Funcionalidades</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-3">
-              <Zap className="w-6 h-6 text-emerald-500" />
-              <h3 className="font-bold text-base text-slate-900 dark:text-white">{t('home.corporate.modules.iot.title', 'Domótica IoT Inteligente')}</h3>
+            <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-3 shadow-sm hover:border-emerald-500 transition-colors">
+              <div className="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold">
+                <Zap className="w-5 h-5" />
+              </div>
+              <h3 className="font-bold text-base text-slate-900 dark:text-white">Domótica IoT & Automatizaciones</h3>
               <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-                {t('home.corporate.modules.iot.desc', 'Enciende las luces de pista 5 minutos antes y apágalas al terminar. Ahorra hasta un 40% en tu factura eléctrica mensual.')}
+                Control de encendido y apagado de luces LED sincronizado con el calendario de partidos y apertura de puertas por código PIN y QR temporal.
               </p>
             </div>
 
-            <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-3">
-              <CreditCard className="w-6 h-6 text-teal-500" />
-              <h3 className="font-bold text-base text-slate-900 dark:text-white">{t('home.corporate.modules.split.title', 'Split Payments 1/4')}</h3>
+            <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-3 shadow-sm hover:border-teal-500 transition-colors">
+              <div className="w-10 h-10 rounded-xl bg-teal-100 dark:bg-teal-950 text-teal-600 dark:text-cyan-400 flex items-center justify-center font-bold">
+                <CreditCard className="w-5 h-5" />
+              </div>
+              <h3 className="font-bold text-base text-slate-900 dark:text-white">Pagos Divididos (Split Payments)</h3>
               <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-                {t('home.corporate.modules.split.desc', 'El organizador no tiene que adelantar el dinero. La app envía enlaces de pago a los 4 jugadores por Bizum o tarjeta.')}
+                Cobro fraccionado a 1/4 por jugador mediante Bizum y tarjeta. Monedero recargable de socios con bonificaciones automáticas.
               </p>
             </div>
 
-            <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-3">
-              <Bot className="w-6 h-6 text-purple-500" />
-              <h3 className="font-bold text-base text-slate-900 dark:text-white">{t('home.corporate.modules.ai.title', 'Copiloto IA en WhatsApp')}</h3>
+            <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-3 shadow-sm hover:border-purple-500 transition-colors">
+              <div className="w-10 h-10 rounded-xl bg-purple-100 dark:bg-purple-950 text-purple-600 dark:text-purple-400 flex items-center justify-center font-bold">
+                <Bot className="w-5 h-5" />
+              </div>
+              <h3 className="font-bold text-base text-slate-900 dark:text-white">Copiloto de Atención 24/7 en WhatsApp</h3>
               <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-                {t('home.corporate.modules.ai.desc', 'Atiende a tus clientes las 24 horas del día por WhatsApp oficial. Informa de pistas libres, tarifas y resuelve dudas automáticamente.')}
+                Asistente inteligente conectado a la API oficial de WhatsApp para consultar disponibilidad de pistas, responder dudas frecuentes y formalizar reservas.
               </p>
             </div>
 
-            <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-3">
-              <Trophy className="w-6 h-6 text-amber-500" />
-              <h3 className="font-bold text-base text-slate-900 dark:text-white">{t('home.corporate.modules.tournaments.title', 'Gestor de Torneos & Rankings')}</h3>
+            <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-3 shadow-sm hover:border-amber-500 transition-colors">
+              <div className="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-950 text-amber-600 dark:text-amber-400 flex items-center justify-center font-bold">
+                <Trophy className="w-5 h-5" />
+              </div>
+              <h3 className="font-bold text-base text-slate-900 dark:text-white">Gestor de Torneos, Ligas y Pozos</h3>
               <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-                {t('home.corporate.modules.tournaments.desc', 'Cuadros de eliminación, liguillas, pozos y rankings sociales con suma de puntos automática y cartelería descargable.')}
+                Cuadros de competición automáticos, pools americanos, fases de grupos y rankings dinámicos por categorías federadas o sociales.
               </p>
             </div>
 
-            <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-3">
-              <ShoppingBag className="w-6 h-6 text-rose-500" />
-              <h3 className="font-bold text-base text-slate-900 dark:text-white">{t('home.corporate.modules.shop.title', 'Tienda & Test Center')}</h3>
+            <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-3 shadow-sm hover:border-rose-500 transition-colors">
+              <div className="w-10 h-10 rounded-xl bg-rose-100 dark:bg-rose-950 text-rose-600 dark:text-rose-400 flex items-center justify-center font-bold">
+                <ShoppingBag className="w-5 h-5" />
+              </div>
+              <h3 className="font-bold text-base text-slate-900 dark:text-white">TPV Físico, Bar y Test Center</h3>
               <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-                {t('home.corporate.modules.shop.desc', 'Catálogo con reserva de palas de test para que los jugadores prueben el material en pista antes de comprar en recepción.')}
+                Terminal punto de venta táctil para cafetería y tienda de material, control de stock en tiempo real, arqueos de caja y prueba de palas en pista.
               </p>
             </div>
 
-            <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-3">
-              <Globe className="w-6 h-6 text-cyan-500" />
-              <h3 className="font-bold text-base text-slate-900 dark:text-white">{t('home.corporate.modules.whitelabel.title', 'Marca Blanca & Dominio Propio')}</h3>
+            <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-3 shadow-sm hover:border-cyan-500 transition-colors">
+              <div className="w-10 h-10 rounded-xl bg-cyan-100 dark:bg-cyan-950 text-cyan-600 dark:text-cyan-400 flex items-center justify-center font-bold">
+                <Globe className="w-5 h-5" />
+              </div>
+              <h3 className="font-bold text-base text-slate-900 dark:text-white">Marca Blanca & Dominio Propio</h3>
               <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-                {t('home.corporate.modules.whitelabel.desc', 'Conecta tu dominio personalizado (ej: tuclub.com) y adapta los colores, logotipos y textos sin menciones técnicas.')}
+                Web pública personalizada, app móvil corporativa con colores e isotipo propios, sin menciones a intermediarios y con dominio web dedicado.
               </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* 6. PLANES Y PRECIOS TRANSPARENTES (60-80€/mes Base) */}
-      <section id="precios" className="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
-        <div className="text-center max-w-3xl mx-auto space-y-3">
-          <div className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
-            {t('home.corporate.pricing.eyebrow', 'Tarifas Claras Sin Comisiones Ocultas')}
+      {/* 6. SECCIÓN DE LLAMADA A LA ACCIÓN (CTA) PARA SOLICITAR DEMO */}
+      <section ref={reveal} id="demos" className="scroll-reveal py-20 lg:py-24 bg-gradient-to-b from-slate-900 via-slate-950 to-slate-900 text-white border-t border-slate-800 relative overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(16,185,129,0.14),transparent_65%)] pointer-events-none" />
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10 relative z-10 text-center">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-black uppercase tracking-widest">
+            <Play className="w-3.5 h-3.5 fill-emerald-400" />
+            <span>Demos Interactivas y Personalizadas por Rol</span>
           </div>
-          <h2 className="text-3xl sm:text-5xl font-black tracking-tight text-slate-900 dark:text-white">
-            {t('home.corporate.pricing.title', 'Planes adaptados a la dimensión real de tu club')}
+
+          <div className="space-y-4 max-w-3xl mx-auto">
+            <h2 className="text-3xl sm:text-5xl font-black tracking-tight text-white leading-tight">
+              Solicita una Demo Guiada o Prueba el Sistema por Rol
+            </h2>
+            <p className="text-sm sm:text-base text-slate-300 leading-relaxed max-w-2xl mx-auto">
+              Comprueba de primera mano el potencial de Setmio antes de tomar cualquier decisión. Selecciona tu perfil y experimenta el cuadrante táctil, la domótica en directo y el portal web en tiempo real.
+            </p>
+          </div>
+
+          {/* Badges de Roles para Demostración */}
+          <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+            <div className="px-4 py-2.5 rounded-xl bg-slate-900/90 border border-slate-800 text-xs text-slate-300 flex items-center gap-2 shadow-xs">
+              <Building2 className="w-4 h-4 text-emerald-400 shrink-0" />
+              <span className="font-bold">Gerentes de Club</span>
+            </div>
+            <div className="px-4 py-2.5 rounded-xl bg-slate-900/90 border border-slate-800 text-xs text-slate-300 flex items-center gap-2 shadow-xs">
+              <GraduationCap className="w-4 h-4 text-teal-400 shrink-0" />
+              <span className="font-bold">Profesores & Academias</span>
+            </div>
+            <div className="px-4 py-2.5 rounded-xl bg-slate-900/90 border border-slate-800 text-xs text-slate-300 flex items-center gap-2 shadow-xs">
+              <Users className="w-4 h-4 text-cyan-400 shrink-0" />
+              <span className="font-bold">Jugadores & Socios</span>
+            </div>
+            <div className="px-4 py-2.5 rounded-xl bg-slate-900/90 border border-slate-800 text-xs text-slate-300 flex items-center gap-2 shadow-xs">
+              <Trophy className="w-4 h-4 text-amber-400 shrink-0" />
+              <span className="font-bold">Jugadores Profesionales</span>
+            </div>
+          </div>
+
+          {/* Único Botón Principal que abre el modal interactivo con selección de roles */}
+          <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
+            <button
+              type="button"
+              onClick={() => {
+                if (onOpenDemoRoleModal) {
+                  onOpenDemoRoleModal();
+                } else {
+                  setLocalDemoModalOpen(true);
+                }
+              }}
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-3 px-8 sm:px-10 py-4 sm:py-4.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black text-sm shadow-xl shadow-emerald-500/25 transition-all duration-200 hover:scale-[1.03] cursor-pointer"
+            >
+              <Play className="w-4 h-4 fill-slate-950" />
+              <span>Solicitar Demo Interactiva</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* 8. LLAMADA A LA ACCIÓN FINAL PRE-FOOTER (REGISTRO DIRECTO) */}
+      <section ref={reveal} className="scroll-reveal py-20 bg-emerald-600 text-white relative overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_left,rgba(255,255,255,0.15),transparent_50%)] pointer-events-none" />
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-8 relative z-10">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/15 border border-white/20 text-white text-xs font-black uppercase tracking-widest backdrop-blur-sm">
+            <CheckCircle2 className="w-4 h-4 text-white" />
+            <span>Empieza Hoy Mismo · 30 Días de Prueba Sin Compromiso</span>
+          </div>
+
+          <h2 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-tight">
+            ¿Listo para llevar la gestión de tu club al siguiente nivel?
           </h2>
-          <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400">
-            {t('home.corporate.pricing.subtitle', 'Todos los planes incluyen actualizaciones gratuitas, soporte telefónico y app móvil PWA.')}
+
+          <p className="text-base sm:text-lg text-emerald-100 max-w-2xl mx-auto leading-relaxed">
+            Sin permanencias, sin comisiones por pista reservada y con soporte técnico telefónico los 365 días del año. Migramos los datos de tu club en menos de 24 horas.
           </p>
 
-          {/* Billing selector */}
-          <div className="flex items-center justify-center gap-3 pt-4">
-            <span className={`text-xs font-bold ${billingCycle === 'monthly' ? 'text-slate-900 dark:text-white' : 'text-slate-500'}`}>
-              {t('home.corporate.pricing.monthly', 'Facturación Mensual')}
+          <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
+            <button
+              type="button"
+              onClick={handleOpenRegister}
+              className="px-8 py-4 rounded-2xl bg-white hover:bg-slate-100 text-slate-950 font-black text-sm shadow-2xl shadow-slate-950/20 transition-all hover:scale-[1.03] flex items-center gap-2 cursor-pointer"
+            >
+              <span>Registrar mi Club Ahora</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setLocalDemoModalOpen(true)}
+              className="px-8 py-4 rounded-2xl bg-emerald-700/80 hover:bg-emerald-700 text-white border border-emerald-400/40 font-bold text-sm shadow-xl transition-all hover:scale-[1.03] flex items-center gap-2 cursor-pointer"
+            >
+              <Play className="w-4 h-4 fill-white" />
+              <span>Ver Demo Interactiva</span>
+            </button>
+          </div>
+
+          <div className="flex flex-wrap justify-center items-center gap-6 text-xs text-emerald-100 font-semibold pt-4">
+            <span className="flex items-center gap-1.5">
+              <Check className="w-4 h-4 text-white" /> Configuración en 2 minutos
             </span>
-            <button
-              onClick={() => setBillingCycle(billingCycle === 'monthly' ? 'yearly' : 'monthly')}
-              className="relative w-12 h-6 rounded-full bg-emerald-600 transition p-0.5"
-            >
-              <span
-                className={`block w-5 h-5 rounded-full bg-white transition-transform ${
-                  billingCycle === 'yearly' ? 'translate-x-6' : 'translate-x-0'
-                }`}
-              />
-            </button>
-            <span className={`text-xs font-bold ${billingCycle === 'yearly' ? 'text-slate-900 dark:text-white' : 'text-slate-500'}`}>
-              {t('home.corporate.pricing.yearly', 'Facturación Anual')} <span className="text-emerald-600 dark:text-emerald-400 text-[10px]">{t('home.corporate.pricing.save', '(Ahorra 2 meses)')}</span>
+            <span className="flex items-center gap-1.5">
+              <Check className="w-4 h-4 text-white" /> Sin tarjeta de crédito
             </span>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 items-stretch">
-          {/* Plan 1: Coach */}
-          <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex flex-col justify-between shadow-sm">
-            <div className="space-y-4">
-              <div className="text-xs font-bold text-slate-500 uppercase">{t('home.corporate.pricing.coachBadge', 'Entrenadores')}</div>
-              <h3 className="text-xl font-black text-slate-900 dark:text-white">{t('home.corporate.pricing.coachTitle', 'Coach / Academia')}</h3>
-              <div className="flex items-baseline gap-1">
-                <span className="text-3xl font-black text-slate-900 dark:text-white font-mono">
-                  {billingCycle === 'yearly' ? '32 €' : '39 €'}
-                </span>
-                <span className="text-xs text-slate-500">/mes</span>
-              </div>
-              <p className="text-xs text-slate-600 dark:text-slate-400">
-                {t('home.corporate.pricing.coachDesc', 'Para entrenadores individuales y pequeñas escuelas sin instalaciones propias.')}
-              </p>
-              <ul className="space-y-2 text-xs text-slate-600 dark:text-slate-400 pt-2 border-t border-slate-200 dark:border-slate-800">
-                <li className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-emerald-500" /> {t('home.corporate.pricing.coachFeat1', 'Hasta 40 alumnos activos')}</li>
-                <li className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-emerald-500" /> {t('home.corporate.pricing.coachFeat2', 'Cobro recurrente de cuotas')}</li>
-                <li className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-emerald-500" /> {t('home.corporate.pricing.coachFeat3', 'Cuadrante de clases particulares')}</li>
-              </ul>
-            </div>
-            <button
-              onClick={() => {
-                setSelectedPlanId('starter');
-                setRegisterModalOpen(true);
-              }}
-              className="mt-6 w-full py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 font-bold text-xs hover:bg-slate-100 dark:hover:bg-slate-800 transition"
-            >
-              {t('home.corporate.pricing.coachBtn', 'Elegir Coach')}
-            </button>
-          </div>
-
-          {/* Plan 2: Club Base (Requisito 60-80€/mes) */}
-          <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border-2 border-emerald-500 flex flex-col justify-between shadow-xl relative">
-            <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full bg-emerald-500 text-white font-black text-[10px] uppercase tracking-wider">
-              {t('home.corporate.pricing.clubBaseBadge', 'Más Demandado')}
-            </div>
-            <div className="space-y-4">
-              <div className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase">{t('home.corporate.pricing.clubBaseBadgeName', 'Club Base')}</div>
-              <h3 className="text-xl font-black text-slate-900 dark:text-white">{t('home.corporate.pricing.clubBaseTitle', 'Plan Club Base')}</h3>
-              <div className="flex items-baseline gap-1">
-                <span className="text-3xl font-black text-emerald-600 dark:text-emerald-400 font-mono">
-                  {billingCycle === 'yearly' ? '65 €' : '79 €'}
-                </span>
-                <span className="text-xs text-slate-500">/mes</span>
-              </div>
-              <p className="text-xs text-slate-600 dark:text-slate-400">
-                {t('home.corporate.pricing.clubBaseDesc', 'Ideal para clubes de hasta 4 pistas que desean informatizar sus reservas y cobros.')}
-              </p>
-              <ul className="space-y-2 text-xs text-slate-600 dark:text-slate-400 pt-2 border-t border-slate-200 dark:border-slate-800">
-                <li className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-emerald-500" /> {t('home.corporate.pricing.clubBaseFeat1', 'Hasta 4 pistas')}</li>
-                <li className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-emerald-500" /> {t('home.corporate.pricing.clubBaseFeat2', 'Reservas ilimitadas online')}</li>
-                <li className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-emerald-500" /> {t('home.corporate.pricing.clubBaseFeat3', 'Web y App de marca blanca')}</li>
-                <li className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-emerald-500" /> {t('home.corporate.pricing.clubBaseFeat4', 'Split payments y Bizum')}</li>
-                <li className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-emerald-500" /> {t('home.corporate.pricing.clubBaseFeat5', 'Partidos abiertos "Play!"')}</li>
-              </ul>
-            </div>
-            <button
-              onClick={() => {
-                setSelectedPlanId('starter');
-                setRegisterModalOpen(true);
-              }}
-              className="mt-6 w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md transition"
-            >
-              {t('home.corporate.pricing.clubBaseBtn', 'Empezar Club Base')}
-            </button>
-          </div>
-
-          {/* Plan 3: Club Pro */}
-          <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex flex-col justify-between shadow-sm">
-            <div className="space-y-4">
-              <div className="text-xs font-bold text-teal-600 dark:text-cyan-400 uppercase">{t('home.corporate.pricing.clubProBadgeName', 'Club Pro')}</div>
-              <h3 className="text-xl font-black text-slate-900 dark:text-white">{t('home.corporate.pricing.clubProTitle', 'Plan Club Pro')}</h3>
-              <div className="flex items-baseline gap-1">
-                <span className="text-3xl font-black text-slate-900 dark:text-white font-mono">
-                  {billingCycle === 'yearly' ? '119 €' : '139 €'}
-                </span>
-                <span className="text-xs text-slate-500">/mes</span>
-              </div>
-              <p className="text-xs text-slate-600 dark:text-slate-400">
-                {t('home.corporate.pricing.clubProDesc', 'Para clubes medianos y grandes que organizan competiciones, escuela y tienda.')}
-              </p>
-              <ul className="space-y-2 text-xs text-slate-600 dark:text-slate-400 pt-2 border-t border-slate-200 dark:border-slate-800">
-                <li className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-emerald-500" /> {t('home.corporate.pricing.clubProFeat1', 'Hasta 10 pistas')}</li>
-                <li className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-emerald-500" /> {t('home.corporate.pricing.clubProFeat2', 'Gestor de torneos y rankings')}</li>
-                <li className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-emerald-500" /> {t('home.corporate.pricing.clubProFeat3', 'Módulo de escuela y academia')}</li>
-                <li className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-emerald-500" /> {t('home.corporate.pricing.clubProFeat4', 'Tienda oficial & test center')}</li>
-                <li className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-emerald-500" /> {t('home.corporate.pricing.clubProFeat5', 'Domótica IoT de pistas')}</li>
-              </ul>
-            </div>
-            <button
-              onClick={() => {
-                setSelectedPlanId('pro');
-                setRegisterModalOpen(true);
-              }}
-              className="mt-6 w-full py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 font-bold text-xs hover:bg-slate-100 dark:hover:bg-slate-800 transition"
-            >
-              {t('home.corporate.pricing.clubProBtn', 'Elegir Club Pro')}
-            </button>
-          </div>
-
-          {/* Plan 4: Elite / Cadenas */}
-          <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex flex-col justify-between shadow-sm">
-            <div className="space-y-4">
-              <div className="text-xs font-bold text-purple-600 dark:text-purple-400 uppercase">{t('home.corporate.pricing.eliteBadge', 'Instalación Élite')}</div>
-              <h3 className="text-xl font-black text-slate-900 dark:text-white">{t('home.corporate.pricing.eliteTitle', 'Plan Élite / Cadena')}</h3>
-              <div className="flex items-baseline gap-1">
-                <span className="text-3xl font-black text-slate-900 dark:text-white font-mono">
-                  {billingCycle === 'yearly' ? '219 €' : '249 €'}
-                </span>
-                <span className="text-xs text-slate-500">/mes</span>
-              </div>
-              <p className="text-xs text-slate-600 dark:text-slate-400">
-                {t('home.corporate.pricing.eliteDesc', 'Pistas ilimitadas, Copiloto IA 24/7 y soporte de ingeniería prioritario.')}
-              </p>
-              <ul className="space-y-2 text-xs text-slate-600 dark:text-slate-400 pt-2 border-t border-slate-200 dark:border-slate-800">
-                <li className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-emerald-500" /> {t('home.corporate.pricing.eliteFeat1', 'Pistas ilimitadas')}</li>
-                <li className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-emerald-500" /> {t('home.corporate.pricing.eliteFeat2', 'Copiloto IA 24/7 en WhatsApp')}</li>
-                <li className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-emerald-500" /> {t('home.corporate.pricing.eliteFeat3', 'Dominio propio SSL gratuito')}</li>
-                <li className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-emerald-500" /> {t('home.corporate.pricing.eliteFeat4', 'TPV Cafetería y POS físico')}</li>
-                <li className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-emerald-500" /> {t('home.corporate.pricing.eliteFeat5', 'Integración ERP & API REST')}</li>
-              </ul>
-            </div>
-            <button
-              onClick={() => {
-                setSelectedPlanId('elite');
-                setRegisterModalOpen(true);
-              }}
-              className="mt-6 w-full py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 font-bold text-xs hover:bg-slate-100 dark:hover:bg-slate-800 transition"
-            >
-              {t('home.corporate.pricing.eliteBtn', 'Contactar Élite')}
-            </button>
+            <span className="flex items-center gap-1.5">
+              <Check className="w-4 h-4 text-white" /> Cancela en cualquier momento
+            </span>
           </div>
         </div>
       </section>
 
-      {/* 7. DEMO CLUBES & SWITCHER DE ROLES */}
-      <section id="demos" className="py-20 bg-slate-50 dark:bg-slate-900/40 border-t border-slate-200 dark:border-slate-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
-          <div className="text-center max-w-2xl mx-auto space-y-2">
-            <div className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
-              {t('home.corporate.demos.eyebrow', 'Casos Reales & Demos Interactivas')}
-            </div>
-            <h2 className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-white">
-              {t('home.corporate.demos.title', 'Explora cómo funciona en clubes reales')}
-            </h2>
-            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400">
-              {t('home.corporate.demos.desc', 'Accede a la web pública de nuestros clubes clientes o inicia sesión en modo simulación para auditar cada perfil.')}
-            </p>
-          </div>
-
-          {/* Club Showcase Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-md space-y-4">
-              <div className="relative h-48 rounded-2xl overflow-hidden">
-                <img
-                  src="https://images.unsplash.com/photo-1554068865-24cecd4e34b8?auto=format&fit=crop&w=800&q=80"
-                  alt="Tu club de pádel"
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent" />
-                <div className="absolute bottom-4 left-4 right-4 text-white">
-                  <div className="font-bold text-sm">{t('home.corporate.demos.clubTitle', 'Tu club de pádel')}</div>
-                  <div className="text-xs text-emerald-400">{t('home.corporate.demos.clubSubtitle', 'Tu marca · Pistas, socios y operaciones en un solo lugar')}</div>
-                </div>
-              </div>
-              <p className="text-xs text-slate-600 dark:text-slate-400">
-                {t('home.corporate.demos.clubDesc', 'Club oficial con escuela federada de adultos y menores, torneos de fin de semana, tienda pro shop con palas de test y cafetería.')}
-              </p>
-              <button
-                onClick={() => onExploreClub('sanmateo')}
-                className="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md transition flex items-center justify-center gap-2"
-              >
-                <span>{t('home.corporate.demos.btnExplore', 'Explorar Web Pública del Club')}</span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
-            </div>
-
-            <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-md space-y-4">
-              <div className="relative h-48 rounded-2xl overflow-hidden">
-                <img
-                  src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=800&q=80"
-                  alt="Martín Sánchez Pro"
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent" />
-                <div className="absolute bottom-4 left-4 right-4 text-white">
-                  <div className="font-bold text-sm">{t('home.corporate.demos.proPlayerTitle', 'Martín Sánchez (WPT Pro Player)')}</div>
-                  <div className="text-xs text-amber-400">{t('home.corporate.demos.proBadge', 'FIP Top 20 · Academia de Competición')}</div>
-                </div>
-              </div>
-              <p className="text-xs text-slate-600 dark:text-slate-400">
-                {t('home.corporate.demos.proDesc', 'Ficha deportiva para atletas de élite, clinics de fin de semana, sponsors oficiales y venta de equipación oficial.')}
-              </p>
-              <button
-                onClick={() => onExploreClub('martinsanchez')}
-                className="w-full py-3 rounded-xl bg-slate-900 dark:bg-slate-800 hover:bg-slate-800 text-white font-bold text-xs border border-slate-700 transition flex items-center justify-center gap-2"
-              >
-                <span>{t('home.corporate.demos.btnExploreAthlete', 'Explorar Web del Atleta')}</span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-
-          {/* Quick Role Simulation Bar */}
-          <div className="p-6 rounded-3xl bg-emerald-950/20 border border-emerald-500/30 max-w-4xl mx-auto space-y-4 text-center">
-            <h3 className="font-bold text-sm text-slate-900 dark:text-white flex items-center justify-center gap-2">
-              <Sliders className="w-4 h-4 text-emerald-500" />
-              <span>{t('demo.badge', 'Simulador de Roles Setmio (Prueba en Vivo)')}</span>
-            </h3>
-            <p className="text-xs text-slate-600 dark:text-slate-400 max-w-xl mx-auto">
-              {t('demo.description', 'Haz clic en cualquiera de los perfiles para entrar directamente al software con sus permisos y vistas operativas completas:')}
-            </p>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
-              <button
-                onClick={() => handleQuickDemoRole('SUPERADMIN')}
-                className="p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-emerald-500 font-bold text-xs text-slate-900 dark:text-white transition"
-              >
-                🏢 {t('register.roles.superadmin.title', 'Superadmin HQ')}
-              </button>
-              <button
-                onClick={() => handleQuickDemoRole('TENANT_OWNER')}
-                className="p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-emerald-500 font-bold text-xs text-slate-900 dark:text-white transition"
-              >
-                🎾 {t('register.roles.tenant_owner.title', 'Gerente Club')}
-              </button>
-              <button
-                onClick={() => handleQuickDemoRole('COACH')}
-                className="p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-emerald-500 font-bold text-xs text-slate-900 dark:text-white transition"
-              >
-                🎓 {t('register.roles.coach_club.title', 'Entrenador / Coach')}
-              </button>
-              <button
-                onClick={() => handleQuickDemoRole('PLAYER')}
-                className="p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-emerald-500 font-bold text-xs text-slate-900 dark:text-white transition"
-              >
-                👤 {t('register.roles.player.title', 'Jugador / Socio')}
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* MODAL INTERACTIVO DE DEMO POR ROL */}
+      <RoleSelectorModal
+        isOpen={localDemoModalOpen}
+        onClose={() => setLocalDemoModalOpen(false)}
+      />
 
       {/* 9. MODAL REGISTRO DE NUEVO CLUB */}
       {registerModalOpen && (

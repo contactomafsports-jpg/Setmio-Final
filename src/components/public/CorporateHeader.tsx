@@ -13,20 +13,19 @@ interface CorporateHeaderProps {
 const menuItems = [
   [Home, 'nav.home', 'Inicio', '/'],
   [Layers, 'nav.solutions', 'Soluciones', '/soluciones'],
-  [Sliders, 'nav.features', 'Funcionalidades', '/funcionalidades'],
-  [Zap, 'nav.modules', 'Módulos y Domótica', '/modulos'],
+  [Sliders, 'nav.features', 'Módulos / Funcionalidades', '/modulos'],
+  [Zap, 'nav.domotica', 'Domótica & Automatizaciones', '/domotica'],
   [Play, 'nav.demo', 'Ver Demo', '/demo'],
   [CreditCard, 'nav.pricing', 'Precios', '/precios'],
   [BookOpen, 'nav.blog', 'Blog', '/blog'],
   [Mail, 'nav.contact', 'Contacto', '/contacto'],
-  [Lock, 'nav.clubAccess', 'Acceso Club', '/login'],
 ] as const;
 
 export function CorporateHeader({ onOpenDemo, onOpenAuth, onOpenRegister }: CorporateHeaderProps) {
   const [open, setOpen] = React.useState(false);
   const [languageMenuOpen, setLanguageMenuOpen] = React.useState(false);
   const langRef = React.useRef<HTMLDivElement>(null);
-  const { t, language, setLanguage, theme, toggleTheme, setCurrentView } = useApp();
+  const { t, language, setLanguage, theme, toggleTheme } = useApp();
   const close = () => setOpen(false);
   const navigate = (event: React.MouseEvent<HTMLAnchorElement>, path: string) => {
     event.preventDefault();
@@ -40,12 +39,6 @@ export function CorporateHeader({ onOpenDemo, onOpenAuth, onOpenRegister }: Corp
     window.history.pushState({}, '', '/registro');
     window.dispatchEvent(new PopStateEvent('popstate'));
     onOpenRegister?.();
-  };
-
-  const handleReturnToAdmin = () => {
-    close();
-    setCurrentView('admin');
-    window.scrollTo({ top: 0, behavior: 'instant' });
   };
 
   React.useEffect(() => {
@@ -74,17 +67,6 @@ export function CorporateHeader({ onOpenDemo, onOpenAuth, onOpenRegister }: Corp
         </button>
 
         <div className="flex items-center gap-1 sm:gap-2">
-          {/* Volver a App Admin (Conmutación Web/App requerida) */}
-          <button
-            type="button"
-            onClick={handleReturnToAdmin}
-            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-bold bg-slate-900 hover:bg-slate-800 text-white dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-700 hover:border-emerald-500 transition shadow-xs cursor-pointer active:scale-95"
-            title="Volver a la App de Gestión del Club"
-          >
-            <span className="hidden sm:inline">Volver a App Admin</span>
-            <span className="sm:hidden">App</span>
-          </button>
-
           <div ref={langRef} className={`relative ${open ? 'hidden lg:block' : 'block'}`}>
             <button
               type="button"
@@ -133,7 +115,8 @@ export function CorporateHeader({ onOpenDemo, onOpenAuth, onOpenRegister }: Corp
             type="button"
             onClick={onOpenAuth}
             className="rounded-xl p-2 text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800 cursor-pointer"
-            aria-label="Acceso Club"
+            aria-label="Acceso Usuarios / Socios"
+            title="Acceso Usuarios / Socios"
           >
             <Lock className="h-5 w-5" />
           </button>
@@ -149,35 +132,35 @@ export function CorporateHeader({ onOpenDemo, onOpenAuth, onOpenRegister }: Corp
           </button>
         </div>
 
-        {/* Desktop Navigation Links: Menú Canónico de 9 elementos */}
-        <nav className="hidden items-center gap-2.5 xl:gap-3 text-xs font-bold lg:flex text-slate-700 dark:text-slate-300" aria-label="Navegación corporativa">
+        {/* Desktop Navigation Links */}
+        <nav className="hidden items-center gap-3 xl:gap-4 text-xs font-bold lg:flex text-slate-700 dark:text-slate-300" aria-label="Navegación corporativa">
           <a href="/" onClick={(event) => navigate(event, '/')} className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
-            {t('nav.home', '1. Inicio')}
+            {t('nav.home', 'Inicio')}
           </a>
           <a href="/soluciones" onClick={(event) => navigate(event, '/soluciones')} className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
-            {t('nav.solutions', '2. Soluciones')}
-          </a>
-          <a href="/funcionalidades" onClick={(event) => navigate(event, '/funcionalidades')} className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
-            {t('nav.features', '3. Funcionalidades')}
+            {t('nav.solutions', 'Soluciones')}
           </a>
           <a href="/modulos" onClick={(event) => navigate(event, '/modulos')} className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
-            {t('nav.modules', '4. Módulos y Domótica')}
+            {t('nav.features', 'Módulos')}
+          </a>
+          <a href="/domotica" onClick={(event) => navigate(event, '/domotica')} className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+            {t('nav.domotica', 'Domótica')}
           </a>
           <button
             type="button"
             onClick={onOpenDemo}
             className="rounded-lg bg-emerald-600/10 hover:bg-emerald-600 hover:text-white text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 px-2.5 py-1.5 transition-colors font-bold cursor-pointer"
           >
-            {t('nav.demo', '5. Ver Demo')}
+            {t('nav.demo', 'Ver Demo')}
           </button>
           <a href="/precios" onClick={(event) => navigate(event, '/precios')} className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
-            {t('nav.pricing', '6. Precios')}
+            {t('nav.pricing', 'Precios')}
           </a>
           <a href="/blog" onClick={(event) => navigate(event, '/blog')} className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
-            {t('nav.blog', '7. Blog')}
+            {t('nav.blog', 'Blog')}
           </a>
           <a href="/contacto" onClick={(event) => navigate(event, '/contacto')} className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
-            {t('nav.contact', '8. Contacto')}
+            {t('nav.contact', 'Contacto')}
           </a>
           <button
             type="button"
@@ -185,7 +168,7 @@ export function CorporateHeader({ onOpenDemo, onOpenAuth, onOpenRegister }: Corp
             className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 dark:border-slate-700 px-3 py-1.5 text-slate-800 dark:text-slate-100 hover:border-emerald-500 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors cursor-pointer"
           >
             <Lock className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-            <span>{t('nav.clubAccess', '9. Acceso Club')}</span>
+            <span>{t('nav.userAccess', 'Acceso Usuarios / Socios')}</span>
           </button>
         </nav>
       </div>
@@ -212,7 +195,7 @@ export function CorporateHeader({ onOpenDemo, onOpenAuth, onOpenRegister }: Corp
           <div className="mt-4 grid gap-2 border-t border-slate-200 pt-4 dark:border-slate-800">
             <button type="button" onClick={() => setLanguageMenuOpen((value) => !value)} className="flex items-center justify-between rounded-xl p-3 text-left text-sm font-bold text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-900" aria-expanded={languageMenuOpen}><span className="flex items-center gap-3"><Globe className="h-4 w-4 text-emerald-600" /><OfficialFlag code={language} /> {t('nav.language', 'Idioma')}: {SUPPORTED_LANGUAGES.find((item) => item.code === language)?.name ?? t('language.es', 'Español')}</span><span>⌄</span></button>{languageMenuOpen && <div className="grid grid-cols-2 gap-2 rounded-xl bg-slate-50 p-2 dark:bg-slate-900">{SUPPORTED_LANGUAGES.map((item) => <button type="button" key={item.code} onClick={() => { setLanguage(item.code); setLanguageMenuOpen(false); }} className={`rounded-lg px-2 py-2 text-left text-xs font-bold hover:bg-emerald-100 dark:hover:bg-slate-800 ${language === item.code ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300' : 'text-slate-800 dark:text-slate-200'}`}><OfficialFlag code={item.code} /> <span className="ml-1">{item.name}</span></button>)}</div>}
             <button type="button" onClick={handleRegisterClick} className="rounded-xl bg-emerald-600 px-4 py-3 text-sm font-black text-white">{t('nav.register', 'Registrarse')} <ArrowRight className="ml-1 inline h-4 w-4" /></button>
-            <button type="button" onClick={() => { close(); onOpenAuth?.(); }} className="rounded-xl border border-slate-300 px-4 py-3 text-sm font-bold text-slate-800 dark:text-slate-200 dark:border-slate-700 hover:border-emerald-500 hover:text-emerald-600 transition"><Lock className="mr-2 inline h-4 w-4 text-emerald-600" />{t('nav.login', 'Acceso Clientes / Login')}</button>
+            <button type="button" onClick={() => { close(); onOpenAuth?.(); }} className="rounded-xl border border-slate-300 px-4 py-3 text-sm font-bold text-slate-800 dark:text-slate-200 dark:border-slate-700 hover:border-emerald-500 hover:text-emerald-600 transition"><Lock className="mr-2 inline h-4 w-4 text-emerald-600" />{t('nav.userAccess', 'Acceso Usuarios / Socios')}</button>
           </div>
         </nav>
       </div>}

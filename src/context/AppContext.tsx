@@ -71,17 +71,19 @@ export type PublicPage =
 const PUBLIC_ROUTES: Record<string, PublicPage> = {
   '/': 'home',
   '/funcionalidades': 'features',
+  '/modulos': 'features',
+  '/domotica': 'modules',
+  '/modulos-domotica': 'modules',
   '/registro': 'home',
   '/login': 'home',
   '/soluciones': 'solutions',
   '/soluciones/clubes': 'solution_clubs',
   '/soluciones/escuelas': 'solution_schools',
   '/soluciones/profesores': 'solution_coaches',
-  '/soluciones/jugadores': 'solution_players',
+  '/soluciones/jugadores': 'players_app',
   '/soluciones/jugadores-profesionales': 'solution_pro_players',
   '/jugadores-app': 'players_app',
   '/para-jugadores': 'players_app',
-  '/modulos-domotica': 'modules',
   '/demo': 'demo',
   '/precios': 'pricing',
   '/perfil-jugador': 'player_profile',
@@ -101,15 +103,15 @@ const PUBLIC_ROUTES: Record<string, PublicPage> = {
 
 const routeForPage: Record<PublicPage, string> = {
   home: '/',
-  features: '/funcionalidades',
+  features: '/modulos',
   solutions: '/soluciones',
   solution_clubs: '/soluciones/clubes',
   solution_schools: '/soluciones/escuelas',
   solution_coaches: '/soluciones/profesores',
-  solution_players: '/soluciones/jugadores',
+  solution_players: '/para-jugadores',
   solution_pro_players: '/soluciones/jugadores-profesionales',
   players_app: '/para-jugadores',
-  modules: '/modulos-domotica',
+  modules: '/domotica',
   demo: '/demo',
   pricing: '/precios',
   player_profile: '/perfil-jugador',
@@ -210,8 +212,8 @@ const readRoute = () => {
 
   const activeClubSlug = pathClubSlug || detectedSubdomain || detectedCustomDomainClub;
 
-  // Every public corporate route uses the Setmio layout; only /club/:slug uses the club layout.
-  const isCorporate = !activeClubSlug && Object.prototype.hasOwnProperty.call(PUBLIC_ROUTES, remainingPath);
+  // Every public corporate route uses the Setmio layout; only club subdomains, custom domains or /club/:slug use the club layout.
+  const isCorporate = !activeClubSlug;
 
   if (remainingPath === '/hq') {
     return {
@@ -367,10 +369,16 @@ export interface AIMessage {
 }
 
 interface AppContextType {
-  // Theme & i18n
+  // Theme & i18n (Aislamiento absoluto de temas)
   theme: ThemeMode;
   setTheme: (theme: ThemeMode) => void;
   toggleTheme: () => void;
+  corporateTheme: ThemeMode;
+  setCorporateTheme: (theme: ThemeMode) => void;
+  toggleCorporateTheme: () => void;
+  clubTheme: ThemeMode;
+  setClubTheme: (theme: ThemeMode) => void;
+  toggleClubTheme: () => void;
   language: SupportedLanguage;
   currentLanguage: SupportedLanguage;
   setLanguage: (lang: SupportedLanguage) => void;
@@ -634,18 +642,67 @@ const ROLE_PROFILES: Record<UserRole, UserSession> = {
 };
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // Theme state (LIGHT MODE is default per requirement 45)
-  const [theme, setTheme] = useState<ThemeMode>(() => {
+  // --- AISLAMIENTO ABSOLUTO DE TEMAS ---
+  // 1. Tema de la Web Pública de Setmio (SaaS Corporativo)
+  const [corporateTheme, setCorporateThemeState] = useState<ThemeMode>(() => {
     try {
-      const saved = localStorage.getItem('setmio_theme') as ThemeMode;
+      const saved = localStorage.getItem('setmio_corporate_theme') as ThemeMode;
       return saved || 'light';
     } catch {
       return 'light';
     }
   });
 
-  const toggleTheme = useCallback(() => {
-    setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
+  const setCorporateTheme = useCallback((mode: ThemeMode) => {
+    setCorporateThemeState(mode);
+    try {
+      localStorage.setItem('setmio_corporate_theme', mode);
+    } catch {
+      // Ignore
+    }
+  }, []);
+
+  const toggleCorporateTheme = useCallback(() => {
+    setCorporateThemeState((prev) => {
+      const next = prev === 'dark' ? 'light' : 'dark';
+      try {
+        localStorage.setItem('setmio_corporate_theme', next);
+      } catch {
+        // Ignore
+      }
+      return next;
+    });
+  }, []);
+
+  // 2. Tema de la Web Pública del Club / Profesional y App Marca Blanca
+  const [clubTheme, setClubThemeState] = useState<ThemeMode>(() => {
+    try {
+      const saved = localStorage.getItem('setmio_club_theme') as ThemeMode;
+      return saved || 'light';
+    } catch {
+      return 'light';
+    }
+  });
+
+  const setClubTheme = useCallback((mode: ThemeMode) => {
+    setClubThemeState(mode);
+    try {
+      localStorage.setItem('setmio_club_theme', mode);
+    } catch {
+      // Ignore
+    }
+  }, []);
+
+  const toggleClubTheme = useCallback(() => {
+    setClubThemeState((prev) => {
+      const next = prev === 'dark' ? 'light' : 'dark';
+      try {
+        localStorage.setItem('setmio_club_theme', next);
+      } catch {
+        // Ignore
+      }
+      return next;
+    });
   }, []);
 
   // Language state (default 'es' per requirement 40)
@@ -675,27 +732,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const t = useCallback((key: string, fallback?: string): string => {
     return TRANSLATIONS[language]?.[key] || TRANSLATIONS.es?.[key] || fallback || key;
   }, [language]);
-
-  // Sync theme with DOM documentElement
-  useEffect(() => {
-    const root = document.documentElement;
-    try {
-      localStorage.setItem('setmio_theme', theme);
-    } catch {
-      // Ignore
-    }
-
-    if (theme === 'dark') {
-      root.classList.add('dark');
-    } else if (theme === 'light') {
-      root.classList.remove('dark');
-    } else {
-      // System
-      const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      if (isDark) root.classList.add('dark');
-      else root.classList.remove('dark');
-    }
-  }, [theme]);
 
   // Modals state
   const [searchModalOpen, setSearchModalOpen] = useState(false);
@@ -738,6 +774,65 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   });
 
   const currentTenant = tenants.find((t) => t.id === currentTenantId) || tenants[0];
+
+  // --- AISLAMIENTO DE TEMA SEGÚN ENTORNO ---
+  // El Panel Admin siempre mantiene de forma fija su modo oscuro canónico
+  const theme: ThemeMode =
+    currentView === 'admin'
+      ? 'dark'
+      : isCorporateLanding
+      ? corporateTheme
+      : clubTheme;
+
+  const setTheme = useCallback(
+    (mode: ThemeMode) => {
+      if (currentView === 'admin') return; // Admin siempre modo oscuro canónico
+      if (isCorporateLanding) {
+        setCorporateTheme(mode);
+      } else {
+        setClubTheme(mode);
+      }
+    },
+    [currentView, isCorporateLanding, setCorporateTheme, setClubTheme]
+  );
+
+  const toggleTheme = useCallback(() => {
+    if (currentView === 'admin') return; // Admin siempre modo oscuro canónico
+    if (isCorporateLanding) {
+      toggleCorporateTheme();
+    } else {
+      toggleClubTheme();
+    }
+  }, [currentView, isCorporateLanding, toggleCorporateTheme, toggleClubTheme]);
+
+  // Sincronización del DOM con el tema activo del entorno
+  useEffect(() => {
+    const root = document.documentElement;
+
+    if (currentView === 'admin') {
+      root.classList.add('dark');
+      root.classList.remove('light');
+      return;
+    }
+
+    const activeMode = isCorporateLanding ? corporateTheme : clubTheme;
+    if (activeMode === 'dark') {
+      root.classList.add('dark');
+      root.classList.remove('light');
+    } else if (activeMode === 'light') {
+      root.classList.remove('dark');
+      root.classList.add('light');
+    } else {
+      const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      if (isDark) {
+        root.classList.add('dark');
+        root.classList.remove('light');
+      } else {
+        root.classList.remove('dark');
+        root.classList.add('light');
+      }
+    }
+  }, [currentView, isCorporateLanding, corporateTheme, clubTheme]);
 
   useEffect(() => {
     const root = document.documentElement;
@@ -1621,6 +1716,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         theme,
         setTheme,
         toggleTheme,
+        corporateTheme,
+        setCorporateTheme,
+        toggleCorporateTheme,
+        clubTheme,
+        setClubTheme,
+        toggleClubTheme,
         language,
         currentLanguage: language,
         setLanguage,

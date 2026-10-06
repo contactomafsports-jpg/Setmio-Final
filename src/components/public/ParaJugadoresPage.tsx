@@ -138,7 +138,7 @@ export function ParaJugadoresPage({ onBack, onOpenDemo, onOpenRegister }: ParaJu
               <div className="pt-4 flex flex-wrap items-center gap-6 text-xs text-slate-400">
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                  <span>Web App PWA Instalable</span>
+                  <span>Acceso Móvil Instantáneo</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-emerald-400" />

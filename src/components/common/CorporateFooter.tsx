@@ -123,75 +123,98 @@ export const CorporateFooter: React.FC<CorporateFooterProps> = ({ minimized = fa
           </div>
         </div>
 
-        {/* Solutions Column */}
-        <div>
-          <h4 className="font-bold text-white mb-3 text-sm tracking-wide">
-            {t('footer.solutionsTitle', 'Soluciones')}
-          </h4>
-          <ul className="space-y-2 text-[11px]">
-            <li>
-              <button
-                type="button"
-                onClick={() => navigateTo('/soluciones/clubes', 'solution_clubs')}
-                className="hover:text-white transition text-left"
-              >
-                {t('footer.solutionsClubs', 'Para Clubes de Pádel')}
-              </button>
-            </li>
-            <li>
-              <button
-                type="button"
-                onClick={() => navigateTo('/soluciones/escuelas', 'solution_schools')}
-                className="hover:text-white transition text-left"
-              >
-                {t('footer.solutionsSchools', 'Para Escuelas & Academias')}
-              </button>
-            </li>
-            <li>
-              <button
-                type="button"
-                onClick={() => navigateTo('/soluciones/profesores', 'solution_coaches')}
-                className="hover:text-white transition text-left"
-              >
-                {t('footer.solutionsCoaches', 'Para Profesores & Entrenadores')}
-              </button>
-            </li>
-            <li>
-              <button
-                type="button"
-                onClick={() => navigateTo('/soluciones/jugadores', 'solution_players')}
-                className="hover:text-white transition text-left"
-              >
-                {t('footer.solutionsPlayers', 'Para Jugadores (App PWA)')}
-              </button>
-            </li>
-            <li>
-              <button
-                type="button"
-                onClick={() => navigateTo('/modulos-domotica', 'modules')}
-                className="hover:text-white transition text-left"
-              >
-                {t('footer.solutionsIot', 'Domótica IoT de Pistas')}
-              </button>
-            </li>
-            <li>
-              <button
-                type="button"
-                onClick={() => navigateTo('/modulos-domotica', 'modules')}
-                className="hover:text-white transition text-left"
-              >
-                {t('footer.solutionsAi', 'Copiloto IA 24/7 en WhatsApp')}
-              </button>
-            </li>
-          </ul>
+        {/* Solutions Column - Separado en Setmio Pro y Setmio Player */}
+        <div className="space-y-4">
+          <div>
+            <h4 className="font-bold text-white mb-2 text-xs tracking-wider uppercase flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+              <span>Setmio Pro</span>
+            </h4>
+            <ul className="space-y-1.5 text-[11px]">
+              <li>
+                <button
+                  type="button"
+                  onClick={() => navigateTo('/soluciones/clubes', 'solution_clubs')}
+                  className="hover:text-emerald-400 transition text-left"
+                >
+                  {t('footer.solutionsClubs', 'Para Clubes de Pádel')}
+                </button>
+              </li>
+              <li>
+                <button
+                  type="button"
+                  onClick={() => navigateTo('/soluciones/escuelas', 'solution_schools')}
+                  className="hover:text-emerald-400 transition text-left"
+                >
+                  {t('footer.solutionsSchools', 'Escuelas & Academias')}
+                </button>
+              </li>
+              <li>
+                <button
+                  type="button"
+                  onClick={() => navigateTo('/soluciones/profesores', 'solution_coaches')}
+                  className="hover:text-emerald-400 transition text-left"
+                >
+                  {t('footer.solutionsCoaches', 'Profesores & Entrenadores')}
+                </button>
+              </li>
+              <li>
+                <button
+                  type="button"
+                  onClick={() => navigateTo('/soluciones/jugadores-profesionales', 'solution_pro_players')}
+                  className="hover:text-emerald-400 transition text-left"
+                >
+                  Jugadores Profesionales
+                </button>
+              </li>
+            </ul>
+          </div>
+
+          <div className="pt-2 border-t border-slate-800/80">
+            <h4 className="font-bold text-white mb-2 text-xs tracking-wider uppercase flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-cyan-500"></span>
+              <span>Setmio Player</span>
+            </h4>
+            <ul className="space-y-1.5 text-[11px]">
+              <li>
+                <button
+                  type="button"
+                  onClick={() => navigateTo('/para-jugadores', 'players_app')}
+                  className="hover:text-cyan-400 transition text-left font-medium text-slate-300"
+                >
+                  Para Jugadores Particulares (App PWA)
+                </button>
+              </li>
+            </ul>
+          </div>
         </div>
 
-        {/* Platform Column */}
+        {/* Platform & Modules Column */}
         <div>
           <h4 className="font-bold text-white mb-3 text-sm tracking-wide">
-            {t('footer.platformTitle', 'Plataforma')}
+            {t('footer.platformTitle', 'Módulos & Plataforma')}
           </h4>
           <ul className="space-y-2 text-[11px]">
+            <li>
+              <button
+                type="button"
+                onClick={() => navigateTo('/modulos', 'features')}
+                className="hover:text-white transition text-left flex items-center gap-1.5"
+              >
+                <span className="text-emerald-400 font-bold">·</span>
+                <span>Módulos y Funcionalidades</span>
+              </button>
+            </li>
+            <li>
+              <button
+                type="button"
+                onClick={() => navigateTo('/domotica', 'modules')}
+                className="hover:text-white transition text-left flex items-center gap-1.5"
+              >
+                <span className="text-emerald-400 font-bold">·</span>
+                <span>Domótica y Automatizaciones</span>
+              </button>
+            </li>
             <li>
               <button
                 type="button"
