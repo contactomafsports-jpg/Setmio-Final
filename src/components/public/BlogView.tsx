@@ -46,8 +46,14 @@ export const BlogView: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
       }
     };
 
+    const params = new URLSearchParams(window.location.search);
+    setSelectedArticleId(params.get('id'));
+
     window.addEventListener('popstate', syncArticleFromUrl);
-    return () => window.removeEventListener('popstate', syncArticleFromUrl);
+    return () => {
+      window.removeEventListener('popstate', syncArticleFromUrl);
+      setSelectedArticleId(null);
+    };
   }, [setSelectedArticleId]);
 
   const categories = [
@@ -92,7 +98,8 @@ export const BlogView: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
 
   const handleBackToList = () => {
     setSelectedArticleId(null);
-    if (typeof window !== 'undefined') {
+    setPublicPage('blog');
+    if (typeof window !== 'undefined' && (window.location.pathname !== '/blog' || window.location.search)) {
       window.history.pushState({}, '', '/blog');
     }
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -222,30 +229,24 @@ export const BlogView: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
               {t((selectedArticle as any).excerptKey || (selectedArticle as any).summaryKey || ('blog.posts.' + selectedArticle.id + '.summary'), selectedArticle.summary)}
             </p>
 
-            <p>
-              El pádel moderno ha evolucionado a una velocidad de juego vertiginosa. En las pistas de última generación como las de Pádel San Mateo en Narón, la combinación de césped texturizado Mondo Supercourt XN con menor fricción y cristal templado de 12 mm exige que el jugador prepare su golpe con medio segundo de anticipación respecto al pádel tradicional.
-            </p>
+            <p>{t('blog.article.p1')}</p>
 
             <h2 className="text-2xl font-bold text-slate-900 dark:text-white mt-8 mb-4">
-              1. Posicionamiento del cuerpo y transferencia de peso
+              {t('blog.article.h1')}
             </h2>
-            <p>
-              El error más recurrente en jugadores de nivel intermedio (3.0 a 4.0) radica en golpear con el peso del cuerpo retrasado hacia el pie trasero. Al ejecutar la víbora o la bandeja profunda, es imprescindible frenar la inercia con pasos de ajuste cortos y llevar el hombro izquierdo (o derecho en zurdos) hacia la trayectoria de la bola antes del punto de impacto.
-            </p>
+            <p>{t('blog.article.p2')}</p>
 
             <h2 className="text-2xl font-bold text-slate-900 dark:text-white mt-8 mb-4">
-              2. La lectura del cristal lateral
+              {t('blog.article.h2')}
             </h2>
-            <p>
-              Aprender a dejar pasar las bolas rápidas para que toquen el cristal de fondo y lateral antes de definirlas reduce en un 60% los errores no forzados. En nuestras clases de la escuela federada insistimos siempre en la paciencia táctica: no busques el tiro ganador en la primera oportunidad si estás a más de dos metros de la red.
-            </p>
+            <p>{t('blog.article.p3')}</p>
 
             <div className="p-6 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 my-8">
               <h4 className="font-bold text-emerald-900 dark:text-emerald-300 text-sm mb-1">
-                {t('blog.coachTip', `Consejo del Entrenador en ${currentTenant.name}`)}
+                {t('blog.coachTipTitle').replace('{club}', currentTenant.name)}
               </h4>
               <p className="text-xs text-emerald-800 dark:text-emerald-400 leading-relaxed">
-                "Dedica 15 minutos en el calentamiento a realizar intercambios lentos de bandeja a media pista sin buscar rematar. Calibrarás el bote del césped del club y ganarás confianza en la pala."
+                {t('blog.article.tip')}
               </p>
             </div>
           </div>

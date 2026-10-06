@@ -202,7 +202,7 @@ export const CorporateFooter: React.FC<CorporateFooterProps> = ({ minimized = fa
                 className="hover:text-white transition text-left flex items-center gap-1.5"
               >
                 <span className="text-emerald-400 font-bold">·</span>
-                <span>Módulos y Funcionalidades</span>
+                <span>{t('footer.modulesLink', 'Módulos y Funcionalidades')}</span>
               </button>
             </li>
             <li>
@@ -212,7 +212,7 @@ export const CorporateFooter: React.FC<CorporateFooterProps> = ({ minimized = fa
                 className="hover:text-white transition text-left flex items-center gap-1.5"
               >
                 <span className="text-emerald-400 font-bold">·</span>
-                <span>Domótica y Automatizaciones</span>
+                <span>{t('footer.domoticaLink', 'Domótica y Automatizaciones')}</span>
               </button>
             </li>
             <li>

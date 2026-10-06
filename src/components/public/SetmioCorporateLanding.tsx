@@ -122,8 +122,8 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
     e.preventDefault();
     setRegisterModalOpen(false);
     triggerDemoToast(
-      '¡Solicitud de Club Recibida!',
-      'Hemos preparado la instancia para tu club. Te hemos enviado las credenciales de acceso.',
+      t('home.registerToast.title'),
+      t('home.registerToast.desc'),
       'success'
     );
   };
@@ -203,7 +203,7 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
                 onClick={() => setLangDropdownOpen(!langDropdownOpen)}
                 className="p-1.5 sm:px-2.5 sm:py-1.5 rounded-xl border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition flex items-center gap-1.5 text-xs font-bold"
                 title="Cambiar idioma con banderas oficiales"
-                aria-label="Seleccionar idioma"
+                aria-label={t('nav.language')}
               >
                 <OfficialFlag code={language} className="w-4 h-3 sm:w-5 sm:h-3.5" />
                 {/* On mobile show only 2 initials */}
@@ -274,7 +274,7 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="lg:hidden p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition border border-slate-200 dark:border-slate-800"
-              aria-label="Abrir menú de navegación"
+              aria-label={t('nav.openMenu')}
             >
               {mobileMenuOpen ? <X className="w-5 h-5 text-emerald-600" /> : <Menu className="w-5 h-5" />}
             </button>
@@ -283,11 +283,11 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
 
         {/* Mobile Navigation Drawer with perfect viewport boundary */}
         {mobileMenuOpen && (
-          <div className="lg:hidden fixed inset-0 z-[9999] overscroll-none bg-slate-950/45 backdrop-blur-sm animate-in fade-in duration-200" role="dialog" aria-modal="true" aria-label="Menú de Setmio" data-modal="true" onWheel={(event) => event.stopPropagation()} onTouchMove={(event) => event.stopPropagation()}>
+          <div className="lg:hidden fixed inset-0 z-[9999] overscroll-none bg-slate-950/45 backdrop-blur-sm animate-in fade-in duration-200" role="dialog" aria-modal="true" aria-label={t('nav.mobileMenu')} data-modal="true" onWheel={(event) => event.stopPropagation()} onTouchMove={(event) => event.stopPropagation()}>
             <div className="fixed inset-y-0 right-0 flex h-dvh w-full max-w-sm flex-col overscroll-contain overflow-y-auto border-l border-slate-200 bg-white p-4 text-slate-900 shadow-2xl backdrop-blur-2xl dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100 animate-in slide-in-from-right duration-200">
               <div className="mb-3 flex items-center justify-between border-b border-slate-200 pb-4 dark:border-slate-800">
                 <span className="text-sm font-black tracking-tight">SETMIO</span>
-                <button type="button" onClick={() => setMobileMenuOpen(false)} className="rounded-xl p-2 text-slate-600 hover:bg-slate-100 hover:text-slate-950 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white" aria-label="Cerrar menú">
+                <button type="button" onClick={() => setMobileMenuOpen(false)} className="rounded-xl p-2 text-slate-600 hover:bg-slate-100 hover:text-slate-950 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white" aria-label={t('nav.closeMenu')}>
                   <X className="h-5 w-5" strokeWidth={1.5} />
                 </button>
               </div>
@@ -743,7 +743,7 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
               <div className="relative rounded-3xl overflow-hidden border border-slate-700/80 shadow-2xl bg-slate-950 aspect-[4/3] sm:aspect-[16/11]">
                 <img
                   src="https://images.unsplash.com/photo-1622163642998-1ea32b0bbc67?auto=format&fit=crop&w=1200&q=80"
-                  alt="Jugador real de pádel en pista de competición interactuando con Setmio Player"
+                  alt={t('home.player.imageAlt')}
                   className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 filter brightness-95"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent" />
@@ -823,7 +823,7 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
             </div>
           </div>
           <div className="overflow-hidden rounded-3xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900 shadow-2xl aspect-video">
-            <video className="h-full w-full object-cover" autoPlay muted loop playsInline controls preload="metadata" poster="https://images.unsplash.com/photo-1554068865-24cecd4e34b8?auto=format&fit=crop&w=1600&q=80" aria-label="Beneficios operativos reales de la plataforma de pádel">
+            <video className="h-full w-full object-cover" autoPlay muted loop playsInline controls preload="metadata" poster="https://images.unsplash.com/photo-1554068865-24cecd4e34b8?auto=format&fit=crop&w=1600&q=80" aria-label={t('home.video.ariaLabel')}>
               <source src="https://cdn.coverr.co/videos/coverr-a-padel-match-1573/1080p.mp4" type="video/mp4" />
             </video>
           </div>

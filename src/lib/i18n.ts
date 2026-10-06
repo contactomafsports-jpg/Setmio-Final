@@ -2810,7 +2810,7 @@ export const TRANSLATIONS: Record<SupportedLanguage, Record<string, string>> = {
     "home.search.players.indoor": "ملعب داخلي مكيّف",
     "home.search.submit": "التحقق من التوفر",
     "home.search.featured": "المرافق المميزة:",
-    "home.search.all": "عرض الكل",
+    "home.search.all": "عر�� الكل",
     "home.search.book": "حجز →",
     "home.teams.eyebrow": "المنافسة والنادي",
     "home.teams.title": "تعرف على فِرقنا",
@@ -3012,6 +3012,20 @@ for (const [lang, dict] of Object.entries(ALL_EXTRA_TRANSLATIONS)) {
       ...TRANSLATIONS[lang as SupportedLanguage],
       ...dict,
     };
+  }
+}
+
+// Some dictionaries contain untranslated Spanish copies. Multi-word strings identical
+// to Spanish (but different from English) are dropped so lookups fall back to English.
+for (const lang of Object.keys(TRANSLATIONS) as SupportedLanguage[]) {
+  if (lang === 'es' || lang === 'en') continue;
+  const dict = TRANSLATIONS[lang];
+  for (const [key, value] of Object.entries(dict)) {
+    const esValue = TRANSLATIONS.es[key];
+    const enValue = TRANSLATIONS.en[key];
+    if (esValue && value === esValue && enValue && enValue !== esValue && value.trim().split(/\s+/).length >= 3) {
+      delete dict[key];
+    }
   }
 }
 
