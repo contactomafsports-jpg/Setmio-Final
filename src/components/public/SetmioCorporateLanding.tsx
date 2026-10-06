@@ -966,13 +966,13 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
 
           <div className="flex flex-wrap justify-center items-center gap-6 text-xs text-emerald-100 font-semibold pt-4">
             <span className="flex items-center gap-1.5">
-              <Check className="w-4 h-4 text-white" aria-hidden="true" /> {t('home.prefooter.trust.setup', 'Configuración en 2 minutos')}
+              <Check className="w-4 h-4 text-white" aria-hidden="true" /> {t('home.prefooter.trust.setup')}
             </span>
             <span className="flex items-center gap-1.5">
-              <Check className="w-4 h-4 text-white" aria-hidden="true" /> {t('home.prefooter.trust.noCard', 'Sin tarjeta de crédito')}
+              <Check className="w-4 h-4 text-white" aria-hidden="true" /> {t('home.prefooter.trust.noCard')}
             </span>
             <span className="flex items-center gap-1.5">
-              <Check className="w-4 h-4 text-white" aria-hidden="true" /> {t('home.prefooter.trust.cancel', 'Cancela en cualquier momento')}
+              <Check className="w-4 h-4 text-white" aria-hidden="true" /> {t('home.prefooter.trust.cancel')}
             </span>
           </div>
         </div>

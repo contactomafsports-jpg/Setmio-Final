@@ -99,15 +99,15 @@ export function ParaJugadoresPage({ onBack, onOpenDemo }: ParaJugadoresPageProps
               <div className="pt-2 flex flex-wrap items-center gap-6 text-xs text-slate-500 dark:text-slate-400 font-semibold">
                 <div className="flex items-center gap-1.5">
                   <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                  <span>{t('playerPage.stat1', 'Reserva en 15 segundos')}</span>
+                  <span>{t('playerPage.stat1')}</span>
                 </div>
                 <div className="flex items-center gap-1.5">
                   <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                  <span>{t('playerPage.stat2', 'Nivel Decimal 1.0 - 7.0')}</span>
+                  <span>{t('playerPage.stat2')}</span>
                 </div>
                 <div className="flex items-center gap-1.5">
                   <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                  <span>{t('playerPage.stat3', 'Split Payment con Bizum')}</span>
+                  <span>{t('playerPage.stat3')}</span>
                 </div>
               </div>
             </div>

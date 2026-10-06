@@ -733,7 +733,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     if (language === 'es') {
       return TRANSLATIONS.es?.[key] || fallback || key;
     }
-    return TRANSLATIONS[language]?.[key] || TRANSLATIONS.en?.[key] || (language === 'es' ? fallback : key);
+    return TRANSLATIONS[language]?.[key] || TRANSLATIONS.en?.[key] || fallback || key;
   }, [language]);
 
   // Modals state

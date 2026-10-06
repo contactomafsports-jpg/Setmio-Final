@@ -110,10 +110,10 @@ export const RoleSelectorModal: React.FC<RoleSelectorModalProps> = ({
             <span>{t('demo.badge', 'Simulador de Roles Setmio')}</span>
           </div>
           <h2 id="role-modal-title" className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
-            {t('demo.heading', 'Selecciona el Rol de Demostración')}
+            {t('demo.heading')}
           </h2>
           <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
-            {t('demo.description', 'Explora las interfaces completas y datos reales según cada perfil de usuario en la plataforma.')}
+            {t('demo.description')}
           </p>
         </div>
 
@@ -161,7 +161,7 @@ export const RoleSelectorModal: React.FC<RoleSelectorModalProps> = ({
         <div className="p-3.5 rounded-2xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 text-xs text-emerald-900 dark:text-emerald-300 flex items-center gap-2.5">
           <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
           <span>
-            {t('demo.note', 'Los usuarios con rol profesional (Admin o Profesor) pueden conmutar a Modo Jugador en cualquier momento con el selector en cabecera.')}
+            {t('demo.note')}
           </span>
         </div>
       </div>
