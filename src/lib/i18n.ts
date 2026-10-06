@@ -3015,8 +3015,8 @@ for (const [lang, dict] of Object.entries(ALL_EXTRA_TRANSLATIONS)) {
   }
 }
 
-/** English is the canonical secondary fallback for every supported language. */
-export const fallbackLng: SupportedLanguage[] = ['en', 'es'];
+/** English is the only fallback for every supported language. */
+export const fallbackLng: SupportedLanguage[] = ['en'];
 
 // Keep every public key available in every dictionary. A missing localized value
 // therefore resolves to English instead of leaking a Spanish source string.
