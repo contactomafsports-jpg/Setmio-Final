@@ -89,8 +89,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onOpenRol
     setPreferredPosition('drive');
     setIsTeamCaptain(true);
     triggerDemoToast(
-      'Autocompletado con Setmio Global ID',
-      'Datos deportivos y credenciales federadas cargadas automáticamente.',
+      t('auth.autofill.title', 'Autocompletado con Setmio Global ID'),
+      t('auth.autofill.desc', 'Datos deportivos y credenciales federadas cargadas automáticamente.'),
       'info'
     );
   };
@@ -199,8 +199,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onOpenRol
 
             <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 space-y-2.5">
               <div className="flex items-center justify-between text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-                <span>O entra directamente con un clic:</span>
-                <span className="text-emerald-600 dark:text-emerald-400 font-semibold">Demo 1-Clic</span>
+                <span>{t('auth.demo.quickLogin', 'O entra directamente con un clic:')}</span>
+                <span className="text-emerald-600 dark:text-emerald-400 font-semibold">{t('auth.demo.oneClick', 'Demo 1-Clic')}</span>
               </div>
             <div className="grid grid-cols-2 gap-2 text-xs">
               <button
@@ -247,7 +247,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onOpenRol
                 <div className="w-2 h-2 rounded-full bg-amber-500" />
                 <div>
                   <div className="text-slate-900 dark:text-white font-bold">Superadmin HQ</div>
-                  <div className="text-[10px] text-slate-500 dark:text-slate-400">Control Global de Plataforma</div>
+                  <div className="text-[10px] text-slate-500 dark:text-slate-400">{t('auth.demo.superadminDesc', 'Control Global de Plataforma')}</div>
                 </div>
               </button>
             </div>
