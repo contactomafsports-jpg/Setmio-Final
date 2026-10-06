@@ -458,15 +458,15 @@ export function SolucionesPage({
               <ul className="space-y-2.5 text-xs text-slate-700 dark:text-slate-300 border-t border-slate-200/80 dark:border-slate-800 pt-4">
                 <li className="flex items-start gap-2">
                   <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
-                  <span>{t('solutions.clubs.f1', 'Cuadrante táctil de pistas con encendido domótico de iluminación LED')}</span>
+                  <span>{t('solutions.clubs.f1')}</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
-                  <span>{t('solutions.clubs.f2', 'Split payments (cobro de 1/4 por jugador vía Bizum y tarjeta)')}</span>
+                  <span>{t('solutions.clubs.f2')}</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
-                  <span>{t('solutions.clubs.f3', 'TPV Bar / Cafetería, arqueos de caja y tienda pro-shop con palas de test')}</span>
+                  <span>{t('solutions.clubs.f3')}</span>
                 </li>
               </ul>
             </div>

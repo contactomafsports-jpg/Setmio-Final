@@ -148,7 +148,7 @@ export function ModulosDomoticaPage({ onBack, onOpenDemo }: ModulosDomoticaPageP
                     <Lightbulb className="w-5 h-5" />
                   </div>
                   <div>
-                    <h4 className="text-sm font-bold text-slate-900 dark:text-white">{t('domotica.ledTitle', 'Iluminación LED Pista')}</h4>
+                    <h4 className="text-sm font-bold text-slate-900 dark:text-white">{t('domotica.ledTitle')}</h4>
                     <span className="text-[11px] text-slate-500 dark:text-slate-400">
                       {t('domotica.status')} {simCourtLight ? t('domotica.ledOn') : t('domotica.ledOff')}
                     </span>

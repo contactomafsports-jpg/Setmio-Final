@@ -69,15 +69,15 @@ export const PricingView: React.FC<PricingViewProps> = ({ onBack, onOpenDemo, on
           <div className="max-w-3xl mx-auto space-y-4 text-center flex flex-col items-center justify-center">
             <div className="inline-flex items-center justify-center gap-2 px-3.5 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs font-black uppercase tracking-widest border border-emerald-500/20 text-center">
               <Sparkles className="w-3.5 h-3.5" />
-              <span>{t('pricing.heroBadge', 'Tarifas Transparentes · Sin Comisiones Ocultas')}</span>
+              <span>{t('pricing.heroBadge')}</span>
             </div>
 
             <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-slate-900 dark:text-white leading-tight text-center">
-              {t('pricing.heroTitle', 'Planes adaptados a la dimensión real de tu club')}
+              {t('pricing.heroTitle')}
             </h1>
 
             <p className="text-base sm:text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto leading-relaxed text-center font-normal">
-              {t('pricing.heroSubtitle', 'Sin permanencia, sin comisiones por pista reservada y con soporte técnico telefónico los 365 días del año. Elige el plan que mejor se ajuste a tu volumen de pistas.')}
+              {t('pricing.heroSubtitle')}
             </p>
 
             {/* Selector de Periodo de Facturación Estrictamente Centrado */}
