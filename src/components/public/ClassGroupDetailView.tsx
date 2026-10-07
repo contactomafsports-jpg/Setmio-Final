@@ -83,12 +83,12 @@ export const ClassGroupDetailView: React.FC<ClassGroupDetailViewProps> = ({
   };
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 animate-in fade-in duration-200">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-in fade-in duration-200">
       {/* 1. TOP BAR WITH BACK BUTTON */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between mb-4">
         <button
           onClick={handleBack}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-200 hover:text-emerald-600 dark:hover:text-emerald-400 font-bold text-xs shadow-xs transition"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-200 hover:text-emerald-600 dark:hover:text-emerald-400 font-bold text-xs shadow-xs transition cursor-pointer active:scale-95"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>Volver a Escuela</span>
@@ -99,7 +99,8 @@ export const ClassGroupDetailView: React.FC<ClassGroupDetailViewProps> = ({
         </span>
       </div>
 
-      {/* 2. GROUP HERO CARD */}
+      <div className="space-y-8">
+        {/* 2. GROUP HERO CARD */}
       <div className="p-6 sm:p-10 rounded-3xl bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-white border border-indigo-900/60 shadow-2xl space-y-6">
         <div className="space-y-3">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-xs font-bold">
@@ -264,6 +265,7 @@ export const ClassGroupDetailView: React.FC<ClassGroupDetailViewProps> = ({
             ))}
           </div>
         </div>
+      </div>
       </div>
     </div>
   );

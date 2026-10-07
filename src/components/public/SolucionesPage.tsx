@@ -158,11 +158,12 @@ export function SolucionesPage({
   };
 
   const handleRegisterClick = () => {
-    if (onOpenRegister) {
-      onOpenRegister();
-    } else if (typeof window !== 'undefined') {
+    if (typeof window !== 'undefined') {
       window.history.pushState({}, '', '/registro');
       window.dispatchEvent(new PopStateEvent('popstate'));
+    }
+    if (onOpenRegister) {
+      onOpenRegister();
     }
   };
 
@@ -177,9 +178,9 @@ export function SolucionesPage({
 
     return (
       <main className="min-h-[calc(100vh-5rem)] bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 py-8 sm:py-12 px-4 sm:px-6 lg:px-8 transition-colors duration-200">
-        <div className="max-w-7xl mx-auto space-y-12">
+        <div className="max-w-7xl mx-auto">
           {/* Navigation Button alineado a la izquierda */}
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between mb-4">
             <button
               type="button"
               onClick={handleBackToGrid}
@@ -194,45 +195,46 @@ export function SolucionesPage({
             </span>
           </div>
 
-          {/* Hero Header Detallado (Alineado limpiamente a la izquierda, tipografía estandarizada) */}
-          <section className="relative overflow-hidden rounded-3xl bg-slate-50 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 p-8 sm:p-12 lg:p-16 shadow-sm dark:shadow-2xl">
-            <div className="relative z-10 max-w-4xl space-y-6 text-left">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 font-bold text-xs uppercase tracking-wider border border-emerald-500/20">
-                <Icon className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                <span>{badgeText}</span>
+          <div className="space-y-12">
+            {/* Hero Header Detallado (Alineado limpiamente a la izquierda, tipografía estandarizada) */}
+            <section className="relative overflow-hidden rounded-3xl bg-slate-50 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 p-8 sm:p-12 lg:p-16 shadow-sm dark:shadow-2xl">
+              <div className="relative z-10 max-w-4xl space-y-6 text-left">
+                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 font-bold text-xs uppercase tracking-wider border border-emerald-500/20">
+                  <Icon className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                  <span>{badgeText}</span>
+                </div>
+
+                <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-slate-900 dark:text-white leading-tight">
+                  {titleText}
+                </h1>
+
+                <p className="text-base sm:text-lg text-slate-600 dark:text-slate-400 leading-relaxed max-w-2xl">
+                  {subtitleText}
+                </p>
+
+                <p className="text-sm sm:text-base text-slate-500 dark:text-slate-400 leading-relaxed max-w-3xl border-l-2 border-emerald-500 pl-4">
+                  {heroDescText}
+                </p>
+
+                <div className="flex flex-wrap items-center gap-3 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => handleDemoClick(badgeText)}
+                    className="px-6 py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs sm:text-sm shadow-lg shadow-emerald-600/20 transition cursor-pointer active:scale-95"
+                  >
+                    {t('solutions.detail.demoBtn', 'Ver demo')}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleRegisterClick}
+                    className="px-6 py-3.5 rounded-2xl bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-bold text-xs sm:text-sm border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 transition cursor-pointer active:scale-95"
+                  >
+                    {t('solutions.detail.registerBtn', 'Registrarse')}
+                  </button>
+                </div>
               </div>
-
-              <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-slate-900 dark:text-white leading-tight">
-                {titleText}
-              </h1>
-
-              <p className="text-base sm:text-lg text-slate-600 dark:text-slate-400 leading-relaxed max-w-2xl">
-                {subtitleText}
-              </p>
-
-              <p className="text-sm sm:text-base text-slate-500 dark:text-slate-400 leading-relaxed max-w-3xl border-l-2 border-emerald-500 pl-4">
-                {heroDescText}
-              </p>
-
-              <div className="flex flex-wrap items-center gap-3 pt-2">
-                <button
-                  type="button"
-                  onClick={() => handleDemoClick(badgeText)}
-                  className="px-6 py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs sm:text-sm shadow-lg shadow-emerald-600/20 transition cursor-pointer active:scale-95"
-                >
-                  {t('solutions.detail.demoBtn', 'Solicitar Demostración Guiada')}
-                </button>
-
-                <button
-                  type="button"
-                  onClick={handleRegisterClick}
-                  className="px-6 py-3.5 rounded-2xl bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-bold text-xs sm:text-sm border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 transition cursor-pointer active:scale-95"
-                >
-                  {t('nav.register', 'Crear Cuenta')}
-                </button>
-              </div>
-            </div>
-          </section>
+            </section>
 
           {/* 4 Métricas Clave de Negocio */}
           <section className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -401,20 +403,22 @@ export function SolucionesPage({
             </div>
           </section>
         </div>
-      </main>
-    );
-  }
+      </div>
+    </main>
+  );
+}
 
   // --- VISTA PRINCIPAL: CUADRÍCULA DE TARJETAS RESUMEN DE SOLUCIONES ---
   return (
     <main className="min-h-[calc(100vh-5rem)] bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 py-8 sm:py-12 px-4 sm:px-6 lg:px-8 transition-colors duration-200">
-      <div className="max-w-7xl mx-auto space-y-12">
+      <div className="max-w-7xl mx-auto">
         {/* Navigation Button alineado a la izquierda */}
-        <div className="flex items-center justify-start">
-          <SubpageHeaderNav onBack={onBack} />
+        <div className="mb-4 flex items-center justify-start">
+          <SubpageHeaderNav onBack={onBack} className="mb-0" />
         </div>
 
-        {/* Header Superior (Alineado limpiamente a la izquierda, tipografía estandarizada) */}
+        <div className="space-y-12">
+          {/* Header Superior (Alineado limpiamente a la izquierda, tipografía estandarizada) */}
         <div className="space-y-4 max-w-3xl text-left">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-700 dark:text-emerald-400 text-xs font-black uppercase tracking-widest">
             <Layers className="w-3.5 h-3.5" />
@@ -546,6 +550,7 @@ export function SolucionesPage({
             );
           })}
         </div>
+      </div>
       </div>
     </main>
   );

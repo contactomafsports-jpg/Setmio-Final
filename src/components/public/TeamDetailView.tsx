@@ -72,12 +72,12 @@ export const TeamDetailView: React.FC<TeamDetailViewProps> = ({
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 animate-in fade-in duration-200">
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-in fade-in duration-200">
       {/* 1. TOP BAR WITH BACK BUTTON */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between mb-4">
         <button
           onClick={handleBack}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-200 hover:text-emerald-600 dark:hover:text-emerald-400 font-bold text-xs shadow-xs transition"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-200 hover:text-emerald-600 dark:hover:text-emerald-400 font-bold text-xs shadow-xs transition cursor-pointer active:scale-95"
           aria-label="Volver al listado de equipos"
         >
           <ArrowLeft className="w-4 h-4" />
@@ -85,7 +85,8 @@ export const TeamDetailView: React.FC<TeamDetailViewProps> = ({
         </button>
       </div>
 
-      {/* 2. TEAM HERO */}
+      <div className="space-y-8">
+        {/* 2. TEAM HERO */}
       <div className="relative rounded-3xl overflow-hidden bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl">
         <div className="relative h-72 sm:h-96 w-full">
           <img
@@ -221,6 +222,7 @@ export const TeamDetailView: React.FC<TeamDetailViewProps> = ({
             );
           })}
         </div>
+      </div>
       </div>
     </div>
   );

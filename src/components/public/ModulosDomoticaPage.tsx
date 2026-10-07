@@ -69,13 +69,14 @@ export function ModulosDomoticaPage({ onBack, onOpenDemo }: ModulosDomoticaPageP
 
   return (
     <main className="min-h-[calc(100vh-5rem)] bg-white text-slate-900 dark:bg-slate-950 dark:text-slate-100 px-4 py-8 sm:px-6 lg:px-8 lg:py-16 transition-colors duration-200">
-      <div className="mx-auto max-w-6xl space-y-12">
+      <div className="mx-auto max-w-6xl">
         {/* Navigation Button alineado a la izquierda */}
-        <div className="flex items-center justify-start">
-          <SubpageHeaderNav onBack={onBack} />
+        <div className="mb-4 flex items-center justify-start">
+          <SubpageHeaderNav onBack={onBack} className="mb-0" />
         </div>
 
-        {/* Hero Header de Domótica & Automatizaciones (Alineado limpiamente a la izquierda) */}
+        <div className="space-y-12">
+          {/* Hero Header de Domótica & Automatizaciones (Alineado limpiamente a la izquierda) */}
         <section className="relative overflow-hidden rounded-3xl bg-slate-50 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 p-8 sm:p-12 lg:p-16 shadow-sm dark:shadow-2xl">
           <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
 
@@ -328,6 +329,7 @@ export function ModulosDomoticaPage({ onBack, onOpenDemo }: ModulosDomoticaPageP
             </button>
           </div>
         </section>
+      </div>
       </div>
     </main>
   );

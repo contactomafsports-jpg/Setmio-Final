@@ -84,13 +84,14 @@ export const ContactFAQView: React.FC<{ onBack?: () => void }> = ({ onBack }) =>
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-16 text-slate-900 dark:text-slate-100 transition-colors duration-200">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 text-slate-900 dark:text-slate-100 transition-colors duration-200">
       {/* Navigation Button alineado a la izquierda */}
-      <div className="flex items-center justify-start">
-        <SubpageHeaderNav onBack={onBack} />
+      <div className="mb-4 flex items-center justify-start">
+        <SubpageHeaderNav onBack={onBack} className="mb-0" />
       </div>
 
-      {/* Header Corporativo (Alineado limpiamente a la izquierda) */}
+      <div className="space-y-16">
+        {/* Header Corporativo (Alineado limpiamente a la izquierda) */}
       <div className="max-w-3xl space-y-4 text-left">
         <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-700 dark:text-emerald-400 text-xs font-black uppercase tracking-widest">
           <Sparkles className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
@@ -417,6 +418,7 @@ export const ContactFAQView: React.FC<{ onBack?: () => void }> = ({ onBack }) =>
             );
           })}
         </div>
+      </div>
       </div>
     </div>
   );

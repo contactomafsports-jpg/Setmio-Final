@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
 import { BlogPost } from '../../types/database';
 import { SubpageHeaderNav } from './SubpageHeaderNav';
+import { CORPORATE_BLOG_POSTS } from '../../data/corporateBlogData';
 import {
   Clock,
   User,
@@ -33,6 +34,8 @@ export const BlogView: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
+  const activeBlogPosts = isCorporateLanding ? CORPORATE_BLOG_POSTS : blogPosts;
+
   // Sincronizar navegación con el historial del navegador (soporte completo de retroceso y avance)
   useEffect(() => {
     const syncArticleFromUrl = () => {
@@ -56,26 +59,38 @@ export const BlogView: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
     };
   }, [setSelectedArticleId]);
 
-  const categories = [
-    { id: 'all', categoryMatch: 'all' },
-    { id: 'tecnica', categoryMatch: 'Técnica & Táctica' },
-    { id: 'instalaciones', categoryMatch: 'Instalaciones' },
-    { id: 'salud', categoryMatch: 'Salud & Rendimiento' },
-  ];
+  const categories = isCorporateLanding
+    ? [
+        { id: 'all', categoryMatch: 'all' },
+        { id: 'domotica', categoryMatch: 'Tecnología & Domótica' },
+        { id: 'gestion', categoryMatch: 'Gestión de Clubes' },
+        { id: 'finanzas', categoryMatch: 'Finanzas & Ocupación' },
+        { id: 'escuelas', categoryMatch: 'Escuelas & Competición' },
+      ]
+    : [
+        { id: 'all', categoryMatch: 'all' },
+        { id: 'tecnica', categoryMatch: 'Técnica & Táctica' },
+        { id: 'instalaciones', categoryMatch: 'Instalaciones' },
+        { id: 'salud', categoryMatch: 'Salud & Rendimiento' },
+      ];
 
-  const selectedArticle = blogPosts.find((p) => p.id === selectedArticleId);
+  const selectedArticle = activeBlogPosts.find((p) => p.id === selectedArticleId);
 
   const relatedArticles = selectedArticle
-    ? blogPosts.filter((p) => p.id !== selectedArticle.id).slice(0, 3)
+    ? activeBlogPosts.filter((p) => p.id !== selectedArticle.id).slice(0, 3)
     : [];
 
   const getCategoryFilterId = (cat: string) => {
+    if (cat === 'Tecnología & Domótica') return 'domotica';
+    if (cat === 'Gestión de Clubes') return 'gestion';
+    if (cat === 'Finanzas & Ocupación') return 'finanzas';
+    if (cat === 'Escuelas & Competición') return 'escuelas';
     if (cat === 'Técnica & Táctica') return 'tecnica';
     if (cat === 'Instalaciones') return 'instalaciones';
     return 'salud';
   };
 
-  const filteredPosts = blogPosts.filter((p) => {
+  const filteredPosts = activeBlogPosts.filter((p) => {
     const activeCat = categories.find((c) => c.id === selectedCategory);
     const matchCat =
       selectedCategory === 'all' ||
@@ -93,6 +108,7 @@ export const BlogView: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
       postTags.toLowerCase().includes(search.toLowerCase()) ||
       p.title.toLowerCase().includes(search.toLowerCase()) ||
       p.summary.toLowerCase().includes(search.toLowerCase());
+
     return matchCat && matchSearch;
   });
 
@@ -229,26 +245,47 @@ export const BlogView: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
               {t((selectedArticle as any).excerptKey || (selectedArticle as any).summaryKey || ('blog.posts.' + selectedArticle.id + '.summary'), selectedArticle.summary)}
             </p>
 
-            <p>{t('blog.article.p1')}</p>
+            {isCorporateLanding ? (
+              <div className="space-y-4 whitespace-pre-line text-sm sm:text-base leading-relaxed text-slate-700 dark:text-slate-300">
+                {selectedArticle.content.split('\n\n').map((paragraph, pIdx) => {
+                  if (paragraph.startsWith('### ')) {
+                    return (
+                      <h3 key={pIdx} className="text-xl font-black text-slate-900 dark:text-white pt-4">
+                        {paragraph.replace('### ', '')}
+                      </h3>
+                    );
+                  }
+                  return (
+                    <p key={pIdx} className="leading-relaxed">
+                      {paragraph}
+                    </p>
+                  );
+                })}
+              </div>
+            ) : (
+              <>
+                <p>{t('blog.article.p1')}</p>
 
-            <h2 className="text-2xl font-bold text-slate-900 dark:text-white mt-8 mb-4">
-              {t('blog.article.h1')}
-            </h2>
-            <p>{t('blog.article.p2')}</p>
+                <h2 className="text-2xl font-bold text-slate-900 dark:text-white mt-8 mb-4">
+                  {t('blog.article.h1')}
+                </h2>
+                <p>{t('blog.article.p2')}</p>
 
-            <h2 className="text-2xl font-bold text-slate-900 dark:text-white mt-8 mb-4">
-              {t('blog.article.h2')}
-            </h2>
-            <p>{t('blog.article.p3')}</p>
+                <h2 className="text-2xl font-bold text-slate-900 dark:text-white mt-8 mb-4">
+                  {t('blog.article.h2')}
+                </h2>
+                <p>{t('blog.article.p3')}</p>
 
-            <div className="p-6 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 my-8">
-              <h4 className="font-bold text-emerald-900 dark:text-emerald-300 text-sm mb-1">
-                {t('blog.coachTipTitle').replace('{club}', currentTenant.name)}
-              </h4>
-              <p className="text-xs text-emerald-800 dark:text-emerald-400 leading-relaxed">
-                {t('blog.article.tip')}
-              </p>
-            </div>
+                <div className="p-6 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 my-8">
+                  <h4 className="font-bold text-emerald-900 dark:text-emerald-300 text-sm mb-1">
+                    {t('blog.coachTipTitle').replace('{club}', currentTenant.name)}
+                  </h4>
+                  <p className="text-xs text-emerald-800 dark:text-emerald-400 leading-relaxed">
+                    {t('blog.article.tip')}
+                  </p>
+                </div>
+              </>
+            )}
           </div>
 
           {/* Related Articles Carousel / Section */}
@@ -312,12 +349,19 @@ export const BlogView: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
             <button
               type="button"
               onClick={() => {
-                setPublicPage('booking');
+                if (isCorporateLanding) {
+                  if (typeof window !== 'undefined') {
+                    window.history.pushState({}, '', '/precios');
+                  }
+                  setPublicPage('pricing');
+                } else {
+                  setPublicPage('booking');
+                }
                 window.scrollTo({ top: 0, behavior: 'smooth' });
               }}
               className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow transition cursor-pointer active:scale-95"
             >
-              {t('blog.bookToPractice', 'Reservar Pista para Practicar')}
+              {isCorporateLanding ? t('corporateBlog.ctaPricing', 'Ver Planes y Precios') : t('blog.bookToPractice', 'Reservar Pista para Practicar')}
             </button>
           </div>
         </article>

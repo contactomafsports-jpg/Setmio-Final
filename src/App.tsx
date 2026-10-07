@@ -230,7 +230,7 @@ export function App() {
       case 'solution_coaches':
       case 'solution_players':
       case 'solution_pro_players':
-        return <SolucionesPage onOpenRegister={() => { setAuthOpen(true); }} roleId={publicPage === 'solution_clubs' ? 'clubes' : publicPage === 'solution_schools' ? 'escuelas' : publicPage === 'solution_coaches' ? 'profesores' : publicPage === 'solution_players' ? 'jugadores' : publicPage === 'solution_pro_players' ? 'profesionales' : undefined} onOpenRole={(roleId) => setPublicPage(`solution_${roleId === 'clubes' ? 'clubs' : roleId === 'escuelas' ? 'schools' : roleId === 'profesores' ? 'coaches' : roleId === 'jugadores' ? 'players' : 'pro_players'}` as typeof publicPage)} onBack={goHome} onOpenDemo={() => setRoleSelectorOpen(true)} />;
+        return <SolucionesPage onOpenRegister={() => { setRegistrationOpen(true); setAuthOpen(true); }} roleId={publicPage === 'solution_clubs' ? 'clubes' : publicPage === 'solution_schools' ? 'escuelas' : publicPage === 'solution_coaches' ? 'profesores' : publicPage === 'solution_players' ? 'jugadores' : publicPage === 'solution_pro_players' ? 'profesionales' : undefined} onOpenRole={(roleId) => setPublicPage(`solution_${roleId === 'clubes' ? 'clubs' : roleId === 'escuelas' ? 'schools' : roleId === 'profesores' ? 'coaches' : roleId === 'jugadores' ? 'players' : 'pro_players'}` as typeof publicPage)} onBack={goHome} onOpenDemo={() => setRoleSelectorOpen(true)} />;
       case 'players_app':
         return <ParaJugadoresPage onBack={goHome} onOpenDemo={() => setRoleSelectorOpen(true)} onOpenRegister={() => { setRegistrationOpen(true); setAuthOpen(true); }} />;
       case 'modules':
@@ -238,7 +238,7 @@ export function App() {
       case 'demo':
         return <HomeView />;
       case 'pricing':
-        return <PricingView onBack={goHome} onOpenDemo={() => setRoleSelectorOpen(true)} />;
+        return <PricingView onBack={goHome} onOpenDemo={() => setRoleSelectorOpen(true)} onOpenRegister={() => { setRegistrationOpen(true); setAuthOpen(true); }} />;
       case 'player_profile':
         return <PlayerPublicProfileView onBack={() => setPublicPage('teams')} />;
       case 'club':

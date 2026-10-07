@@ -5,9 +5,11 @@ import { useApp } from '../../context/AppContext';
 export function SubpageHeaderNav({
   onBack,
   label,
+  className,
 }: {
   onBack?: () => void;
   label?: string;
+  className?: string;
 }) {
   const { t, setPublicPage } = useApp();
   const handleBack = () => {
@@ -35,7 +37,7 @@ export function SubpageHeaderNav({
     <button
       type="button"
       onClick={handleBack}
-      className="mb-8 inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-bold text-slate-700 shadow-sm transition hover:border-emerald-400 hover:text-emerald-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200 dark:hover:text-emerald-400 cursor-pointer active:scale-95"
+      className={`mb-4 inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-bold text-slate-700 shadow-xs transition hover:border-emerald-400 hover:text-emerald-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200 dark:hover:text-emerald-400 cursor-pointer active:scale-95 ${className || ''}`}
     >
       <ArrowLeft className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
       <span>{label || t('common.back', 'Volver atrás')}</span>

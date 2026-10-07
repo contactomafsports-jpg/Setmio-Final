@@ -247,13 +247,13 @@ export const PlayerPublicProfileView: React.FC<PlayerPublicProfileViewProps> = (
   };
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 animate-in fade-in duration-200">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-in fade-in duration-200">
       {/* 1. TOP NAVIGATION WITH UNIVERSAL BACK BUTTON */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between mb-4">
         <button
           type="button"
           onClick={handleBack}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-200 hover:text-emerald-600 dark:hover:text-emerald-400 font-bold text-xs shadow-xs transition cursor-pointer"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-200 hover:text-emerald-600 dark:hover:text-emerald-400 font-bold text-xs shadow-xs transition cursor-pointer active:scale-95"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>Volver</span>
@@ -262,14 +262,15 @@ export const PlayerPublicProfileView: React.FC<PlayerPublicProfileViewProps> = (
         <button
           type="button"
           onClick={handleShare}
-          className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs font-semibold transition cursor-pointer"
+          className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs font-semibold transition cursor-pointer active:scale-95"
         >
           <Share2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
           <span>Compartir Ficha</span>
         </button>
       </div>
 
-      {/* 2. HERO CARD: Diseño prémium centrado con avatar destacado */}
+      <div className="space-y-8">
+        {/* 2. HERO CARD: Diseño prémium centrado con avatar destacado */}
       <div className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-slate-900 via-slate-900 to-slate-950 text-white border border-slate-800 p-6 sm:p-8 shadow-2xl">
         <div className="absolute top-0 right-0 w-96 h-96 bg-[radial-gradient(circle_at_70%_30%,rgba(16,185,129,0.18),transparent_60%)] pointer-events-none" />
 
@@ -551,6 +552,7 @@ export const PlayerPublicProfileView: React.FC<PlayerPublicProfileViewProps> = (
           )}
         </div>
       )}
+      </div>
     </div>
   );
 };

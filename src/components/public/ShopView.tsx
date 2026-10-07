@@ -77,17 +77,20 @@ export const ShopView: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
         {/* If a product is selected -> FULL DEDICATED PAGE (No modal) */}
         {selectedProduct ? (
-          <section className="space-y-10 animate-in fade-in duration-150 max-w-5xl mx-auto">
+          <section className="animate-in fade-in duration-150 max-w-5xl mx-auto">
             {/* Aesthetic Back Button */}
-            <button
-              onClick={() => setSelectedProductId(null)}
-              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 text-xs font-bold text-slate-800 dark:text-slate-200 shadow-sm transition"
-            >
-              <ArrowLeft className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-              <span>Volver a la Tienda del Club</span>
-            </button>
+            <div className="mb-4">
+              <button
+                onClick={() => setSelectedProductId(null)}
+                className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 text-xs font-bold text-slate-800 dark:text-slate-200 shadow-sm transition"
+              >
+                <ArrowLeft className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                <span>Volver a la Tienda del Club</span>
+              </button>
+            </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            <div className="space-y-10">
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
               {/* Product Gallery */}
               <div className="lg:col-span-6 space-y-4">
                 <div className="relative rounded-3xl overflow-hidden bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 shadow-sm">
@@ -292,6 +295,7 @@ export const ShopView: React.FC = () => {
                 </div>
               </div>
             )}
+            </div>
           </section>
         ) : (
           /* MAIN STORE LAYOUT */

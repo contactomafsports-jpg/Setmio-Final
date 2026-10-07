@@ -52,10 +52,10 @@ export const FeaturesView: React.FC<FeaturesViewProps> = ({
 
   return (
     <main className="min-h-[calc(100vh-4rem)] bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 py-10 transition-colors">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Navigation & Action */}
-        <div className="flex items-center justify-between">
-          <SubpageHeaderNav onBack={handleBack} />
+        <div className="flex items-center justify-between mb-4">
+          <SubpageHeaderNav onBack={handleBack} className="mb-0" />
 
           {onOpenOnboarding && (
             <button
@@ -67,7 +67,8 @@ export const FeaturesView: React.FC<FeaturesViewProps> = ({
           )}
         </div>
 
-        {/* Hero alineado a la izquierda */}
+        <div className="space-y-12">
+          {/* Hero alineado a la izquierda */}
         <div className="text-left space-y-4 max-w-3xl">
           <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-800 text-xs font-bold">
             <Layers className="w-4 h-4 text-emerald-500" />
@@ -148,6 +149,7 @@ export const FeaturesView: React.FC<FeaturesViewProps> = ({
             <ArrowRight className="w-4 h-4" />
           </button>
         </section>
+      </div>
       </div>
     </main>
   );

@@ -32,7 +32,7 @@ export const AboutClubView: React.FC = () => {
               setPublicPage('home');
               window.scrollTo({ top: 0, behavior: 'smooth' });
             }}
-            className="inline-flex items-center gap-2 mb-6 px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold text-slate-300 hover:text-white backdrop-blur-md transition"
+            className="inline-flex items-center gap-2 mb-4 px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold text-slate-300 hover:text-white backdrop-blur-md transition"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>Volver a Inicio</span>

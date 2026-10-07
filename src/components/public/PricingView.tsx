@@ -49,23 +49,37 @@ export const PricingView: React.FC<PricingViewProps> = ({ onBack, onOpenDemo, on
     },
   ];
 
-  const handleAction = () => {
-    if (onOpenDemo) {
-      onOpenDemo();
-    } else if (onOpenRegister) {
+  const handleSelectPlan = (planId: string) => {
+    const planParam = planId === 'club_pro' ? 'profesional' : planId === 'club_base' ? 'club' : planId;
+    if (typeof window !== 'undefined') {
+      window.history.pushState({ plan: planParam }, '', `/registro?plan=${planParam}`);
+      window.dispatchEvent(new PopStateEvent('popstate'));
+    }
+    if (onOpenRegister) {
+      onOpenRegister();
+    }
+  };
+
+  const handleRegisterCta = () => {
+    if (typeof window !== 'undefined') {
+      window.history.pushState({}, '', '/registro');
+      window.dispatchEvent(new PopStateEvent('popstate'));
+    }
+    if (onOpenRegister) {
       onOpenRegister();
     }
   };
 
   return (
     <main className="min-h-[calc(100vh-4rem)] bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 py-10 transition-colors duration-200">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-14">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Navigation alineada a la izquierda */}
-        <div className="flex items-center justify-start">
-          <SubpageHeaderNav onBack={onBack} />
+        <div className="mb-4 flex items-center justify-start">
+          <SubpageHeaderNav onBack={onBack} className="mb-0" />
         </div>
 
-        {/* Header Estrictamente Centrado */}
+        <div className="space-y-12">
+          {/* Header Estrictamente Centrado */}
         <div className="space-y-6 text-center w-full">
           <div className="max-w-3xl mx-auto space-y-4 text-center flex flex-col items-center justify-center">
             <div className="inline-flex items-center justify-center gap-2 px-3.5 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs font-black uppercase tracking-widest border border-emerald-500/20 text-center">
@@ -192,7 +206,7 @@ export const PricingView: React.FC<PricingViewProps> = ({ onBack, onOpenDemo, on
                 <div className="w-full pt-6 mt-6 border-t border-slate-100 dark:border-slate-800/80 flex justify-center text-center">
                   <button
                     type="button"
-                    onClick={handleAction}
+                    onClick={() => handleSelectPlan(tier.id)}
                     className={`w-full py-3.5 px-4 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-2 cursor-pointer shadow-xs active:scale-95 text-center ${
                       tier.featured
                         ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-600/25 shadow-md'
@@ -208,7 +222,7 @@ export const PricingView: React.FC<PricingViewProps> = ({ onBack, onOpenDemo, on
           })}
         </div>
 
-        {/* Garantía y FAQ Breve Estrictamente Centrado */}
+        {/* Garantía y FAQ Breve Estrictamente Centrado (Sin mención de 30 días de prueba, 2 botones) */}
         <section className="rounded-3xl bg-slate-50 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 p-8 sm:p-10 text-center space-y-4 max-w-3xl mx-auto flex flex-col items-center justify-center">
           <div className="flex justify-center text-center">
             <div className="w-12 h-12 rounded-2xl bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
@@ -217,24 +231,33 @@ export const PricingView: React.FC<PricingViewProps> = ({ onBack, onOpenDemo, on
           </div>
 
           <h3 className="text-xl font-black text-slate-900 dark:text-white text-center w-full">
-            {t('home.prefooter.badge', 'Garantía Setmio: 30 Días de Prueba Sin Compromiso')}
+            {t('pricing.finalBadge', 'Garantía y Compromiso Setmio: Alta Guiada y Migración Sin Costes Ocultos')}
           </h3>
 
           <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed text-center w-full max-w-xl mx-auto">
-            {t('home.prefooter.subtitle', 'Configuramos tu club, importamos tu base de socios y te formamos a ti y a tu equipo de recepción de forma completamente gratuita. Sin contratos de permanencia ni costes de alta ocultos.')}
+            {t('pricing.finalSubtitle', 'Configuramos tu club, importamos tu base de socios y te formamos a ti y a tu equipo de recepción de forma completamente gratuita. Sin contratos de permanencia ni costes de alta ocultos.')}
           </p>
 
-          <div className="pt-2 flex justify-center text-center">
+          <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3 w-full">
             <button
               type="button"
-              onClick={handleAction}
-              className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition cursor-pointer shadow-md text-center active:scale-95"
+              onClick={handleRegisterCta}
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition cursor-pointer shadow-md text-center active:scale-95"
             >
-              <span>{t('pricing.finalCta', 'Solicitar Demo o Alta Directa')}</span>
+              <span>{t('pricing.registerBtn', 'Registrarse')}</span>
               <ArrowRight className="w-4 h-4" />
+            </button>
+
+            <button
+              type="button"
+              onClick={onOpenDemo}
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-900 dark:text-white font-bold text-xs transition cursor-pointer shadow-xs text-center active:scale-95"
+            >
+              <span>{t('pricing.demoBtn', 'Ver demo')}</span>
             </button>
           </div>
         </section>
+      </div>
       </div>
     </main>
   );

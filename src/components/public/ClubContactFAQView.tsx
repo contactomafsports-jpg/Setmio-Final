@@ -60,9 +60,13 @@ export const ClubContactFAQView: React.FC<{ onBack?: () => void }> = ({ onBack }
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-16 text-slate-900 dark:text-slate-100 transition-colors duration-200">
-      <SubpageHeaderNav onBack={onBack} />
-      {/* Header */}
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 text-slate-900 dark:text-slate-100 transition-colors duration-200">
+      <div className="mb-4 flex items-center justify-start">
+        <SubpageHeaderNav onBack={onBack} className="mb-0" />
+      </div>
+
+      <div className="space-y-16">
+        {/* Header */}
       <div className="max-w-3xl space-y-3 text-left">
         <div className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
           <MapPin className="w-4 h-4" />
@@ -127,6 +131,7 @@ export const ClubContactFAQView: React.FC<{ onBack?: () => void }> = ({ onBack }
             <span>{t('contact.whatsapp', 'Chatear por WhatsApp')}</span>
           </a>
         </div>
+      </div>
       </div>
     </div>
   );

@@ -134,17 +134,20 @@ export const TeamsView: React.FC = () => {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-10 text-slate-900 dark:text-slate-100 transition-colors duration-200">
       {/* If a team is selected -> Full dynamic page (No modal) */}
       {selectedTeam ? (
-        <section className="space-y-8 animate-in fade-in duration-150 max-w-5xl mx-auto">
+        <section className="animate-in fade-in duration-150 max-w-5xl mx-auto">
           {/* Aesthetic Back Button */}
-          <button
-            onClick={() => setSelectedTeamId(null)}
-            className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-bold text-slate-800 dark:text-slate-200 transition"
-          >
-            <ArrowLeft className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-            <span>Volver a Equipos del Club</span>
-          </button>
+          <div className="mb-4">
+            <button
+              onClick={() => setSelectedTeamId(null)}
+              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-bold text-slate-800 dark:text-slate-200 transition cursor-pointer active:scale-95"
+            >
+              <ArrowLeft className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+              <span>Volver a Equipos del Club</span>
+            </button>
+          </div>
 
-          {/* Team Detail Hero Card */}
+          <div className="space-y-8">
+            {/* Team Detail Hero Card */}
           <div className="relative rounded-3xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-xl bg-white dark:bg-slate-900">
             <div className="relative h-72 sm:h-96 w-full overflow-hidden">
               <img
@@ -247,6 +250,7 @@ export const TeamsView: React.FC = () => {
                 </div>
               ))}
             </div>
+          </div>
           </div>
         </section>
       ) : (

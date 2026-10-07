@@ -1,6 +1,6 @@
 import React from 'react';
 import { useApp } from '../../context/AppContext';
-import { Instagram, Facebook, ShieldCheck, Mail, Phone, Lock, ExternalLink } from 'lucide-react';
+import { Instagram, Facebook, Mail, Phone, Lock, ExternalLink } from 'lucide-react';
 
 interface CorporateFooterProps {
   minimized?: boolean;
@@ -96,10 +96,6 @@ export const CorporateFooter: React.FC<CorporateFooterProps> = ({ minimized = fa
           <p className="text-slate-400 leading-relaxed text-[11px]">
             {t('footer.description', 'Software de Marca Blanca integral para profesionales del pádel. Incluye Web Pública, App de Gestión Interna, App para Personal y Clientes, y Agente de IA para web y redes.')}
           </p>
-          <div className="text-[11px] text-slate-500 flex items-center gap-1.5">
-            <ShieldCheck className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-            <span>{t('footer.infrastructure', 'Desplegado en producción sobre Vercel Edge & Supabase PostgreSQL.')}</span>
-          </div>
           {/* Social media links */}
           <div className="flex items-center gap-3 pt-1">
             <a
