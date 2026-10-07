@@ -248,6 +248,26 @@ const readRoute = () => {
       isCorporate: false,
     };
   }
+  if (remainingPath === '/admin' || remainingPath.startsWith('/admin/')) {
+    let admin: AdminTab = 'dashboard';
+    if (remainingPath === '/admin/pistas' || remainingPath.startsWith('/admin/pistas/')) {
+      admin = 'courts_management';
+    } else if (remainingPath === '/admin/domotica' || remainingPath.startsWith('/admin/domotica/')) {
+      admin = 'smart_courts';
+    } else if (remainingPath === '/admin/reservas' || remainingPath.startsWith('/admin/reservas/')) {
+      admin = 'agenda';
+    } else if (remainingPath === '/admin/clientes' || remainingPath.startsWith('/admin/clientes/')) {
+      admin = 'customers';
+    }
+    return {
+      view: 'admin' as MainView,
+      page: 'home' as PublicPage,
+      admin,
+      player: 'dashboard' as PlayerTab,
+      clubSlug: activeClubSlug,
+      isCorporate: false,
+    };
+  }
   if (
     remainingPath === '/jugadores' ||
     remainingPath.startsWith('/jugadores/') ||

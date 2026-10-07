@@ -32,6 +32,8 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
     logoutOrExitDemo,
     theme,
     toggleTheme,
+    adminTheme,
+    setAdminTheme,
     language,
     setLanguage,
     setAdminTab,
@@ -47,6 +49,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [aiDrawerOpen, setAiDrawerOpen] = useState(false);
   const [aiInputText, setAiInputText] = useState('');
+  const [avatarImgError, setAvatarImgError] = useState(false);
 
   const langRef = useRef<HTMLDivElement>(null);
   const userMenuRef = useRef<HTMLDivElement>(null);
@@ -93,15 +96,23 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
     logoutOrExitDemo();
   };
 
+  const isDark =
+    theme === 'dark' ||
+    adminTheme === 'dark' ||
+    (typeof document !== 'undefined' && document.documentElement.classList.contains('dark'));
+
   const handleToggleTheme = () => {
+    const nextMode = isDark ? 'light' : 'dark';
     const root = document.documentElement;
-    const isDark = root.classList.contains('dark');
-    if (isDark) {
-      root.classList.remove('dark');
-      root.classList.add('light');
-    } else {
+    if (nextMode === 'dark') {
       root.classList.add('dark');
       root.classList.remove('light');
+    } else {
+      root.classList.remove('dark');
+      root.classList.add('light');
+    }
+    if (setAdminTheme) {
+      setAdminTheme(nextMode);
     }
     toggleTheme();
   };
@@ -183,10 +194,10 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
             type="button"
             onClick={handleToggleTheme}
             className="p-2 rounded-xl text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
-            title={theme === 'dark' ? 'Modo claro' : 'Modo oscuro'}
+            title={isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
             aria-label="Alternar tema"
           >
-            {theme === 'dark' ? (
+            {isDark ? (
               <Sun className="w-4 h-4 text-amber-400" />
             ) : (
               <Moon className="w-4 h-4 text-slate-700 dark:text-slate-300" />
@@ -226,16 +237,14 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
                   className="w-8 h-8 rounded-full overflow-hidden shrink-0 border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 flex items-center justify-center shadow-xs aspect-square"
                   style={{ borderRadius: '9999px', overflow: 'hidden' }}
                 >
-                  {currentUser.avatarUrl ? (
+                  {currentUser.avatarUrl && !avatarImgError ? (
                     <img
                       src={currentUser.avatarUrl}
                       alt={currentUser.name}
                       className="w-full h-full object-cover rounded-full block aspect-square"
-                      style={{ borderRadius: '9999px', objectFit: 'cover' }}
+                      style={{ borderRadius: '9999px', objectFit: 'cover', width: '100%', height: '100%', display: 'block' }}
                       loading="eager"
-                      onError={(e) => {
-                        e.currentTarget.style.display = 'none';
-                      }}
+                      onError={() => setAvatarImgError(true)}
                     />
                   ) : (
                     <span className="text-white font-black text-xs bg-gradient-to-br from-emerald-500 to-teal-700 w-full h-full flex items-center justify-center select-none">
@@ -262,15 +271,13 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
                     className="w-10 h-10 rounded-full overflow-hidden shrink-0 border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 flex items-center justify-center shadow-xs aspect-square"
                     style={{ borderRadius: '9999px', overflow: 'hidden' }}
                   >
-                    {currentUser.avatarUrl ? (
+                    {currentUser.avatarUrl && !avatarImgError ? (
                       <img
                         src={currentUser.avatarUrl}
                         alt={currentUser.name}
                         className="w-full h-full object-cover rounded-full block aspect-square"
-                        style={{ borderRadius: '9999px', objectFit: 'cover' }}
-                        onError={(e) => {
-                          e.currentTarget.style.display = 'none';
-                        }}
+                        style={{ borderRadius: '9999px', objectFit: 'cover', width: '100%', height: '100%', display: 'block' }}
+                        onError={() => setAvatarImgError(true)}
                       />
                     ) : (
                       <span className="text-white font-black text-sm bg-emerald-600 w-full h-full flex items-center justify-center select-none">

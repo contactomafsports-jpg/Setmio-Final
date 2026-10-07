@@ -120,7 +120,7 @@ export const deLocale: Record<string, string> = {
   "club.nav.customers": "Mitglieder & Spieler CRM",
   "club.nav.dashboard": "Übersicht",
   "club.nav.domains": "Domains & DNS",
-  "club.nav.iot": "Haussteuerung",
+  "club.nav.iot": "Domotik",
   "club.nav.logout": "Abmelden / Demo beenden",
   "club.nav.more": "Mehr",
   "club.nav.pos": "Kasse & POS",

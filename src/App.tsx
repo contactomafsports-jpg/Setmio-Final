@@ -120,6 +120,21 @@ export function App() {
       const pathname = typeof window !== 'undefined' ? window.location.pathname : '/';
 
       // URLs de gestión interna
+      if (pathname === '/admin' || pathname === '/gestion') {
+        setCurrentView('admin');
+        setAdminTab('dashboard');
+        return;
+      }
+      if (pathname === '/admin/pistas' || pathname === '/gestion/pistas') {
+        setCurrentView('admin');
+        setAdminTab('courts_management');
+        return;
+      }
+      if (pathname === '/admin/domotica' || pathname === '/gestion/domotica' || pathname === '/gestion/pistas-inteligentes') {
+        setCurrentView('admin');
+        setAdminTab('smart_courts');
+        return;
+      }
       if (pathname === '/gestion/ajustes/ia' || pathname.endsWith('/ia')) {
         setCurrentView('admin');
         setAdminTab('settings');

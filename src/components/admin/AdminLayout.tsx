@@ -165,7 +165,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
             </div>
             <div className="min-w-0">
               <div className="font-black text-xs text-slate-900 dark:text-white truncate tracking-wider">
-                SETMIO PRO
+                Setmio Pro
               </div>
               <div className="text-[10px] text-emerald-600 dark:text-emerald-400 font-extrabold uppercase tracking-wider flex items-center gap-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
@@ -238,11 +238,26 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
         {/* User profile footer */}
         <div className="p-3 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 flex items-center justify-between text-xs">
           <div className="flex items-center gap-2 min-w-0">
-            <img
-              src={currentUser.avatarUrl}
-              alt={currentUser.name}
-              className="w-8 h-8 rounded-full object-cover shrink-0 border border-slate-300 dark:border-slate-700"
-            />
+            <div
+              className="w-8 h-8 rounded-full overflow-hidden shrink-0 border border-slate-300 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 flex items-center justify-center aspect-square"
+              style={{ borderRadius: '9999px', overflow: 'hidden' }}
+            >
+              {currentUser.avatarUrl ? (
+                <img
+                  src={currentUser.avatarUrl}
+                  alt={currentUser.name}
+                  className="w-full h-full object-cover block aspect-square"
+                  style={{ borderRadius: '9999px', objectFit: 'cover', width: '100%', height: '100%', display: 'block' }}
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                  }}
+                />
+              ) : (
+                <span className="text-white font-black text-xs bg-emerald-600 w-full h-full flex items-center justify-center select-none">
+                  {currentUser.name.slice(0, 2).toUpperCase()}
+                </span>
+              )}
+            </div>
             <div className="min-w-0">
               <div className="font-bold text-slate-900 dark:text-white truncate text-[11px]">{currentUser.name}</div>
               <div className="text-[10px] text-emerald-600 dark:text-emerald-400 font-mono font-bold truncate">Club Admin</div>
