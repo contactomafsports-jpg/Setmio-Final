@@ -30,7 +30,7 @@ export const PrivateMobileNav: React.FC<PrivateMobileNavProps> = ({
     },
     {
       id: 'smart_courts' as AdminTab,
-      label: t('club.nav.iot', 'Domótica IoT'),
+      label: t('club.nav.iot', 'Domótica'),
       icon: Zap,
     },
     {

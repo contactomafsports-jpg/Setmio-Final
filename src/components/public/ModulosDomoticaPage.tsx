@@ -249,7 +249,7 @@ export function ModulosDomoticaPage({ onBack, onOpenDemo }: ModulosDomoticaPageP
               {t('domotica.catalogTitle')}
             </h2>
             <p className="text-xs text-slate-500 dark:text-slate-400">
-              {t('domotica.catalogSub')}
+              {t('domotica.hardware.subtitle')}
             </p>
           </div>
 

@@ -381,6 +381,9 @@ interface AppContextType {
   clubTheme: ThemeMode;
   setClubTheme: (theme: ThemeMode) => void;
   toggleClubTheme: () => void;
+  adminTheme: ThemeMode;
+  setAdminTheme: (theme: ThemeMode) => void;
+  toggleAdminTheme: () => void;
   language: SupportedLanguage;
   currentLanguage: SupportedLanguage;
   setLanguage: (lang: SupportedLanguage) => void;
@@ -708,6 +711,37 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     });
   }, []);
 
+  // 3. Tema del Panel Admin / HQ
+  const [adminTheme, setAdminThemeState] = useState<ThemeMode>(() => {
+    try {
+      const saved = localStorage.getItem('setmio_admin_theme') as ThemeMode;
+      return saved || 'dark';
+    } catch {
+      return 'dark';
+    }
+  });
+
+  const setAdminTheme = useCallback((mode: ThemeMode) => {
+    setAdminThemeState(mode);
+    try {
+      localStorage.setItem('setmio_admin_theme', mode);
+    } catch {
+      // Ignore
+    }
+  }, []);
+
+  const toggleAdminTheme = useCallback(() => {
+    setAdminThemeState((prev) => {
+      const next = prev === 'dark' ? 'light' : 'dark';
+      try {
+        localStorage.setItem('setmio_admin_theme', next);
+      } catch {
+        // Ignore
+      }
+      return next;
+    });
+  }, []);
+
   // Language state synchronized with i18n
   const normalizeSupportedLanguage = (code?: string | null): SupportedLanguage | null => {
     if (!code) return null;
@@ -844,46 +878,51 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const currentTenant = tenants.find((t) => t.id === currentTenantId) || tenants[0];
 
   // --- AISLAMIENTO DE TEMA SEGÚN ENTORNO ---
-  // El Panel Admin / HQ siempre mantiene de forma fija su modo oscuro canónico
   const theme: ThemeMode =
     currentView === 'admin' || currentView === 'hq'
-      ? 'dark'
+      ? adminTheme
       : isCorporateLanding
       ? corporateTheme
       : clubTheme;
 
   const setTheme = useCallback(
     (mode: ThemeMode) => {
-      if (currentView === 'admin' || currentView === 'hq') return; // Admin siempre modo oscuro canónico
+      if (currentView === 'admin' || currentView === 'hq') {
+        setAdminTheme(mode);
+        return;
+      }
       if (isCorporateLanding) {
         setCorporateTheme(mode);
       } else {
         setClubTheme(mode);
       }
     },
-    [currentView, isCorporateLanding, setCorporateTheme, setClubTheme]
+    [currentView, isCorporateLanding, setAdminTheme, setCorporateTheme, setClubTheme]
   );
 
   const toggleTheme = useCallback(() => {
-    if (currentView === 'admin' || currentView === 'hq') return; // Admin siempre modo oscuro canónico
+    if (currentView === 'admin' || currentView === 'hq') {
+      toggleAdminTheme();
+      return;
+    }
     if (isCorporateLanding) {
       toggleCorporateTheme();
     } else {
       toggleClubTheme();
     }
-  }, [currentView, isCorporateLanding, toggleCorporateTheme, toggleClubTheme]);
+  }, [currentView, isCorporateLanding, toggleAdminTheme, toggleCorporateTheme, toggleClubTheme]);
 
   // Sincronización del DOM con el tema activo del entorno
   useEffect(() => {
     const root = document.documentElement;
 
-    if (currentView === 'admin' || currentView === 'hq') {
-      root.classList.add('dark');
-      root.classList.remove('light');
-      return;
-    }
+    const activeMode =
+      currentView === 'admin' || currentView === 'hq'
+        ? adminTheme
+        : isCorporateLanding
+        ? corporateTheme
+        : clubTheme;
 
-    const activeMode = isCorporateLanding ? corporateTheme : clubTheme;
     if (activeMode === 'dark') {
       root.classList.add('dark');
       root.classList.remove('light');
@@ -900,7 +939,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         root.classList.add('light');
       }
     }
-  }, [currentView, isCorporateLanding, corporateTheme, clubTheme]);
+  }, [currentView, isCorporateLanding, adminTheme, corporateTheme, clubTheme]);
 
   useEffect(() => {
     const root = document.documentElement;
@@ -1790,6 +1829,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         clubTheme,
         setClubTheme,
         toggleClubTheme,
+        adminTheme,
+        setAdminTheme,
+        toggleAdminTheme,
         language,
         currentLanguage: language,
         setLanguage,

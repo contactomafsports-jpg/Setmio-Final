@@ -75,7 +75,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   const mainDesktopTabs: { id: AdminTab; label: string; icon: React.ReactNode }[] = [
     { id: 'dashboard', label: t('club.nav.dashboard', 'Inicio'), icon: <LayoutDashboard className="w-5 h-5" /> },
     { id: 'agenda', label: t('club.nav.bookings', 'Reservas'), icon: <Calendar className="w-5 h-5" /> },
-    { id: 'smart_courts', label: t('club.nav.iot', 'Domótica IoT'), icon: <Zap className="w-5 h-5" /> },
+    { id: 'smart_courts', label: t('club.nav.iot', 'Domótica'), icon: <Zap className="w-5 h-5" /> },
     { id: 'pos_cafe', label: t('club.nav.pos', 'TPV / Caja'), icon: <CreditCard className="w-5 h-5" /> },
   ];
 
@@ -165,7 +165,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
             </div>
             <div className="min-w-0">
               <div className="font-black text-xs text-slate-900 dark:text-white truncate tracking-wider">
-                SETMIO PADEL PRO
+                SETMIO PRO
               </div>
               <div className="text-[10px] text-emerald-600 dark:text-emerald-400 font-extrabold uppercase tracking-wider flex items-center gap-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />

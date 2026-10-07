@@ -13,6 +13,7 @@ export const DOMOTICA_TRANSLATIONS: Record<string, Record<string, string>> = {
 
     "domotica.catalogTitle": "Hardware y Automatizaciones IoT Disponibles",
     "domotica.catalogSub": "Dispositivos certificados e integrados de forma nativa con el motor de reservas de Setmio.",
+    "domotica.hardware.subtitle": "Dispositivos certificados e integrados de forma nativa con el motor de reservas de Setmio.",
     "domotica.status": "Estado: ",
     "domotica.ledOn": "Encendido (400 Lux)",
     "domotica.ledOff": "Apagado (Standby 0W)",
@@ -107,7 +108,8 @@ export const DOMOTICA_TRANSLATIONS: Record<string, Record<string, string>> = {
     "domotica.mqttBadge": "MQTT Broker Online (Ping: 14ms)",
 
     "domotica.catalogTitle": "Available IoT Hardware & Automation",
-    "domotica.catalogSub": "Certified industrial devices natively integrated with Setmio's reservation engine.",
+    "domotica.catalogSub": "Certified devices natively integrated with the Setmio booking engine.",
+    "domotica.hardware.subtitle": "Certified devices natively integrated with the Setmio booking engine.",
     "domotica.status": "Status: ",
     "domotica.ledOn": "Turned On (400 Lux)",
     "domotica.ledOff": "Turned Off (Standby 0W)",
@@ -261,6 +263,27 @@ DOMOTICA_TRANSLATIONS.it = { ...DOMOTICA_TRANSLATIONS.en };
 DOMOTICA_TRANSLATIONS.fr = { ...DOMOTICA_TRANSLATIONS.en };
 DOMOTICA_TRANSLATIONS.de = { ...DOMOTICA_TRANSLATIONS.en };
 DOMOTICA_TRANSLATIONS.ar = { ...DOMOTICA_TRANSLATIONS.en };
+
+DOMOTICA_TRANSLATIONS.va["domotica.hardware.subtitle"] = "Dispositius certificats i integrats de forma nativa amb el motor de reserves de Setmio.";
+DOMOTICA_TRANSLATIONS.va["domotica.catalogSub"] = "Dispositius certificats i integrats de forma nativa amb el motor de reserves de Setmio.";
+
+DOMOTICA_TRANSLATIONS.eu["domotica.hardware.subtitle"] = "Setmioko erreserba-motorrarekin modu natiboan integratutako gailu ziurtatuak.";
+DOMOTICA_TRANSLATIONS.eu["domotica.catalogSub"] = "Setmioko erreserba-motorrarekin modu natiboan integratutako gailu ziurtatuak.";
+
+DOMOTICA_TRANSLATIONS.ar["domotica.hardware.subtitle"] = "أجهزة معتمدة ومدمجة بشكل أصلي مع محرك حجوزات Setmio.";
+DOMOTICA_TRANSLATIONS.ar["domotica.catalogSub"] = "أجهزة معتمدة ومدمجة بشكل أصلي مع محرك حجوزات Setmio.";
+
+DOMOTICA_TRANSLATIONS.pt["domotica.hardware.subtitle"] = "Dispositivos certificados e integrados de forma nativa com o motor de reservas da Setmio.";
+DOMOTICA_TRANSLATIONS.pt["domotica.catalogSub"] = "Dispositivos certificados e integrados de forma nativa com o motor de reservas da Setmio.";
+
+DOMOTICA_TRANSLATIONS.fr["domotica.hardware.subtitle"] = "Appareils certifiés et intégrés nativement au moteur de réservation Setmio.";
+DOMOTICA_TRANSLATIONS.fr["domotica.catalogSub"] = "Appareils certifiés et intégrés nativement au moteur de réservation Setmio.";
+
+DOMOTICA_TRANSLATIONS.de["domotica.hardware.subtitle"] = "Zertifizierte und nativ in die Setmio-Buchungsmaschine integrierte Geräte.";
+DOMOTICA_TRANSLATIONS.de["domotica.catalogSub"] = "Zertifizierte und nativ in die Setmio-Buchungsmaschine integrierte Geräte.";
+
+DOMOTICA_TRANSLATIONS.it["domotica.hardware.subtitle"] = "Dispositivi certificati e integrati nativamente con il motore di prenotazione di Setmio.";
+DOMOTICA_TRANSLATIONS.it["domotica.catalogSub"] = "Dispositivi certificati e integrati nativamente con il motore di prenotazione di Setmio.";
 
 // Italian additions
 DOMOTICA_TRANSLATIONS.it = {
