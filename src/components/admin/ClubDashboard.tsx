@@ -12,6 +12,7 @@ import {
   GraduationCap,
   Trophy,
   Settings,
+  Shield,
   CheckCircle2,
   Clock,
   KeyRound,
@@ -26,6 +27,7 @@ export const ClubDashboard: React.FC = () => {
     currentTenant,
     courts,
     setAdminTab,
+    setSelectedCustomerId,
     isClubOpen,
     toggleClubOpenState,
     enterWhiteLabelPlayerPreview,
@@ -247,12 +249,11 @@ export const ClubDashboard: React.FC = () => {
             </div>
           </div>
 
-          <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 pt-1">
+          <div className="flex items-center text-xs text-slate-500 dark:text-slate-400 pt-1">
             <span className="inline-flex items-center gap-1 font-bold text-emerald-600 dark:text-emerald-400">
               <TrendingUp className="w-3.5 h-3.5" />
               +18,4% crecimiento mensual
             </span>
-            <span>Objetivo mensual: 22.000 € (87%)</span>
           </div>
         </div>
 
@@ -305,29 +306,38 @@ export const ClubDashboard: React.FC = () => {
       </section>
 
       {/* ======================================================================
-          3. BLOQUE ACCESOS RÁPIDOS OPERATIVOS (POSICIONADO AQUÍ)
-          - Encabezado: "ACCESOS RÁPIDOS OPERATIVOS" (exact title, sin coletillas)
-          - Grid 2x2 de tarjetas compactas:
-            1. 🎾 Partidas Abiertas ("Play!")
-            2. 🎓 Escuela / Clases
-            3. 👥 Socios / CRM
-            4. ⚙️ Ajustes del Club
+          3. BLOQUE ACCESOS RÁPIDOS OPERATIVOS (6 MÓDULOS REQUERIDOS)
+          - Icono único superior en cada tarjeta (sin icono repetido a la altura del título)
+          - Enrutamiento correcto a sus respectivas vistas
           ====================================================================== */}
       <section className="space-y-3">
         <h2 className="font-black text-sm uppercase tracking-wider text-slate-700 dark:text-slate-300">
-          ACCESOS RÁPIDOS OPERATIVOS
+          {t('dashboard.quick_access_title', 'ACCESOS RÁPIDOS OPERATIVOS')}
         </h2>
 
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-          {/* 1. Partidas Abiertas ("Play!") */}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
+          {/* 1. Partidas abiertas -> /admin/partidas */}
           <button
             type="button"
-            onClick={() => setAdminTab('tournaments')}
-            className="p-4 sm:p-5 rounded-3xl bg-white dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700/80 hover:border-emerald-500/50 hover:shadow-md transition text-left group flex flex-col justify-between shadow-xs cursor-pointer"
+            onClick={() => {
+              if (typeof window !== 'undefined') {
+                window.history.pushState({}, '', '/admin/partidas');
+              }
+              setAdminTab('matches');
+            }}
+            className="p-4 rounded-3xl bg-white dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700/80 hover:border-emerald-500/50 hover:shadow-md transition text-left group flex flex-col justify-between shadow-xs cursor-pointer"
           >
             <div className="flex items-center justify-between mb-3">
               <div className="p-3 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 group-hover:scale-105 transition-transform border border-emerald-500/20">
-                <Trophy className="w-5 h-5" />
+                {/* Icono de raqueta y pelota de pádel para partidos */}
+                <svg className="w-5 h-5 fill-none stroke-current stroke-2" viewBox="0 0 24 24">
+                  <circle cx="11" cy="9" r="6" />
+                  <path d="m15.5 13.5 5 5c.8.8.8 2.2 0 3s-2.2.8-3 0l-5-5" strokeLinecap="round" strokeLinejoin="round" />
+                  <circle cx="10" cy="8" r="0.8" fill="currentColor" />
+                  <circle cx="12" cy="8" r="0.8" fill="currentColor" />
+                  <circle cx="11" cy="10" r="0.8" fill="currentColor" />
+                  <circle cx="19.5" cy="4.5" r="2.5" fill="currentColor" stroke="none" />
+                </svg>
               </div>
               <span className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300">
                 Play!
@@ -335,51 +345,62 @@ export const ClubDashboard: React.FC = () => {
             </div>
             <div>
               <div className="font-black text-sm text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition">
-                🎾 Partidas Abiertas
+                {t('dashboard.quick_matches', 'Partidas abiertas')}
               </div>
               <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
-                Matchmaking y niveles
+                {t('dashboard.quick_matches_desc', 'Matchmaking y niveles')}
               </div>
             </div>
             <div className="mt-3 pt-2 border-t border-slate-100 dark:border-slate-700/60 flex items-center justify-between text-[11px] text-emerald-600 dark:text-emerald-400 font-bold">
-              <span>Gestionar partidas</span>
+              <span>{t('dashboard.quick_matches_action', 'Gestionar partidas')}</span>
               <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
             </div>
           </button>
 
-          {/* 2. Escuela / Clases */}
+          {/* 2. Competiciones -> /admin/competiciones (icono de trofeo) */}
           <button
             type="button"
-            onClick={() => setAdminTab('academy')}
-            className="p-4 sm:p-5 rounded-3xl bg-white dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700/80 hover:border-blue-500/50 hover:shadow-md transition text-left group flex flex-col justify-between shadow-xs cursor-pointer"
+            onClick={() => {
+              if (typeof window !== 'undefined') {
+                window.history.pushState({}, '', '/admin/competiciones');
+              }
+              setAdminTab('tournaments');
+            }}
+            className="p-4 rounded-3xl bg-white dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700/80 hover:border-amber-500/50 hover:shadow-md transition text-left group flex flex-col justify-between shadow-xs cursor-pointer"
           >
             <div className="flex items-center justify-between mb-3">
-              <div className="p-3 rounded-2xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 group-hover:scale-105 transition-transform border border-blue-500/20">
-                <GraduationCap className="w-5 h-5" />
+              <div className="p-3 rounded-2xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 group-hover:scale-105 transition-transform border border-amber-500/20">
+                <Trophy className="w-5 h-5" />
               </div>
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300">
-                Cursos
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300">
+                Torneos
               </span>
             </div>
             <div>
-              <div className="font-black text-sm text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition">
-                🎓 Escuela / Clases
+              <div className="font-black text-sm text-slate-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition">
+                {t('dashboard.quick_competitions', 'Competiciones')}
               </div>
               <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
-                Grupos, alumnos y profes
+                {t('dashboard.quick_competitions_desc', 'Torneos, cuadros y fases')}
               </div>
             </div>
-            <div className="mt-3 pt-2 border-t border-slate-100 dark:border-slate-700/60 flex items-center justify-between text-[11px] text-blue-600 dark:text-blue-400 font-bold">
-              <span>Ver cuadrícula</span>
+            <div className="mt-3 pt-2 border-t border-slate-100 dark:border-slate-700/60 flex items-center justify-between text-[11px] text-amber-600 dark:text-amber-400 font-bold">
+              <span>{t('dashboard.quick_competitions_action', 'Ver competiciones')}</span>
               <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
             </div>
           </button>
 
-          {/* 3. Socios / CRM */}
+          {/* 3. Socios / CRM -> /admin/socios */}
           <button
             type="button"
-            onClick={() => setAdminTab('customers')}
-            className="p-4 sm:p-5 rounded-3xl bg-white dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700/80 hover:border-indigo-500/50 hover:shadow-md transition text-left group flex flex-col justify-between shadow-xs cursor-pointer"
+            onClick={() => {
+              setSelectedCustomerId(null);
+              if (typeof window !== 'undefined') {
+                window.history.pushState({}, '', '/admin/socios');
+              }
+              setAdminTab('customers');
+            }}
+            className="p-4 rounded-3xl bg-white dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700/80 hover:border-indigo-500/50 hover:shadow-md transition text-left group flex flex-col justify-between shadow-xs cursor-pointer"
           >
             <div className="flex items-center justify-between mb-3">
               <div className="p-3 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 group-hover:scale-105 transition-transform border border-indigo-500/20">
@@ -391,23 +412,94 @@ export const ClubDashboard: React.FC = () => {
             </div>
             <div>
               <div className="font-black text-sm text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition">
-                👥 Socios / CRM
+                {t('dashboard.quick_crm', 'Socios / CRM')}
               </div>
               <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
-                Fichas, monederos y altas
+                {t('dashboard.quick_crm_desc', 'Fichas, monederos y altas')}
               </div>
             </div>
             <div className="mt-3 pt-2 border-t border-slate-100 dark:border-slate-700/60 flex items-center justify-between text-[11px] text-indigo-600 dark:text-indigo-400 font-bold">
-              <span>Listado de socios</span>
+              <span>{t('dashboard.quick_crm_action', 'Listado de socios')}</span>
               <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
             </div>
           </button>
 
-          {/* 4. Ajustes del Club */}
+          {/* 4. Escuela / Clases -> /admin/escuela */}
           <button
             type="button"
-            onClick={() => setAdminTab('settings')}
-            className="p-4 sm:p-5 rounded-3xl bg-white dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700/80 hover:border-slate-400 dark:hover:border-slate-600 hover:shadow-md transition text-left group flex flex-col justify-between shadow-xs cursor-pointer"
+            onClick={() => {
+              if (typeof window !== 'undefined') {
+                window.history.pushState({}, '', '/admin/escuela');
+              }
+              setAdminTab('academy');
+            }}
+            className="p-4 rounded-3xl bg-white dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700/80 hover:border-blue-500/50 hover:shadow-md transition text-left group flex flex-col justify-between shadow-xs cursor-pointer"
+          >
+            <div className="flex items-center justify-between mb-3">
+              <div className="p-3 rounded-2xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 group-hover:scale-105 transition-transform border border-blue-500/20">
+                <GraduationCap className="w-5 h-5" />
+              </div>
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300">
+                Cursos
+              </span>
+            </div>
+            <div>
+              <div className="font-black text-sm text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition">
+                {t('dashboard.quick_academy', 'Escuela / Clases')}
+              </div>
+              <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
+                {t('dashboard.quick_academy_desc', 'Grupos, alumnos y profes')}
+              </div>
+            </div>
+            <div className="mt-3 pt-2 border-t border-slate-100 dark:border-slate-700/60 flex items-center justify-between text-[11px] text-blue-600 dark:text-blue-400 font-bold">
+              <span>{t('dashboard.quick_academy_action', 'Ver cuadrícula')}</span>
+              <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+            </div>
+          </button>
+
+          {/* 5. Equipos -> /admin/equipos */}
+          <button
+            type="button"
+            onClick={() => {
+              if (typeof window !== 'undefined') {
+                window.history.pushState({}, '', '/admin/equipos');
+              }
+              setAdminTab('teams');
+            }}
+            className="p-4 rounded-3xl bg-white dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700/80 hover:border-cyan-500/50 hover:shadow-md transition text-left group flex flex-col justify-between shadow-xs cursor-pointer"
+          >
+            <div className="flex items-center justify-between mb-3">
+              <div className="p-3 rounded-2xl bg-cyan-50 dark:bg-cyan-950/60 text-cyan-600 dark:text-cyan-400 group-hover:scale-105 transition-transform border border-cyan-500/20">
+                <Shield className="w-5 h-5" />
+              </div>
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-cyan-100 dark:bg-cyan-950 text-cyan-700 dark:text-cyan-300">
+                Ligas
+              </span>
+            </div>
+            <div>
+              <div className="font-black text-sm text-slate-900 dark:text-white group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition">
+                {t('dashboard.quick_teams', 'Equipos')}
+              </div>
+              <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
+                {t('dashboard.quick_teams_desc', 'Capitanes, jugadores y actas')}
+              </div>
+            </div>
+            <div className="mt-3 pt-2 border-t border-slate-100 dark:border-slate-700/60 flex items-center justify-between text-[11px] text-cyan-600 dark:text-cyan-400 font-bold">
+              <span>{t('dashboard.quick_teams_action', 'Gestionar equipos')}</span>
+              <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+            </div>
+          </button>
+
+          {/* 6. Ajustes del Club -> /admin/ajustes */}
+          <button
+            type="button"
+            onClick={() => {
+              if (typeof window !== 'undefined') {
+                window.history.pushState({}, '', '/admin/ajustes');
+              }
+              setAdminTab('settings');
+            }}
+            className="p-4 rounded-3xl bg-white dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700/80 hover:border-slate-400 dark:hover:border-slate-600 hover:shadow-md transition text-left group flex flex-col justify-between shadow-xs cursor-pointer"
           >
             <div className="flex items-center justify-between mb-3">
               <div className="p-3 rounded-2xl bg-slate-100 dark:bg-slate-700/60 text-slate-700 dark:text-slate-300 group-hover:scale-105 transition-transform">
@@ -419,14 +511,14 @@ export const ClubDashboard: React.FC = () => {
             </div>
             <div>
               <div className="font-black text-sm text-slate-900 dark:text-white group-hover:text-slate-700 dark:group-hover:text-slate-200 transition">
-                ⚙️ Ajustes del Club
+                {t('dashboard.quick_settings', 'Ajustes del Club')}
               </div>
               <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
-                Horarios, tarifas e iluminación
+                {t('dashboard.quick_settings_desc', 'Horarios, tarifas e iluminación')}
               </div>
             </div>
             <div className="mt-3 pt-2 border-t border-slate-100 dark:border-slate-700/60 flex items-center justify-between text-[11px] text-slate-600 dark:text-slate-400 font-bold">
-              <span>Configuración</span>
+              <span>{t('dashboard.quick_settings_action', 'Configuración')}</span>
               <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
             </div>
           </button>

@@ -174,24 +174,34 @@ export function App() {
         setAdminTab('tournaments');
         return;
       }
-      if (pathname === '/gestion/escuela') {
+      if (pathname === '/gestion/escuela' || pathname === '/admin/escuela') {
         setCurrentView('admin');
         setAdminTab('academy');
         return;
       }
-      if (pathname === '/gestion/tpv') {
+      if (pathname === '/gestion/tpv' || pathname === '/admin/tpv') {
         setCurrentView('admin');
         setAdminTab('pos_cafe');
         return;
       }
-      if (pathname === '/gestion/tienda') {
+      if (
+        pathname === '/gestion/tienda' ||
+        pathname === '/admin/tienda' ||
+        pathname.startsWith('/admin/tienda/') ||
+        pathname.startsWith('/gestion/tienda/')
+      ) {
         setCurrentView('admin');
         setAdminTab('shop');
         return;
       }
-      if (pathname === '/gestion/equipos') {
+      if (pathname === '/gestion/equipos' || pathname === '/admin/equipos') {
         setCurrentView('admin');
         setAdminTab('teams');
+        return;
+      }
+      if (pathname === '/gestion/ajustes' || pathname === '/admin/ajustes') {
+        setCurrentView('admin');
+        setAdminTab('settings');
         return;
       }
 
