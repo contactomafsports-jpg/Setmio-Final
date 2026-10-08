@@ -196,7 +196,7 @@ export const ClubDashboard: React.FC = () => {
 
       {/* ======================================================================
           2. BLOQUE KPIS FINANCIEROS Y OCUPACIÓN EN TIEMPO REAL
-          - Tarjeta "Ingresos de Hoy" (Online + TPV Bar) y "Facturación del Mes"
+          - Tarjeta "Ingresos de Hoy" (Online + TPV) y "Facturación del Mes"
           - Tarjeta "% Ocupación en Tiempo Real" (barra de progreso y horas punta)
           ====================================================================== */}
       <section className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
@@ -209,15 +209,15 @@ export const ClubDashboard: React.FC = () => {
               </div>
               <div>
                 <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
-                  Ingresos de Hoy
+                  {t('dashboard.revenueToday', 'Ingresos de Hoy')}
                 </span>
-                <span className="text-[11px] text-slate-500 dark:text-slate-400">Online + TPV Bar</span>
+                <span className="text-[11px] text-slate-500 dark:text-slate-400">{t('dashboard.revenueSubtitle', 'Online / TPV')}</span>
               </div>
             </div>
 
             <div className="text-right">
               <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
-                Facturación del Mes
+                {t('dashboard.revenueMonth', 'Facturación del Mes')}
               </span>
               <span className="font-black text-xs text-emerald-600 dark:text-emerald-400 font-mono">
                 {totalRevenueMonth.toLocaleString('es-ES', { minimumFractionDigits: 0 })} €
@@ -230,16 +230,16 @@ export const ClubDashboard: React.FC = () => {
               {totalRevenueToday.toLocaleString('es-ES', { minimumFractionDigits: 2 })} €
             </div>
 
-            {/* Desglose Online + TPV Bar */}
+            {/* Desglose Online + TPV */}
             <div className="grid grid-cols-2 gap-2 mt-3 pt-3 border-t border-slate-100 dark:border-slate-700/60 text-xs">
               <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900/70 border border-slate-100 dark:border-slate-700/60">
-                <span className="text-[11px] text-slate-500 dark:text-slate-400 block font-medium">Reservas Online</span>
+                <span className="text-[11px] text-slate-500 dark:text-slate-400 block font-medium">{t('dashboard.onlineBookings', 'Reservas Online')}</span>
                 <span className="font-black font-mono text-slate-900 dark:text-white text-sm">
                   {onlineRevenueToday.toFixed(2)} €
                 </span>
               </div>
               <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900/70 border border-slate-100 dark:border-slate-700/60">
-                <span className="text-[11px] text-slate-500 dark:text-slate-400 block font-medium">TPV / Bar & Tienda</span>
+                <span className="text-[11px] text-slate-500 dark:text-slate-400 block font-medium">{t('dashboard.tpvSubtitle', 'TPV / Tienda y Mostrador')}</span>
                 <span className="font-black font-mono text-slate-900 dark:text-white text-sm">
                   {tpvRevenueToday.toFixed(2)} €
                 </span>

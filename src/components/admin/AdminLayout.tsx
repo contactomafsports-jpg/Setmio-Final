@@ -55,6 +55,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
     isClubOpen,
     toggleClubOpenState,
     enterWhiteLabelPlayerPreview,
+    setSelectedCustomerId,
     t,
   } = useApp();
 
@@ -75,7 +76,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   const mainDesktopTabs: { id: AdminTab; label: string; icon: React.ReactNode }[] = [
     { id: 'dashboard', label: t('club.nav.dashboard', 'Inicio'), icon: <LayoutDashboard className="w-5 h-5" /> },
     { id: 'agenda', label: t('club.nav.bookings', 'Reservas'), icon: <Calendar className="w-5 h-5" /> },
-    { id: 'smart_courts', label: t('club.nav.iot', 'Domótica'), icon: <Zap className="w-5 h-5" /> },
+    { id: 'matches', label: t('club.nav.matches', 'Partidas'), icon: <Trophy className="w-5 h-5" /> },
     { id: 'pos_cafe', label: t('club.nav.pos', 'TPV / Caja'), icon: <CreditCard className="w-5 h-5" /> },
   ];
 
@@ -83,10 +84,9 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   const moreTabs: { id: AdminTab; label: string; icon: React.ReactNode; desc: string; badge?: string }[] = [
     {
       id: 'courts_management',
-      label: 'Gestión de Pistas',
+      label: t('club.nav.courts_iot', 'Pistas / Domótica'),
       icon: <Layers className="w-5 h-5 text-emerald-500" />,
-      desc: 'Altas, bajas, tarifas y domótica IoT',
-      badge: 'Nuevo',
+      desc: t('club.nav.courts_management_desc', 'Inventario, tarifas y domótica IoT'),
     },
     {
       id: 'customers',
@@ -147,6 +147,12 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   ];
 
   const handleSelectTab = (tab: AdminTab) => {
+    if (tab === 'customers') {
+      setSelectedCustomerId(null);
+      if (typeof window !== 'undefined' && window.location.pathname.startsWith('/gestion/jugadores/')) {
+        window.history.pushState({}, '', '/gestion/jugadores');
+      }
+    }
     setAdminTab(tab);
     setMobileMoreOpen(false);
     window.scrollTo({ top: 0, behavior: 'smooth' });

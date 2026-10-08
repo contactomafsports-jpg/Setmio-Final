@@ -161,6 +161,10 @@ export const AdminCustomers: React.FC = () => {
       if (
         pathname === '/socios' ||
         pathname === '/crm' ||
+        pathname === '/admin/socios' ||
+        pathname === '/admin/crm' ||
+        pathname === '/gestion/socios' ||
+        pathname === '/gestion/crm' ||
         pathname === '/gestion/jugadores' ||
         pathname === '/jugadores'
       ) {
@@ -185,6 +189,11 @@ export const AdminCustomers: React.FC = () => {
         }
       }
 
+      if (!selectedCustomerId) {
+        setSelectedCustomer(null);
+        return;
+      }
+
       if (selectedCustomerId) {
         const slug = selectedCustomerId.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-');
         const found = customerList.find(
@@ -196,6 +205,8 @@ export const AdminCustomers: React.FC = () => {
         );
         if (found) {
           setSelectedCustomer(found);
+        } else {
+          setSelectedCustomer(null);
         }
       }
     };

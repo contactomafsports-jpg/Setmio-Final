@@ -1,5 +1,5 @@
 import React from 'react';
-import { LayoutDashboard, Calendar, Zap, CreditCard, Menu } from 'lucide-react';
+import { LayoutDashboard, Calendar, Trophy, CreditCard, Menu } from 'lucide-react';
 import { useApp, AdminTab } from '../../context/AppContext';
 
 interface PrivateMobileNavProps {
@@ -29,9 +29,9 @@ export const PrivateMobileNav: React.FC<PrivateMobileNavProps> = ({
       icon: Calendar,
     },
     {
-      id: 'smart_courts' as AdminTab,
-      label: t('club.nav.iot', 'Domótica'),
-      icon: Zap,
+      id: 'matches' as AdminTab,
+      label: t('club.nav.matches', 'Partidas'),
+      icon: Trophy,
     },
     {
       id: 'pos_cafe' as AdminTab,

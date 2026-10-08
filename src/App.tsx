@@ -43,6 +43,7 @@ import { AdminCustomers } from './components/admin/AdminCustomers';
 import { AdminTeams } from './components/admin/AdminTeams';
 import { AdminSchool } from './components/admin/AdminSchool';
 import { AdminTournaments } from './components/admin/AdminTournaments';
+import { AdminMatches } from './components/admin/AdminMatches';
 import { AdminShopOrders } from './components/admin/AdminShopOrders';
 import { AdminSmartCourts } from './components/admin/AdminSmartCourts';
 import { AdminCafePOS } from './components/admin/AdminCafePOS';
@@ -125,6 +126,11 @@ export function App() {
         setAdminTab('dashboard');
         return;
       }
+      if (pathname === '/admin/partidas' || pathname === '/gestion/partidas') {
+        setCurrentView('admin');
+        setAdminTab('matches');
+        return;
+      }
       if (pathname === '/admin/pistas' || pathname === '/gestion/pistas') {
         setCurrentView('admin');
         setAdminTab('courts_management');
@@ -132,7 +138,7 @@ export function App() {
       }
       if (pathname === '/admin/domotica' || pathname === '/gestion/domotica' || pathname === '/gestion/pistas-inteligentes') {
         setCurrentView('admin');
-        setAdminTab('smart_courts');
+        setAdminTab('courts_management');
         return;
       }
       if (pathname === '/gestion/ajustes/ia' || pathname.endsWith('/ia')) {
@@ -140,12 +146,30 @@ export function App() {
         setAdminTab('settings');
         return;
       }
+      if (
+        pathname === '/admin/socios' ||
+        pathname === '/admin/crm' ||
+        pathname === '/gestion/socios' ||
+        pathname === '/gestion/crm'
+      ) {
+        setCurrentView('admin');
+        setAdminTab('customers');
+        return;
+      }
       if (pathname.startsWith('/gestion/jugadores/')) {
         setCurrentView('admin');
         setAdminTab('customers');
         return;
       }
-      if (pathname.startsWith('/gestion/torneos/')) {
+      if (
+        pathname === '/admin/competiciones' ||
+        pathname === '/gestion/competiciones' ||
+        pathname.startsWith('/admin/competiciones/') ||
+        pathname.startsWith('/gestion/competiciones/') ||
+        pathname === '/admin/torneos' ||
+        pathname.startsWith('/admin/torneos/') ||
+        pathname.startsWith('/gestion/torneos/')
+      ) {
         setCurrentView('admin');
         setAdminTab('tournaments');
         return;
@@ -282,6 +306,8 @@ export function App() {
       case 'all_bookings':
       case 'bookings':
         return <AllBookingsPage onBackToQuadrant={() => setAdminTab('agenda')} />;
+      case 'matches':
+        return <AdminMatches />;
       case 'customers':
         return <AdminCustomers />;
       case 'teams':
@@ -293,7 +319,7 @@ export function App() {
       case 'shop':
         return <AdminShopOrders />;
       case 'smart_courts':
-        return <AdminSmartCourts />;
+        return <AdminCourtsManagement initialTab="iot" />;
       case 'pos_cafe':
         return <AdminCafePOS />;
       case 'web_editor':

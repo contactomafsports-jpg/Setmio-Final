@@ -138,6 +138,7 @@ const routeForAdminTab: Record<AdminTab, string> = {
   courts_management: '/gestion/pistas',
   all_bookings: '/gestion/todas-las-reservas',
   bookings: '/gestion/todas-las-reservas',
+  matches: '/gestion/partidas',
   customers: '/gestion/clientes',
   teams: '/gestion/equipos',
   academy: '/gestion/escuela',
@@ -332,6 +333,7 @@ export type AdminTab =
   | 'courts_management'
   | 'all_bookings'
   | 'bookings'
+  | 'matches'
   | 'customers'
   | 'teams'
   | 'academy'
