@@ -14,6 +14,7 @@ import {
   AuditLogItem,
   NotificationItem,
   PageBlock,
+  ClubRanking,
 } from '../types/database';
 
 export const INITIAL_PLANS: Plan[] = [
@@ -176,6 +177,35 @@ export const INITIAL_TENANT: Tenant = {
     ],
     whatsappWidgetEnabled: true,
     whatsappGreetingMessage: '¡Hola! Escribo desde la web de Pádel San Mateo. Me gustaría consultar disponibilidad de pistas o información de la escuela.',
+    paymentMethods: {
+      cash: true,
+      manualPos: true,
+      stripeTerminal: true,
+      stripeTerminalReaderCode: 'gold-bear-apple',
+      stripeTerminalStatus: 'connected',
+      pushCharge: true,
+      wallet: true,
+      onlineGateway: true,
+    },
+    policies: {
+      requireOnlinePayment: false,
+      allowCounterPayment: true,
+      cancellationRefundType: 'partial',
+      cancellationWindowHours: 12,
+      cancellationPenaltyPercent: 50,
+      memberCourtDiscountPercent: 20,
+      memberShopDiscountPercent: 10,
+    },
+    coupons: [
+      { id: 'cp-1', code: 'SETMIO10', discountType: 'percent', discountValue: 10, scope: 'global', active: true },
+      { id: 'cp-2', code: 'PROMOPISTA', discountType: 'fixed', discountValue: 5, scope: 'courts', active: true },
+      { id: 'cp-3', code: 'TIENDA15', discountType: 'percent', discountValue: 15, scope: 'shop', active: true },
+    ],
+    classVouchers: [
+      { id: 'v-1', title: 'Bono 4 Clases Individuales', classesCount: 4, price: 90, validityDays: 60, active: true },
+      { id: 'v-2', title: 'Bono 8 Clases Grupo Reducido', classesCount: 8, price: 150, validityDays: 90, active: true },
+      { id: 'v-3', title: 'Bono 10 Clases Intensivo WPT', classesCount: 10, price: 195, validityDays: 120, active: true },
+    ],
   },
 };
 
@@ -1018,3 +1048,59 @@ export const INITIAL_PAGE_BLOCKS: PageBlock[] = [
   { id: 'block-blog', type: 'latest_blog', title: 'Actualidad & Consejos de Juego', isVisible: true, order: 7 },
   { id: 'block-contact', type: 'contact_card', title: 'Ubicación e Instalaciones en Narón', isVisible: true, order: 8 },
 ];
+
+export const INITIAL_RANKINGS: ClubRanking[] = [
+  {
+    id: 'rnk-general',
+    tenantId: 'tenant-san-mateo-01',
+    name: 'Ranking General del Club 2026',
+    category: 'Absoluto',
+    season: 'Temporada 2026',
+    description: 'Ranking unificado de socios y jugadores federados de Pádel San Mateo. Suma de puntos por partidos oficiales y torneos.',
+    active: true,
+    linkedTournamentIds: ['t-2026-01'],
+    leaderboard: [
+      { id: 'rnk-p-1', rank: 1, playerId: 'p-1', playerName: 'Carlos Méndez', level: 4.85, points: 1420, matchesWon: 28, matchesPlayed: 32, streak: '5V', isMember: true },
+      { id: 'rnk-p-2', rank: 2, playerId: 'p-2', playerName: 'Pablo Vello', level: 4.80, points: 1350, matchesWon: 26, matchesPlayed: 31, streak: '3V', isMember: true },
+      { id: 'rnk-p-3', rank: 3, playerId: 'p-3', playerName: 'Laura Senra', level: 5.00, points: 1290, matchesWon: 25, matchesPlayed: 28, streak: '4V', isMember: true },
+      { id: 'rnk-p-4', rank: 4, playerId: 'p-4', playerName: 'Mateo Varela', level: 4.15, points: 1110, matchesWon: 21, matchesPlayed: 27, streak: '1V', isMember: true },
+      { id: 'rnk-p-5', rank: 5, playerId: 'p-5', playerName: 'Rosa Carballo', level: 3.90, points: 980, matchesWon: 18, matchesPlayed: 25, streak: '2V', isMember: true },
+      { id: 'rnk-p-6', rank: 6, playerId: 'p-6', playerName: 'Iván Gómez', level: 3.45, points: 860, matchesWon: 15, matchesPlayed: 24, streak: '1D', isMember: true },
+      { id: 'rnk-p-7', rank: 7, playerId: 'p-7', playerName: 'Lucas Piñeiro', level: 3.85, points: 790, matchesWon: 13, matchesPlayed: 22, streak: '2D', isMember: false },
+      { id: 'rnk-p-8', rank: 8, playerId: 'p-8', playerName: 'David Castro', level: 4.10, points: 720, matchesWon: 12, matchesPlayed: 20, streak: '1V', isMember: false },
+    ],
+  },
+  {
+    id: 'rnk-masculino-1',
+    tenantId: 'tenant-san-mateo-01',
+    name: 'Ranking Masculino 1ª Categoría',
+    category: 'Masculino Pro',
+    season: 'Temporada 2026',
+    description: 'Circuito competitivo de nivel avanzado (Nivel FEP ≥ 4.0). Determina la siembra oficial para cruces en cuadros de torneos.',
+    active: true,
+    linkedTournamentIds: ['t-2026-01'],
+    leaderboard: [
+      { id: 'rnk-p-1', rank: 1, playerId: 'p-1', playerName: 'Carlos Méndez', level: 4.85, points: 940, matchesWon: 19, matchesPlayed: 21, streak: '5V', isMember: true },
+      { id: 'rnk-p-2', rank: 2, playerId: 'p-2', playerName: 'Pablo Vello', level: 4.80, points: 910, matchesWon: 18, matchesPlayed: 22, streak: '3V', isMember: true },
+      { id: 'rnk-p-4', rank: 3, playerId: 'p-4', playerName: 'Mateo Varela', level: 4.15, points: 760, matchesWon: 14, matchesPlayed: 18, streak: '2V', isMember: true },
+      { id: 'rnk-p-8', rank: 4, playerId: 'p-8', playerName: 'David Castro', level: 4.10, points: 610, matchesWon: 11, matchesPlayed: 17, streak: '1V', isMember: false },
+    ],
+  },
+  {
+    id: 'rnk-femenino-oro',
+    tenantId: 'tenant-san-mateo-01',
+    name: 'Ranking Femenino Oro',
+    category: 'Femenino',
+    season: 'Temporada 2026',
+    description: 'Competición regular femenina con ascensos y descensos mensuales por grupos de nivel.',
+    active: true,
+    linkedTournamentIds: ['t-2026-01'],
+    leaderboard: [
+      { id: 'rnk-p-3', rank: 1, playerId: 'p-3', playerName: 'Laura Senra', level: 5.00, points: 1050, matchesWon: 20, matchesPlayed: 22, streak: '6V', isMember: true },
+      { id: 'rnk-p-5', rank: 2, playerId: 'p-5', playerName: 'Rosa Carballo', level: 3.90, points: 830, matchesWon: 16, matchesPlayed: 20, streak: '2V', isMember: true },
+      { id: 'rnk-p-9', rank: 3, playerId: 'p-9', playerName: 'Ana Belén Vázquez', level: 4.20, points: 790, matchesWon: 15, matchesPlayed: 19, streak: '3V', isMember: true },
+      { id: 'rnk-p-10', rank: 4, playerId: 'p-10', playerName: 'Lucía Fernández', level: 3.80, points: 640, matchesWon: 11, matchesPlayed: 17, streak: '1D', isMember: false },
+    ],
+  },
+];
+

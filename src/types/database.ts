@@ -126,6 +126,27 @@ export interface Tenant {
     whatsappGreetingMessage: string;
     chatWidgetMode?: 'whatsapp' | 'ai' | 'both';
     purchasePolicies?: string;
+    paymentMethods?: {
+      cash: boolean;
+      manualPos: boolean;
+      stripeTerminal: boolean;
+      stripeTerminalReaderCode?: string;
+      stripeTerminalStatus?: 'connected' | 'disconnected' | 'pairing';
+      pushCharge: boolean;
+      wallet: boolean;
+      onlineGateway: boolean;
+    };
+    policies?: {
+      requireOnlinePayment: boolean;
+      allowCounterPayment: boolean;
+      cancellationRefundType: 'full' | 'partial' | 'penalty' | 'no_refund';
+      cancellationWindowHours: number;
+      cancellationPenaltyPercent: number;
+      memberCourtDiscountPercent: number;
+      memberShopDiscountPercent: number;
+    };
+    coupons?: DiscountCoupon[];
+    classVouchers?: ClassVoucher[];
   };
   // Specific contextual metadata
   proPlayerStats?: {
@@ -221,6 +242,8 @@ export interface Booking {
   }[];
   accessPin?: string;
   notes?: string;
+  matchScore?: string;
+  isScoreHiddenInPublicProfile?: boolean;
 }
 
 export interface OpenMatch {
@@ -236,6 +259,9 @@ export interface OpenMatch {
   maxLevel: number;
   pricePerPlayer: number;
   status: 'open' | 'full' | 'completed' | 'canceled';
+  mode?: 'competitive' | 'friendly';
+  matchScore?: string;
+  isScoreHiddenInPublicProfile?: boolean;
   players: {
     id: string;
     name: string;
@@ -471,3 +497,49 @@ export interface NotificationItem {
   timestamp: string;
   read: boolean;
 }
+
+export interface DiscountCoupon {
+  id: string;
+  code: string;
+  discountType: 'percent' | 'fixed';
+  discountValue: number;
+  scope: 'global' | 'shop' | 'courts';
+  active: boolean;
+  expiresAt?: string;
+}
+
+export interface ClassVoucher {
+  id: string;
+  title: string;
+  classesCount: number;
+  price: number;
+  validityDays: number;
+  active: boolean;
+}
+
+export interface RankingLeaderboardEntry {
+  id: string;
+  rank: number;
+  playerId: string;
+  playerName: string;
+  avatarUrl?: string;
+  isMember: boolean;
+  level: number;
+  points: number;
+  matchesWon: number;
+  matchesPlayed: number;
+  streak: string;
+}
+
+export interface ClubRanking {
+  id: string;
+  tenantId: string;
+  name: string;
+  category: string;
+  season: string;
+  description: string;
+  active: boolean;
+  linkedTournamentIds: string[];
+  leaderboard: RankingLeaderboardEntry[];
+}
+

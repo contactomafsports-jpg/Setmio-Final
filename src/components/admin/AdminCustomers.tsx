@@ -138,6 +138,7 @@ export const AdminCustomers: React.FC = () => {
     playerOriginTab,
     setPlayerOriginTab,
     setAdminTab,
+    t,
   } = useApp();
 
   const [customerList, setCustomerList] = useState<CustomerItem[]>(() => {
@@ -238,6 +239,13 @@ export const AdminCustomers: React.FC = () => {
     position: 'Revés' as 'Drive' | 'Revés' | 'Ambas',
     hand: 'Diestro' as 'Diestro' | 'Zurdo',
     initialBalance: 0,
+    feeAmount: 45,
+    isZeroFee: false,
+    chargeInitialFeeInPOS: true,
+    initialFeePaymentMethod: 'card' as 'cash' | 'card' | 'app',
+    recurringBilling: true,
+    recurringBillingType: 'stripe' as 'stripe' | 'manual',
+    recurringInterval: 'monthly' as 'monthly' | 'quarterly' | 'annual',
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -266,6 +274,12 @@ export const AdminCustomers: React.FC = () => {
     e.preventDefault();
     if (!validateNewPlayer()) return;
 
+    const feeText = newPlayerForm.isMember
+      ? newPlayerForm.isZeroFee
+        ? 'Activo (Cuota 0€ · Exenta)'
+        : `Activo (${newPlayerForm.feeAmount}€/${newPlayerForm.recurringInterval === 'monthly' ? 'mes' : newPlayerForm.recurringInterval === 'quarterly' ? 'trim' : 'año'})`
+      : 'Esporádico';
+
     const newPlayer: CustomerItem = {
       id: `c-${Date.now()}`,
       name: newPlayerForm.name.trim(),
@@ -279,7 +293,7 @@ export const AdminCustomers: React.FC = () => {
       avatarUrl: `https://images.unsplash.com/photo-${1530000000000 + Math.floor(Math.random() * 10000000)}?auto=format&fit=crop&w=200&q=80`,
       hand: newPlayerForm.hand,
       position: newPlayerForm.position,
-      status: newPlayerForm.isMember ? 'Activo (Al día)' : 'Esporádico',
+      status: feeText,
     };
 
     const updated = [newPlayer, ...customerList];
@@ -301,12 +315,27 @@ export const AdminCustomers: React.FC = () => {
       position: 'Revés',
       hand: 'Diestro',
       initialBalance: 0,
+      feeAmount: 45,
+      isZeroFee: false,
+      chargeInitialFeeInPOS: true,
+      initialFeePaymentMethod: 'card',
+      recurringBilling: true,
+      recurringBillingType: 'stripe',
+      recurringInterval: 'monthly',
     });
     setErrors({});
 
+    const feeChargedNotice = newPlayerForm.isMember
+      ? newPlayerForm.isZeroFee
+        ? 'Socio registrado con Cuota 0€ (Convenio/Cortesía).'
+        : newPlayerForm.chargeInitialFeeInPOS
+        ? `Cuota inicial (${newPlayerForm.feeAmount}€) cobrada vía ${newPlayerForm.initialFeePaymentMethod === 'cash' ? 'Efectivo' : newPlayerForm.initialFeePaymentMethod === 'card' ? 'Tarjeta/Datáfono' : 'App Push'} en TPV.`
+        : 'Cuota pendiente de abono.'
+      : '';
+
     triggerDemoToast(
       'Jugador Registrado',
-      `Ficha creada para ${newPlayer.name} con nivel ${newPlayer.level.toFixed(2)}.`,
+      `Ficha creada para ${newPlayer.name} con nivel ${newPlayer.level.toFixed(2)}. ${feeChargedNotice}`,
       'success'
     );
   };
@@ -354,22 +383,26 @@ export const AdminCustomers: React.FC = () => {
     <div className="space-y-6 text-slate-900 dark:text-slate-100 max-w-7xl mx-auto pb-12">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
-            Socios & CRM de Jugadores
+          <div className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
+            <Users className="w-3.5 h-3.5 text-emerald-500" />
+            <span>{t('crm.headerEyebrow', 'Base de Datos & Fidelización')}</span>
+          </div>
+          <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight mt-0.5">
+            {t('crm.headerTitle', 'Socios & CRM de Jugadores')}
           </h1>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-            Base de datos oficial de {currentTenant.name} · Fichas, monederos, niveles y estadísticas.
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-2xl leading-relaxed">
+            {t('crm.headerSubtitle', 'Gestión integral de socios, cobro de cuotas, monederos y niveles ELO.')}
           </p>
         </div>
 
-        {/* CORRECCIÓN DE BUG REQUERIMIENTO 7: Abre el modal correspondiente */}
+        {/* Botón Nuevo Jugador */}
         <button
           type="button"
           onClick={() => {
             setErrors({});
             setIsNewPlayerModalOpen(true);
           }}
-          className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-sm flex items-center gap-1.5 transition self-start sm:self-auto active:scale-95 cursor-pointer"
+          className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md transition flex items-center gap-1.5 self-start sm:self-auto active:scale-95 cursor-pointer"
         >
           <UserPlus className="w-4 h-4" />
           <span>+ Nuevo Jugador</span>
@@ -617,8 +650,8 @@ export const AdminCustomers: React.FC = () => {
                 </div>
               </div>
 
-              {/* Condición de Socio */}
-              <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 space-y-3">
+              {/* Condición de Socio & Cuotas */}
+              <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 space-y-3.5">
                 <label className="flex items-center gap-2 cursor-pointer font-bold text-slate-800 dark:text-slate-200">
                   <input
                     type="checkbox"
@@ -626,35 +659,177 @@ export const AdminCustomers: React.FC = () => {
                     onChange={(e) => setNewPlayerForm({ ...newPlayerForm, isMember: e.target.checked })}
                     className="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500"
                   />
-                  <span>Es socio del club con cuota mensual</span>
+                  <span>Es socio del club con cuota de membresía</span>
                 </label>
 
                 {newPlayerForm.isMember && (
-                  <div className="grid grid-cols-2 gap-3 pt-1">
-                    <div>
-                      <label className="block text-[11px] font-semibold text-slate-500 mb-1">
-                        Número de Socio
-                      </label>
-                      <input
-                        type="text"
-                        value={newPlayerForm.memberNum}
-                        onChange={(e) => setNewPlayerForm({ ...newPlayerForm, memberNum: e.target.value })}
-                        className="w-full px-3 py-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white"
-                      />
+                  <div className="space-y-3 pt-1 border-t border-slate-200 dark:border-slate-800">
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-[11px] font-semibold text-slate-500 mb-1">
+                          Número de Socio
+                        </label>
+                        <input
+                          type="text"
+                          value={newPlayerForm.memberNum}
+                          onChange={(e) => setNewPlayerForm({ ...newPlayerForm, memberNum: e.target.value })}
+                          className="w-full px-3 py-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[11px] font-semibold text-slate-500 mb-1">
+                          Saldo Inicial de Monedero (€)
+                        </label>
+                        <input
+                          type="number"
+                          min="0"
+                          step="5"
+                          value={newPlayerForm.initialBalance}
+                          onChange={(e) => setNewPlayerForm({ ...newPlayerForm, initialBalance: parseFloat(e.target.value) || 0 })}
+                          className="w-full px-3 py-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-mono text-slate-900 dark:text-white"
+                        />
+                      </div>
                     </div>
-                    <div>
-                      <label className="block text-[11px] font-semibold text-slate-500 mb-1">
-                        Saldo Inicial de Monedero (€)
+
+                    {/* Opción Explícita: Cuota 0€ */}
+                    <div className="p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+                      <label className="flex items-center gap-2 cursor-pointer text-xs font-bold text-slate-800 dark:text-slate-200">
+                        <input
+                          type="checkbox"
+                          checked={newPlayerForm.isZeroFee}
+                          onChange={(e) => setNewPlayerForm({ ...newPlayerForm, isZeroFee: e.target.checked })}
+                          className="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500"
+                        />
+                        <span>{t('crm.zeroFeeOption', 'Registrar Socio con Cuota 0€ (Cortesía / Convenio / Cantera)')}</span>
                       </label>
-                      <input
-                        type="number"
-                        min="0"
-                        step="5"
-                        value={newPlayerForm.initialBalance}
-                        onChange={(e) => setNewPlayerForm({ ...newPlayerForm, initialBalance: parseFloat(e.target.value) || 0 })}
-                        className="w-full px-3 py-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-mono text-slate-900 dark:text-white"
-                      />
                     </div>
+
+                    {/* Importe de la Cuota y Cobro en TPV */}
+                    {!newPlayerForm.isZeroFee && (
+                      <div className="space-y-3 p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">
+                              {t('crm.initialFee', 'Cuota Inicial de Alta (€)')}
+                            </label>
+                            <input
+                              type="number"
+                              min="1"
+                              step="5"
+                              value={newPlayerForm.feeAmount}
+                              onChange={(e) => setNewPlayerForm({ ...newPlayerForm, feeAmount: parseFloat(e.target.value) || 0 })}
+                              className="w-full px-3 py-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-mono font-bold text-slate-900 dark:text-white"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">
+                              {t('crm.recurringInterval', 'Periodicidad de la Cuota')}
+                            </label>
+                            <select
+                              value={newPlayerForm.recurringInterval}
+                              onChange={(e) => setNewPlayerForm({ ...newPlayerForm, recurringInterval: e.target.value as any })}
+                              className="w-full px-3 py-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white"
+                            >
+                              <option value="monthly">{t('crm.intervalMonthly', 'Mensual')}</option>
+                              <option value="quarterly">{t('crm.intervalQuarterly', 'Trimestral')}</option>
+                              <option value="annual">{t('crm.intervalAnnual', 'Anual')}</option>
+                            </select>
+                          </div>
+                        </div>
+
+                        {/* Cobro inicial en TPV */}
+                        <div className="pt-2 border-t border-slate-100 dark:border-slate-800 space-y-2">
+                          <label className="flex items-center gap-2 cursor-pointer text-xs font-bold text-slate-800 dark:text-slate-200">
+                            <input
+                              type="checkbox"
+                              checked={newPlayerForm.chargeInitialFeeInPOS}
+                              onChange={(e) => setNewPlayerForm({ ...newPlayerForm, chargeInitialFeeInPOS: e.target.checked })}
+                              className="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500"
+                            />
+                            <span>{t('crm.chargeInPOS', 'Cobrar cuota inicial directamente en el TPV')}</span>
+                          </label>
+
+                          {newPlayerForm.chargeInitialFeeInPOS && (
+                            <div className="grid grid-cols-3 gap-1.5 pt-1">
+                              <button
+                                type="button"
+                                onClick={() => setNewPlayerForm({ ...newPlayerForm, initialFeePaymentMethod: 'card' })}
+                                className={`py-1.5 px-2 rounded-lg text-[11px] font-bold border transition ${
+                                  newPlayerForm.initialFeePaymentMethod === 'card'
+                                    ? 'bg-emerald-600 border-emerald-600 text-white shadow-xs'
+                                    : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300'
+                                }`}
+                              >
+                                {t('crm.methodCard', 'Tarjeta / Datáfono')}
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setNewPlayerForm({ ...newPlayerForm, initialFeePaymentMethod: 'cash' })}
+                                className={`py-1.5 px-2 rounded-lg text-[11px] font-bold border transition ${
+                                  newPlayerForm.initialFeePaymentMethod === 'cash'
+                                    ? 'bg-emerald-600 border-emerald-600 text-white shadow-xs'
+                                    : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300'
+                                }`}
+                              >
+                                {t('crm.methodCash', 'Efectivo (Mostrador)')}
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setNewPlayerForm({ ...newPlayerForm, initialFeePaymentMethod: 'app' })}
+                                className={`py-1.5 px-2 rounded-lg text-[11px] font-bold border transition ${
+                                  newPlayerForm.initialFeePaymentMethod === 'app'
+                                    ? 'bg-emerald-600 border-emerald-600 text-white shadow-xs'
+                                    : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300'
+                                }`}
+                              >
+                                {t('crm.methodApp', 'Cobro Push / App')}
+                              </button>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Cobro recurrente periódico */}
+                        <div className="pt-2 border-t border-slate-100 dark:border-slate-800 space-y-2">
+                          <label className="flex items-center gap-2 cursor-pointer text-xs font-bold text-slate-800 dark:text-slate-200">
+                            <input
+                              type="checkbox"
+                              checked={newPlayerForm.recurringBilling}
+                              onChange={(e) => setNewPlayerForm({ ...newPlayerForm, recurringBilling: e.target.checked })}
+                              className="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500"
+                            />
+                            <span>{t('crm.recurringBilling', 'Activar Cobro Recurrente Periódico')}</span>
+                          </label>
+
+                          {newPlayerForm.recurringBilling && (
+                            <div className="grid grid-cols-2 gap-2 pt-1">
+                              <button
+                                type="button"
+                                onClick={() => setNewPlayerForm({ ...newPlayerForm, recurringBillingType: 'stripe' })}
+                                className={`py-1.5 px-2 rounded-lg text-[11px] font-bold border text-left transition ${
+                                  newPlayerForm.recurringBillingType === 'stripe'
+                                    ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-500 text-emerald-700 dark:text-emerald-300'
+                                    : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400'
+                                }`}
+                              >
+                                {t('crm.recurringStripe', 'Suscripción Automática Stripe')}
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setNewPlayerForm({ ...newPlayerForm, recurringBillingType: 'manual' })}
+                                className={`py-1.5 px-2 rounded-lg text-[11px] font-bold border text-left transition ${
+                                  newPlayerForm.recurringBillingType === 'manual'
+                                    ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-500 text-emerald-700 dark:text-emerald-300'
+                                    : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400'
+                                }`}
+                              >
+                                {t('crm.recurringManual', 'Renovación en Mostrador / Remesa')}
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>

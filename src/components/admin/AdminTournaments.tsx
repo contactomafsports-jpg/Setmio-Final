@@ -27,10 +27,33 @@ import {
   Shield,
   Layers,
   Check,
+  Medal,
 } from 'lucide-react';
 
 export const AdminTournaments: React.FC = () => {
-  const { tournaments, courts, createBooking, triggerDemoToast, currentTenant, t } = useApp();
+  const {
+    tournaments,
+    courts,
+    createBooking,
+    triggerDemoToast,
+    currentTenant,
+    rankings,
+    createRanking,
+    linkTournamentToRanking,
+    t,
+  } = useApp();
+
+  // Navigation tab: Tournaments vs Rankings
+  const [activeTab, setActiveTab] = useState<'tournaments' | 'rankings'>('tournaments');
+  const [selectedRankingId, setSelectedRankingId] = useState<string | null>(null);
+  const [isCreateRankingModalOpen, setIsCreateRankingModalOpen] = useState(false);
+  const [newRankingForm, setNewRankingForm] = useState({
+    name: '',
+    category: 'Absoluto',
+    season: 'Temporada 2026',
+    description: '',
+  });
+  const [selectedTournamentToLink, setSelectedTournamentToLink] = useState('');
 
   // If selectedTournamentId is null, show main vertical cards list. If set, show dedicated detail page.
   const [selectedTournamentId, setSelectedTournamentId] = useState<string | null>(null);
@@ -253,6 +276,78 @@ export const AdminTournaments: React.FC = () => {
     const matchStatus = statusFilter === 'all' || item.status === statusFilter;
     return matchSearch && matchStatus;
   });
+
+  const handleCreateRankingSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newRankingForm.name.trim()) return;
+
+    createRanking({
+      name: newRankingForm.name.trim(),
+      category: newRankingForm.category,
+      season: newRankingForm.season,
+      description: newRankingForm.description.trim() || 'Ranking oficial de competición y partidas puntuables.',
+      active: true,
+      linkedTournamentIds: [],
+      leaderboard: [
+        {
+          id: `rkp-${Date.now()}-1`,
+          rank: 1,
+          playerId: 'p-1',
+          playerName: 'Carlos Méndez',
+          isMember: true,
+          level: 4.85,
+          points: 1250,
+          matchesWon: 14,
+          matchesPlayed: 16,
+          streak: '5V',
+        },
+        {
+          id: `rkp-${Date.now()}-2`,
+          rank: 2,
+          playerId: 'p-2',
+          playerName: 'Pablo Vello',
+          isMember: true,
+          level: 4.80,
+          points: 1080,
+          matchesWon: 12,
+          matchesPlayed: 15,
+          streak: '3V',
+        },
+        {
+          id: `rkp-${Date.now()}-3`,
+          rank: 3,
+          playerId: 'p-3',
+          playerName: 'Laura Senra',
+          isMember: true,
+          level: 5.00,
+          points: 950,
+          matchesWon: 11,
+          matchesPlayed: 13,
+          streak: '2V',
+        },
+        {
+          id: `rkp-${Date.now()}-4`,
+          rank: 4,
+          playerId: 'p-4',
+          playerName: 'Mateo Varela',
+          isMember: true,
+          level: 4.15,
+          points: 780,
+          matchesWon: 8,
+          matchesPlayed: 12,
+          streak: '1D',
+        },
+      ],
+    });
+
+    setNewRankingForm({
+      name: '',
+      category: 'Absoluto',
+      season: 'Temporada 2026',
+      description: '',
+    });
+    setIsCreateRankingModalOpen(false);
+  };
 
   return (
     <div className="space-y-6 text-slate-900 dark:text-slate-100 max-w-7xl mx-auto pb-12 font-sans">
@@ -1161,6 +1256,118 @@ export const AdminTournaments: React.FC = () => {
                   className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold transition shadow-sm active:scale-95 cursor-pointer"
                 >
                   Publicar Competición
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ======================================================================
+          MODAL: CREAR NUEVO RANKING DEL CLUB
+          ====================================================================== */}
+      {isCreateRankingModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs animate-in fade-in">
+          <div className="w-full max-w-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+              <div className="flex items-center gap-2">
+                <div className="p-2 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400">
+                  <Medal className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-slate-900 dark:text-white">
+                    {t('tournaments.modalNewRankingTitle', 'Crear Nuevo Ranking del Club')}
+                  </h3>
+                  <p className="text-[11px] text-slate-500">
+                    Define la categoría, temporada y reglas de asignación de puntos
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsCreateRankingModalOpen(false)}
+                className="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-white rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateRankingSubmit} className="space-y-3.5 text-xs">
+              <div>
+                <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  {t('tournaments.rankingName', 'Nombre del Ranking')} *
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="ej. Ranking General Pádel San Mateo 2026"
+                  value={newRankingForm.name}
+                  onChange={(e) => setNewRankingForm({ ...newRankingForm, name: e.target.value })}
+                  className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                    {t('tournaments.rankingCategory', 'Categoría')}
+                  </label>
+                  <select
+                    value={newRankingForm.category}
+                    onChange={(e) => setNewRankingForm({ ...newRankingForm, category: e.target.value })}
+                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                  >
+                    <option value="Absoluto">Absoluto General</option>
+                    <option value="Masculino Pro">Masculino 1ª Categoría (Pro)</option>
+                    <option value="Masculino 2ª">Masculino 2ª Categoría</option>
+                    <option value="Femenino">Femenino Oro</option>
+                    <option value="Femenino Plata">Femenino Plata</option>
+                    <option value="Mixto">Mixto Open</option>
+                    <option value="Veteranos">Veteranos +40</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                    {t('tournaments.rankingSeason', 'Temporada / Edición')}
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="ej. Temporada 2026"
+                    value={newRankingForm.season}
+                    onChange={(e) => setNewRankingForm({ ...newRankingForm, season: e.target.value })}
+                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  {t('tournaments.rankingDesc', 'Descripción y Reglas de Puntuación')}
+                </label>
+                <textarea
+                  rows={3}
+                  placeholder="Detalla cómo puntúan las partidas y torneos vinculados..."
+                  value={newRankingForm.description}
+                  onChange={(e) => setNewRankingForm({ ...newRankingForm, description: e.target.value })}
+                  className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                />
+              </div>
+
+              <div className="pt-2 flex items-center justify-end gap-2 border-t border-slate-100 dark:border-slate-800">
+                <button
+                  type="button"
+                  onClick={() => setIsCreateRankingModalOpen(false)}
+                  className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold transition cursor-pointer"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold transition shadow-sm active:scale-95 cursor-pointer"
+                >
+                  Guardar y Crear Ranking
                 </button>
               </div>
             </form>

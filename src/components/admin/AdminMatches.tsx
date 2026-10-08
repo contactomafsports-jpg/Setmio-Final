@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useApp } from '../../context/AppContext';
 import { OpenMatch } from '../../types/database';
 import {
@@ -40,6 +40,7 @@ export const AdminMatches: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState<'all' | 'open' | 'full'>('all');
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [selectedMatchForAdd, setSelectedMatchForAdd] = useState<OpenMatch | null>(null);
+  const [selectedMatchForDetail, setSelectedMatchForDetail] = useState<OpenMatch | null>(null);
 
   // New match form state
   const [selectedCourtId, setSelectedCourtId] = useState(courts[0]?.id || 'court-1');
@@ -48,14 +49,36 @@ export const AdminMatches: React.FC = () => {
   const [minLevel, setMinLevel] = useState(3.0);
   const [maxLevel, setMaxLevel] = useState(4.25);
   const [pricePerPlayer, setPricePerPlayer] = useState(7.0);
+  const [matchMode, setMatchMode] = useState<'competitive' | 'friendly'>('competitive');
   const [creatorName, setCreatorName] = useState('Carlos Méndez');
   const [creatorLevel, setCreatorLevel] = useState(3.85);
   const [creatorPosition, setCreatorPosition] = useState<'drive' | 'reves' | 'both'>('drive');
 
   // Add player to match form state
+  const [selectedMemberOption, setSelectedMemberOption] = useState<string>('Carlos Méndez');
+  const [isManualGuestName, setIsManualGuestName] = useState(false);
   const [guestName, setGuestName] = useState('');
   const [guestLevel, setGuestLevel] = useState(3.75);
   const [guestPosition, setGuestPosition] = useState<'drive' | 'reves' | 'both'>('both');
+
+  interface ClubPlayerOption {
+    name: string;
+    level: number;
+    isMember: boolean;
+    label: string;
+  }
+
+  const registeredClubMembers: ClubPlayerOption[] = useMemo(() => [
+    { name: 'Carlos Méndez', level: 4.85, isMember: true, label: 'Carlos Méndez (Socio #108 · Nivel 4.85)' },
+    { name: 'Pablo Vello', level: 4.80, isMember: true, label: 'Pablo Vello (Socio #019 · Nivel 4.80)' },
+    { name: 'Laura Senra', level: 5.00, isMember: true, label: 'Laura Senra (Socia Pro · Nivel 5.00)' },
+    { name: 'Rosa Carballo', level: 3.90, isMember: true, label: 'Rosa Carballo (Socia #042 · Nivel 3.90)' },
+    { name: 'Mateo Varela', level: 4.15, isMember: true, label: 'Mateo Varela (Socio #055 · Nivel 4.15)' },
+    { name: 'Iván Gómez', level: 3.45, isMember: true, label: 'Iván Gómez (Socio #087 · Nivel 3.45)' },
+    { name: 'Lucas Piñeiro', level: 3.85, isMember: false, label: 'Lucas Piñeiro (Invitado · Nivel 3.85)' },
+    { name: 'David Castro', level: 4.10, isMember: false, label: 'David Castro (Invitado · Nivel 4.10)' },
+    { name: 'Marcos Soto', level: 3.50, isMember: false, label: 'Marcos Soto (Invitado · Nivel 3.50)' },
+  ], []);
 
   const filteredMatches = openMatches.filter((m) => {
     const isFull = m.players.length >= 4;
@@ -98,6 +121,7 @@ export const AdminMatches: React.FC = () => {
       maxLevel: Number(maxLevel),
       pricePerPlayer: Number(pricePerPlayer),
       status: 'open',
+      mode: matchMode,
       players: [
         {
           id: `admin-${Date.now()}`,
@@ -112,29 +136,42 @@ export const AdminMatches: React.FC = () => {
     setShowCreateModal(false);
     triggerDemoToast(
       t('matches.toastCreatedTitle', 'Partida Abierta Publicada'),
-      t('matches.toastCreatedDesc', `Partida creada en ${court.name} para el ${matchDate} a las ${matchTime}. Matchmaking activo.`),
+      t('matches.toastCreatedDesc', `Partida creada en ${court.name} para el ${matchDate} a las ${matchTime}. Matchmaking activo (${matchMode === 'competitive' ? 'Modo Competitivo' : 'Modo Amistoso'}).`),
       'success'
     );
   };
 
   const handleAddPlayerSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedMatchForAdd || !guestName.trim()) return;
+    if (!selectedMatchForAdd) return;
+
+    let finalName = '';
+    let finalLevel = guestLevel;
+
+    if (isManualGuestName) {
+      if (!guestName.trim()) return;
+      finalName = guestName.trim();
+    } else {
+      const found = registeredClubMembers.find((m) => m.name === selectedMemberOption);
+      finalName = found ? found.name : selectedMemberOption;
+      if (found) finalLevel = found.level;
+    }
 
     joinOpenMatch(selectedMatchForAdd.id, {
-      name: guestName.trim(),
-      level: Number(guestLevel),
+      name: finalName,
+      level: Number(finalLevel),
       position: guestPosition,
     });
 
     triggerDemoToast(
       t('matches.toastPlayerAddedTitle', 'Jugador Añadido a la Partida'),
-      t('matches.toastPlayerAddedDesc', `${guestName} ha sido confirmado en la plaza de la partida de ${selectedMatchForAdd.courtName}.`),
+      t('matches.toastPlayerAddedDesc', `${finalName} ha sido confirmado en la plaza de la partida de ${selectedMatchForAdd.courtName}.`),
       'success'
     );
 
     setSelectedMatchForAdd(null);
     setGuestName('');
+    setIsManualGuestName(false);
   };
 
   return (
@@ -143,14 +180,14 @@ export const AdminMatches: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
-            <Trophy className="w-3.5 h-3.5" />
-            <span>{t('matches.headerEyebrow', 'Matchmaking & Comunidad Play!')}</span>
+            <Trophy className="w-3.5 h-3.5 text-emerald-500" />
+            <span>{t('matches.eyebrow', 'Matchmaking & Comunidad Play!')}</span>
           </div>
           <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight mt-0.5">
-            {t('matches.headerTitle', 'Gestión de Partidas Abiertas')}
+            {t('matches.title', 'Gestión de Partidas Abiertas')}
           </h1>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-            {t('matches.headerSubtitle', `${currentTenant.name} · Partidas niveladas por rating decimal, división de pago a 1/4 y convocatorias de socios.`)}
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-2xl leading-relaxed">
+            {t('matches.subtitle', `${currentTenant.name} · Partidas niveladas por rating decimal, división de pago a 1/4 y convocatorias de socios.`)}
           </p>
         </div>
 
@@ -158,17 +195,17 @@ export const AdminMatches: React.FC = () => {
           <button
             type="button"
             onClick={() => setAdminTab('agenda')}
-            className="px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs hover:bg-slate-200 dark:hover:bg-slate-700 transition cursor-pointer"
+            className="px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-bold text-xs hover:bg-slate-200 dark:hover:bg-slate-700 transition cursor-pointer border border-slate-200 dark:border-slate-700 shadow-xs"
           >
-            {t('matches.viewAgendaBtn', 'Ver Agenda Pistas')}
+            {t('matches.btnAgenda', 'Agenda')}
           </button>
           <button
             type="button"
             onClick={() => setShowCreateModal(true)}
-            className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-sm flex items-center gap-1.5 transition active:scale-95 cursor-pointer"
+            className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md flex items-center gap-1.5 transition active:scale-95 cursor-pointer"
           >
             <Plus className="w-4 h-4" />
-            <span>{t('matches.createMatchBtn', 'Nueva Partida Abierta')}</span>
+            <span>{t('matches.btnNew', 'Nueva partida')}</span>
           </button>
         </div>
       </div>
@@ -311,7 +348,7 @@ export const AdminMatches: React.FC = () => {
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredMatches.map((m) => {
             const isFull = m.players.length >= 4;
             const openSlots = 4 - m.players.length;
@@ -325,107 +362,95 @@ export const AdminMatches: React.FC = () => {
             return (
               <div
                 key={m.id}
-                className={`p-6 rounded-3xl bg-white dark:bg-slate-900 border transition-all duration-200 space-y-5 shadow-xs hover:shadow-md flex flex-col justify-between ${
+                onClick={() => setSelectedMatchForDetail(m)}
+                className={`p-4 rounded-2xl bg-white dark:bg-slate-900 border transition-all duration-200 shadow-xs hover:shadow-md flex flex-col justify-between cursor-pointer group ${
                   isFull
                     ? 'border-emerald-500/30 dark:border-emerald-500/20'
-                    : 'border-slate-200 dark:border-slate-800 hover:border-emerald-500/40'
+                    : 'border-slate-200 dark:border-slate-800 hover:border-emerald-500/50'
                 }`}
               >
-                <div className="space-y-4">
-                  {/* Header de la tarjeta */}
-                  <div className="flex items-start justify-between gap-3">
+                <div className="space-y-3">
+                  {/* Fila Superior: Fecha/Hora, Pista y Badges */}
+                  <div className="flex items-start justify-between gap-2">
                     <div>
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="font-mono text-xs font-black text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
-                          <Clock className="w-3.5 h-3.5" />
-                          <span>{startDateFormatted} · {startTimeFormatted}</span>
-                        </span>
-                        <span className="text-slate-300 dark:text-slate-700">·</span>
-                        <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400">
-                          {m.courtName}
-                        </span>
+                      <div className="flex items-center gap-1.5 text-xs font-mono font-bold text-slate-800 dark:text-slate-200">
+                        <Clock className="w-3.5 h-3.5 text-emerald-500" />
+                        <span>{startDateFormatted} · {startTimeFormatted}</span>
                       </div>
-
-                      <h3 className="text-base font-black text-slate-900 dark:text-white">
-                        {m.courtName} · {t('matches.cardTitle', 'Partido Play!')}
-                      </h3>
+                      <div className="text-sm font-black text-slate-900 dark:text-white mt-0.5 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition">
+                        {m.courtName}
+                      </div>
                     </div>
 
-                    <div className="text-right shrink-0">
+                    <div className="flex flex-col items-end gap-1">
                       <span
-                        className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${
+                        className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider ${
                           isFull
                             ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300'
                             : 'bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300'
                         }`}
                       >
-                        {isFull ? (
-                          <>
-                            <CheckCircle2 className="w-3 h-3" />
-                            <span>{t('matches.statusFull', 'Completa (4/4)')}</span>
-                          </>
-                        ) : (
-                          <>
-                            <AlertCircle className="w-3 h-3" />
-                            <span>{openSlots} {t('matches.statusNeedPlayers', 'Plaza(s) Libre(s)')}</span>
-                          </>
-                        )}
+                        {isFull ? t('matches.statusFull', 'Completa') : `${openSlots} ${t('matches.statusNeedPlayers', 'libres')}`}
                       </span>
-
-                      <div className="mt-1 font-mono font-black text-xs text-slate-900 dark:text-white">
-                        {m.pricePerPlayer.toFixed(2)} € <span className="text-[10px] text-slate-400 font-normal">/jugador</span>
-                      </div>
+                      <span
+                        className={`text-[9px] font-bold px-1.5 py-0.5 rounded-md ${
+                          m.mode === 'friendly'
+                            ? 'bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800'
+                            : 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800'
+                        }`}
+                      >
+                        {m.mode === 'friendly' ? 'Amistoso' : 'Competitivo (ELO)'}
+                      </span>
                     </div>
                   </div>
 
-                  {/* Nivel Requerido */}
-                  <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-xs">
-                    <span className="text-slate-500 dark:text-slate-400 font-semibold">
-                      {t('matches.levelRange', 'Nivel Decimal Permitido:')}
+                  {/* Nivel ELO & Precio */}
+                  <div className="flex items-center justify-between text-xs py-1.5 px-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800/80">
+                    <span className="text-slate-500 dark:text-slate-400 text-[11px]">
+                      Nivel ELO: <strong className="text-slate-800 dark:text-slate-200 font-mono">{m.minLevel.toFixed(2)} - {m.maxLevel.toFixed(2)}</strong>
                     </span>
-                    <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded-lg border border-emerald-500/20">
-                      {m.minLevel.toFixed(2)} - {m.maxLevel.toFixed(2)}
+                    <span className="font-mono font-black text-slate-900 dark:text-white">
+                      {m.pricePerPlayer.toFixed(2)} €
                     </span>
                   </div>
 
-                  {/* 4 Plazas de Jugadores */}
-                  <div className="space-y-2">
-                    <div className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center justify-between">
-                      <span>{t('matches.playersGridTitle', 'Alineación de Parejas (4 Plazas):')}</span>
-                      <span>{m.players.length} / 4</span>
+                  {/* Avatares de Jugadores Confirmados en pequeño */}
+                  <div>
+                    <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">
+                      <span>Plazas ({m.players.length}/4)</span>
+                      <span className="text-emerald-600 dark:text-emerald-400 lowercase font-normal group-hover:underline">
+                        Ver detalle →
+                      </span>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-2">
-                      {/* Jugadores confirmados */}
+                    <div className="flex items-center gap-1.5">
+                      {/* Jugadores confirmados con avatar pequeño */}
                       {m.players.map((p, idx) => (
                         <div
                           key={idx}
-                          className="p-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-between gap-2 text-xs shadow-2xs"
+                          className="relative group/avatar"
+                          title={`${p.name} · Nivel ${p.level.toFixed(2)} (${p.position})`}
                         >
-                          <div className="min-w-0">
-                            <div className="font-bold text-slate-900 dark:text-white truncate text-[11px]">
-                              {p.name}
-                            </div>
-                            <div className="text-[10px] text-slate-400 flex items-center gap-1">
-                              <span>Nivel {p.level.toFixed(2)}</span>
-                              <span>·</span>
-                              <span className="capitalize">{p.position}</span>
-                            </div>
+                          <div className="w-8 h-8 rounded-full bg-emerald-600 text-white font-black text-xs flex items-center justify-center border-2 border-white dark:border-slate-900 shadow-xs">
+                            {p.name.slice(0, 2).toUpperCase()}
                           </div>
-                          <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" title="Confirmado y Pagado" />
+                          <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-400 border border-white dark:border-slate-900" />
                         </div>
                       ))}
 
-                      {/* Plazas Libres */}
+                      {/* Plazas libres con placeholder circular */}
                       {Array.from({ length: openSlots }).map((_, emptyIdx) => (
                         <button
                           key={`empty-${emptyIdx}`}
                           type="button"
-                          onClick={() => setSelectedMatchForAdd(m)}
-                          className="p-2.5 rounded-xl border border-dashed border-slate-300 dark:border-slate-700 hover:border-emerald-500 hover:bg-emerald-50/50 dark:hover:bg-emerald-950/30 text-slate-500 hover:text-emerald-600 dark:hover:text-emerald-400 transition flex items-center justify-center gap-1.5 text-xs font-bold cursor-pointer group"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedMatchForAdd(m);
+                          }}
+                          className="w-8 h-8 rounded-full border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 text-slate-400 hover:text-emerald-600 flex items-center justify-center text-xs font-bold transition cursor-pointer"
+                          title="Inscribir jugador en esta plaza"
                         >
-                          <UserPlus className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
-                          <span>{t('matches.addGuestBtn', '+ Inscribir Socio')}</span>
+                          +
                         </button>
                       ))}
                     </div>
@@ -433,23 +458,23 @@ export const AdminMatches: React.FC = () => {
                 </div>
 
                 {/* Footer de Acciones Rápidas */}
-                <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2 text-xs">
-                  <div className="flex items-center gap-1.5 text-[11px] text-slate-500 dark:text-slate-400 font-medium">
-                    <Shield className="w-3.5 h-3.5 text-emerald-500" />
-                    <span>{t('matches.creatorLabel', 'Creado por:')} <strong className="text-slate-800 dark:text-slate-200">{m.creatorName}</strong></span>
-                  </div>
+                <div className="pt-3 mt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-xs">
+                  <span className="text-[10px] text-slate-500 truncate max-w-[130px]">
+                    Por: <strong className="text-slate-700 dark:text-slate-300">{m.creatorName}</strong>
+                  </span>
 
-                  <div className="flex items-center gap-2">
-                    {!isFull && (
-                      <button
-                        type="button"
-                        onClick={() => setSelectedMatchForAdd(m)}
-                        className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition cursor-pointer"
-                      >
-                        {t('matches.completeMatchBtn', 'Completar Plaza')}
-                      </button>
-                    )}
-                  </div>
+                  {!isFull && (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedMatchForAdd(m);
+                      }}
+                      className="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[11px] transition cursor-pointer shadow-xs"
+                    >
+                      + Inscribir
+                    </button>
+                  )}
                 </div>
               </div>
             );
@@ -457,6 +482,141 @@ export const AdminMatches: React.FC = () => {
         </div>
       )}
 
+      {/* MODAL: DETALLE DE PARTIDA COMPLETA */}
+      {selectedMatchForDetail && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs animate-in fade-in duration-150">
+          <div className="w-full max-w-lg rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl p-6 sm:p-8 space-y-5">
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+              <div>
+                <div className="flex items-center gap-2">
+                  <span
+                    className={`text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full ${
+                      selectedMatchForDetail.mode === 'friendly'
+                        ? 'bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300'
+                        : 'bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300'
+                    }`}
+                  >
+                    {selectedMatchForDetail.mode === 'friendly'
+                      ? t('matches.modeFriendly', 'Modo Amistoso (No altera nivelación)')
+                      : t('matches.modeCompetitive', 'Modo Competitivo (Afecta ELO)')}
+                  </span>
+                </div>
+                <h3 className="text-lg font-black text-slate-900 dark:text-white mt-1">
+                  {selectedMatchForDetail.courtName} · Partido Play!
+                </h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  {selectedMatchForDetail.startTime.split('T')[0]} a las {selectedMatchForDetail.startTime.includes('T') ? selectedMatchForDetail.startTime.split('T')[1].slice(0, 5) : '19:30'} · {selectedMatchForDetail.durationMinutes} min
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setSelectedMatchForDetail(null)}
+                className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* KPIs del partido */}
+            <div className="grid grid-cols-3 gap-2 text-center">
+              <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800">
+                <span className="text-[10px] uppercase font-bold text-slate-400 block">Nivel ELO</span>
+                <span className="text-sm font-mono font-black text-emerald-600 dark:text-emerald-400">
+                  {selectedMatchForDetail.minLevel.toFixed(2)} - {selectedMatchForDetail.maxLevel.toFixed(2)}
+                </span>
+              </div>
+              <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800">
+                <span className="text-[10px] uppercase font-bold text-slate-400 block">Cuota 1/4</span>
+                <span className="text-sm font-mono font-black text-slate-900 dark:text-white">
+                  {selectedMatchForDetail.pricePerPlayer.toFixed(2)} €
+                </span>
+              </div>
+              <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800">
+                <span className="text-[10px] uppercase font-bold text-slate-400 block">Plazas Libres</span>
+                <span className="text-sm font-mono font-black text-amber-500">
+                  {4 - selectedMatchForDetail.players.length} / 4
+                </span>
+              </div>
+            </div>
+
+            {/* Lista detallada de jugadores */}
+            <div className="space-y-2">
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-500 block">
+                Jugadores Inscritos ({selectedMatchForDetail.players.length}/4):
+              </span>
+
+              <div className="space-y-2">
+                {selectedMatchForDetail.players.map((p, idx) => (
+                  <div
+                    key={idx}
+                    className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 flex items-center justify-between text-xs"
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-full bg-emerald-600 text-white font-black text-xs flex items-center justify-center">
+                        {p.name.slice(0, 2).toUpperCase()}
+                      </div>
+                      <div>
+                        <div className="font-bold text-slate-900 dark:text-white">{p.name}</div>
+                        <div className="text-[10px] text-slate-500">
+                          Nivel ELO {p.level.toFixed(2)} · Posición: <span className="capitalize">{p.position}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300">
+                      Confirmado
+                    </span>
+                  </div>
+                ))}
+
+                {Array.from({ length: 4 - selectedMatchForDetail.players.length }).map((_, emptyIdx) => (
+                  <div
+                    key={`slot-${emptyIdx}`}
+                    className="p-2.5 rounded-xl border border-dashed border-slate-300 dark:border-slate-700 flex items-center justify-between text-xs text-slate-400"
+                  >
+                    <span>Plaza {selectedMatchForDetail.players.length + emptyIdx + 1} Libre</span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const m = selectedMatchForDetail;
+                        setSelectedMatchForDetail(null);
+                        setSelectedMatchForAdd(m);
+                      }}
+                      className="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs"
+                    >
+                      Inscribir
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2">
+              <button
+                type="button"
+                onClick={() => setSelectedMatchForDetail(null)}
+                className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs"
+              >
+                {t('matches.detailClose', 'Cerrar Detalle')}
+              </button>
+
+              {selectedMatchForDetail.players.length < 4 && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    const m = selectedMatchForDetail;
+                    setSelectedMatchForDetail(null);
+                    setSelectedMatchForAdd(m);
+                  }}
+                  className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md"
+                >
+                  + Inscribir Jugador
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
       {/* MODAL: CREAR NUEVA PARTIDA ABIERTA */}
       {showCreateModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs animate-in fade-in duration-150">
@@ -480,6 +640,50 @@ export const AdminMatches: React.FC = () => {
             </div>
 
             <form onSubmit={handleCreateSubmit} className="space-y-4 text-xs">
+              {/* Selector de Clasificación del Partido: Competitivo vs Amistoso */}
+              <div>
+                <label className="block font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
+                  Clasificación del Partido
+                </label>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setMatchMode('competitive')}
+                    className={`p-3 rounded-2xl border text-left transition cursor-pointer ${
+                      matchMode === 'competitive'
+                        ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-500 text-emerald-800 dark:text-emerald-300 shadow-xs'
+                        : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400'
+                    }`}
+                  >
+                    <div className="font-bold text-xs flex items-center gap-1.5">
+                      <Trophy className="w-3.5 h-3.5 text-amber-500" />
+                      <span>Modo Competitivo</span>
+                    </div>
+                    <div className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">
+                      Afecta al Nivel ELO del jugador
+                    </div>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setMatchMode('friendly')}
+                    className={`p-3 rounded-2xl border text-left transition cursor-pointer ${
+                      matchMode === 'friendly'
+                        ? 'bg-indigo-50 dark:bg-indigo-950/60 border-indigo-500 text-indigo-800 dark:text-indigo-300 shadow-xs'
+                        : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400'
+                    }`}
+                  >
+                    <div className="font-bold text-xs flex items-center gap-1.5">
+                      <Users className="w-3.5 h-3.5 text-indigo-500" />
+                      <span>Modo Amistoso</span>
+                    </div>
+                    <div className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">
+                      No altera la nivelación ELO
+                    </div>
+                  </button>
+                </div>
+              </div>
+
               <div>
                 <label className="block font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
                   {t('matches.formCourt', 'Pista Asignada')}
@@ -617,7 +821,7 @@ export const AdminMatches: React.FC = () => {
                   {t('matches.modalAddTitle', 'Inscribir Socio en Partida')}
                 </h3>
                 <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                  {selectedMatchForAdd.courtName} · {selectedMatchForAdd.minLevel.toFixed(2)} - {selectedMatchForAdd.maxLevel.toFixed(2)}
+                  {selectedMatchForAdd.courtName} · Nivel ELO {selectedMatchForAdd.minLevel.toFixed(2)} - {selectedMatchForAdd.maxLevel.toFixed(2)}
                 </p>
               </div>
               <button
@@ -632,16 +836,59 @@ export const AdminMatches: React.FC = () => {
             <form onSubmit={handleAddPlayerSubmit} className="space-y-4 text-xs">
               <div>
                 <label className="block font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
-                  {t('matches.formAddName', 'Nombre del Jugador / Socio')} *
+                  Inscripción de Jugador
                 </label>
-                <input
-                  type="text"
-                  value={guestName}
-                  onChange={(e) => setGuestName(e.target.value)}
-                  placeholder="Ej. Lucas Rey Domínguez"
-                  className="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
-                  required
-                />
+                <div className="flex items-center gap-2 mb-2 text-xs">
+                  <button
+                    type="button"
+                    onClick={() => setIsManualGuestName(false)}
+                    className={`px-3 py-1.5 rounded-lg font-bold transition cursor-pointer ${
+                      !isManualGuestName
+                        ? 'bg-emerald-600 text-white shadow-xs'
+                        : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
+                    }`}
+                  >
+                    Buscar Socio Registrado
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setIsManualGuestName(true)}
+                    className={`px-3 py-1.5 rounded-lg font-bold transition cursor-pointer ${
+                      isManualGuestName
+                        ? 'bg-emerald-600 text-white shadow-xs'
+                        : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
+                    }`}
+                  >
+                    Invitado Libre
+                  </button>
+                </div>
+
+                {!isManualGuestName ? (
+                  <select
+                    value={selectedMemberOption}
+                    onChange={(e) => {
+                      setSelectedMemberOption(e.target.value);
+                      const found = registeredClubMembers.find((m) => m.name === e.target.value);
+                      if (found) setGuestLevel(found.level);
+                    }}
+                    className="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs text-slate-900 dark:text-white font-bold focus:outline-none focus:border-emerald-500"
+                  >
+                    {registeredClubMembers.map((m) => (
+                      <option key={m.name} value={m.name}>
+                        {m.label}
+                      </option>
+                    ))}
+                  </select>
+                ) : (
+                  <input
+                    type="text"
+                    value={guestName}
+                    onChange={(e) => setGuestName(e.target.value)}
+                    placeholder="Ej. Lucas Rey Domínguez"
+                    className="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                    required
+                  />
+                )}
               </div>
 
               <div className="grid grid-cols-2 gap-3">

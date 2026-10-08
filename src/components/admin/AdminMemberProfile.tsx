@@ -57,7 +57,7 @@ interface AdminMemberProfileProps {
 }
 
 export const AdminMemberProfile: React.FC<AdminMemberProfileProps> = ({ member, onBack }) => {
-  const { currentUser, currentTenant, triggerDemoToast, setAdminTab } = useApp();
+  const { currentUser, currentTenant, triggerDemoToast, setAdminTab, t } = useApp();
 
   // Role detection
   const isAdmin =
@@ -389,7 +389,7 @@ export const AdminMemberProfile: React.FC<AdminMemberProfileProps> = ({ member, 
           className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700/80 text-xs font-bold text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 hover:border-emerald-500/50 transition shadow-xs cursor-pointer active:scale-95"
         >
           <ArrowLeft className="w-4 h-4" />
-          <span>Volver</span>
+          <span>{t('crm.goToMembers', 'Ir a Socios & CRM')}</span>
         </button>
 
         <div className="flex items-center gap-2">

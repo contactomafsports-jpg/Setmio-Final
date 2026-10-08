@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
+import { DiscountCoupon, ClassVoucher } from '../../types/database';
 import {
   Settings,
   MessageCircle,
@@ -28,6 +29,20 @@ import {
   Send,
   Sliders,
   X,
+  Smartphone,
+  Banknote,
+  Radio,
+  Ticket,
+  Percent,
+  Tag,
+  HelpCircle,
+  AlertCircle,
+  RefreshCw,
+  Plus,
+  Trash2,
+  Wallet,
+  Shield,
+  Award,
 } from 'lucide-react';
 
 export interface DaySchedule {
@@ -48,17 +63,21 @@ const DEFAULT_WEEKLY_SCHEDULE: DaySchedule[] = [
 ];
 
 export const AdminSettings: React.FC = () => {
-  const { currentTenant, updateCurrentTenant, triggerDemoToast, theme, setTheme, setAdminTab, courts, language } = useApp();
+  const { currentTenant, updateCurrentTenant, triggerDemoToast, theme, setTheme, setAdminTab, courts, language, t } = useApp();
 
-  const [activeSection, setActiveSection] = useState<'general' | 'ai'>('general');
+  const [activeSection, setActiveSection] = useState<'general' | 'payments' | 'promos' | 'ai'>('general');
 
-  // URL route sync for /gestion/ajustes/ia
+  // URL route sync for /gestion/ajustes/ia, /admin/ajustes/pagos, etc.
   useEffect(() => {
     const handleUrlSettings = () => {
       const pathname = typeof window !== 'undefined' ? window.location.pathname : '';
       if (pathname === '/gestion/ajustes/ia' || pathname.endsWith('/ia')) {
         setActiveSection('ai');
-      } else if (pathname === '/gestion/ajustes' || pathname === '/gestion/configuracion') {
+      } else if (pathname.includes('/pagos') || pathname.includes('/payments') || pathname.includes('/metodos-pago')) {
+        setActiveSection('payments');
+      } else if (pathname.includes('/cupones') || pathname.includes('/bonos') || pathname.includes('/promociones')) {
+        setActiveSection('promos');
+      } else if (pathname === '/gestion/ajustes' || pathname === '/gestion/configuracion' || pathname === '/admin/ajustes') {
         setActiveSection('general');
       }
     };
@@ -66,6 +85,147 @@ export const AdminSettings: React.FC = () => {
     window.addEventListener('popstate', handleUrlSettings);
     return () => window.removeEventListener('popstate', handleUrlSettings);
   }, []);
+
+  // 1. Payment Methods State
+  const [paymentMethods, setPaymentMethods] = useState({
+    cash: currentTenant.settings?.paymentMethods?.cash ?? true,
+    manualPos: currentTenant.settings?.paymentMethods?.manualPos ?? true,
+    stripeTerminal: currentTenant.settings?.paymentMethods?.stripeTerminal ?? true,
+    stripeTerminalReaderCode: currentTenant.settings?.paymentMethods?.stripeTerminalReaderCode ?? 'gold-bear-apple',
+    stripeTerminalStatus: currentTenant.settings?.paymentMethods?.stripeTerminalStatus ?? 'connected',
+    pushCharge: currentTenant.settings?.paymentMethods?.pushCharge ?? true,
+    wallet: currentTenant.settings?.paymentMethods?.wallet ?? true,
+    onlineGateway: currentTenant.settings?.paymentMethods?.onlineGateway ?? true,
+  });
+
+  // 2. Club Policies State
+  const [policies, setPolicies] = useState({
+    requireOnlinePayment: currentTenant.settings?.policies?.requireOnlinePayment ?? false,
+    allowCounterPayment: currentTenant.settings?.policies?.allowCounterPayment ?? true,
+    cancellationRefundType: currentTenant.settings?.policies?.cancellationRefundType ?? 'partial',
+    cancellationWindowHours: currentTenant.settings?.policies?.cancellationWindowHours ?? 12,
+    cancellationPenaltyPercent: currentTenant.settings?.policies?.cancellationPenaltyPercent ?? 50,
+    memberCourtDiscountPercent: currentTenant.settings?.policies?.memberCourtDiscountPercent ?? 20,
+    memberShopDiscountPercent: currentTenant.settings?.policies?.memberShopDiscountPercent ?? 10,
+  });
+
+  // 3. Discount Coupons State
+  const [coupons, setCoupons] = useState<DiscountCoupon[]>(
+    currentTenant.settings?.coupons || [
+      { id: 'cp-1', code: 'SETMIO10', discountType: 'percent', discountValue: 10, scope: 'global', active: true },
+      { id: 'cp-2', code: 'PROMOPISTA', discountType: 'fixed', discountValue: 5, scope: 'courts', active: true },
+      { id: 'cp-3', code: 'TIENDA15', discountType: 'percent', discountValue: 15, scope: 'shop', active: true },
+    ]
+  );
+  const [showAddCouponModal, setShowAddCouponModal] = useState(false);
+  const [newCouponForm, setNewCouponForm] = useState({
+    code: '',
+    discountType: 'percent' as 'percent' | 'fixed',
+    discountValue: 10,
+    scope: 'global' as 'global' | 'shop' | 'courts',
+  });
+
+  // 4. Class Vouchers State
+  const [vouchers, setVouchers] = useState<ClassVoucher[]>(
+    currentTenant.settings?.classVouchers || [
+      { id: 'v-1', title: 'Bono 4 Clases Individuales', classesCount: 4, price: 90, validityDays: 60, active: true },
+      { id: 'v-2', title: 'Bono 8 Clases Grupo Reducido', classesCount: 8, price: 150, validityDays: 90, active: true },
+      { id: 'v-3', title: 'Bono 10 Clases Intensivo WPT', classesCount: 10, price: 195, validityDays: 120, active: true },
+    ]
+  );
+  const [showAddVoucherModal, setShowAddVoucherModal] = useState(false);
+  const [newVoucherForm, setNewVoucherForm] = useState({
+    title: '',
+    classesCount: 5,
+    price: 110,
+    validityDays: 60,
+  });
+
+  const [isPairingTerminal, setIsPairingTerminal] = useState(false);
+
+  const handlePairTerminal = () => {
+    setIsPairingTerminal(true);
+    triggerDemoToast(
+      t('settings.payments.stripeStatusPairing', 'Sincronizando...'),
+      `Enviando handshake a lector con código "${paymentMethods.stripeTerminalReaderCode}".`,
+      'info'
+    );
+    setTimeout(() => {
+      setIsPairingTerminal(false);
+      setPaymentMethods((prev) => ({ ...prev, stripeTerminalStatus: 'connected' }));
+      triggerDemoToast(
+        t('settings.payments.stripeStatusConnected', 'Lector Vinculado y Activo'),
+        'Dispositivo Bwise WisePOS E (IP: 192.168.1.144) listo para cobros en TPV.',
+        'success'
+      );
+    }, 1200);
+  };
+
+  const handleSavePaymentsAndPolicies = (e: React.FormEvent) => {
+    e.preventDefault();
+    updateCurrentTenant({
+      settings: {
+        ...currentTenant.settings,
+        paymentMethods,
+        policies,
+        coupons,
+        classVouchers: vouchers,
+      },
+    });
+    triggerDemoToast(
+      t('settings.saveSuccess', 'Configuración del Club Guardada'),
+      t('settings.saveSuccessDesc', 'Las políticas y métodos de pago han sido actualizados.'),
+      'success'
+    );
+  };
+
+  const handleCreateCoupon = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newCouponForm.code.trim()) return;
+    const item: DiscountCoupon = {
+      id: `cp-${Date.now()}`,
+      code: newCouponForm.code.trim().toUpperCase(),
+      discountType: newCouponForm.discountType,
+      discountValue: Number(newCouponForm.discountValue) || 10,
+      scope: newCouponForm.scope,
+      active: true,
+    };
+    const updated = [item, ...coupons];
+    setCoupons(updated);
+    updateCurrentTenant({
+      settings: {
+        ...currentTenant.settings,
+        coupons: updated,
+      },
+    });
+    setNewCouponForm({ code: '', discountType: 'percent', discountValue: 10, scope: 'global' });
+    setShowAddCouponModal(false);
+    triggerDemoToast('Cupón Creado', `Cupón ${item.code} añadido con éxito.`, 'success');
+  };
+
+  const handleCreateVoucher = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newVoucherForm.title.trim()) return;
+    const item: ClassVoucher = {
+      id: `v-${Date.now()}`,
+      title: newVoucherForm.title.trim(),
+      classesCount: Number(newVoucherForm.classesCount) || 5,
+      price: Number(newVoucherForm.price) || 100,
+      validityDays: Number(newVoucherForm.validityDays) || 60,
+      active: true,
+    };
+    const updated = [item, ...vouchers];
+    setVouchers(updated);
+    updateCurrentTenant({
+      settings: {
+        ...currentTenant.settings,
+        classVouchers: updated,
+      },
+    });
+    setNewVoucherForm({ title: '', classesCount: 5, price: 110, validityDays: 60 });
+    setShowAddVoucherModal(false);
+    triggerDemoToast('Bono de Clases Creado', `Bono "${item.title}" disponible para venta.`, 'success');
+  };
 
   // Modal: Bloqueo de Pistas por Rangos de Fecha y Hora
   const [isLockoutModalOpen, setIsLockoutModalOpen] = useState(false);
@@ -264,8 +424,8 @@ export const AdminSettings: React.FC = () => {
         </p>
       </div>
 
-      {/* Selector de Pestañas: General vs Configuración de IA */}
-      <div className="flex items-center gap-2 border-b border-slate-200 dark:border-slate-800 pb-3">
+      {/* Selector de Pestañas: General vs Pagos vs Promociones vs IA */}
+      <div className="flex flex-wrap items-center gap-2 border-b border-slate-200 dark:border-slate-800 pb-3">
         <button
           type="button"
           onClick={() => setActiveSection('general')}
@@ -277,6 +437,32 @@ export const AdminSettings: React.FC = () => {
         >
           <Settings className="w-4 h-4" />
           <span>Configuración General</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveSection('payments')}
+          className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 cursor-pointer ${
+            activeSection === 'payments'
+              ? 'bg-emerald-600 text-white shadow-xs'
+              : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800 hover:border-slate-300'
+          }`}
+        >
+          <CreditCard className="w-4 h-4" />
+          <span>{t('settings.tabs.payments', 'Métodos de Pago & Políticas')}</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveSection('promos')}
+          className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 cursor-pointer ${
+            activeSection === 'promos'
+              ? 'bg-emerald-600 text-white shadow-xs'
+              : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800 hover:border-slate-300'
+          }`}
+        >
+          <Tag className="w-4 h-4" />
+          <span>{t('settings.tabs.promos', 'Cupones y Bonos')}</span>
         </button>
 
         <button
@@ -660,6 +846,753 @@ export const AdminSettings: React.FC = () => {
             </button>
           </div>
         </form>
+      )}
+
+      {/* ======================================================================
+          PESTAÑA: MÉTODOS DE PAGO & POLÍTICAS DEL CLUB
+          ====================================================================== */}
+      {activeSection === 'payments' && (
+        <form onSubmit={handleSavePaymentsAndPolicies} className="space-y-6 text-xs">
+          {/* 1. MÉTODOS DE PAGO ACTIVOS */}
+          <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-5 shadow-sm">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-3">
+              <div>
+                <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                  <CreditCard className="w-4 h-4 text-emerald-500" />
+                  <span>{t('settings.payments.title', 'Configuración de Métodos de Pago')}</span>
+                </h3>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                  {t('settings.payments.subtitle', 'Activa o desactiva pasarelas y medios de cobro disponibles en el TPV de mostrador y web del club.')}
+                </p>
+              </div>
+              <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold bg-emerald-50 dark:bg-emerald-950 px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800 self-start sm:self-auto">
+                TPV & Online
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* 1. Efectivo */}
+              <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 flex items-start justify-between gap-3">
+                <div className="flex items-start gap-3">
+                  <div className="p-2.5 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 shrink-0">
+                    <Banknote className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-slate-900 dark:text-white text-xs">
+                      {t('settings.payments.cash', 'Efectivo (Mostrador)')}
+                    </h4>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 leading-relaxed">
+                      {t('settings.payments.cashDesc', 'Cobro tradicional en efectivo para reservas y compras en recepción o cafetería.')}
+                    </p>
+                  </div>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer shrink-0 mt-0.5">
+                  <input
+                    type="checkbox"
+                    checked={paymentMethods.cash}
+                    onChange={(e) => setPaymentMethods({ ...paymentMethods, cash: e.target.checked })}
+                    className="sr-only peer"
+                  />
+                  <div className="w-9 h-5 bg-slate-200 dark:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-600"></div>
+                </label>
+              </div>
+
+              {/* 2. Datáfono del Banco Manual */}
+              <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 flex items-start justify-between gap-3">
+                <div className="flex items-start gap-3">
+                  <div className="p-2.5 rounded-xl bg-blue-100 dark:bg-blue-950 text-blue-600 dark:text-blue-400 shrink-0">
+                    <CreditCard className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-slate-900 dark:text-white text-xs">
+                      {t('settings.payments.manualPos', 'Datáfono del Banco (Manual)')}
+                    </h4>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 leading-relaxed">
+                      {t('settings.payments.manualPosDesc', 'Cobro mediante datáfono bancario físico convencional (BBVA, Santander, CaixaBank, etc.).')}
+                    </p>
+                  </div>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer shrink-0 mt-0.5">
+                  <input
+                    type="checkbox"
+                    checked={paymentMethods.manualPos}
+                    onChange={(e) => setPaymentMethods({ ...paymentMethods, manualPos: e.target.checked })}
+                    className="sr-only peer"
+                  />
+                  <div className="w-9 h-5 bg-slate-200 dark:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-600"></div>
+                </label>
+              </div>
+
+              {/* 3. Cobro por Notificación Push / App del Socio */}
+              <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 flex items-start justify-between gap-3">
+                <div className="flex items-start gap-3">
+                  <div className="p-2.5 rounded-xl bg-purple-100 dark:bg-purple-950 text-purple-600 dark:text-purple-400 shrink-0">
+                    <Smartphone className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-slate-900 dark:text-white text-xs">
+                      {t('settings.payments.pushCharge', 'Cobro por Notificación Push / App del Socio')}
+                    </h4>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 leading-relaxed">
+                      {t('settings.payments.pushChargeDesc', 'Envía solicitud de cobro instantánea al móvil del cliente registrado para confirmación y pago en 1-clic.')}
+                    </p>
+                  </div>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer shrink-0 mt-0.5">
+                  <input
+                    type="checkbox"
+                    checked={paymentMethods.pushCharge}
+                    onChange={(e) => setPaymentMethods({ ...paymentMethods, pushCharge: e.target.checked })}
+                    className="sr-only peer"
+                  />
+                  <div className="w-9 h-5 bg-slate-200 dark:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-600"></div>
+                </label>
+              </div>
+
+              {/* 4. Monedero / Saldo de Socio y Bonos */}
+              <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 flex items-start justify-between gap-3">
+                <div className="flex items-start gap-3">
+                  <div className="p-2.5 rounded-xl bg-amber-100 dark:bg-amber-950 text-amber-600 dark:text-amber-400 shrink-0">
+                    <Wallet className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-slate-900 dark:text-white text-xs">
+                      {t('settings.payments.wallet', 'Monedero / Saldo de Socio y Bonos')}
+                    </h4>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 leading-relaxed">
+                      {t('settings.payments.walletDesc', 'Permite debitar consumos, reservas y clases del saldo virtual prepagado del socio.')}
+                    </p>
+                  </div>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer shrink-0 mt-0.5">
+                  <input
+                    type="checkbox"
+                    checked={paymentMethods.wallet}
+                    onChange={(e) => setPaymentMethods({ ...paymentMethods, wallet: e.target.checked })}
+                    className="sr-only peer"
+                  />
+                  <div className="w-9 h-5 bg-slate-200 dark:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-600"></div>
+                </label>
+              </div>
+
+              {/* 5. Pasarela Online Stripe (Web & App) */}
+              <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 flex items-start justify-between gap-3 md:col-span-2">
+                <div className="flex items-start gap-3">
+                  <div className="p-2.5 rounded-xl bg-indigo-100 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 shrink-0">
+                    <Globe className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-slate-900 dark:text-white text-xs">
+                      {t('settings.payments.onlineGateway', 'Pasarela Online Stripe (Web & App)')}
+                    </h4>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 leading-relaxed">
+                      {t('settings.payments.onlineGatewayDesc', 'Cobros automáticos con tarjeta de crédito/débito y 3D Secure en la web pública.')}
+                    </p>
+                  </div>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer shrink-0 mt-0.5">
+                  <input
+                    type="checkbox"
+                    checked={paymentMethods.onlineGateway}
+                    onChange={(e) => setPaymentMethods({ ...paymentMethods, onlineGateway: e.target.checked })}
+                    className="sr-only peer"
+                  />
+                  <div className="w-9 h-5 bg-slate-200 dark:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-600"></div>
+                </label>
+              </div>
+            </div>
+
+            {/* 6. Datáfono Integrado (Stripe Terminal) con Formulario de Emparejamiento */}
+            <div className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 space-y-4">
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex items-start gap-3">
+                  <div className="p-2.5 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 shrink-0">
+                    <Radio className="w-4 h-4 animate-pulse" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h4 className="font-bold text-slate-900 dark:text-white text-xs">
+                        {t('settings.payments.stripeTerminal', 'Datáfono Integrado (Stripe Terminal)')}
+                      </h4>
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300">
+                        Hardware TPV
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 leading-relaxed">
+                      {t('settings.payments.stripeTerminalDesc', 'Lector físico de tarjetas conectado por red con cobro automatizado en el TPV.')}
+                    </p>
+                  </div>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer shrink-0 mt-0.5">
+                  <input
+                    type="checkbox"
+                    checked={paymentMethods.stripeTerminal}
+                    onChange={(e) => setPaymentMethods({ ...paymentMethods, stripeTerminal: e.target.checked })}
+                    className="sr-only peer"
+                  />
+                  <div className="w-9 h-5 bg-slate-200 dark:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-600"></div>
+                </label>
+              </div>
+
+              {paymentMethods.stripeTerminal && (
+                <div className="pt-3 border-t border-slate-200 dark:border-slate-800 grid grid-cols-1 sm:grid-cols-3 gap-3 items-end">
+                  <div className="sm:col-span-2">
+                    <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">
+                      {t('settings.payments.stripePairCode', 'Código de Emparejamiento del Lector')}
+                    </label>
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={paymentMethods.stripeTerminalReaderCode}
+                        onChange={(e) =>
+                          setPaymentMethods({ ...paymentMethods, stripeTerminalReaderCode: e.target.value })
+                        }
+                        placeholder="ej. gold-bear-apple"
+                        className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-mono font-bold text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                      />
+                      <button
+                        type="button"
+                        onClick={handlePairTerminal}
+                        disabled={isPairingTerminal}
+                        className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shrink-0 flex items-center gap-1.5 transition cursor-pointer disabled:opacity-50"
+                      >
+                        {isPairingTerminal ? (
+                          <>
+                            <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                            <span>{t('settings.payments.stripeStatusPairing', 'Sincronizando...')}</span>
+                          </>
+                        ) : (
+                          <>
+                            <Radio className="w-3.5 h-3.5" />
+                            <span>{t('settings.payments.stripeBtnPair', 'Vincular / Probar Lector')}</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+                    <span className="text-[10px] text-slate-400 mt-1 block">
+                      {t('settings.payments.stripePairCodeHelp', 'Código mostrado en la pantalla del lector (ej. gold-bear-apple).')}
+                    </span>
+                  </div>
+
+                  <div className="p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-[11px] flex items-center gap-2">
+                    {paymentMethods.stripeTerminalStatus === 'connected' ? (
+                      <>
+                        <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                        <div>
+                          <div className="font-bold text-emerald-600 dark:text-emerald-400">
+                            {t('settings.payments.stripeStatusConnected', 'Lector Vinculado y Activo')}
+                          </div>
+                          <div className="text-[10px] text-slate-400">WisePOS E · Online</div>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <AlertCircle className="w-4 h-4 text-amber-500 shrink-0" />
+                        <div>
+                          <div className="font-bold text-amber-600 dark:text-amber-400">
+                            {t('settings.payments.stripeStatusDisconnected', 'Sin Lector Vinculado')}
+                          </div>
+                          <div className="text-[10px] text-slate-400">Introduce código</div>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* 2. POLÍTICAS DE PAGO Y CANCELACIÓN */}
+          <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-5 shadow-sm">
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+              <div>
+                <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                  <ShieldCheck className="w-4 h-4 text-indigo-500" />
+                  <span>{t('settings.policies.title', 'Políticas de Pago y Cancelación')}</span>
+                </h3>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                  {t('settings.policies.subtitle', 'Reglas de exigencia de pago previo, ventanas de anulación y penalizaciones económicas.')}
+                </p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Exigir Pago Online Obligatorio */}
+              <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 flex items-start justify-between gap-3">
+                <div>
+                  <h4 className="font-bold text-slate-900 dark:text-white text-xs">
+                    {t('settings.policies.requireOnline', 'Pago Online Obligatorio en Reservas Web')}
+                  </h4>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 leading-relaxed">
+                    {t('settings.policies.requireOnlineDesc', 'Si está activo, toda reserva realizada por la web o app requiere pago inmediato.')}
+                  </p>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer shrink-0 mt-0.5">
+                  <input
+                    type="checkbox"
+                    checked={policies.requireOnlinePayment}
+                    onChange={(e) => setPolicies({ ...policies, requireOnlinePayment: e.target.checked })}
+                    className="sr-only peer"
+                  />
+                  <div className="w-9 h-5 bg-slate-200 dark:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-600"></div>
+                </label>
+              </div>
+
+              {/* Permitir Pago en Mostrador / Recepción */}
+              <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 flex items-start justify-between gap-3">
+                <div>
+                  <h4 className="font-bold text-slate-900 dark:text-white text-xs">
+                    {t('settings.policies.allowCounter', 'Permitir Pago en Mostrador / Recepción')}
+                  </h4>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 leading-relaxed">
+                    {t('settings.policies.allowCounterDesc', 'Permite a los usuarios confirmar su reserva y abonar al llegar al club.')}
+                  </p>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer shrink-0 mt-0.5">
+                  <input
+                    type="checkbox"
+                    checked={policies.allowCounterPayment}
+                    onChange={(e) => setPolicies({ ...policies, allowCounterPayment: e.target.checked })}
+                    className="sr-only peer"
+                  />
+                  <div className="w-9 h-5 bg-slate-200 dark:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-600"></div>
+                </label>
+              </div>
+
+              {/* Selector Política de Reembolso */}
+              <div>
+                <label className="block text-slate-700 dark:text-slate-300 font-bold mb-1">
+                  {t('settings.policies.refundType', 'Política de Cancelación y Reembolso')}
+                </label>
+                <select
+                  value={policies.cancellationRefundType}
+                  onChange={(e) => setPolicies({ ...policies, cancellationRefundType: e.target.value as any })}
+                  className="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-bold text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                >
+                  <option value="full">{t('settings.policies.refundFull', 'Reembolso 100% (Monedero o Tarjeta)')}</option>
+                  <option value="partial">{t('settings.policies.refundPartial', 'Reembolso Parcial (Con Penalización)')}</option>
+                  <option value="no_refund">{t('settings.policies.refundNone', 'Sin Reembolso (Penalización Total)')}</option>
+                </select>
+              </div>
+
+              {/* Antelación mínima de cancelación */}
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-slate-700 dark:text-slate-300 font-bold mb-1">
+                    {t('settings.policies.cancellationWindow', 'Antelación Mínima (Horas)')}
+                  </label>
+                  <input
+                    type="number"
+                    min="1"
+                    max="72"
+                    value={policies.cancellationWindowHours}
+                    onChange={(e) => setPolicies({ ...policies, cancellationWindowHours: parseInt(e.target.value) || 12 })}
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-mono font-bold text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-700 dark:text-slate-300 font-bold mb-1">
+                    {t('settings.policies.penaltyPercent', 'Penalización (%)')}
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    value={policies.cancellationPenaltyPercent}
+                    onChange={(e) => setPolicies({ ...policies, cancellationPenaltyPercent: parseInt(e.target.value) || 50 })}
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-mono font-bold text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* 3. TARIFAS ESPECIALES Y DESCUENTOS A SOCIOS */}
+          <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-4 shadow-sm">
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+              <div>
+                <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                  <Percent className="w-4 h-4 text-emerald-500" />
+                  <span>{t('settings.discounts.title', 'Tarifas Especiales y Descuentos a Socios')}</span>
+                </h3>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                  Beneficios automáticos aplicados en reservas de pistas y consumiciones de mostrador/tienda para socios activos.
+                </p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-slate-700 dark:text-slate-300 font-bold mb-1">
+                  {t('settings.discounts.courtDiscount', 'Descuento a Socios en Reserva de Pistas (%)')}
+                </label>
+                <div className="relative">
+                  <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    value={policies.memberCourtDiscountPercent}
+                    onChange={(e) => setPolicies({ ...policies, memberCourtDiscountPercent: parseInt(e.target.value) || 0 })}
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-mono font-bold text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 pr-8"
+                  />
+                  <span className="absolute right-3 top-2 text-slate-400 font-bold">%</span>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-slate-700 dark:text-slate-300 font-bold mb-1">
+                  {t('settings.discounts.shopDiscount', 'Descuento a Socios en Tienda y Bar (%)')}
+                </label>
+                <div className="relative">
+                  <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    value={policies.memberShopDiscountPercent}
+                    onChange={(e) => setPolicies({ ...policies, memberShopDiscountPercent: parseInt(e.target.value) || 0 })}
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-mono font-bold text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 pr-8"
+                  />
+                  <span className="absolute right-3 top-2 text-slate-400 font-bold">%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex justify-end pt-2">
+            <button
+              type="submit"
+              className="px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md transition flex items-center gap-2 cursor-pointer active:scale-95"
+            >
+              <Save className="w-4 h-4" />
+              <span>Guardar Métodos de Pago y Políticas</span>
+            </button>
+          </div>
+        </form>
+      )}
+
+      {/* ======================================================================
+          PESTAÑA: CUPONES Y BONOS DE CLASES
+          ====================================================================== */}
+      {activeSection === 'promos' && (
+        <div className="space-y-6 text-xs">
+          {/* CUPONES DE DESCUENTO */}
+          <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-4 shadow-sm">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 dark:border-slate-800 pb-3">
+              <div>
+                <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                  <Ticket className="w-4 h-4 text-emerald-500" />
+                  <span>{t('settings.promos.couponsTitle', 'Cupones de Descuento')}</span>
+                </h3>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                  {t('settings.promos.couponsSubtitle', 'Crea y administra códigos promocionales para reservas de pistas, tienda o uso global.')}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowAddCouponModal(true)}
+                className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1.5 transition cursor-pointer self-start sm:self-auto"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>{t('settings.promos.newCouponBtn', 'Nuevo Cupón')}</span>
+              </button>
+            </div>
+
+            <div className="overflow-x-auto">
+              <table className="w-full text-left">
+                <thead>
+                  <tr className="border-b border-slate-100 dark:border-slate-800 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                    <th className="py-2.5 px-3">Código</th>
+                    <th className="py-2.5 px-3">Descuento</th>
+                    <th className="py-2.5 px-3">Ámbito</th>
+                    <th className="py-2.5 px-3">Estado</th>
+                    <th className="py-2.5 px-3 text-right">Acción</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                  {coupons.map((cp) => (
+                    <tr key={cp.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/40">
+                      <td className="py-3 px-3">
+                        <span className="font-mono font-black text-xs text-slate-900 dark:text-white bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-md">
+                          {cp.code}
+                        </span>
+                      </td>
+                      <td className="py-3 px-3 font-bold font-mono text-emerald-600 dark:text-emerald-400">
+                        {cp.discountType === 'percent' ? `${cp.discountValue}%` : `${cp.discountValue.toFixed(2)} €`}
+                      </td>
+                      <td className="py-3 px-3">
+                        <span className="capitalize text-slate-600 dark:text-slate-300 font-semibold">
+                          {cp.scope === 'global' ? 'Global (Todo el club)' : cp.scope === 'courts' ? 'Solo Pistas' : 'Solo Tienda / Bar'}
+                        </span>
+                      </td>
+                      <td className="py-3 px-3">
+                        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black ${
+                          cp.active
+                            ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300'
+                            : 'bg-slate-100 dark:bg-slate-800 text-slate-500'
+                        }`}>
+                          {cp.active ? 'Activo' : 'Inactivo'}
+                        </span>
+                      </td>
+                      <td className="py-3 px-3 text-right">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const updated = coupons.map((c) => (c.id === cp.id ? { ...c, active: !c.active } : c));
+                            setCoupons(updated);
+                            updateCurrentTenant({ settings: { ...currentTenant.settings, coupons: updated } });
+                          }}
+                          className="text-[11px] font-bold text-slate-500 hover:text-emerald-600 cursor-pointer"
+                        >
+                          {cp.active ? 'Desactivar' : 'Activar'}
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* BONOS DE CLASES */}
+          <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-4 shadow-sm">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 dark:border-slate-800 pb-3">
+              <div>
+                <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                  <Award className="w-4 h-4 text-amber-500" />
+                  <span>{t('settings.promos.vouchersTitle', 'Bonos de Clases de Pádel')}</span>
+                </h3>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                  {t('settings.promos.vouchersSubtitle', 'Packs personalizables de clases (4, 5, 8, 10 clases) para venta a alumnos y socios.')}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowAddVoucherModal(true)}
+                className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1.5 transition cursor-pointer self-start sm:self-auto"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>{t('settings.promos.newVoucherBtn', 'Nuevo Bono de Clases')}</span>
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              {vouchers.map((v) => (
+                <div
+                  key={v.id}
+                  className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 space-y-3 flex flex-col justify-between"
+                >
+                  <div className="space-y-1">
+                    <span className="text-[10px] font-black uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
+                      Pack {v.classesCount} Clases
+                    </span>
+                    <h4 className="font-bold text-slate-900 dark:text-white text-xs">
+                      {v.title}
+                    </h4>
+                    <p className="text-[11px] text-slate-400">
+                      Validez: {v.validityDays} días tras la compra
+                    </p>
+                  </div>
+
+                  <div className="pt-2 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between">
+                    <span className="text-base font-black font-mono text-slate-900 dark:text-white">
+                      {v.price.toFixed(2)} €
+                    </span>
+                    <span className="text-[10px] text-slate-400 font-mono">
+                      {(v.price / v.classesCount).toFixed(2)} €/clase
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* MODAL: NUEVO CUPÓN */}
+          {showAddCouponModal && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs animate-in fade-in duration-150">
+              <div className="w-full max-w-md rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl p-6 space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-base font-black text-slate-900 dark:text-white">
+                    Crear Cupón de Descuento
+                  </h3>
+                  <button
+                    type="button"
+                    onClick={() => setShowAddCouponModal(false)}
+                    className="p-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white cursor-pointer"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+
+                <form onSubmit={handleCreateCoupon} className="space-y-3 text-xs">
+                  <div>
+                    <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                      Código del Cupón
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={newCouponForm.code}
+                      onChange={(e) => setNewCouponForm({ ...newCouponForm, code: e.target.value.toUpperCase() })}
+                      placeholder="Ej. BIENVENIDA15"
+                      className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl font-mono font-bold text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                        Tipo
+                      </label>
+                      <select
+                        value={newCouponForm.discountType}
+                        onChange={(e) => setNewCouponForm({ ...newCouponForm, discountType: e.target.value as any })}
+                        className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl font-bold text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                      >
+                        <option value="percent">Porcentaje (%)</option>
+                        <option value="fixed">Fijo (€)</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                        Valor
+                      </label>
+                      <input
+                        type="number"
+                        min="1"
+                        value={newCouponForm.discountValue}
+                        onChange={(e) => setNewCouponForm({ ...newCouponForm, discountValue: parseFloat(e.target.value) || 0 })}
+                        className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl font-mono font-bold text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                      Ámbito de Aplicación
+                    </label>
+                    <select
+                      value={newCouponForm.scope}
+                      onChange={(e) => setNewCouponForm({ ...newCouponForm, scope: e.target.value as any })}
+                      className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl font-bold text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                    >
+                      <option value="global">Global (Todo el Club)</option>
+                      <option value="courts">Solo Reservas de Pistas</option>
+                      <option value="shop">Solo Tienda y Cafetería</option>
+                    </select>
+                  </div>
+
+                  <div className="pt-2 flex justify-end gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setShowAddCouponModal(false)}
+                      className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold"
+                    >
+                      Cancelar
+                    </button>
+                    <button
+                      type="submit"
+                      className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold"
+                    >
+                      Crear Cupón
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          )}
+
+          {/* MODAL: NUEVO BONO DE CLASES */}
+          {showAddVoucherModal && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs animate-in fade-in duration-150">
+              <div className="w-full max-w-md rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl p-6 space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-base font-black text-slate-900 dark:text-white">
+                    Crear Bono de Clases
+                  </h3>
+                  <button
+                    type="button"
+                    onClick={() => setShowAddVoucherModal(false)}
+                    className="p-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white cursor-pointer"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+
+                <form onSubmit={handleCreateVoucher} className="space-y-3 text-xs">
+                  <div>
+                    <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                      Nombre / Título del Bono
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={newVoucherForm.title}
+                      onChange={(e) => setNewVoucherForm({ ...newVoucherForm, title: e.target.value })}
+                      placeholder="Ej. Bono 5 Clases Particulares"
+                      className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl font-bold text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-2">
+                    <div>
+                      <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                        Nº Clases
+                      </label>
+                      <input
+                        type="number"
+                        min="1"
+                        max="50"
+                        value={newVoucherForm.classesCount}
+                        onChange={(e) => setNewVoucherForm({ ...newVoucherForm, classesCount: parseInt(e.target.value) || 5 })}
+                        className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl font-mono font-bold text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                        Precio (€)
+                      </label>
+                      <input
+                        type="number"
+                        min="1"
+                        value={newVoucherForm.price}
+                        onChange={(e) => setNewVoucherForm({ ...newVoucherForm, price: parseFloat(e.target.value) || 0 })}
+                        className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl font-mono font-bold text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                        Validez (días)
+                      </label>
+                      <input
+                        type="number"
+                        min="1"
+                        value={newVoucherForm.validityDays}
+                        onChange={(e) => setNewVoucherForm({ ...newVoucherForm, validityDays: parseInt(e.target.value) || 60 })}
+                        className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl font-mono font-bold text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="pt-2 flex justify-end gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setShowAddVoucherModal(false)}
+                      className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold"
+                    >
+                      Cancelar
+                    </button>
+                    <button
+                      type="submit"
+                      className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold"
+                    >
+                      Crear Bono
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          )}
+        </div>
       )}
 
       {/* ======================================================================

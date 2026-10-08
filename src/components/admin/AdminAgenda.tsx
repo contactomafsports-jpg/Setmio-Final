@@ -27,8 +27,10 @@ export const AdminAgenda: React.FC = () => {
     cancelBooking,
     toggleCourtLight,
     currentUser,
+    currentTenant,
     triggerDemoToast,
     navigateToPlayerProfile,
+    t,
   } = useApp();
 
   const [currentDate, setCurrentDate] = useState('2026-09-30');
@@ -73,14 +75,31 @@ export const AdminAgenda: React.FC = () => {
   const [newCourtId, setNewCourtId] = useState(courts[0]?.id || 'court-1');
   const [newTime, setNewTime] = useState('17:00');
   const [durationMinutes, setDurationMinutes] = useState<60 | 90 | 120>(90);
-  const [clientType, setClientType] = useState<'existing' | 'new' | 'block'>('existing');
+  const [clientType, setClientType] = useState<'existing' | 'new' | 'anonymous' | 'block'>('existing');
   const [selectedMember, setSelectedMember] = useState('Carlos Méndez (Socio 108)');
   const [newClientName, setNewClientName] = useState('');
   const [newClientPhone, setNewClientPhone] = useState('');
   const [newSplit, setNewSplit] = useState(false);
-  const [invitedPlayer2, setInvitedPlayer2] = useState('');
-  const [invitedPlayer3, setInvitedPlayer3] = useState('');
-  const [invitedPlayer4, setInvitedPlayer4] = useState('');
+  
+  // Interactive 4 players for split payment
+  const [splitPlayers, setSplitPlayers] = useState<Array<{ name: string; isMember: boolean }>>([
+    { name: 'Carlos Méndez', isMember: true },
+    { name: 'Pablo Vello', isMember: true },
+    { name: 'Lucas Piñeiro', isMember: false },
+    { name: 'David Castro', isMember: false },
+  ]);
+
+  const clubRegisteredPlayers = React.useMemo(() => [
+    { name: 'Carlos Méndez', isMember: true, label: 'Carlos Méndez (Socio #108 · Nivel 4.85)' },
+    { name: 'Pablo Vello', isMember: true, label: 'Pablo Vello (Socio #019 · Nivel 4.80)' },
+    { name: 'Laura Senra', isMember: true, label: 'Laura Senra (Socia Pro · Nivel 5.00)' },
+    { name: 'Rosa Carballo', isMember: true, label: 'Rosa Carballo (Socia #042 · Nivel 3.90)' },
+    { name: 'Mateo Varela', isMember: true, label: 'Mateo Varela (Socio #055 · Nivel 4.15)' },
+    { name: 'Iván Gómez', isMember: true, label: 'Iván Gómez (Socio #087 · Nivel 3.45)' },
+    { name: 'Lucas Piñeiro', isMember: false, label: 'Lucas Piñeiro (Invitado · Nivel 3.85)' },
+    { name: 'David Castro', isMember: false, label: 'David Castro (Invitado · Nivel 4.10)' },
+    { name: 'Marcos Soto', isMember: false, label: 'Marcos Soto (Invitado · Nivel 3.50)' },
+  ], []);
 
   const timeRows = [
     '09:00', '10:30', '12:00', '13:30', '15:00', '16:30', '17:00', '18:30', '20:00', '21:30'
@@ -101,20 +120,34 @@ export const AdminAgenda: React.FC = () => {
     const startISO = `${currentDate}T${newTime}:00`;
     const hours = durationMinutes / 60;
     const finalPrice = clientType === 'block' ? 0 : court.hourlyRate * hours;
-    const clientDisplayName = clientType === 'block'
-      ? `BLOQUEO: ${newClientName || 'Mantenimiento / Evento Club'}`
-      : clientType === 'existing'
-      ? selectedMember
-      : newClientName || 'Cliente Mostrador';
+    
+    let clientDisplayName = 'Cliente Mostrador';
+    if (clientType === 'block') {
+      clientDisplayName = `BLOQUEO: ${newClientName || 'Mantenimiento / Evento Club'}`;
+    } else if (clientType === 'existing') {
+      clientDisplayName = selectedMember;
+    } else if (clientType === 'anonymous') {
+      clientDisplayName = 'Anónimo / Cliente Ocasional';
+    } else {
+      clientDisplayName = newClientName || 'Cliente Mostrador';
+    }
 
-    const participants = newSplit
-      ? [
-          { name: clientDisplayName, paid: true, amount: finalPrice / 4 },
-          { name: invitedPlayer2 || 'Jugador 2 (Pendiente)', paid: false, amount: finalPrice / 4 },
-          { name: invitedPlayer3 || 'Jugador 3 (Pendiente)', paid: false, amount: finalPrice / 4 },
-          { name: invitedPlayer4 || 'Jugador 4 (Pendiente)', paid: false, amount: finalPrice / 4 },
-        ]
-      : [{ name: clientDisplayName, paid: true, amount: finalPrice }];
+    const memberDiscountPercent = currentTenant.settings?.policies?.memberCourtDiscountPercent ?? 20;
+
+    let participants: Booking['participants'];
+    if (newSplit && clientType !== 'block') {
+      const baseShare = finalPrice / 4;
+      participants = splitPlayers.map((p, idx) => {
+        const discounted = p.isMember ? baseShare * (1 - memberDiscountPercent / 100) : baseShare;
+        return {
+          name: p.name || `Jugador ${idx + 1}`,
+          paid: idx === 0,
+          amount: parseFloat(discounted.toFixed(2)),
+        };
+      });
+    } else {
+      participants = [{ name: clientDisplayName, paid: true, amount: finalPrice }];
+    }
 
     const startH = parseInt(newTime.split(':')[0], 10);
     const startM = parseInt(newTime.split(':')[1], 10);
@@ -126,7 +159,7 @@ export const AdminAgenda: React.FC = () => {
     createBooking({
       courtId: court.id,
       courtName: court.name,
-      creatorId: clientType === 'existing' ? 'socio-member' : 'reception-client',
+      creatorId: clientType === 'existing' ? 'socio-member' : clientType === 'anonymous' ? 'anon-guest' : 'reception-client',
       creatorName: clientDisplayName,
       startTime: startISO,
       endTime: endISO,
@@ -135,14 +168,11 @@ export const AdminAgenda: React.FC = () => {
       paymentStatus: clientType === 'block' ? 'paid' : newSplit ? 'partially_paid' : 'paid',
       isSplitPayment: newSplit,
       participants,
-      notes: clientType === 'block' ? 'Pista bloqueada administrativamente por recepción.' : undefined,
+      notes: clientType === 'block' ? 'Pista bloqueada administrativamente por recepción.' : clientType === 'anonymous' ? 'Reserva mostrador anónima sin datos personales registrados.' : undefined,
     });
 
     setShowNewModal(false);
     setNewClientName('');
-    setInvitedPlayer2('');
-    setInvitedPlayer3('');
-    setInvitedPlayer4('');
     triggerDemoToast('Reserva Registrada', `Reserva creada con éxito en ${court.name}.`, 'success');
   };
 
@@ -205,11 +235,15 @@ export const AdminAgenda: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
         {/* Fila 1 en móvil / Izquierda en desktop: Título sin recortarse */}
         <div className="w-full sm:w-auto min-w-0">
-          <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
-            Reservas y Disponibilidad
+          <div className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
+            <Calendar className="w-3.5 h-3.5 text-emerald-500" />
+            <span>{t('agenda.eyebrow', 'Cuadrante Diario & Control de Ocupación')}</span>
+          </div>
+          <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight mt-0.5">
+            {t('agenda.title', 'Reservas y Disponibilidad')}
           </h1>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 hidden sm:block">
-            Cuadrante interactivo y gestión diaria del club
+            {t('agenda.subtitle', 'Cuadrante interactivo y gestión diaria de pistas del club')}
           </p>
         </div>
 
@@ -384,7 +418,12 @@ export const AdminAgenda: React.FC = () => {
 
           <button
             type="button"
-            onClick={() => setShowAllBookingsView(true)}
+            onClick={() => {
+              setShowAllBookingsView(true);
+              if (typeof window !== 'undefined') {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }
+            }}
             className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-700/80 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 hover:text-emerald-600 dark:hover:text-emerald-400 font-bold text-xs transition border border-slate-200/80 dark:border-slate-600/60 shadow-xs cursor-pointer active:scale-95 shrink-0"
           >
             <span className="hidden sm:inline">Historial Completo / Todas las Reservas</span>
@@ -451,7 +490,7 @@ export const AdminAgenda: React.FC = () => {
             <form onSubmit={handleCreateSubmit} className="space-y-3.5 text-xs mt-4">
               <div>
                 <label className="block text-slate-700 dark:text-slate-300 mb-1 font-bold">Tipo de Operación</label>
-                <div className="grid grid-cols-3 gap-1.5 p-1 bg-slate-100 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 p-1 bg-slate-100 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700">
                   <button
                     type="button"
                     onClick={() => setClientType('existing')}
@@ -476,6 +515,17 @@ export const AdminAgenda: React.FC = () => {
                   </button>
                   <button
                     type="button"
+                    onClick={() => setClientType('anonymous')}
+                    className={`py-1.5 px-2 rounded-lg font-bold text-[11px] transition ${
+                      clientType === 'anonymous'
+                        ? 'bg-emerald-600 text-white shadow-xs'
+                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                    }`}
+                  >
+                    Anónimo / Ocasional
+                  </button>
+                  <button
+                    type="button"
                     onClick={() => setClientType('block')}
                     className={`py-1.5 px-2 rounded-lg font-bold text-[11px] transition ${
                       clientType === 'block'
@@ -487,6 +537,13 @@ export const AdminAgenda: React.FC = () => {
                   </button>
                 </div>
               </div>
+
+              {clientType === 'anonymous' && (
+                <div className="p-3 rounded-xl bg-slate-100 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 text-[11px] text-slate-600 dark:text-slate-400">
+                  <span className="font-bold text-slate-800 dark:text-slate-200 block mb-0.5">Reserva Anónima en Mostrador</span>
+                  <span>Sin registro de datos personales. Se emitirá ticket genérico en recepción y cobro directo en TPV.</span>
+                </div>
+              )}
 
               {clientType === 'existing' && (
                 <div>
@@ -579,40 +636,85 @@ export const AdminAgenda: React.FC = () => {
               </div>
 
               {clientType !== 'block' && (
-                <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 space-y-2">
+                <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 space-y-2.5">
                   <div className="flex items-center justify-between">
-                    <span className="font-bold text-slate-700 dark:text-slate-300">Pago Fraccionado (Split 4 Jugadores)</span>
+                    <div>
+                      <span className="font-bold text-slate-800 dark:text-slate-200 block">
+                        Pago Fraccionado (Split 4 Jugadores)
+                      </span>
+                      <span className="text-[10px] text-slate-500">
+                        Tarifas dinámicas recalculadas automáticamente según condición de socio
+                      </span>
+                    </div>
                     <input
                       type="checkbox"
                       checked={newSplit}
                       onChange={(e) => setNewSplit(e.target.checked)}
-                      className="w-4 h-4 text-emerald-600 rounded"
+                      className="w-4 h-4 text-emerald-600 rounded cursor-pointer"
                     />
                   </div>
+
                   {newSplit && (
-                    <div className="space-y-1.5 pt-1 text-[11px]">
-                      <span className="text-slate-400 block font-medium">Invitar compañeros:</span>
-                      <input
-                        type="text"
-                        placeholder="Jugador 2: ej. marcos@email.es"
-                        value={invitedPlayer2}
-                        onChange={(e) => setInvitedPlayer2(e.target.value)}
-                        className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1.5 text-slate-900 dark:text-white"
-                      />
-                      <input
-                        type="text"
-                        placeholder="Jugador 3: ej. brais@email.es"
-                        value={invitedPlayer3}
-                        onChange={(e) => setInvitedPlayer3(e.target.value)}
-                        className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1.5 text-slate-900 dark:text-white"
-                      />
-                      <input
-                        type="text"
-                        placeholder="Jugador 4: ej. lucia@email.es"
-                        value={invitedPlayer4}
-                        onChange={(e) => setInvitedPlayer4(e.target.value)}
-                        className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1.5 text-slate-900 dark:text-white"
-                      />
+                    <div className="space-y-2 pt-1 text-[11px] border-t border-slate-200 dark:border-slate-800">
+                      {splitPlayers.map((sp, idx) => {
+                        const courtRate = courts.find((c) => c.id === newCourtId)?.hourlyRate || 28;
+                        const totalCost = (courtRate * durationMinutes) / 60;
+                        const baseShare = totalCost / 4;
+                        const discount = currentTenant.settings?.policies?.memberCourtDiscountPercent ?? 20;
+                        const finalShare = sp.isMember ? baseShare * (1 - discount / 100) : baseShare;
+
+                        return (
+                          <div
+                            key={idx}
+                            className="p-2 rounded-lg bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2"
+                          >
+                            <div className="flex-1 flex items-center gap-2">
+                              <span className="font-bold text-slate-400 w-4">{idx + 1}.</span>
+                              <select
+                                value={sp.name}
+                                onChange={(e) => {
+                                  const val = e.target.value;
+                                  const found = clubRegisteredPlayers.find((p) => p.name === val);
+                                  const updated = [...splitPlayers];
+                                  updated[idx] = {
+                                    name: val,
+                                    isMember: found ? found.isMember : sp.isMember,
+                                  };
+                                  setSplitPlayers(updated);
+                                }}
+                                className="flex-1 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-2 py-1 text-xs text-slate-900 dark:text-white"
+                              >
+                                {clubRegisteredPlayers.map((p) => (
+                                  <option key={p.name} value={p.name}>
+                                    {p.label}
+                                  </option>
+                                ))}
+                              </select>
+                            </div>
+
+                            <div className="flex items-center justify-between sm:justify-end gap-2 shrink-0">
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const updated = [...splitPlayers];
+                                  updated[idx] = { ...updated[idx], isMember: !updated[idx].isMember };
+                                  setSplitPlayers(updated);
+                                }}
+                                className={`px-2 py-0.5 rounded text-[10px] font-bold border transition ${
+                                  sp.isMember
+                                    ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border-emerald-300'
+                                    : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-300'
+                                }`}
+                              >
+                                {sp.isMember ? 'Socio (-20%)' : 'No Socio'}
+                              </button>
+                              <span className="font-mono font-bold text-slate-900 dark:text-white text-xs">
+                                {finalShare.toFixed(2)} €
+                              </span>
+                            </div>
+                          </div>
+                        );
+                      })}
                     </div>
                   )}
                 </div>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useApp } from '../../context/AppContext';
 import { CafeProduct, Booking } from '../../types/database';
 import {
@@ -31,6 +31,7 @@ import {
   Receipt,
   Calculator,
   Upload,
+  Smartphone,
 } from 'lucide-react';
 
 interface LinkedChargeMeta {
@@ -58,8 +59,45 @@ export const AdminCafePOS: React.FC = () => {
 
   const [activeCategory, setActiveCategory] = useState<string>('all');
   const [posCart, setPosCart] = useState<{ product: CafeProduct; qty: number; meta?: LinkedChargeMeta }[]>([]);
-  const [paymentMethod, setPaymentMethod] = useState<'cash' | 'card' | 'member_wallet'>('card');
+  const [paymentMethod, setPaymentMethod] = useState<string>('card');
   const [sessionSalesTotal, setSessionSalesTotal] = useState(148.5);
+
+  const configuredMethods = currentTenant.settings?.paymentMethods;
+  const availablePaymentMethods = useMemo(() => {
+    const list: Array<{ id: string; label: string; icon: any }> = [];
+
+    // Datáfono Banco (Manual)
+    if (configuredMethods ? configuredMethods.manualPos : true) {
+      list.push({ id: 'card', label: 'Datáfono Banco', icon: CreditCard });
+    }
+    // Stripe Terminal (Lector Integrado)
+    if (configuredMethods?.stripeTerminal) {
+      list.push({ id: 'stripe_terminal', label: 'Stripe Terminal', icon: CreditCard });
+    }
+    // Efectivo
+    if (configuredMethods ? configuredMethods.cash : true) {
+      list.push({ id: 'cash', label: 'Efectivo', icon: Banknote });
+    }
+    // Cobro Push / App del Socio
+    if (configuredMethods?.pushCharge) {
+      list.push({ id: 'push_charge', label: 'Cobro Push / App', icon: Smartphone });
+    }
+    // Monedero / Saldo Socio
+    if (configuredMethods ? configuredMethods.wallet : true) {
+      list.push({ id: 'member_wallet', label: 'Monedero Socio', icon: Wallet });
+    }
+
+    if (list.length === 0) {
+      list.push({ id: 'cash', label: 'Efectivo', icon: Banknote });
+    }
+    return list;
+  }, [configuredMethods]);
+
+  useEffect(() => {
+    if (availablePaymentMethods.length > 0 && !availablePaymentMethods.some((m) => m.id === paymentMethod)) {
+      setPaymentMethod(availablePaymentMethods[0].id);
+    }
+  }, [availablePaymentMethods, paymentMethod]);
 
   // Modal: Asignar Reserva / Pago de Jugador
   const [assignModalOpen, setAssignModalOpen] = useState(false);
@@ -171,11 +209,10 @@ export const AdminCafePOS: React.FC = () => {
     });
 
     setSessionSalesTotal((prev) => prev + cartTotal);
+    const methodLabel = availablePaymentMethods.find((m) => m.id === paymentMethod)?.label || 'TPV';
     triggerDemoToast(
       'Venta Cobrada en TPV',
-      `Ticket emitido por ${cartTotal.toFixed(2)} € pagado con ${
-        paymentMethod === 'card' ? 'Tarjeta' : paymentMethod === 'cash' ? 'Efectivo' : 'Saldo de Socio'
-      }. Reservas y monederos actualizados.`,
+      `Ticket emitido por ${cartTotal.toFixed(2)} € pagado con ${methodLabel}. Reservas y monederos actualizados.`,
       'success'
     );
     setPosCart([]);
@@ -575,50 +612,30 @@ export const AdminCafePOS: React.FC = () => {
             )}
           </div>
 
-          {/* Payment Method Selector */}
+          {/* Payment Method Selector (Filtered by Club Settings) */}
           <div className="pt-2 border-t border-slate-100 dark:border-slate-700/60 space-y-2">
             <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
-              Método de Cobro:
+              Método de Cobro (Activos en Club):
             </span>
-            <div className="grid grid-cols-3 gap-2">
-              <button
-                type="button"
-                onClick={() => setPaymentMethod('card')}
-                className={`p-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${
-                  paymentMethod === 'card'
-                    ? 'bg-emerald-600 text-white shadow-xs'
-                    : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
-                }`}
-              >
-                <CreditCard className="w-3.5 h-3.5" />
-                <span>Tarjeta</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setPaymentMethod('cash')}
-                className={`p-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${
-                  paymentMethod === 'cash'
-                    ? 'bg-emerald-600 text-white shadow-xs'
-                    : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
-                }`}
-              >
-                <Banknote className="w-3.5 h-3.5" />
-                <span>Efectivo</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setPaymentMethod('member_wallet')}
-                className={`p-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${
-                  paymentMethod === 'member_wallet'
-                    ? 'bg-emerald-600 text-white shadow-xs'
-                    : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
-                }`}
-              >
-                <Wallet className="w-3.5 h-3.5" />
-                <span>Monedero</span>
-              </button>
+            <div className={`grid ${availablePaymentMethods.length <= 2 ? 'grid-cols-2' : availablePaymentMethods.length <= 3 ? 'grid-cols-3' : 'grid-cols-2 sm:grid-cols-3'} gap-2`}>
+              {availablePaymentMethods.map((m) => {
+                const IconComponent = m.icon;
+                return (
+                  <button
+                    key={m.id}
+                    type="button"
+                    onClick={() => setPaymentMethod(m.id)}
+                    className={`p-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${
+                      paymentMethod === m.id
+                        ? 'bg-emerald-600 text-white shadow-xs'
+                        : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+                    }`}
+                  >
+                    <IconComponent className="w-3.5 h-3.5" />
+                    <span className="truncate">{m.label}</span>
+                  </button>
+                );
+              })}
             </div>
           </div>
 

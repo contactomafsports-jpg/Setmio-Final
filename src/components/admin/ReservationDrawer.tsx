@@ -18,6 +18,7 @@ import {
   Shield,
   Sparkles,
   ExternalLink,
+  Trophy,
 } from 'lucide-react';
 
 export interface ReservationDrawerParticipant {
@@ -53,6 +54,8 @@ export interface ReservationDrawerData {
   category?: 'match' | 'academy' | 'private' | 'tournament';
   participants?: ReservationDrawerParticipant[];
   notes?: string;
+  matchScore?: string;
+  isScoreHiddenInPublicProfile?: boolean;
 }
 
 interface ReservationDrawerProps {
@@ -74,11 +77,25 @@ export const ReservationDrawer: React.FC<ReservationDrawerProps> = ({
   onCancelReservation,
   onOpenPlayerProfile,
 }) => {
-  const { currentTenant, courts, setAdminTab, triggerDemoToast, setPosPendingCharge, navigateToPlayerProfile, t } = useApp();
+  const { currentTenant, courts, setAdminTab, triggerDemoToast, setPosPendingCharge, navigateToPlayerProfile, updateBooking, t } = useApp();
   const [copiedPin, setCopiedPin] = useState(false);
   const [isReassigning, setIsReassigning] = useState(false);
   const [tpvChoiceModal, setTpvChoiceModal] = useState(false);
   const [selectedNewCourt, setSelectedNewCourt] = useState(reservation?.courtName || '');
+  const [matchScoreInput, setMatchScoreInput] = useState(reservation?.matchScore || '');
+  const [isScoreHidden, setIsScoreHidden] = useState(reservation?.isScoreHiddenInPublicProfile || false);
+  const [isScoreSaved, setIsScoreSaved] = useState(false);
+
+  const handleSaveScore = () => {
+    if (!reservation) return;
+    updateBooking(reservation.id, {
+      matchScore: matchScoreInput,
+      isScoreHiddenInPublicProfile: isScoreHidden,
+    });
+    setIsScoreSaved(true);
+    triggerDemoToast('Resultado Guardado', `Marcador "${matchScoreInput}" registrado con éxito.`, 'success');
+    setTimeout(() => setIsScoreSaved(false), 2000);
+  };
 
   if (!isOpen || !reservation) return null;
 
@@ -397,6 +414,49 @@ export const ReservationDrawer: React.FC<ReservationDrawerProps> = ({
               </div>
             ))}
           </div>
+        </div>
+
+        {/* 3b. Registro de Resultado del Partido y Privacidad */}
+        <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80 space-y-2.5 text-xs">
+          <div className="flex items-center justify-between">
+            <span className="font-extrabold text-slate-800 dark:text-slate-200 uppercase tracking-wider text-[11px] flex items-center gap-1.5">
+              <Trophy className="w-3.5 h-3.5 text-amber-500" />
+              <span>Resultado del Partido & Visibilidad</span>
+            </span>
+            {isScoreSaved && (
+              <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1">
+                <Check className="w-3 h-3" />
+                <span>Guardado</span>
+              </span>
+            )}
+          </div>
+
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+            <input
+              type="text"
+              placeholder="Ej. 6-4, 3-6, 7-6"
+              value={matchScoreInput}
+              onChange={(e) => setMatchScoreInput(e.target.value)}
+              className="flex-1 px-3 py-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl font-mono text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+            />
+            <button
+              type="button"
+              onClick={handleSaveScore}
+              className="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition active:scale-95 shrink-0 cursor-pointer"
+            >
+              Guardar Marcador
+            </button>
+          </div>
+
+          <label className="flex items-center gap-2 cursor-pointer text-[11px] text-slate-600 dark:text-slate-400 pt-1 border-t border-slate-200/60 dark:border-slate-700/60">
+            <input
+              type="checkbox"
+              checked={isScoreHidden}
+              onChange={(e) => setIsScoreHidden(e.target.checked)}
+              className="w-3.5 h-3.5 rounded text-emerald-600 focus:ring-emerald-500"
+            />
+            <span>Ocultar resultado en el perfil público del jugador</span>
+          </label>
         </div>
 
         {/* Reasignar Pista Desplegable */}

@@ -17,6 +17,7 @@ import {
   NotificationItem,
   PageBlock,
   Plan,
+  ClubRanking,
 } from '../types/database';
 import {
   INITIAL_TENANT,
@@ -34,6 +35,7 @@ import {
   INITIAL_CAFE_PRODUCTS,
   INITIAL_AUDIT_LOGS,
   INITIAL_PAGE_BLOCKS,
+  INITIAL_RANKINGS,
 } from '../data/initialData';
 import { fallbackLng, SupportedLanguage, TRANSLATIONS } from '../lib/i18n';
 import { i18n } from '../i18n';
@@ -481,6 +483,7 @@ interface AppContextType {
 
   openMatches: OpenMatch[];
   createOpenMatch: (match: Omit<OpenMatch, 'id' | 'tenantId'>) => void;
+  updateOpenMatch: (matchId: string, updates: Partial<OpenMatch>) => void;
   joinOpenMatch: (matchId: string, player: { name: string; level: number; position: 'drive' | 'reves' | 'both' }) => void;
   leaveOpenMatch: (matchId: string, playerName: string) => void;
 
@@ -488,7 +491,14 @@ interface AppContextType {
   academyGroups: AcademyGroup[];
 
   tournaments: Tournament[];
+  createTournament: (tournament: Omit<Tournament, 'id' | 'tenantId'>) => Tournament;
+  updateTournament: (tournamentId: string, updates: Partial<Tournament>) => void;
   registerTournamentTeam: (tournamentId: string, categoryName: string, teamName: string) => void;
+
+  rankings: ClubRanking[];
+  createRanking: (ranking: Omit<ClubRanking, 'id' | 'tenantId'>) => void;
+  updateRanking: (id: string, updates: Partial<ClubRanking>) => void;
+  linkTournamentToRanking: (rankingId: string, tournamentId: string) => void;
 
   products: Product[];
   cart: CartItem[];
@@ -1175,6 +1185,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [coaches] = useState<Coach[]>(INITIAL_COACHES);
   const [academyGroups] = useState<AcademyGroup[]>(INITIAL_ACADEMY_GROUPS);
   const [tournaments, setTournaments] = useState<Tournament[]>(() => readDemoState('setmio_demo_tournaments_v1', INITIAL_TOURNAMENTS));
+  const [rankings, setRankings] = useState<ClubRanking[]>(() => readDemoState('setmio_demo_rankings_v1', INITIAL_RANKINGS));
   const [products] = useState<Product[]>(INITIAL_PRODUCTS);
   const [blogPosts] = useState<BlogPost[]>(INITIAL_BLOG_POSTS);
   const [pageBlocks, setPageBlocks] = useState<PageBlock[]>(() => readDemoState('setmio_demo_page_blocks_v1', INITIAL_PAGE_BLOCKS));
@@ -1253,10 +1264,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     saveDemoState('setmio_demo_bookings_v1', bookings);
     saveDemoState('setmio_demo_matches_v1', openMatches);
     saveDemoState('setmio_demo_tournaments_v1', tournaments);
+    saveDemoState('setmio_demo_rankings_v1', rankings);
     saveDemoState('setmio_demo_page_blocks_v1', pageBlocks);
     saveDemoState('setmio_demo_cart_v1', cart);
     saveDemoState('setmio_demo_favorites_v1', favorites);
-  }, [courts, bookings, openMatches, tournaments, pageBlocks, cart, favorites]);
+  }, [courts, bookings, openMatches, tournaments, rankings, pageBlocks, cart, favorites]);
 
   const toggleFavorite = (itemId: string) => {
     setFavorites((prev) => {
@@ -1596,7 +1608,30 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     );
   };
 
+  const updateOpenMatch = (matchId: string, updates: Partial<OpenMatch>) => {
+    setOpenMatches((prev) =>
+      prev.map((m) => (m.id === matchId ? { ...m, ...updates } : m))
+    );
+  };
+
   // Tournaments
+  const createTournament = (tournamentData: Omit<Tournament, 'id' | 'tenantId'>): Tournament => {
+    const newT: Tournament = {
+      ...tournamentData,
+      id: `t-${Date.now().toString().slice(-4)}`,
+      tenantId: currentTenant.id,
+    };
+    setTournaments((prev) => [newT, ...prev]);
+    triggerDemoToast('Torneo Creado', `Torneo "${newT.title}" publicado con éxito.`, 'success');
+    return newT;
+  };
+
+  const updateTournament = (tournamentId: string, updates: Partial<Tournament>) => {
+    setTournaments((prev) =>
+      prev.map((t) => (t.id === tournamentId ? { ...t, ...updates } : t))
+    );
+  };
+
   const registerTournamentTeam = (tournamentId: string, categoryName: string, teamName: string) => {
     setTournaments((prev) =>
       prev.map((t) => {
@@ -1615,6 +1650,37 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       `Pareja "${teamName}" inscrita en la categoría "${categoryName}".`,
       'success'
     );
+  };
+
+  // Rankings
+  const createRanking = (rankingData: Omit<ClubRanking, 'id' | 'tenantId'>) => {
+    const newR: ClubRanking = {
+      ...rankingData,
+      id: `rnk-${Date.now().toString().slice(-4)}`,
+      tenantId: currentTenant.id,
+    };
+    setRankings((prev) => [newR, ...prev]);
+    triggerDemoToast('Ranking Creado', `El ranking "${newR.name}" ha sido creado con éxito.`, 'success');
+  };
+
+  const updateRanking = (id: string, updates: Partial<ClubRanking>) => {
+    setRankings((prev) =>
+      prev.map((r) => (r.id === id ? { ...r, ...updates } : r))
+    );
+  };
+
+  const linkTournamentToRanking = (rankingId: string, tournamentId: string) => {
+    setRankings((prev) =>
+      prev.map((r) => {
+        if (r.id !== rankingId) return r;
+        if (r.linkedTournamentIds.includes(tournamentId)) return r;
+        return { ...r, linkedTournamentIds: [...r.linkedTournamentIds, tournamentId] };
+      })
+    );
+    setTournaments((prev) =>
+      prev.map((t) => (t.id === tournamentId ? { ...t, rankingCategory: rankings.find(rk => rk.id === rankingId)?.name || t.rankingCategory } : t))
+    );
+    triggerDemoToast('Torneo Vinculado', 'El torneo ha sido vinculado al ranking con éxito.', 'success');
   };
 
   // Page blocks editor
@@ -1925,6 +1991,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
         openMatches,
         createOpenMatch,
+        updateOpenMatch,
         joinOpenMatch,
         leaveOpenMatch,
 
@@ -1932,7 +1999,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         academyGroups,
 
         tournaments,
+        createTournament,
+        updateTournament,
         registerTournamentTeam,
+
+        rankings,
+        createRanking,
+        updateRanking,
+        linkTournamentToRanking,
 
         products,
         cart,
