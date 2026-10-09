@@ -131,6 +131,20 @@ export function App() {
         setAdminTab('matches');
         return;
       }
+      if (
+        pathname === '/admin/reservas/todas' ||
+        pathname === '/gestion/todas-las-reservas' ||
+        pathname === '/admin/todas-las-reservas'
+      ) {
+        setCurrentView('admin');
+        setAdminTab('all_bookings');
+        return;
+      }
+      if (pathname === '/admin/reservas' || pathname === '/gestion/reservas') {
+        setCurrentView('admin');
+        setAdminTab('agenda');
+        return;
+      }
       if (pathname === '/admin/pistas' || pathname === '/gestion/pistas') {
         setCurrentView('admin');
         setAdminTab('courts_management');

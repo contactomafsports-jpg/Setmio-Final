@@ -32,6 +32,9 @@ import {
   Calculator,
   Upload,
   Smartphone,
+  ShoppingBag,
+  Info,
+  ExternalLink,
 } from 'lucide-react';
 
 interface LinkedChargeMeta {
@@ -55,6 +58,8 @@ export const AdminCafePOS: React.FC = () => {
     markBookingPaid,
     posPendingCharge,
     setPosPendingCharge,
+    setAdminTab,
+    t,
   } = useApp();
 
   const [activeCategory, setActiveCategory] = useState<string>('all');
@@ -115,6 +120,8 @@ export const AdminCafePOS: React.FC = () => {
   const [catalogModalOpen, setCatalogModalOpen] = useState(false);
   const [productFormModalOpen, setProductFormModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<CafeProduct | null>(null);
+  const [selectedProductDetail, setSelectedProductDetail] = useState<CafeProduct | null>(null);
+  const [productToDelete, setProductToDelete] = useState<CafeProduct | null>(null);
   const [productFormData, setProductFormData] = useState({
     name: '',
     category: 'Bebidas',
@@ -122,6 +129,33 @@ export const AdminCafePOS: React.FC = () => {
     stock: 50,
     imageUrl: '',
   });
+
+  const PRESET_PRODUCT_IMAGES = [
+    { label: 'Agua Mineral', url: 'https://images.unsplash.com/photo-1548839140-29a749e1bc4e?auto=format&fit=crop&w=400&q=80' },
+    { label: 'Isotónico / Powerade', url: 'https://images.unsplash.com/photo-1551024709-8f23befc6f87?auto=format&fit=crop&w=400&q=80' },
+    { label: 'Estrella Galicia 0,0', url: 'https://images.unsplash.com/photo-1608270546103-979c3d4e0e5a?auto=format&fit=crop&w=400&q=80' },
+    { label: 'Café Espresso', url: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=400&q=80' },
+    { label: 'Bocadillo Jamón Ibérico', url: 'https://images.unsplash.com/photo-1509722747041-616f39b57569?auto=format&fit=crop&w=400&q=80' },
+    { label: 'Barrita Proteica', url: 'https://images.unsplash.com/photo-1622484216805-4c0734cba8f0?auto=format&fit=crop&w=400&q=80' },
+    { label: 'Bote Bolas Head Pro S', url: 'https://images.unsplash.com/photo-1554068865-24cecd4e34b8?auto=format&fit=crop&w=400&q=80' },
+    { label: 'Overgrip Wilson Pro', url: 'https://images.unsplash.com/photo-1622163642998-1ea32b0bbc67?auto=format&fit=crop&w=400&q=80' },
+    { label: 'Pala de Pádel Pro', url: 'https://images.unsplash.com/photo-1612872087720-bb876e2e67d1?auto=format&fit=crop&w=400&q=80' },
+  ];
+
+  const getFallbackProductImage = (cat: string) => {
+    switch (cat) {
+      case 'Café':
+        return 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=400&q=80';
+      case 'Bocadillos':
+        return 'https://images.unsplash.com/photo-1509722747041-616f39b57569?auto=format&fit=crop&w=400&q=80';
+      case 'Snacks':
+        return 'https://images.unsplash.com/photo-1622484216805-4c0734cba8f0?auto=format&fit=crop&w=400&q=80';
+      case 'Grip/Pelotas':
+        return 'https://images.unsplash.com/photo-1554068865-24cecd4e34b8?auto=format&fit=crop&w=400&q=80';
+      default:
+        return 'https://images.unsplash.com/photo-1548839140-29a749e1bc4e?auto=format&fit=crop&w=400&q=80';
+    }
+  };
 
   // Sample club members for wallet assignment
   const demoMembers = [
@@ -449,6 +483,22 @@ export const AdminCafePOS: React.FC = () => {
             <span>Catálogo</span>
           </button>
 
+          {/* Enlace directo a Pedidos de Tienda (/admin/tienda/pedidos) */}
+          <button
+            type="button"
+            onClick={() => {
+              setAdminTab('shop');
+              if (typeof window !== 'undefined') {
+                window.history.pushState({}, '', '/admin/tienda/pedidos');
+              }
+            }}
+            className="px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs border border-slate-200/80 dark:border-slate-700/80 transition active:scale-95 cursor-pointer flex items-center justify-center gap-1.5"
+            title="Gestión de Pedidos de Tienda Online"
+          >
+            <ShoppingBag className="w-4 h-4 text-indigo-500 shrink-0" />
+            <span>{t('shop.viewOrders', 'Pedidos')}</span>
+          </button>
+
           {/* Contenedor dinámico del "Total Turno" */}
           <div className="p-2 sm:px-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800 text-center sm:text-right shadow-xs flex flex-col justify-center min-w-[95px]">
             <div className="text-[9px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">
@@ -498,6 +548,10 @@ export const AdminCafePOS: React.FC = () => {
                     <img
                       src={prod.imageUrl}
                       alt={prod.name}
+                      onError={(e) => {
+                        e.currentTarget.onerror = null;
+                        e.currentTarget.src = getFallbackProductImage(prod.category);
+                      }}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                   ) : (
@@ -505,6 +559,19 @@ export const AdminCafePOS: React.FC = () => {
                       <Coffee className="w-8 h-8 opacity-60" />
                     </div>
                   )}
+
+                  {/* Botón rápido ver detalle */}
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedProductDetail(prod);
+                    }}
+                    className="absolute bottom-1.5 right-1.5 p-1 rounded-lg bg-slate-900/70 hover:bg-slate-900 text-white transition z-10"
+                    title="Ver detalle del producto"
+                  >
+                    <Info className="w-3 h-3" />
+                  </button>
 
                   {/* Badge de Categoría Superpuesto en esquina superior izquierda */}
                   <span className="absolute top-1.5 left-1.5 px-2 py-0.5 rounded-md bg-slate-900/80 backdrop-blur-xs text-[9px] font-bold text-white uppercase tracking-wider shadow-xs">
@@ -861,13 +928,18 @@ export const AdminCafePOS: React.FC = () => {
               {cafeProducts.map((p) => (
                 <div
                   key={p.id}
-                  className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/80 flex items-center justify-between gap-3 text-xs"
+                  className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/80 flex items-center justify-between gap-3 text-xs hover:border-emerald-500/50 transition cursor-pointer"
+                  onClick={() => setSelectedProductDetail(p)}
                 >
                   <div className="flex items-center gap-3 min-w-0">
                     {p.imageUrl ? (
                       <img
                         src={p.imageUrl}
                         alt={p.name}
+                        onError={(e) => {
+                          e.currentTarget.onerror = null;
+                          e.currentTarget.src = getFallbackProductImage(p.category);
+                        }}
                         className="w-10 h-10 rounded-lg object-cover bg-slate-200 dark:bg-slate-700 shrink-0"
                       />
                     ) : (
@@ -885,15 +957,24 @@ export const AdminCafePOS: React.FC = () => {
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-3 shrink-0">
-                    <span className="font-mono font-bold text-sm text-slate-900 dark:text-white">
+                  <div className="flex items-center gap-2 shrink-0" onClick={(e) => e.stopPropagation()}>
+                    <span className="font-mono font-bold text-sm text-slate-900 dark:text-white mr-1">
                       {p.price.toFixed(2)} €
                     </span>
 
                     <button
                       type="button"
+                      onClick={() => setSelectedProductDetail(p)}
+                      className="p-1.5 rounded-lg bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-300 transition cursor-pointer"
+                      title="Ver detalle del producto"
+                    >
+                      <Info className="w-3.5 h-3.5" />
+                    </button>
+
+                    <button
+                      type="button"
                       onClick={() => openEditProductModal(p)}
-                      className="p-1.5 rounded-lg bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-emerald-500 hover:text-white transition"
+                      className="p-1.5 rounded-lg bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-emerald-500 hover:text-white transition cursor-pointer"
                       title="Editar producto"
                     >
                       <Edit2 className="w-3.5 h-3.5" />
@@ -901,12 +982,8 @@ export const AdminCafePOS: React.FC = () => {
 
                     <button
                       type="button"
-                      onClick={() => {
-                        if (confirm(`¿Retirar "${p.name}" del catálogo?`)) {
-                          deleteCafeProduct(p.id);
-                        }
-                      }}
-                      className="p-1.5 rounded-lg bg-slate-200 dark:bg-slate-700 text-rose-500 hover:bg-rose-600 hover:text-white transition"
+                      onClick={() => setProductToDelete(p)}
+                      className="p-1.5 rounded-lg bg-slate-200 dark:bg-slate-700 text-rose-500 hover:bg-rose-600 hover:text-white transition cursor-pointer"
                       title="Eliminar producto"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
@@ -990,25 +1067,53 @@ export const AdminCafePOS: React.FC = () => {
 
               <div>
                 <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
-                  Imagen del Producto (URL o Archivo Local)
+                  Imagen del Producto (URL, Archivo Local o Preset)
                 </label>
                 {productFormData.imageUrl && (
-                  <div className="relative mb-2 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-950 h-24 flex items-center justify-center">
+                  <div className="relative mb-2 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-950 h-28 flex items-center justify-center">
                     <img
                       src={productFormData.imageUrl}
                       alt="Vista previa"
+                      onError={(e) => {
+                        e.currentTarget.onerror = null;
+                        e.currentTarget.src = getFallbackProductImage(productFormData.category);
+                      }}
                       className="w-full h-full object-cover"
                     />
                     <button
                       type="button"
                       onClick={() => setProductFormData({ ...productFormData, imageUrl: '' })}
-                      className="absolute top-1.5 right-1.5 p-1 rounded-lg bg-black/60 text-white hover:bg-black transition text-xs"
+                      className="absolute top-1.5 right-1.5 p-1 rounded-lg bg-black/60 text-white hover:bg-black transition text-xs cursor-pointer"
                       title="Eliminar imagen"
                     >
                       <X className="w-3.5 h-3.5" />
                     </button>
                   </div>
                 )}
+
+                {/* Presets de imágenes de catálogo oficiales */}
+                <div className="mb-2">
+                  <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">
+                    Presets de imagen oficiales:
+                  </span>
+                  <div className="flex flex-wrap gap-1">
+                    {PRESET_PRODUCT_IMAGES.map((imgItem) => (
+                      <button
+                        key={imgItem.label}
+                        type="button"
+                        onClick={() => setProductFormData({ ...productFormData, imageUrl: imgItem.url })}
+                        className={`px-2 py-0.5 rounded-lg text-[10px] font-bold border transition cursor-pointer ${
+                          productFormData.imageUrl === imgItem.url
+                            ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-500 text-emerald-700 dark:text-emerald-300'
+                            : 'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-slate-300'
+                        }`}
+                      >
+                        {imgItem.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
                 <div className="flex gap-2">
                   <input
                     type="url"
@@ -1051,12 +1156,180 @@ export const AdminCafePOS: React.FC = () => {
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold shadow-xs"
+                  className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold shadow-xs cursor-pointer active:scale-95"
                 >
                   Guardar Producto
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* ======================================================================
+          MODAL: PÁGINA DE DETALLE COMPLETO DE PRODUCTO (Requisito Bloque 2)
+          ====================================================================== */}
+      {selectedProductDetail && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 backdrop-blur-sm p-4 animate-in fade-in duration-150">
+          <div className="relative w-full max-w-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl text-slate-900 dark:text-slate-100 space-y-5 max-h-[92vh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+              <div className="flex items-center gap-2">
+                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300">
+                  {selectedProductDetail.category}
+                </span>
+                <span className="text-xs font-mono text-slate-400">
+                  ID: #{selectedProductDetail.id}
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setSelectedProductDetail(null)}
+                className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Foto del Producto con Fallback Robusto */}
+            <div className="relative h-48 sm:h-56 rounded-2xl overflow-hidden bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+              <img
+                src={selectedProductDetail.imageUrl || getFallbackProductImage(selectedProductDetail.category)}
+                alt={selectedProductDetail.name}
+                onError={(e) => {
+                  e.currentTarget.onerror = null;
+                  e.currentTarget.src = getFallbackProductImage(selectedProductDetail.category);
+                }}
+                className="w-full h-full object-cover"
+              />
+              <span className="absolute bottom-2.5 left-2.5 px-3 py-1 rounded-xl bg-slate-950/80 backdrop-blur-xs text-xs font-mono font-black text-white">
+                {selectedProductDetail.price.toFixed(2)} €
+              </span>
+              <span className="absolute bottom-2.5 right-2.5 px-3 py-1 rounded-xl bg-white/90 dark:bg-slate-900/90 backdrop-blur-xs text-xs font-mono font-bold text-slate-800 dark:text-slate-200">
+                Stock: {selectedProductDetail.stock} unidades
+              </span>
+            </div>
+
+            <div>
+              <h2 className="text-lg font-black text-slate-900 dark:text-white">
+                {selectedProductDetail.name}
+              </h2>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                Producto registrado en el TPV y catálogo oficial de {currentTenant.name}.
+              </p>
+            </div>
+
+            {/* Ficha de datos y métricas */}
+            <div className="grid grid-cols-3 gap-2.5 text-center text-xs">
+              <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800">
+                <span className="text-[10px] text-slate-400 font-bold uppercase block">Precio Venta</span>
+                <span className="text-base font-black font-mono text-emerald-600 dark:text-emerald-400">
+                  {selectedProductDetail.price.toFixed(2)} €
+                </span>
+              </div>
+              <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800">
+                <span className="text-[10px] text-slate-400 font-bold uppercase block">Existencias</span>
+                <span className="text-base font-black font-mono text-slate-900 dark:text-white">
+                  {selectedProductDetail.stock} uds
+                </span>
+              </div>
+              <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800">
+                <span className="text-[10px] text-slate-400 font-bold uppercase block">Estado</span>
+                <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">
+                  {selectedProductDetail.active !== false ? 'Activo en Caja' : 'Inactivo'}
+                </span>
+              </div>
+            </div>
+
+            {/* Acciones principales: Editar todos los campos o Eliminar con confirmación */}
+            <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-3">
+              <button
+                type="button"
+                onClick={() => {
+                  const target = selectedProductDetail;
+                  setSelectedProductDetail(null);
+                  setProductToDelete(target);
+                }}
+                className="px-4 py-2.5 rounded-xl border border-rose-200 dark:border-rose-900/60 bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 hover:bg-rose-100 dark:hover:bg-rose-900/40 font-bold text-xs flex items-center gap-1.5 transition cursor-pointer"
+              >
+                <Trash2 className="w-4 h-4" />
+                <span>{t('shop.deleteProduct', 'Eliminar Producto')}</span>
+              </button>
+
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setSelectedProductDetail(null)}
+                  className="px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs"
+                >
+                  Cerrar
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const prod = selectedProductDetail;
+                    setSelectedProductDetail(null);
+                    openEditProductModal(prod);
+                  }}
+                  className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md flex items-center gap-1.5 cursor-pointer active:scale-95"
+                >
+                  <Edit2 className="w-3.5 h-3.5" />
+                  <span>Editar Todos los Campos</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ======================================================================
+          MODAL: CONFIRMACIÓN PREVIA PARA ELIMINAR PRODUCTO (Requisito Bloque 2)
+          ====================================================================== */}
+      {productToDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/75 backdrop-blur-xs p-4 animate-in fade-in duration-150">
+          <div className="w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl space-y-4">
+            <div className="w-12 h-12 rounded-2xl bg-rose-100 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center mx-auto">
+              <AlertCircle className="w-6 h-6" />
+            </div>
+
+            <div className="text-center space-y-1">
+              <h3 className="text-base font-black text-slate-900 dark:text-white">
+                {t('shop.deleteConfirmTitle', '¿Eliminar este producto?')}
+              </h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                {t(
+                  'shop.deleteConfirmDesc',
+                  'Esta acción retirará el artículo del catálogo del TPV y de la tienda online de forma permanente.'
+                )}
+              </p>
+              <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 mt-2 font-bold text-xs text-slate-800 dark:text-slate-200">
+                "{productToDelete.name}" · {productToDelete.price.toFixed(2)} €
+              </div>
+            </div>
+
+            <div className="pt-2 flex items-center justify-end gap-2.5">
+              <button
+                type="button"
+                onClick={() => setProductToDelete(null)}
+                className="px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 font-bold text-xs text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  deleteCafeProduct(productToDelete.id);
+                  triggerDemoToast(
+                    'Producto Eliminado',
+                    `"${productToDelete.name}" ha sido retirado del catálogo.`,
+                    'info'
+                  );
+                  setProductToDelete(null);
+                }}
+                className="px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs shadow-md transition cursor-pointer active:scale-95"
+              >
+                {t('shop.btnConfirmDelete', 'Sí, eliminar producto')}
+              </button>
+            </div>
           </div>
         </div>
       )}

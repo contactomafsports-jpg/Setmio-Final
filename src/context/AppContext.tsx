@@ -44,6 +44,90 @@ import { checkPermission, PermissionAction, PermissionCheckResult } from '../lib
 
 export type MainView = 'public' | 'admin' | 'player' | 'coach' | 'hq';
 
+export interface ClubVenue {
+  id: string; // 'all' or venue id
+  name: string;
+  shortName: string;
+  city: string;
+  address: string;
+  courtsCount: number;
+  indoorCourts: number;
+  outdoorCourts: number;
+  occupiedCourtsNow: number;
+  revenueToday: number;
+  revenueMonth: number;
+  isMain?: boolean;
+}
+
+export const INITIAL_VENUES: ClubVenue[] = [
+  {
+    id: 'all',
+    name: 'Todas las Sedes (Vista Consolidada)',
+    shortName: 'Todas las Sedes',
+    city: 'Red Multi-Sede Galicia',
+    address: '4 Instalaciones Deportivas Vinculadas',
+    courtsCount: 24,
+    indoorCourts: 18,
+    outdoorCourts: 6,
+    occupiedCourtsNow: 17,
+    revenueToday: 2480.0,
+    revenueMonth: 58240.0,
+  },
+  {
+    id: 'venue-san-mateo',
+    name: 'Sede Central · Centro de Pádel San Mateo',
+    shortName: 'Sede Narón (Central)',
+    city: 'Narón, A Coruña',
+    address: 'Pol. Ind. Río do Pozo, Avda. dos Padelistas 14',
+    courtsCount: 8,
+    indoorCourts: 7,
+    outdoorCourts: 1,
+    occupiedCourtsNow: 6,
+    revenueToday: 1275.5,
+    revenueMonth: 19290.0,
+    isMain: true,
+  },
+  {
+    id: 'venue-coruna',
+    name: 'Sede A Coruña · Matogrande Sport Club',
+    shortName: 'Sede A Coruña',
+    city: 'A Coruña',
+    address: 'Rúa Enrique Mariñas 32, Matogrande',
+    courtsCount: 6,
+    indoorCourts: 5,
+    outdoorCourts: 1,
+    occupiedCourtsNow: 5,
+    revenueToday: 590.0,
+    revenueMonth: 15400.0,
+  },
+  {
+    id: 'venue-santiago',
+    name: 'Sede Santiago · Compostela Padel Indoor',
+    shortName: 'Sede Santiago',
+    city: 'Santiago de Compostela',
+    address: 'Vía Edison 12, Polígono del Tambre',
+    courtsCount: 4,
+    indoorCourts: 4,
+    outdoorCourts: 0,
+    occupiedCourtsNow: 3,
+    revenueToday: 340.0,
+    revenueMonth: 11150.0,
+  },
+  {
+    id: 'venue-vigo',
+    name: 'Sede Vigo · Setmio Arena Rías Baixas',
+    shortName: 'Sede Vigo',
+    city: 'Vigo, Pontevedra',
+    address: 'Avda. de Madrid 88, Vigo',
+    courtsCount: 6,
+    indoorCourts: 2,
+    outdoorCourts: 4,
+    occupiedCourtsNow: 3,
+    revenueToday: 274.5,
+    revenueMonth: 12400.0,
+  },
+];
+
 export type PublicPage =
   | 'home'
   | 'features'
@@ -257,10 +341,20 @@ const readRoute = () => {
       admin = 'courts_management';
     } else if (remainingPath === '/admin/domotica' || remainingPath.startsWith('/admin/domotica/')) {
       admin = 'smart_courts';
+    } else if (remainingPath === '/admin/reservas/todas' || remainingPath.startsWith('/admin/reservas/todas') || remainingPath === '/gestion/todas-las-reservas') {
+      admin = 'all_bookings';
     } else if (remainingPath === '/admin/reservas' || remainingPath.startsWith('/admin/reservas/')) {
       admin = 'agenda';
-    } else if (remainingPath === '/admin/clientes' || remainingPath.startsWith('/admin/clientes/')) {
+    } else if (remainingPath === '/admin/clientes' || remainingPath.startsWith('/admin/clientes/') || remainingPath === '/admin/socios' || remainingPath.startsWith('/admin/socios/')) {
       admin = 'customers';
+    } else if (remainingPath === '/admin/partidas' || remainingPath.startsWith('/admin/partidas/')) {
+      admin = 'matches';
+    } else if (remainingPath === '/admin/tienda' || remainingPath.startsWith('/admin/tienda/')) {
+      admin = 'shop';
+    } else if (remainingPath === '/admin/tpv' || remainingPath.startsWith('/admin/tpv/')) {
+      admin = 'pos_cafe';
+    } else if (remainingPath === '/admin/ajustes' || remainingPath.startsWith('/admin/ajustes/')) {
+      admin = 'settings';
     }
     return {
       view: 'admin' as MainView,
@@ -449,6 +543,13 @@ interface AppContextType {
   switchTenant: (tenantId: string) => void;
   plans: Plan[];
   updatePlan: (planId: string, updated: Partial<Plan>) => void;
+
+  // Multi-Sede & Venues
+  venues: ClubVenue[];
+  selectedVenueId: string;
+  selectedVenue: ClubVenue;
+  setSelectedVenueId: (venueId: string) => void;
+  isConsolidatedView: boolean;
 
   // Auth & Roles & Permissions
   currentUser: UserSession;
@@ -743,13 +844,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     });
   }, []);
 
-  // 3. Tema del Panel Admin / HQ
+  // 3. Tema del Panel Admin / HQ (Predeterminado: Light Mode)
   const [adminTheme, setAdminThemeState] = useState<ThemeMode>(() => {
     try {
       const saved = localStorage.getItem('setmio_admin_theme') as ThemeMode;
-      return saved || 'dark';
+      return saved || 'light';
     } catch {
-      return 'dark';
+      return 'light';
     }
   });
 
@@ -908,6 +1009,28 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   });
 
   const currentTenant = tenants.find((t) => t.id === currentTenantId) || tenants[0];
+
+  // --- MULTI-SEDE / MULTI-CLUB STATE ---
+  const [venues] = useState<ClubVenue[]>(INITIAL_VENUES);
+  const [selectedVenueId, setSelectedVenueIdState] = useState<string>(() => {
+    try {
+      return localStorage.getItem('setmio_selected_venue_id') || 'all';
+    } catch {
+      return 'all';
+    }
+  });
+
+  const setSelectedVenueId = useCallback((venueId: string) => {
+    setSelectedVenueIdState(venueId);
+    try {
+      localStorage.setItem('setmio_selected_venue_id', venueId);
+    } catch {
+      // Ignore
+    }
+  }, []);
+
+  const selectedVenue = INITIAL_VENUES.find((v) => v.id === selectedVenueId) || INITIAL_VENUES[0];
+  const isConsolidatedView = selectedVenueId === 'all';
 
   // --- AISLAMIENTO DE TEMA SEGÚN ENTORNO ---
   const theme: ThemeMode =
@@ -1959,6 +2082,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         switchTenant,
         plans,
         updatePlan,
+
+        venues,
+        selectedVenueId,
+        selectedVenue,
+        setSelectedVenueId,
+        isConsolidatedView,
 
         currentUser,
         switchUserRole,

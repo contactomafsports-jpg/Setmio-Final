@@ -27,23 +27,28 @@ export const AllBookingsPage: React.FC<AllBookingsPageProps> = ({
 }) => {
   const { bookings, courts, setAdminTab, triggerDemoToast, navigateToPlayerProfile, t } = useApp();
 
-  // Scroll to top on enter
+  // Scroll to top on enter (Forzar scrollTop: 0 inmediato)
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
     }
   }, []);
 
   const [searchTerm, setSearchTerm] = useState('');
+  const [timeFilter, setTimeFilter] = useState<'all' | 'upcoming' | 'past'>('all');
   const [statusFilter, setStatusFilter] = useState<'all' | 'confirmed' | 'pending' | 'canceled'>('all');
   const [courtFilter, setCourtFilter] = useState<string>('all');
   const [dateFilter, setDateFilter] = useState<string>('');
   const [selectedDrawerBooking, setSelectedDrawerBooking] = useState<ReservationDrawerData | null>(null);
 
-  // Filter bookings
+  // Filter bookings with temporal state and payment filters
   const filteredBookings = useMemo(() => {
+    const now = new Date();
+
     return bookings.filter((b) => {
-      // Search by player name, court, PIN or date string
+      // 1. Search by player name, court, PIN or date string
       const term = searchTerm.toLowerCase().trim();
       const matchesSearch =
         !term ||
@@ -52,7 +57,17 @@ export const AllBookingsPage: React.FC<AllBookingsPageProps> = ({
         (b.accessPin && b.accessPin.toLowerCase().includes(term)) ||
         b.startTime.toLowerCase().includes(term);
 
-      // Filter by payment status
+      // 2. Filter by Temporal Status (Pasadas vs Futuras)
+      const bookingDate = new Date(b.endTime || b.startTime);
+      const isPast = !isNaN(bookingDate.getTime()) && bookingDate < now;
+      let matchesTime = true;
+      if (timeFilter === 'upcoming') {
+        matchesTime = !isPast;
+      } else if (timeFilter === 'past') {
+        matchesTime = isPast;
+      }
+
+      // 3. Filter by payment status
       let matchesStatus = true;
       if (statusFilter === 'confirmed') {
         matchesStatus = b.paymentStatus === 'paid' || (b.status === 'confirmed' && b.paymentStatus !== 'pending' && b.paymentStatus !== 'partially_paid');
@@ -62,15 +77,15 @@ export const AllBookingsPage: React.FC<AllBookingsPageProps> = ({
         matchesStatus = b.status === 'canceled';
       }
 
-      // Filter by court
+      // 4. Filter by court
       const matchesCourt = courtFilter === 'all' || b.courtId === courtFilter;
 
-      // Filter by date
+      // 5. Filter by date
       const matchesDate = !dateFilter || b.startTime.startsWith(dateFilter);
 
-      return matchesSearch && matchesStatus && matchesCourt && matchesDate;
+      return matchesSearch && matchesTime && matchesStatus && matchesCourt && matchesDate;
     });
-  }, [bookings, searchTerm, statusFilter, courtFilter, dateFilter]);
+  }, [bookings, searchTerm, timeFilter, statusFilter, courtFilter, dateFilter]);
 
   // Convert Booking to Drawer & ListItem data
   const mapBookingToItemData = (b: Booking): BookingListItemData => {
@@ -164,7 +179,7 @@ export const AllBookingsPage: React.FC<AllBookingsPageProps> = ({
               className="px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold text-xs transition flex items-center gap-1.5 cursor-pointer shadow-xs border border-slate-200 dark:border-slate-700"
             >
               <Calendar className="w-3.5 h-3.5 text-slate-500" />
-              <span>{t('allBookings.backBtn', 'Ir a Cuadrante')}</span>
+              <span>{t('allBookings.agendaBtn', 'Agenda')}</span>
             </button>
           )}
 
@@ -177,10 +192,10 @@ export const AllBookingsPage: React.FC<AllBookingsPageProps> = ({
                 triggerDemoToast('Nueva Reserva', 'Abriendo formulario de creación de reserva.', 'info');
               }
             }}
-            className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md flex items-center gap-1.5 transition active:scale-95 cursor-pointer"
+            className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md flex items-center gap-1.5 transition active:scale-95 cursor-pointer"
           >
             <Plus className="w-4 h-4" />
-            <span>{t('bookings.newBtn', 'Nueva Reserva')}</span>
+            <span>{t('allBookings.newShortBtn', 'Nueva')}</span>
           </button>
         </div>
       </div>
@@ -226,7 +241,7 @@ export const AllBookingsPage: React.FC<AllBookingsPageProps> = ({
 
       {/* CONTENEDOR UNIFICADO: BUSCADOR, FILTROS Y LISTA DE RESERVAS */}
       <div className="bg-white dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 rounded-2xl p-4 sm:p-5 shadow-sm space-y-4">
-        {/* Fila de Filtros y Buscador */}
+        {/* Fila 1: Buscador y Selectores de Pista / Fecha (Estilo Minimalista) */}
         <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3">
           {/* Buscador en tiempo real por nombre de jugador, pista o PIN */}
           <div className="relative flex-1 min-w-0">
@@ -236,7 +251,7 @@ export const AllBookingsPage: React.FC<AllBookingsPageProps> = ({
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Buscar por titular, pista o PIN de acceso..."
-              className="w-full pl-9 pr-8 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-emerald-500 transition"
+              className="w-full pl-9 pr-8 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700/80 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-emerald-500 transition shadow-2xs"
             />
             {searchTerm && (
               <button
@@ -249,12 +264,12 @@ export const AllBookingsPage: React.FC<AllBookingsPageProps> = ({
             )}
           </div>
 
-          {/* Selector de Pista y Selector de Fecha Móvil (Flex-wrap anti-overflow) */}
+          {/* Selector de Pista y Selector de Fecha */}
           <div className="flex flex-wrap sm:flex-nowrap items-center gap-2">
             <select
               value={courtFilter}
               onChange={(e) => setCourtFilter(e.target.value)}
-              className="flex-1 sm:flex-none px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 transition font-medium min-w-[130px]"
+              className="flex-1 sm:flex-none px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700/80 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 transition font-medium min-w-[140px] shadow-2xs cursor-pointer"
             >
               <option value="all">Todas las Pistas</option>
               {courts.map((court) => (
@@ -264,13 +279,13 @@ export const AllBookingsPage: React.FC<AllBookingsPageProps> = ({
               ))}
             </select>
 
-            {/* Selector de Fecha Responsivo Móvil */}
+            {/* Selector de Fecha */}
             <div className="flex items-center gap-1 flex-1 sm:flex-none min-w-0">
               <input
                 type="date"
                 value={dateFilter}
                 onChange={(e) => setDateFilter(e.target.value)}
-                className="w-full sm:w-auto px-2.5 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 transition font-medium max-w-[145px]"
+                className="w-full sm:w-auto px-2.5 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700/80 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 transition font-medium max-w-[145px] shadow-2xs cursor-pointer"
                 title="Filtrar por fecha específica"
               />
               {dateFilter && (
@@ -286,62 +301,108 @@ export const AllBookingsPage: React.FC<AllBookingsPageProps> = ({
           </div>
         </div>
 
-        {/* Selectores de Estado: Cuadrícula fija sin scroll horizontal y centrada */}
-        <div className="pt-2 border-t border-slate-100 dark:border-slate-700/60 space-y-1.5">
-          <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-0.5">
-            Filtrar por Estado
+        {/* Fila 2: Segmented Controls Minimalistas (Estado Temporal + Estado de Pago) */}
+        <div className="pt-2 border-t border-slate-100 dark:border-slate-700/60 grid grid-cols-1 md:grid-cols-2 gap-3">
+          {/* 1. Filtro Temporal: Pasadas vs Futuras */}
+          <div className="space-y-1">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-0.5">
+              Estado Temporal
+            </span>
+            <div className="inline-flex w-full p-1 bg-slate-100 dark:bg-slate-900/90 rounded-xl border border-slate-200/80 dark:border-slate-800 text-xs gap-1">
+              <button
+                type="button"
+                onClick={() => setTimeFilter('all')}
+                className={`flex-1 py-1.5 px-2 rounded-lg font-bold text-[11px] transition text-center cursor-pointer ${
+                  timeFilter === 'all'
+                    ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-xs'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                }`}
+              >
+                {t('allBookings.timeFilter.all', 'Todas')}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setTimeFilter('upcoming')}
+                className={`flex-1 py-1.5 px-2 rounded-lg font-bold text-[11px] transition text-center cursor-pointer flex items-center justify-center gap-1 ${
+                  timeFilter === 'upcoming'
+                    ? 'bg-emerald-600 text-white shadow-xs'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400'
+                }`}
+              >
+                <Clock className="w-3 h-3" />
+                <span>{t('allBookings.timeFilter.upcoming', 'Futuras / Pendientes')}</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setTimeFilter('past')}
+                className={`flex-1 py-1.5 px-2 rounded-lg font-bold text-[11px] transition text-center cursor-pointer flex items-center justify-center gap-1 ${
+                  timeFilter === 'past'
+                    ? 'bg-slate-800 dark:bg-slate-700 text-white shadow-xs'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                }`}
+              >
+                <CheckCircle2 className="w-3 h-3" />
+                <span>{t('allBookings.timeFilter.past', 'Pasadas / Efectuadas')}</span>
+              </button>
+            </div>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
-            <button
-              type="button"
-              onClick={() => setStatusFilter('all')}
-              className={`py-2 px-2.5 rounded-xl font-bold transition text-xs flex items-center justify-center text-center cursor-pointer ${
-                statusFilter === 'all'
-                  ? 'bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 shadow-xs'
-                  : 'bg-slate-100 dark:bg-slate-700/70 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
-              }`}
-            >
-              Todas ({bookings.length})
-            </button>
 
-            <button
-              type="button"
-              onClick={() => setStatusFilter('confirmed')}
-              className={`py-2 px-2.5 rounded-xl font-bold transition text-xs flex items-center justify-center gap-1.5 text-center cursor-pointer ${
-                statusFilter === 'confirmed'
-                  ? 'bg-emerald-600 text-white shadow-xs'
-                  : 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 border border-emerald-500/20'
-              }`}
-            >
-              <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
-              <span className="truncate">Pagadas ({confirmedCount})</span>
-            </button>
+          {/* 2. Filtro de Estado de Pago */}
+          <div className="space-y-1">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-0.5">
+              Estado de Pago
+            </span>
+            <div className="inline-flex w-full p-1 bg-slate-100 dark:bg-slate-900/90 rounded-xl border border-slate-200/80 dark:border-slate-800 text-xs gap-1">
+              <button
+                type="button"
+                onClick={() => setStatusFilter('all')}
+                className={`flex-1 py-1.5 px-1.5 rounded-lg font-bold text-[11px] transition text-center cursor-pointer ${
+                  statusFilter === 'all'
+                    ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-xs'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                }`}
+              >
+                {t('allBookings.paymentFilter.all', 'Todos')}
+              </button>
 
-            <button
-              type="button"
-              onClick={() => setStatusFilter('pending')}
-              className={`py-2 px-2.5 rounded-xl font-bold transition text-xs flex items-center justify-center gap-1.5 text-center cursor-pointer ${
-                statusFilter === 'pending'
-                  ? 'bg-amber-600 text-white shadow-xs'
-                  : 'bg-amber-50 dark:bg-amber-950/50 text-amber-800 dark:text-amber-300 hover:bg-amber-100 dark:hover:bg-amber-900/60 border border-amber-500/20'
-              }`}
-            >
-              <AlertCircle className="w-3.5 h-3.5 shrink-0" />
-              <span className="truncate">Pendientes ({pendingCount})</span>
-            </button>
+              <button
+                type="button"
+                onClick={() => setStatusFilter('confirmed')}
+                className={`flex-1 py-1.5 px-1.5 rounded-lg font-bold text-[11px] transition text-center cursor-pointer ${
+                  statusFilter === 'confirmed'
+                    ? 'bg-emerald-600 text-white shadow-xs'
+                    : 'text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/40'
+                }`}
+              >
+                Pagadas
+              </button>
 
-            <button
-              type="button"
-              onClick={() => setStatusFilter('canceled')}
-              className={`py-2 px-2.5 rounded-xl font-bold transition text-xs flex items-center justify-center gap-1.5 text-center cursor-pointer ${
-                statusFilter === 'canceled'
-                  ? 'bg-rose-600 text-white shadow-xs'
-                  : 'bg-rose-50 dark:bg-rose-950/50 text-rose-700 dark:text-rose-300 hover:bg-rose-100 dark:hover:bg-rose-900/60 border border-rose-500/20'
-              }`}
-            >
-              <XCircle className="w-3.5 h-3.5 shrink-0" />
-              <span className="truncate">Canceladas ({bookings.filter((b) => b.status === 'canceled').length})</span>
-            </button>
+              <button
+                type="button"
+                onClick={() => setStatusFilter('pending')}
+                className={`flex-1 py-1.5 px-1.5 rounded-lg font-bold text-[11px] transition text-center cursor-pointer ${
+                  statusFilter === 'pending'
+                    ? 'bg-amber-600 text-white shadow-xs'
+                    : 'text-amber-700 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/40'
+                }`}
+              >
+                Pendientes
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setStatusFilter('canceled')}
+                className={`flex-1 py-1.5 px-1.5 rounded-lg font-bold text-[11px] transition text-center cursor-pointer ${
+                  statusFilter === 'canceled'
+                    ? 'bg-rose-600 text-white shadow-xs'
+                    : 'text-rose-700 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40'
+                }`}
+              >
+                Canceladas
+              </button>
+            </div>
           </div>
         </div>
 

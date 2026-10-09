@@ -77,7 +77,7 @@ export const ReservationDrawer: React.FC<ReservationDrawerProps> = ({
   onCancelReservation,
   onOpenPlayerProfile,
 }) => {
-  const { currentTenant, courts, setAdminTab, triggerDemoToast, setPosPendingCharge, navigateToPlayerProfile, updateBooking, t } = useApp();
+  const { currentTenant, courts, setAdminTab, triggerDemoToast, setPosPendingCharge, navigateToPlayerProfile, updateBooking, language, t } = useApp();
   const [copiedPin, setCopiedPin] = useState(false);
   const [isReassigning, setIsReassigning] = useState(false);
   const [tpvChoiceModal, setTpvChoiceModal] = useState(false);
@@ -102,6 +102,29 @@ export const ReservationDrawer: React.FC<ReservationDrawerProps> = ({
   const pinCode = reservation.accessPin || '4821#';
   const displayTime = reservation.timeSlot || `${reservation.startTime} - ${reservation.endTime || ''}`;
   const sportType = reservation.sport || 'Pádel Indoor WPT';
+
+  // Explicit reservation date calculation
+  const rawDateString = reservation.startTime.includes('T')
+    ? reservation.startTime.split('T')[0]
+    : reservation.startTime.split(' ')[0] || new Date().toISOString().split('T')[0];
+
+  const parsedDate = new Date(reservation.startTime.includes('T') ? reservation.startTime : `${rawDateString}T12:00:00`);
+  const formattedExplicitDate = !isNaN(parsedDate.getTime())
+    ? parsedDate.toLocaleDateString(language === 'en' ? 'en-US' : 'es-ES', {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+      })
+    : rawDateString;
+
+  // Has the reservation already elapsed or is it pending/upcoming?
+  const now = new Date();
+  const endDateTime = reservation.endTime
+    ? new Date(reservation.endTime.includes('T') ? reservation.endTime : `${rawDateString}T${reservation.endTime}:00`)
+    : parsedDate;
+
+  const isPast = !isNaN(endDateTime.getTime()) && endDateTime < now;
 
   // Default participants list if not provided
   const participants: ReservationDrawerParticipant[] = reservation.participants && reservation.participants.length > 0
@@ -260,14 +283,34 @@ export const ReservationDrawer: React.FC<ReservationDrawerProps> = ({
               <Calendar className="w-6 h-6" />
             </div>
             <div className="min-w-0">
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <h3 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white truncate">
                   {reservation.courtName}
                 </h3>
                 <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
                   {sportType}
                 </span>
+
+                {/* Badge Explícito: Transcurrida vs Pendiente */}
+                {isPast ? (
+                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 shadow-2xs">
+                    <CheckCircle2 className="w-3 h-3 text-slate-400" />
+                    <span>{t('booking.status_past', 'Reserva Pasada / Efectuada')}</span>
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30 shadow-2xs">
+                    <Clock className="w-3 h-3 text-emerald-500 animate-pulse" />
+                    <span>{t('booking.status_upcoming', 'Reserva Pendiente / Próxima')}</span>
+                  </span>
+                )}
               </div>
+
+              {/* Fecha Explícita de la Reserva */}
+              <div className="flex items-center gap-1.5 text-xs font-bold text-slate-800 dark:text-slate-200 mt-1 capitalize">
+                <Calendar className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                <span>{formattedExplicitDate}</span>
+              </div>
+
               <div className="flex items-center gap-2 text-xs font-semibold text-emerald-600 dark:text-emerald-400 mt-0.5">
                 <Clock className="w-3.5 h-3.5 shrink-0" />
                 <span>{displayTime}</span>

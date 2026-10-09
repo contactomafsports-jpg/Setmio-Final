@@ -62,9 +62,9 @@ export const AdminCourtsManagement: React.FC<AdminCourtsManagementProps> = ({
     }
   }, [initialTab]);
 
-  // Inventory Filters & State
-  const [search, setSearch] = useState('');
-  const [filterType, setFilterType] = useState<'all' | 'indoor' | 'outdoor' | 'covered'>('all');
+  // Inventory Filters & State (Segmented Controls Minimalistas)
+  const [formatFilter, setFormatFilter] = useState<'all' | 'double' | 'single'>('all');
+  const [locationFilter, setLocationFilter] = useState<'all' | 'indoor' | 'outdoor'>('all');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [editingCourt, setEditingCourt] = useState<Court | null>(null);
   const [deletingCourtId, setDeletingCourtId] = useState<string | null>(null);
@@ -206,11 +206,15 @@ export const AdminCourtsManagement: React.FC<AdminCourtsManagementProps> = ({
   };
 
   const filteredCourts = courts.filter((c) => {
-    const matchesSearch =
-      c.name.toLowerCase().includes(search.toLowerCase()) ||
-      c.surface.toLowerCase().includes(search.toLowerCase());
-    const matchesType = filterType === 'all' || c.courtType === filterType;
-    return matchesSearch && matchesType;
+    // Formato: Doble vs Individual
+    if (formatFilter === 'double' && c.isSingle) return false;
+    if (formatFilter === 'single' && !c.isSingle) return false;
+
+    // Ubicación: Indoor vs Outdoor (sin opciones obsoletas)
+    if (locationFilter === 'indoor' && c.courtType !== 'indoor' && c.courtType !== 'covered') return false;
+    if (locationFilter === 'outdoor' && c.courtType !== 'outdoor') return false;
+
+    return true;
   });
 
   const filteredDevices = smartDevices.filter((d) => {
@@ -368,40 +372,60 @@ export const AdminCourtsManagement: React.FC<AdminCourtsManagementProps> = ({
           ====================================================================== */}
       {activeTab === 'inventory' && (
         <div className="space-y-6 animate-in fade-in duration-150">
-          {/* Barra de Búsqueda y Filtros */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-xs">
-            <div className="relative w-full sm:w-80">
-              <Search className="absolute left-3 top-2.5 w-4 h-4 text-slate-400" />
-              <input
-                type="text"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Buscar pista o superficie..."
-                className="w-full pl-9 pr-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-emerald-500 transition"
-              />
+          {/* Filtros por Pestañas / Píldoras Minimalistas (Sin caja de búsqueda) */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-3.5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-xs">
+            {/* 1. Formato: Doble vs Individual */}
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 shrink-0">
+                Formato:
+              </span>
+              <div className="inline-flex p-1 bg-slate-100 dark:bg-slate-950 rounded-xl border border-slate-200/80 dark:border-slate-800 text-xs gap-1">
+                {(['all', 'double', 'single'] as const).map((fmt) => (
+                  <button
+                    key={fmt}
+                    type="button"
+                    onClick={() => setFormatFilter(fmt)}
+                    className={`py-1 px-3 rounded-lg font-bold text-xs transition cursor-pointer ${
+                      formatFilter === fmt
+                        ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-xs'
+                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                    }`}
+                  >
+                    {fmt === 'all'
+                      ? t('courts.filter_all_formats', 'Todos')
+                      : fmt === 'double'
+                      ? t('courts.filter_double', 'Doble')
+                      : t('courts.filter_single', 'Individual')}
+                  </button>
+                ))}
+              </div>
             </div>
 
-            <div className="flex items-center gap-1.5 overflow-x-auto w-full sm:w-auto">
-              {(['all', 'indoor', 'outdoor', 'covered'] as const).map((tType) => (
-                <button
-                  key={tType}
-                  type="button"
-                  onClick={() => setFilterType(tType)}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition whitespace-nowrap cursor-pointer ${
-                    filterType === tType
-                      ? 'bg-emerald-600 text-white shadow-xs'
-                      : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-                  }`}
-                >
-                  {tType === 'all'
-                    ? 'Todas'
-                    : tType === 'indoor'
-                    ? 'Indoor'
-                    : tType === 'outdoor'
-                    ? 'Outdoor'
-                    : 'Cubierta'}
-                </button>
-              ))}
+            {/* 2. Ubicación: Indoor vs Outdoor */}
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 shrink-0">
+                Ubicación:
+              </span>
+              <div className="inline-flex p-1 bg-slate-100 dark:bg-slate-950 rounded-xl border border-slate-200/80 dark:border-slate-800 text-xs gap-1">
+                {(['all', 'indoor', 'outdoor'] as const).map((loc) => (
+                  <button
+                    key={loc}
+                    type="button"
+                    onClick={() => setLocationFilter(loc)}
+                    className={`py-1 px-3 rounded-lg font-bold text-xs transition cursor-pointer ${
+                      locationFilter === loc
+                        ? 'bg-emerald-600 text-white shadow-xs'
+                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                    }`}
+                  >
+                    {loc === 'all'
+                      ? t('courts.filter_all_locations', 'Todas')
+                      : loc === 'indoor'
+                      ? t('courts.filter_indoor', 'Indoor')
+                      : t('courts.filter_outdoor', 'Outdoor')}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
 

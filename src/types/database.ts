@@ -246,6 +246,18 @@ export interface Booking {
   isScoreHiddenInPublicProfile?: boolean;
 }
 
+export interface OpenMatchSlotRequest {
+  id: string;
+  playerName: string;
+  playerLevel: number;
+  playerEmail?: string;
+  playerPhone?: string;
+  position?: 'drive' | 'reves' | 'both';
+  status: 'pending' | 'accepted' | 'rejected';
+  requestedAt: string;
+  paid?: boolean;
+}
+
 export interface OpenMatch {
   id: string;
   tenantId: string;
@@ -262,12 +274,21 @@ export interface OpenMatch {
   mode?: 'competitive' | 'friendly';
   matchScore?: string;
   isScoreHiddenInPublicProfile?: boolean;
+  visibility?: 'public' | 'private' | 'group';
+  restrictedGroupId?: string;
+  restrictedGroupName?: string;
+  gender?: 'male' | 'female' | 'mixed';
+  isClubCreated?: boolean;
+  paymentPolicy?: 'online_only' | 'counter_only' | 'both';
+  paymentMode?: 'split' | 'single';
+  slotRequests?: OpenMatchSlotRequest[];
   players: {
     id: string;
     name: string;
     level: number;
     position: 'drive' | 'reves' | 'both';
     paid: boolean;
+    customPrice?: number;
   }[];
 }
 

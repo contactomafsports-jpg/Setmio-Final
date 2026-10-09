@@ -16,6 +16,7 @@ import {
   CheckCircle2,
   X,
   ArrowRight,
+  FileSpreadsheet,
 } from 'lucide-react';
 
 export const AdminAgenda: React.FC = () => {
@@ -292,12 +293,32 @@ export const AdminAgenda: React.FC = () => {
             </button>
           </div>
 
-          {/* Botón Nueva Reserva: Sin icono + redundante */}
+          {/* Botón Prominente Todas las Reservas */}
+          <button
+            type="button"
+            onClick={() => {
+              if (typeof window !== 'undefined') {
+                window.history.pushState({}, '', '/admin/reservas/todas');
+              }
+              setShowAllBookingsView(true);
+              if (typeof window !== 'undefined') {
+                window.scrollTo({ top: 0, behavior: 'instant' });
+              }
+            }}
+            className="px-3.5 py-2 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-emerald-500/50 hover:bg-slate-50 dark:hover:bg-slate-800/80 text-slate-800 dark:text-slate-200 hover:text-emerald-600 dark:hover:text-emerald-400 font-bold text-xs transition shadow-2xs flex items-center gap-1.5 cursor-pointer active:scale-95 shrink-0"
+          >
+            <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-500" />
+            <span className="hidden sm:inline">Todas las Reservas</span>
+            <span className="sm:hidden">Todas</span>
+          </button>
+
+          {/* Botón Nueva Reserva */}
           <button
             type="button"
             onClick={() => setShowNewModal(true)}
-            className="px-4 py-2 rounded-2xl bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-black text-xs shadow-sm transition shrink-0 whitespace-nowrap cursor-pointer"
+            className="px-4 py-2 rounded-2xl bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-black text-xs shadow-sm transition shrink-0 whitespace-nowrap cursor-pointer flex items-center gap-1.5"
           >
+            <Plus className="w-3.5 h-3.5" />
             <span>Nueva Reserva</span>
           </button>
         </div>
@@ -415,21 +436,6 @@ export const AdminAgenda: React.FC = () => {
               {dayBookings.length}
             </span>
           </div>
-
-          <button
-            type="button"
-            onClick={() => {
-              setShowAllBookingsView(true);
-              if (typeof window !== 'undefined') {
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-              }
-            }}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-700/80 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 hover:text-emerald-600 dark:hover:text-emerald-400 font-bold text-xs transition border border-slate-200/80 dark:border-slate-600/60 shadow-xs cursor-pointer active:scale-95 shrink-0"
-          >
-            <span className="hidden sm:inline">Historial Completo / Todas las Reservas</span>
-            <span className="sm:hidden">Ver Todas</span>
-            <ArrowRight className="w-3.5 h-3.5 text-emerald-500" />
-          </button>
         </div>
 
         {/* Listado con el componente unificado BookingListItem */}

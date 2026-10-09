@@ -43,6 +43,8 @@ import {
   Wallet,
   Shield,
   Award,
+  Truck,
+  Package,
 } from 'lucide-react';
 
 export interface DaySchedule {
@@ -65,9 +67,9 @@ const DEFAULT_WEEKLY_SCHEDULE: DaySchedule[] = [
 export const AdminSettings: React.FC = () => {
   const { currentTenant, updateCurrentTenant, triggerDemoToast, theme, setTheme, setAdminTab, courts, language, t } = useApp();
 
-  const [activeSection, setActiveSection] = useState<'general' | 'payments' | 'promos' | 'ai'>('general');
+  const [activeSection, setActiveSection] = useState<'general' | 'payments' | 'promos' | 'ai' | 'shipping'>('general');
 
-  // URL route sync for /gestion/ajustes/ia, /admin/ajustes/pagos, etc.
+  // URL route sync for /gestion/ajustes/ia, /admin/ajustes/pagos, /admin/ajustes/envios, etc.
   useEffect(() => {
     const handleUrlSettings = () => {
       const pathname = typeof window !== 'undefined' ? window.location.pathname : '';
@@ -77,6 +79,8 @@ export const AdminSettings: React.FC = () => {
         setActiveSection('payments');
       } else if (pathname.includes('/cupones') || pathname.includes('/bonos') || pathname.includes('/promociones')) {
         setActiveSection('promos');
+      } else if (pathname.includes('/envios') || pathname.includes('/shipping') || pathname.includes('/logistica')) {
+        setActiveSection('shipping');
       } else if (pathname === '/gestion/ajustes' || pathname === '/gestion/configuracion' || pathname === '/admin/ajustes') {
         setActiveSection('general');
       }
@@ -225,6 +229,38 @@ export const AdminSettings: React.FC = () => {
     setNewVoucherForm({ title: '', classesCount: 5, price: 110, validityDays: 60 });
     setShowAddVoucherModal(false);
     triggerDemoToast('Bono de Clases Creado', `Bono "${item.title}" disponible para venta.`, 'success');
+  };
+
+  // Shipping & Logistics Configuration State
+  const [shippingConfig, setShippingConfig] = useState({
+    mode: 'flat_rate' as 'flat_rate' | 'custom' | 'api',
+    flatRatePrice: 4.90,
+    freeShippingThreshold: 60.00,
+    enableFreeShipping: true,
+    rates: [
+      { id: 'r-1', zone: 'Local / Ferrolterra (A Coruña)', price: 2.90, estimatedDays: '24h' },
+      { id: 'r-2', zone: 'Península (España y Portugal)', price: 4.90, estimatedDays: '24-48h' },
+      { id: 'r-3', zone: 'Baleares y Canarias', price: 8.90, estimatedDays: '48-72h' },
+      { id: 'r-4', zone: 'Internacional / UE', price: 14.50, estimatedDays: '3-5 días' },
+    ],
+    apiIntegration: {
+      carrier: 'correos_express' as 'correos_express' | 'seur' | 'gls' | 'dhl' | 'mrw' | 'sendcloud',
+      accountNumber: 'SETMIO-CX-8842',
+      apiKey: 'cx_live_9f82d1c098e721a',
+      connected: true,
+      pickupAddress: 'Pistas Centrales San Mateo, Narón',
+      autoLabelGeneration: true,
+      trackingSms: true,
+    },
+  });
+
+  const handleSaveShippingConfig = (e: React.FormEvent) => {
+    e.preventDefault();
+    triggerDemoToast(
+      'Configuración de Envíos Guardada',
+      `Modalidad (${shippingConfig.mode === 'flat_rate' ? 'Precio Único' : shippingConfig.mode === 'custom' ? 'Tarifas Personalizadas' : 'Integración Logística API'}) guardada en los ajustes del club.`,
+      'success'
+    );
   };
 
   // Modal: Bloqueo de Pistas por Rangos de Fecha y Hora
@@ -479,6 +515,19 @@ export const AdminSettings: React.FC = () => {
           <span className="px-1.5 py-0.2 rounded bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 font-mono text-[9px] font-black">
             NUEVO
           </span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveSection('shipping')}
+          className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 cursor-pointer ${
+            activeSection === 'shipping'
+              ? 'bg-emerald-600 text-white shadow-xs'
+              : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800 hover:border-slate-300'
+          }`}
+        >
+          <Truck className="w-4 h-4 text-emerald-500" />
+          <span>{t('shop.shippingSettings', 'Configuración de Envíos')}</span>
         </button>
       </div>
 
@@ -1965,6 +2014,300 @@ export const AdminSettings: React.FC = () => {
               <Save className="w-4 h-4" />
               <span>Guardar Configuración de IA Multicanal</span>
             </button>
+          </div>
+        </form>
+      )}
+
+      {/* ======================================================================
+          PESTAÑA 5: CONFIGURACIÓN DE ENVÍOS Y LOGÍSTICA (Requisito Bloque 2)
+          ====================================================================== */}
+      {activeSection === 'shipping' && (
+        <form onSubmit={handleSaveShippingConfig} className="space-y-6 text-xs animate-in fade-in duration-150">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-6 shadow-xs space-y-6">
+            <div className="border-b border-slate-100 dark:border-slate-800 pb-4">
+              <div className="flex items-center gap-2">
+                <Truck className="w-5 h-5 text-emerald-500" />
+                <h2 className="text-base font-black text-slate-900 dark:text-white">
+                  {t('shop.shippingSettings', 'Configuración de Gastos de Envío & Logística')}
+                </h2>
+              </div>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                Define las tarifas aplicadas a las compras de material en la tienda online y envíos a socios: precio único, tarifas personalizadas o sincronización API con transportistas.
+              </p>
+            </div>
+
+            {/* 1. Modalidad de Envíos */}
+            <div className="space-y-3">
+              <label className="block font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider text-[11px]">
+                Modalidad de Tarifas de Envío
+              </label>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <button
+                  type="button"
+                  onClick={() => setShippingConfig({ ...shippingConfig, mode: 'flat_rate' })}
+                  className={`p-4 rounded-2xl border text-left transition cursor-pointer ${
+                    shippingConfig.mode === 'flat_rate'
+                      ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-500 text-emerald-900 dark:text-emerald-200 font-bold shadow-2xs'
+                      : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400'
+                  }`}
+                >
+                  <div className="text-xs font-bold mb-1 flex items-center gap-1.5">
+                    <Package className="w-4 h-4 text-emerald-500" />
+                    <span>{t('shop.shippingFlatRate', 'Precio Único / Tarifa Plana')}</span>
+                  </div>
+                  <p className="text-[11px] text-slate-500 font-normal leading-relaxed">
+                    Coste fijo por expedición nacional con umbral para portes gratis.
+                  </p>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setShippingConfig({ ...shippingConfig, mode: 'custom' })}
+                  className={`p-4 rounded-2xl border text-left transition cursor-pointer ${
+                    shippingConfig.mode === 'custom'
+                      ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-500 text-emerald-900 dark:text-emerald-200 font-bold shadow-2xs'
+                      : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400'
+                  }`}
+                >
+                  <div className="text-xs font-bold mb-1 flex items-center gap-1.5">
+                    <Layers className="w-4 h-4 text-indigo-500" />
+                    <span>{t('shop.shippingCustomRates', 'Tarifas Personalizadas')}</span>
+                  </div>
+                  <p className="text-[11px] text-slate-500 font-normal leading-relaxed">
+                    Diferenciación de coste según zona geográfica y destino.
+                  </p>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setShippingConfig({ ...shippingConfig, mode: 'api' })}
+                  className={`p-4 rounded-2xl border text-left transition cursor-pointer ${
+                    shippingConfig.mode === 'api'
+                      ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-500 text-emerald-900 dark:text-emerald-200 font-bold shadow-2xs'
+                      : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400'
+                  }`}
+                >
+                  <div className="text-xs font-bold mb-1 flex items-center gap-1.5">
+                    <Zap className="w-4 h-4 text-amber-500" />
+                    <span>{t('shop.shippingLogisticsApi', 'Integración Plataformas (API)')}</span>
+                  </div>
+                  <p className="text-[11px] text-slate-500 font-normal leading-relaxed">
+                    Conexión directa con Correos Express, SEUR, GLS o Sendcloud.
+                  </p>
+                </button>
+              </div>
+            </div>
+
+            {/* Configuración según modalidad */}
+            {shippingConfig.mode === 'flat_rate' && (
+              <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                      Tarifa Plana Estándar Península (€)
+                    </label>
+                    <input
+                      type="number"
+                      step="0.10"
+                      min="0"
+                      value={shippingConfig.flatRatePrice}
+                      onChange={(e) =>
+                        setShippingConfig({
+                          ...shippingConfig,
+                          flatRatePrice: parseFloat(e.target.value) || 0,
+                        })
+                      }
+                      className="w-full px-3.5 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl font-mono font-bold text-xs text-slate-900 dark:text-white"
+                    />
+                    <span className="text-[11px] text-slate-400 mt-1 block">
+                      Aplicado a todos los pedidos que no alcancen el importe mínimo de portes gratis.
+                    </span>
+                  </div>
+
+                  <div>
+                    <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                      {t('shop.freeShippingThreshold', 'Envío gratis a partir de (€)')}
+                    </label>
+                    <input
+                      type="number"
+                      step="1"
+                      min="0"
+                      value={shippingConfig.freeShippingThreshold}
+                      onChange={(e) =>
+                        setShippingConfig({
+                          ...shippingConfig,
+                          freeShippingThreshold: parseFloat(e.target.value) || 0,
+                        })
+                      }
+                      className="w-full px-3.5 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl font-mono font-bold text-xs text-slate-900 dark:text-white"
+                    />
+                    <span className="text-[11px] text-slate-400 mt-1 block">
+                      Pedidos con importe igual o superior viajarán sin coste de envío para el cliente.
+                    </span>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {shippingConfig.mode === 'custom' && (
+              <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 space-y-3">
+                <span className="font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider text-[11px] block">
+                  Tarifas por Destino y Zona de Entrega
+                </span>
+
+                <div className="space-y-2">
+                  {shippingConfig.rates.map((rate, idx) => (
+                    <div
+                      key={rate.id}
+                      className="p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-between gap-3 text-xs"
+                    >
+                      <div className="min-w-0">
+                        <div className="font-bold text-slate-900 dark:text-white truncate">
+                          {rate.zone}
+                        </div>
+                        <div className="text-[11px] text-slate-500">
+                          Plazo estimado de entrega: <strong className="text-slate-700 dark:text-slate-300">{rate.estimatedDays}</strong>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2 shrink-0">
+                        <input
+                          type="number"
+                          step="0.10"
+                          min="0"
+                          value={rate.price}
+                          onChange={(e) => {
+                            const val = parseFloat(e.target.value) || 0;
+                            const updated = shippingConfig.rates.map((r, i) =>
+                              i === idx ? { ...r, price: val } : r
+                            );
+                            setShippingConfig({ ...shippingConfig, rates: updated });
+                          }}
+                          className="w-20 px-2 py-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-right font-mono font-bold text-xs"
+                        />
+                        <span className="font-bold text-slate-400 text-xs">€</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {shippingConfig.mode === 'api' && (
+              <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 space-y-4">
+                <div className="flex items-center justify-between pb-2 border-b border-slate-200 dark:border-slate-800">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+                    <span className="font-bold text-xs text-slate-900 dark:text-white">
+                      Conector de API Logística Activo
+                    </span>
+                  </div>
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300">
+                    Sincronizado
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                      {t('shop.logisticsCarrier', 'Empresa de Transporte Principal')}
+                    </label>
+                    <select
+                      value={shippingConfig.apiIntegration.carrier}
+                      onChange={(e) =>
+                        setShippingConfig({
+                          ...shippingConfig,
+                          apiIntegration: {
+                            ...shippingConfig.apiIntegration,
+                            carrier: e.target.value as any,
+                          },
+                        })
+                      }
+                      className="w-full px-3 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-bold text-slate-900 dark:text-white"
+                    >
+                      <option value="correos_express">Correos Express (Paq 24 / Paq Empresa)</option>
+                      <option value="seur">SEUR (SEUR 24 / DPD Group)</option>
+                      <option value="gls">GLS Parcel Spain</option>
+                      <option value="dhl">DHL Express Spain</option>
+                      <option value="mrw">MRW Urgente</option>
+                      <option value="sendcloud">Sendcloud Multi-carrier Hub</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                      Número de Cuenta / Cliente Logístico
+                    </label>
+                    <input
+                      type="text"
+                      value={shippingConfig.apiIntegration.accountNumber}
+                      onChange={(e) =>
+                        setShippingConfig({
+                          ...shippingConfig,
+                          apiIntegration: {
+                            ...shippingConfig.apiIntegration,
+                            accountNumber: e.target.value,
+                          },
+                        })
+                      }
+                      className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-mono font-bold text-slate-900 dark:text-white"
+                    />
+                  </div>
+
+                  <div className="sm:col-span-2">
+                    <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                      {t('shop.logisticsApiKey', 'Clave API / Token Secreto de Logística')}
+                    </label>
+                    <input
+                      type="password"
+                      value={shippingConfig.apiIntegration.apiKey}
+                      onChange={(e) =>
+                        setShippingConfig({
+                          ...shippingConfig,
+                          apiIntegration: {
+                            ...shippingConfig.apiIntegration,
+                            apiKey: e.target.value,
+                          },
+                        })
+                      }
+                      className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-mono text-slate-900 dark:text-white"
+                    />
+                  </div>
+
+                  <div className="sm:col-span-2">
+                    <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                      Dirección de Recogida de Almacén (Club)
+                    </label>
+                    <input
+                      type="text"
+                      value={shippingConfig.apiIntegration.pickupAddress}
+                      onChange={(e) =>
+                        setShippingConfig({
+                          ...shippingConfig,
+                          apiIntegration: {
+                            ...shippingConfig.apiIntegration,
+                            pickupAddress: e.target.value,
+                          },
+                        })
+                      }
+                      className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-bold text-slate-900 dark:text-white"
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Botón Guardar */}
+            <div className="flex justify-end pt-2">
+              <button
+                type="submit"
+                className="px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md transition flex items-center gap-2 cursor-pointer active:scale-95"
+              >
+                <Save className="w-4 h-4" />
+                <span>{t('shop.saveShipping', 'Guardar Configuración de Envíos')}</span>
+              </button>
+            </div>
           </div>
         </form>
       )}
