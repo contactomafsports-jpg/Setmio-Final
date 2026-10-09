@@ -71,32 +71,32 @@ export const AdminCafePOS: React.FC = () => {
   const availablePaymentMethods = useMemo(() => {
     const list: Array<{ id: string; label: string; icon: any }> = [];
 
-    // Datáfono Banco (Manual)
-    if (configuredMethods ? configuredMethods.manualPos : true) {
-      list.push({ id: 'card', label: 'Datáfono Banco', icon: CreditCard });
+    // 1. Efectivo (Mostrador)
+    if (configuredMethods ? configuredMethods.cash !== false : true) {
+      list.push({ id: 'cash', label: t('pos.paymentMethods.cash', 'Efectivo'), icon: Banknote });
     }
-    // Stripe Terminal (Lector Integrado)
-    if (configuredMethods?.stripeTerminal) {
-      list.push({ id: 'stripe_terminal', label: 'Stripe Terminal', icon: CreditCard });
+    // 2. Datáfono del Banco (Manual)
+    if (configuredMethods ? configuredMethods.manualPos !== false : true) {
+      list.push({ id: 'card', label: t('pos.paymentMethods.manualPos', 'Datáfono Banco (Manual)'), icon: CreditCard });
     }
-    // Efectivo
-    if (configuredMethods ? configuredMethods.cash : true) {
-      list.push({ id: 'cash', label: 'Efectivo', icon: Banknote });
+    // 3. Datáfono Integrado (Stripe Terminal)
+    if (configuredMethods ? configuredMethods.stripeTerminal !== false : true) {
+      list.push({ id: 'stripe_terminal', label: t('pos.paymentMethods.stripeTerminal', 'Stripe Terminal'), icon: CreditCard });
     }
-    // Cobro Push / App del Socio
-    if (configuredMethods?.pushCharge) {
-      list.push({ id: 'push_charge', label: 'Cobro Push / App', icon: Smartphone });
+    // 4. Cobro por Notificación Push / App del Socio
+    if (configuredMethods ? configuredMethods.pushCharge !== false : true) {
+      list.push({ id: 'push_charge', label: t('pos.paymentMethods.pushCharge', 'Cobro Push / App'), icon: Smartphone });
     }
-    // Monedero / Saldo Socio
-    if (configuredMethods ? configuredMethods.wallet : true) {
-      list.push({ id: 'member_wallet', label: 'Monedero Socio', icon: Wallet });
+    // 5. Monedero / Saldo de Socio y Bonos
+    if (configuredMethods ? configuredMethods.wallet !== false : true) {
+      list.push({ id: 'member_wallet', label: t('pos.paymentMethods.wallet', 'Monedero Socio'), icon: Wallet });
     }
 
     if (list.length === 0) {
-      list.push({ id: 'cash', label: 'Efectivo', icon: Banknote });
+      list.push({ id: 'cash', label: t('pos.paymentMethods.cash', 'Efectivo'), icon: Banknote });
     }
     return list;
-  }, [configuredMethods]);
+  }, [configuredMethods, t]);
 
   useEffect(() => {
     if (availablePaymentMethods.length > 0 && !availablePaymentMethods.some((m) => m.id === paymentMethod)) {

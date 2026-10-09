@@ -156,13 +156,36 @@ export const AdminSettings: React.FC = () => {
     );
     setTimeout(() => {
       setIsPairingTerminal(false);
-      setPaymentMethods((prev) => ({ ...prev, stripeTerminalStatus: 'connected' }));
+      const updated = { ...paymentMethods, stripeTerminalStatus: 'connected' as const };
+      setPaymentMethods(updated);
+      updateCurrentTenant({
+        settings: {
+          ...currentTenant.settings,
+          paymentMethods: updated,
+        },
+      });
       triggerDemoToast(
         t('settings.payments.stripeStatusConnected', 'Lector Vinculado y Activo'),
         'Dispositivo Bwise WisePOS E (IP: 192.168.1.144) listo para cobros en TPV.',
         'success'
       );
     }, 1200);
+  };
+
+  const handleTogglePaymentMethod = (key: keyof typeof paymentMethods, checked: boolean) => {
+    const updated = { ...paymentMethods, [key]: checked };
+    setPaymentMethods(updated);
+    updateCurrentTenant({
+      settings: {
+        ...currentTenant.settings,
+        paymentMethods: updated,
+      },
+    });
+    triggerDemoToast(
+      t('settings.payments.activeMethods', 'Métodos de Pago'),
+      t('settings.payments.autoSynced', 'Sincronizado automáticamente con TPV.'),
+      'info'
+    );
   };
 
   const handleSavePaymentsAndPolicies = (e: React.FormEvent) => {
@@ -939,7 +962,7 @@ export const AdminSettings: React.FC = () => {
                   <input
                     type="checkbox"
                     checked={paymentMethods.cash}
-                    onChange={(e) => setPaymentMethods({ ...paymentMethods, cash: e.target.checked })}
+                    onChange={(e) => handleTogglePaymentMethod('cash', e.target.checked)}
                     className="sr-only peer"
                   />
                   <div className="w-9 h-5 bg-slate-200 dark:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-600"></div>
@@ -965,7 +988,7 @@ export const AdminSettings: React.FC = () => {
                   <input
                     type="checkbox"
                     checked={paymentMethods.manualPos}
-                    onChange={(e) => setPaymentMethods({ ...paymentMethods, manualPos: e.target.checked })}
+                    onChange={(e) => handleTogglePaymentMethod('manualPos', e.target.checked)}
                     className="sr-only peer"
                   />
                   <div className="w-9 h-5 bg-slate-200 dark:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-600"></div>
@@ -991,7 +1014,7 @@ export const AdminSettings: React.FC = () => {
                   <input
                     type="checkbox"
                     checked={paymentMethods.pushCharge}
-                    onChange={(e) => setPaymentMethods({ ...paymentMethods, pushCharge: e.target.checked })}
+                    onChange={(e) => handleTogglePaymentMethod('pushCharge', e.target.checked)}
                     className="sr-only peer"
                   />
                   <div className="w-9 h-5 bg-slate-200 dark:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-600"></div>
@@ -1017,7 +1040,7 @@ export const AdminSettings: React.FC = () => {
                   <input
                     type="checkbox"
                     checked={paymentMethods.wallet}
-                    onChange={(e) => setPaymentMethods({ ...paymentMethods, wallet: e.target.checked })}
+                    onChange={(e) => handleTogglePaymentMethod('wallet', e.target.checked)}
                     className="sr-only peer"
                   />
                   <div className="w-9 h-5 bg-slate-200 dark:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-600"></div>
@@ -1043,7 +1066,7 @@ export const AdminSettings: React.FC = () => {
                   <input
                     type="checkbox"
                     checked={paymentMethods.onlineGateway}
-                    onChange={(e) => setPaymentMethods({ ...paymentMethods, onlineGateway: e.target.checked })}
+                    onChange={(e) => handleTogglePaymentMethod('onlineGateway', e.target.checked)}
                     className="sr-only peer"
                   />
                   <div className="w-9 h-5 bg-slate-200 dark:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-600"></div>
@@ -1076,7 +1099,7 @@ export const AdminSettings: React.FC = () => {
                   <input
                     type="checkbox"
                     checked={paymentMethods.stripeTerminal}
-                    onChange={(e) => setPaymentMethods({ ...paymentMethods, stripeTerminal: e.target.checked })}
+                    onChange={(e) => handleTogglePaymentMethod('stripeTerminal', e.target.checked)}
                     className="sr-only peer"
                   />
                   <div className="w-9 h-5 bg-slate-200 dark:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-600"></div>

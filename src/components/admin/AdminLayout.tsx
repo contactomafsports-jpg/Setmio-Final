@@ -102,9 +102,9 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
     },
     {
       id: 'tournaments',
-      label: t('club.nav.tournaments', 'Torneos y Ligas'),
+      label: t('club.nav.tournaments', 'Competiciones'),
       icon: <Trophy className="w-5 h-5 text-amber-500" />,
-      desc: 'Cuadros eliminatorios y parejas',
+      desc: t('club.nav.tournaments_desc', 'Torneos oficiales, cuadros y rankings'),
     },
     {
       id: 'web_editor',
