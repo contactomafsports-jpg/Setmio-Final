@@ -25,11 +25,14 @@ export const BookingFlow: React.FC = () => {
     selectedCourtsForBooking,
   } = useApp();
 
+  const tenantCourts = courts.filter((c) => !c.tenantId || c.tenantId === currentTenant.id);
+  const activeCourts = tenantCourts.length > 0 ? tenantCourts : courts;
+
   const [selectedDate, setSelectedDate] = useState(() => new Date().toISOString().slice(0, 10));
   const [selectedCourtId, setSelectedCourtId] = useState<string>(
     selectedCourtsForBooking && selectedCourtsForBooking.length > 0
       ? selectedCourtsForBooking[0]
-      : courts[0]?.id || 'court-1'
+      : activeCourts[0]?.id || 'court-1'
   );
   const [selectedSlot, setSelectedSlot] = useState<string>('18:30');
   const [duration, setDuration] = useState<60 | 90>(90);
@@ -39,7 +42,7 @@ export const BookingFlow: React.FC = () => {
   const [player4, setPlayer4] = useState('');
   const [confirmedBooking, setConfirmedBooking] = useState<Booking | null>(null);
 
-  const selectedCourt = courts.find((c) => c.id === selectedCourtId) || courts[0];
+  const selectedCourt = activeCourts.find((c) => c.id === selectedCourtId) || activeCourts[0];
 
   const timeSlots = [
     '09:00', '10:30', '12:00', '13:30', '15:30', '17:00', '18:30', '20:00', '21:30'
@@ -236,7 +239,7 @@ export const BookingFlow: React.FC = () => {
                 </h3>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {courts.map((court) => {
+                  {activeCourts.map((court) => {
                     const isSelected = selectedCourtId === court.id;
                     return (
                       <button

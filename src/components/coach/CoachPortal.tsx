@@ -149,7 +149,16 @@ export const CoachPortal: React.FC = () => {
     switchUserRole,
     logoutOrExitDemo,
     triggerDemoToast,
+    tenants,
+    switchTenant,
+    navigateToEntityWeb,
   } = useApp();
+
+  const handleViewCoachWeb = () => {
+    const coachTenant = tenants.find((t) => t.type === 'COACH') || currentTenant;
+    switchTenant(coachTenant.id);
+    navigateToEntityWeb(coachTenant.slug);
+  };
 
   const [activeTab, setActiveTab] = useState<'agenda' | 'students' | 'availability' | 'rates'>('agenda');
   const [classList, setClassList] = useState<PrivateClass[]>(INITIAL_CLASSES);
@@ -250,11 +259,12 @@ export const CoachPortal: React.FC = () => {
             </button>
 
             <button
-              onClick={() => setCurrentView('public')}
+              onClick={handleViewCoachWeb}
               className="px-3 py-1.5 rounded-xl border border-slate-300 dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-1.5 transition"
+              title="Ver Landing Pública Personal del Entrenador"
             >
               <ExternalLink className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Ver Web Pública</span>
+              <span className="hidden sm:inline">Ver Mi Web Personal</span>
             </button>
 
             {/* Cerrar Sesión / Salir Demo */}
@@ -973,16 +983,16 @@ export const CoachPortal: React.FC = () => {
 
               <button
                 onClick={() => {
-                  setCurrentView('public');
+                  handleViewCoachWeb();
                   setShowMoreDrawer(false);
                 }}
                 className="w-full p-3 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-left flex items-center justify-between"
               >
                 <div className="flex items-center gap-3">
-                  <ExternalLink className="w-5 h-5 text-slate-500" />
+                  <ExternalLink className="w-5 h-5 text-emerald-500" />
                   <div>
-                    <div className="text-xs font-bold text-slate-900 dark:text-white">Ver Web Pública del Club</div>
-                    <div className="text-[10px] text-slate-500 dark:text-slate-400">Pistas, escuela y torneos visibles</div>
+                    <div className="text-xs font-bold text-slate-900 dark:text-white">Ver Mi Web Pública Personal</div>
+                    <div className="text-[10px] text-slate-500 dark:text-slate-400">Página personal con clases, bonos y disponibilidad</div>
                   </div>
                 </div>
                 <ChevronRight className="w-4 h-4 text-slate-400" />

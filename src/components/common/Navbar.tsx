@@ -82,16 +82,39 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCart, onOpenAuth, onOpenDe
   const cartItemsCount = cart.reduce((acc, item) => acc + item.quantity, 0);
   const currentLangOption = SUPPORTED_LANGUAGES.find((l) => l.code === language) || SUPPORTED_LANGUAGES[0];
 
-  const mainNavLinks: { id: PublicPage; label: string; icon: React.ReactNode }[] = [
-    { id: 'home', label: t('nav.home', 'Inicio'), icon: null },
-    { id: 'courts', label: t('nav.courts', 'Pistas'), icon: <Sparkles className="w-4 h-4" /> },
-    { id: 'academy', label: t('nav.academy', 'Escuela'), icon: <GraduationCap className="w-4 h-4" /> },
-    { id: 'tournaments', label: t('nav.tournaments', 'Torneos'), icon: <Trophy className="w-4 h-4" /> },
-    { id: 'shop', label: t('nav.shop', 'Tienda'), icon: <Store className="w-4 h-4" /> },
-    { id: 'contact', label: t('nav.contact', 'Contacto'), icon: <MapPin className="w-4 h-4" /> },
-  ];
-  const enabledPublicPages = currentTenant.publicPages ?? ['home', 'courts', 'academy', 'tournaments', 'shop', 'contact'];
-  const visibleMainNavLinks = mainNavLinks.filter((link) => enabledPublicPages.includes(link.id));
+  const getNavLinksForTenant = (): { id: PublicPage; label: string; icon: React.ReactNode }[] => {
+    if (currentTenant.type === 'COACH') {
+      return [
+        { id: 'home', label: 'Inicio & Clases', icon: null },
+        { id: 'contact', label: 'Contacto & WhatsApp', icon: <MapPin className="w-4 h-4" /> },
+      ];
+    }
+    if (currentTenant.type === 'ACADEMY') {
+      return [
+        { id: 'home', label: 'Inicio', icon: null },
+        { id: 'academy', label: 'Programas & Niveles', icon: <GraduationCap className="w-4 h-4" /> },
+        { id: 'contact', label: 'Admisiones & Contacto', icon: <MapPin className="w-4 h-4" /> },
+      ];
+    }
+    if (currentTenant.type === 'PRO_PLAYER') {
+      return [
+        { id: 'home', label: 'Inicio & Palmarés', icon: null },
+        { id: 'shop', label: 'Colección Oficial', icon: <Store className="w-4 h-4" /> },
+        { id: 'contact', label: 'Prensa & Sponsors', icon: <MapPin className="w-4 h-4" /> },
+      ];
+    }
+    // PADEL_CLUB
+    return [
+      { id: 'home', label: t('nav.home', 'Inicio'), icon: null },
+      { id: 'courts', label: t('nav.courts', 'Pistas'), icon: <Sparkles className="w-4 h-4" /> },
+      { id: 'academy', label: t('nav.academy', 'Escuela'), icon: <GraduationCap className="w-4 h-4" /> },
+      { id: 'tournaments', label: t('nav.tournaments', 'Torneos'), icon: <Trophy className="w-4 h-4" /> },
+      { id: 'shop', label: t('nav.shop', 'Tienda'), icon: <Store className="w-4 h-4" /> },
+      { id: 'contact', label: t('nav.contact', 'Contacto'), icon: <MapPin className="w-4 h-4" /> },
+    ];
+  };
+
+  const visibleMainNavLinks = getNavLinksForTenant();
 
   const handleNavClick = (pageId: PublicPage) => {
     setPublicPage(pageId);

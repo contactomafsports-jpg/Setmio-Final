@@ -33,6 +33,8 @@ export const TopBarDemo: React.FC = () => {
     isCorporateLanding,
     setIsCorporateLanding,
     navigateToClub,
+    navigateToEntityWeb,
+    viewEntityWeb,
     navigateToCorporate,
   } = useApp();
 
@@ -46,7 +48,9 @@ export const TopBarDemo: React.FC = () => {
     { role: 'TENANT_OWNER', label: 'Propietario Club', desc: 'Control total de Pádel San Mateo' },
     { role: 'TENANT_ADMIN', label: 'Gerente / Admin', desc: 'Gestión operativa del club' },
     { role: 'RECEPTION', label: 'Recepción y Pistas', desc: 'Agenda y atención a jugadores' },
-    { role: 'COACH', label: 'Entrenador / Coach', desc: 'Clases y grupos de la escuela' },
+    { role: 'COACH', label: 'Entrenador Independiente', desc: 'Clases particulares, bonos y metodología' },
+    { role: 'ACADEMY_MANAGER', label: 'Director Academia', desc: 'Escuela de menores, adultos y admisiones' },
+    { role: 'PROFESSIONAL_PLAYER', label: 'Jugador Pro FIP', desc: 'Portfolio de atleta, circuito y sponsors' },
     { role: 'PLAYER', label: 'Jugador Socio', desc: 'Reservas, partidos y estadísticas' },
     { role: 'STORE_MANAGER', label: 'Responsable Tienda', desc: 'Catálogo e inventario deportivo' },
     { role: 'TOURNAMENT_ORGANIZER', label: 'Organizador Torneos', desc: 'Cuadros y parejas' },
@@ -103,7 +107,12 @@ export const TopBarDemo: React.FC = () => {
                       }`}
                     >
                       <div>
-                        <div>{t.name}</div>
+                        <div className="flex items-center gap-1.5">
+                          <span>{t.name}</span>
+                          <span className="text-[9px] uppercase font-bold px-1 py-0.2 rounded bg-slate-700/80 text-cyan-300">
+                            {t.type === 'PADEL_CLUB' ? 'Club' : t.type === 'ACADEMY' ? 'Academia' : t.type === 'COACH' ? 'Coach' : t.type === 'PRO_PLAYER' ? 'Pro' : t.type}
+                          </span>
+                        </div>
                         <div className="text-[10px] text-slate-400">{t.city}, {t.region} · Plan {t.planId.toUpperCase()}</div>
                       </div>
                       {t.id === currentTenant.id && <CheckCircle2 className="w-4 h-4 text-emerald-400" />}
@@ -133,8 +142,7 @@ export const TopBarDemo: React.FC = () => {
 
             <button
               onClick={() => {
-                setIsCorporateLanding(false);
-                setCurrentView('public');
+                viewEntityWeb();
               }}
               className={`flex items-center gap-1 px-2.5 py-1 rounded text-xs font-medium transition ${
                 !isCorporateLanding && currentView === 'public'
@@ -144,7 +152,15 @@ export const TopBarDemo: React.FC = () => {
               title={`Web Pública de ${currentTenant.shortName}`}
             >
               <Globe className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Web Club</span>
+              <span className="hidden sm:inline">
+                {currentTenant.type === 'COACH' || currentView === 'coach'
+                  ? 'Web Entrenador'
+                  : currentTenant.type === 'ACADEMY' || currentUser.role === 'ACADEMY_MANAGER'
+                  ? 'Web Academia'
+                  : currentTenant.type === 'PRO_PLAYER' || currentUser.role === 'PROFESSIONAL_PLAYER'
+                  ? 'Web Pro'
+                  : 'Web Club'}
+              </span>
             </button>
 
             <button
@@ -233,10 +249,27 @@ export const TopBarDemo: React.FC = () => {
                       onClick={() => {
                         switchUserRole(item.role);
                         setIsCorporateLanding(false);
-                        if (item.role === 'PLAYER') setCurrentView('player');
-                        else if (item.role === 'COACH') setCurrentView('coach');
-                        else if (item.role === 'SUPERADMIN') setCurrentView('hq');
-                        else setCurrentView('admin');
+                        if (item.role === 'PLAYER') {
+                          setCurrentView('player');
+                        } else if (item.role === 'COACH') {
+                          const coachTenant = tenants.find((t) => t.type === 'COACH');
+                          if (coachTenant) switchTenant(coachTenant.id);
+                          setCurrentView('coach');
+                        } else if (item.role === 'ACADEMY_MANAGER') {
+                          const acadTenant = tenants.find((t) => t.type === 'ACADEMY');
+                          if (acadTenant) switchTenant(acadTenant.id);
+                          setCurrentView('admin');
+                        } else if (item.role === 'PROFESSIONAL_PLAYER') {
+                          const proTenant = tenants.find((t) => t.type === 'PRO_PLAYER');
+                          if (proTenant) switchTenant(proTenant.id);
+                          viewEntityWeb(proTenant?.slug);
+                        } else if (item.role === 'SUPERADMIN') {
+                          setCurrentView('hq');
+                        } else {
+                          const clubTenant = tenants.find((t) => t.type === 'PADEL_CLUB');
+                          if (clubTenant) switchTenant(clubTenant.id);
+                          setCurrentView('admin');
+                        }
                         setShowRoleMenu(false);
                         triggerDemoToast(
                           'Rol Cambiado',

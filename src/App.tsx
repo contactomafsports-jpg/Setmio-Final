@@ -11,6 +11,7 @@ import { CartDrawer } from './components/public/CartDrawer';
 import { AuthModal } from './components/public/AuthModal';
 
 // Public views
+import { PublicEntityLanding } from './components/public/PublicEntityLanding';
 import { HomeView } from './components/public/HomeView';
 import { AboutClubView } from './components/public/AboutClubView';
 import { CourtsView } from './components/public/CourtsView';
@@ -64,6 +65,8 @@ export function App() {
     currentView,
     setCurrentView,
     currentTenant,
+    tenants,
+    switchTenant,
     publicPage,
     setPublicPage,
     adminTab,
@@ -71,6 +74,7 @@ export function App() {
     demoToast,
     clearDemoToast,
     isCorporateLanding,
+    setIsCorporateLanding,
     navigateToClub,
     currentUser,
     navigateToCorporate,
@@ -119,6 +123,20 @@ export function App() {
     };
     const syncRoute = () => {
       const pathname = typeof window !== 'undefined' ? window.location.pathname : '/';
+
+      // URLs de webs públicas por entidad (/p/[slug] o /club/[slug])
+      if (pathname.startsWith('/p/') || pathname.startsWith('/club/')) {
+        const prefix = pathname.startsWith('/p/') ? '/p/' : '/club/';
+        const slug = pathname.replace(prefix, '').split('/')[0];
+        const target = tenants.find((t) => t.slug === slug || t.id === slug);
+        if (target) {
+          switchTenant(target.id);
+        }
+        setIsCorporateLanding(false);
+        setCurrentView('public');
+        setPublicPage('home');
+        return;
+      }
 
       // URLs de gestión interna
       if (pathname === '/blog' || pathname.startsWith('/blog/')) {
@@ -279,7 +297,7 @@ export function App() {
   const renderPublicPage = () => {
     switch (publicPage) {
       case 'home':
-        return <HomeView />;
+        return <PublicEntityLanding />;
       case 'features':
         return <FeaturesView onBack={goHome} />;
       case 'solutions':

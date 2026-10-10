@@ -27,10 +27,19 @@ export const PlayerHeader: React.FC<PlayerHeaderProps> = ({
     setCurrentView,
     logoutOrExitDemo,
     isWhiteLabelPlayerPreview,
+    selectedVenue,
   } = useApp();
 
-  const clubShortName = isWhiteLabelPlayerPreview ? 'Padel Premier' : currentTenant.shortName;
-  const clubInitials = isWhiteLabelPlayerPreview ? 'PCP' : 'SM';
+  const clubShortName = selectedVenue && selectedVenue.id !== 'all'
+    ? `${currentTenant.shortName} (${selectedVenue.shortName})`
+    : currentTenant.shortName;
+  const clubInitials = currentTenant.name
+    .split(' ')
+    .filter(Boolean)
+    .map((w) => w[0])
+    .join('')
+    .slice(0, 3)
+    .toUpperCase() || 'PAD';
 
   return (
     <header

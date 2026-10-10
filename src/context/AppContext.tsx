@@ -289,10 +289,15 @@ const readRoute = () => {
     detectedCustomDomainClub = 'martinsanchez';
   }
 
-  // 3. Detect Path /club/:slug
+  // 3. Detect Path /p/:slug or /club/:slug
   let pathClubSlug: string | null = null;
   let remainingPath = path;
-  if (path.startsWith('/club/')) {
+  if (path.startsWith('/p/')) {
+    const parts = path.split('/');
+    pathClubSlug = parts[2] || null;
+    remainingPath = '/' + parts.slice(3).join('/');
+    if (remainingPath === '/') remainingPath = '/';
+  } else if (path.startsWith('/club/')) {
     const parts = path.split('/');
     pathClubSlug = parts[2] || null;
     remainingPath = '/' + parts.slice(3).join('/');
@@ -518,6 +523,8 @@ interface AppContextType {
   isCorporateLanding: boolean;
   setIsCorporateLanding: (isCorporate: boolean) => void;
   navigateToClub: (slug: string) => void;
+  navigateToEntityWeb: (slug: string) => void;
+  viewEntityWeb: (targetSlugOrType?: string) => void;
   navigateToCorporate: () => void;
   currentView: MainView;
   setCurrentView: (view: MainView) => void;
@@ -1161,18 +1168,66 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     };
   }, [currentTenant, isCorporateLanding]);
 
-  const navigateToClub = (slug: string) => {
+  const navigateToEntityWeb = (slug: string) => {
     setIsCorporateLanding(false);
-    const target = tenants.find((t) => t.slug === slug);
+    const target = tenants.find((t) => t.slug === slug || t.id === slug);
     if (target) {
       setCurrentTenantId(target.id);
     }
     setCurrentViewState('public');
     setPublicPageState('home');
     if (typeof window !== 'undefined') {
-      window.history.pushState({}, '', `/club/${slug}`);
+      window.history.pushState({}, '', `/p/${slug}`);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
+  };
+
+  const navigateToClub = (slug: string) => {
+    navigateToEntityWeb(slug);
+  };
+
+  const viewEntityWeb = (targetSlugOrType?: string) => {
+    if (targetSlugOrType) {
+      const match = tenants.find(
+        (t) =>
+          t.slug === targetSlugOrType ||
+          t.id === targetSlugOrType ||
+          t.type.toLowerCase() === targetSlugOrType.toLowerCase()
+      );
+      if (match) {
+        navigateToEntityWeb(match.slug);
+        return;
+      }
+    }
+
+    // Dynamic redirection based on active role/entity:
+    // 1. Profesor Independiente -> Landing personal del profesor (/p/varelacoach)
+    if (currentView === 'coach' || currentUser.role === 'COACH' || currentTenant.type === 'COACH') {
+      const coachTenant = tenants.find((t) => t.type === 'COACH') || currentTenant;
+      navigateToEntityWeb(coachTenant.slug);
+      return;
+    }
+
+    // 2. Escuela / Academia -> Página pública propia de la academia (/p/academiaelite)
+    if (currentUser.role === 'ACADEMY_MANAGER' || currentTenant.type === 'ACADEMY') {
+      const academyTenant = tenants.find((t) => t.type === 'ACADEMY') || currentTenant;
+      navigateToEntityWeb(academyTenant.slug);
+      return;
+    }
+
+    // 3. Jugador Profesional -> Portfolio público del jugador (/p/martinsanchez)
+    if (currentUser.role === 'PROFESSIONAL_PLAYER' || currentTenant.type === 'PRO_PLAYER') {
+      const proTenant = tenants.find((t) => t.type === 'PRO_PLAYER') || currentTenant;
+      navigateToEntityWeb(proTenant.slug);
+      return;
+    }
+
+    // 4. Club de Pádel -> Web pública del club activo
+    const clubTenant =
+      tenants.find((t) => t.id === currentTenant.id && t.type === 'PADEL_CLUB') ||
+      tenants.find((t) => t.type === 'PADEL_CLUB') ||
+      currentTenant;
+    navigateToEntityWeb(clubTenant.slug);
   };
 
   const navigateToCorporate = () => {
@@ -1210,13 +1265,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         window.location.pathname !== '/registro' &&
         window.location.pathname !== '/login' &&
         window.location.pathname !== corporatePath &&
-        !window.location.pathname.startsWith('/club/')
+        !window.location.pathname.startsWith('/club/') &&
+        !window.location.pathname.startsWith('/p/')
       ) {
         window.history.pushState({}, '', corporatePath);
       }
       return;
     }
-    const prefix = `/club/${currentTenant.slug}`;
+    const currentPath = window.location.pathname;
+    const isPRoute = currentPath.startsWith('/p/');
+    const prefix = isPRoute ? `/p/${currentTenant.slug}` : `/club/${currentTenant.slug}`;
     const path = currentView === 'admin'
       ? `${prefix}${routeForAdminTab[adminTab]}`
       : currentView === 'player'
@@ -1475,7 +1533,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setCurrentViewState('player');
     triggerDemoToast(
       t('white_label.player_view', 'Vista Jugador'),
-      t('white_label.banner_notice', 'Estás probando la app de jugador con la marca blanca del club'),
+      `Cargando la app del socio con la agenda, pistas y catálogo de ${currentTenant.name}`,
       'info'
     );
   };
@@ -1485,8 +1543,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setCurrentUser(ROLE_PROFILES.TENANT_OWNER);
     setCurrentViewState('admin');
     triggerDemoToast(
-      'Modo Admin Setmio',
-      'Has vuelto al panel de gestión B2B de Setmio.',
+      `Gestión de ${currentTenant.shortName}`,
+      `Has vuelto al panel de administración de ${currentTenant.name}.`,
       'info'
     );
   };
@@ -2183,6 +2241,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         isCorporateLanding,
         setIsCorporateLanding,
         navigateToClub,
+        navigateToEntityWeb,
+        viewEntityWeb,
         navigateToCorporate,
 
         currentView,

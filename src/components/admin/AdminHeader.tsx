@@ -15,6 +15,8 @@ import {
   Globe,
   Building2,
   Check,
+  Eye,
+  UserCheck,
 } from 'lucide-react';
 import { SUPPORTED_LANGUAGES } from '../../lib/i18n';
 import { i18n } from '../../i18n';
@@ -48,6 +50,8 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
     selectedVenueId,
     selectedVenue,
     setSelectedVenueId,
+    enterWhiteLabelPlayerPreview,
+    viewEntityWeb,
     isConsolidatedView,
     isMultiVenue,
     t,
@@ -197,6 +201,18 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
             )}
           </div>
 
+          {/* Botón Vista Jugador (Manteniendo el contexto del Club y Sede activa) */}
+          <button
+            type="button"
+            onClick={enterWhiteLabelPlayerPreview}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 border border-emerald-300/80 dark:border-emerald-800/80 shadow-xs cursor-pointer active:scale-98"
+            title={`Probar Vista Jugador manteniendo el contexto de ${currentTenant.name}${selectedVenue && selectedVenue.id !== 'all' ? ` (${selectedVenue.shortName})` : ''}`}
+            aria-label="Vista Jugador"
+          >
+            <Eye className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+            <span className="hidden sm:inline">{t('white_label.player_view', 'Vista Jugador')}</span>
+          </button>
+
           {/* Theme Toggle */}
           <button
             type="button"
@@ -309,17 +325,25 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
 
                 {/* Opciones del Dropdown */}
                 <div className="space-y-0.5 py-1">
-                  {/* Ver Web del Club */}
+                  {/* Ver Web de la Entidad Activa */}
                   <button
                     type="button"
                     onClick={() => {
                       setUserMenuOpen(false);
-                      navigateToClub(currentTenant.slug);
+                      viewEntityWeb(currentTenant.slug);
                     }}
                     className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold transition text-left cursor-pointer"
                   >
                     <Globe className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                    <span>{t('club.menu.viewWeb', 'Ver Web del Club')}</span>
+                    <span>
+                      {currentTenant.type === 'ACADEMY'
+                        ? 'Ver Web de la Academia'
+                        : currentTenant.type === 'COACH'
+                        ? 'Ver Web del Entrenador'
+                        : currentTenant.type === 'PRO_PLAYER'
+                        ? 'Ver Portfolio Pro'
+                        : t('club.menu.viewWeb', 'Ver Web del Club')}
+                    </span>
                   </button>
 
                   {/* 1. Mi Perfil */}

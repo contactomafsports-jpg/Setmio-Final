@@ -32,6 +32,7 @@ import {
   Plus,
   Flame,
   LogOut,
+  ShoppingBag,
 } from 'lucide-react';
 import { BookingFlow } from '../public/BookingFlow';
 import { OpenMatchesView } from '../public/OpenMatchesView';
@@ -56,11 +57,12 @@ export const PlayerPortal: React.FC = () => {
     logoutOrExitDemo,
     isWhiteLabelPlayerPreview,
     exitWhiteLabelPlayerPreview,
+    selectedVenue,
     t,
   } = useApp();
 
   const [activePlayerTab, setActivePlayerTab] = useState<
-    'overview' | 'booking' | 'matches' | 'tournaments' | 'teams' | 'academy' | 'stats' | 'profile'
+    'overview' | 'booking' | 'matches' | 'tournaments' | 'teams' | 'academy' | 'stats' | 'profile' | 'shop'
   >('overview');
 
   const [legalModalOpen, setLegalModalOpen] = useState(false);
@@ -68,9 +70,15 @@ export const PlayerPortal: React.FC = () => {
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
   const [tournamentSubTab, setTournamentSubTab] = useState<'inscribed' | 'in_progress' | 'upcoming'>('inscribed');
 
-  const clubDisplayName = isWhiteLabelPlayerPreview ? t('white_label.club_name_preview', 'Padel Club Premier') : currentTenant.name;
-  const clubShortName = isWhiteLabelPlayerPreview ? 'Padel Premier' : currentTenant.shortName;
-  const clubInitials = isWhiteLabelPlayerPreview ? 'PCP' : 'SM';
+  const clubDisplayName = currentTenant.name;
+  const clubShortName = currentTenant.shortName;
+  const clubInitials = currentTenant.name
+    .split(' ')
+    .filter(Boolean)
+    .map((w) => w[0])
+    .join('')
+    .slice(0, 3)
+    .toUpperCase() || 'PAD';
 
   const normalizedPlayerName = currentUser.name.split(' (')[0].trim().toLocaleLowerCase();
   const myBookings = bookings.filter((booking) =>
@@ -130,7 +138,7 @@ export const PlayerPortal: React.FC = () => {
             onClick={exitWhiteLabelPlayerPreview}
             className="shrink-0 px-3.5 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs shadow-md transition hover:scale-105 active:scale-95 flex items-center gap-1.5"
           >
-            <span>{t('white_label.return_admin', '← Volver a Modo Admin (Setmio)')}</span>
+            <span>{t('white_label.return_admin', `← Volver a Gestión (${currentTenant.shortName})`)}</span>
           </button>
         </aside>
       )}
@@ -161,11 +169,11 @@ export const PlayerPortal: React.FC = () => {
               <div className="flex items-center gap-2">
                 <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">{currentUser.name}</h1>
                 <span className="text-[10px] uppercase px-2 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-800 font-mono font-bold">
-                  Socio #SM-408
+                  Socio #{currentTenant.slug === 'sanmateo' ? 'SM-408' : 'SOC-101'}
                 </span>
               </div>
               <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                {currentTenant.name} · Posición preferida: <strong>Revés</strong> · Diestro
+                {currentTenant.name} {selectedVenue && selectedVenue.id !== 'all' ? `· ${selectedVenue.name}` : `· ${currentTenant.city}`} · Posición preferida: <strong>Revés</strong> · Diestro
               </div>
             </div>
           </div>
@@ -208,6 +216,7 @@ export const PlayerPortal: React.FC = () => {
               { id: 'tournaments', label: 'Mis Competiciones', icon: Trophy },
               { id: 'teams', label: 'Mis Equipos', icon: Shield },
               { id: 'academy', label: 'Escuela & Clases', icon: GraduationCap },
+              { id: 'shop', label: 'Tienda Club', icon: ShoppingBag },
               { id: 'stats', label: 'Nivel & Stats', icon: TrendingUp },
               { id: 'profile', label: 'Mi Ficha', icon: UserRound },
             ].map((tab) => {
@@ -609,6 +618,70 @@ export const PlayerPortal: React.FC = () => {
               playerId="user-player-carlos"
               onBack={() => setActivePlayerTab('overview')}
             />
+          </div>
+        )}
+
+        {/* SHOP TAB (Tienda / Catálogo del Club) */}
+        {activePlayerTab === 'shop' && (
+          <div className="space-y-6 animate-in fade-in duration-150">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <h2 className="text-xl font-black text-slate-900 dark:text-white">Pro Shop · {currentTenant.name}</h2>
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  Palas oficiales, calzado técnico y accesorios con un 15% de descuento exclusivo para socios activos.
+                </p>
+              </div>
+              <span className="px-3 py-1 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 font-bold text-xs">
+                Tarifa Socio Aplicada (-15%)
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+              {products
+                .filter((p) => !p.tenantId || p.tenantId === currentTenant.id)
+                .map((product) => {
+                  const memberPrice = product.price * 0.85;
+                  return (
+                    <div
+                      key={product.id}
+                      className="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 shadow-sm space-y-4 flex flex-col justify-between hover:border-emerald-500/50 transition group"
+                    >
+                      <div className="space-y-3">
+                        <div className="relative h-48 rounded-2xl overflow-hidden bg-slate-100 dark:bg-slate-800">
+                          <img
+                            src={product.imageUrl}
+                            alt={product.name}
+                            className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+                          />
+                          <span className="absolute top-2 right-2 px-2 py-0.5 rounded-lg bg-emerald-500 text-slate-950 font-black text-[10px]">
+                            -15% SOCIO
+                          </span>
+                        </div>
+                        <div>
+                          <span className="text-[10px] font-bold uppercase text-slate-400">{product.brand} · {product.category}</span>
+                          <h3 className="font-bold text-slate-900 dark:text-white text-sm line-clamp-1">{product.name}</h3>
+                          <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 mt-1">{product.description}</p>
+                        </div>
+                      </div>
+
+                      <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                        <div>
+                          <div className="text-[10px] text-slate-400 line-through">{product.price.toFixed(2)} €</div>
+                          <div className="font-mono font-black text-emerald-600 dark:text-emerald-400 text-lg">
+                            {memberPrice.toFixed(2)} €
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => triggerDemoToast('Artículo Reservado', `"${product.name}" reservado en la recepción del club a precio de socio. Se cargará a tu monedero en entrega.`, 'success')}
+                          className="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white dark:bg-white dark:hover:bg-slate-100 dark:text-slate-900 font-bold text-xs shadow transition active:scale-95"
+                        >
+                          Reservar
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+            </div>
           </div>
         )}
       </main>
