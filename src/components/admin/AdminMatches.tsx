@@ -33,6 +33,8 @@ import {
   ExternalLink,
   Trash2,
   Edit3,
+  Megaphone,
+  Send,
 } from 'lucide-react';
 
 export const AdminMatches: React.FC = () => {
@@ -49,6 +51,8 @@ export const AdminMatches: React.FC = () => {
     triggerDemoToast,
     setAdminTab,
     navigateToPlayerProfile,
+    playerGroups,
+    sendGroupConvocatoria,
     t,
   } = useApp();
 
@@ -68,6 +72,17 @@ export const AdminMatches: React.FC = () => {
   const [editingMatch, setEditingMatch] = useState<OpenMatch | null>(null);
   const [matchToDelete, setMatchToDelete] = useState<OpenMatch | null>(null);
   const [replacingPlayerName, setReplacingPlayerName] = useState<string | null>(null);
+
+  // Convocatoria a Grupo de Jugadores (Sustituto de WhatsApp)
+  const [notifyGroupMatch, setNotifyGroupMatch] = useState<OpenMatch | null>(null);
+  const [selectedGroupIdForNotification, setSelectedGroupIdForNotification] = useState<string>('');
+  const [convocatoriaCustomSubject, setConvocatoriaCustomSubject] = useState('');
+  const [convocatoriaCustomMessage, setConvocatoriaCustomMessage] = useState('');
+  const [convocatoriaChannels, setConvocatoriaChannels] = useState<('push' | 'email' | 'whatsapp')[]>([
+    'push',
+    'email',
+    'whatsapp',
+  ]);
 
   // Edit match form state
   const [editFormData, setEditFormData] = useState<{
@@ -244,6 +259,55 @@ export const AdminMatches: React.FC = () => {
       `Partida en ${court.name} (${gender === 'male' ? 'Masculina' : gender === 'female' ? 'Femenina' : 'Mixta'}) · ${visibility === 'public' ? 'Pública' : visibility === 'group' ? `Grupo: ${restrictedGroupName}` : 'Privada'} · Cobro: ${paymentMode === 'split' ? 'Split 1/4' : 'Pago Único'}.`,
       'success'
     );
+  };
+
+  const handleCreateAndNotifyGroup = (e: React.FormEvent) => {
+    e.preventDefault();
+    const court = courts.find((c) => c.id === selectedCourtId) || courts[0];
+    const startISO = `${matchDate}T${matchTime}:00Z`;
+    const finalCreatorName = isClubCreator
+      ? `${currentTenant.name} (Club Oficial)`
+      : creatorName.trim() || 'Organizador';
+
+    const newMatchData: OpenMatch = {
+      id: `match-${Date.now()}`,
+      tenantId: currentTenant.id,
+      courtId: court.id,
+      courtName: court.name,
+      creatorName: finalCreatorName,
+      creatorLevel: Number(creatorLevel) || 4.0,
+      startTime: startISO,
+      durationMinutes: 90,
+      minLevel: Number(minLevel),
+      maxLevel: Number(maxLevel),
+      pricePerPlayer: Number(pricePerPlayer),
+      status: 'open',
+      mode: matchMode,
+      visibility,
+      restrictedGroupName: visibility === 'group' ? restrictedGroupName : undefined,
+      gender,
+      isClubCreated: isClubCreator,
+      paymentMode,
+      paymentPolicy,
+      players: [
+        {
+          id: `p-${Date.now()}`,
+          name: isClubCreator ? `Admin · ${currentTenant.name}` : finalCreatorName,
+          level: Number(creatorLevel) || 4.0,
+          position: creatorPosition,
+          paid: true,
+        },
+      ],
+    };
+
+    createOpenMatch(newMatchData);
+    setShowCreateModal(false);
+    triggerDemoToast(
+      t('matches.toastCreatedTitle', 'Partida Publicada con Éxito'),
+      `Partida creada en ${court.name}. Configura la convocatoria para el grupo de jugadores.`,
+      'success'
+    );
+    handleOpenNotifyGroup(newMatchData);
   };
 
   const handleAddPlayerSubmit = (e: React.FormEvent) => {
@@ -457,6 +521,70 @@ export const AdminMatches: React.FC = () => {
       });
     } else {
       triggerDemoToast(t('matches.linkCopied', 'Enlace copiado'), url, 'success');
+    }
+  };
+
+  // Convocatoria a Grupo de Jugadores
+  const handleOpenNotifyGroup = (match: OpenMatch) => {
+    setNotifyGroupMatch(match);
+    const bestMatchingGroup =
+      playerGroups.find(
+        (g) =>
+          g.minLevel !== undefined &&
+          g.maxLevel !== undefined &&
+          match.minLevel >= g.minLevel - 0.25 &&
+          match.maxLevel <= g.maxLevel + 0.25
+      ) || playerGroups[0];
+
+    const targetGroupId = bestMatchingGroup ? bestMatchingGroup.id : playerGroups[0]?.id || '';
+    setSelectedGroupIdForNotification(targetGroupId);
+
+    const openSlots = Math.max(1, 4 - match.players.length);
+    const dateFormatted = match.startTime.split('T')[0] || 'Hoy';
+    const timeFormatted = match.startTime.includes('T')
+      ? match.startTime.split('T')[1].slice(0, 5)
+      : '19:30';
+
+    setConvocatoriaCustomSubject(
+      `🏆 Convocatoria de Pádel: ${openSlots} plaza${openSlots > 1 ? 's' : ''} libre${openSlots > 1 ? 's' : ''} en ${match.courtName}`
+    );
+    setConvocatoriaCustomMessage(
+      `Partida abierta nivel ${match.minLevel.toFixed(2)} - ${match.maxLevel.toFixed(2)} el ${dateFormatted} a las ${timeFormatted} h en ${match.courtName}. Quedan ${openSlots} plaza(s) disponible(s). Cuota individual: ${match.pricePerPlayer.toFixed(2)} € (Pago con monedero o tarjeta).`
+    );
+    setConvocatoriaChannels(['push', 'email', 'whatsapp']);
+  };
+
+  const handleSendMatchConvocatoria = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!notifyGroupMatch) return;
+    const targetGroup =
+      playerGroups.find((g) => g.id === selectedGroupIdForNotification) || playerGroups[0];
+    if (!targetGroup) return;
+
+    const actionUrl = `https://setmio.com/partida/${notifyGroupMatch.id}`;
+
+    sendGroupConvocatoria({
+      groupId: targetGroup.id,
+      groupName: targetGroup.name,
+      type: 'match',
+      relatedId: notifyGroupMatch.id,
+      title: convocatoriaCustomSubject.trim(),
+      message: convocatoriaCustomMessage.trim(),
+      actionUrl,
+      recipientsCount: targetGroup.memberCount,
+      channels: convocatoriaChannels,
+    });
+
+    setNotifyGroupMatch(null);
+  };
+
+  const handleMatchWhatsAppShare = () => {
+    if (!notifyGroupMatch) return;
+    const actionUrl = `https://setmio.com/partida/${notifyGroupMatch.id}`;
+    const text = `🎾 *CONVOCATORIA OFICIAL DE PARTIDA EN ${currentTenant.name.toUpperCase()}*\n\n📢 *${convocatoriaCustomSubject}*\n${convocatoriaCustomMessage}\n\n👉 *Reserva y paga tu plaza directamente aquí:* ${actionUrl}`;
+    const encoded = encodeURIComponent(text);
+    if (typeof window !== 'undefined') {
+      window.open(`https://wa.me/?text=${encoded}`, '_blank');
     }
   };
 
@@ -959,16 +1087,31 @@ export const AdminMatches: React.FC = () => {
                     </button>
 
                     {!isFull && (
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setSelectedMatchForAdd(m);
-                        }}
-                        className="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[11px] transition cursor-pointer shadow-xs active:scale-95"
-                      >
-                        + Inscribir
-                      </button>
+                      <>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleOpenNotifyGroup(m);
+                          }}
+                          className="px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 font-bold text-[11px] border border-emerald-300 dark:border-emerald-800 transition cursor-pointer shadow-2xs active:scale-95 flex items-center gap-1"
+                          title="Lanzar convocatoria a grupo de jugadores (WhatsApp)"
+                        >
+                          <Megaphone className="w-3 h-3 text-emerald-500" />
+                          <span>Notificar Grupo</span>
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedMatchForAdd(m);
+                          }}
+                          className="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[11px] transition cursor-pointer shadow-xs active:scale-95"
+                        >
+                          + Inscribir
+                        </button>
+                      </>
                     )}
                   </div>
                 </div>
@@ -1334,16 +1477,33 @@ export const AdminMatches: React.FC = () => {
               )}
             </div>
 
-            {/* Footer con Enlace Compartir y Cerrar */}
-            <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2">
-              <button
-                type="button"
-                onClick={() => handleCopyMatchLink(selectedMatchForDetail.id)}
-                className="px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs hover:bg-slate-200 dark:hover:bg-slate-700 transition flex items-center gap-1.5 cursor-pointer"
-              >
-                <Share2 className="w-3.5 h-3.5" />
-                <span>{t('matches.copyLink', 'Copiar Enlace de Reserva')}</span>
-              </button>
+            {/* Footer con Enlace Compartir, Notificar Grupo y Cerrar */}
+            <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2 flex-wrap">
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => handleCopyMatchLink(selectedMatchForDetail.id)}
+                  className="px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs hover:bg-slate-200 dark:hover:bg-slate-700 transition flex items-center gap-1.5 cursor-pointer"
+                >
+                  <Share2 className="w-3.5 h-3.5" />
+                  <span>{t('matches.copyLink', 'Copiar Enlace')}</span>
+                </button>
+
+                {selectedMatchForDetail.players.length < 4 && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const m = selectedMatchForDetail;
+                      setSelectedMatchForDetail(null);
+                      handleOpenNotifyGroup(m);
+                    }}
+                    className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-95"
+                  >
+                    <Megaphone className="w-3.5 h-3.5" />
+                    <span>Notificar a Grupo ({4 - selectedMatchForDetail.players.length} plazas libres)</span>
+                  </button>
+                )}
+              </div>
 
               <button
                 type="button"
@@ -1698,13 +1858,21 @@ export const AdminMatches: React.FC = () => {
               </div>
 
               {/* Botones de acción */}
-              <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex justify-end gap-2.5">
+              <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-end gap-2.5">
                 <button
                   type="button"
                   onClick={() => setShowCreateModal(false)}
                   className="px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 font-bold text-xs text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
                 >
                   {t('matches.cancelBtn', 'Cancelar')}
+                </button>
+                <button
+                  type="button"
+                  onClick={handleCreateAndNotifyGroup}
+                  className="px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-slate-800 dark:hover:bg-slate-700 text-white font-bold text-xs shadow-md transition cursor-pointer active:scale-95 flex items-center gap-1.5"
+                >
+                  <Megaphone className="w-3.5 h-3.5 text-emerald-400" />
+                  <span>Publicar y Notificar Grupo</span>
                 </button>
                 <button
                   type="submit"
@@ -2288,6 +2456,200 @@ export const AdminMatches: React.FC = () => {
                 <span>Sí, Eliminar Partida</span>
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* ======================================================================
+          MODAL 7: CONVOCATORIA INSTANTÁNEA A GRUPO DE JUGADORES (SUSTITUTO WHATSAPP)
+          ====================================================================== */}
+      {notifyGroupMatch && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs animate-in fade-in duration-150">
+          <div className="w-full max-w-lg rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl p-6 sm:p-7 space-y-4 max-h-[92vh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+              <div className="flex items-center gap-2.5">
+                <div className="p-2 rounded-xl bg-emerald-500 text-white shadow-xs">
+                  <Megaphone className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-base font-black text-slate-900 dark:text-white">
+                    Notificar a Grupo de Jugadores
+                  </h3>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                    Sustituto oficial de grupos de WhatsApp con reserva y cobro directo a 1/4.
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setNotifyGroupMatch(null)}
+                className="p-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Ficha Resumen de la Partida */}
+            <div className="p-3.5 rounded-2xl bg-emerald-50/50 dark:bg-emerald-950/30 border border-emerald-500/20 text-xs space-y-2">
+              <div className="flex items-center justify-between font-bold text-slate-900 dark:text-white">
+                <span className="flex items-center gap-1.5">
+                  <Clock className="w-3.5 h-3.5 text-emerald-500" />
+                  <span>{notifyGroupMatch.courtName} · {notifyGroupMatch.startTime.replace('T', ' ')}</span>
+                </span>
+                <span className="px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300 font-bold text-[10px]">
+                  {4 - notifyGroupMatch.players.length} plazas libres
+                </span>
+              </div>
+
+              <div className="flex items-center justify-between text-[11px] text-slate-600 dark:text-slate-300 pt-1 border-t border-emerald-500/20">
+                <span>Rango requerido: <strong>{notifyGroupMatch.minLevel.toFixed(2)} - {notifyGroupMatch.maxLevel.toFixed(2)}</strong></span>
+                <span className="font-mono font-bold text-slate-900 dark:text-white">
+                  {notifyGroupMatch.pricePerPlayer.toFixed(2)} €/jugador
+                </span>
+              </div>
+            </div>
+
+            <form onSubmit={handleSendMatchConvocatoria} className="space-y-4 text-xs">
+              {/* Selección del Grupo Registrado */}
+              <div>
+                <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  Seleccionar Grupo de Jugadores Destinatario *
+                </label>
+                <select
+                  value={selectedGroupIdForNotification}
+                  onChange={(e) => setSelectedGroupIdForNotification(e.target.value)}
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 font-bold"
+                >
+                  {playerGroups.map((g) => (
+                    <option key={g.id} value={g.id}>
+                      {g.name} ({g.memberCount} socios · {g.category.toUpperCase()})
+                    </option>
+                  ))}
+                </select>
+                <span className="text-[10px] text-slate-400 mt-1 block">
+                  El sistema pre-selecciona automáticamente la lista que coincide con el nivel de la partida.
+                </span>
+              </div>
+
+              <div>
+                <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  Asunto de la Notificación *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={convocatoriaCustomSubject}
+                  onChange={(e) => setConvocatoriaCustomSubject(e.target.value)}
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                />
+              </div>
+
+              <div>
+                <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  Mensaje para los Jugadores *
+                </label>
+                <textarea
+                  rows={3}
+                  required
+                  value={convocatoriaCustomMessage}
+                  onChange={(e) => setConvocatoriaCustomMessage(e.target.value)}
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                />
+              </div>
+
+              <div>
+                <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  Enlace Directo de Reserva / Pago de Plaza
+                </label>
+                <input
+                  type="text"
+                  readOnly
+                  value={`https://setmio.com/partida/${notifyGroupMatch.id}`}
+                  className="w-full px-3 py-2 bg-slate-100 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-mono text-emerald-600 dark:text-emerald-400 select-all"
+                />
+              </div>
+
+              {/* Canales Simultáneos */}
+              <div>
+                <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                  Canales de Envío Simultáneos
+                </label>
+                <div className="grid grid-cols-3 gap-2">
+                  <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      checked={convocatoriaChannels.includes('push')}
+                      onChange={(e) => {
+                        if (e.target.checked) setConvocatoriaChannels([...convocatoriaChannels, 'push']);
+                        else setConvocatoriaChannels(convocatoriaChannels.filter((c) => c !== 'push'));
+                      }}
+                      className="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500"
+                    />
+                    <span className="text-[11px] font-bold">App Push</span>
+                  </div>
+
+                  <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      checked={convocatoriaChannels.includes('email')}
+                      onChange={(e) => {
+                        if (e.target.checked) setConvocatoriaChannels([...convocatoriaChannels, 'email']);
+                        else setConvocatoriaChannels(convocatoriaChannels.filter((c) => c !== 'email'));
+                      }}
+                      className="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500"
+                    />
+                    <span className="text-[11px] font-bold">Email Club</span>
+                  </div>
+
+                  <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      checked={convocatoriaChannels.includes('whatsapp')}
+                      onChange={(e) => {
+                        if (e.target.checked) setConvocatoriaChannels([...convocatoriaChannels, 'whatsapp']);
+                        else setConvocatoriaChannels(convocatoriaChannels.filter((c) => c !== 'whatsapp'));
+                      }}
+                      className="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500"
+                    />
+                    <span className="text-[11px] font-bold">WhatsApp</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Botón WhatsApp opcional */}
+              <div className="p-3 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-500/30 flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2 text-emerald-800 dark:text-emerald-300">
+                  <MessageCircle className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span className="text-[11px] font-bold">
+                    ¿Quieres compartirlo también en WhatsApp Web?
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleMatchWhatsAppShare}
+                  className="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[11px] transition shrink-0 cursor-pointer"
+                >
+                  Abrir WhatsApp
+                </button>
+              </div>
+
+              <div className="pt-2 flex justify-end gap-2 border-t border-slate-100 dark:border-slate-800">
+                <button
+                  type="button"
+                  onClick={() => setNotifyGroupMatch(null)}
+                  className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs cursor-pointer"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-sm flex items-center gap-1.5 cursor-pointer active:scale-95"
+                >
+                  <Send className="w-4 h-4" />
+                  <span>Lanzar Convocatoria a Grupo</span>
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

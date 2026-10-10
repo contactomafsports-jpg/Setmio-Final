@@ -328,6 +328,48 @@ export interface AcademyGroup {
   schedule: string;
 }
 
+export interface PlayerGroupMember {
+  id: string;
+  name: string;
+  level: number;
+  phone: string;
+  email: string;
+  isMember: boolean;
+  avatarUrl?: string;
+}
+
+export interface PlayerGroup {
+  id: string;
+  tenantId: string;
+  name: string;
+  description: string;
+  category: 'level' | 'academy' | 'venue' | 'social';
+  minLevel?: number;
+  maxLevel?: number;
+  memberCount: number;
+  playerNames: string[];
+  members?: PlayerGroupMember[];
+  createdAt: string;
+  lastConvocatoriaAt?: string;
+  lastConvocatoriaSubject?: string;
+  isWhatsAppReplacement?: boolean;
+}
+
+export interface PlayerGroupConvocatoria {
+  id: string;
+  tenantId: string;
+  groupId: string;
+  groupName: string;
+  type: 'match' | 'class' | 'general';
+  relatedId?: string; // matchId or classId
+  title: string;
+  message: string;
+  actionUrl: string;
+  recipientsCount: number;
+  sentAt: string;
+  channels: ('push' | 'email' | 'whatsapp')[];
+}
+
 export interface TournamentSponsor {
   id: string;
   name: string;

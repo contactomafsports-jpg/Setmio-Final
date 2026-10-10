@@ -18,6 +18,8 @@ import {
   PageBlock,
   Plan,
   ClubRanking,
+  PlayerGroup,
+  PlayerGroupConvocatoria,
 } from '../types/database';
 import {
   INITIAL_TENANT,
@@ -36,6 +38,8 @@ import {
   INITIAL_AUDIT_LOGS,
   INITIAL_PAGE_BLOCKS,
   INITIAL_RANKINGS,
+  INITIAL_PLAYER_GROUPS,
+  INITIAL_GROUP_CONVOCATORIAS,
 } from '../data/initialData';
 import { fallbackLng, SupportedLanguage, TRANSLATIONS } from '../lib/i18n';
 import { i18n } from '../i18n';
@@ -612,6 +616,13 @@ interface AppContextType {
   createRanking: (ranking: Omit<ClubRanking, 'id' | 'tenantId'>) => void;
   updateRanking: (id: string, updates: Partial<ClubRanking>) => void;
   linkTournamentToRanking: (rankingId: string, tournamentId: string) => void;
+
+  playerGroups: PlayerGroup[];
+  createPlayerGroup: (group: Omit<PlayerGroup, 'id' | 'tenantId' | 'createdAt'>) => void;
+  updatePlayerGroup: (groupId: string, data: Partial<PlayerGroup>) => void;
+  deletePlayerGroup: (groupId: string) => void;
+  groupConvocatorias: PlayerGroupConvocatoria[];
+  sendGroupConvocatoria: (convocatoria: Omit<PlayerGroupConvocatoria, 'id' | 'tenantId' | 'sentAt'>) => void;
 
   products: Product[];
   cart: CartItem[];
@@ -1413,6 +1424,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [academyGroups] = useState<AcademyGroup[]>(INITIAL_ACADEMY_GROUPS);
   const [tournaments, setTournaments] = useState<Tournament[]>(() => readDemoState('setmio_demo_tournaments_v1', INITIAL_TOURNAMENTS));
   const [rankings, setRankings] = useState<ClubRanking[]>(() => readDemoState('setmio_demo_rankings_v1', INITIAL_RANKINGS));
+  const [playerGroups, setPlayerGroups] = useState<PlayerGroup[]>(() => readDemoState('setmio_demo_player_groups_v1', INITIAL_PLAYER_GROUPS));
+  const [groupConvocatorias, setGroupConvocatorias] = useState<PlayerGroupConvocatoria[]>(() => readDemoState('setmio_demo_group_convocatorias_v1', INITIAL_GROUP_CONVOCATORIAS));
   const [products] = useState<Product[]>(INITIAL_PRODUCTS);
   const [blogPosts] = useState<BlogPost[]>(INITIAL_BLOG_POSTS);
   const [pageBlocks, setPageBlocks] = useState<PageBlock[]>(() => readDemoState('setmio_demo_page_blocks_v1', INITIAL_PAGE_BLOCKS));
@@ -1990,6 +2003,78 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     triggerDemoToast('Torneo Vinculado', 'El torneo ha sido vinculado al ranking con éxito.', 'success');
   };
 
+  // Player Groups & Convocatorias (WhatsApp replacement)
+  const createPlayerGroup = (groupData: Omit<PlayerGroup, 'id' | 'tenantId' | 'createdAt'>) => {
+    const newGroup: PlayerGroup = {
+      ...groupData,
+      id: `grp-${Date.now().toString().slice(-5)}`,
+      tenantId: currentTenant.id,
+      createdAt: new Date().toISOString().split('T')[0],
+      isWhatsAppReplacement: true,
+    };
+    setPlayerGroups((prev) => {
+      const next = [newGroup, ...prev];
+      saveDemoState('setmio_demo_player_groups_v1', next);
+      return next;
+    });
+    triggerDemoToast(
+      'Grupo de Jugadores Creado',
+      `El grupo "${newGroup.name}" (${newGroup.memberCount} jugadores) está listo para convocatorias instantáneas.`,
+      'success'
+    );
+  };
+
+  const updatePlayerGroup = (groupId: string, data: Partial<PlayerGroup>) => {
+    setPlayerGroups((prev) => {
+      const next = prev.map((g) => (g.id === groupId ? { ...g, ...data } : g));
+      saveDemoState('setmio_demo_player_groups_v1', next);
+      return next;
+    });
+    triggerDemoToast('Grupo Actualizado', 'Los cambios en la lista de distribución se han guardado.', 'success');
+  };
+
+  const deletePlayerGroup = (groupId: string) => {
+    setPlayerGroups((prev) => {
+      const next = prev.filter((g) => g.id !== groupId);
+      saveDemoState('setmio_demo_player_groups_v1', next);
+      return next;
+    });
+    triggerDemoToast('Grupo Eliminado', 'La lista de distribución ha sido retirada.', 'info');
+  };
+
+  const sendGroupConvocatoria = (convocatoria: Omit<PlayerGroupConvocatoria, 'id' | 'tenantId' | 'sentAt'>) => {
+    const now = 'Ahora mismo';
+    const newConv: PlayerGroupConvocatoria = {
+      ...convocatoria,
+      id: `cnv-${Date.now().toString().slice(-5)}`,
+      tenantId: currentTenant.id,
+      sentAt: now,
+    };
+    setGroupConvocatorias((prev) => {
+      const next = [newConv, ...prev];
+      saveDemoState('setmio_demo_group_convocatorias_v1', next);
+      return next;
+    });
+    setPlayerGroups((prev) => {
+      const next = prev.map((g) =>
+        g.id === convocatoria.groupId
+          ? {
+              ...g,
+              lastConvocatoriaAt: now,
+              lastConvocatoriaSubject: convocatoria.title,
+            }
+          : g
+      );
+      saveDemoState('setmio_demo_player_groups_v1', next);
+      return next;
+    });
+    triggerDemoToast(
+      'Convocatoria Lanzada',
+      `Convocatoria enviada con éxito a ${convocatoria.groupName} (${convocatoria.recipientsCount} jugadores notificados con enlace directo).`,
+      'success'
+    );
+  };
+
   // Page blocks editor
   const updatePageBlocks = (blocks: PageBlock[]) => {
     setPageBlocks(blocks);
@@ -2327,6 +2412,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         createRanking,
         updateRanking,
         linkTournamentToRanking,
+
+        playerGroups,
+        createPlayerGroup,
+        updatePlayerGroup,
+        deletePlayerGroup,
+        groupConvocatorias,
+        sendGroupConvocatoria,
 
         products,
         cart,

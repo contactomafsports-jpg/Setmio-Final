@@ -70,6 +70,11 @@ export const PlayerPortal: React.FC = () => {
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
   const [tournamentSubTab, setTournamentSubTab] = useState<'inscribed' | 'in_progress' | 'upcoming'>('inscribed');
 
+  const userPendingPaymentMatch = openMatches.find((m) =>
+    m.players.some((p) => p.name === currentUser.name && !p.paid)
+  );
+  const hasUnpaidMatch = Boolean(userPendingPaymentMatch);
+
   const clubDisplayName = currentTenant.name;
   const clubShortName = currentTenant.shortName;
   const clubInitials = currentTenant.name
@@ -242,10 +247,39 @@ export const PlayerPortal: React.FC = () => {
       </div>
 
       {/* 4. MAIN CONTENT AREA */}
-      <main className="max-w-5xl mx-auto px-4 sm:px-6 pt-6 space-y-8">
+      <main className="max-w-5xl mx-auto px-4 sm:px-6 pt-6 pb-24 sm:pb-8 space-y-6">
         {/* OVERVIEW TAB */}
         {activePlayerTab === 'overview' && (
           <div className="space-y-6 animate-in fade-in duration-150">
+            {/* Aviso de Pago Pendiente (Split 1/4) Mobile-First */}
+            {userPendingPaymentMatch && (
+              <div className="p-5 sm:p-6 rounded-3xl bg-amber-50 dark:bg-amber-950/40 border-2 border-amber-400 dark:border-amber-600 shadow-md flex flex-col sm:flex-row sm:items-center justify-between gap-4 animate-in fade-in duration-200">
+                <div className="space-y-1">
+                  <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-100 dark:bg-amber-900/60 text-amber-900 dark:text-amber-200 text-[10px] font-extrabold uppercase tracking-wider">
+                    <Clock className="w-3.5 h-3.5 text-amber-600" />
+                    <span>Pago Dividido Pendiente · Split 1/4</span>
+                  </div>
+                  <h3 className="text-base sm:text-lg font-black text-slate-900 dark:text-white">
+                    Tienes 1 plaza reservada en {userPendingPaymentMatch.courtName}
+                  </h3>
+                  <p className="text-xs text-slate-600 dark:text-slate-300">
+                    Fecha: {userPendingPaymentMatch.startTime.split('T')[0]} a las {userPendingPaymentMatch.startTime.split('T')[1]?.slice(0, 5)} h · Tu cuota individual: <strong className="font-mono text-emerald-600 dark:text-emerald-400 font-bold">{userPendingPaymentMatch.pricePerPlayer.toFixed(2)} €</strong>
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2 shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => setActivePlayerTab('matches')}
+                    className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md transition flex items-center justify-center gap-2 active:scale-95 cursor-pointer"
+                  >
+                    <CreditCard className="w-4 h-4" />
+                    <span>Pagar mi parte ({userPendingPaymentMatch.pricePerPlayer.toFixed(2)} €)</span>
+                  </button>
+                </div>
+              </div>
+            )}
+
             {/* Next Match Highlight Card */}
             {upcomingBooking && (
               <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-emerald-500/40 shadow-lg space-y-4">
@@ -885,6 +919,50 @@ export const PlayerPortal: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* 9. MOBILE-FIRST BOTTOM NAVIGATION BAR (Acción Rápida & Navegación Táctil) */}
+      <nav className="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 py-1 px-2 flex items-center justify-around shadow-lg">
+        {[
+          { id: 'overview', label: 'Inicio', icon: Home },
+          { id: 'booking', label: 'Reservar', icon: Calendar },
+          {
+            id: 'matches',
+            label: 'Partidos',
+            icon: Users,
+            badge: hasUnpaidMatch ? '!' : undefined,
+          },
+          { id: 'tournaments', label: 'Torneos', icon: Trophy },
+          { id: 'profile', label: 'Mi Ficha', icon: UserRound },
+        ].map((tab) => {
+          const Icon = tab.icon;
+          const isActive = activePlayerTab === tab.id;
+          return (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => setActivePlayerTab(tab.id as typeof activePlayerTab)}
+              className={`relative flex flex-col items-center justify-center py-1.5 px-3 rounded-xl transition cursor-pointer ${
+                isActive
+                  ? 'text-emerald-600 dark:text-emerald-400 font-bold'
+                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+              }`}
+            >
+              <div className="relative">
+                <Icon className={`w-5 h-5 ${isActive ? 'stroke-[2.5]' : 'stroke-2'}`} />
+                {tab.badge && (
+                  <span className="absolute -top-1 -right-2 w-4 h-4 rounded-full bg-amber-500 text-slate-950 font-black text-[9px] flex items-center justify-center animate-bounce shadow-xs">
+                    {tab.badge}
+                  </span>
+                )}
+              </div>
+              <span className="text-[10px] mt-0.5">{tab.label}</span>
+              {isActive && (
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-0.5" />
+              )}
+            </button>
+          );
+        })}
+      </nav>
     </div>
   );
 };

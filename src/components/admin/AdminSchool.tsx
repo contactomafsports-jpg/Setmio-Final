@@ -30,6 +30,7 @@ import {
   DollarSign,
   ChevronRight,
   UserPlus,
+  Megaphone,
 } from 'lucide-react';
 
 export interface SchoolStudent {
@@ -251,7 +252,15 @@ const INITIAL_STUDENTS_DATA: SchoolStudent[] = [
 ];
 
 export const AdminSchool: React.FC = () => {
-  const { coaches, courts, triggerDemoToast, currentTenant, t } = useApp();
+  const {
+    coaches,
+    courts,
+    triggerDemoToast,
+    currentTenant,
+    playerGroups,
+    sendGroupConvocatoria,
+    t,
+  } = useApp();
 
   const [groups, setGroups] = useState<SchoolGroupItem[]>(INITIAL_GROUPS);
   const [coachesList, setCoachesList] = useState<SchoolCoachItem[]>(INITIAL_COACHES_DATA);
@@ -273,6 +282,13 @@ export const AdminSchool: React.FC = () => {
   const [confirmDeleteGroup, setConfirmDeleteGroup] = useState<SchoolGroupItem | null>(null);
   const [confirmPublishClass, setConfirmPublishClass] = useState<SchoolGroupItem | null>(null);
   const [inviteModalGroup, setInviteModalGroup] = useState<SchoolGroupItem | null>(null);
+  const [notifyGroupSchoolItem, setNotifyGroupSchoolItem] = useState<SchoolGroupItem | null>(null);
+
+  // Notificar a Grupo Form State
+  const [selectedGroupIdForClass, setSelectedGroupIdForClass] = useState<string>('');
+  const [classConvocatoriaSubject, setClassConvocatoriaSubject] = useState<string>('');
+  const [classConvocatoriaMessage, setClassConvocatoriaMessage] = useState<string>('');
+  const [classChannels, setClassChannels] = useState({ push: true, whatsapp: true, email: false });
 
   // Invitation Modal Form State
   const [inviteSelectedUser, setInviteSelectedUser] = useState('Carlos Méndez');
@@ -561,6 +577,60 @@ export const AdminSchool: React.FC = () => {
     setConfirmPublishClass(null);
   };
 
+  // Open Notification to Player Group for Class with open spots
+  const handleOpenNotifyGroupForClass = (group: SchoolGroupItem) => {
+    setNotifyGroupSchoolItem(group);
+    const vacantCount = Math.max(1, group.maxStudents - group.currentStudents);
+
+    // Auto find best matching player group by category / name
+    const bestMatchingGroup =
+      playerGroups.find((g) =>
+        group.levelCategory.toLowerCase().includes(g.category) ||
+        g.name.toLowerCase().includes('escuela') ||
+        g.name.toLowerCase().includes(group.levelCategory.toLowerCase())
+      ) || playerGroups[0];
+
+    const targetGroupId = bestMatchingGroup ? bestMatchingGroup.id : playerGroups[0]?.id || '';
+    setSelectedGroupIdForClass(targetGroupId);
+    setClassConvocatoriaSubject(`Plaza disponible en ${group.name} (${group.schedule})`);
+    setClassConvocatoriaMessage(
+      `¡Hola! Quedan ${vacantCount} plaza(s) disponible(s) en la sesión "${group.name}" impartida por ${group.coachName} en ${group.courtName}. Horario: ${group.schedule} (${group.days.join(', ')}). Reserva tu plaza y gestiona el pago de forma inmediata:`
+    );
+    setClassChannels({ push: true, whatsapp: true, email: false });
+  };
+
+  const handleSendClassConvocatoria = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!notifyGroupSchoolItem) return;
+
+    const targetGroup =
+      playerGroups.find((g) => g.id === selectedGroupIdForClass) || playerGroups[0];
+    const vacantCount = Math.max(1, notifyGroupSchoolItem.maxStudents - notifyGroupSchoolItem.currentStudents);
+
+    const activeChannels = (Object.entries(classChannels)
+      .filter(([, v]) => v)
+      .map(([k]) => k) as ('push' | 'whatsapp' | 'email')[]);
+
+    sendGroupConvocatoria({
+      groupId: targetGroup.id,
+      groupName: targetGroup.name,
+      type: 'class',
+      relatedId: notifyGroupSchoolItem.id,
+      title: classConvocatoriaSubject.trim(),
+      message: classConvocatoriaMessage.trim(),
+      actionUrl: `https://setmio.com/clase/${notifyGroupSchoolItem.id}`,
+      recipientsCount: targetGroup.memberCount,
+      channels: activeChannels.length > 0 ? activeChannels : ['push'],
+    });
+
+    setNotifyGroupSchoolItem(null);
+    triggerDemoToast(
+      'Convocatoria Enviada a Grupo',
+      `Notificación enviada a los ${targetGroup.memberCount} socios de "${targetGroup.name}" vía ${activeChannels.map((c) => c.toUpperCase()).join(' + ') || 'Push'}. ${vacantCount} plaza(s) convocada(s).`,
+      'success'
+    );
+  };
+
   // Execute Delete Group
   const executeDelete = () => {
     if (!confirmDeleteGroup) return;
@@ -627,6 +697,15 @@ export const AdminSchool: React.FC = () => {
             <div className="flex items-center gap-2">
               {selectedGroupDetail.maxStudents - selectedGroupDetail.currentStudents > 0 && (
                 <>
+                  <button
+                    type="button"
+                    onClick={() => handleOpenNotifyGroupForClass(selectedGroupDetail)}
+                    className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-95"
+                    title="Convocatoria instantánea a grupos de jugadores (WhatsApp)"
+                  >
+                    <Megaphone className="w-3.5 h-3.5" />
+                    <span>Notificar a Grupo ({selectedGroupDetail.maxStudents - selectedGroupDetail.currentStudents} libres)</span>
+                  </button>
                   <button
                     type="button"
                     onClick={() => setConfirmPublishClass(selectedGroupDetail)}
@@ -1224,6 +1303,15 @@ export const AdminSchool: React.FC = () => {
                       <div className="flex items-center gap-2">
                         {openSpots > 0 && (
                           <>
+                            <button
+                              type="button"
+                              onClick={() => handleOpenNotifyGroupForClass(group)}
+                              className="px-2.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[11px] shadow-2xs flex items-center gap-1 transition cursor-pointer active:scale-95"
+                              title="Convocatoria instantánea a grupos de jugadores (WhatsApp)"
+                            >
+                              <Megaphone className="w-3 h-3" />
+                              <span>Notificar Grupo</span>
+                            </button>
                             <button
                               type="button"
                               onClick={() => setConfirmPublishClass(group)}
@@ -1966,6 +2054,173 @@ export const AdminSchool: React.FC = () => {
                 <span>Confirmar y Publicar</span>
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* =====================================================================
+          MODAL: NOTIFICAR A GRUPO DE JUGADORES (CONVOCATORIA PARA CLASE / CURSO)
+          ===================================================================== */}
+      {notifyGroupSchoolItem && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs animate-in fade-in duration-150">
+          <div className="w-full max-w-lg rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl p-6 sm:p-7 space-y-4 max-h-[92vh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+              <div className="flex items-center gap-2.5">
+                <div className="p-2 rounded-xl bg-emerald-500 text-white shadow-xs">
+                  <Megaphone className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-base font-black text-slate-900 dark:text-white">
+                    Notificar a Grupo de Jugadores
+                  </h3>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                    Sustituto oficial de WhatsApp con enlace directo a la inscripción y cobro.
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setNotifyGroupSchoolItem(null)}
+                className="p-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Ficha Resumen de la Clase / Sesión */}
+            <div className="p-3.5 rounded-2xl bg-emerald-50/50 dark:bg-emerald-950/30 border border-emerald-500/20 text-xs space-y-2">
+              <div className="flex items-center justify-between font-bold text-slate-900 dark:text-white">
+                <span className="flex items-center gap-1.5">
+                  <Clock className="w-3.5 h-3.5 text-emerald-500" />
+                  <span>{notifyGroupSchoolItem.name} · {notifyGroupSchoolItem.schedule}</span>
+                </span>
+                <span className="px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300 font-bold text-[10px]">
+                  {notifyGroupSchoolItem.maxStudents - notifyGroupSchoolItem.currentStudents} plazas libres
+                </span>
+              </div>
+
+              <div className="flex items-center justify-between text-[11px] text-slate-600 dark:text-slate-300 pt-1 border-t border-emerald-500/20">
+                <span>Profesor: <strong>{notifyGroupSchoolItem.coachName}</strong> ({notifyGroupSchoolItem.courtName})</span>
+                <span className="font-mono font-bold text-slate-900 dark:text-white">
+                  {notifyGroupSchoolItem.memberFee.toFixed(2)} €/sesión
+                </span>
+              </div>
+            </div>
+
+            <form onSubmit={handleSendClassConvocatoria} className="space-y-4 text-xs">
+              {/* Selección del Grupo Registrado */}
+              <div>
+                <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  Seleccionar Grupo de Jugadores Destinatario *
+                </label>
+                <select
+                  value={selectedGroupIdForClass}
+                  onChange={(e) => setSelectedGroupIdForClass(e.target.value)}
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 font-bold"
+                >
+                  {playerGroups.map((g) => (
+                    <option key={g.id} value={g.id}>
+                      {g.name} ({g.memberCount} socios · {g.category.toUpperCase()})
+                    </option>
+                  ))}
+                </select>
+                <span className="text-[10px] text-slate-400 mt-1 block">
+                  El sistema pre-selecciona automáticamente la lista más afín a la escuela o nivel de la clase.
+                </span>
+              </div>
+
+              <div>
+                <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  Asunto de la Notificación *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={classConvocatoriaSubject}
+                  onChange={(e) => setClassConvocatoriaSubject(e.target.value)}
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                />
+              </div>
+
+              <div>
+                <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  Mensaje para los Alumnos / Socios *
+                </label>
+                <textarea
+                  rows={3}
+                  required
+                  value={classConvocatoriaMessage}
+                  onChange={(e) => setClassConvocatoriaMessage(e.target.value)}
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                />
+              </div>
+
+              <div>
+                <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  Enlace Directo de Inscripción / Pago
+                </label>
+                <input
+                  type="text"
+                  readOnly
+                  value={`https://setmio.com/clase/${notifyGroupSchoolItem.id}`}
+                  className="w-full px-3 py-2 bg-slate-100 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-mono text-emerald-600 dark:text-emerald-400 select-all"
+                />
+              </div>
+
+              {/* Canales Simultáneos */}
+              <div>
+                <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                  Canales de Envío Simultáneos
+                </label>
+                <div className="grid grid-cols-3 gap-2">
+                  <label className="flex items-center gap-2 p-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 cursor-pointer text-[11px] font-bold">
+                    <input
+                      type="checkbox"
+                      checked={classChannels.push}
+                      onChange={(e) => setClassChannels({ ...classChannels, push: e.target.checked })}
+                      className="rounded accent-emerald-600"
+                    />
+                    <span>Notificación Push</span>
+                  </label>
+                  <label className="flex items-center gap-2 p-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 cursor-pointer text-[11px] font-bold">
+                    <input
+                      type="checkbox"
+                      checked={classChannels.whatsapp}
+                      onChange={(e) => setClassChannels({ ...classChannels, whatsapp: e.target.checked })}
+                      className="rounded accent-emerald-600"
+                    />
+                    <span>WhatsApp SMS</span>
+                  </label>
+                  <label className="flex items-center gap-2 p-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 cursor-pointer text-[11px] font-bold">
+                    <input
+                      type="checkbox"
+                      checked={classChannels.email}
+                      onChange={(e) => setClassChannels({ ...classChannels, email: e.target.checked })}
+                      className="rounded accent-emerald-600"
+                    />
+                    <span>Email Club</span>
+                  </label>
+                </div>
+              </div>
+
+              <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                <button
+                  type="button"
+                  onClick={() => setNotifyGroupSchoolItem(null)}
+                  className="px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 font-bold text-xs text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+                >
+                  Cancelar
+                </button>
+
+                <button
+                  type="submit"
+                  className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md transition cursor-pointer active:scale-95 flex items-center gap-2"
+                >
+                  <Megaphone className="w-4 h-4" />
+                  <span>Enviar Convocatoria a Grupo</span>
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
