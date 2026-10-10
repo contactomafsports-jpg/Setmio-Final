@@ -29,6 +29,9 @@ export const AdminAgenda: React.FC = () => {
     toggleCourtLight,
     currentUser,
     currentTenant,
+    isMultiVenue,
+    venues,
+    selectedVenueId,
     triggerDemoToast,
     navigateToPlayerProfile,
     t,
@@ -37,8 +40,30 @@ export const AdminAgenda: React.FC = () => {
   const [currentDate, setCurrentDate] = useState('2026-09-30');
   const [selectedDrawerData, setSelectedDrawerData] = useState<ReservationDrawerData | null>(null);
   const [showNewModal, setShowNewModal] = useState(false);
-  const [showAllBookingsView, setShowAllBookingsView] = useState(false);
+  const [showAllBookingsView, setShowAllBookingsView] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return (
+        window.location.pathname.includes('/reservas/todas') ||
+        window.location.pathname.includes('/todas-las-reservas')
+      );
+    }
+    return false;
+  });
   const dateInputRef = React.useRef<HTMLInputElement>(null);
+
+  // Sync with browser URL changes
+  React.useEffect(() => {
+    const handlePopState = () => {
+      if (typeof window !== 'undefined') {
+        const isAll =
+          window.location.pathname.includes('/reservas/todas') ||
+          window.location.pathname.includes('/todas-las-reservas');
+        setShowAllBookingsView(isAll);
+      }
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
 
   const stepDate = (days: number) => {
     const parts = currentDate.split('-').map(Number);
@@ -189,6 +214,9 @@ export const AdminAgenda: React.FC = () => {
 
     return {
       id: b.id,
+      venueId: b.venueId,
+      venueName: b.venueName,
+      venueShortName: b.venueShortName,
       courtId: b.courtId,
       courtName: b.courtName,
       courtType: 'Indoor Cristal Pro',
@@ -219,8 +247,16 @@ export const AdminAgenda: React.FC = () => {
   if (showAllBookingsView) {
     return (
       <AllBookingsPage
-        onBackToQuadrant={() => setShowAllBookingsView(false)}
-        onOpenNewBookingModal={() => setShowNewModal(true)}
+        onBackToQuadrant={() => {
+          setShowAllBookingsView(false);
+          setShowNewModal(false);
+          if (typeof window !== 'undefined') {
+            window.history.pushState({}, '', '/gestion/reservas');
+          }
+        }}
+        onOpenNewBookingModal={() => {
+          // Handled directly inside AllBookingsPage modal
+        }}
       />
     );
   }

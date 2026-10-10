@@ -45,6 +45,7 @@ export const AdminMatches: React.FC = () => {
     leaveOpenMatch,
     courts,
     currentTenant,
+    isMultiVenue,
     triggerDemoToast,
     setAdminTab,
     navigateToPlayerProfile,
@@ -776,7 +777,7 @@ export const AdminMatches: React.FC = () => {
                       </div>
 
                       {/* Creador: Club o Socio */}
-                      <div className="flex items-center gap-1 text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                      <div className="flex items-center gap-1.5 text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 flex-wrap">
                         {m.isClubCreated ? (
                           <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-bold">
                             <Shield className="w-3 h-3" />
@@ -784,6 +785,13 @@ export const AdminMatches: React.FC = () => {
                           </span>
                         ) : (
                           <span className="truncate">Org: {m.creatorName}</span>
+                        )}
+
+                        {isMultiVenue && (m.venueShortName || m.venueName) && (
+                          <span className="inline-flex items-center gap-1 px-1.5 py-0.2 rounded bg-indigo-50 dark:bg-indigo-950/80 text-indigo-700 dark:text-indigo-300 font-bold text-[9px] border border-indigo-200 dark:border-indigo-800">
+                            <Building2 className="w-2.5 h-2.5 text-indigo-500 shrink-0" />
+                            <span className="truncate max-w-[80px]">{m.venueShortName || m.venueName}</span>
+                          </span>
                         )}
                       </div>
                     </div>
@@ -978,21 +986,29 @@ export const AdminMatches: React.FC = () => {
           <div className="w-full max-w-xl rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl p-6 sm:p-7 space-y-5 max-h-[92vh] overflow-y-auto">
             {/* Header del modal */}
             <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
-              <div>
-                <div className="flex items-center gap-2">
-                  <span
-                    className={`text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full ${
-                      selectedMatchForDetail.mode === 'friendly'
-                        ? 'bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300'
-                        : 'bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300'
-                    }`}
-                  >
-                    {selectedMatchForDetail.mode === 'friendly'
-                      ? t('matches.modeFriendly', 'Modo Amistoso')
-                      : t('matches.modeCompetitive', 'Modo Competitivo (ELO)')}
+              <div className="space-y-1.5">
+                <div className="flex flex-wrap items-center gap-1.5">
+                  {/* Badge 1: Tipo de Partida (Abierta / Pública / Privada) */}
+                  <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800">
+                    {selectedMatchForDetail.visibility === 'private'
+                      ? 'Partida Privada'
+                      : selectedMatchForDetail.visibility === 'group'
+                      ? `Grupo: ${selectedMatchForDetail.restrictedGroupName || 'Equipo'}`
+                      : selectedMatchForDetail.status === 'open'
+                      ? 'Partida Abierta'
+                      : 'Partida Pública'}
                   </span>
 
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
+                  {/* Badge 2: Género (Masculina / Femenina / Mixta) */}
+                  <span
+                    className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full border ${
+                      selectedMatchForDetail.gender === 'female'
+                        ? 'bg-pink-50 dark:bg-pink-950/70 text-pink-700 dark:text-pink-300 border-pink-200 dark:border-pink-800'
+                        : selectedMatchForDetail.gender === 'mixed'
+                        ? 'bg-teal-50 dark:bg-teal-950/70 text-teal-700 dark:text-teal-300 border-teal-200 dark:border-teal-800'
+                        : 'bg-indigo-50 dark:bg-indigo-950/70 text-indigo-700 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800'
+                    }`}
+                  >
                     {selectedMatchForDetail.gender === 'female'
                       ? 'Femenina'
                       : selectedMatchForDetail.gender === 'mixed'
@@ -1000,8 +1016,29 @@ export const AdminMatches: React.FC = () => {
                       : 'Masculina'}
                   </span>
 
+                  {/* Badge 3: Modo Competitivo o Amistoso */}
+                  <span
+                    className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
+                      selectedMatchForDetail.mode === 'friendly'
+                        ? 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700'
+                        : 'bg-amber-50 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border-amber-200 dark:border-amber-800'
+                    }`}
+                  >
+                    {selectedMatchForDetail.mode === 'friendly'
+                      ? t('matches.modeFriendly', 'Modo Amistoso')
+                      : t('matches.modeCompetitive', 'Modo Competitivo (ELO)')}
+                  </span>
+
+                  {/* Badge 4: Sede (en entornos multi-sede) */}
+                  {isMultiVenue && (selectedMatchForDetail.venueShortName || selectedMatchForDetail.venueName) && (
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 flex items-center gap-1">
+                      <Building2 className="w-3 h-3 text-indigo-500" />
+                      <span>{selectedMatchForDetail.venueShortName || selectedMatchForDetail.venueName}</span>
+                    </span>
+                  )}
+
                   {selectedMatchForDetail.isClubCreated && (
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 flex items-center gap-1">
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
                       <Shield className="w-3 h-3" />
                       <span>Oficial Club</span>
                     </span>
@@ -1016,30 +1053,33 @@ export const AdminMatches: React.FC = () => {
                   {selectedMatchForDetail.startTime.includes('T')
                     ? selectedMatchForDetail.startTime.split('T')[1].slice(0, 5)
                     : '19:30'}{' '}
-                  · {selectedMatchForDetail.durationMinutes} min · {selectedMatchForDetail.visibility === 'group' ? `Grupo: ${selectedMatchForDetail.restrictedGroupName}` : selectedMatchForDetail.visibility === 'private' ? 'Privada' : 'Pública'}
+                  · {selectedMatchForDetail.durationMinutes} min
                 </p>
               </div>
 
               <button
                 type="button"
                 onClick={() => setSelectedMatchForDetail(null)}
-                className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+                className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer shrink-0"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            {/* Barra de Acciones de Administración si la partida está Abierta */}
+            {/* Barra de Acciones de Administración si la partida está Abierta (Sin título redundante, contenedor sin desborde) */}
             {(selectedMatchForDetail.status === 'open' || selectedMatchForDetail.players.length < 4) && (
-              <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 flex items-center justify-between gap-2">
-                <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                  Acciones Administrador (Partida Abierta)
-                </span>
+              <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-2.5">
                 <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+                  <span className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                    Convocatoria abierta · {Math.max(0, 4 - selectedMatchForDetail.players.length)} plazas disponibles
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 shrink-0">
                   <button
                     type="button"
                     onClick={() => handleOpenEditMatch(selectedMatchForDetail)}
-                    className="px-3 py-1.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 hover:border-emerald-500 text-slate-700 dark:text-slate-300 font-bold text-xs flex items-center gap-1.5 cursor-pointer shadow-2xs transition"
+                    className="px-3 py-1.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 hover:border-emerald-500 text-slate-700 dark:text-slate-300 font-bold text-xs flex items-center gap-1.5 cursor-pointer shadow-2xs transition shrink-0"
                   >
                     <Edit3 className="w-3.5 h-3.5 text-emerald-500" />
                     <span>Editar Partida</span>
@@ -1047,7 +1087,7 @@ export const AdminMatches: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setMatchToDelete(selectedMatchForDetail)}
-                    className="px-3 py-1.5 rounded-xl bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-900 text-rose-600 dark:text-rose-400 font-bold text-xs flex items-center gap-1.5 cursor-pointer hover:bg-rose-100 transition shadow-2xs"
+                    className="px-3 py-1.5 rounded-xl bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-900 hover:bg-rose-100 dark:hover:bg-rose-900 text-rose-600 dark:text-rose-400 font-bold text-xs flex items-center gap-1.5 cursor-pointer transition shadow-2xs shrink-0"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                     <span>Eliminar</span>
@@ -1234,8 +1274,19 @@ export const AdminMatches: React.FC = () => {
                       className="p-3 rounded-xl bg-white dark:bg-slate-900 border border-amber-200 dark:border-amber-800/60 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs"
                     >
                       <div>
-                        <div className="font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                          <span>{req.playerName}</span>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSelectedMatchForDetail(null);
+                              navigateToPlayerProfile(req.playerName, 'matches');
+                            }}
+                            className="font-bold text-slate-900 dark:text-white flex items-center gap-1.5 cursor-pointer hover:text-emerald-500 transition group text-left"
+                            title={`Ver perfil de ${req.playerName}`}
+                          >
+                            <span className="group-hover:underline">{req.playerName}</span>
+                            <span className="text-[10px] text-emerald-500 font-normal">↗</span>
+                          </button>
                           <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300">
                             Nivel {req.playerLevel.toFixed(2)}
                           </span>

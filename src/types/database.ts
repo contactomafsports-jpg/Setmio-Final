@@ -118,6 +118,7 @@ export interface Tenant {
     cancellationWindowHours: number;
     splitPaymentAllowed: boolean;
     playerMatchCreationAllowed: boolean;
+    isMultiVenue?: boolean;
     openingHours: {
       days: string;
       hours: string;
@@ -219,11 +220,18 @@ export interface Court {
   isDoorOpen?: boolean;
   isDeviceOnline?: boolean;
   accessPin?: string;
+  venueId?: string;
+  venueName?: string;
 }
 
 export interface Booking {
   id: string;
   tenantId: string;
+  venueId?: string;
+  venueName?: string;
+  venueShortName?: string;
+  category?: 'match' | 'academy' | 'private' | 'tournament' | 'maintenance';
+  title?: string;
   courtId: string;
   courtName: string;
   creatorId: string;
@@ -261,6 +269,9 @@ export interface OpenMatchSlotRequest {
 export interface OpenMatch {
   id: string;
   tenantId: string;
+  venueId?: string;
+  venueName?: string;
+  venueShortName?: string;
   courtId: string;
   courtName: string;
   creatorName: string;

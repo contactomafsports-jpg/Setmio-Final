@@ -127,6 +127,96 @@ const INITIAL_CUSTOMERS: CustomerItem[] = [
     position: 'Revés',
     status: 'Esporádico',
   },
+  {
+    id: 'c-7',
+    name: 'Mateo Varela',
+    email: 'mateo.varela@padelsanmateo.es',
+    phone: '+34 600 11 22 33',
+    memberNum: 'SM-055',
+    level: 4.15,
+    balance: 35.0,
+    isMember: true,
+    matches: 52,
+    avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80',
+    hand: 'Diestro',
+    position: 'Revés',
+    status: 'Activo (Socio)',
+  },
+  {
+    id: 'c-8',
+    name: 'Lucas Piñeiro',
+    email: 'lucas.pineiro@email.es',
+    phone: '+34 677 88 99 00',
+    memberNum: 'Casual',
+    level: 3.85,
+    balance: 15.0,
+    isMember: false,
+    matches: 22,
+    avatarUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=200&q=80',
+    hand: 'Diestro',
+    position: 'Drive',
+    status: 'Esporádico',
+  },
+  {
+    id: 'c-9',
+    name: 'David Castro',
+    email: 'david.castro@email.es',
+    phone: '+34 688 99 00 11',
+    memberNum: 'SM-420',
+    level: 4.10,
+    balance: 40.0,
+    isMember: true,
+    matches: 31,
+    avatarUrl: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=200&q=80',
+    hand: 'Diestro',
+    position: 'Revés',
+    status: 'Activo (Al día)',
+  },
+  {
+    id: 'c-10',
+    name: 'Pablo Vello',
+    email: 'pablo.vello@email.es',
+    phone: '+34 699 00 11 22',
+    memberNum: 'SM-019',
+    level: 4.80,
+    balance: 55.0,
+    isMember: true,
+    matches: 64,
+    avatarUrl: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=200&q=80',
+    hand: 'Zurdo',
+    position: 'Drive',
+    status: 'Activo (Al día)',
+  },
+  {
+    id: 'c-11',
+    name: 'Laura Senra',
+    email: 'laura.senra@padelsanmateo.es',
+    phone: '+34 655 44 33 22',
+    memberNum: 'SM-PRO',
+    level: 5.00,
+    balance: 80.0,
+    isMember: true,
+    matches: 90,
+    avatarUrl: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=200&q=80',
+    hand: 'Diestro',
+    position: 'Revés',
+    status: 'Socia Pro',
+  },
+  {
+    id: 'c-12',
+    name: 'Rosa Carballo',
+    email: 'rosa.carballo@email.es',
+    phone: '+34 611 99 88 77',
+    memberNum: 'SM-042',
+    level: 3.90,
+    balance: 22.0,
+    isMember: true,
+    matches: 27,
+    avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
+    hand: 'Diestro',
+    position: 'Drive',
+    status: 'Activo (Al día)',
+  },
 ];
 
 export const AdminCustomers: React.FC = () => {
@@ -158,7 +248,7 @@ export const AdminCustomers: React.FC = () => {
   React.useEffect(() => {
     const handleUrlPlayer = () => {
       const pathname = typeof window !== 'undefined' ? window.location.pathname : '';
-      // Si la URL es la lista general (/socios, /crm, /gestion/jugadores, /jugadores sin slug), forzar lista general
+      // Si la URL es la lista general (/socios, /crm, /gestion/jugadores, /admin/socios sin id), forzar lista general
       if (
         pathname === '/socios' ||
         pathname === '/crm' ||
@@ -174,41 +264,61 @@ export const AdminCustomers: React.FC = () => {
         return;
       }
 
-      if (pathname.startsWith('/jugadores/') || pathname.startsWith('/gestion/jugadores/')) {
-        const slug = pathname.replace('/gestion/jugadores/', '').replace('/jugadores/', '').toLowerCase().trim();
-        if (slug) {
-          const found = customerList.find(
-            (c) =>
-              c.name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-') === slug ||
-              c.id.toLowerCase() === slug ||
-              c.name.toLowerCase().includes(slug.replace(/-/g, ' '))
-          );
-          if (found) {
-            setSelectedCustomer(found);
-            return;
-          }
-        }
+      // Check all individual profile paths: /admin/socios/:id, /gestion/socios/:id, /gestion/jugadores/:id, /jugadores/:id
+      let targetSlug = '';
+      if (pathname.includes('/admin/socios/')) {
+        targetSlug = pathname.split('/admin/socios/')[1]?.toLowerCase().trim() || '';
+      } else if (pathname.includes('/gestion/socios/')) {
+        targetSlug = pathname.split('/gestion/socios/')[1]?.toLowerCase().trim() || '';
+      } else if (pathname.includes('/socios/')) {
+        targetSlug = pathname.split('/socios/')[1]?.toLowerCase().trim() || '';
+      } else if (pathname.includes('/gestion/jugadores/')) {
+        targetSlug = pathname.split('/gestion/jugadores/')[1]?.toLowerCase().trim() || '';
+      } else if (pathname.includes('/jugadores/')) {
+        targetSlug = pathname.split('/jugadores/')[1]?.toLowerCase().trim() || '';
       }
 
-      if (!selectedCustomerId) {
-        setSelectedCustomer(null);
+      const lookupKey = targetSlug || selectedCustomerId || '';
+
+      if (lookupKey) {
+        const cleanKey = lookupKey.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-');
+        const found = customerList.find(
+          (c) =>
+            c.id.toLowerCase() === lookupKey.toLowerCase() ||
+            c.name.toLowerCase() === lookupKey.toLowerCase() ||
+            c.name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-') === cleanKey ||
+            c.name.toLowerCase().includes(lookupKey.toLowerCase()) ||
+            cleanKey.includes(c.name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-'))
+        );
+
+        if (found) {
+          setSelectedCustomer(found);
+          return;
+        }
+
+        // Si no está registrado en la demo, autogenerar la ficha para garantizar 100% navegación fluida
+        const fallbackPlayerName = selectedCustomerId || lookupKey.replace(/-/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase());
+        const dynamicPlayer: CustomerItem = {
+          id: `c-${cleanKey || 'temp'}`,
+          name: fallbackPlayerName,
+          email: `${cleanKey || 'jugador'}@galiciapadel.com`,
+          phone: '+34 611 22 33 44',
+          memberNum: `SM-${Math.floor(400 + Math.random() * 50)}`,
+          level: 3.90,
+          balance: 25.0,
+          isMember: true,
+          matches: 18,
+          avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
+          hand: 'Diestro',
+          position: 'Drive',
+          status: 'Activo (Al día)',
+        };
+        setSelectedCustomer(dynamicPlayer);
         return;
       }
 
-      if (selectedCustomerId) {
-        const slug = selectedCustomerId.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-');
-        const found = customerList.find(
-          (c) =>
-            c.id.toLowerCase() === selectedCustomerId.toLowerCase() ||
-            c.name.toLowerCase() === selectedCustomerId.toLowerCase() ||
-            c.name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-') === slug ||
-            c.name.toLowerCase().includes(selectedCustomerId.toLowerCase())
-        );
-        if (found) {
-          setSelectedCustomer(found);
-        } else {
-          setSelectedCustomer(null);
-        }
+      if (!selectedCustomerId && !targetSlug) {
+        setSelectedCustomer(null);
       }
     };
 
@@ -222,7 +332,7 @@ export const AdminCustomers: React.FC = () => {
     setSelectedCustomerId(customer.id);
     const slug = customer.name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-');
     if (typeof window !== 'undefined') {
-      window.history.pushState({}, '', `/gestion/jugadores/${slug}`);
+      window.history.pushState({}, '', `/admin/socios/${slug}`);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };

@@ -142,19 +142,26 @@ export const AdminCafePOS: React.FC = () => {
     { label: 'Pala de Pádel Pro', url: 'https://images.unsplash.com/photo-1612872087720-bb876e2e67d1?auto=format&fit=crop&w=400&q=80' },
   ];
 
-  const getFallbackProductImage = (cat: string) => {
-    switch (cat) {
-      case 'Café':
-        return 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=400&q=80';
-      case 'Bocadillos':
-        return 'https://images.unsplash.com/photo-1509722747041-616f39b57569?auto=format&fit=crop&w=400&q=80';
-      case 'Snacks':
-        return 'https://images.unsplash.com/photo-1622484216805-4c0734cba8f0?auto=format&fit=crop&w=400&q=80';
-      case 'Grip/Pelotas':
-        return 'https://images.unsplash.com/photo-1554068865-24cecd4e34b8?auto=format&fit=crop&w=400&q=80';
-      default:
-        return 'https://images.unsplash.com/photo-1548839140-29a749e1bc4e?auto=format&fit=crop&w=400&q=80';
-    }
+  const CATEGORY_PLACEHOLDERS: Record<string, string> = {
+    Bebidas:
+      'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="200" viewBox="0 0 300 200" fill="none"><rect width="300" height="200" fill="%230f172a"/><rect x="15" y="15" width="270" height="170" rx="16" fill="%231e293b" stroke="%23334155" stroke-width="1.5"/><circle cx="150" cy="85" r="32" fill="%2306b6d4" fill-opacity="0.15" stroke="%2306b6d4" stroke-width="2"/><path d="M142 65h16v8h-16zM139 73h22l4 28a4 4 0 0 1-4 4h-18a4 4 0 0 1-4-4l4-28z" stroke="%2306b6d4" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><text x="150" y="142" fill="%2338bdf8" font-family="system-ui,sans-serif" font-size="12" font-weight="700" text-anchor="middle">BEBIDA / AGUA</text><text x="150" y="158" fill="%2364748b" font-family="system-ui,sans-serif" font-size="9" font-weight="600" text-anchor="middle">SETMIO TPV PRO</text></svg>',
+    Café:
+      'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="200" viewBox="0 0 300 200" fill="none"><rect width="300" height="200" fill="%230f172a"/><rect x="15" y="15" width="270" height="170" rx="16" fill="%231e293b" stroke="%23334155" stroke-width="1.5"/><circle cx="150" cy="85" r="32" fill="%23f59e0b" fill-opacity="0.15" stroke="%23f59e0b" stroke-width="2"/><path d="M136 78h24v16a6 6 0 0 1-6 6h-12a6 6 0 0 1-6-6V78zm24 3h6a4 4 0 0 1 0 8h-6M132 104h32" stroke="%23f59e0b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><text x="150" y="142" fill="%23fbbf24" font-family="system-ui,sans-serif" font-size="12" font-weight="700" text-anchor="middle">CAFETERÍA / EXPRESSO</text><text x="150" y="158" fill="%2364748b" font-family="system-ui,sans-serif" font-size="9" font-weight="600" text-anchor="middle">SETMIO TPV PRO</text></svg>',
+    Bocadillos:
+      'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="200" viewBox="0 0 300 200" fill="none"><rect width="300" height="200" fill="%230f172a"/><rect x="15" y="15" width="270" height="170" rx="16" fill="%231e293b" stroke="%23334155" stroke-width="1.5"/><circle cx="150" cy="85" r="32" fill="%2310b981" fill-opacity="0.15" stroke="%2310b981" stroke-width="2"/><path d="M132 82c3-8 33-8 36 0v6H132v-6zm0 10h36v4c0 3-3 6-6 6h-24c-3 0-6-3-6-6v-4z" stroke="%2310b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><text x="150" y="142" fill="%2334d399" font-family="system-ui,sans-serif" font-size="12" font-weight="700" text-anchor="middle">BOCADILLO / TOSTA</text><text x="150" y="158" fill="%2364748b" font-family="system-ui,sans-serif" font-size="9" font-weight="600" text-anchor="middle">SETMIO TPV PRO</text></svg>',
+    Snacks:
+      'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="200" viewBox="0 0 300 200" fill="none"><rect width="300" height="200" fill="%230f172a"/><rect x="15" y="15" width="270" height="170" rx="16" fill="%231e293b" stroke="%23334155" stroke-width="1.5"/><circle cx="150" cy="85" r="32" fill="%23a855f7" fill-opacity="0.15" stroke="%23a855f7" stroke-width="2"/><path d="M134 76h32l-4 22h-24l-4-22zm-4 4l-4 4 4 4m40-8l4 4-4 4" stroke="%23a855f7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><text x="150" y="142" fill="%23c084fc" font-family="system-ui,sans-serif" font-size="12" font-weight="700" text-anchor="middle">SNACK / BARRITA</text><text x="150" y="158" fill="%2364748b" font-family="system-ui,sans-serif" font-size="9" font-weight="600" text-anchor="middle">SETMIO TPV PRO</text></svg>',
+    'Grip/Pelotas':
+      'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="200" viewBox="0 0 300 200" fill="none"><rect width="300" height="200" fill="%230f172a"/><rect x="15" y="15" width="270" height="170" rx="16" fill="%231e293b" stroke="%23334155" stroke-width="1.5"/><circle cx="150" cy="85" r="32" fill="%23eab308" fill-opacity="0.15" stroke="%23eab308" stroke-width="2"/><circle cx="150" cy="85" r="16" stroke="%23eab308" stroke-width="2.5"/><path d="M140 75c6 3 14 17 20 20m0-20c-6 3-14 17-20 20" stroke="%23eab308" stroke-width="2" stroke-linecap="round"/><text x="150" y="142" fill="%23facc15" font-family="system-ui,sans-serif" font-size="12" font-weight="700" text-anchor="middle">PELOTAS / OVERGRIP</text><text x="150" y="158" fill="%2364748b" font-family="system-ui,sans-serif" font-size="9" font-weight="600" text-anchor="middle">SETMIO TPV PRO</text></svg>',
+    'Reserva Pista':
+      'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="200" viewBox="0 0 300 200" fill="none"><rect width="300" height="200" fill="%230f172a"/><rect x="15" y="15" width="270" height="170" rx="16" fill="%231e293b" stroke="%23334155" stroke-width="1.5"/><circle cx="150" cy="85" r="32" fill="%2310b981" fill-opacity="0.15" stroke="%2310b981" stroke-width="2"/><path d="M130 85h40M150 65v40M134 70l32 30" stroke="%2310b981" stroke-width="2.5" stroke-linecap="round"/><text x="150" y="142" fill="%2334d399" font-family="system-ui,sans-serif" font-size="12" font-weight="700" text-anchor="middle">RESERVA DE PISTA</text><text x="150" y="158" fill="%2364748b" font-family="system-ui,sans-serif" font-size="9" font-weight="600" text-anchor="middle">SETMIO TPV PRO</text></svg>',
+    Default:
+      'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="200" viewBox="0 0 300 200" fill="none"><rect width="300" height="200" fill="%230f172a"/><rect x="15" y="15" width="270" height="170" rx="16" fill="%231e293b" stroke="%23334155" stroke-width="1.5"/><circle cx="150" cy="85" r="32" fill="%2310b981" fill-opacity="0.15" stroke="%2310b981" stroke-width="2"/><path d="M138 85h24M150 73v24" stroke="%2310b981" stroke-width="3" stroke-linecap="round"/><text x="150" y="142" fill="%2334d399" font-family="system-ui,sans-serif" font-size="12" font-weight="700" text-anchor="middle">ARTÍCULO TPV</text><text x="150" y="158" fill="%2364748b" font-family="system-ui,sans-serif" font-size="9" font-weight="600" text-anchor="middle">SETMIO TPV PRO</text></svg>',
+  };
+
+  const getFallbackProductImage = (cat?: string) => {
+    if (!cat) return CATEGORY_PLACEHOLDERS['Default'];
+    return CATEGORY_PLACEHOLDERS[cat] || CATEGORY_PLACEHOLDERS['Default'];
   };
 
   // Sample club members for wallet assignment

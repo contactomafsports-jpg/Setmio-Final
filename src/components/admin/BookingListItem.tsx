@@ -1,9 +1,13 @@
 import React from 'react';
-import { Clock, KeyRound, CheckCircle2, AlertCircle, XCircle } from 'lucide-react';
+import { Clock, KeyRound, CheckCircle2, AlertCircle, XCircle, Building2 } from 'lucide-react';
+import { useApp } from '../../context/AppContext';
 import { ReservationDrawerData } from './ReservationDrawer';
 
 export interface BookingListItemData {
   id: string;
+  venueId?: string;
+  venueName?: string;
+  venueShortName?: string;
   timeSlot?: string;
   startTime: string;
   endTime?: string;
@@ -13,7 +17,7 @@ export interface BookingListItemData {
   creatorName: string;
   creatorPhone?: string;
   creatorMemberNum?: string;
-  category?: 'match' | 'academy' | 'private' | 'tournament';
+  category?: 'match' | 'academy' | 'private' | 'tournament' | 'maintenance';
   title?: string;
   sport?: string;
   totalPrice?: number | string;
@@ -37,6 +41,8 @@ export const BookingListItem: React.FC<BookingListItemProps> = ({
   onClick,
   className = '',
 }) => {
+  const { isMultiVenue } = useApp();
+
   // Format Time Slot
   const formatTimeSlot = () => {
     if (booking.timeSlot) return booking.timeSlot;
@@ -138,6 +144,13 @@ export const BookingListItem: React.FC<BookingListItemProps> = ({
         <span className="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-700/80 text-slate-700 dark:text-slate-200 font-bold text-xs border border-slate-200 dark:border-slate-600/70">
           {booking.courtName}
         </span>
+
+        {isMultiVenue && (booking.venueShortName || booking.venueName) && (
+          <span className="px-2 py-0.5 rounded-lg bg-indigo-50 dark:bg-indigo-950/70 text-indigo-700 dark:text-indigo-300 font-bold text-[10px] border border-indigo-200 dark:border-indigo-800 shrink-0 flex items-center gap-1">
+            <Building2 className="w-3 h-3 text-indigo-500 shrink-0" />
+            <span className="truncate max-w-[120px]">{booking.venueShortName || booking.venueName}</span>
+          </span>
+        )}
       </div>
 
       {/* CENTRO: Nombre del Titular + Tipo de reserva */}

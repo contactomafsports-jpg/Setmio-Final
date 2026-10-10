@@ -308,6 +308,119 @@ export const AdminSchool: React.FC = () => {
     publishedAsOpen: true,
   });
 
+  // Modals para Añadir Alumno y Añadir Profesor (Acciones Tarea 6)
+  const [isNewStudentModalOpen, setIsNewStudentModalOpen] = useState(false);
+  const [isNewCoachModalOpen, setIsNewCoachModalOpen] = useState(false);
+
+  const [studentFormData, setStudentFormData] = useState({
+    name: '',
+    phone: '',
+    email: '',
+    level: '3.0',
+    type: 'regular' as 'regular' | 'single',
+    groupName: groups[0]?.name || 'Iniciación Técnica Adultos',
+    paymentStatus: 'paid' as 'paid' | 'pending' | 'scholarship',
+  });
+
+  const [coachFormData, setCoachFormData] = useState({
+    name: '',
+    roleTitle: 'Monitor de Pistas & Tecnificación',
+    certification: 'Monitor Titulado FEP / FGP',
+    phone: '+34 600 00 00 00',
+    email: '',
+    hourlyRate: 30.0,
+    weeklyHours: 20,
+    bio: 'Entrenador oficial con experiencia en iniciación y competición escolar.',
+  });
+
+  const handleStudentSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!studentFormData.name.trim()) return;
+    const newStudent: SchoolStudent = {
+      id: `st-${Date.now()}`,
+      name: studentFormData.name.trim(),
+      phone: studentFormData.phone || '+34 600 00 00 00',
+      email: studentFormData.email || `${studentFormData.name.toLowerCase().replace(/\s+/g, '.')}@email.es`,
+      level: studentFormData.level || '3.0',
+      type: studentFormData.type,
+      groupName: studentFormData.groupName,
+      paymentStatus: studentFormData.paymentStatus,
+      attendancesCount: 0,
+      joinDate: new Date().toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' }),
+    };
+
+    setStudentsList((prev) => [newStudent, ...prev]);
+
+    // Si se asigna a un grupo regular, actualizar los alumnos inscritos
+    if (studentFormData.type === 'regular' && studentFormData.groupName) {
+      setGroups((prev) =>
+        prev.map((g) =>
+          g.name === studentFormData.groupName
+            ? {
+                ...g,
+                currentStudents: Math.min(g.maxStudents, g.currentStudents + 1),
+                students: [...g.students, newStudent.name],
+              }
+            : g
+        )
+      );
+    }
+
+    triggerDemoToast(
+      'Alumno Matriculado',
+      `${newStudent.name} ha sido inscrito en ${studentFormData.groupName || 'la escuela'}.`,
+      'success'
+    );
+    setStudentFormData({
+      name: '',
+      phone: '',
+      email: '',
+      level: '3.0',
+      type: 'regular',
+      groupName: groups[0]?.name || 'Iniciación Técnica Adultos',
+      paymentStatus: 'paid',
+    });
+    setIsNewStudentModalOpen(false);
+  };
+
+  const handleCoachSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!coachFormData.name.trim()) return;
+    const newCoach: SchoolCoachItem = {
+      id: `coach-${Date.now()}`,
+      name: coachFormData.name.trim(),
+      roleTitle: coachFormData.roleTitle,
+      certification: coachFormData.certification,
+      phone: coachFormData.phone,
+      email: coachFormData.email || `${coachFormData.name.toLowerCase().replace(/\s+/g, '.')}@padelsanmateo.es`,
+      photoUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80',
+      hourlyRate: Number(coachFormData.hourlyRate) || 30.0,
+      rating: 5.0,
+      reviewsCount: 1,
+      bio: coachFormData.bio,
+      weeklyHours: Number(coachFormData.weeklyHours) || 20,
+      assignedGroupIds: [],
+    };
+
+    setCoachesList((prev) => [...prev, newCoach]);
+    triggerDemoToast(
+      'Profesor Dado de Alta',
+      `${newCoach.name} ha sido registrado como ${newCoach.roleTitle} en el club.`,
+      'success'
+    );
+    setCoachFormData({
+      name: '',
+      roleTitle: 'Monitor de Pistas & Tecnificación',
+      certification: 'Monitor Titulado FEP / FGP',
+      phone: '+34 600 00 00 00',
+      email: '',
+      hourlyRate: 30.0,
+      weeklyHours: 20,
+      bio: 'Entrenador oficial con experiencia en iniciación y competición escolar.',
+    });
+    setIsNewCoachModalOpen(false);
+  };
+
   // Submit New Group
   const handleGroupSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -855,27 +968,53 @@ export const AdminSchool: React.FC = () => {
               </p>
             </div>
 
-            {/* Dos botones de acción separados */}
-            <div className="flex items-center gap-2.5 self-start sm:self-auto">
+            {/* Botonera Superior Alineada (4 Acciones Diferenciadas - Tarea 6) */}
+            <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto shrink-0">
+              {/* 1. + Nuevo Grupo */}
               <button
                 type="button"
                 onClick={() => {
                   setEditingGroup(null);
                   setIsNewGroupModalOpen(true);
                 }}
-                className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1.5 shadow-xs transition active:scale-95 cursor-pointer"
+                className="px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1.5 shadow-xs transition active:scale-95 cursor-pointer whitespace-nowrap"
+                title="Crear grupo periódico con matrícula y cuota"
               >
-                <Plus className="w-4 h-4" />
-                <span>{t('school.actions.newGroup', 'Nuevo Grupo')}</span>
+                <Plus className="w-3.5 h-3.5" />
+                <span>+ Nuevo Grupo</span>
               </button>
 
+              {/* 2. + Nueva Clase */}
               <button
                 type="button"
                 onClick={() => setIsNewClassModalOpen(true)}
-                className="px-3.5 py-2 rounded-xl bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-900 dark:text-white border border-slate-200 dark:border-slate-800 font-bold text-xs flex items-center gap-1.5 shadow-xs transition active:scale-95 cursor-pointer"
+                className="px-3 py-2 rounded-xl bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-800 font-bold text-xs flex items-center gap-1.5 shadow-2xs transition active:scale-95 cursor-pointer whitespace-nowrap"
+                title="Publicar clase suelta o clínica"
               >
-                <Plus className="w-4 h-4" />
-                <span>{t('school.actions.newClass', 'Nueva Clase')}</span>
+                <Plus className="w-3.5 h-3.5 text-emerald-500" />
+                <span>+ Nueva Clase</span>
+              </button>
+
+              {/* 3. + Añadir Alumno */}
+              <button
+                type="button"
+                onClick={() => setIsNewStudentModalOpen(true)}
+                className="px-3 py-2 rounded-xl bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-800 font-bold text-xs flex items-center gap-1.5 shadow-2xs transition active:scale-95 cursor-pointer whitespace-nowrap"
+                title="Matricular alumno directamente"
+              >
+                <UserPlus className="w-3.5 h-3.5 text-indigo-500" />
+                <span>+ Añadir Alumno</span>
+              </button>
+
+              {/* 4. + Añadir Profesor */}
+              <button
+                type="button"
+                onClick={() => setIsNewCoachModalOpen(true)}
+                className="px-3 py-2 rounded-xl bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-800 font-bold text-xs flex items-center gap-1.5 shadow-2xs transition active:scale-95 cursor-pointer whitespace-nowrap"
+                title="Dar de alta nuevo entrenador"
+              >
+                <GraduationCap className="w-3.5 h-3.5 text-amber-500" />
+                <span>+ Añadir Profesor</span>
               </button>
             </div>
           </div>

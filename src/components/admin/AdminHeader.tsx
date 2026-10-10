@@ -49,6 +49,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
     selectedVenue,
     setSelectedVenueId,
     isConsolidatedView,
+    isMultiVenue,
     t,
   } = useApp();
 
@@ -342,36 +343,38 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
                   </button>
                 </div>
 
-                {/* Sección de Selección Rápida de Sede en Menú de Usuario */}
-                <div className="border-t border-slate-100 dark:border-slate-800 my-1 pt-1">
-                  <div className="px-3 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center justify-between">
-                    <span>Sede Activa</span>
-                    <span className="text-emerald-500 font-bold text-[9px]">{isConsolidatedView ? 'Consolidado' : 'Sede Única'}</span>
+                {/* Sección de Selección Rápida de Sede en Menú de Usuario (ÚNICAMENTE si el club es Multi-Sede) */}
+                {isMultiVenue && (
+                  <div className="border-t border-slate-100 dark:border-slate-800 my-1 pt-1">
+                    <div className="px-3 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center justify-between">
+                      <span>Sede Activa</span>
+                      <span className="text-emerald-500 font-bold text-[9px]">{isConsolidatedView ? 'Consolidado' : 'Sede Única'}</span>
+                    </div>
+                    <div className="space-y-0.5 px-1 max-h-36 overflow-y-auto">
+                      {venues.map((venue) => {
+                        const isSelected = selectedVenueId === venue.id;
+                        return (
+                          <button
+                            key={venue.id}
+                            type="button"
+                            onClick={() => {
+                              setSelectedVenueId(venue.id);
+                              setUserMenuOpen(false);
+                            }}
+                            className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-left text-xs transition cursor-pointer ${
+                              isSelected
+                                ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 font-bold'
+                                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                            }`}
+                          >
+                            <span className="truncate">{venue.shortName}</span>
+                            {isSelected && <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />}
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
-                  <div className="space-y-0.5 px-1 max-h-36 overflow-y-auto">
-                    {venues.map((venue) => {
-                      const isSelected = selectedVenueId === venue.id;
-                      return (
-                        <button
-                          key={venue.id}
-                          type="button"
-                          onClick={() => {
-                            setSelectedVenueId(venue.id);
-                            setUserMenuOpen(false);
-                          }}
-                          className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-left text-xs transition cursor-pointer ${
-                            isSelected
-                              ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 font-bold'
-                              : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
-                          }`}
-                        >
-                          <span className="truncate">{venue.shortName}</span>
-                          {isSelected && <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
+                )}
 
                 <div className="border-t border-slate-100 dark:border-slate-800 my-1" />
 

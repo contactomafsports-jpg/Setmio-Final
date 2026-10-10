@@ -545,6 +545,9 @@ interface AppContextType {
   updatePlan: (planId: string, updated: Partial<Plan>) => void;
 
   // Multi-Sede & Venues
+  isMultiVenue: boolean;
+  toggleMultiVenueMode: () => void;
+  setIsMultiVenueMode: (isMulti: boolean) => void;
   venues: ClubVenue[];
   selectedVenueId: string;
   selectedVenue: ClubVenue;
@@ -578,6 +581,7 @@ interface AppContextType {
   createBooking: (newBooking: Omit<Booking, 'id' | 'tenantId'>) => Booking;
   updateBooking: (bookingId: string, updates: Partial<Booking>) => void;
   cancelBooking: (bookingId: string) => void;
+  deleteBooking: (bookingId: string) => void;
   markBookingPaid: (bookingId: string, participantName?: string) => void;
   posPendingCharge: PosPendingCharge | null;
   setPosPendingCharge: (charge: PosPendingCharge | null) => void;
@@ -1011,8 +1015,46 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const currentTenant = tenants.find((t) => t.id === currentTenantId) || tenants[0];
 
-  // --- MULTI-SEDE / MULTI-CLUB STATE ---
-  const [venues] = useState<ClubVenue[]>(INITIAL_VENUES);
+  // --- CONDICIONALIDAD DINÁMICA: SINGLE-SEDE VS MULTI-SEDE ---
+  const [isMultiVenueOverride, setIsMultiVenueOverride] = useState<boolean | null>(() => {
+    try {
+      const stored = localStorage.getItem('setmio_is_multivenue_mode');
+      return stored !== null ? stored === 'true' : null;
+    } catch {
+      return null;
+    }
+  });
+
+  // Evalúa si el club cuenta con suscripción multi-sede (Plan Enterprise / Pro) o gestiona más de una sede
+  const isMultiVenue = isMultiVenueOverride !== null
+    ? isMultiVenueOverride
+    : (currentTenant.settings?.isMultiVenue ?? (currentTenant.planId === 'elite' || currentTenant.planId === 'pro'));
+
+  const setIsMultiVenueMode = useCallback((val: boolean) => {
+    setIsMultiVenueOverride(val);
+    try {
+      localStorage.setItem('setmio_is_multivenue_mode', String(val));
+    } catch {
+      // Ignore
+    }
+  }, []);
+
+  const toggleMultiVenueMode = useCallback(() => {
+    setIsMultiVenueOverride((prev) => {
+      const current = prev !== null ? prev : isMultiVenue;
+      const next = !current;
+      try {
+        localStorage.setItem('setmio_is_multivenue_mode', String(next));
+      } catch {
+        // Ignore
+      }
+      return next;
+    });
+  }, [isMultiVenue]);
+
+  // Si es Monosede, sólo existe la sede única (Central); si es Multi-Sede, existen todas las sedes
+  const venues = isMultiVenue ? INITIAL_VENUES : [INITIAL_VENUES[1]];
+
   const [selectedVenueId, setSelectedVenueIdState] = useState<string>(() => {
     try {
       return localStorage.getItem('setmio_selected_venue_id') || 'all';
@@ -1030,8 +1072,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   }, []);
 
-  const selectedVenue = INITIAL_VENUES.find((v) => v.id === selectedVenueId) || INITIAL_VENUES[0];
-  const isConsolidatedView = selectedVenueId === 'all';
+  const effectiveSelectedVenueId = isMultiVenue ? selectedVenueId : INITIAL_VENUES[1].id;
+  const selectedVenue = isMultiVenue
+    ? (INITIAL_VENUES.find((v) => v.id === effectiveSelectedVenueId) || INITIAL_VENUES[0])
+    : INITIAL_VENUES[1];
+  const isConsolidatedView = isMultiVenue && effectiveSelectedVenueId === 'all';
 
   // --- AISLAMIENTO DE TEMA SEGÚN ENTORNO ---
   const theme: ThemeMode =
@@ -1578,14 +1623,42 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   // Booking Actions
   const createBooking = (newBookingData: Omit<Booking, 'id' | 'tenantId'>): Booking => {
     const randomPin = `${Math.floor(1000 + Math.random() * 9000)}#`;
+
+    // Regla de Precios (Tarea 3):
+    // Las reservas generadas a través de clases, grupos o torneos deben registrarse a 0€ en pista
+    // salvo que se trate de una clase suelta de pago individual.
+    const isFromActivityOrTournament =
+      newBookingData.category === 'tournament' ||
+      (newBookingData.category === 'academy' && !newBookingData.notes?.toLowerCase().includes('suelta')) ||
+      (newBookingData.notes && (
+        newBookingData.notes.toLowerCase().includes('grupo') ||
+        newBookingData.notes.toLowerCase().includes('torneo') ||
+        newBookingData.notes.toLowerCase().includes('escuela') ||
+        newBookingData.notes.toLowerCase().includes('clase periódica')
+      ));
+
+    const finalPrice = isFromActivityOrTournament ? 0 : (newBookingData.totalPrice ?? 0);
+
+    const defaultVenue = isMultiVenue
+      ? (selectedVenueId !== 'all' ? selectedVenue : INITIAL_VENUES[1])
+      : INITIAL_VENUES[1];
+
     const newBooking: Booking = {
       ...newBookingData,
+      totalPrice: finalPrice,
+      venueId: newBookingData.venueId || defaultVenue.id,
+      venueName: newBookingData.venueName || defaultVenue.name,
+      venueShortName: newBookingData.venueShortName || defaultVenue.shortName,
       id: `b-${Date.now().toString().slice(-4)}`,
       tenantId: currentTenant.id,
-      accessPin: randomPin,
+      accessPin: newBookingData.accessPin || randomPin,
     };
 
-    setBookings((prev) => [newBooking, ...prev]);
+    setBookings((prev) => {
+      const updated = [newBooking, ...prev];
+      saveDemoState('setmio_demo_bookings_v1', updated);
+      return updated;
+    });
 
     // Add audit log
     setAuditLogs((prev) => [
@@ -1596,7 +1669,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         role: currentUser.role,
         action: 'Nueva Reserva Creada',
         target: `${newBooking.courtName} (${newBooking.startTime.split('T')[1] || ''})`,
-        details: `Importe: ${newBooking.totalPrice}€. Código PIN de puerta generado: ${randomPin}`,
+        details: `Importe pista: ${newBooking.totalPrice.toFixed(2)}€. PIN de acceso: ${newBooking.accessPin}. Sede: ${newBooking.venueShortName || newBooking.venueName || 'Central'}`,
       },
       ...prev,
     ]);
@@ -1606,7 +1679,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       {
         id: `notif-${Date.now()}`,
         title: '¡Reserva Confirmada!',
-        message: `Tu pista "${newBooking.courtName}" está reservada. PIN de acceso al vestuario/pista: ${randomPin}`,
+        message: `Pista "${newBooking.courtName}" reservada. PIN de acceso: ${newBooking.accessPin}`,
         type: 'booking',
         timestamp: 'Ahora mismo',
         read: false,
@@ -1615,8 +1688,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     ]);
 
     triggerDemoToast(
-      'Reserva Registrada con Éxito',
-      `Pista confirmada. PIN ${randomPin} asignado para apertura de puertas.`,
+      'Reserva Registrada',
+      `Pista confirmada (${newBooking.courtName}). PIN ${newBooking.accessPin} asignado.${finalPrice === 0 ? ' Tarifa 0,00€ por actividad/escuela.' : ''}`,
       'success'
     );
 
@@ -1624,17 +1697,60 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const updateBooking = (bookingId: string, updates: Partial<Booking>) => {
-  setBookings((prev) => prev.map((booking) => booking.id === bookingId ? { ...booking, ...updates } : booking));
-  triggerDemoToast('Reserva actualizada', 'Los cambios se han guardado en el historial del club.', 'success');
+    setBookings((prev) => {
+      const updated = prev.map((booking) => (booking.id === bookingId ? { ...booking, ...updates } : booking));
+      saveDemoState('setmio_demo_bookings_v1', updated);
+      return updated;
+    });
+    triggerDemoToast('Reserva actualizada', 'Los cambios se han guardado en el historial del club.', 'success');
   };
 
   const cancelBooking = (bookingId: string) => {
-    setBookings((prev) =>
-      prev.map((b) => (b.id === bookingId ? { ...b, status: 'canceled' } : b))
-    );
+    setBookings((prev) => {
+      const updated = prev.map((b) => (b.id === bookingId ? { ...b, status: 'canceled' as const } : b));
+      saveDemoState('setmio_demo_bookings_v1', updated);
+      return updated;
+    });
+    setAuditLogs((prev) => [
+      {
+        id: `log-${Date.now()}`,
+        timestamp: 'Ahora mismo',
+        actor: currentUser.email,
+        role: currentUser.role,
+        action: 'Reserva Cancelada',
+        target: bookingId,
+        details: 'Reserva cancelada y pista liberada en la agenda del club.',
+      },
+      ...prev,
+    ]);
     triggerDemoToast(
       'Reserva Cancelada',
       'La reserva ha sido cancelada y la pista queda liberada en la agenda del club.',
+      'info'
+    );
+  };
+
+  const deleteBooking = (bookingId: string) => {
+    setBookings((prev) => {
+      const updated = prev.filter((b) => b.id !== bookingId);
+      saveDemoState('setmio_demo_bookings_v1', updated);
+      return updated;
+    });
+    setAuditLogs((prev) => [
+      {
+        id: `log-${Date.now()}`,
+        timestamp: 'Ahora mismo',
+        actor: currentUser.email,
+        role: currentUser.role,
+        action: 'Reserva Eliminada',
+        target: bookingId,
+        details: 'Reserva eliminada permanentemente del archivo por el administrador.',
+      },
+      ...prev,
+    ]);
+    triggerDemoToast(
+      'Reserva Eliminada',
+      'La reserva ha sido eliminada permanentemente del registro.',
       'info'
     );
   };
@@ -1950,7 +2066,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setCurrentViewState('admin');
     setAdminTabState('customers');
     if (typeof window !== 'undefined') {
-      window.history.pushState({}, '', `/gestion/jugadores/${slug}`);
+      window.history.pushState({}, '', `/admin/socios/${slug}`);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
     triggerDemoToast(
@@ -2093,6 +2209,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         plans,
         updatePlan,
 
+        isMultiVenue,
+        toggleMultiVenueMode,
+        setIsMultiVenueMode,
         venues,
         selectedVenueId,
         selectedVenue,
@@ -2124,6 +2243,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         createBooking,
         updateBooking,
         cancelBooking,
+        deleteBooking,
         markBookingPaid,
         posPendingCharge,
         setPosPendingCharge,

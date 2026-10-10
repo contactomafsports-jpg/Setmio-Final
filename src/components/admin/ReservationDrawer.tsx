@@ -19,6 +19,9 @@ import {
   Sparkles,
   ExternalLink,
   Trophy,
+  Edit3,
+  Trash2,
+  Building2,
 } from 'lucide-react';
 
 export interface ReservationDrawerParticipant {
@@ -33,6 +36,9 @@ export interface ReservationDrawerParticipant {
 
 export interface ReservationDrawerData {
   id: string;
+  venueId?: string;
+  venueName?: string;
+  venueShortName?: string;
   courtId?: string;
   courtName: string;
   courtType?: string;
@@ -51,7 +57,7 @@ export interface ReservationDrawerData {
   lightsStatus?: 'on' | 'off' | 'auto';
   doorStatus?: 'open' | 'locked' | 'auto';
   title?: string;
-  category?: 'match' | 'academy' | 'private' | 'tournament';
+  category?: 'match' | 'academy' | 'private' | 'tournament' | 'maintenance';
   participants?: ReservationDrawerParticipant[];
   notes?: string;
   matchScore?: string;
@@ -77,7 +83,19 @@ export const ReservationDrawer: React.FC<ReservationDrawerProps> = ({
   onCancelReservation,
   onOpenPlayerProfile,
 }) => {
-  const { currentTenant, courts, setAdminTab, triggerDemoToast, setPosPendingCharge, navigateToPlayerProfile, updateBooking, language, t } = useApp();
+  const {
+    currentTenant,
+    courts,
+    setAdminTab,
+    triggerDemoToast,
+    setPosPendingCharge,
+    navigateToPlayerProfile,
+    updateBooking,
+    deleteBooking,
+    isMultiVenue,
+    language,
+    t,
+  } = useApp();
   const [copiedPin, setCopiedPin] = useState(false);
   const [isReassigning, setIsReassigning] = useState(false);
   const [tpvChoiceModal, setTpvChoiceModal] = useState(false);
@@ -85,6 +103,45 @@ export const ReservationDrawer: React.FC<ReservationDrawerProps> = ({
   const [matchScoreInput, setMatchScoreInput] = useState(reservation?.matchScore || '');
   const [isScoreHidden, setIsScoreHidden] = useState(reservation?.isScoreHiddenInPublicProfile || false);
   const [isScoreSaved, setIsScoreSaved] = useState(false);
+
+  // Edit reservation modal state
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editCourtName, setEditCourtName] = useState(reservation?.courtName || '');
+  const [editPrice, setEditPrice] = useState(String(reservation?.totalPrice ?? 28));
+  const [editNotes, setEditNotes] = useState(reservation?.notes || '');
+  const [editStatus, setEditStatus] = useState(reservation?.status || 'confirmed');
+
+  const handleOpenEditModal = () => {
+    if (!reservation) return;
+    setEditCourtName(reservation.courtName);
+    setEditPrice(String(reservation.totalPrice ?? 28));
+    setEditNotes(reservation.notes || '');
+    setEditStatus(reservation.status || 'confirmed');
+    setIsEditModalOpen(true);
+  };
+
+  const handleSaveEdit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!reservation) return;
+    const priceNum = parseFloat(editPrice) || 0;
+    updateBooking(reservation.id, {
+      courtName: editCourtName,
+      totalPrice: priceNum,
+      notes: editNotes,
+      status: editStatus as any,
+    });
+    triggerDemoToast('Reserva Modificada', `Cambios guardados en la reserva de ${reservation.creatorName}.`, 'success');
+    setIsEditModalOpen(false);
+    onClose();
+  };
+
+  const handleDelete = () => {
+    if (!reservation) return;
+    if (window.confirm(`¿Estás seguro de eliminar permanentemente la reserva de ${reservation.creatorName} en ${reservation.courtName}? Esta acción liberará la pista en la agenda.`)) {
+      deleteBooking(reservation.id);
+      onClose();
+    }
+  };
 
   const handleSaveScore = () => {
     if (!reservation) return;
@@ -290,6 +347,13 @@ export const ReservationDrawer: React.FC<ReservationDrawerProps> = ({
                 <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
                   {sportType}
                 </span>
+
+                {isMultiVenue && (reservation.venueShortName || reservation.venueName) && (
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
+                    <Building2 className="w-3 h-3 text-indigo-500" />
+                    <span>{reservation.venueShortName || reservation.venueName}</span>
+                  </span>
+                )}
 
                 {/* Badge Explícito: Transcurrida vs Pendiente */}
                 {isPast ? (
@@ -539,48 +603,160 @@ export const ReservationDrawer: React.FC<ReservationDrawerProps> = ({
           </div>
         )}
 
-        {/* 4. Botones Operativos Claros */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+        {/* 4. Botones Operativos Claros (Acciones completas de Administrador: Editar, Cancelar, Eliminar) */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
           {/* Botón 1: Abrir en TPV / Cobrar */}
           <button
             type="button"
             onClick={handleGoToTPV}
-            className="py-2.5 px-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs transition shadow-xs flex items-center justify-center gap-1.5 active:scale-95"
+            className="py-2.5 px-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs transition shadow-xs flex items-center justify-center gap-1.5 active:scale-95 cursor-pointer"
           >
-            <CreditCard className="w-3.5 h-3.5" />
-            <span>Abrir en TPV</span>
+            <CreditCard className="w-3.5 h-3.5 shrink-0" />
+            <span className="truncate">Abrir en TPV</span>
           </button>
 
-          {/* Botón 2: Reasignar Pista */}
+          {/* Botón 2: Editar Reserva */}
+          <button
+            type="button"
+            onClick={handleOpenEditModal}
+            className="py-2.5 px-2 rounded-xl bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold text-xs transition border border-slate-200 dark:border-slate-700 flex items-center justify-center gap-1.5 active:scale-95 cursor-pointer shadow-2xs"
+          >
+            <Edit3 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+            <span className="truncate">Editar</span>
+          </button>
+
+          {/* Botón 3: Reasignar Pista */}
           <button
             type="button"
             onClick={() => setIsReassigning(!isReassigning)}
-            className="py-2.5 px-3 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold text-xs transition border border-slate-200 dark:border-slate-700 flex items-center justify-center gap-1.5 active:scale-95"
+            className="py-2.5 px-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold text-xs transition border border-slate-200 dark:border-slate-700 flex items-center justify-center gap-1.5 active:scale-95 cursor-pointer"
           >
-            <RefreshCw className="w-3.5 h-3.5 text-indigo-500" />
-            <span>Reasignar Pista</span>
+            <RefreshCw className="w-3.5 h-3.5 text-indigo-500 shrink-0" />
+            <span className="truncate">Reasignar</span>
           </button>
 
-          {/* Botón 3: Reenviar PIN por WhatsApp */}
+          {/* Botón 4: Reenviar PIN por WhatsApp */}
           <button
             type="button"
             onClick={handleWhatsAppPin}
-            className="py-2.5 px-3 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold text-xs transition border border-slate-200 dark:border-slate-700 flex items-center justify-center gap-1.5 active:scale-95"
+            className="py-2.5 px-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold text-xs transition border border-slate-200 dark:border-slate-700 flex items-center justify-center gap-1.5 active:scale-95 cursor-pointer"
           >
-            <MessageCircle className="w-3.5 h-3.5 text-emerald-500" />
-            <span>PIN WhatsApp</span>
+            <MessageCircle className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+            <span className="truncate">WhatsApp</span>
           </button>
 
-          {/* Botón 4: Cancelar Reserva */}
+          {/* Botón 5: Cancelar Reserva */}
           <button
             type="button"
             onClick={handleCancel}
-            className="py-2.5 px-3 rounded-xl bg-rose-50 dark:bg-rose-950/60 hover:bg-rose-100 dark:hover:bg-rose-900/60 text-rose-700 dark:text-rose-300 font-bold text-xs transition border border-rose-200 dark:border-rose-800 flex items-center justify-center gap-1.5 active:scale-95"
+            className="py-2.5 px-2 rounded-xl bg-amber-50 dark:bg-amber-950/60 hover:bg-amber-100 dark:hover:bg-amber-900/60 text-amber-700 dark:text-amber-300 font-bold text-xs transition border border-amber-200 dark:border-amber-800 flex items-center justify-center gap-1.5 active:scale-95 cursor-pointer"
           >
-            <AlertTriangle className="w-3.5 h-3.5 text-rose-500" />
-            <span>Cancelar</span>
+            <AlertTriangle className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+            <span className="truncate">Cancelar</span>
+          </button>
+
+          {/* Botón 6: Eliminar Reserva */}
+          <button
+            type="button"
+            onClick={handleDelete}
+            className="py-2.5 px-2 rounded-xl bg-rose-50 dark:bg-rose-950/60 hover:bg-rose-100 dark:hover:bg-rose-900/60 text-rose-700 dark:text-rose-300 font-bold text-xs transition border border-rose-200 dark:border-rose-800 flex items-center justify-center gap-1.5 active:scale-95 cursor-pointer"
+          >
+            <Trash2 className="w-3.5 h-3.5 text-rose-500 shrink-0" />
+            <span className="truncate">Eliminar</span>
           </button>
         </div>
+
+        {/* Modal: Editar Reserva */}
+        {isEditModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-sm animate-in fade-in duration-150">
+            <div className="relative w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl text-slate-900 dark:text-slate-100 space-y-4">
+              <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+                <div className="flex items-center gap-2">
+                  <Edit3 className="w-5 h-5 text-emerald-500" />
+                  <h3 className="text-base font-black text-slate-900 dark:text-white">
+                    Editar Datos de la Reserva
+                  </h3>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsEditModalOpen(false)}
+                  className="p-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <form onSubmit={handleSaveEdit} className="space-y-3.5 text-xs">
+                <div>
+                  <label className="block text-slate-700 dark:text-slate-300 mb-1 font-bold">Pista</label>
+                  <select
+                    value={editCourtName}
+                    onChange={(e) => setEditCourtName(e.target.value)}
+                    className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-semibold text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                  >
+                    {courts.map((c) => (
+                      <option key={c.id} value={c.name}>
+                        {c.name} ({c.courtType} · {c.hourlyRate}€/h)
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-slate-700 dark:text-slate-300 mb-1 font-bold">Importe Total (€)</label>
+                  <input
+                    type="number"
+                    step="0.5"
+                    min="0"
+                    value={editPrice}
+                    onChange={(e) => setEditPrice(e.target.value)}
+                    className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-mono font-bold text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-slate-700 dark:text-slate-300 mb-1 font-bold">Estado Operativo</label>
+                  <select
+                    value={editStatus}
+                    onChange={(e) => setEditStatus(e.target.value)}
+                    className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-semibold text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                  >
+                    <option value="confirmed">Confirmada</option>
+                    <option value="pending">Pendiente</option>
+                    <option value="canceled">Cancelada</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-slate-700 dark:text-slate-300 mb-1 font-bold">Notas Internas</label>
+                  <textarea
+                    rows={2}
+                    value={editNotes}
+                    onChange={(e) => setEditNotes(e.target.value)}
+                    placeholder="Observaciones de recepción..."
+                    className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 resize-none"
+                  />
+                </div>
+
+                <div className="pt-2 flex justify-end gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setIsEditModalOpen(false)}
+                    className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-xs"
+                  >
+                    Guardar Cambios
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
 
         {/* Modal de selección TPV (Pago Total vs Pago Individual de Jugador) */}
         {tpvChoiceModal && (
