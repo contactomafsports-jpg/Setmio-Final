@@ -147,10 +147,6 @@ export const AllBookingsPage: React.FC<AllBookingsPageProps> = ({
       {/* HEADER DE PÁGINA (ESTÁNDAR CANÓNICO UNIFICADO) */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="min-w-0">
-          <div className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider flex items-center gap-1.5 mb-1">
-            <Calendar className="w-3.5 h-3.5 text-emerald-500" />
-            <span>{t('bookings.all_eyebrow', 'Auditoría & Archivo de Reservas')}</span>
-          </div>
           <div className="flex items-center gap-2">
             {onBackToQuadrant && (
               <button
@@ -176,7 +172,7 @@ export const AllBookingsPage: React.FC<AllBookingsPageProps> = ({
             <button
               type="button"
               onClick={onBackToQuadrant}
-              className="px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold text-xs transition flex items-center gap-1.5 cursor-pointer shadow-xs border border-slate-200 dark:border-slate-700"
+              className="px-3.5 py-2 rounded-xl bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 font-bold text-xs transition flex items-center gap-1.5 cursor-pointer shadow-2xs border border-slate-200 dark:border-slate-800"
             >
               <Calendar className="w-3.5 h-3.5 text-slate-500" />
               <span>{t('allBookings.agendaBtn', 'Agenda')}</span>
@@ -192,10 +188,10 @@ export const AllBookingsPage: React.FC<AllBookingsPageProps> = ({
                 triggerDemoToast('Nueva Reserva', 'Abriendo formulario de creación de reserva.', 'info');
               }
             }}
-            className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md flex items-center gap-1.5 transition active:scale-95 cursor-pointer"
+            className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md flex items-center gap-1.5 transition active:scale-95 cursor-pointer whitespace-nowrap"
           >
-            <Plus className="w-4 h-4" />
-            <span>{t('allBookings.newShortBtn', 'Nueva')}</span>
+            <Plus className="w-4 h-4 shrink-0" />
+            <span>{t('allBookings.newBtn', 'Nueva reserva')}</span>
           </button>
         </div>
       </div>
@@ -239,19 +235,19 @@ export const AllBookingsPage: React.FC<AllBookingsPageProps> = ({
         </div>
       </div>
 
-      {/* CONTENEDOR UNIFICADO: BUSCADOR, FILTROS Y LISTA DE RESERVAS */}
-      <div className="bg-white dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 rounded-2xl p-4 sm:p-5 shadow-sm space-y-4">
-        {/* Fila 1: Buscador y Selectores de Pista / Fecha (Estilo Minimalista) */}
-        <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3">
-          {/* Buscador en tiempo real por nombre de jugador, pista o PIN */}
+      {/* BARRA DE BÚSQUEDA Y FILTROS ULTRA-COMPACTOS (Renderizados directamente sobre el fondo) */}
+      <div className="space-y-3">
+        {/* Fila 1: Buscador y Selectores de Pista / Fecha Ultra-Compactos */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5">
+          {/* Buscador ultra-compacto */}
           <div className="relative flex-1 min-w-0">
-            <Search className="absolute left-3 top-2.5 w-4 h-4 text-slate-400" />
+            <Search className="absolute left-3 top-2.5 w-3.5 h-3.5 text-slate-400" />
             <input
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Buscar por titular, pista o PIN de acceso..."
-              className="w-full pl-9 pr-8 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700/80 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-emerald-500 transition shadow-2xs"
+              className="w-full pl-8.5 pr-8 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-emerald-500 transition shadow-2xs"
             />
             {searchTerm && (
               <button
@@ -265,11 +261,11 @@ export const AllBookingsPage: React.FC<AllBookingsPageProps> = ({
           </div>
 
           {/* Selector de Pista y Selector de Fecha */}
-          <div className="flex flex-wrap sm:flex-nowrap items-center gap-2">
+          <div className="flex items-center gap-2 shrink-0">
             <select
               value={courtFilter}
               onChange={(e) => setCourtFilter(e.target.value)}
-              className="flex-1 sm:flex-none px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700/80 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 transition font-medium min-w-[140px] shadow-2xs cursor-pointer"
+              className="px-2.5 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-emerald-500 transition font-medium min-w-[130px] shadow-2xs cursor-pointer"
             >
               <option value="all">Todas las Pistas</option>
               {courts.map((court) => (
@@ -280,12 +276,12 @@ export const AllBookingsPage: React.FC<AllBookingsPageProps> = ({
             </select>
 
             {/* Selector de Fecha */}
-            <div className="flex items-center gap-1 flex-1 sm:flex-none min-w-0">
+            <div className="flex items-center gap-1">
               <input
                 type="date"
                 value={dateFilter}
                 onChange={(e) => setDateFilter(e.target.value)}
-                className="w-full sm:w-auto px-2.5 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700/80 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 transition font-medium max-w-[145px] shadow-2xs cursor-pointer"
+                className="px-2 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-emerald-500 transition font-medium max-w-[140px] shadow-2xs cursor-pointer"
                 title="Filtrar por fecha específica"
               />
               {dateFilter && (
@@ -301,144 +297,134 @@ export const AllBookingsPage: React.FC<AllBookingsPageProps> = ({
           </div>
         </div>
 
-        {/* Fila 2: Segmented Controls Minimalistas (Estado Temporal + Estado de Pago) */}
-        <div className="pt-2 border-t border-slate-100 dark:border-slate-700/60 grid grid-cols-1 md:grid-cols-2 gap-3">
+        {/* Fila 2: Segmented Controls Minimalistas Ultra-Compactos (Estado Temporal + Estado de Pago) */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
           {/* 1. Filtro Temporal: Pasadas vs Futuras */}
-          <div className="space-y-1">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-0.5">
-              Estado Temporal
-            </span>
-            <div className="inline-flex w-full p-1 bg-slate-100 dark:bg-slate-900/90 rounded-xl border border-slate-200/80 dark:border-slate-800 text-xs gap-1">
-              <button
-                type="button"
-                onClick={() => setTimeFilter('all')}
-                className={`flex-1 py-1.5 px-2 rounded-lg font-bold text-[11px] transition text-center cursor-pointer ${
-                  timeFilter === 'all'
-                    ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-xs'
-                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-                }`}
-              >
-                {t('allBookings.timeFilter.all', 'Todas')}
-              </button>
+          <div className="inline-flex w-full p-1 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 text-xs gap-1 shadow-2xs">
+            <button
+              type="button"
+              onClick={() => setTimeFilter('all')}
+              className={`flex-1 py-1 px-2 rounded-lg font-bold text-[11px] transition text-center cursor-pointer ${
+                timeFilter === 'all'
+                  ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white shadow-xs'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+              }`}
+            >
+              {t('allBookings.timeFilter.all', 'Todas')}
+            </button>
 
-              <button
-                type="button"
-                onClick={() => setTimeFilter('upcoming')}
-                className={`flex-1 py-1.5 px-2 rounded-lg font-bold text-[11px] transition text-center cursor-pointer flex items-center justify-center gap-1 ${
-                  timeFilter === 'upcoming'
-                    ? 'bg-emerald-600 text-white shadow-xs'
-                    : 'text-slate-600 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400'
-                }`}
-              >
-                <Clock className="w-3 h-3" />
-                <span>{t('allBookings.timeFilter.upcoming', 'Futuras / Pendientes')}</span>
-              </button>
+            <button
+              type="button"
+              onClick={() => setTimeFilter('upcoming')}
+              className={`flex-1 py-1 px-2 rounded-lg font-bold text-[11px] transition text-center cursor-pointer flex items-center justify-center gap-1 ${
+                timeFilter === 'upcoming'
+                  ? 'bg-emerald-600 text-white shadow-xs'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400'
+              }`}
+            >
+              <Clock className="w-3 h-3" />
+              <span>{t('allBookings.timeFilter.upcoming', 'Futuras / Pendientes')}</span>
+            </button>
 
-              <button
-                type="button"
-                onClick={() => setTimeFilter('past')}
-                className={`flex-1 py-1.5 px-2 rounded-lg font-bold text-[11px] transition text-center cursor-pointer flex items-center justify-center gap-1 ${
-                  timeFilter === 'past'
-                    ? 'bg-slate-800 dark:bg-slate-700 text-white shadow-xs'
-                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-                }`}
-              >
-                <CheckCircle2 className="w-3 h-3" />
-                <span>{t('allBookings.timeFilter.past', 'Pasadas / Efectuadas')}</span>
-              </button>
-            </div>
+            <button
+              type="button"
+              onClick={() => setTimeFilter('past')}
+              className={`flex-1 py-1 px-2 rounded-lg font-bold text-[11px] transition text-center cursor-pointer flex items-center justify-center gap-1 ${
+                timeFilter === 'past'
+                  ? 'bg-slate-800 dark:bg-slate-700 text-white shadow-xs'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+              }`}
+            >
+              <CheckCircle2 className="w-3 h-3" />
+              <span>{t('allBookings.timeFilter.past', 'Pasadas / Efectuadas')}</span>
+            </button>
           </div>
 
           {/* 2. Filtro de Estado de Pago */}
-          <div className="space-y-1">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-0.5">
-              Estado de Pago
-            </span>
-            <div className="inline-flex w-full p-1 bg-slate-100 dark:bg-slate-900/90 rounded-xl border border-slate-200/80 dark:border-slate-800 text-xs gap-1">
-              <button
-                type="button"
-                onClick={() => setStatusFilter('all')}
-                className={`flex-1 py-1.5 px-1.5 rounded-lg font-bold text-[11px] transition text-center cursor-pointer ${
-                  statusFilter === 'all'
-                    ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-xs'
-                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-                }`}
-              >
-                {t('allBookings.paymentFilter.all', 'Todos')}
-              </button>
+          <div className="inline-flex w-full p-1 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 text-xs gap-1 shadow-2xs">
+            <button
+              type="button"
+              onClick={() => setStatusFilter('all')}
+              className={`flex-1 py-1 px-1.5 rounded-lg font-bold text-[11px] transition text-center cursor-pointer ${
+                statusFilter === 'all'
+                  ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white shadow-xs'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+              }`}
+            >
+              {t('allBookings.paymentFilter.all', 'Todos')}
+            </button>
 
-              <button
-                type="button"
-                onClick={() => setStatusFilter('confirmed')}
-                className={`flex-1 py-1.5 px-1.5 rounded-lg font-bold text-[11px] transition text-center cursor-pointer ${
-                  statusFilter === 'confirmed'
-                    ? 'bg-emerald-600 text-white shadow-xs'
-                    : 'text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/40'
-                }`}
-              >
-                Pagadas
-              </button>
+            <button
+              type="button"
+              onClick={() => setStatusFilter('confirmed')}
+              className={`flex-1 py-1 px-1.5 rounded-lg font-bold text-[11px] transition text-center cursor-pointer ${
+                statusFilter === 'confirmed'
+                  ? 'bg-emerald-600 text-white shadow-xs'
+                  : 'text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/40'
+              }`}
+            >
+              Pagadas
+            </button>
 
-              <button
-                type="button"
-                onClick={() => setStatusFilter('pending')}
-                className={`flex-1 py-1.5 px-1.5 rounded-lg font-bold text-[11px] transition text-center cursor-pointer ${
-                  statusFilter === 'pending'
-                    ? 'bg-amber-600 text-white shadow-xs'
-                    : 'text-amber-700 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/40'
-                }`}
-              >
-                Pendientes
-              </button>
+            <button
+              type="button"
+              onClick={() => setStatusFilter('pending')}
+              className={`flex-1 py-1 px-1.5 rounded-lg font-bold text-[11px] transition text-center cursor-pointer ${
+                statusFilter === 'pending'
+                  ? 'bg-amber-600 text-white shadow-xs'
+                  : 'text-amber-700 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/40'
+              }`}
+            >
+              Pendientes
+            </button>
 
-              <button
-                type="button"
-                onClick={() => setStatusFilter('canceled')}
-                className={`flex-1 py-1.5 px-1.5 rounded-lg font-bold text-[11px] transition text-center cursor-pointer ${
-                  statusFilter === 'canceled'
-                    ? 'bg-rose-600 text-white shadow-xs'
-                    : 'text-rose-700 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40'
-                }`}
-              >
-                Canceladas
-              </button>
-            </div>
+            <button
+              type="button"
+              onClick={() => setStatusFilter('canceled')}
+              className={`flex-1 py-1 px-1.5 rounded-lg font-bold text-[11px] transition text-center cursor-pointer ${
+                statusFilter === 'canceled'
+                  ? 'bg-rose-600 text-white shadow-xs'
+                  : 'text-rose-700 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40'
+              }`}
+            >
+              Canceladas
+            </button>
           </div>
         </div>
+      </div>
 
-        {/* LISTADO DE RESERVAS INTEGRADO EN EL MISMO CONTENEDOR */}
-        <div className="pt-2 border-t border-slate-100 dark:border-slate-700/60 space-y-2.5">
-          <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
-            <span className="font-bold uppercase tracking-wider text-[11px]">
-              {filteredBookings.length} {filteredBookings.length === 1 ? 'Reserva' : 'Reservas'} encontradas
-            </span>
-          </div>
-
-          {filteredBookings.length === 0 ? (
-            <div className="p-8 text-center text-slate-400 dark:text-slate-500 text-xs">
-              <Calendar className="w-10 h-10 text-slate-300 dark:text-slate-600 mx-auto mb-2" />
-              <h3 className="font-bold text-sm text-slate-900 dark:text-white">
-                No se encontraron reservas
-              </h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-sm mx-auto">
-                No hay reservas que coincidan con los criterios de búsqueda o filtros seleccionados.
-              </p>
-            </div>
-          ) : (
-            <div className="space-y-2.5">
-              {filteredBookings.map((b) => {
-                const itemData = mapBookingToItemData(b);
-                return (
-                  <BookingListItem
-                    key={b.id}
-                    booking={itemData}
-                    onClick={() => handleOpenBookingDetail(b)}
-                  />
-                );
-              })}
-            </div>
-          )}
+      {/* LISTADO DE RESERVAS (Renderizado directamente sobre el fondo) */}
+      <div className="space-y-3">
+        <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 px-1">
+          <span className="font-bold uppercase tracking-wider text-[11px]">
+            {filteredBookings.length} {filteredBookings.length === 1 ? 'Reserva' : 'Reservas'} encontradas
+          </span>
         </div>
+
+        {filteredBookings.length === 0 ? (
+          <div className="p-12 text-center text-slate-400 dark:text-slate-500 text-xs rounded-2xl bg-white/50 dark:bg-slate-900/50 border border-dashed border-slate-200 dark:border-slate-800">
+            <Calendar className="w-10 h-10 text-slate-300 dark:text-slate-600 mx-auto mb-2" />
+            <h3 className="font-bold text-sm text-slate-900 dark:text-white">
+              No se encontraron reservas
+            </h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-sm mx-auto">
+              No hay reservas que coincidan con los criterios de búsqueda o filtros seleccionados.
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-2.5">
+            {filteredBookings.map((b) => {
+              const itemData = mapBookingToItemData(b);
+              return (
+                <BookingListItem
+                  key={b.id}
+                  booking={itemData}
+                  onClick={() => handleOpenBookingDetail(b)}
+                />
+              );
+            })}
+          </div>
+        )}
       </div>
 
       {/* Bottom Sheet Drawer de Detalle Operativo */}

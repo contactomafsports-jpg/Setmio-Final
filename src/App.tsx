@@ -121,12 +121,22 @@ export function App() {
       const pathname = typeof window !== 'undefined' ? window.location.pathname : '/';
 
       // URLs de gestión interna
+      if (pathname === '/blog' || pathname.startsWith('/blog/')) {
+        setCurrentView('public');
+        setPublicPage('blog');
+        return;
+      }
       if (pathname === '/admin' || pathname === '/gestion') {
         setCurrentView('admin');
         setAdminTab('dashboard');
         return;
       }
-      if (pathname === '/admin/partidas' || pathname === '/gestion/partidas') {
+      if (
+        pathname === '/admin/partidas' ||
+        pathname === '/gestion/partidas' ||
+        pathname.startsWith('/admin/partidas/') ||
+        pathname.startsWith('/gestion/partidas/')
+      ) {
         setCurrentView('admin');
         setAdminTab('matches');
         return;

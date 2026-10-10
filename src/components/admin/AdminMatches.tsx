@@ -31,6 +31,8 @@ import {
   Wallet,
   Building2,
   ExternalLink,
+  Trash2,
+  Edit3,
 } from 'lucide-react';
 
 export const AdminMatches: React.FC = () => {
@@ -38,12 +40,14 @@ export const AdminMatches: React.FC = () => {
     openMatches,
     createOpenMatch,
     updateOpenMatch,
+    deleteOpenMatch,
     joinOpenMatch,
     leaveOpenMatch,
     courts,
     currentTenant,
     triggerDemoToast,
     setAdminTab,
+    navigateToPlayerProfile,
     t,
   } = useApp();
 
@@ -53,12 +57,39 @@ export const AdminMatches: React.FC = () => {
   const [levelFilter, setLevelFilter] = useState<'all' | 'iniciacion' | 'intermedio' | 'avanzado'>('all');
   const [genderFilter, setGenderFilter] = useState<'all' | 'male' | 'female' | 'mixed'>('all');
   const [visibilityFilter, setVisibilityFilter] = useState<'all' | 'public' | 'private_group'>('all');
+  const [showSecondaryFilters, setShowSecondaryFilters] = useState(false);
 
-  // Modals
+  // Modals & Action States
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [selectedMatchForAdd, setSelectedMatchForAdd] = useState<OpenMatch | null>(null);
   const [selectedMatchForDetail, setSelectedMatchForDetail] = useState<OpenMatch | null>(null);
   const [slotRequestTargetMatch, setSlotRequestTargetMatch] = useState<OpenMatch | null>(null);
+  const [editingMatch, setEditingMatch] = useState<OpenMatch | null>(null);
+  const [matchToDelete, setMatchToDelete] = useState<OpenMatch | null>(null);
+  const [replacingPlayerName, setReplacingPlayerName] = useState<string | null>(null);
+
+  // Edit match form state
+  const [editFormData, setEditFormData] = useState<{
+    courtId: string;
+    date: string;
+    time: string;
+    durationMinutes: number;
+    minLevel: number;
+    maxLevel: number;
+    pricePerPlayer: number;
+    gender: 'male' | 'female' | 'mixed';
+    mode: 'competitive' | 'friendly';
+  }>({
+    courtId: courts[0]?.id || '',
+    date: '2026-10-10',
+    time: '19:30',
+    durationMinutes: 90,
+    minLevel: 3.0,
+    maxLevel: 4.5,
+    pricePerPlayer: 7.5,
+    gender: 'male',
+    mode: 'competitive',
+  });
 
   // New match form state
   const [isClubCreator, setIsClubCreator] = useState(true);
@@ -234,6 +265,11 @@ export const AdminMatches: React.FC = () => {
       finalName = guestName.trim();
     }
 
+    if (replacingPlayerName) {
+      leaveOpenMatch(selectedMatchForAdd.id, replacingPlayerName);
+      setReplacingPlayerName(null);
+    }
+
     joinOpenMatch(selectedMatchForAdd.id, {
       name: finalName,
       level: Number(finalLevel),
@@ -269,6 +305,43 @@ export const AdminMatches: React.FC = () => {
     setSelectedMatchForAdd(null);
     setGuestName('');
     setCustomPlayerFee('');
+  };
+
+  const handleOpenEditMatch = (match: OpenMatch) => {
+    setEditingMatch(match);
+    const datePart = match.startTime.split('T')[0] || '2026-10-10';
+    const timePart = match.startTime.includes('T') ? match.startTime.split('T')[1].slice(0, 5) : '19:30';
+    setEditFormData({
+      courtId: match.courtId,
+      date: datePart,
+      time: timePart,
+      durationMinutes: match.durationMinutes,
+      minLevel: match.minLevel,
+      maxLevel: match.maxLevel,
+      pricePerPlayer: match.pricePerPlayer,
+      gender: match.gender || 'male',
+      mode: match.mode || 'competitive',
+    });
+  };
+
+  const handleSaveEditMatch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingMatch) return;
+    const selectedCourt = courts.find((c) => c.id === editFormData.courtId) || courts[0];
+    const newStartTime = `${editFormData.date}T${editFormData.time}:00`;
+    updateOpenMatch(editingMatch.id, {
+      courtId: selectedCourt.id,
+      courtName: selectedCourt.name,
+      startTime: newStartTime,
+      durationMinutes: editFormData.durationMinutes,
+      minLevel: editFormData.minLevel,
+      maxLevel: editFormData.maxLevel,
+      pricePerPlayer: editFormData.pricePerPlayer,
+      gender: editFormData.gender,
+      mode: editFormData.mode,
+    });
+    setEditingMatch(null);
+    triggerDemoToast('Partida Actualizada', 'Los datos de la partida han sido actualizados con éxito.', 'success');
   };
 
   // Submit slot request by level
@@ -478,23 +551,11 @@ export const AdminMatches: React.FC = () => {
         </div>
       </div>
 
-      {/* 3. Barra de Búsqueda y Filtros Minimalistas (Píldoras / Segmented Controls) */}
-      <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-3.5">
-        {/* Fila superior: Buscador + Segmented Control de Estado */}
-        <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
-          <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-3.5 top-2.5 w-4 h-4 text-slate-400" />
-            <input
-              type="text"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder={t('matches.searchPlaceholder', 'Buscar por pista, grupo o jugador...')}
-              className="w-full pl-9 pr-3.5 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-emerald-500 transition"
-            />
-          </div>
-
-          {/* Segmented Control de Estado */}
-          <div className="inline-flex items-center p-1 rounded-xl bg-slate-100 dark:bg-slate-800/80 border border-slate-200/60 dark:border-slate-700/60 text-xs font-bold self-start md:self-auto">
+      {/* 3. Filtros Simplificados: Solo Filtro de Estado visible + Botón compacto de Filtros secundarios */}
+      <div className="space-y-3">
+        <div className="p-2 sm:p-2.5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-2xs flex flex-wrap items-center justify-between gap-2.5">
+          {/* Segmented Control de Estado (Visible de forma permanente) */}
+          <div className="inline-flex items-center p-1 rounded-xl bg-slate-100 dark:bg-slate-800/80 border border-slate-200/60 dark:border-slate-700/60 text-xs font-bold">
             <button
               type="button"
               onClick={() => setStatusFilter('all')}
@@ -529,91 +590,129 @@ export const AdminMatches: React.FC = () => {
               {t('matches.filterFull', 'Completas')} ({fullMatchesCount})
             </button>
           </div>
+
+          {/* Botón compacto con icono de Filtros para desplegar filtros secundarios */}
+          <button
+            type="button"
+            onClick={() => setShowSecondaryFilters(!showSecondaryFilters)}
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer border ${
+              showSecondaryFilters || (search || levelFilter !== 'all' || genderFilter !== 'all' || visibilityFilter !== 'all')
+                ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-500 text-emerald-700 dark:text-emerald-300 shadow-2xs'
+                : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700/80'
+            }`}
+            title="Desplegar u ocultar filtros secundarios"
+          >
+            <Filter className="w-3.5 h-3.5" />
+            <span>Filtros</span>
+            {(search || levelFilter !== 'all' || genderFilter !== 'all' || visibilityFilter !== 'all') && (
+              <span className="w-2 h-2 rounded-full bg-emerald-500" />
+            )}
+          </button>
         </div>
 
-        {/* Fila inferior: Píldoras minimalistas por Nivel, Género y Visibilidad */}
-        <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-slate-100 dark:border-slate-800/60 text-xs">
-          {/* Píldoras de Nivel */}
-          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mr-1">
-            Nivel:
-          </span>
-          <div className="flex flex-wrap items-center gap-1.5">
-            {[
-              { id: 'all', label: 'Todos' },
-              { id: 'iniciacion', label: 'Iniciación (≤3.25)' },
-              { id: 'intermedio', label: 'Intermedio (3.0-4.25)' },
-              { id: 'avanzado', label: 'Avanzado (≥4.0)' },
-            ].map((lvl) => (
-              <button
-                key={lvl.id}
-                type="button"
-                onClick={() => setLevelFilter(lvl.id as any)}
-                className={`px-2.5 py-1 rounded-lg text-xs font-bold transition cursor-pointer border ${
-                  levelFilter === lvl.id
-                    ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-500 text-emerald-700 dark:text-emerald-300 shadow-2xs'
-                    : 'bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-slate-300'
-                }`}
-              >
-                {lvl.label}
-              </button>
-            ))}
+        {/* Panel Desplegable de Filtros Secundarios */}
+        {showSecondaryFilters && (
+          <div className="p-3.5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-3 animate-in fade-in-50 duration-150">
+            {/* Buscador */}
+            <div className="relative">
+              <Search className="absolute left-3 top-2.5 w-3.5 h-3.5 text-slate-400" />
+              <input
+                type="text"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder={t('matches.searchPlaceholder', 'Buscar por pista, grupo o jugador...')}
+                className="w-full pl-8.5 pr-8 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-emerald-500 transition"
+              />
+              {search && (
+                <button
+                  type="button"
+                  onClick={() => setSearch('')}
+                  className="absolute right-2.5 top-2.5 text-xs text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
+                >
+                  ✕
+                </button>
+              )}
+            </div>
+
+            {/* Píldoras secundarias: Nivel, Género y Tipo */}
+            <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-slate-100 dark:border-slate-800/60 text-xs">
+              {/* Nivel */}
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mr-1">Nivel:</span>
+              <div className="flex flex-wrap items-center gap-1.5">
+                {[
+                  { id: 'all', label: 'Todos' },
+                  { id: 'iniciacion', label: 'Iniciación (≤3.25)' },
+                  { id: 'intermedio', label: 'Intermedio (3.0-4.25)' },
+                  { id: 'avanzado', label: 'Avanzado (≥4.0)' },
+                ].map((lvl) => (
+                  <button
+                    key={lvl.id}
+                    type="button"
+                    onClick={() => setLevelFilter(lvl.id as any)}
+                    className={`px-2 py-0.5 rounded-lg text-xs font-bold transition cursor-pointer border ${
+                      levelFilter === lvl.id
+                        ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-500 text-emerald-700 dark:text-emerald-300 shadow-2xs'
+                        : 'bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-slate-300'
+                    }`}
+                  >
+                    {lvl.label}
+                  </button>
+                ))}
+              </div>
+
+              <div className="h-4 w-px bg-slate-200 dark:border-slate-800 mx-1 hidden sm:block" />
+
+              {/* Género */}
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mr-1">Género:</span>
+              <div className="flex items-center gap-1.5">
+                {[
+                  { id: 'all', label: t('matches.filterGenderAll', 'Todos') },
+                  { id: 'male', label: t('matches.filterGenderMale', 'Masculina') },
+                  { id: 'female', label: t('matches.filterGenderFemale', 'Femenina') },
+                  { id: 'mixed', label: t('matches.filterGenderMixed', 'Mixta') },
+                ].map((g) => (
+                  <button
+                    key={g.id}
+                    type="button"
+                    onClick={() => setGenderFilter(g.id as any)}
+                    className={`px-2 py-0.5 rounded-lg text-xs font-bold transition cursor-pointer border ${
+                      genderFilter === g.id
+                        ? 'bg-indigo-50 dark:bg-indigo-950/60 border-indigo-500 text-indigo-700 dark:text-indigo-300 shadow-2xs'
+                        : 'bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-slate-300'
+                    }`}
+                  >
+                    {g.label}
+                  </button>
+                ))}
+              </div>
+
+              <div className="h-4 w-px bg-slate-200 dark:border-slate-800 mx-1 hidden sm:block" />
+
+              {/* Visibilidad */}
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mr-1">Tipo:</span>
+              <div className="flex items-center gap-1.5">
+                {[
+                  { id: 'all', label: 'Todas' },
+                  { id: 'public', label: 'Públicas' },
+                  { id: 'private_group', label: 'Grupos / Privadas' },
+                ].map((v) => (
+                  <button
+                    key={v.id}
+                    type="button"
+                    onClick={() => setVisibilityFilter(v.id as any)}
+                    className={`px-2 py-0.5 rounded-lg text-xs font-bold transition cursor-pointer border ${
+                      visibilityFilter === v.id
+                        ? 'bg-slate-900 dark:bg-white border-slate-900 dark:border-white text-white dark:text-slate-900 shadow-2xs'
+                        : 'bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-slate-300'
+                    }`}
+                  >
+                    {v.label}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
-
-          <div className="h-4 w-px bg-slate-200 dark:border-slate-800 mx-1 hidden sm:block" />
-
-          {/* Píldoras de Género */}
-          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mr-1">
-            Género:
-          </span>
-          <div className="flex items-center gap-1.5">
-            {[
-              { id: 'all', label: t('matches.filterGenderAll', 'Todos') },
-              { id: 'male', label: t('matches.filterGenderMale', 'Masculina') },
-              { id: 'female', label: t('matches.filterGenderFemale', 'Femenina') },
-              { id: 'mixed', label: t('matches.filterGenderMixed', 'Mixta') },
-            ].map((g) => (
-              <button
-                key={g.id}
-                type="button"
-                onClick={() => setGenderFilter(g.id as any)}
-                className={`px-2.5 py-1 rounded-lg text-xs font-bold transition cursor-pointer border ${
-                  genderFilter === g.id
-                    ? 'bg-indigo-50 dark:bg-indigo-950/60 border-indigo-500 text-indigo-700 dark:text-indigo-300 shadow-2xs'
-                    : 'bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-slate-300'
-                }`}
-              >
-                {g.label}
-              </button>
-            ))}
-          </div>
-
-          <div className="h-4 w-px bg-slate-200 dark:border-slate-800 mx-1 hidden sm:block" />
-
-          {/* Píldoras de Visibilidad */}
-          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mr-1">
-            Tipo:
-          </span>
-          <div className="flex items-center gap-1.5">
-            {[
-              { id: 'all', label: 'Todas' },
-              { id: 'public', label: 'Públicas' },
-              { id: 'private_group', label: 'Grupos / Privadas' },
-            ].map((v) => (
-              <button
-                key={v.id}
-                type="button"
-                onClick={() => setVisibilityFilter(v.id as any)}
-                className={`px-2.5 py-1 rounded-lg text-xs font-bold transition cursor-pointer border ${
-                  visibilityFilter === v.id
-                    ? 'bg-slate-900 dark:bg-white border-slate-900 dark:border-white text-white dark:text-slate-900 shadow-2xs'
-                    : 'bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-slate-300'
-                }`}
-              >
-                {v.label}
-              </button>
-            ))}
-          </div>
-        </div>
+        )}
       </div>
 
       {/* 4. Listado de Partidas con Tarjetas Estándar Pro */}
@@ -773,10 +872,22 @@ export const AdminMatches: React.FC = () => {
                       {m.players.map((p, idx) => (
                         <div
                           key={idx}
-                          className="relative group/avatar"
-                          title={`${p.name} · Nivel ${p.level.toFixed(2)} (${p.position}) · ${p.paid ? 'Pagado' : 'Pendiente de pago'}`}
+                          role="button"
+                          tabIndex={0}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigateToPlayerProfile(p.name, 'matches');
+                          }}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                              e.stopPropagation();
+                              navigateToPlayerProfile(p.name, 'matches');
+                            }
+                          }}
+                          className="relative group/avatar cursor-pointer hover:scale-110 transition-transform"
+                          title={`${p.name} · Ver perfil del jugador · Nivel ${p.level.toFixed(2)} (${p.position}) · ${p.paid ? 'Pagado' : 'Pendiente de pago'}`}
                         >
-                          <div className="w-8 h-8 rounded-full bg-emerald-600 text-white font-black text-xs flex items-center justify-center border-2 border-white dark:border-slate-900 shadow-xs">
+                          <div className="w-8 h-8 rounded-full bg-emerald-600 text-white font-black text-xs flex items-center justify-center border-2 border-white dark:border-slate-900 shadow-xs group-hover/avatar:ring-2 group-hover/avatar:ring-emerald-400">
                             {p.name.slice(0, 2).toUpperCase()}
                           </div>
                           {/* Mini badge de posición */}
@@ -918,6 +1029,33 @@ export const AdminMatches: React.FC = () => {
               </button>
             </div>
 
+            {/* Barra de Acciones de Administración si la partida está Abierta */}
+            {(selectedMatchForDetail.status === 'open' || selectedMatchForDetail.players.length < 4) && (
+              <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 flex items-center justify-between gap-2">
+                <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                  Acciones Administrador (Partida Abierta)
+                </span>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => handleOpenEditMatch(selectedMatchForDetail)}
+                    className="px-3 py-1.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 hover:border-emerald-500 text-slate-700 dark:text-slate-300 font-bold text-xs flex items-center gap-1.5 cursor-pointer shadow-2xs transition"
+                  >
+                    <Edit3 className="w-3.5 h-3.5 text-emerald-500" />
+                    <span>Editar Partida</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setMatchToDelete(selectedMatchForDetail)}
+                    className="px-3 py-1.5 rounded-xl bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-900 text-rose-600 dark:text-rose-400 font-bold text-xs flex items-center gap-1.5 cursor-pointer hover:bg-rose-100 transition shadow-2xs"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                    <span>Eliminar</span>
+                  </button>
+                </div>
+              </div>
+            )}
+
             {/* KPIs del partido */}
             <div className="grid grid-cols-3 gap-2.5 text-center">
               <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800">
@@ -940,7 +1078,124 @@ export const AdminMatches: React.FC = () => {
               </div>
             </div>
 
-            {/* SECCIÓN: SOLICITUDES DE PLAZA POR NIVEL (Requisito Crítico Bloque 2) */}
+            {/* 1. Lista detallada de jugadores confirmados */}
+            <div className="space-y-2">
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-500 block">
+                Jugadores Inscritos ({selectedMatchForDetail.players.length}/4):
+              </span>
+
+              <div className="space-y-2">
+                {selectedMatchForDetail.players.map((p, idx) => (
+                  <div
+                    key={idx}
+                    className="p-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 flex items-center justify-between text-xs"
+                  >
+                    <div
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => {
+                        setSelectedMatchForDetail(null);
+                        navigateToPlayerProfile(p.name, 'matches');
+                      }}
+                      className="flex items-center gap-2.5 cursor-pointer hover:opacity-80 transition group"
+                      title={`Ver perfil de ${p.name}`}
+                    >
+                      <div className="w-8 h-8 rounded-full bg-emerald-600 text-white font-black text-xs flex items-center justify-center">
+                        {p.name.slice(0, 2).toUpperCase()}
+                      </div>
+                      <div>
+                        <div className="font-bold text-slate-900 dark:text-white flex items-center gap-1.5 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition">
+                          <span>{p.name}</span>
+                          <span className="text-[10px] text-emerald-500 font-normal opacity-0 group-hover:opacity-100 transition-opacity">↗</span>
+                          {p.customPrice && (
+                            <span className="text-[10px] font-mono text-emerald-600 font-bold whitespace-nowrap">
+                              ({p.customPrice.toFixed(2)} €)
+                            </span>
+                          )}
+                        </div>
+                        <div className="text-[10px] text-slate-500">
+                          Nivel ELO {p.level.toFixed(2)} · Posición: <span className="capitalize">{p.position}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      {p.paid ? (
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 flex items-center gap-1">
+                          <Check className="w-3 h-3" />
+                          <span>Pagado</span>
+                        </span>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => handlePayPlayerShare(selectedMatchForDetail.id, p.name)}
+                          className="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[11px] shadow-2xs transition cursor-pointer flex items-center gap-1"
+                          title="Cobrar cuota en TPV o saldo"
+                        >
+                          <Wallet className="w-3 h-3" />
+                          <span>{t('matches.payMyShare', 'Pagar mi parte')}</span>
+                        </button>
+                      )}
+
+                      {/* Acciones para administrador si la partida está abierta */}
+                      {(selectedMatchForDetail.status === 'open' || selectedMatchForDetail.players.length < 4) && (
+                        <div className="flex items-center gap-1 border-l border-slate-200 dark:border-slate-800 pl-2">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const m = selectedMatchForDetail;
+                              setReplacingPlayerName(p.name);
+                              setSelectedMatchForDetail(null);
+                              setSelectedMatchForAdd(m);
+                            }}
+                            className="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition cursor-pointer"
+                            title={`Reemplazar a ${p.name}`}
+                          >
+                            <UserPlus className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              leaveOpenMatch(selectedMatchForDetail.id, p.name);
+                              setSelectedMatchForDetail((prev) =>
+                                prev ? { ...prev, players: prev.players.filter((pl) => pl.name !== p.name), status: 'open' } : null
+                              );
+                            }}
+                            className="p-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/50 dark:hover:bg-rose-900 text-rose-500 transition cursor-pointer"
+                            title={`Quitar a ${p.name} de la partida`}
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+
+                {/* Plazas libres */}
+                {Array.from({ length: Math.max(0, 4 - selectedMatchForDetail.players.length) }).map((_, emptyIdx) => (
+                  <div
+                    key={`slot-${emptyIdx}`}
+                    className="p-3 rounded-xl border border-dashed border-slate-300 dark:border-slate-700 flex items-center justify-between text-xs text-slate-400"
+                  >
+                    <span>Plaza {selectedMatchForDetail.players.length + emptyIdx + 1} Libre</span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const m = selectedMatchForDetail;
+                        setSelectedMatchForDetail(null);
+                        setSelectedMatchForAdd(m);
+                      }}
+                      className="px-3 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs cursor-pointer shadow-xs"
+                    >
+                      + Inscribir
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* 2. SECCIÓN: SOLICITUD DE PLAZA POR NIVEL (SITUADO JUSTO DEBAJO DE LOS JUGADORES) */}
             <div className="rounded-2xl bg-amber-50/60 dark:bg-amber-950/30 border border-amber-200/80 dark:border-amber-800/60 p-4 space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -1026,81 +1281,6 @@ export const AdminMatches: React.FC = () => {
                   ))}
                 </div>
               )}
-            </div>
-
-            {/* Lista detallada de jugadores */}
-            <div className="space-y-2">
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-500 block">
-                Jugadores Inscritos ({selectedMatchForDetail.players.length}/4):
-              </span>
-
-              <div className="space-y-2">
-                {selectedMatchForDetail.players.map((p, idx) => (
-                  <div
-                    key={idx}
-                    className="p-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 flex items-center justify-between text-xs"
-                  >
-                    <div className="flex items-center gap-2.5">
-                      <div className="w-8 h-8 rounded-full bg-emerald-600 text-white font-black text-xs flex items-center justify-center">
-                        {p.name.slice(0, 2).toUpperCase()}
-                      </div>
-                      <div>
-                        <div className="font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
-                          <span>{p.name}</span>
-                          {p.customPrice && (
-                            <span className="text-[10px] font-mono text-emerald-600 font-bold">
-                              ({p.customPrice.toFixed(2)} €)
-                            </span>
-                          )}
-                        </div>
-                        <div className="text-[10px] text-slate-500">
-                          Nivel ELO {p.level.toFixed(2)} · Posición: <span className="capitalize">{p.position}</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      {p.paid ? (
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 flex items-center gap-1">
-                          <Check className="w-3 h-3" />
-                          <span>Pagado</span>
-                        </span>
-                      ) : (
-                        <button
-                          type="button"
-                          onClick={() => handlePayPlayerShare(selectedMatchForDetail.id, p.name)}
-                          className="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[11px] shadow-2xs transition cursor-pointer flex items-center gap-1"
-                          title="Cobrar cuota en TPV o saldo"
-                        >
-                          <Wallet className="w-3 h-3" />
-                          <span>{t('matches.payMyShare', 'Pagar mi parte')}</span>
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                ))}
-
-                {/* Plazas libres */}
-                {Array.from({ length: Math.max(0, 4 - selectedMatchForDetail.players.length) }).map((_, emptyIdx) => (
-                  <div
-                    key={`slot-${emptyIdx}`}
-                    className="p-3 rounded-xl border border-dashed border-slate-300 dark:border-slate-700 flex items-center justify-between text-xs text-slate-400"
-                  >
-                    <span>Plaza {selectedMatchForDetail.players.length + emptyIdx + 1} Libre</span>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const m = selectedMatchForDetail;
-                        setSelectedMatchForDetail(null);
-                        setSelectedMatchForAdd(m);
-                      }}
-                      className="px-3 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs cursor-pointer shadow-xs"
-                    >
-                      + Inscribir
-                    </button>
-                  </div>
-                ))}
-              </div>
             </div>
 
             {/* Footer con Enlace Compartir y Cerrar */}
@@ -1817,6 +1997,246 @@ export const AdminMatches: React.FC = () => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* ======================================================================
+          MODAL 5: EDICIÓN COMPLETA DE PARTIDA ABIERTA
+          ====================================================================== */}
+      {editingMatch && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs animate-in fade-in duration-150">
+          <div className="w-full max-w-lg rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl p-6 sm:p-7 space-y-4 max-h-[92vh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+              <div className="flex items-center gap-2">
+                <div className="p-2 rounded-xl bg-emerald-50 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400">
+                  <Edit3 className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-base font-black text-slate-900 dark:text-white">
+                    Editar Datos de la Partida
+                  </h3>
+                  <p className="text-xs text-slate-500">
+                    Modifica pista, horario, nivel ELO y tarifas de la convocatoria
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setEditingMatch(null)}
+                className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveEditMatch} className="space-y-4 text-xs">
+              <div>
+                <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  Pista Asignada
+                </label>
+                <select
+                  value={editFormData.courtId}
+                  onChange={(e) => setEditFormData({ ...editFormData, courtId: e.target.value })}
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl font-bold text-slate-900 dark:text-white"
+                >
+                  {courts.map((court) => (
+                    <option key={court.id} value={court.id}>
+                      {court.name} ({court.courtType})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                    Fecha
+                  </label>
+                  <input
+                    type="date"
+                    required
+                    value={editFormData.date}
+                    onChange={(e) => setEditFormData({ ...editFormData, date: e.target.value })}
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white font-mono"
+                  />
+                </div>
+                <div>
+                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                    Hora de Inicio
+                  </label>
+                  <input
+                    type="time"
+                    required
+                    value={editFormData.time}
+                    onChange={(e) => setEditFormData({ ...editFormData, time: e.target.value })}
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white font-mono"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-3 gap-2.5">
+                <div>
+                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                    Duración
+                  </label>
+                  <select
+                    value={editFormData.durationMinutes}
+                    onChange={(e) => setEditFormData({ ...editFormData, durationMinutes: parseInt(e.target.value) })}
+                    className="w-full px-2.5 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl font-bold text-slate-900 dark:text-white"
+                  >
+                    <option value={60}>60 min</option>
+                    <option value={90}>90 min</option>
+                    <option value={120}>120 min</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                    Nivel Mín
+                  </label>
+                  <input
+                    type="number"
+                    step="0.25"
+                    min="1.0"
+                    max="7.0"
+                    value={editFormData.minLevel}
+                    onChange={(e) => setEditFormData({ ...editFormData, minLevel: parseFloat(e.target.value) })}
+                    className="w-full px-2.5 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl font-mono font-bold text-slate-900 dark:text-white"
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                    Nivel Máx
+                  </label>
+                  <input
+                    type="number"
+                    step="0.25"
+                    min="1.0"
+                    max="7.0"
+                    value={editFormData.maxLevel}
+                    onChange={(e) => setEditFormData({ ...editFormData, maxLevel: parseFloat(e.target.value) })}
+                    className="w-full px-2.5 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl font-mono font-bold text-slate-900 dark:text-white"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-3 gap-2.5">
+                <div>
+                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                    Precio/Jug. (€)
+                  </label>
+                  <input
+                    type="number"
+                    step="0.5"
+                    min="0"
+                    value={editFormData.pricePerPlayer}
+                    onChange={(e) => setEditFormData({ ...editFormData, pricePerPlayer: parseFloat(e.target.value) })}
+                    className="w-full px-2.5 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl font-mono font-bold text-slate-900 dark:text-white"
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                    Género
+                  </label>
+                  <select
+                    value={editFormData.gender}
+                    onChange={(e) => setEditFormData({ ...editFormData, gender: e.target.value as any })}
+                    className="w-full px-2 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl font-bold text-slate-900 dark:text-white"
+                  >
+                    <option value="male">Masculina</option>
+                    <option value="female">Femenina</option>
+                    <option value="mixed">Mixta</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                    Modo
+                  </label>
+                  <select
+                    value={editFormData.mode}
+                    onChange={(e) => setEditFormData({ ...editFormData, mode: e.target.value as any })}
+                    className="w-full px-2 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl font-bold text-slate-900 dark:text-white"
+                  >
+                    <option value="competitive">Competitivo</option>
+                    <option value="friendly">Amistoso</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setEditingMatch(null)}
+                  className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold shadow-md cursor-pointer"
+                >
+                  Guardar Cambios
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ======================================================================
+          MODAL 6: CONFIRMACIÓN PREVIA PARA ELIMINAR PARTIDA ABIERTA
+          ====================================================================== */}
+      {matchToDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs animate-in fade-in duration-150">
+          <div className="w-full max-w-md rounded-3xl bg-white dark:bg-slate-900 border border-rose-200 dark:border-rose-900/60 shadow-2xl p-6 space-y-4">
+            <div className="flex items-center gap-3">
+              <div className="p-3 rounded-2xl bg-rose-50 dark:bg-rose-950 text-rose-600 dark:text-rose-400">
+                <AlertCircle className="w-6 h-6" />
+              </div>
+              <div>
+                <h3 className="text-base font-black text-slate-900 dark:text-white">
+                  ¿Eliminar Partida Abierta?
+                </h3>
+                <p className="text-xs text-slate-500">
+                  Esta acción no se puede deshacer
+                </p>
+              </div>
+            </div>
+
+            <div className="p-3.5 rounded-2xl bg-rose-50/50 dark:bg-rose-950/30 border border-rose-100 dark:border-rose-900/40 text-xs text-rose-800 dark:text-rose-300 space-y-1 leading-relaxed">
+              <p>
+                Se cancelará la partida programada en <strong>{matchToDelete.courtName}</strong> a las <strong>{matchToDelete.startTime.split('T')[1]?.slice(0, 5) || '19:30'}</strong> ({matchToDelete.startTime.split('T')[0]}).
+              </p>
+              <p className="text-[11px] text-slate-600 dark:text-slate-400 pt-1">
+                Se liberará el hueco en el cuadrante de reservas y se notificará la cancelación a los {matchToDelete.players.length} jugadores convocados.
+              </p>
+            </div>
+
+            <div className="pt-2 flex justify-end gap-2 text-xs">
+              <button
+                type="button"
+                onClick={() => setMatchToDelete(null)}
+                className="px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold hover:bg-slate-200 transition cursor-pointer"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  deleteOpenMatch(matchToDelete.id);
+                  setMatchToDelete(null);
+                  setSelectedMatchForDetail(null);
+                }}
+                className="px-4.5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-black shadow-md transition active:scale-95 cursor-pointer flex items-center gap-1.5"
+              >
+                <Trash2 className="w-4 h-4" />
+                <span>Sí, Eliminar Partida</span>
+              </button>
+            </div>
           </div>
         </div>
       )}

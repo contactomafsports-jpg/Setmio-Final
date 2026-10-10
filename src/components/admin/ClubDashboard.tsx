@@ -43,7 +43,6 @@ export const ClubDashboard: React.FC = () => {
   } = useApp();
 
   const [selectedReservation, setSelectedReservation] = useState<ReservationDrawerData | null>(null);
-  const [showVenueDropdown, setShowVenueDropdown] = useState(false);
 
   // Financial Metrics: Online + TPV Bar (Dynamic based on selected venue or consolidated view)
   const totalRevenueToday = selectedVenue.revenueToday;
@@ -151,9 +150,9 @@ export const ClubDashboard: React.FC = () => {
         <div className="relative flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           <div className="space-y-2">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 text-[11px] font-black uppercase tracking-wider">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 text-[11px] font-black tracking-wider">
                 <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
-                SETMIO ENTERPRISE TOP
+                Setmio Pro
               </span>
 
               {/* Badge destacado Abierto / Cerrado */}
@@ -170,60 +169,6 @@ export const ClubDashboard: React.FC = () => {
                 <span className={`w-2 h-2 rounded-full ${isClubOpen ? 'bg-emerald-400 animate-pulse' : 'bg-rose-400'}`} />
                 <span>{isClubOpen ? t('club.status.open', 'Abierto') : t('club.status.closed', 'Cerrado')}</span>
               </button>
-              {/* Selector Multi-Sede / Modo Consolidado */}
-              <div className="relative">
-                <button
-                  type="button"
-                  onClick={() => setShowVenueDropdown(!showVenueDropdown)}
-                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold transition border cursor-pointer bg-slate-800/90 hover:bg-slate-700/90 text-slate-200 border-slate-600/80 shadow-xs active:scale-95"
-                  title="Cambiar sede o activar vista consolidada"
-                >
-                  <Building2 className="w-3.5 h-3.5 text-emerald-400" />
-                  <span className="font-extrabold">{selectedVenue.shortName}</span>
-                  <span className="text-[10px] text-slate-400 font-mono">({selectedVenue.courtsCount} pistas)</span>
-                  <ChevronDown className="w-3 h-3 text-slate-400" />
-                </button>
-
-                {showVenueDropdown && (
-                  <div className="absolute left-0 mt-2 w-72 rounded-2xl bg-slate-900 border border-slate-700 shadow-2xl p-2 z-50 animate-in fade-in-50 duration-150 text-xs space-y-1">
-                    <div className="px-2 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center justify-between">
-                      <span>{t('dashboard.venueSelector', 'Sede / Instalación')}</span>
-                      <span className="text-emerald-400 font-mono">Multi-Sede Pro</span>
-                    </div>
-
-                    {venues.map((venue) => {
-                      const isSelected = selectedVenueId === venue.id;
-                      return (
-                        <button
-                          key={venue.id}
-                          type="button"
-                          onClick={() => {
-                            setSelectedVenueId(venue.id);
-                            setShowVenueDropdown(false);
-                          }}
-                          className={`w-full flex items-center justify-between p-2 rounded-xl transition text-left cursor-pointer ${
-                            isSelected
-                              ? 'bg-emerald-600 text-white font-bold shadow-xs'
-                              : 'text-slate-200 hover:bg-slate-800'
-                          }`}
-                        >
-                          <div className="min-w-0">
-                            <div className="text-xs truncate font-bold">{venue.shortName}</div>
-                            <div className={`text-[10px] truncate ${isSelected ? 'text-emerald-100' : 'text-slate-400'}`}>
-                              {venue.city}
-                            </div>
-                          </div>
-                          <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-md shrink-0 ml-2 ${
-                            isSelected ? 'bg-emerald-700 text-white' : 'bg-slate-800 text-slate-300'
-                          }`}>
-                            {venue.courtsCount} pistas
-                          </span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
             </div>
 
             <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-white tracking-tight">

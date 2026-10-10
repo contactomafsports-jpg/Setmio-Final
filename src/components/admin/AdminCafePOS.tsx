@@ -483,22 +483,6 @@ export const AdminCafePOS: React.FC = () => {
             <span>Catálogo</span>
           </button>
 
-          {/* Enlace directo a Pedidos de Tienda (/admin/tienda/pedidos) */}
-          <button
-            type="button"
-            onClick={() => {
-              setAdminTab('shop');
-              if (typeof window !== 'undefined') {
-                window.history.pushState({}, '', '/admin/tienda/pedidos');
-              }
-            }}
-            className="px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs border border-slate-200/80 dark:border-slate-700/80 transition active:scale-95 cursor-pointer flex items-center justify-center gap-1.5"
-            title="Gestión de Pedidos de Tienda Online"
-          >
-            <ShoppingBag className="w-4 h-4 text-indigo-500 shrink-0" />
-            <span>{t('shop.viewOrders', 'Pedidos')}</span>
-          </button>
-
           {/* Contenedor dinámico del "Total Turno" */}
           <div className="p-2 sm:px-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800 text-center sm:text-right shadow-xs flex flex-col justify-center min-w-[95px]">
             <div className="text-[9px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">
@@ -536,29 +520,31 @@ export const AdminCafePOS: React.FC = () => {
           {/* Touch item cards con Imagen de Vista Previa Arriba y Badge de Categoría Superpuesto */}
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
             {filteredProducts.map((prod) => (
-              <button
+              <div
                 key={prod.id}
-                type="button"
+                role="button"
+                tabIndex={0}
                 onClick={() => addItemToPOS(prod)}
-                className="p-2.5 rounded-2xl bg-white dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 hover:border-emerald-500/50 text-left transition flex flex-col group shadow-xs hover:scale-[1.01] active:scale-[0.99] cursor-pointer overflow-hidden"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    addItemToPOS(prod);
+                  }
+                }}
+                className="p-2.5 rounded-2xl bg-white dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 hover:border-emerald-500/50 text-left transition flex flex-col group shadow-xs hover:scale-[1.01] active:scale-[0.99] cursor-pointer overflow-hidden select-none"
               >
                 {/* 1. Imagen Superior con Badges Superpuestos */}
                 <div className="relative w-full h-28 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-700/50 shrink-0">
-                  {prod.imageUrl ? (
-                    <img
-                      src={prod.imageUrl}
-                      alt={prod.name}
-                      onError={(e) => {
-                        e.currentTarget.onerror = null;
-                        e.currentTarget.src = getFallbackProductImage(prod.category);
-                      }}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                  ) : (
-                    <div className="w-full h-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
-                      <Coffee className="w-8 h-8 opacity-60" />
-                    </div>
-                  )}
+                  <img
+                    src={prod.imageUrl || getFallbackProductImage(prod.category)}
+                    alt={prod.name}
+                    loading="lazy"
+                    onError={(e) => {
+                      e.currentTarget.onerror = null;
+                      e.currentTarget.src = getFallbackProductImage(prod.category);
+                    }}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
 
                   {/* Botón rápido ver detalle */}
                   <button
@@ -599,7 +585,7 @@ export const AdminCafePOS: React.FC = () => {
                     </span>
                   </div>
                 </div>
-              </button>
+              </div>
             ))}
           </div>
         </div>
@@ -932,21 +918,15 @@ export const AdminCafePOS: React.FC = () => {
                   onClick={() => setSelectedProductDetail(p)}
                 >
                   <div className="flex items-center gap-3 min-w-0">
-                    {p.imageUrl ? (
-                      <img
-                        src={p.imageUrl}
-                        alt={p.name}
-                        onError={(e) => {
-                          e.currentTarget.onerror = null;
-                          e.currentTarget.src = getFallbackProductImage(p.category);
-                        }}
-                        className="w-10 h-10 rounded-lg object-cover bg-slate-200 dark:bg-slate-700 shrink-0"
-                      />
-                    ) : (
-                      <div className="w-10 h-10 rounded-lg bg-emerald-100 dark:bg-emerald-950 text-emerald-600 flex items-center justify-center shrink-0">
-                        <Coffee className="w-5 h-5" />
-                      </div>
-                    )}
+                    <img
+                      src={p.imageUrl || getFallbackProductImage(p.category)}
+                      alt={p.name}
+                      onError={(e) => {
+                        e.currentTarget.onerror = null;
+                        e.currentTarget.src = getFallbackProductImage(p.category);
+                      }}
+                      className="w-10 h-10 rounded-lg object-cover bg-slate-200 dark:bg-slate-700 shrink-0"
+                    />
                     <div className="min-w-0">
                       <div className="font-bold text-slate-900 dark:text-white truncate">
                         {p.name}

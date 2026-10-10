@@ -412,7 +412,7 @@ export const ReservationDrawer: React.FC<ReservationDrawerProps> = ({
             <span className="font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400 text-[11px]">
               Jugadores Confirmados ({participants.filter(p => p.paid).length}/4 Pagados)
             </span>
-            <span className="font-mono font-bold text-slate-900 dark:text-white">
+            <span className="font-mono font-bold text-slate-900 dark:text-white whitespace-nowrap shrink-0">
               Total: {typeof reservation.totalPrice === 'number' ? `${reservation.totalPrice.toFixed(2)} €` : reservation.totalPrice || '28.00 €'}
             </span>
           </div>
@@ -620,7 +620,7 @@ export const ReservationDrawer: React.FC<ReservationDrawerProps> = ({
                     Carga el importe íntegro de la pista en el ticket
                   </div>
                 </div>
-                <div className="text-base font-black font-mono text-emerald-700 dark:text-emerald-400">
+                <div className="text-base font-black font-mono text-emerald-700 dark:text-emerald-400 whitespace-nowrap shrink-0">
                   {typeof reservation.totalPrice === 'number' ? `${reservation.totalPrice.toFixed(2)} €` : reservation.totalPrice}
                 </div>
               </button>

@@ -248,10 +248,10 @@ export const AdminAgenda: React.FC = () => {
           </p>
         </div>
 
-        {/* Fila 2 en móvil (Selector a la izquierda, Botón a la derecha) / Derecha en desktop */}
-        <div className="flex items-center justify-between sm:justify-end gap-2.5 w-full sm:w-auto">
+        {/* Acciones Superiores: Selector de Fecha, Todas las Reservas y Nueva Reserva alineados de forma fluida */}
+        <div className="flex items-center flex-wrap sm:flex-nowrap gap-2 sm:gap-2.5 w-full sm:w-auto shrink-0 justify-start sm:justify-end">
           {/* Selector de Fechas Moderno, Minimalista y Dark/Emerald */}
-          <div className="inline-flex items-center bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-1 shadow-xs transition hover:border-emerald-500/50">
+          <div className="inline-flex items-center bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-1 shadow-xs transition hover:border-emerald-500/50 shrink-0">
             <button
               type="button"
               onClick={() => stepDate(-1)}
@@ -264,10 +264,10 @@ export const AdminAgenda: React.FC = () => {
             {/* Pill Central Estilizada */}
             <div
               onClick={() => dateInputRef.current?.showPicker ? dateInputRef.current.showPicker() : dateInputRef.current?.focus()}
-              className="relative flex items-center gap-1.5 px-3 py-1 rounded-xl bg-slate-50 dark:bg-slate-800/80 hover:bg-emerald-50 dark:hover:bg-emerald-950/60 text-slate-800 dark:text-slate-200 hover:text-emerald-600 dark:hover:text-emerald-400 cursor-pointer transition select-none"
+              className="relative flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-xl bg-slate-50 dark:bg-slate-800/80 hover:bg-emerald-50 dark:hover:bg-emerald-950/60 text-slate-800 dark:text-slate-200 hover:text-emerald-600 dark:hover:text-emerald-400 cursor-pointer transition select-none"
               title="Seleccionar otra fecha"
             >
-              <Calendar className="w-3.5 h-3.5 text-emerald-500" />
+              <Calendar className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
               <span className="text-xs font-bold whitespace-nowrap">
                 {formattedDateLabel}
               </span>
@@ -305,9 +305,9 @@ export const AdminAgenda: React.FC = () => {
                 window.scrollTo({ top: 0, behavior: 'instant' });
               }
             }}
-            className="px-3.5 py-2 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-emerald-500/50 hover:bg-slate-50 dark:hover:bg-slate-800/80 text-slate-800 dark:text-slate-200 hover:text-emerald-600 dark:hover:text-emerald-400 font-bold text-xs transition shadow-2xs flex items-center gap-1.5 cursor-pointer active:scale-95 shrink-0"
+            className="px-3 py-2 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-emerald-500/50 hover:bg-slate-50 dark:hover:bg-slate-800/80 text-slate-800 dark:text-slate-200 hover:text-emerald-600 dark:hover:text-emerald-400 font-bold text-xs transition shadow-2xs flex items-center gap-1.5 cursor-pointer active:scale-95 shrink-0 whitespace-nowrap"
           >
-            <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-500" />
+            <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
             <span className="hidden sm:inline">Todas las Reservas</span>
             <span className="sm:hidden">Todas</span>
           </button>
@@ -316,9 +316,9 @@ export const AdminAgenda: React.FC = () => {
           <button
             type="button"
             onClick={() => setShowNewModal(true)}
-            className="px-4 py-2 rounded-2xl bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-black text-xs shadow-sm transition shrink-0 whitespace-nowrap cursor-pointer flex items-center gap-1.5"
+            className="px-3.5 sm:px-4 py-2 rounded-2xl bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-black text-xs shadow-sm transition shrink-0 whitespace-nowrap cursor-pointer flex items-center gap-1.5"
           >
-            <Plus className="w-3.5 h-3.5" />
+            <Plus className="w-3.5 h-3.5 shrink-0" />
             <span>Nueva Reserva</span>
           </button>
         </div>

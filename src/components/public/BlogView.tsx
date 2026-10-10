@@ -36,28 +36,53 @@ export const BlogView: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
 
   const activeBlogPosts = isCorporateLanding ? CORPORATE_BLOG_POSTS : blogPosts;
 
-  // Sincronizar navegación con el historial del navegador (soporte completo de retroceso y avance)
+  // Helper para renderizar texto enriquecido con font-weight normal y negrita únicamente en títulos y <strong>
+  const renderFormattedInline = (text: string) => {
+    const parts = text.split(/(\*\*.*?\*\*)/g);
+    return parts.map((part, index) => {
+      if (part.startsWith('**') && part.endsWith('**')) {
+        return (
+          <strong key={index} className="font-bold text-slate-900 dark:text-white">
+            {part.slice(2, -2)}
+          </strong>
+        );
+      }
+      return <span key={index} className="font-normal">{part}</span>;
+    });
+  };
+
+  // Sincronizar navegación con el historial del navegador (soporte completo de /blog/[slug] y ?id=)
   useEffect(() => {
     const syncArticleFromUrl = () => {
       if (typeof window === 'undefined') return;
+      const pathname = window.location.pathname;
       const params = new URLSearchParams(window.location.search);
       const articleIdFromParam = params.get('id');
+
+      if (pathname.startsWith('/blog/') && pathname !== '/blog/') {
+        const slug = pathname.replace(/^\/blog\//, '').trim();
+        const found = activeBlogPosts.find((p) => p.slug === slug || p.id === slug);
+        if (found) {
+          setSelectedArticleId(found.id);
+          return;
+        }
+      }
+
       if (articleIdFromParam) {
         setSelectedArticleId(articleIdFromParam);
-      } else if (window.location.pathname === '/blog') {
+      } else if (pathname === '/blog') {
         setSelectedArticleId(null);
       }
     };
 
-    const params = new URLSearchParams(window.location.search);
-    setSelectedArticleId(params.get('id'));
+    syncArticleFromUrl();
 
     window.addEventListener('popstate', syncArticleFromUrl);
     return () => {
       window.removeEventListener('popstate', syncArticleFromUrl);
       setSelectedArticleId(null);
     };
-  }, [setSelectedArticleId]);
+  }, [setSelectedArticleId, activeBlogPosts]);
 
   const categories = isCorporateLanding
     ? [
@@ -143,9 +168,11 @@ export const BlogView: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
   };
 
   const handleSelectArticle = (id: string) => {
+    const post = activeBlogPosts.find((p) => p.id === id);
     setSelectedArticleId(id);
     if (typeof window !== 'undefined') {
-      window.history.pushState({ articleId: id }, '', `/blog?id=${id}`);
+      const url = post?.slug ? `/blog/${post.slug}` : `/blog?id=${id}`;
+      window.history.pushState({ articleId: id }, '', url);
     }
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -239,52 +266,73 @@ export const BlogView: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
             />
           </div>
 
-          {/* Article Prose Content */}
-          <div className="prose prose-slate dark:prose-invert max-w-none text-sm sm:text-base leading-relaxed space-y-6 text-slate-700 dark:text-slate-300">
-            <p className="text-lg font-medium text-slate-900 dark:text-slate-100 leading-relaxed border-l-4 border-emerald-500 pl-4">
+          {/* Article Content with regular reading font-weight */}
+          <div className="max-w-none text-base leading-relaxed space-y-6 text-slate-700 dark:text-slate-300 font-normal">
+            <p className="text-lg font-normal text-slate-800 dark:text-slate-200 leading-relaxed border-l-4 border-emerald-500 pl-4 py-0.5">
               {t((selectedArticle as any).excerptKey || (selectedArticle as any).summaryKey || ('blog.posts.' + selectedArticle.id + '.summary'), selectedArticle.summary)}
             </p>
 
             {isCorporateLanding ? (
-              <div className="space-y-4 whitespace-pre-line text-sm sm:text-base leading-relaxed text-slate-700 dark:text-slate-300">
-                {selectedArticle.content.split('\n\n').map((paragraph, pIdx) => {
-                  if (paragraph.startsWith('### ')) {
+              <div className="space-y-5 text-base leading-relaxed text-slate-700 dark:text-slate-300 font-normal">
+                {selectedArticle.content.split('\n\n').map((block, pIdx) => {
+                  const trimmed = block.trim();
+                  if (trimmed.startsWith('### ')) {
                     return (
-                      <h3 key={pIdx} className="text-xl font-black text-slate-900 dark:text-white pt-4">
-                        {paragraph.replace('### ', '')}
+                      <h3 key={pIdx} className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white pt-3 tracking-tight">
+                        {trimmed.replace('### ', '')}
                       </h3>
                     );
                   }
+                  if (trimmed.startsWith('## ')) {
+                    return (
+                      <h2 key={pIdx} className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white pt-4 tracking-tight">
+                        {trimmed.replace('## ', '')}
+                      </h2>
+                    );
+                  }
+                  const lines = trimmed.split('\n');
+                  const isList = lines.length > 1 && lines.every((line) => line.trim().startsWith('- ') || line.trim().startsWith('* '));
+                  if (isList) {
+                    return (
+                      <ul key={pIdx} className="space-y-2.5 my-3 pl-5 list-disc marker:text-emerald-500 font-normal text-slate-700 dark:text-slate-300">
+                        {lines.map((line, lIdx) => (
+                          <li key={lIdx} className="font-normal leading-relaxed text-slate-700 dark:text-slate-300">
+                            {renderFormattedInline(line.trim().replace(/^[-*]\s+/, ''))}
+                          </li>
+                        ))}
+                      </ul>
+                    );
+                  }
                   return (
-                    <p key={pIdx} className="leading-relaxed">
-                      {paragraph}
+                    <p key={pIdx} className="font-normal leading-relaxed text-slate-700 dark:text-slate-300">
+                      {renderFormattedInline(trimmed)}
                     </p>
                   );
                 })}
               </div>
             ) : (
-              <>
-                <p>{t('blog.article.p1')}</p>
+              <div className="space-y-5 font-normal text-slate-700 dark:text-slate-300">
+                <p className="font-normal leading-relaxed">{t('blog.article.p1')}</p>
 
                 <h2 className="text-2xl font-bold text-slate-900 dark:text-white mt-8 mb-4">
                   {t('blog.article.h1')}
                 </h2>
-                <p>{t('blog.article.p2')}</p>
+                <p className="font-normal leading-relaxed">{t('blog.article.p2')}</p>
 
                 <h2 className="text-2xl font-bold text-slate-900 dark:text-white mt-8 mb-4">
                   {t('blog.article.h2')}
                 </h2>
-                <p>{t('blog.article.p3')}</p>
+                <p className="font-normal leading-relaxed">{t('blog.article.p3')}</p>
 
                 <div className="p-6 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 my-8">
                   <h4 className="font-bold text-emerald-900 dark:text-emerald-300 text-sm mb-1">
                     {t('blog.coachTipTitle').replace('{club}', currentTenant.name)}
                   </h4>
-                  <p className="text-xs text-emerald-800 dark:text-emerald-400 leading-relaxed">
+                  <p className="text-xs text-emerald-800 dark:text-emerald-400 leading-relaxed font-normal">
                     {t('blog.article.tip')}
                   </p>
                 </div>
-              </>
+              </div>
             )}
           </div>
 

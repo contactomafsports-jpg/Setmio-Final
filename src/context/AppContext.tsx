@@ -585,6 +585,7 @@ interface AppContextType {
   openMatches: OpenMatch[];
   createOpenMatch: (match: Omit<OpenMatch, 'id' | 'tenantId'>) => void;
   updateOpenMatch: (matchId: string, updates: Partial<OpenMatch>) => void;
+  deleteOpenMatch: (matchId: string) => void;
   joinOpenMatch: (matchId: string, player: { name: string; level: number; position: 'drive' | 'reves' | 'both' }) => void;
   leaveOpenMatch: (matchId: string, playerName: string) => void;
 
@@ -1737,6 +1738,15 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     );
   };
 
+  const deleteOpenMatch = (matchId: string) => {
+    setOpenMatches((prev) => prev.filter((m) => m.id !== matchId));
+    triggerDemoToast(
+      'Partida eliminada',
+      'La partida abierta ha sido cancelada y la pista liberada correctamente.',
+      'info'
+    );
+  };
+
   // Tournaments
   const createTournament = (tournamentData: Omit<Tournament, 'id' | 'tenantId'>): Tournament => {
     const newT: Tournament = {
@@ -2121,6 +2131,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         openMatches,
         createOpenMatch,
         updateOpenMatch,
+        deleteOpenMatch,
         joinOpenMatch,
         leaveOpenMatch,
 
