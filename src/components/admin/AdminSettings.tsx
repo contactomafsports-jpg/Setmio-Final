@@ -45,7 +45,9 @@ import {
   Award,
   Truck,
   Package,
+  Bell,
 } from 'lucide-react';
+import { AdminNotificationSettings } from './AdminNotificationSettings';
 
 export interface DaySchedule {
   day: string;
@@ -67,13 +69,23 @@ const DEFAULT_WEEKLY_SCHEDULE: DaySchedule[] = [
 export const AdminSettings: React.FC = () => {
   const { currentTenant, updateCurrentTenant, triggerDemoToast, theme, setTheme, setAdminTab, courts, language, t } = useApp();
 
-  const [activeSection, setActiveSection] = useState<'general' | 'payments' | 'promos' | 'ai' | 'shipping'>('general');
+  const [activeSection, setActiveSection] = useState<
+    'general' | 'payments' | 'promos' | 'ai' | 'shipping' | 'notifications'
+  >('general');
 
-  // URL route sync for /gestion/ajustes/ia, /admin/ajustes/pagos, /admin/ajustes/envios, etc.
+  // URL route sync for /gestion/ajustes/notificaciones, /admin/ajustes/notificaciones, /gestion/ajustes/ia, etc.
   useEffect(() => {
     const handleUrlSettings = () => {
       const pathname = typeof window !== 'undefined' ? window.location.pathname : '';
-      if (pathname === '/gestion/ajustes/ia' || pathname.endsWith('/ia')) {
+      if (
+        pathname === '/admin/ajustes/notificaciones' ||
+        pathname === '/gestion/ajustes/notificaciones' ||
+        pathname.includes('/notificaciones') ||
+        pathname.includes('/notifications') ||
+        pathname.includes('/avisos')
+      ) {
+        setActiveSection('notifications');
+      } else if (pathname === '/gestion/ajustes/ia' || pathname.endsWith('/ia')) {
         setActiveSection('ai');
       } else if (pathname.includes('/pagos') || pathname.includes('/payments') || pathname.includes('/metodos-pago')) {
         setActiveSection('payments');
@@ -551,6 +563,19 @@ export const AdminSettings: React.FC = () => {
         >
           <Truck className="w-4 h-4 text-emerald-500" />
           <span>{t('shop.shippingSettings', 'Configuración de Envíos')}</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveSection('notifications')}
+          className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 cursor-pointer ${
+            activeSection === 'notifications'
+              ? 'bg-emerald-600 text-white shadow-xs'
+              : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800 hover:border-slate-300'
+          }`}
+        >
+          <Bell className="w-4 h-4 text-emerald-500" />
+          <span>Notificaciones & Plantillas</span>
         </button>
       </div>
 
@@ -2333,6 +2358,13 @@ export const AdminSettings: React.FC = () => {
             </div>
           </div>
         </form>
+      )}
+
+      {/* ======================================================================
+          PESTAÑA 6: NOTIFICACIONES & PLANTILLAS (/admin/ajustes/notificaciones)
+          ====================================================================== */}
+      {activeSection === 'notifications' && (
+        <AdminNotificationSettings />
       )}
 
       {/* =====================================================================

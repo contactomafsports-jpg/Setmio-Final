@@ -21,6 +21,7 @@ import {
 import { SUPPORTED_LANGUAGES } from '../../lib/i18n';
 import { i18n } from '../../i18n';
 import { OfficialFlag } from '../common/OfficialFlag';
+import { NotificationsPopover } from '../common/NotificationsPopover';
 
 interface AdminHeaderProps {
   onOpenProfileModal?: () => void;
@@ -201,17 +202,20 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
             )}
           </div>
 
-          {/* Botón Vista Jugador (Manteniendo el contexto del Club y Sede activa) */}
+          {/* Botón Vista Jugador (Oculto en móvil conforme a requerimiento de limpieza de barra superior) */}
           <button
             type="button"
             onClick={enterWhiteLabelPlayerPreview}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 border border-emerald-300/80 dark:border-emerald-800/80 shadow-xs cursor-pointer active:scale-98"
+            className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 border border-emerald-300/80 dark:border-emerald-800/80 shadow-xs cursor-pointer active:scale-98"
             title={`Probar Vista Jugador manteniendo el contexto de ${currentTenant.name}${selectedVenue && selectedVenue.id !== 'all' ? ` (${selectedVenue.shortName})` : ''}`}
             aria-label="Vista Jugador"
           >
             <Eye className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
             <span className="hidden sm:inline">{t('white_label.player_view', 'Vista Jugador')}</span>
           </button>
+
+          {/* Centro Global de Notificaciones */}
+          <NotificationsPopover variant="admin" />
 
           {/* Theme Toggle */}
           <button

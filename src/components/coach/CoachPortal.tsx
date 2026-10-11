@@ -25,6 +25,7 @@ import {
   Menu,
   LogOut,
 } from 'lucide-react';
+import { NotificationsPopover } from '../common/NotificationsPopover';
 
 interface PrivateClass {
   id: string;
@@ -249,6 +250,9 @@ export const CoachPortal: React.FC = () => {
               <User className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">Modo Jugador</span>
             </button>
+
+            {/* Centro de Notificaciones */}
+            <NotificationsPopover variant="coach" />
 
             <button
               onClick={toggleTheme}

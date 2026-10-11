@@ -19,6 +19,7 @@ import {
   Users,
   Swords,
   ChevronRight,
+  Bell,
 } from 'lucide-react';
 
 interface PlayerProfileData {
@@ -206,11 +207,13 @@ const PLAYERS_DIRECTORY: Record<string, PlayerProfileData> = {
 interface PlayerPublicProfileViewProps {
   playerId?: string;
   onBack?: () => void;
+  onOpenNotifications?: () => void;
 }
 
 export const PlayerPublicProfileView: React.FC<PlayerPublicProfileViewProps> = ({
   playerId,
   onBack,
+  onOpenNotifications,
 }) => {
   const { currentTenant, triggerDemoToast, currentUser } = useApp();
 
@@ -259,14 +262,27 @@ export const PlayerPublicProfileView: React.FC<PlayerPublicProfileViewProps> = (
           <span>Volver</span>
         </button>
 
-        <button
-          type="button"
-          onClick={handleShare}
-          className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs font-semibold transition cursor-pointer active:scale-95"
-        >
-          <Share2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-          <span>Compartir Ficha</span>
-        </button>
+        <div className="flex items-center gap-2">
+          {onOpenNotifications && (
+            <button
+              type="button"
+              onClick={onOpenNotifications}
+              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800 text-xs font-bold transition cursor-pointer active:scale-95 shadow-2xs"
+            >
+              <Bell className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+              <span>Preferencias de Avisos</span>
+            </button>
+          )}
+
+          <button
+            type="button"
+            onClick={handleShare}
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs font-semibold transition cursor-pointer active:scale-95"
+          >
+            <Share2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+            <span>Compartir Ficha</span>
+          </button>
+        </div>
       </div>
 
       <div className="space-y-8">

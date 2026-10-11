@@ -38,6 +38,7 @@ import { BookingFlow } from '../public/BookingFlow';
 import { OpenMatchesView } from '../public/OpenMatchesView';
 import { PlayerHeader } from './PlayerHeader';
 import { PlayerPublicProfileView } from '../public/PlayerPublicProfileView';
+import { PlayerNotificationPreferences } from './PlayerNotificationPreferences';
 import { ReservationDrawer, ReservationDrawerData } from '../admin/ReservationDrawer';
 
 export const PlayerPortal: React.FC = () => {
@@ -65,8 +66,23 @@ export const PlayerPortal: React.FC = () => {
   } = useApp();
 
   const [activePlayerTab, setActivePlayerTab] = useState<
-    'overview' | 'booking' | 'matches' | 'tournaments' | 'teams' | 'academy' | 'stats' | 'profile' | 'shop'
+    'overview' | 'booking' | 'matches' | 'tournaments' | 'teams' | 'academy' | 'stats' | 'profile' | 'shop' | 'notifications'
   >('overview');
+
+  // URL route sync for /jugador/perfil/notificaciones
+  React.useEffect(() => {
+    const handleUrlSync = () => {
+      if (typeof window !== 'undefined') {
+        const path = window.location.pathname;
+        if (path === '/jugador/perfil/notificaciones' || path.endsWith('/notificaciones')) {
+          setActivePlayerTab('notifications');
+        }
+      }
+    };
+    handleUrlSync();
+    window.addEventListener('popstate', handleUrlSync);
+    return () => window.removeEventListener('popstate', handleUrlSync);
+  }, []);
 
   const [legalModalOpen, setLegalModalOpen] = useState(false);
   const [publicProfileModalOpen, setPublicProfileModalOpen] = useState(false);
@@ -710,8 +726,26 @@ export const PlayerPortal: React.FC = () => {
             <PlayerPublicProfileView
               playerId="user-player-carlos"
               onBack={() => setActivePlayerTab('overview')}
+              onOpenNotifications={() => {
+                setActivePlayerTab('notifications');
+                if (typeof window !== 'undefined') {
+                  window.history.pushState(null, '', '/jugador/perfil/notificaciones');
+                }
+              }}
             />
           </div>
+        )}
+
+        {/* NOTIFICATIONS PREFERENCES TAB (/jugador/perfil/notificaciones) */}
+        {activePlayerTab === 'notifications' && (
+          <PlayerNotificationPreferences
+            onBack={() => {
+              setActivePlayerTab('profile');
+              if (typeof window !== 'undefined') {
+                window.history.pushState(null, '', '/jugador');
+              }
+            }}
+          />
         )}
 
         {/* SHOP TAB (Tienda / Catálogo del Club) */}

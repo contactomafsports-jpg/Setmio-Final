@@ -35,6 +35,7 @@ import {
   Edit3,
   Megaphone,
   Send,
+  Smartphone,
 } from 'lucide-react';
 
 export const AdminMatches: React.FC = () => {
@@ -48,6 +49,7 @@ export const AdminMatches: React.FC = () => {
     courts,
     currentTenant,
     isMultiVenue,
+    venues,
     triggerDemoToast,
     setAdminTab,
     navigateToPlayerProfile,
@@ -56,13 +58,60 @@ export const AdminMatches: React.FC = () => {
     t,
   } = useApp();
 
-  // Filters State (Minimalist segmented controls & clean search)
+  // Filters State
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'open' | 'full'>('all');
   const [levelFilter, setLevelFilter] = useState<'all' | 'iniciacion' | 'intermedio' | 'avanzado'>('all');
   const [genderFilter, setGenderFilter] = useState<'all' | 'male' | 'female' | 'mixed'>('all');
   const [visibilityFilter, setVisibilityFilter] = useState<'all' | 'public' | 'private_group'>('all');
-  const [showSecondaryFilters, setShowSecondaryFilters] = useState(false);
+  const [venueFilter, setVenueFilter] = useState<string>('all');
+  const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
+
+  // Temporary filter states for the Clean Filter Modal
+  const [tempSearch, setTempSearch] = useState('');
+  const [tempLevelFilter, setTempLevelFilter] = useState<'all' | 'iniciacion' | 'intermedio' | 'avanzado'>('all');
+  const [tempGenderFilter, setTempGenderFilter] = useState<'all' | 'male' | 'female' | 'mixed'>('all');
+  const [tempVisibilityFilter, setTempVisibilityFilter] = useState<'all' | 'public' | 'private_group'>('all');
+  const [tempVenueFilter, setTempVenueFilter] = useState<string>('all');
+
+  const openFilterModal = () => {
+    setTempSearch(search);
+    setTempLevelFilter(levelFilter);
+    setTempGenderFilter(genderFilter);
+    setTempVisibilityFilter(visibilityFilter);
+    setTempVenueFilter(venueFilter);
+    setIsFilterModalOpen(true);
+  };
+
+  const handleApplyFilters = () => {
+    setSearch(tempSearch);
+    setLevelFilter(tempLevelFilter);
+    setGenderFilter(tempGenderFilter);
+    setVisibilityFilter(tempVisibilityFilter);
+    setVenueFilter(tempVenueFilter);
+    setIsFilterModalOpen(false);
+  };
+
+  const handleClearFilters = () => {
+    setTempSearch('');
+    setTempLevelFilter('all');
+    setTempGenderFilter('all');
+    setTempVisibilityFilter('all');
+    setTempVenueFilter('all');
+    setSearch('');
+    setLevelFilter('all');
+    setGenderFilter('all');
+    setVisibilityFilter('all');
+    setVenueFilter('all');
+    setIsFilterModalOpen(false);
+  };
+
+  const activeFiltersCount =
+    (search ? 1 : 0) +
+    (levelFilter !== 'all' ? 1 : 0) +
+    (genderFilter !== 'all' ? 1 : 0) +
+    (visibilityFilter !== 'all' ? 1 : 0) +
+    (venueFilter !== 'all' ? 1 : 0);
 
   // Modals & Action States
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -72,6 +121,60 @@ export const AdminMatches: React.FC = () => {
   const [editingMatch, setEditingMatch] = useState<OpenMatch | null>(null);
   const [matchToDelete, setMatchToDelete] = useState<OpenMatch | null>(null);
   const [replacingPlayerName, setReplacingPlayerName] = useState<string | null>(null);
+
+  // Hub Unificado: Compartir / Notificar
+  const [shareNotifyMatch, setShareNotifyMatch] = useState<OpenMatch | null>(null);
+  const [shareChannel, setShareChannel] = useState<'email' | 'whatsapp' | 'push'>('whatsapp');
+  const [segmentType, setSegmentType] = useState<'individual' | 'group' | 'level'>('level');
+  const [selectedIndividualPlayer, setSelectedIndividualPlayer] = useState<string>('Carlos Méndez');
+  const [selectedGroupId, setSelectedGroupId] = useState<string>('');
+  const [hubSubject, setHubSubject] = useState<string>('');
+  const [hubMessage, setHubMessage] = useState<string>('');
+
+  const CLUB_PLAYERS_LIST = [
+    { id: 'p-1', name: 'Carlos Méndez', level: 3.85, phone: '+34 611 22 33 44', email: 'carlos.mendez@galiciapadel.com' },
+    { id: 'p-2', name: 'Diego Soto', level: 3.90, phone: '+34 622 33 44 55', email: 'diego.soto@email.es' },
+    { id: 'p-3', name: 'Brais Quintana', level: 4.20, phone: '+34 633 44 55 66', email: 'brais.padel@email.es' },
+    { id: 'p-4', name: 'Lucía Casal', level: 3.65, phone: '+34 644 55 66 77', email: 'lucia.casal@email.es' },
+    { id: 'p-5', name: 'Marcos Seijo', level: 4.10, phone: '+34 655 66 77 88', email: 'marcos.seijo@email.es' },
+    { id: 'p-6', name: 'Mateo Varela', level: 4.10, phone: '+34 666 77 88 99', email: 'mateo.varela@email.es' },
+    { id: 'p-7', name: 'Lucas Piñeiro', level: 3.85, phone: '+34 677 88 99 00', email: 'lucas.pineiro@email.es' },
+  ];
+
+  // Deep Link & URL Sync para /admin/partidas/:id
+  React.useEffect(() => {
+    const handleUrlSync = () => {
+      if (typeof window !== 'undefined') {
+        const path = window.location.pathname;
+        if (path.startsWith('/admin/partidas/') || path.startsWith('/gestion/partidas/')) {
+          const id = path.split('/').pop();
+          if (id && id !== 'partidas') {
+            const found = openMatches.find((m) => m.id === id);
+            if (found) {
+              setSelectedMatchForDetail(found);
+            }
+          }
+        }
+      }
+    };
+    handleUrlSync();
+    window.addEventListener('popstate', handleUrlSync);
+    return () => window.removeEventListener('popstate', handleUrlSync);
+  }, [openMatches]);
+
+  const openMatchDetail = (m: OpenMatch) => {
+    setSelectedMatchForDetail(m);
+    if (typeof window !== 'undefined') {
+      window.history.pushState(null, '', `/admin/partidas/${m.id}`);
+    }
+  };
+
+  const closeMatchDetail = () => {
+    setSelectedMatchForDetail(null);
+    if (typeof window !== 'undefined') {
+      window.history.pushState(null, '', '/admin/partidas');
+    }
+  };
 
   // Convocatoria a Grupo de Jugadores (Sustituto de WhatsApp)
   const [notifyGroupMatch, setNotifyGroupMatch] = useState<OpenMatch | null>(null);
@@ -203,9 +306,17 @@ export const AdminMatches: React.FC = () => {
         (visibilityFilter === 'public' && (m.visibility === 'public' || !m.visibility)) ||
         (visibilityFilter === 'private_group' && (m.visibility === 'private' || m.visibility === 'group'));
 
-      return matchSearch && matchStatus && matchLevel && matchGender && matchVis;
+      // Venue Filter
+      const court = courts.find((c) => c.id === m.courtId);
+      const matchVenue =
+        venueFilter === 'all' ||
+        !isMultiVenue ||
+        court?.venueId === venueFilter ||
+        (m as any).venueId === venueFilter;
+
+      return matchSearch && matchStatus && matchLevel && matchGender && matchVis && matchVenue;
     });
-  }, [openMatches, search, statusFilter, levelFilter, genderFilter, visibilityFilter]);
+  }, [openMatches, search, statusFilter, levelFilter, genderFilter, visibilityFilter, venueFilter, courts, isMultiVenue]);
 
   const totalOpenSlots = openMatches.reduce((acc, m) => acc + Math.max(0, 4 - m.players.length), 0);
   const fullMatchesCount = openMatches.filter((m) => m.players.length >= 4).length;
@@ -588,6 +699,97 @@ export const AdminMatches: React.FC = () => {
     }
   };
 
+  // Hub Unificado: Compartir / Notificar
+  const handleOpenShareNotifyHub = (match: OpenMatch) => {
+    setShareNotifyMatch(match);
+    const bestMatchingGroup =
+      playerGroups.find(
+        (g) =>
+          g.minLevel !== undefined &&
+          g.maxLevel !== undefined &&
+          match.minLevel >= g.minLevel - 0.25 &&
+          match.maxLevel <= g.maxLevel + 0.25
+      ) || playerGroups[0];
+
+    setSelectedGroupId(bestMatchingGroup ? bestMatchingGroup.id : playerGroups[0]?.id || '');
+    setShareChannel('whatsapp');
+    setSegmentType('level');
+    setSelectedIndividualPlayer(CLUB_PLAYERS_LIST[0].name);
+
+    const openSlots = Math.max(1, 4 - match.players.length);
+    const dateFormatted = match.startTime.split('T')[0] || 'Hoy';
+    const timeFormatted = match.startTime.includes('T')
+      ? match.startTime.split('T')[1].slice(0, 5)
+      : '19:30';
+
+    setHubSubject(
+      `🏆 Convocatoria de Pádel: ${openSlots} plaza${openSlots > 1 ? 's' : ''} libre${openSlots > 1 ? 's' : ''} en ${match.courtName}`
+    );
+    setHubMessage(
+      `Partida abierta nivel ${match.minLevel.toFixed(2)} - ${match.maxLevel.toFixed(2)} el ${dateFormatted} a las ${timeFormatted} h en ${match.courtName}. Quedan ${openSlots} plaza(s) disponible(s). Cuota individual: ${match.pricePerPlayer.toFixed(2)} € (Pago con monedero o tarjeta).`
+    );
+  };
+
+  const handleSendShareNotifyHub = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!shareNotifyMatch) return;
+    const actionUrl = `https://setmio.com/partida/${shareNotifyMatch.id}`;
+
+    let targetSummary = '';
+    let recipientsCount = 1;
+
+    if (segmentType === 'individual') {
+      targetSummary = `Jugador: ${selectedIndividualPlayer}`;
+      recipientsCount = 1;
+    } else if (segmentType === 'group') {
+      const grp = playerGroups.find((g) => g.id === selectedGroupId) || playerGroups[0];
+      targetSummary = `Grupo: ${grp?.name || 'Grupo de socios'}`;
+      recipientsCount = grp?.memberCount || 12;
+    } else {
+      targetSummary = `Nivel ${shareNotifyMatch.minLevel.toFixed(2)} - ${shareNotifyMatch.maxLevel.toFixed(2)} (ELO ${(shareNotifyMatch.minLevel * 350).toFixed(0)} - ${(shareNotifyMatch.maxLevel * 350).toFixed(0)})`;
+      recipientsCount = 18;
+    }
+
+    if (shareChannel === 'whatsapp') {
+      const text = `🎾 *CONVOCATORIA EN ${currentTenant.name.toUpperCase()}*\n\n📢 *${hubSubject}*\n${hubMessage}\n\n👉 *Reserva y paga tu plaza a 1/4:* ${actionUrl}`;
+      const encoded = encodeURIComponent(text);
+      if (typeof window !== 'undefined') {
+        window.open(`https://wa.me/?text=${encoded}`, '_blank');
+      }
+      triggerDemoToast(
+        'WhatsApp Enviado',
+        `Convocatoria enviada vía WhatsApp a ${targetSummary} (${recipientsCount} destinatarios).`,
+        'success'
+      );
+    } else if (shareChannel === 'email') {
+      triggerDemoToast(
+        'Email Corporativo Enviado',
+        `Plantilla oficial del club enviada a ${targetSummary} (${recipientsCount} destinatarios).`,
+        'success'
+      );
+    } else {
+      triggerDemoToast(
+        'Notificación Push Emitida',
+        `Aviso instantáneo push enviado a la app de los socios de ${targetSummary}.`,
+        'success'
+      );
+    }
+
+    sendGroupConvocatoria({
+      groupId: selectedGroupId || 'general',
+      groupName: targetSummary,
+      type: 'match',
+      relatedId: shareNotifyMatch.id,
+      title: hubSubject.trim(),
+      message: hubMessage.trim(),
+      actionUrl,
+      recipientsCount,
+      channels: [shareChannel],
+    });
+
+    setShareNotifyMatch(null);
+  };
+
   return (
     <div className="space-y-6 text-slate-900 dark:text-slate-100 max-w-7xl mx-auto pb-16">
       {/* 1. Header Oficial Pro */}
@@ -680,15 +882,15 @@ export const AdminMatches: React.FC = () => {
         </div>
       </div>
 
-      {/* 3. Filtros Simplificados: Solo Filtro de Estado visible + Botón compacto de Filtros secundarios */}
+      {/* 3. Filtros Responsive: Pestañas de estado y Botón de filtro a la misma altura */}
       <div className="space-y-3">
-        <div className="p-2 sm:p-2.5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-2xs flex flex-wrap items-center justify-between gap-2.5">
+        <div className="p-2 sm:p-2.5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-2xs flex items-center justify-between gap-2">
           {/* Segmented Control de Estado (Visible de forma permanente) */}
-          <div className="inline-flex items-center p-1 rounded-xl bg-slate-100 dark:bg-slate-800/80 border border-slate-200/60 dark:border-slate-700/60 text-xs font-bold">
+          <div className="inline-flex items-center p-1 rounded-xl bg-slate-100 dark:bg-slate-800/80 border border-slate-200/60 dark:border-slate-700/60 text-xs font-bold overflow-x-auto shrink min-w-0">
             <button
               type="button"
               onClick={() => setStatusFilter('all')}
-              className={`px-3 py-1.5 rounded-lg transition cursor-pointer ${
+              className={`px-2.5 sm:px-3 py-1.5 rounded-lg transition cursor-pointer text-xs shrink-0 ${
                 statusFilter === 'all'
                   ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xs'
                   : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
@@ -699,7 +901,7 @@ export const AdminMatches: React.FC = () => {
             <button
               type="button"
               onClick={() => setStatusFilter('open')}
-              className={`px-3 py-1.5 rounded-lg transition cursor-pointer ${
+              className={`px-2.5 sm:px-3 py-1.5 rounded-lg transition cursor-pointer text-xs shrink-0 ${
                 statusFilter === 'open'
                   ? 'bg-white dark:bg-slate-900 text-emerald-600 dark:text-emerald-400 shadow-xs'
                   : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
@@ -710,7 +912,7 @@ export const AdminMatches: React.FC = () => {
             <button
               type="button"
               onClick={() => setStatusFilter('full')}
-              className={`px-3 py-1.5 rounded-lg transition cursor-pointer ${
+              className={`px-2.5 sm:px-3 py-1.5 rounded-lg transition cursor-pointer text-xs shrink-0 ${
                 statusFilter === 'full'
                   ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-xs'
                   : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
@@ -720,129 +922,261 @@ export const AdminMatches: React.FC = () => {
             </button>
           </div>
 
-          {/* Botón compacto con icono de Filtros para desplegar filtros secundarios */}
+          {/* Botón de Filtro Responsive: a la misma altura, condensado en icono de filtro sin texto en móvil */}
           <button
             type="button"
-            onClick={() => setShowSecondaryFilters(!showSecondaryFilters)}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer border ${
-              showSecondaryFilters || (search || levelFilter !== 'all' || genderFilter !== 'all' || visibilityFilter !== 'all')
+            onClick={openFilterModal}
+            className={`p-2 sm:px-3.5 sm:py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shrink-0 border ${
+              activeFiltersCount > 0
                 ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-500 text-emerald-700 dark:text-emerald-300 shadow-2xs'
                 : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700/80'
             }`}
-            title="Desplegar u ocultar filtros secundarios"
+            title="Abrir filtros avanzados"
+            aria-label="Filtros avanzados"
           >
-            <Filter className="w-3.5 h-3.5" />
-            <span>Filtros</span>
-            {(search || levelFilter !== 'all' || genderFilter !== 'all' || visibilityFilter !== 'all') && (
-              <span className="w-2 h-2 rounded-full bg-emerald-500" />
+            <Filter className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+            <span className="hidden sm:inline">Filtros</span>
+            {activeFiltersCount > 0 && (
+              <span className="w-4 h-4 rounded-full bg-emerald-500 text-white font-black text-[9px] flex items-center justify-center leading-none">
+                {activeFiltersCount}
+              </span>
             )}
           </button>
         </div>
 
-        {/* Panel Desplegable de Filtros Secundarios */}
-        {showSecondaryFilters && (
-          <div className="p-3.5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-3 animate-in fade-in-50 duration-150">
-            {/* Buscador */}
-            <div className="relative">
-              <Search className="absolute left-3 top-2.5 w-3.5 h-3.5 text-slate-400" />
-              <input
-                type="text"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder={t('matches.searchPlaceholder', 'Buscar por pista, grupo o jugador...')}
-                className="w-full pl-8.5 pr-8 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-emerald-500 transition"
-              />
-              {search && (
-                <button
-                  type="button"
-                  onClick={() => setSearch('')}
-                  className="absolute right-2.5 top-2.5 text-xs text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
-                >
-                  ✕
-                </button>
-              )}
-            </div>
-
-            {/* Píldoras secundarias: Nivel, Género y Tipo */}
-            <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-slate-100 dark:border-slate-800/60 text-xs">
-              {/* Nivel */}
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mr-1">Nivel:</span>
-              <div className="flex flex-wrap items-center gap-1.5">
-                {[
-                  { id: 'all', label: 'Todos' },
-                  { id: 'iniciacion', label: 'Iniciación (≤3.25)' },
-                  { id: 'intermedio', label: 'Intermedio (3.0-4.25)' },
-                  { id: 'avanzado', label: 'Avanzado (≥4.0)' },
-                ].map((lvl) => (
-                  <button
-                    key={lvl.id}
-                    type="button"
-                    onClick={() => setLevelFilter(lvl.id as any)}
-                    className={`px-2 py-0.5 rounded-lg text-xs font-bold transition cursor-pointer border ${
-                      levelFilter === lvl.id
-                        ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-500 text-emerald-700 dark:text-emerald-300 shadow-2xs'
-                        : 'bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-slate-300'
-                    }`}
-                  >
-                    {lvl.label}
-                  </button>
-                ))}
-              </div>
-
-              <div className="h-4 w-px bg-slate-200 dark:border-slate-800 mx-1 hidden sm:block" />
-
-              {/* Género */}
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mr-1">Género:</span>
-              <div className="flex items-center gap-1.5">
-                {[
-                  { id: 'all', label: t('matches.filterGenderAll', 'Todos') },
-                  { id: 'male', label: t('matches.filterGenderMale', 'Masculina') },
-                  { id: 'female', label: t('matches.filterGenderFemale', 'Femenina') },
-                  { id: 'mixed', label: t('matches.filterGenderMixed', 'Mixta') },
-                ].map((g) => (
-                  <button
-                    key={g.id}
-                    type="button"
-                    onClick={() => setGenderFilter(g.id as any)}
-                    className={`px-2 py-0.5 rounded-lg text-xs font-bold transition cursor-pointer border ${
-                      genderFilter === g.id
-                        ? 'bg-indigo-50 dark:bg-indigo-950/60 border-indigo-500 text-indigo-700 dark:text-indigo-300 shadow-2xs'
-                        : 'bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-slate-300'
-                    }`}
-                  >
-                    {g.label}
-                  </button>
-                ))}
-              </div>
-
-              <div className="h-4 w-px bg-slate-200 dark:border-slate-800 mx-1 hidden sm:block" />
-
-              {/* Visibilidad */}
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mr-1">Tipo:</span>
-              <div className="flex items-center gap-1.5">
-                {[
-                  { id: 'all', label: 'Todas' },
-                  { id: 'public', label: 'Públicas' },
-                  { id: 'private_group', label: 'Grupos / Privadas' },
-                ].map((v) => (
-                  <button
-                    key={v.id}
-                    type="button"
-                    onClick={() => setVisibilityFilter(v.id as any)}
-                    className={`px-2 py-0.5 rounded-lg text-xs font-bold transition cursor-pointer border ${
-                      visibilityFilter === v.id
-                        ? 'bg-slate-900 dark:bg-white border-slate-900 dark:border-white text-white dark:text-slate-900 shadow-2xs'
-                        : 'bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-slate-300'
-                    }`}
-                  >
-                    {v.label}
-                  </button>
-                ))}
-              </div>
-            </div>
+        {/* Chips de filtros activos para borrado rápido */}
+        {activeFiltersCount > 0 && (
+          <div className="flex flex-wrap items-center gap-1.5 px-1 text-xs">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mr-1">
+              Filtros activos:
+            </span>
+            {search && (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800 text-[11px] font-medium">
+                "{search}"
+                <button type="button" onClick={() => setSearch('')} className="hover:text-rose-500">×</button>
+              </span>
+            )}
+            {venueFilter !== 'all' && (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800 text-[11px] font-medium">
+                Sede: {venues.find((v) => v.id === venueFilter)?.shortName || venueFilter}
+                <button type="button" onClick={() => setVenueFilter('all')} className="hover:text-rose-500">×</button>
+              </span>
+            )}
+            {levelFilter !== 'all' && (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800 text-[11px] font-medium">
+                {levelFilter === 'iniciacion' ? 'Iniciación' : levelFilter === 'intermedio' ? 'Intermedio' : 'Avanzado'}
+                <button type="button" onClick={() => setLevelFilter('all')} className="hover:text-rose-500">×</button>
+              </span>
+            )}
+            {genderFilter !== 'all' && (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800 text-[11px] font-medium">
+                {genderFilter === 'male' ? 'Masculina' : genderFilter === 'female' ? 'Femenina' : 'Mixta'}
+                <button type="button" onClick={() => setGenderFilter('all')} className="hover:text-rose-500">×</button>
+              </span>
+            )}
+            {visibilityFilter !== 'all' && (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800 text-[11px] font-medium">
+                {visibilityFilter === 'public' ? 'Pública' : 'Grupo/Privada'}
+                <button type="button" onClick={() => setVisibilityFilter('all')} className="hover:text-rose-500">×</button>
+              </span>
+            )}
+            <button
+              type="button"
+              onClick={handleClearFilters}
+              className="text-[11px] text-slate-500 hover:text-rose-500 underline ml-1 cursor-pointer"
+            >
+              Limpiar todos
+            </button>
           </div>
         )}
       </div>
+
+      {/* ======================================================================
+          MODAL DE FILTROS AVANZADOS LIMPIO
+          ====================================================================== */}
+      {isFilterModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs animate-in fade-in duration-150">
+          <div className="w-full max-w-md rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl p-6 space-y-5 max-h-[90vh] overflow-y-auto">
+            {/* Header del Modal de Filtros */}
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+              <div className="flex items-center gap-2.5">
+                <div className="p-2 rounded-xl bg-emerald-50 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400">
+                  <Filter className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="font-extrabold text-sm text-slate-900 dark:text-white leading-none">
+                    Filtros de Partidas
+                  </h3>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                    Personaliza los parámetros de búsqueda y visualización
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsFilterModalOpen(false)}
+                className="p-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Opciones Avanzadas */}
+            <div className="space-y-4 text-xs">
+              {/* Buscador */}
+              <div className="space-y-1">
+                <label className="block font-bold text-slate-700 dark:text-slate-300">
+                  Buscar por texto:
+                </label>
+                <div className="relative">
+                  <Search className="absolute left-3 top-2.5 w-3.5 h-3.5 text-slate-400" />
+                  <input
+                    type="text"
+                    value={tempSearch}
+                    onChange={(e) => setTempSearch(e.target.value)}
+                    placeholder="Buscar por pista, grupo o jugador..."
+                    className="w-full pl-8.5 pr-8 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-emerald-500"
+                  />
+                  {tempSearch && (
+                    <button
+                      type="button"
+                      onClick={() => setTempSearch('')}
+                      className="absolute right-2.5 top-2.5 text-xs text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                    >
+                      ✕
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Sede del Club (si es multi-sede) */}
+              {isMultiVenue && (
+                <div className="space-y-1">
+                  <label className="block font-bold text-slate-700 dark:text-slate-300">
+                    Sede del Club:
+                  </label>
+                  <select
+                    value={tempVenueFilter}
+                    onChange={(e) => setTempVenueFilter(e.target.value)}
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 font-bold"
+                  >
+                    <option value="all">Todas las Sedes</option>
+                    {venues
+                      .filter((v) => v.id !== 'all')
+                      .map((v) => (
+                        <option key={v.id} value={v.id}>
+                          {v.shortName}
+                        </option>
+                      ))}
+                  </select>
+                </div>
+              )}
+
+              {/* Nivel de Juego */}
+              <div className="space-y-1.5">
+                <label className="block font-bold text-slate-700 dark:text-slate-300">
+                  Nivel de Juego:
+                </label>
+                <div className="grid grid-cols-2 gap-1.5">
+                  {[
+                    { id: 'all', label: 'Todos los niveles' },
+                    { id: 'iniciacion', label: 'Iniciación (≤3.25)' },
+                    { id: 'intermedio', label: 'Intermedio (3.0 - 4.25)' },
+                    { id: 'avanzado', label: 'Avanzado (≥4.0)' },
+                  ].map((lvl) => (
+                    <button
+                      key={lvl.id}
+                      type="button"
+                      onClick={() => setTempLevelFilter(lvl.id as any)}
+                      className={`p-2 rounded-xl text-xs font-bold transition text-left border ${
+                        tempLevelFilter === lvl.id
+                          ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-500 text-emerald-700 dark:text-emerald-300 shadow-2xs'
+                          : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-slate-300'
+                      }`}
+                    >
+                      {lvl.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Categoría de Género */}
+              <div className="space-y-1.5">
+                <label className="block font-bold text-slate-700 dark:text-slate-300">
+                  Categoría de Género:
+                </label>
+                <div className="grid grid-cols-2 gap-1.5">
+                  {[
+                    { id: 'all', label: 'Todas las categorías' },
+                    { id: 'male', label: 'Masculina' },
+                    { id: 'female', label: 'Femenina' },
+                    { id: 'mixed', label: 'Mixta' },
+                  ].map((g) => (
+                    <button
+                      key={g.id}
+                      type="button"
+                      onClick={() => setTempGenderFilter(g.id as any)}
+                      className={`p-2 rounded-xl text-xs font-bold transition text-left border ${
+                        tempGenderFilter === g.id
+                          ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-500 text-emerald-700 dark:text-emerald-300 shadow-2xs'
+                          : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-slate-300'
+                      }`}
+                    >
+                      {g.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Tipo de Partida */}
+              <div className="space-y-1.5">
+                <label className="block font-bold text-slate-700 dark:text-slate-300">
+                  Tipo de Partida:
+                </label>
+                <div className="grid grid-cols-3 gap-1.5">
+                  {[
+                    { id: 'all', label: 'Todas' },
+                    { id: 'public', label: 'Pública' },
+                    { id: 'private_group', label: 'Grupos / Privadas' },
+                  ].map((vis) => (
+                    <button
+                      key={vis.id}
+                      type="button"
+                      onClick={() => setTempVisibilityFilter(vis.id as any)}
+                      className={`p-2 rounded-xl text-[11px] font-bold transition text-center border ${
+                        tempVisibilityFilter === vis.id
+                          ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-500 text-emerald-700 dark:text-emerald-300 shadow-2xs'
+                          : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-slate-300'
+                      }`}
+                    >
+                      {vis.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Acciones Claras: Limpiar filtros & Aplicar filtros */}
+            <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2">
+              <button
+                type="button"
+                onClick={handleClearFilters}
+                className="px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 font-bold text-xs transition cursor-pointer"
+              >
+                Limpiar filtros
+              </button>
+
+              <button
+                type="button"
+                onClick={handleApplyFilters}
+                className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md transition cursor-pointer active:scale-95"
+              >
+                Aplicar filtros
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* 4. Listado de Partidas con Tarjetas Estándar Pro */}
       {filteredMatches.length === 0 ? (
@@ -885,7 +1219,7 @@ export const AdminMatches: React.FC = () => {
             return (
               <div
                 key={m.id}
-                onClick={() => setSelectedMatchForDetail(m)}
+                onClick={() => openMatchDetail(m)}
                 className={`p-4 rounded-2xl bg-white dark:bg-slate-900 border transition-all duration-200 shadow-xs hover:shadow-md flex flex-col justify-between cursor-pointer group ${
                   isFull
                     ? 'border-emerald-500/30 dark:border-emerald-500/20'
@@ -1080,10 +1414,23 @@ export const AdminMatches: React.FC = () => {
                         e.stopPropagation();
                         handleCopyMatchLink(m.id);
                       }}
-                      className="p-1 rounded-lg text-slate-400 hover:text-emerald-600 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
-                      title="Copiar enlace directo de la partida"
+                      className="p-1.5 rounded-lg text-slate-400 hover:text-emerald-600 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+                      title="Copiar enlace"
                     >
-                      <Share2 className="w-3.5 h-3.5" />
+                      <Copy className="w-3.5 h-3.5" />
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleOpenShareNotifyHub(m);
+                      }}
+                      className="px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 font-bold text-[11px] border border-emerald-300 dark:border-emerald-800 transition cursor-pointer shadow-2xs active:scale-95 flex items-center gap-1"
+                      title="Compartir / Notificar"
+                    >
+                      <Share2 className="w-3 h-3 text-emerald-500" />
+                      <span>Compartir / Notificar</span>
                     </button>
 
                     {!isFull && (
@@ -1094,11 +1441,11 @@ export const AdminMatches: React.FC = () => {
                             e.stopPropagation();
                             handleOpenNotifyGroup(m);
                           }}
-                          className="px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 font-bold text-[11px] border border-emerald-300 dark:border-emerald-800 transition cursor-pointer shadow-2xs active:scale-95 flex items-center gap-1"
-                          title="Lanzar convocatoria a grupo de jugadores (WhatsApp)"
+                          className="px-2 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 font-bold text-[11px] transition cursor-pointer flex items-center gap-1"
+                          title="Notificar a grupo"
                         >
-                          <Megaphone className="w-3 h-3 text-emerald-500" />
-                          <span>Notificar Grupo</span>
+                          <Megaphone className="w-3 h-3 text-slate-500" />
+                          <span className="hidden xl:inline">Notificar a grupo</span>
                         </button>
 
                         <button
@@ -1202,7 +1549,7 @@ export const AdminMatches: React.FC = () => {
 
               <button
                 type="button"
-                onClick={() => setSelectedMatchForDetail(null)}
+                onClick={closeMatchDetail}
                 className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer shrink-0"
               >
                 <X className="w-5 h-5" />
@@ -1477,16 +1824,29 @@ export const AdminMatches: React.FC = () => {
               )}
             </div>
 
-            {/* Footer con Enlace Compartir, Notificar Grupo y Cerrar */}
+            {/* Footer con Copiar enlace, Compartir/Notificar y Notificar a grupo */}
             <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2 flex-wrap">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 <button
                   type="button"
                   onClick={() => handleCopyMatchLink(selectedMatchForDetail.id)}
                   className="px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs hover:bg-slate-200 dark:hover:bg-slate-700 transition flex items-center gap-1.5 cursor-pointer"
+                  title="Copiar enlace"
+                >
+                  <Copy className="w-3.5 h-3.5 text-slate-500" />
+                  <span>Copiar enlace</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    const m = selectedMatchForDetail;
+                    handleOpenShareNotifyHub(m);
+                  }}
+                  className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-95"
                 >
                   <Share2 className="w-3.5 h-3.5" />
-                  <span>{t('matches.copyLink', 'Copiar Enlace')}</span>
+                  <span>Compartir / Notificar</span>
                 </button>
 
                 {selectedMatchForDetail.players.length < 4 && (
@@ -1494,20 +1854,19 @@ export const AdminMatches: React.FC = () => {
                     type="button"
                     onClick={() => {
                       const m = selectedMatchForDetail;
-                      setSelectedMatchForDetail(null);
                       handleOpenNotifyGroup(m);
                     }}
-                    className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-95"
+                    className="px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs transition flex items-center gap-1.5 cursor-pointer"
                   >
-                    <Megaphone className="w-3.5 h-3.5" />
-                    <span>Notificar a Grupo ({4 - selectedMatchForDetail.players.length} plazas libres)</span>
+                    <Megaphone className="w-3.5 h-3.5 text-emerald-500" />
+                    <span>Notificar a grupo</span>
                   </button>
                 )}
               </div>
 
               <button
                 type="button"
-                onClick={() => setSelectedMatchForDetail(null)}
+                onClick={closeMatchDetail}
                 className="px-4 py-2 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-bold text-xs cursor-pointer"
               >
                 {t('matches.detailClose', 'Cerrar Detalle')}
@@ -2647,6 +3006,256 @@ export const AdminMatches: React.FC = () => {
                 >
                   <Send className="w-4 h-4" />
                   <span>Lanzar Convocatoria a Grupo</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ======================================================================
+          MODAL 8: HUB UNIFICADO PARA COMPARTIR Y NOTIFICAR
+          ====================================================================== */}
+      {shareNotifyMatch && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs animate-in fade-in duration-150">
+          <div className="w-full max-w-xl rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl p-6 sm:p-7 space-y-4 max-h-[92vh] overflow-y-auto text-slate-900 dark:text-slate-100">
+            {/* Header */}
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+              <div className="flex items-center gap-2.5">
+                <div className="p-2 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-xs">
+                  <Share2 className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-base font-black text-slate-900 dark:text-white">
+                    Compartir / Notificar Partida
+                  </h3>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                    Hub centralizado para difusión multicanal y convocatoria segmentada de jugadores
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShareNotifyMatch(null)}
+                className="p-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Resumen de la Partida */}
+            <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 space-y-2 text-xs">
+              <div className="flex items-center justify-between font-bold">
+                <span className="flex items-center gap-1.5 text-slate-900 dark:text-white">
+                  <Clock className="w-3.5 h-3.5 text-emerald-500" />
+                  <span>{shareNotifyMatch.courtName} · {shareNotifyMatch.startTime.replace('T', ' ')}</span>
+                </span>
+                <span className="px-2.5 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300 font-bold text-[10px]">
+                  {4 - shareNotifyMatch.players.length} plazas libres
+                </span>
+              </div>
+              <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 pt-1 border-t border-slate-200/60 dark:border-slate-800/60">
+                <span>Rango requerido: <strong className="text-slate-800 dark:text-slate-200">{shareNotifyMatch.minLevel.toFixed(2)} - {shareNotifyMatch.maxLevel.toFixed(2)}</strong></span>
+                <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400">
+                  {shareNotifyMatch.pricePerPlayer.toFixed(2)} €/jugador
+                </span>
+              </div>
+            </div>
+
+            {/* Enlace Directo Copiable */}
+            <div className="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 flex items-center justify-between gap-2">
+              <span className="text-[11px] font-mono text-slate-600 dark:text-slate-300 truncate select-all">
+                https://setmio.com/partida/{shareNotifyMatch.id}
+              </span>
+              <button
+                type="button"
+                onClick={() => handleCopyMatchLink(shareNotifyMatch.id)}
+                className="px-2.5 py-1 rounded-lg bg-white dark:bg-slate-900 hover:bg-slate-50 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 text-[11px] font-bold transition flex items-center gap-1 cursor-pointer shrink-0 shadow-2xs"
+              >
+                <Copy className="w-3 h-3 text-emerald-500" />
+                <span>Copiar enlace</span>
+              </button>
+            </div>
+
+            <form onSubmit={handleSendShareNotifyHub} className="space-y-4 text-xs">
+              {/* 1. Selector dinámico de canal */}
+              <div>
+                <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                  1. Seleccionar Canal de Difusión:
+                </label>
+                <div className="grid grid-cols-3 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setShareChannel('whatsapp')}
+                    className={`p-3 rounded-2xl border text-xs font-bold flex flex-col items-center justify-center gap-1.5 transition cursor-pointer ${
+                      shareChannel === 'whatsapp'
+                        ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-500 text-emerald-700 dark:text-emerald-300 shadow-2xs'
+                        : 'bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400'
+                    }`}
+                  >
+                    <MessageCircle className="w-5 h-5 text-emerald-500" />
+                    <span>WhatsApp</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setShareChannel('email')}
+                    className={`p-3 rounded-2xl border text-xs font-bold flex flex-col items-center justify-center gap-1.5 transition cursor-pointer ${
+                      shareChannel === 'email'
+                        ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-500 text-emerald-700 dark:text-emerald-300 shadow-2xs'
+                        : 'bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400'
+                    }`}
+                  >
+                    <Mail className="w-5 h-5 text-indigo-500" />
+                    <span>Email</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setShareChannel('push')}
+                    className={`p-3 rounded-2xl border text-xs font-bold flex flex-col items-center justify-center gap-1.5 transition cursor-pointer ${
+                      shareChannel === 'push'
+                        ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-500 text-emerald-700 dark:text-emerald-300 shadow-2xs'
+                        : 'bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400'
+                    }`}
+                  >
+                    <Smartphone className="w-5 h-5 text-amber-500" />
+                    <span>Push In-App</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* 2. Segmentación de Destinatarios */}
+              <div>
+                <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                  2. Segmentar Destinatarios por:
+                </label>
+                <div className="grid grid-cols-3 gap-1.5 p-1 rounded-xl bg-slate-100 dark:bg-slate-800/80 mb-2.5">
+                  <button
+                    type="button"
+                    onClick={() => setSegmentType('level')}
+                    className={`py-1.5 px-2 rounded-lg text-[11px] font-bold transition cursor-pointer ${
+                      segmentType === 'level'
+                        ? 'bg-white dark:bg-slate-900 text-emerald-600 dark:text-emerald-400 shadow-xs'
+                        : 'text-slate-600 dark:text-slate-400'
+                    }`}
+                  >
+                    Nivel / Rango ELO
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setSegmentType('group')}
+                    className={`py-1.5 px-2 rounded-lg text-[11px] font-bold transition cursor-pointer ${
+                      segmentType === 'group'
+                        ? 'bg-white dark:bg-slate-900 text-emerald-600 dark:text-emerald-400 shadow-xs'
+                        : 'text-slate-600 dark:text-slate-400'
+                    }`}
+                  >
+                    Grupo de Jugadores
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setSegmentType('individual')}
+                    className={`py-1.5 px-2 rounded-lg text-[11px] font-bold transition cursor-pointer ${
+                      segmentType === 'individual'
+                        ? 'bg-white dark:bg-slate-900 text-emerald-600 dark:text-emerald-400 shadow-xs'
+                        : 'text-slate-600 dark:text-slate-400'
+                    }`}
+                  >
+                    Jugador Individual
+                  </button>
+                </div>
+
+                {/* Sub-selector según Segmentación */}
+                {segmentType === 'level' && (
+                  <div className="p-3 rounded-2xl bg-emerald-50/60 dark:bg-emerald-950/40 border border-emerald-500/20 space-y-1">
+                    <span className="font-bold text-slate-900 dark:text-white flex items-center justify-between">
+                      <span>Rango ELO seleccionado:</span>
+                      <span className="font-mono text-emerald-600 dark:text-emerald-400">
+                        {shareNotifyMatch.minLevel.toFixed(2)} - {shareNotifyMatch.maxLevel.toFixed(2)}
+                      </span>
+                    </span>
+                    <p className="text-[11px] text-slate-600 dark:text-slate-400">
+                      Se enviará automáticamente a los <strong>18 socios cualificados</strong> del club cuyo nivel Play! o ELO coincide con esta partida.
+                    </p>
+                  </div>
+                )}
+
+                {segmentType === 'group' && (
+                  <div className="space-y-1">
+                    <select
+                      value={selectedGroupId}
+                      onChange={(e) => setSelectedGroupId(e.target.value)}
+                      className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-bold text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                    >
+                      {playerGroups.map((g) => (
+                        <option key={g.id} value={g.id}>
+                          {g.name} ({g.memberCount} socios · {g.category.toUpperCase()})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+
+                {segmentType === 'individual' && (
+                  <div className="space-y-1">
+                    <select
+                      value={selectedIndividualPlayer}
+                      onChange={(e) => setSelectedIndividualPlayer(e.target.value)}
+                      className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-bold text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                    >
+                      {CLUB_PLAYERS_LIST.map((p) => (
+                        <option key={p.id} value={p.name}>
+                          {p.name} (Nivel {p.level.toFixed(2)} · {p.phone})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+              </div>
+
+              {/* 3. Mensaje Personalizable */}
+              <div>
+                <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  Asunto del aviso:
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={hubSubject}
+                  onChange={(e) => setHubSubject(e.target.value)}
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                />
+              </div>
+
+              <div>
+                <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  Texto del Mensaje:
+                </label>
+                <textarea
+                  rows={3}
+                  required
+                  value={hubMessage}
+                  onChange={(e) => setHubMessage(e.target.value)}
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 leading-relaxed"
+                />
+              </div>
+
+              {/* Acciones */}
+              <div className="pt-2 flex justify-end gap-2 border-t border-slate-100 dark:border-slate-800">
+                <button
+                  type="button"
+                  onClick={() => setShareNotifyMatch(null)}
+                  className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs cursor-pointer"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md flex items-center gap-1.5 cursor-pointer active:scale-95"
+                >
+                  <Send className="w-4 h-4" />
+                  <span>Enviar por {shareChannel === 'whatsapp' ? 'WhatsApp' : shareChannel === 'email' ? 'Email' : 'Push'}</span>
                 </button>
               </div>
             </form>

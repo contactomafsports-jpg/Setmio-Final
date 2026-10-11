@@ -246,9 +246,18 @@ export function App() {
         setAdminTab('teams');
         return;
       }
-      if (pathname === '/gestion/ajustes' || pathname === '/admin/ajustes') {
+      if (
+        pathname === '/gestion/ajustes' ||
+        pathname === '/admin/ajustes' ||
+        pathname.startsWith('/admin/ajustes/') ||
+        pathname.startsWith('/gestion/ajustes/')
+      ) {
         setCurrentView('admin');
         setAdminTab('settings');
+        return;
+      }
+      if (pathname === '/jugador' || pathname.startsWith('/jugador/')) {
+        setCurrentView('player');
         return;
       }
 
