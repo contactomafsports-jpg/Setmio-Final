@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import { useApp } from '../../context/AppContext';
 import {
   ArrowLeft,
@@ -35,6 +35,11 @@ import {
   Filter,
   ExternalLink,
   Users,
+  Target,
+  BarChart3,
+  Percent,
+  Zap,
+  Info,
 } from 'lucide-react';
 
 export interface AdminMemberData {
@@ -96,6 +101,34 @@ export const AdminMemberProfile: React.FC<AdminMemberProfileProps> = ({ member, 
   const [selectedMatchDetail, setSelectedMatchDetail] = useState<any | null>(null);
   const [allCompetitionsModalOpen, setAllCompetitionsModalOpen] = useState(false);
   const [selectedCompetitionDetail, setSelectedCompetitionDetail] = useState<any | null>(null);
+  const [selectedPartnerDetail, setSelectedPartnerDetail] = useState<any | null>(null);
+  const [selectedRivalDetail, setSelectedRivalDetail] = useState<any | null>(null);
+
+  // Interactive Chart state
+  const [chartTimeframe, setChartTimeframe] = useState<'6m' | 'season' | 'all'>('6m');
+  const [hoveredPointIndex, setHoveredPointIndex] = useState<number | null>(null);
+
+  // Horizontal Carousels Smooth Scroll Refs
+  const partnersScrollRef = useRef<HTMLDivElement>(null);
+  const rivalsScrollRef = useRef<HTMLDivElement>(null);
+
+  const scrollPartners = (direction: 'left' | 'right') => {
+    if (partnersScrollRef.current) {
+      partnersScrollRef.current.scrollBy({
+        left: direction === 'left' ? -260 : 260,
+        behavior: 'smooth',
+      });
+    }
+  };
+
+  const scrollRivals = (direction: 'left' | 'right') => {
+    if (rivalsScrollRef.current) {
+      rivalsScrollRef.current.scrollBy({
+        left: direction === 'left' ? -260 : 260,
+        behavior: 'smooth',
+      });
+    }
+  };
 
   // Edit Modal State
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -121,11 +154,25 @@ export const AdminMemberProfile: React.FC<AdminMemberProfileProps> = ({ member, 
   const [compSearchQuery, setCompSearchQuery] = useState('');
   const [compCategoryFilter, setCompCategoryFilter] = useState('all');
 
-  // Stats mock data
-  const winRate = 68;
-  const wonMatches = Math.round((memberData.matches * winRate) / 100);
-  const lostMatches = memberData.matches - wonMatches;
+  // Stats mock data ricos y completos
+  const totalMatches = Math.max(memberData.matches || 38, 28);
+  const winRate = 68.4;
+  const wonMatches = Math.round((totalMatches * winRate) / 100);
+  const lostMatches = totalMatches - wonMatches;
   const streak = '+4 Victorias';
+  const setsWon = 58;
+  const setsLost = 26;
+
+  // Tendencia de nivel ELO certificada
+  const levelTrend = {
+    delta: '+0.45 ELO',
+    percentage: '+13.2%',
+    initialLevel: 3.40,
+    currentLevel: Number((memberData.level || 3.85).toFixed(2)),
+    status: 'En Progresión Alta',
+    reliability: '96% FEP Certificado',
+    period: 'Últimos 90 días',
+  };
 
   // Ranking del club
   const clubRanking = {
@@ -135,7 +182,65 @@ export const AdminMemberProfile: React.FC<AdminMemberProfileProps> = ({ member, 
     points: 2450,
   };
 
-  // Top 5 Compañeros habituales (carrusel)
+  // Histórico de Nivel ELO mes a mes (Gráficos)
+  const eloHistoryPoints = [
+    {
+      month: 'May',
+      fullName: 'Mayo 2026',
+      level: 3.35,
+      elo: 1380,
+      matches: 4,
+      milestone: 'Inicio de temporada oficial FEP',
+      delta: '+0.00',
+    },
+    {
+      month: 'Jun',
+      fullName: 'Junio 2026',
+      level: 3.40,
+      elo: 1420,
+      matches: 6,
+      milestone: 'Campeón Consolación · Torneo Benéfico Rías Altas',
+      delta: '+0.05',
+    },
+    {
+      month: 'Jul',
+      fullName: 'Julio 2026',
+      level: 3.55,
+      elo: 1485,
+      matches: 8,
+      milestone: 'Playoff Cuartos · Liga Autonómica Interclubes',
+      delta: '+0.15',
+    },
+    {
+      month: 'Ago',
+      fullName: 'Agosto 2026',
+      level: 3.65,
+      elo: 1530,
+      matches: 7,
+      milestone: '🏆 Campeón Cuadro Principal · Nocturno Estrella Galicia',
+      delta: '+0.10',
+    },
+    {
+      month: 'Sep',
+      fullName: 'Septiembre 2026',
+      level: 3.75,
+      elo: 1595,
+      matches: 8,
+      milestone: '🥈 Finalista Subcampeón · I Open Primavera San Mateo',
+      delta: '+0.10',
+    },
+    {
+      month: 'Oct',
+      fullName: 'Octubre 2026',
+      level: Number((memberData.level || 3.85).toFixed(2)),
+      elo: 1640,
+      matches: 5,
+      milestone: 'Certificación FEP Oficial · Nivel Consolidado en Top 3%',
+      delta: '+0.10',
+    },
+  ];
+
+  // Top 5 Compañeros habituales (carrusel horizontal full-width)
   const frequentPartners = [
     {
       id: 'p-1',
@@ -143,8 +248,14 @@ export const AdminMemberProfile: React.FC<AdminMemberProfileProps> = ({ member, 
       avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80',
       level: 5.5,
       matchesTogether: 18,
+      wonTogether: 14,
+      lostTogether: 4,
       winRateTogether: 78,
       position: 'Drive',
+      streakTogether: '+4 Victorias',
+      compatibility: 96,
+      bestTournament: 'Torneo Nocturno Estrella Galicia (Campeones)',
+      playStyle: 'Volea agresiva y salida de pared rápida',
     },
     {
       id: 'p-2',
@@ -152,8 +263,14 @@ export const AdminMemberProfile: React.FC<AdminMemberProfileProps> = ({ member, 
       avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=200&q=80',
       level: 3.85,
       matchesTogether: 12,
+      wonTogether: 9,
+      lostTogether: 3,
       winRateTogether: 75,
       position: 'Revés',
+      streakTogether: '+2 Victorias',
+      compatibility: 91,
+      bestTournament: 'I Open Primavera (Finalistas)',
+      playStyle: 'Control táctico y bandeja profunda',
     },
     {
       id: 'p-3',
@@ -161,8 +278,14 @@ export const AdminMemberProfile: React.FC<AdminMemberProfileProps> = ({ member, 
       avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=200&q=80',
       level: 3.9,
       matchesTogether: 9,
+      wonTogether: 6,
+      lostTogether: 3,
       winRateTogether: 67,
       position: 'Drive',
+      streakTogether: '+1 Victoria',
+      compatibility: 88,
+      bestTournament: 'Liga Autonómica Interclubes FGP (Cuartos)',
+      playStyle: 'Zurdo técnico con globo milimétrico',
     },
     {
       id: 'p-4',
@@ -170,8 +293,14 @@ export const AdminMemberProfile: React.FC<AdminMemberProfileProps> = ({ member, 
       avatar: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=200&q=80',
       level: 4.2,
       matchesTogether: 7,
+      wonTogether: 5,
+      lostTogether: 2,
       winRateTogether: 71,
       position: 'Ambas',
+      streakTogether: '+1 Victoria',
+      compatibility: 85,
+      bestTournament: 'Master Final San Mateo (Semifinalistas)',
+      playStyle: 'Pegada potente y remate en suspensión',
     },
     {
       id: 'p-5',
@@ -179,69 +308,102 @@ export const AdminMemberProfile: React.FC<AdminMemberProfileProps> = ({ member, 
       avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=200&q=80',
       level: 4.0,
       matchesTogether: 6,
+      wonTogether: 4,
+      lostTogether: 2,
       winRateTogether: 66,
       position: 'Revés',
+      streakTogether: '+2 Victorias',
+      compatibility: 82,
+      bestTournament: 'Torneo Social Club San Mateo',
+      playStyle: 'Solidez en defensa y bloqueo de red',
     },
   ];
 
-  // Top 5 Rivales habituales (carrusel)
+  // Top 5 Rivales habituales (carrusel horizontal full-width)
   const habitualRivals = [
     {
       id: 'r-1',
       name: 'David Castro',
       avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=200&q=80',
       level: 4.1,
+      position: 'Revés',
       h2hMatches: 14,
+      winsAgainst: 8,
+      lossesAgainst: 6,
       balance: '8V - 6D',
       winRate: 57,
+      lastMatch: 'Victoria 6-4, 7-5 (04 Oct 2026)',
+      setsRatio: '18 - 14',
+      rivalryType: 'Duelo Clásico de Revés',
+      intensity: 'Muy Alta',
     },
     {
       id: 'r-2',
       name: 'Sergio Ramos',
       avatar: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=200&q=80',
       level: 4.5,
+      position: 'Drive',
       h2hMatches: 11,
+      winsAgainst: 5,
+      lossesAgainst: 6,
       balance: '5V - 6D',
       winRate: 45,
+      lastMatch: 'Derrota 4-6, 5-7 (28 Sep 2026)',
+      setsRatio: '12 - 13',
+      rivalryType: 'Máxima Exigencia Física',
+      intensity: 'Extrema',
     },
     {
       id: 'r-3',
       name: 'Carlos Soto',
       avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80',
       level: 4.0,
+      position: 'Drive',
       h2hMatches: 9,
+      winsAgainst: 6,
+      lossesAgainst: 3,
       balance: '6V - 3D',
       winRate: 67,
+      lastMatch: 'Victoria 6-3, 6-4 (18 Sep 2026)',
+      setsRatio: '13 - 7',
+      rivalryType: 'Reto Técnico en Red',
+      intensity: 'Alta',
     },
     {
       id: 'r-4',
       name: 'Manuel Gómez',
       avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=200&q=80',
       level: 3.6,
+      position: 'Revés',
       h2hMatches: 8,
+      winsAgainst: 7,
+      lossesAgainst: 1,
       balance: '7V - 1D',
       winRate: 88,
+      lastMatch: 'Victoria 6-2, 6-3 (24 Sep 2026)',
+      setsRatio: '14 - 3',
+      rivalryType: 'Dominio Táctico de Fondo',
+      intensity: 'Media',
     },
     {
       id: 'r-5',
       name: 'Alberto Morales',
       avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=200&q=80',
       level: 4.0,
+      position: 'Drive',
       h2hMatches: 7,
+      winsAgainst: 4,
+      lossesAgainst: 3,
       balance: '4V - 3D',
       winRate: 57,
+      lastMatch: 'Victoria 6-3, 3-6, 7-6 (01 Oct 2026)',
+      setsRatio: '9 - 8',
+      rivalryType: 'Desempate en Super Tie-Break',
+      intensity: 'Alta',
     },
   ];
 
-  const levelHistory = [
-    { month: 'Jun', level: 3.4, height: '45%' },
-    { month: 'Jul', level: 3.55, height: '60%' },
-    { month: 'Ago', level: 3.65, height: '70%' },
-    { month: 'Sep', level: 3.75, height: '82%' },
-    { month: 'Oct', level: memberData.level, height: '95%' },
-  ];
-
-  // Match History
+  // Match History (6 partidos realistas con todos los detalles)
   const matchHistory = [
     {
       id: 'm-1',
@@ -346,7 +508,7 @@ export const AdminMemberProfile: React.FC<AdminMemberProfileProps> = ({ member, 
         { name: 'Sergio Ramos', avatar: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=150&q=80', level: 4.5 },
         { name: 'Marcos Blanco', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=150&q=80', level: 4.3 },
       ],
-      type: 'Liga Social de Primavera',
+      type: 'Liga Social de Primavera - J4',
       paid: true,
       amount: '8.00 €',
     },
@@ -385,9 +547,80 @@ export const AdminMemberProfile: React.FC<AdminMemberProfileProps> = ({ member, 
       paid: true,
       amount: '6.50 €',
     },
+    {
+      id: 'm-5',
+      date: '19 Sep 2026',
+      time: '17:30 - 19:00',
+      court: 'Pista 1 Central (Panorámica WPT)',
+      courtImage: 'https://images.unsplash.com/photo-1554068865-24cecd4e34b8?auto=format&fit=crop&w=400&q=80',
+      result: 'Victoria',
+      score: '6-4, 6-2',
+      isWin: true,
+      minLevel: 3.8,
+      maxLevel: 4.6,
+      gender: 'male',
+      visibility: 'public',
+      isClubCreated: true,
+      paymentMode: 'split',
+      pricePerPlayer: 8.0,
+      paymentPolicy: 'both',
+      players: [
+        { name: memberData.name, level: memberData.level, position: 'reves', paid: true },
+        { name: 'Mateo Varela', level: 5.5, position: 'drive', paid: true },
+        { name: 'Alberto Morales', level: 4.0, position: 'reves', paid: true },
+        { name: 'Carlos Soto', level: 4.0, position: 'drive', paid: true },
+      ],
+      team1: [
+        { name: memberData.name, avatar: memberData.avatarUrl || 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=150&q=80', level: memberData.level },
+        { name: 'Mateo Varela', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80', level: 5.5 },
+      ],
+      team2: [
+        { name: 'Alberto Morales', avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=150&q=80', level: 4.0 },
+        { name: 'Carlos Soto', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=150&q=80', level: 4.0 },
+      ],
+      type: 'Semifinal Cuadro Social Oro',
+      paid: true,
+      amount: '8.00 €',
+    },
+    {
+      id: 'm-6',
+      date: '12 Sep 2026',
+      time: '10:30 - 12:00',
+      court: 'Pista 5 (Cristal Pro)',
+      courtImage: 'https://images.unsplash.com/photo-1526676037777-05a232554f77?auto=format&fit=crop&w=400&q=80',
+      result: 'Derrota',
+      score: '6-7(5), 4-6',
+      isWin: false,
+      minLevel: 3.75,
+      maxLevel: 4.25,
+      gender: 'male',
+      visibility: 'public',
+      isClubCreated: false,
+      creatorName: 'David Castro',
+      paymentMode: 'split',
+      pricePerPlayer: 7.5,
+      paymentPolicy: 'online_only',
+      players: [
+        { name: memberData.name, level: memberData.level, position: 'reves', paid: true },
+        { name: 'Pablo Álvarez', level: 4.2, position: 'drive', paid: true },
+        { name: 'David Castro', level: 4.1, position: 'reves', paid: true },
+        { name: 'Sergio Ramos', level: 4.5, position: 'drive', paid: true },
+      ],
+      team1: [
+        { name: memberData.name, avatar: memberData.avatarUrl || 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=150&q=80', level: memberData.level },
+        { name: 'Pablo Álvarez', avatar: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=150&q=80', level: 4.2 },
+      ],
+      team2: [
+        { name: 'David Castro', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=150&q=80', level: 4.1 },
+        { name: 'Sergio Ramos', avatar: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=150&q=80', level: 4.5 },
+      ],
+      type: 'Interclubes Amistoso Rías Altas',
+      paid: true,
+      amount: '7.50 €',
+    },
   ];
 
-  // Tournaments History
+  // Tournaments History (5 torneos completos y realistas)
   const tournamentHistory = [
     {
       id: 'tourn-1',
@@ -396,12 +629,13 @@ export const AdminMemberProfile: React.FC<AdminMemberProfileProps> = ({ member, 
       category: '2ª Categoría Masculina',
       position: 'Subcampeón (Finalista)',
       partner: 'Mateo Varela',
-      rounds: '5 Rondas superadas',
+      rounds: '5 Rondas superadas (4V - 1D)',
       badge: '🥈 Plata',
       imageUrl: 'https://images.unsplash.com/photo-1554068865-24cecd4e34b8?auto=format&fit=crop&w=600&q=80',
       matchesWon: 4,
       matchesLost: 1,
-      prize: '150 € + Material Deportivo',
+      prize: '150 € + Material Deportivo Bullpadel',
+      pointsEarned: '+180 Puntos Ranking Club',
     },
     {
       id: 'tourn-2',
@@ -410,40 +644,43 @@ export const AdminMemberProfile: React.FC<AdminMemberProfileProps> = ({ member, 
       category: '3ª Categoría Oro',
       position: 'Campeón de Cuadro Principal',
       partner: 'Lucas Piñeiro',
-      rounds: 'Campeones invictos',
+      rounds: 'Campeones invictos (5V - 0D)',
       badge: '🏆 Oro',
       imageUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80',
       matchesWon: 5,
       matchesLost: 0,
-      prize: 'Trofeo Oficial + Pala Bullpadel',
+      prize: 'Trofeo Oficial + Pala Bullpadel Vertex 04',
+      pointsEarned: '+250 Puntos Ranking Club',
     },
     {
       id: 'tourn-3',
       name: 'Liga Autonómica Gallega FGP — Fase Interclubes',
       date: 'Jul 2026',
       category: 'Federado 1ª División Club',
-      position: 'Cuartos de Final',
+      position: 'Cuartos de Final (Playoff)',
       partner: 'Diego Soto',
-      rounds: 'Clasificados para playoff',
+      rounds: 'Clasificados para playoff autonómico (3V - 2D)',
       badge: '⭐ Cuartos',
       imageUrl: 'https://images.unsplash.com/photo-1526676037777-05a232554f77?auto=format&fit=crop&w=600&q=80',
       matchesWon: 3,
       matchesLost: 2,
-      prize: 'Puntos Ranking Oficial FGP',
+      prize: 'Puntos Oficiales Ranking FEP / FGP',
+      pointsEarned: '+120 Puntos Ranking Club',
     },
     {
       id: 'tourn-4',
       name: 'Master Final San Mateo 2025',
       date: 'Dic 2025',
       category: '1ª Categoría Oro',
-      position: 'Semifinalista',
+      position: 'Semifinalista de Cuadro',
       partner: 'Mateo Varela',
-      rounds: '3 Rondas',
+      rounds: '3 Rondas disputadas (2V - 1D)',
       badge: '🥉 Bronce',
       imageUrl: 'https://images.unsplash.com/photo-1546519638-68e109498ffc?auto=format&fit=crop&w=600&q=80',
       matchesWon: 2,
       matchesLost: 1,
-      prize: 'Bolsa de deporte Bullpadel',
+      prize: 'Bolsa de deporte Bullpadel Pro Tour',
+      pointsEarned: '+100 Puntos Ranking Club',
     },
     {
       id: 'tourn-5',
@@ -452,12 +689,13 @@ export const AdminMemberProfile: React.FC<AdminMemberProfileProps> = ({ member, 
       category: 'Categoría Abierta Mixta',
       position: 'Campeón de Consolación',
       partner: 'Elena Castro',
-      rounds: '4 Rondas',
+      rounds: '4 Rondas superadas (3V - 1D)',
       badge: '🏅 Consolación',
       imageUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80',
       matchesWon: 3,
       matchesLost: 1,
-      prize: 'Pack hidratación + Toalla oficial',
+      prize: 'Pack hidratación + Toalla oficial microfibra',
+      pointsEarned: '+80 Puntos Ranking Club',
     },
   ];
 
@@ -796,62 +1034,367 @@ export const AdminMemberProfile: React.FC<AdminMemberProfileProps> = ({ member, 
         )}
       </section>
 
-      {/* 4. MÉTRICAS GENERALES DE EFICACIA */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        {/* Win Rate */}
-        <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-2">
+      {/* 4. ESTADÍSTICAS Y MÉTRICAS COMPLETAS (AUDITADAS PARA VALIDAR DISEÑO FINAL) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Métrica 1: Eficacia en Partidos (Win Rate) */}
+        <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-2.5">
           <div className="flex items-center justify-between text-xs">
-            <span className="font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-[10px]">
-              Eficacia en Partidos
+            <span className="font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-[10px] flex items-center gap-1.5">
+              <Percent className="w-3.5 h-3.5 text-emerald-500" />
+              <span>Eficacia en Partidos</span>
             </span>
             <span className="font-black text-emerald-600 dark:text-emerald-400 font-mono text-sm">
               {winRate}%
             </span>
           </div>
-          <div className="h-2 w-full rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
-            <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${winRate}%` }} />
+          <div className="h-2 w-full rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden flex">
+            <div
+              className="h-full bg-gradient-to-r from-emerald-500 to-teal-400 rounded-full transition-all duration-500"
+              style={{ width: `${winRate}%` }}
+            />
           </div>
-          <div className="flex items-center justify-between text-[11px] text-slate-500">
-            <span>{wonMatches} Victorias</span>
-            <span>{lostMatches} Derrotas</span>
-          </div>
-        </div>
-
-        {/* Racha y Experiencia */}
-        <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-1">
-          <span className="font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-[10px]">
-            Racha & Partidos
-          </span>
-          <div className="text-xl font-black text-slate-900 dark:text-white flex items-center gap-2">
-            <span>{memberData.matches} jugados</span>
-          </div>
-          <div className="text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1">
-            <Flame className="w-3.5 h-3.5 text-amber-500" />
-            <span>Mejor racha: 6 victorias seguidas</span>
+          <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 font-medium">
+            <span className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-bold font-mono">
+              <Check className="w-3 h-3" />
+              <span>{wonMatches} Victorias</span>
+            </span>
+            <span className="flex items-center gap-1 text-slate-500 dark:text-slate-400 font-mono">
+              <span>{lostMatches} Derrotas</span>
+            </span>
           </div>
         </div>
 
-        {/* Evolución de Nivel */}
-        <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-1">
-          <span className="font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-[10px]">
-            Evolución de Nivel FEP
-          </span>
-          <div className="flex items-end justify-between gap-1.5 h-9 pt-1">
-            {levelHistory.map((item, idx) => (
-              <div key={idx} className="flex-1 flex flex-col items-center gap-0.5">
-                <div
-                  className="w-full bg-emerald-500/80 hover:bg-emerald-500 rounded-t transition"
-                  style={{ height: item.height }}
-                  title={`${item.month}: Nivel ${item.level}`}
-                />
-                <span className="text-[9px] text-slate-400 font-mono">{item.month}</span>
-              </div>
-            ))}
+        {/* Métrica 2: Partidos Jugados & Racha Activa */}
+        <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-1.5">
+          <div className="flex items-center justify-between text-xs">
+            <span className="font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-[10px] flex items-center gap-1.5">
+              <Activity className="w-3.5 h-3.5 text-blue-500" />
+              <span>Partidos & Racha</span>
+            </span>
+            <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-400 border border-amber-300 dark:border-amber-800/80 flex items-center gap-1">
+              <Flame className="w-3 h-3 text-amber-500" />
+              <span>{streak}</span>
+            </span>
+          </div>
+          <div className="text-xl font-black text-slate-900 dark:text-white flex items-baseline gap-1.5 font-mono">
+            <span>{totalMatches}</span>
+            <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 font-sans">
+              partidos oficiales
+            </span>
+          </div>
+          <div className="text-[11px] text-slate-500 dark:text-slate-400 flex items-center justify-between pt-0.5 border-t border-slate-100 dark:border-slate-800">
+            <span>Sets: <strong className="font-mono text-slate-700 dark:text-slate-300">{setsWon}G - {setsLost}P</strong></span>
+            <span className="text-emerald-600 dark:text-emerald-400 font-semibold text-[10px]">Récord: 6V seguidas</span>
+          </div>
+        </div>
+
+        {/* Métrica 3: Tendencia de Nivel FEP / ELO (Requerimiento Clave) */}
+        <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-1.5">
+          <div className="flex items-center justify-between text-xs">
+            <span className="font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-[10px] flex items-center gap-1.5">
+              <TrendingUp className="w-3.5 h-3.5 text-emerald-500" />
+              <span>Tendencia de Nivel</span>
+            </span>
+            <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-800/80">
+              {levelTrend.status}
+            </span>
+          </div>
+          <div className="text-xl font-black text-emerald-600 dark:text-emerald-400 flex items-baseline gap-1.5 font-mono">
+            <span>{levelTrend.delta}</span>
+            <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">
+              ({levelTrend.percentage})
+            </span>
+          </div>
+          <div className="text-[11px] text-slate-500 dark:text-slate-400 flex items-center justify-between pt-0.5 border-t border-slate-100 dark:border-slate-800">
+            <span>{levelTrend.period}</span>
+            <span className="font-mono text-slate-700 dark:text-slate-300">{levelTrend.initialLevel.toFixed(2)} → {levelTrend.currentLevel.toFixed(2)}</span>
+          </div>
+        </div>
+
+        {/* Métrica 4: Puntos de Ranking & Percentil Club */}
+        <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-1.5">
+          <div className="flex items-center justify-between text-xs">
+            <span className="font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-[10px] flex items-center gap-1.5">
+              <Trophy className="w-3.5 h-3.5 text-amber-500" />
+              <span>Ranking Club</span>
+            </span>
+            <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-400 border border-amber-300 dark:border-amber-800/80 font-mono">
+              Top 3%
+            </span>
+          </div>
+          <div className="text-xl font-black text-slate-900 dark:text-white flex items-baseline gap-1.5 font-mono">
+            <span>{clubRanking.points.toLocaleString()}</span>
+            <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 font-sans">
+              puntos acumulados
+            </span>
+          </div>
+          <div className="text-[11px] text-slate-500 dark:text-slate-400 flex items-center justify-between pt-0.5 border-t border-slate-100 dark:border-slate-800">
+            <span className="font-bold text-slate-700 dark:text-slate-300">{clubRanking.category}</span>
+            <span>Puesto #{clubRanking.rank}</span>
           </div>
         </div>
       </div>
 
-      {/* 5. FICHA TÉCNICA (RENOMBRADA Y EDITABLE) */}
+      {/* 5. GRÁFICO DEDICADO: EVOLUCIÓN DE NIVEL ELO EN LOS ÚLTIMOS MESES */}
+      <section className="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 p-5 sm:p-6 shadow-sm space-y-4">
+        {/* Cabecera del gráfico con selector de periodo y badge oficial */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 dark:border-slate-800 pb-3.5">
+          <div className="flex items-center gap-2.5">
+            <div className="w-9 h-9 rounded-xl bg-emerald-50 dark:bg-emerald-950/80 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+              <TrendingUp className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="font-black text-sm sm:text-base text-slate-900 dark:text-white">
+                  Evolución de Nivel ELO & Histórico de Puntuación
+                </h3>
+                <span className="hidden sm:inline-flex px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800">
+                  {levelTrend.delta} ({levelTrend.percentage})
+                </span>
+              </div>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                Calibración matemática y certificación continua según resultados federados y partidas del club
+              </p>
+            </div>
+          </div>
+
+          {/* Selector interactivo de periodo */}
+          <div className="flex items-center gap-1 p-1 bg-slate-100 dark:bg-slate-800/90 rounded-xl text-xs shrink-0 self-start sm:self-auto">
+            <button
+              type="button"
+              onClick={() => setChartTimeframe('6m')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
+                chartTimeframe === '6m'
+                  ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xs'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+              }`}
+            >
+              Últimos 6 Meses
+            </button>
+            <button
+              type="button"
+              onClick={() => setChartTimeframe('season')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
+                chartTimeframe === 'season'
+                  ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xs'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+              }`}
+            >
+              Temporada 2026
+            </button>
+            <button
+              type="button"
+              onClick={() => setChartTimeframe('all')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
+                chartTimeframe === 'all'
+                  ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xs'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+              }`}
+            >
+              Histórico
+            </button>
+          </div>
+        </div>
+
+        {/* Lienzo SVG interactivo de alta fidelidad */}
+        <div className="relative pt-2 pb-1">
+          <div className="h-56 sm:h-64 w-full">
+            <svg
+              viewBox="0 0 600 200"
+              className="w-full h-full overflow-visible"
+              preserveAspectRatio="none"
+            >
+              <defs>
+                <linearGradient id="eloAreaGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#10b981" stopOpacity="0.32" />
+                  <stop offset="60%" stopColor="#10b981" stopOpacity="0.08" />
+                  <stop offset="100%" stopColor="#10b981" stopOpacity="0.00" />
+                </linearGradient>
+                <filter id="glowShadow" x="-20%" y="-20%" width="140%" height="140%">
+                  <feDropShadow dx="0" dy="4" stdDeviation="4" floodColor="#10b981" floodOpacity="0.4" />
+                </filter>
+              </defs>
+
+              {/* Líneas horizontales de referencia con marcas de nivel FEP y puntos ELO */}
+              {[
+                { y: 30, level: '4.00', elo: '1,700' },
+                { y: 65, level: '3.80', elo: '1,620' },
+                { y: 100, level: '3.60', elo: '1,510' },
+                { y: 135, level: '3.40', elo: '1,420' },
+                { y: 170, level: '3.20', elo: '1,350' },
+              ].map((line, idx) => (
+                <g key={idx}>
+                  <line
+                    x1="45"
+                    y1={line.y}
+                    x2="590"
+                    y2={line.y}
+                    stroke="currentColor"
+                    className="text-slate-100 dark:text-slate-800/80"
+                    strokeWidth="1"
+                    strokeDasharray={idx === 1 ? 'none' : '3 3'}
+                  />
+                  <text
+                    x="5"
+                    y={line.y + 4}
+                    className="text-[10px] font-mono fill-slate-400 dark:fill-slate-500 font-semibold"
+                  >
+                    Nv {line.level}
+                  </text>
+                  <text
+                    x="595"
+                    y={line.y + 4}
+                    className="text-[9px] font-mono fill-slate-300 dark:fill-slate-600 hidden sm:inline"
+                    textAnchor="start"
+                  >
+                    {line.elo}
+                  </text>
+                </g>
+              ))}
+
+              {/* Curva y Área de evolución de Nivel ELO */}
+              {/* Coordenadas X: May(70), Jun(170), Jul(270), Ago(370), Sep(470), Oct(570) */}
+              {/* Coordenadas Y: 3.35(143), 3.40(135), 3.55(108), 3.65(91), 3.75(74), 3.85(56) */}
+              <path
+                d="M 70 143 C 120 143, 120 135, 170 135 C 220 135, 220 108, 270 108 C 320 108, 320 91, 370 91 C 420 91, 420 74, 470 74 C 520 74, 520 56, 570 56 L 570 180 L 70 180 Z"
+                fill="url(#eloAreaGradient)"
+              />
+
+              <path
+                d="M 70 143 C 120 143, 120 135, 170 135 C 220 135, 220 108, 270 108 C 320 108, 320 91, 370 91 C 420 91, 420 74, 470 74 C 520 74, 520 56, 570 56"
+                fill="none"
+                stroke="#10b981"
+                strokeWidth="3.5"
+                strokeLinecap="round"
+                filter="url(#glowShadow)"
+              />
+
+              {/* Puntos de datos interactivos con animaciones y tooltips */}
+              {[
+                { x: 70, y: 143, idx: 0 },
+                { x: 170, y: 135, idx: 1 },
+                { x: 270, y: 108, idx: 2 },
+                { x: 370, y: 91, idx: 3 },
+                { x: 470, y: 74, idx: 4 },
+                { x: 570, y: 56, idx: 5 },
+              ].map((pt) => {
+                const item = eloHistoryPoints[pt.idx];
+                const isHovered = hoveredPointIndex === pt.idx;
+                return (
+                  <g
+                    key={pt.idx}
+                    className="cursor-pointer group"
+                    onMouseEnter={() => setHoveredPointIndex(pt.idx)}
+                    onMouseLeave={() => setHoveredPointIndex(null)}
+                    onClick={() => setHoveredPointIndex(pt.idx)}
+                  >
+                    {/* Anillo de enfoque al pasar el cursor */}
+                    <circle
+                      cx={pt.x}
+                      cy={pt.y}
+                      r={isHovered ? 12 : 7}
+                      fill="#10b981"
+                      fillOpacity={isHovered ? 0.25 : 0.15}
+                      className="transition-all duration-200"
+                    />
+                    {/* Punto principal */}
+                    <circle
+                      cx={pt.x}
+                      cy={pt.y}
+                      r={isHovered ? 6 : 4.5}
+                      fill="#ffffff"
+                      stroke="#10b981"
+                      strokeWidth={isHovered ? 3 : 2.5}
+                      className="transition-all duration-200 dark:fill-slate-900"
+                    />
+
+                    {/* Valor numérico flotante permanente */}
+                    <text
+                      x={pt.x}
+                      y={pt.y - 10}
+                      textAnchor="middle"
+                      className={`text-[10px] font-mono font-bold transition-all duration-200 ${
+                        isHovered
+                          ? 'fill-emerald-600 dark:fill-emerald-400 text-xs'
+                          : 'fill-slate-700 dark:fill-slate-300'
+                      }`}
+                    >
+                      {item.level.toFixed(2)}
+                    </text>
+
+                    {/* Etiqueta del mes inferior */}
+                    <text
+                      x={pt.x}
+                      y="195"
+                      textAnchor="middle"
+                      className={`text-[11px] font-bold font-mono transition-colors ${
+                        isHovered
+                          ? 'fill-emerald-600 dark:fill-emerald-400'
+                          : 'fill-slate-500 dark:fill-slate-400'
+                      }`}
+                    >
+                      {item.month}
+                    </text>
+                  </g>
+                );
+              })}
+            </svg>
+          </div>
+
+          {/* Tooltip flotante con información rica del hito deportivo seleccionado o activo */}
+          {hoveredPointIndex !== null && (
+            <div className="mt-3 p-3 rounded-2xl bg-slate-900 dark:bg-slate-950 text-white border border-emerald-500/40 shadow-xl flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs animate-in fade-in zoom-in-95 duration-150">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-mono font-black text-xs shrink-0">
+                  Nv {eloHistoryPoints[hoveredPointIndex].level.toFixed(2)}
+                </div>
+                <div>
+                  <div className="font-bold flex items-center gap-2">
+                    <span>{eloHistoryPoints[hoveredPointIndex].fullName}</span>
+                    <span className="font-mono text-emerald-400 text-[11px]">
+                      {eloHistoryPoints[hoveredPointIndex].elo} pts ELO
+                    </span>
+                    <span className="px-1.5 py-0.2 rounded bg-emerald-950 text-emerald-300 font-mono text-[10px]">
+                      {eloHistoryPoints[hoveredPointIndex].delta}
+                    </span>
+                  </div>
+                  <div className="text-[11px] text-slate-300">
+                    {eloHistoryPoints[hoveredPointIndex].milestone}
+                  </div>
+                </div>
+              </div>
+
+              <div className="text-right text-[11px] text-slate-400 shrink-0 font-mono">
+                {eloHistoryPoints[hoveredPointIndex].matches} partidos disputados
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Resumen inferior de indicadores clave del gráfico */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-3 border-t border-slate-100 dark:border-slate-800 text-xs">
+          <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800">
+            <span className="text-[10px] text-slate-400 uppercase font-bold block">Nivel Inicial (May)</span>
+            <span className="font-mono font-bold text-slate-800 dark:text-slate-200 text-sm">3.40 FEP</span>
+          </div>
+          <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800">
+            <span className="text-[10px] text-slate-400 uppercase font-bold block">Nivel Máximo</span>
+            <span className="font-mono font-bold text-slate-800 dark:text-slate-200 text-sm">3.88 FEP</span>
+          </div>
+          <div className="p-2.5 rounded-xl bg-emerald-50/60 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-800/80">
+            <span className="text-[10px] text-emerald-700 dark:text-emerald-400 uppercase font-bold block">Nivel Consolidado</span>
+            <span className="font-mono font-bold text-emerald-700 dark:text-emerald-300 text-sm">
+              {levelTrend.currentLevel.toFixed(2)} FEP (~1,640 ELO)
+            </span>
+          </div>
+          <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800">
+            <span className="text-[10px] text-slate-400 uppercase font-bold block">Fiabilidad Oficial</span>
+            <span className="font-mono font-bold text-slate-800 dark:text-slate-200 text-sm">96% (38 Partidos)</span>
+          </div>
+        </div>
+      </section>
+
+      {/* 6. FICHA TÉCNICA (RENOMBRADA Y EDITABLE) */}
       <section className="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 p-5 shadow-sm space-y-3">
         <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2.5">
           <div className="flex items-center gap-2">
@@ -928,11 +1471,11 @@ export const AdminMemberProfile: React.FC<AdminMemberProfileProps> = ({ member, 
         </div>
       </section>
 
-      {/* 6. CARRUSELES HORIZONTALES FULL-WIDTH: COMPAÑEROS HABITUALES Y RIVALES HABITUALES */}
+      {/* 7. CARRUSELES HORIZONTALES FULL-WIDTH: COMPAÑEROS HABITUALES Y RIVALES HABITUALES */}
       <div className="space-y-6">
         {/* CARRUSEL: COMPAÑEROS HABITUALES (TOP 5) */}
-        <section className="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 p-5 shadow-sm space-y-3">
-          <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2.5">
+        <section className="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 p-5 shadow-sm space-y-3.5">
+          <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
             <div className="flex items-center gap-2">
               <Users className="w-4 h-4 text-emerald-500" />
               <div>
@@ -944,49 +1487,102 @@ export const AdminMemberProfile: React.FC<AdminMemberProfileProps> = ({ member, 
                 </p>
               </div>
             </div>
-            <span className="text-[10px] font-mono font-bold text-slate-400 uppercase">
-              Top 5 Jugadores
-            </span>
+
+            {/* Controles de navegación y pill de contador */}
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-mono font-bold text-slate-400 uppercase hidden sm:inline">
+                Top 5 Parejas
+              </span>
+              <div className="flex items-center gap-1">
+                <button
+                  type="button"
+                  onClick={() => scrollPartners('left')}
+                  className="p-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition cursor-pointer"
+                  title="Desplazar a la izquierda"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => scrollPartners('right')}
+                  className="p-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition cursor-pointer"
+                  title="Desplazar a la derecha"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
           </div>
 
           {/* Carrusel edge-to-edge con overflow horizontal fluido */}
-          <div className="-mx-5 px-5 overflow-x-auto no-scrollbar flex items-stretch gap-3 pb-2 pt-1">
+          <div
+            ref={partnersScrollRef}
+            className="-mx-5 px-5 overflow-x-auto no-scrollbar flex items-stretch gap-3.5 pb-2 pt-1 scroll-smooth"
+          >
             {frequentPartners.map((partner, idx) => (
               <div
                 key={partner.id}
-                className="min-w-[240px] max-w-[240px] p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800 shrink-0 space-y-3 hover:border-emerald-500/50 transition shadow-xs flex flex-col justify-between"
+                role="button"
+                tabIndex={0}
+                onClick={() => setSelectedPartnerDetail(partner)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') setSelectedPartnerDetail(partner);
+                }}
+                className="min-w-[260px] max-w-[260px] p-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800 shrink-0 space-y-3 hover:border-emerald-500/60 hover:shadow-md transition cursor-pointer flex flex-col justify-between group"
+                title="Haz clic para ver el desglose completo con este compañero"
               >
-                <div className="flex items-center gap-3">
-                  <div className="relative">
-                    <img
-                      src={partner.avatar}
-                      alt={partner.name}
-                      className="w-11 h-11 rounded-xl object-cover ring-2 ring-emerald-500/40"
-                    />
-                    <span className="absolute -top-1.5 -left-1.5 w-5 h-5 rounded-full bg-emerald-600 text-white font-mono font-black text-[10px] flex items-center justify-center">
-                      #{idx + 1}
-                    </span>
-                  </div>
-                  <div className="min-w-0">
-                    <div className="font-bold text-slate-900 dark:text-white truncate text-xs">
-                      {partner.name}
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3">
+                    <div className="relative">
+                      <img
+                        src={partner.avatar}
+                        alt={partner.name}
+                        className="w-12 h-12 rounded-2xl object-cover ring-2 ring-emerald-500/40 group-hover:ring-emerald-500 transition"
+                      />
+                      <span className="absolute -top-1.5 -left-1.5 w-5 h-5 rounded-full bg-emerald-600 text-white font-mono font-black text-[10px] flex items-center justify-center shadow-xs">
+                        #{idx + 1}
+                      </span>
                     </div>
-                    <div className="text-[11px] text-slate-500 dark:text-slate-400 font-mono">
-                      Nv {partner.level.toFixed(2)} · {partner.position}
+                    <div className="min-w-0 flex-1">
+                      <div className="font-bold text-slate-900 dark:text-white truncate text-xs group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition">
+                        {partner.name}
+                      </div>
+                      <div className="text-[11px] text-slate-500 dark:text-slate-400 font-mono">
+                        Nv {partner.level.toFixed(2)} · {partner.position}
+                      </div>
+                      <span className="inline-block mt-0.5 px-2 py-0.2 rounded text-[9px] font-bold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                        {partner.streakTogether}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Barra de compatibilidad y efectividad */}
+                  <div className="space-y-1">
+                    <div className="flex items-center justify-between text-[10px]">
+                      <span className="text-slate-500">Compatibilidad táctica:</span>
+                      <strong className="text-emerald-600 dark:text-emerald-400 font-mono font-bold">
+                        {partner.compatibility}%
+                      </strong>
+                    </div>
+                    <div className="h-1.5 w-full bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-emerald-500 rounded-full"
+                        style={{ width: `${partner.compatibility}%` }}
+                      />
                     </div>
                   </div>
                 </div>
 
-                <div className="pt-2 border-t border-slate-200/60 dark:border-slate-800/80 flex items-center justify-between text-xs">
+                <div className="pt-2.5 border-t border-slate-200/60 dark:border-slate-800/80 flex items-center justify-between text-xs">
                   <div>
                     <span className="text-[10px] text-slate-400 uppercase block font-bold">Juntos</span>
-                    <span className="font-mono font-bold text-slate-800 dark:text-slate-200">
-                      {partner.matchesTogether} partidos
+                    <span className="font-mono font-bold text-slate-800 dark:text-slate-200 text-[11px]">
+                      {partner.matchesTogether} ({partner.wonTogether}V-{partner.lostTogether}D)
                     </span>
                   </div>
                   <div className="text-right">
-                    <span className="text-[10px] text-slate-400 uppercase block font-bold">Victorias</span>
-                    <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400">
+                    <span className="text-[10px] text-slate-400 uppercase block font-bold">Eficacia</span>
+                    <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400 text-xs">
                       {partner.winRateTogether}%
                     </span>
                   </div>
@@ -997,8 +1593,8 @@ export const AdminMemberProfile: React.FC<AdminMemberProfileProps> = ({ member, 
         </section>
 
         {/* CARRUSEL: RIVALES HABITUALES (TOP 5) */}
-        <section className="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 p-5 shadow-sm space-y-3">
-          <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2.5">
+        <section className="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 p-5 shadow-sm space-y-3.5">
+          <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
             <div className="flex items-center gap-2">
               <Swords className="w-4 h-4 text-amber-500" />
               <div>
@@ -1010,49 +1606,97 @@ export const AdminMemberProfile: React.FC<AdminMemberProfileProps> = ({ member, 
                 </p>
               </div>
             </div>
-            <span className="text-[10px] font-mono font-bold text-slate-400 uppercase">
-              Top 5 Rivales
-            </span>
+
+            {/* Controles de navegación y pill de contador */}
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-mono font-bold text-slate-400 uppercase hidden sm:inline">
+                Top 5 Rivales
+              </span>
+              <div className="flex items-center gap-1">
+                <button
+                  type="button"
+                  onClick={() => scrollRivals('left')}
+                  className="p-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition cursor-pointer"
+                  title="Desplazar a la izquierda"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => scrollRivals('right')}
+                  className="p-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition cursor-pointer"
+                  title="Desplazar a la derecha"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
           </div>
 
           {/* Carrusel edge-to-edge con overflow horizontal fluido */}
-          <div className="-mx-5 px-5 overflow-x-auto no-scrollbar flex items-stretch gap-3 pb-2 pt-1">
+          <div
+            ref={rivalsScrollRef}
+            className="-mx-5 px-5 overflow-x-auto no-scrollbar flex items-stretch gap-3.5 pb-2 pt-1 scroll-smooth"
+          >
             {habitualRivals.map((rival, idx) => (
               <div
                 key={rival.id}
-                className="min-w-[240px] max-w-[240px] p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800 shrink-0 space-y-3 hover:border-amber-500/50 transition shadow-xs flex flex-col justify-between"
+                role="button"
+                tabIndex={0}
+                onClick={() => setSelectedRivalDetail(rival)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') setSelectedRivalDetail(rival);
+                }}
+                className="min-w-[260px] max-w-[260px] p-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800 shrink-0 space-y-3 hover:border-amber-500/60 hover:shadow-md transition cursor-pointer flex flex-col justify-between group"
+                title="Haz clic para ver el historial H2H completo"
               >
-                <div className="flex items-center gap-3">
-                  <div className="relative">
-                    <img
-                      src={rival.avatar}
-                      alt={rival.name}
-                      className="w-11 h-11 rounded-xl object-cover ring-2 ring-amber-500/40"
-                    />
-                    <span className="absolute -top-1.5 -left-1.5 w-5 h-5 rounded-full bg-amber-500 text-slate-950 font-mono font-black text-[10px] flex items-center justify-center">
-                      #{idx + 1}
-                    </span>
-                  </div>
-                  <div className="min-w-0">
-                    <div className="font-bold text-slate-900 dark:text-white truncate text-xs">
-                      {rival.name}
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3">
+                    <div className="relative">
+                      <img
+                        src={rival.avatar}
+                        alt={rival.name}
+                        className="w-12 h-12 rounded-2xl object-cover ring-2 ring-amber-500/40 group-hover:ring-amber-500 transition"
+                      />
+                      <span className="absolute -top-1.5 -left-1.5 w-5 h-5 rounded-full bg-amber-500 text-slate-950 font-mono font-black text-[10px] flex items-center justify-center shadow-xs">
+                        #{idx + 1}
+                      </span>
                     </div>
-                    <div className="text-[11px] text-slate-500 dark:text-slate-400 font-mono">
-                      Nv {rival.level.toFixed(2)} · H2H
+                    <div className="min-w-0 flex-1">
+                      <div className="font-bold text-slate-900 dark:text-white truncate text-xs group-hover:text-amber-600 dark:group-hover:text-amber-400 transition">
+                        {rival.name}
+                      </div>
+                      <div className="text-[11px] text-slate-500 dark:text-slate-400 font-mono">
+                        Nv {rival.level.toFixed(2)} · {rival.position}
+                      </div>
+                      <span className="inline-block mt-0.5 px-2 py-0.2 rounded text-[9px] font-bold bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
+                        {rival.rivalryType}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Detalle de sets y último cruce */}
+                  <div className="text-[10px] space-y-1 bg-white dark:bg-slate-900 p-2 rounded-xl border border-slate-100 dark:border-slate-800/80">
+                    <div className="flex items-center justify-between text-slate-500">
+                      <span>Sets H2H:</span>
+                      <strong className="text-slate-800 dark:text-slate-200 font-mono">{rival.setsRatio}</strong>
+                    </div>
+                    <div className="text-[10px] text-emerald-600 dark:text-emerald-400 truncate font-semibold">
+                      Último: {rival.lastMatch}
                     </div>
                   </div>
                 </div>
 
-                <div className="pt-2 border-t border-slate-200/60 dark:border-slate-800/80 flex items-center justify-between text-xs">
+                <div className="pt-2.5 border-t border-slate-200/60 dark:border-slate-800/80 flex items-center justify-between text-xs">
                   <div>
                     <span className="text-[10px] text-slate-400 uppercase block font-bold">Enfrentamientos</span>
-                    <span className="font-mono font-bold text-slate-800 dark:text-slate-200">
-                      {rival.h2hMatches} cruces
+                    <span className="font-mono font-bold text-slate-800 dark:text-slate-200 text-[11px]">
+                      {rival.h2hMatches} partidos
                     </span>
                   </div>
                   <div className="text-right">
                     <span className="text-[10px] text-slate-400 uppercase block font-bold">Balance H2H</span>
-                    <span className="font-mono font-bold text-amber-600 dark:text-amber-400">
+                    <span className="font-mono font-bold text-amber-600 dark:text-amber-400 text-xs">
                       {rival.balance}
                     </span>
                   </div>
@@ -1961,6 +2605,227 @@ export const AdminMemberProfile: React.FC<AdminMemberProfileProps> = ({ member, 
               >
                 <Check className="w-4 h-4" />
                 <span>Confirmar y Cobrar</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ======================================================================
+          16. MODAL: DETALLE COMPLETO DE COMPAÑERO HABITUAL
+          ====================================================================== */}
+      {selectedPartnerDetail && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-sm animate-in fade-in duration-150">
+          <div className="relative w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl text-slate-900 dark:text-slate-100 space-y-4 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+              <div className="flex items-center gap-2">
+                <Users className="w-5 h-5 text-emerald-500" />
+                <h3 className="text-base font-black text-slate-900 dark:text-white">
+                  Desglose de Pareja Oficial
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setSelectedPartnerDetail(null)}
+                className="p-1 rounded-lg text-slate-400 hover:text-white"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Ficha rápida de pareja */}
+            <div className="flex items-center gap-3 p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800">
+              <img
+                src={selectedPartnerDetail.avatar}
+                alt={selectedPartnerDetail.name}
+                className="w-14 h-14 rounded-2xl object-cover ring-2 ring-emerald-500/50"
+              />
+              <div className="min-w-0 flex-1">
+                <div className="font-bold text-slate-900 dark:text-white text-sm">
+                  {selectedPartnerDetail.name}
+                </div>
+                <div className="text-xs text-slate-500 dark:text-slate-400 font-mono">
+                  Nivel {selectedPartnerDetail.level.toFixed(2)} · {selectedPartnerDetail.position}
+                </div>
+                <div className="flex items-center gap-1.5 mt-1">
+                  <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300">
+                    {selectedPartnerDetail.streakTogether}
+                  </span>
+                  <span className="text-[10px] text-slate-500">
+                    Compatibilidad: <strong className="text-emerald-600 font-mono">{selectedPartnerDetail.compatibility}%</strong>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Métricas de rendimiento conjunto */}
+            <div className="grid grid-cols-2 gap-2 text-xs">
+              <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800">
+                <span className="text-[10px] text-slate-400 uppercase font-bold block">Partidos Juntos</span>
+                <span className="font-mono font-bold text-slate-900 dark:text-white text-sm">
+                  {selectedPartnerDetail.matchesTogether} partidos
+                </span>
+                <span className="text-[10px] text-slate-500 block">
+                  {selectedPartnerDetail.wonTogether} Victorias · {selectedPartnerDetail.lostTogether} Derrotas
+                </span>
+              </div>
+
+              <div className="p-3 rounded-xl bg-emerald-50/50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-800/80">
+                <span className="text-[10px] text-emerald-700 dark:text-emerald-400 uppercase font-bold block">% Eficacia</span>
+                <span className="font-mono font-bold text-emerald-700 dark:text-emerald-300 text-sm">
+                  {selectedPartnerDetail.winRateTogether}%
+                </span>
+                <span className="text-[10px] text-emerald-600 dark:text-emerald-400 block font-semibold">
+                  Pareja de Alto Rendimiento
+                </span>
+              </div>
+            </div>
+
+            {/* Estilo y Mayor Logro */}
+            <div className="space-y-2 text-xs bg-slate-50 dark:bg-slate-950 p-3.5 rounded-2xl border border-slate-200/60 dark:border-slate-800">
+              <div>
+                <span className="text-[10px] text-slate-400 uppercase font-bold block">Complementariedad Táctica</span>
+                <span className="text-slate-800 dark:text-slate-200 text-[11px] font-medium">
+                  {selectedPartnerDetail.playStyle}
+                </span>
+              </div>
+              <div className="pt-2 border-t border-slate-200/60 dark:border-slate-800/80">
+                <span className="text-[10px] text-slate-400 uppercase font-bold block">Mayor Logro Conjunto</span>
+                <span className="text-emerald-600 dark:text-emerald-400 text-[11px] font-bold">
+                  {selectedPartnerDetail.bestTournament}
+                </span>
+              </div>
+            </div>
+
+            <div className="pt-2 flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setSelectedPartnerDetail(null);
+                  triggerDemoToast(
+                    'Convocatoria Preparada',
+                    `Se ha configurado la pareja ${memberData.name} & ${selectedPartnerDetail.name} para la próxima partida abierta.`,
+                    'success'
+                  );
+                }}
+                className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-xs cursor-pointer"
+              >
+                Convocatoria Rápida
+              </button>
+              <button
+                type="button"
+                onClick={() => setSelectedPartnerDetail(null)}
+                className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs"
+              >
+                Cerrar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ======================================================================
+          17. MODAL: DETALLE COMPLETO DE RIVAL HABITUAL (HEAD TO HEAD)
+          ====================================================================== */}
+      {selectedRivalDetail && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-sm animate-in fade-in duration-150">
+          <div className="relative w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl text-slate-900 dark:text-slate-100 space-y-4 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+              <div className="flex items-center gap-2">
+                <Swords className="w-5 h-5 text-amber-500" />
+                <h3 className="text-base font-black text-slate-900 dark:text-white">
+                  Historial Head to Head (H2H)
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setSelectedRivalDetail(null)}
+                className="p-1 rounded-lg text-slate-400 hover:text-white"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Ficha de rival */}
+            <div className="flex items-center gap-3 p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800">
+              <img
+                src={selectedRivalDetail.avatar}
+                alt={selectedRivalDetail.name}
+                className="w-14 h-14 rounded-2xl object-cover ring-2 ring-amber-500/50"
+              />
+              <div className="min-w-0 flex-1">
+                <div className="font-bold text-slate-900 dark:text-white text-sm">
+                  {selectedRivalDetail.name}
+                </div>
+                <div className="text-xs text-slate-500 dark:text-slate-400 font-mono">
+                  Nivel {selectedRivalDetail.level.toFixed(2)} · {selectedRivalDetail.position}
+                </div>
+                <div className="flex items-center gap-1.5 mt-1">
+                  <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300">
+                    {selectedRivalDetail.rivalryType}
+                  </span>
+                  <span className="text-[10px] text-slate-500">
+                    Intensidad: <strong className="text-amber-600">{selectedRivalDetail.intensity}</strong>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Métricas de cruces directos */}
+            <div className="grid grid-cols-2 gap-2 text-xs">
+              <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800">
+                <span className="text-[10px] text-slate-400 uppercase font-bold block">Balance Global</span>
+                <span className="font-mono font-bold text-slate-900 dark:text-white text-sm">
+                  {selectedRivalDetail.balance}
+                </span>
+                <span className="text-[10px] text-slate-500 block">
+                  {selectedRivalDetail.h2hMatches} enfrentamientos directos
+                </span>
+              </div>
+
+              <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800">
+                <span className="text-[10px] text-slate-400 uppercase font-bold block">Sets Disputados</span>
+                <span className="font-mono font-bold text-slate-900 dark:text-white text-sm">
+                  {selectedRivalDetail.setsRatio}
+                </span>
+                <span className="text-[10px] text-slate-500 block">
+                  {selectedRivalDetail.winRate}% efectividad
+                </span>
+              </div>
+            </div>
+
+            {/* Último cruce registrado */}
+            <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800 text-xs space-y-1">
+              <span className="text-[10px] text-slate-400 uppercase font-bold block">Último Partido Oficial</span>
+              <div className="text-slate-900 dark:text-white font-bold text-[11px]">
+                {selectedRivalDetail.lastMatch}
+              </div>
+              <p className="text-[10px] text-slate-500">
+                Partido registrado en el ranking oficial del club bajo reglas de la FEP.
+              </p>
+            </div>
+
+            <div className="pt-2 flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setSelectedRivalDetail(null);
+                  triggerDemoToast(
+                    'Reto Generado',
+                    `Se ha enviado una invitación de reto deportivo a ${selectedRivalDetail.name}.`,
+                    'success'
+                  );
+                }}
+                className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs shadow-xs cursor-pointer"
+              >
+                Lanzar Reto Directo
+              </button>
+              <button
+                type="button"
+                onClick={() => setSelectedRivalDetail(null)}
+                className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs"
+              >
+                Cerrar
               </button>
             </div>
           </div>
