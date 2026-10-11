@@ -45,13 +45,15 @@ export const NotificationsPopover: React.FC<NotificationsPopoverProps> = ({ vari
     };
   }, [isOpen]);
 
-  const filteredNotifications = notifications.filter((item) => {
-    if (filterType === 'all') return true;
-    if (filterType === 'booking') return item.type === 'booking';
-    if (filterType === 'match') return item.type === 'match' || item.type === 'tournament';
-    if (filterType === 'system') return item.type === 'system';
-    return true;
-  });
+  const filteredNotifications = notifications
+    .filter((item, index, self) => self.findIndex((n) => n.id === item.id) === index)
+    .filter((item) => {
+      if (filterType === 'all') return true;
+      if (filterType === 'booking') return item.type === 'booking';
+      if (filterType === 'match') return item.type === 'match' || item.type === 'tournament';
+      if (filterType === 'system') return item.type === 'system';
+      return true;
+    });
 
   const handleOpenPreferences = () => {
     setIsOpen(false);
@@ -190,9 +192,9 @@ export const NotificationsPopover: React.FC<NotificationsPopoverProps> = ({ vari
                 <p className="text-xs font-semibold">No hay notificaciones en este filtro</p>
               </div>
             ) : (
-              filteredNotifications.map((notif) => (
+              filteredNotifications.map((notif, index) => (
                 <div
-                  key={notif.id}
+                  key={`${notif.id}-${index}`}
                   className={`p-3 transition flex items-start gap-3 hover:bg-slate-50 dark:hover:bg-slate-800/40 ${
                     !notif.read ? 'bg-emerald-50/30 dark:bg-emerald-950/20' : ''
                   }`}

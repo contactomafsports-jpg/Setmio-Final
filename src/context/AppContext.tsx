@@ -1562,11 +1562,15 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     );
   };
 
+  // Helper for guaranteed collision-free unique IDs across rapid or batch actions
+  const generateUniqueId = (prefix: string) =>
+    `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+
   // Court Actions
   const addCourt = (courtData: Omit<Court, 'id' | 'tenantId'>): Court => {
     const newCourt: Court = {
       ...courtData,
-      id: `court-${Date.now()}`,
+      id: generateUniqueId('court'),
       tenantId: currentTenant.id,
       accessPin: courtData.accessPin || `${Math.floor(1000 + Math.random() * 9000)}#`,
     };
@@ -1619,7 +1623,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     // Audit log
     setAuditLogs((prev) => [
       {
-        id: `log-${Date.now()}`,
+        id: generateUniqueId('log'),
         timestamp: 'Ahora mismo',
         actor: currentUser.email,
         role: currentUser.role,
@@ -1645,7 +1649,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     );
     setAuditLogs((prev) => [
       {
-        id: `log-${Date.now()}`,
+        id: generateUniqueId('log'),
         timestamp: 'Ahora mismo',
         actor: currentUser.email,
         role: currentUser.role,
@@ -1720,7 +1724,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       venueId: newBookingData.venueId || defaultVenue.id,
       venueName: newBookingData.venueName || defaultVenue.name,
       venueShortName: newBookingData.venueShortName || defaultVenue.shortName,
-      id: `b-${Date.now().toString().slice(-4)}`,
+      id: generateUniqueId('b'),
       tenantId: currentTenant.id,
       accessPin: newBookingData.accessPin || randomPin,
     };
@@ -1732,9 +1736,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     });
 
     // Add audit log
+    const logId = generateUniqueId('log');
     setAuditLogs((prev) => [
       {
-        id: `log-${Date.now()}`,
+        id: logId,
         timestamp: 'Ahora mismo',
         actor: currentUser.email,
         role: currentUser.role,
@@ -1746,16 +1751,17 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     ]);
 
     // Send notification
+    const notifId = generateUniqueId('notif');
     setNotifications((prev) => [
       {
-        id: `notif-${Date.now()}`,
+        id: notifId,
         title: '¡Reserva Confirmada!',
         message: `Pista "${newBooking.courtName}" reservada. PIN de acceso: ${newBooking.accessPin}`,
         type: 'booking',
         timestamp: 'Ahora mismo',
         read: false,
       },
-      ...prev,
+      ...prev.filter((n) => n.id !== notifId),
     ]);
 
     triggerDemoToast(
@@ -1784,7 +1790,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     });
     setAuditLogs((prev) => [
       {
-        id: `log-${Date.now()}`,
+        id: generateUniqueId('log'),
         timestamp: 'Ahora mismo',
         actor: currentUser.email,
         role: currentUser.role,
@@ -1809,7 +1815,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     });
     setAuditLogs((prev) => [
       {
-        id: `log-${Date.now()}`,
+        id: generateUniqueId('log'),
         timestamp: 'Ahora mismo',
         actor: currentUser.email,
         role: currentUser.role,
@@ -2166,7 +2172,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     );
   };
 
-  // Notifications
+  // Notifications state with ID deduplication guarantee
   const [notifications, setNotifications] = useState<NotificationItem[]>([
     {
       id: 'notif-1',
