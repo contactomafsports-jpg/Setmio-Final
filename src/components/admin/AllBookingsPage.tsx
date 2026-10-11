@@ -23,11 +23,13 @@ import {
 interface AllBookingsPageProps {
   onBackToQuadrant?: () => void;
   onOpenNewBookingModal?: () => void;
+  isModal?: boolean;
 }
 
 export const AllBookingsPage: React.FC<AllBookingsPageProps> = ({
   onBackToQuadrant,
   onOpenNewBookingModal,
+  isModal = false,
 }) => {
   const {
     bookings,
@@ -232,6 +234,8 @@ export const AllBookingsPage: React.FC<AllBookingsPageProps> = ({
       category: b.category || (b.isSplitPayment ? 'match' : 'private'),
       title: b.title || (b.isSplitPayment ? 'Pádel Abierto' : `Reserva ${b.courtName}`),
       sport: 'Pádel Indoor WPT',
+      mode: b.mode || 'competitive',
+      gender: b.gender || 'mixed',
       participants: b.participants?.map((p) => ({
         name: p.name,
         paid: p.paid,
@@ -267,30 +271,47 @@ export const AllBookingsPage: React.FC<AllBookingsPageProps> = ({
       {/* ======================================================================
           HEADER DE PÁGINA (Sin etiqueta verde obsoleta, botones corregidos)
           ====================================================================== */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div className="min-w-0">
-          <div className="flex items-center gap-2">
-            <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight truncate">
-              {t('allBookings.title', 'Todas las Reservas')}
-            </h1>
+      {!isModal ? (
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="min-w-0">
+            <div className="flex items-center gap-2">
+              <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight truncate">
+                {t('allBookings.title', 'Historial de Reservas')}
+              </h1>
+            </div>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 truncate">
+              {t('allBookings.subtitle', 'Histórico completo y gestión operativa de reservas')}
+            </p>
           </div>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 truncate">
-            {t('allBookings.subtitle', 'Histórico completo y gestión operativa de reservas')}
-          </p>
+
+          {/* Botonera Superior */}
+          <div className="flex items-center gap-2 self-start sm:self-auto shrink-0">
+            <button
+              type="button"
+              onClick={handleGoToAgenda}
+              className="px-3.5 py-2 rounded-xl bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 font-bold text-xs transition flex items-center gap-1.5 cursor-pointer shadow-2xs border border-slate-200 dark:border-slate-800"
+              title="Ir al cuadrante diario de pistas"
+            >
+              <Calendar className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+              <span>{t('allBookings.agendaBtn', 'Agenda')}</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={handleOpenNewBooking}
+              className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md flex items-center gap-1.5 transition active:scale-95 cursor-pointer whitespace-nowrap"
+              title="Crear nueva reserva de pista"
+            >
+              <Plus className="w-4 h-4 shrink-0" />
+              <span>{t('allBookings.newBtn', 'Nueva reserva')}</span>
+            </button>
+          </div>
         </div>
-
-        {/* Botonera Superior: Botón "Agenda" (redirige a cuadrante) y Botón "Nueva reserva" (abre modal) */}
-        <div className="flex items-center gap-2 self-start sm:self-auto shrink-0">
-          <button
-            type="button"
-            onClick={handleGoToAgenda}
-            className="px-3.5 py-2 rounded-xl bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 font-bold text-xs transition flex items-center gap-1.5 cursor-pointer shadow-2xs border border-slate-200 dark:border-slate-800"
-            title="Ir al cuadrante diario de pistas"
-          >
-            <Calendar className="w-3.5 h-3.5 text-slate-500 shrink-0" />
-            <span>{t('allBookings.agendaBtn', 'Agenda')}</span>
-          </button>
-
+      ) : (
+        <div className="flex items-center justify-between gap-3 pb-2 border-b border-slate-200 dark:border-slate-800">
+          <p className="text-xs text-slate-500 dark:text-slate-400">
+            Filtra y gestiona el histórico de reservas sin perder tu fecha activa en el cuadrante.
+          </p>
           <button
             type="button"
             onClick={handleOpenNewBooking}
@@ -301,7 +322,7 @@ export const AllBookingsPage: React.FC<AllBookingsPageProps> = ({
             <span>{t('allBookings.newBtn', 'Nueva reserva')}</span>
           </button>
         </div>
-      </div>
+      )}
 
       {/* TARJETAS RESUMEN KPIS */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">

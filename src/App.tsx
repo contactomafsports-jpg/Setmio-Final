@@ -168,7 +168,12 @@ export function App() {
         setAdminTab('all_bookings');
         return;
       }
-      if (pathname === '/admin/reservas' || pathname === '/gestion/reservas') {
+      if (
+        pathname === '/admin/reservas' ||
+        pathname.startsWith('/admin/reservas/') ||
+        pathname === '/gestion/reservas' ||
+        pathname.startsWith('/gestion/reservas/')
+      ) {
         setCurrentView('admin');
         setAdminTab('agenda');
         return;
@@ -241,9 +246,22 @@ export function App() {
         setAdminTab('teams');
         return;
       }
-      if (pathname === '/gestion/ajustes' || pathname === '/admin/ajustes') {
+      if (
+        pathname === '/gestion/ajustes' ||
+        pathname === '/admin/ajustes' ||
+        pathname.startsWith('/admin/ajustes/') ||
+        pathname.startsWith('/gestion/ajustes/')
+      ) {
         setCurrentView('admin');
         setAdminTab('settings');
+        return;
+      }
+      if (
+        pathname === '/jugador/perfil/notificaciones' ||
+        pathname.startsWith('/jugador/perfil') ||
+        pathname.startsWith('/jugador/notificaciones')
+      ) {
+        setCurrentView('player');
         return;
       }
 
@@ -352,12 +370,11 @@ export function App() {
       case 'dashboard':
         return <ContextualDashboard />;
       case 'agenda':
+      case 'all_bookings':
+      case 'bookings':
         return <AdminAgenda />;
       case 'courts_management':
         return <AdminCourtsManagement />;
-      case 'all_bookings':
-      case 'bookings':
-        return <AllBookingsPage onBackToQuadrant={() => setAdminTab('agenda')} />;
       case 'matches':
         return <AdminMatches />;
       case 'customers':

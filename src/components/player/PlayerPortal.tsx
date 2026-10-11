@@ -33,11 +33,14 @@ import {
   Flame,
   LogOut,
   ShoppingBag,
+  Bell,
 } from 'lucide-react';
 import { BookingFlow } from '../public/BookingFlow';
 import { OpenMatchesView } from '../public/OpenMatchesView';
 import { PlayerHeader } from './PlayerHeader';
 import { PlayerPublicProfileView } from '../public/PlayerPublicProfileView';
+import { ReservationDrawer, ReservationDrawerData } from '../admin/ReservationDrawer';
+import { PlayerNotificationSettings } from './PlayerNotificationSettings';
 
 export const PlayerPortal: React.FC = () => {
   const {
@@ -58,17 +61,37 @@ export const PlayerPortal: React.FC = () => {
     isWhiteLabelPlayerPreview,
     exitWhiteLabelPlayerPreview,
     selectedVenue,
+    venues,
+    cancelBooking,
     t,
   } = useApp();
 
   const [activePlayerTab, setActivePlayerTab] = useState<
-    'overview' | 'booking' | 'matches' | 'tournaments' | 'teams' | 'academy' | 'stats' | 'profile' | 'shop'
+    'overview' | 'booking' | 'matches' | 'tournaments' | 'teams' | 'academy' | 'stats' | 'profile' | 'shop' | 'notifications'
   >('overview');
+
+  // URL sync for /jugador/perfil/notificaciones
+  useEffect(() => {
+    const handleUrl = () => {
+      const pathname = typeof window !== 'undefined' ? window.location.pathname : '';
+      if (
+        pathname === '/jugador/perfil/notificaciones' ||
+        pathname === '/jugador/notificaciones' ||
+        pathname.includes('/notificaciones')
+      ) {
+        setActivePlayerTab('notifications');
+      }
+    };
+    handleUrl();
+    window.addEventListener('popstate', handleUrl);
+    return () => window.removeEventListener('popstate', handleUrl);
+  }, []);
 
   const [legalModalOpen, setLegalModalOpen] = useState(false);
   const [publicProfileModalOpen, setPublicProfileModalOpen] = useState(false);
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
   const [tournamentSubTab, setTournamentSubTab] = useState<'inscribed' | 'in_progress' | 'upcoming'>('inscribed');
+  const [selectedPlayerDrawerData, setSelectedPlayerDrawerData] = useState<ReservationDrawerData | null>(null);
 
   const userPendingPaymentMatch = openMatches.find((m) =>
     m.players.some((p) => p.name === currentUser.name && !p.paid)
@@ -95,6 +118,53 @@ export const PlayerPortal: React.FC = () => {
     new Date(booking.startTime).getTime() >= Date.now() &&
     (booking.status === 'confirmed' || booking.status === 'pending')
   );
+
+  const openUpcomingBookingDrawer = () => {
+    if (!upcomingBooking) return;
+    const start = upcomingBooking.startTime.includes('T')
+      ? upcomingBooking.startTime.split('T')[1].slice(0, 5)
+      : upcomingBooking.startTime.slice(0, 5);
+    const end = upcomingBooking.endTime
+      ? (upcomingBooking.endTime.includes('T') ? upcomingBooking.endTime.split('T')[1].slice(0, 5) : upcomingBooking.endTime.slice(0, 5))
+      : '19:30';
+
+    const court = courts.find((c) => c.id === upcomingBooking.courtId);
+    const venue = upcomingBooking.venueId ? venues.find((v) => v.id === upcomingBooking.venueId) : null;
+
+    setSelectedPlayerDrawerData({
+      id: upcomingBooking.id,
+      courtId: upcomingBooking.courtId,
+      courtName: upcomingBooking.courtName,
+      courtType: court?.courtType || 'Indoor Cristal Pro',
+      startTime: upcomingBooking.startTime,
+      endTime: upcomingBooking.endTime,
+      timeSlot: `${start} - ${end}`,
+      creatorName: upcomingBooking.creatorName,
+      creatorPhone: '+34 611 22 33 44',
+      creatorMemberNum: 'Socio #SM-408',
+      category: upcomingBooking.category || 'match',
+      title: upcomingBooking.title || 'Reserva de Pista',
+      sport: 'Pádel Indoor WPT',
+      mode: upcomingBooking.mode || 'competitive',
+      gender: upcomingBooking.gender || 'mixed',
+      venueId: upcomingBooking.venueId,
+      venueName: venue?.name || upcomingBooking.venueName || currentTenant.name,
+      venueShortName: venue?.shortName || upcomingBooking.venueShortName,
+      totalPrice: upcomingBooking.totalPrice || 28.0,
+      status: upcomingBooking.status === 'canceled' ? 'Cancelada' : 'Confirmada',
+      paymentStatus: upcomingBooking.paymentStatus || 'paid',
+      accessPin: upcomingBooking.accessPin || '4829#',
+      lightsStatus: 'auto',
+      doorStatus: 'auto',
+      participants: upcomingBooking.participants || [
+        { name: currentUser.name, paid: true, amount: (upcomingBooking.totalPrice || 28) / 4, statusText: 'Pagado' },
+        { name: 'Mateo Varela', paid: true, amount: (upcomingBooking.totalPrice || 28) / 4, statusText: 'Pagado' },
+        { name: 'Lucas Piñeiro', paid: true, amount: (upcomingBooking.totalPrice || 28) / 4, statusText: 'Pagado' },
+        { name: 'David Castro', paid: true, amount: (upcomingBooking.totalPrice || 28) / 4, statusText: 'Pagado' },
+      ],
+      notes: upcomingBooking.notes,
+    });
+  };
 
   // Player's teams
   const myTeams = [
@@ -224,6 +294,7 @@ export const PlayerPortal: React.FC = () => {
               { id: 'shop', label: 'Tienda Club', icon: ShoppingBag },
               { id: 'stats', label: 'Nivel & Stats', icon: TrendingUp },
               { id: 'profile', label: 'Mi Ficha', icon: UserRound },
+              { id: 'notifications', label: 'Notificaciones', icon: Bell },
             ].map((tab) => {
               const Icon = tab.icon;
               const isActive = activePlayerTab === tab.id;
@@ -312,8 +383,16 @@ export const PlayerPortal: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="pt-2 border-t border-slate-100 dark:border-slate-800 text-[11px] text-slate-500 dark:text-slate-400">
-                  Las luces se encenderán automáticamente 5 minutos antes del inicio de tu reserva.
+                <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-[11px] text-slate-500 dark:text-slate-400">
+                  <span>Las luces se encenderán automáticamente 5 minutos antes del inicio de tu reserva.</span>
+                  <button
+                    type="button"
+                    onClick={openUpcomingBookingDrawer}
+                    className="px-3.5 py-1.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/80 hover:bg-emerald-100 dark:hover:bg-emerald-900/80 border border-emerald-500/30 text-emerald-700 dark:text-emerald-300 font-bold text-xs flex items-center justify-center gap-1.5 transition cursor-pointer shrink-0"
+                  >
+                    <span>Ficha y Gestión de Plaza</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </button>
                 </div>
               </div>
             )}
@@ -718,6 +797,13 @@ export const PlayerPortal: React.FC = () => {
             </div>
           </div>
         )}
+
+        {/* NOTIFICATIONS TAB (/jugador/perfil/notificaciones) */}
+        {activePlayerTab === 'notifications' && (
+          <div className="space-y-6 animate-in fade-in duration-150">
+            <PlayerNotificationSettings onBack={() => setActivePlayerTab('overview')} />
+          </div>
+        )}
       </main>
 
       {/* 5. NATIVE MOBILE BOTTOM BAR (Clean, accessible, no overlapping text!) */}
@@ -860,6 +946,7 @@ export const PlayerPortal: React.FC = () => {
                   { id: 'academy', label: 'Escuela & Clases', icon: GraduationCap },
                   { id: 'stats', label: 'Nivel & Estadísticas', icon: TrendingUp },
                   { id: 'profile', label: 'Mi Ficha', icon: UserRound },
+                  { id: 'notifications', label: 'Notificaciones', icon: Bell },
                 ].map((item) => {
                   const Icon = item.icon;
                   const isActive = activePlayerTab === item.id;
@@ -963,6 +1050,20 @@ export const PlayerPortal: React.FC = () => {
           );
         })}
       </nav>
+
+      {/* Ficha de Detalles de Reserva Operativa para Jugador */}
+      {selectedPlayerDrawerData && (
+        <ReservationDrawer
+          isOpen={true}
+          reservation={selectedPlayerDrawerData}
+          userRole="player"
+          onClose={() => setSelectedPlayerDrawerData(null)}
+          onCancelReservation={(id) => {
+            cancelBooking(id);
+            setSelectedPlayerDrawerData(null);
+          }}
+        />
+      )}
     </div>
   );
 };

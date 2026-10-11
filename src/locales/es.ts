@@ -1842,7 +1842,7 @@ export const esLocale: Record<string, string> = {
   "matches.payMyShare": "Pagar mi parte",
   "matches.inviteRegistered": "Invitar Socio Registrado",
   "matches.inviteExternal": "Enviar Invitación WhatsApp / Email",
-  "matches.copyLink": "Copiar Enlace de Reserva",
+  "matches.copyLink": "Copiar Enlace",
   "matches.sendWhatsApp": "Enviar por WhatsApp",
   "matches.sendEmail": "Enviar por Email",
   "matches.linkCopied": "Enlace copiado al portapapeles",

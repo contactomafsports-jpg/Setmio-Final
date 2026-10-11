@@ -232,6 +232,8 @@ export interface Booking {
   venueShortName?: string;
   category?: 'match' | 'academy' | 'private' | 'tournament' | 'maintenance';
   title?: string;
+  mode?: 'friendly' | 'competitive';
+  gender?: 'male' | 'female' | 'mixed';
   courtId: string;
   courtName: string;
   creatorId: string;

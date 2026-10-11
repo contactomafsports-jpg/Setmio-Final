@@ -21,6 +21,7 @@ import {
 import { SUPPORTED_LANGUAGES } from '../../lib/i18n';
 import { i18n } from '../../i18n';
 import { OfficialFlag } from '../common/OfficialFlag';
+import { NotificationBell } from '../common/NotificationBell';
 
 interface AdminHeaderProps {
   onOpenProfileModal?: () => void;
@@ -212,6 +213,9 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
             <Eye className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
             <span className="hidden sm:inline">{t('white_label.player_view', 'Vista Jugador')}</span>
           </button>
+
+          {/* Centro de Notificaciones */}
+          <NotificationBell role="admin" />
 
           {/* Theme Toggle */}
           <button

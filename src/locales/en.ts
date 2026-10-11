@@ -1842,7 +1842,7 @@ export const enLocale: Record<string, string> = {
   "matches.payMyShare": "Pay my share",
   "matches.inviteRegistered": "Invite Registered Member",
   "matches.inviteExternal": "Send WhatsApp / Email Invite",
-  "matches.copyLink": "Copy Booking Link",
+  "matches.copyLink": "Copy Link",
   "matches.sendWhatsApp": "Send via WhatsApp",
   "matches.sendEmail": "Send via Email",
   "matches.linkCopied": "Link copied to clipboard",
