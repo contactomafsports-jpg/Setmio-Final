@@ -246,22 +246,9 @@ export function App() {
         setAdminTab('teams');
         return;
       }
-      if (
-        pathname === '/gestion/ajustes' ||
-        pathname === '/admin/ajustes' ||
-        pathname.startsWith('/admin/ajustes/') ||
-        pathname.startsWith('/gestion/ajustes/')
-      ) {
+      if (pathname === '/gestion/ajustes' || pathname === '/admin/ajustes') {
         setCurrentView('admin');
         setAdminTab('settings');
-        return;
-      }
-      if (
-        pathname === '/jugador/perfil/notificaciones' ||
-        pathname.startsWith('/jugador/perfil') ||
-        pathname.startsWith('/jugador/notificaciones')
-      ) {
-        setCurrentView('player');
         return;
       }
 

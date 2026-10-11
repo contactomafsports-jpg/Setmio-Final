@@ -25,7 +25,6 @@ import {
   Menu,
   LogOut,
 } from 'lucide-react';
-import { NotificationBell } from '../common/NotificationBell';
 
 interface PrivateClass {
   id: string;
@@ -250,9 +249,6 @@ export const CoachPortal: React.FC = () => {
               <User className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">Modo Jugador</span>
             </button>
-
-            {/* Centro de Notificaciones */}
-            <NotificationBell role="coach" />
 
             <button
               onClick={toggleTheme}

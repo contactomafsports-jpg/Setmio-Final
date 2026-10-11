@@ -33,14 +33,12 @@ import {
   Flame,
   LogOut,
   ShoppingBag,
-  Bell,
 } from 'lucide-react';
 import { BookingFlow } from '../public/BookingFlow';
 import { OpenMatchesView } from '../public/OpenMatchesView';
 import { PlayerHeader } from './PlayerHeader';
 import { PlayerPublicProfileView } from '../public/PlayerPublicProfileView';
 import { ReservationDrawer, ReservationDrawerData } from '../admin/ReservationDrawer';
-import { PlayerNotificationSettings } from './PlayerNotificationSettings';
 
 export const PlayerPortal: React.FC = () => {
   const {
@@ -67,25 +65,8 @@ export const PlayerPortal: React.FC = () => {
   } = useApp();
 
   const [activePlayerTab, setActivePlayerTab] = useState<
-    'overview' | 'booking' | 'matches' | 'tournaments' | 'teams' | 'academy' | 'stats' | 'profile' | 'shop' | 'notifications'
+    'overview' | 'booking' | 'matches' | 'tournaments' | 'teams' | 'academy' | 'stats' | 'profile' | 'shop'
   >('overview');
-
-  // URL sync for /jugador/perfil/notificaciones
-  useEffect(() => {
-    const handleUrl = () => {
-      const pathname = typeof window !== 'undefined' ? window.location.pathname : '';
-      if (
-        pathname === '/jugador/perfil/notificaciones' ||
-        pathname === '/jugador/notificaciones' ||
-        pathname.includes('/notificaciones')
-      ) {
-        setActivePlayerTab('notifications');
-      }
-    };
-    handleUrl();
-    window.addEventListener('popstate', handleUrl);
-    return () => window.removeEventListener('popstate', handleUrl);
-  }, []);
 
   const [legalModalOpen, setLegalModalOpen] = useState(false);
   const [publicProfileModalOpen, setPublicProfileModalOpen] = useState(false);
@@ -294,7 +275,6 @@ export const PlayerPortal: React.FC = () => {
               { id: 'shop', label: 'Tienda Club', icon: ShoppingBag },
               { id: 'stats', label: 'Nivel & Stats', icon: TrendingUp },
               { id: 'profile', label: 'Mi Ficha', icon: UserRound },
-              { id: 'notifications', label: 'Notificaciones', icon: Bell },
             ].map((tab) => {
               const Icon = tab.icon;
               const isActive = activePlayerTab === tab.id;
@@ -797,13 +777,6 @@ export const PlayerPortal: React.FC = () => {
             </div>
           </div>
         )}
-
-        {/* NOTIFICATIONS TAB (/jugador/perfil/notificaciones) */}
-        {activePlayerTab === 'notifications' && (
-          <div className="space-y-6 animate-in fade-in duration-150">
-            <PlayerNotificationSettings onBack={() => setActivePlayerTab('overview')} />
-          </div>
-        )}
       </main>
 
       {/* 5. NATIVE MOBILE BOTTOM BAR (Clean, accessible, no overlapping text!) */}
@@ -946,7 +919,6 @@ export const PlayerPortal: React.FC = () => {
                   { id: 'academy', label: 'Escuela & Clases', icon: GraduationCap },
                   { id: 'stats', label: 'Nivel & Estadísticas', icon: TrendingUp },
                   { id: 'profile', label: 'Mi Ficha', icon: UserRound },
-                  { id: 'notifications', label: 'Notificaciones', icon: Bell },
                 ].map((item) => {
                   const Icon = item.icon;
                   const isActive = activePlayerTab === item.id;

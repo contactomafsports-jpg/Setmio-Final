@@ -656,7 +656,6 @@ interface AppContextType {
   notifications: NotificationItem[];
   unreadNotificationsCount: number;
   markNotificationsAsRead: () => void;
-  addNotification: (item: Omit<NotificationItem, 'id' | 'timestamp' | 'read'> & { id?: string; timestamp?: string }) => void;
 
   // CRM Player Profile Navigation
   selectedCustomerId: string | null;
@@ -2171,35 +2170,19 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [notifications, setNotifications] = useState<NotificationItem[]>([
     {
       id: 'notif-1',
-      title: '¡Plaza libre en Partida Play! 19:30',
-      message: 'Falta 1 jugador de nivel 3.5 - 4.25 en Pista 1 Central Panorámica WPT. ¡Únete o invita a un compañero!',
-      type: 'match',
-      timestamp: 'Hace 10 min',
-      read: false,
-    },
-    {
-      id: 'notif-2',
-      title: 'Reserva confirmada en Pista 2',
-      message: 'Tu reserva para hoy a las 18:00 está lista. PIN domótico de apertura: 4821.',
-      type: 'booking',
-      timestamp: 'Hoy, 10:30',
-      read: false,
-    },
-    {
-      id: 'notif-3',
-      title: 'Pago individual 1/4 pendiente',
-      message: 'Carlos Méndez te ha incluido en la partida de las 20:00. Tu cuota individual es de 7,50 €.',
-      type: 'payment',
+      title: 'Pistas renovadas en Narón',
+      message: 'Nuevo césped Mondo Supercourt WPT disponible para reserva en pistas 1 y 2.',
+      type: 'system',
       timestamp: 'Hoy, 09:15',
       read: false,
     },
     {
-      id: 'notif-4',
+      id: 'notif-2',
       title: 'I Open Primavera Pádel San Mateo',
-      message: 'Abiertas las inscripciones para el torneo oficial con 1.800€ en premios.',
+      message: 'Abiertas las inscripciones para el torneo con 1.800€ en premios.',
       type: 'tournament',
       timestamp: 'Ayer',
-      read: true,
+      read: false,
     },
   ]);
 
@@ -2207,18 +2190,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const markNotificationsAsRead = () => {
     setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
-  };
-
-  const addNotification = (item: Omit<NotificationItem, 'id' | 'timestamp' | 'read'> & { id?: string; timestamp?: string }) => {
-    const newItem: NotificationItem = {
-      id: item.id || `notif-${Date.now()}`,
-      title: item.title,
-      message: item.message,
-      type: item.type,
-      timestamp: item.timestamp || 'Ahora mismo',
-      read: false,
-    };
-    setNotifications((prev) => [newItem, ...prev]);
   };
 
   // CRM Player Profile Navigation
@@ -2481,7 +2452,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         notifications,
         unreadNotificationsCount,
         markNotificationsAsRead,
-        addNotification,
 
         selectedCustomerId,
         setSelectedCustomerId,

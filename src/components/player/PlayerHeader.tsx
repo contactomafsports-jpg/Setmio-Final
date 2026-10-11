@@ -8,7 +8,6 @@ import {
   FileText,
   LogOut,
 } from 'lucide-react';
-import { NotificationBell } from '../common/NotificationBell';
 
 interface PlayerHeaderProps {
   onToggleMobileDrawer?: () => void;
@@ -78,9 +77,6 @@ export const PlayerHeader: React.FC<PlayerHeaderProps> = ({
         </div>
 
         <div className="flex items-center gap-2">
-          {/* Centro de Notificaciones */}
-          <NotificationBell role="player" />
-
           {/* Theme Toggle */}
           <button
             type="button"
