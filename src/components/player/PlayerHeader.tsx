@@ -1,14 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import {
   Menu,
-  Sun,
-  Moon,
-  User,
-  FileText,
-  LogOut,
+  ShoppingCart,
 } from 'lucide-react';
 import { NotificationsPopover } from '../common/NotificationsPopover';
+import { UserProfileDropdown } from '../common/UserProfileDropdown';
+import { CartDrawer } from '../public/CartDrawer';
 
 interface PlayerHeaderProps {
   onToggleMobileDrawer?: () => void;
@@ -23,124 +21,89 @@ export const PlayerHeader: React.FC<PlayerHeaderProps> = ({
 }) => {
   const {
     currentTenant,
-    theme,
-    toggleTheme,
-    setCurrentView,
-    logoutOrExitDemo,
+    cart,
     isWhiteLabelPlayerPreview,
     selectedVenue,
   } = useApp();
 
+  const [isCartOpen, setIsCartOpen] = useState(false);
+
+  const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+
   const clubShortName = selectedVenue && selectedVenue.id !== 'all'
     ? `${currentTenant.shortName} (${selectedVenue.shortName})`
     : currentTenant.shortName;
-  const clubInitials = currentTenant.name
-    .split(' ')
-    .filter(Boolean)
-    .map((w) => w[0])
-    .join('')
-    .slice(0, 3)
-    .toUpperCase() || 'PAD';
 
   return (
-    <header
-      className={`sticky ${
-        isWhiteLabelPlayerPreview ? 'top-10' : 'top-0'
-      } z-50 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-4 sm:px-6 py-3 shadow-xs transition-all`}
-    >
-      <div className="max-w-7xl mx-auto flex items-center justify-between">
-        <div className="flex min-w-0 items-center gap-2 sm:gap-3">
-          {/* Mobile Drawer Toggle */}
+    <>
+      <header
+        className={`sticky ${
+          isWhiteLabelPlayerPreview ? 'top-10' : 'top-0'
+        } z-50 h-14 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-3 sm:px-6 flex items-center justify-between gap-2 shadow-xs transition-colors`}
+      >
+        {/* Lado Izquierdo: Logo/Marca Setmio */}
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
           {onToggleMobileDrawer && (
             <button
               type="button"
               onClick={onToggleMobileDrawer}
-              className="lg:hidden p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+              className="lg:hidden p-1.5 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
               aria-label="Menú lateral"
             >
               <Menu className="w-5 h-5" />
             </button>
           )}
 
-          <div className="min-w-0 flex items-center gap-2.5">
-            <div className="w-9 h-9 shrink-0 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-700 flex items-center justify-center font-black text-white text-sm shadow-xs select-none">
-              {clubInitials}
+          <div className="flex items-center gap-2.5">
+            {/* Isotipo Oficial Setmio */}
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-700 text-white font-black text-sm flex items-center justify-center shadow-xs shrink-0 select-none">
+              S
             </div>
-            <div>
-              <div className="font-extrabold text-sm text-slate-900 dark:text-white leading-tight truncate">
-                {clubShortName}
-              </div>
-              <div className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold uppercase tracking-wider">
-                Área Privada del Jugador
-              </div>
+            {/* Texto Oficial Setmio */}
+            <div className="flex items-center gap-2">
+              <span className="font-black text-sm sm:text-base tracking-tight text-slate-900 dark:text-white leading-none">
+                Setmio Player
+              </span>
+              <span className="hidden sm:inline-flex items-center text-[10px] font-extrabold text-cyan-700 dark:text-cyan-300 bg-cyan-50 dark:bg-cyan-950/80 px-2 py-0.5 rounded-md border border-cyan-200/60 dark:border-cyan-800/60">
+                Multi-Club Neutra
+              </span>
             </div>
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
-          {/* Centro Global de Notificaciones */}
+        {/* Lado Derecho: 1. Notificaciones, 2. Carrito de Compra (Solo Jugador), 3. Avatar de Usuario */}
+        <div className="flex items-center gap-1.5 sm:gap-2">
+          {/* 1. Icono de Notificaciones (Campanita con badge dinámico) */}
           <NotificationsPopover variant="player" />
 
-          {/* Theme Toggle */}
+          {/* 2. Icono de Carrito de Compra (Solo en Vista Jugador) */}
           <button
             type="button"
-            onClick={toggleTheme}
-            className="p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition"
-            title={theme === 'dark' ? 'Modo claro' : 'Modo oscuro'}
+            onClick={() => setIsCartOpen(true)}
+            className="relative p-2 rounded-xl text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+            title="Ver Detalles del Carrito"
+            aria-label="Carrito de compra"
           >
-            {theme === 'dark' ? (
-              <Sun className="w-4 h-4 text-amber-400" />
-            ) : (
-              <Moon className="w-4 h-4 text-slate-700" />
+            <ShoppingCart className="w-4 h-4" />
+            {cartCount > 0 && (
+              <span className="absolute top-1.5 right-1.5 min-w-[16px] h-4 px-1 rounded-full bg-emerald-500 text-white font-black text-[9px] flex items-center justify-center leading-none ring-2 ring-white dark:ring-slate-900 animate-in zoom-in-75 duration-150">
+                {cartCount > 9 ? '9+' : cartCount}
+              </span>
             )}
           </button>
 
-          {/* Public profile button */}
-          {onOpenPublicProfile && (
-            <button
-              type="button"
-              onClick={onOpenPublicProfile}
-              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
-            >
-              <User className="w-3.5 h-3.5 text-emerald-500" />
-              <span>Mi Perfil Público</span>
-            </button>
-          )}
-
-          {/* Legal modal button */}
-          {onOpenLegalModal && (
-            <button
-              type="button"
-              onClick={onOpenLegalModal}
-              className="p-2 rounded-xl text-slate-500 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition"
-              title="Información Legal y Normativa"
-            >
-              <FileText className="w-4 h-4" />
-            </button>
-          )}
-
-          {/* Switch to public web */}
-          <button
-            type="button"
-            onClick={() => setCurrentView('public')}
-            className="text-xs font-semibold text-slate-500 hover:text-emerald-600 dark:hover:text-emerald-400 px-2 py-1 transition"
-          >
-            Web Pública
-          </button>
-
-          {/* Cerrar Sesión / Salir Demo */}
-          <button
-            type="button"
-            onClick={logoutOrExitDemo}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-50 dark:bg-rose-950/50 hover:bg-rose-100 dark:hover:bg-rose-900/50 text-xs font-bold text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800 transition shadow-xs"
-            title="Cerrar Sesión / Salir Demo"
-          >
-            <LogOut className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400" />
-            <span className="hidden sm:inline">Salir Demo</span>
-          </button>
+          {/* 3. Avatar del Usuario con Menú Desplegable */}
+          <UserProfileDropdown
+            variant="player"
+            onOpenProfileModal={onOpenPublicProfile}
+            onOpenLegalModal={onOpenLegalModal}
+          />
         </div>
-      </div>
-    </header>
+      </header>
+
+      {/* Pantalla / Modal funcional de Detalles del Carrito lista para producción */}
+      <CartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
+    </>
   );
 };
 

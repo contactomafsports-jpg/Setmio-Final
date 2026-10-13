@@ -1,27 +1,23 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useApp, AdminTab } from '../../context/AppContext';
 import {
-  User,
-  Settings,
-  LogOut,
-  ChevronDown,
+  Sparkles,
+  ExternalLink,
   Sun,
   Moon,
+  ChevronDown,
+  Check,
+  Globe,
   Bot,
-  Sparkles,
+  Minimize2,
   X,
   Send,
-  Minimize2,
-  Globe,
-  Building2,
-  Check,
-  Eye,
-  UserCheck,
 } from 'lucide-react';
+import { NotificationsPopover } from '../common/NotificationsPopover';
+import { UserProfileDropdown } from '../common/UserProfileDropdown';
+import { OfficialFlag } from '../common/OfficialFlag';
 import { SUPPORTED_LANGUAGES } from '../../lib/i18n';
 import { i18n } from '../../i18n';
-import { OfficialFlag } from '../common/OfficialFlag';
-import { NotificationsPopover } from '../common/NotificationsPopover';
 
 interface AdminHeaderProps {
   onOpenProfileModal?: () => void;
@@ -33,102 +29,45 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
   onSelectTab,
 }) => {
   const {
+    currentTenant,
     currentUser,
-    logoutOrExitDemo,
+    viewEntityWeb,
     theme,
     toggleTheme,
-    adminTheme,
-    setAdminTheme,
     language,
     setLanguage,
-    setAdminTab,
-    currentTenant,
-    navigateToClub,
     aiMessages,
     sendAIMessage,
     isAiThinking,
-    venues,
-    selectedVenueId,
-    selectedVenue,
-    setSelectedVenueId,
-    enterWhiteLabelPlayerPreview,
-    viewEntityWeb,
-    isConsolidatedView,
-    isMultiVenue,
     t,
   } = useApp();
 
-  const [langDropdownOpen, setLangDropdownOpen] = useState(false);
-  const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [aiDrawerOpen, setAiDrawerOpen] = useState(false);
   const [aiInputText, setAiInputText] = useState('');
-  const [avatarImgError, setAvatarImgError] = useState(false);
-
+  const [langDropdownOpen, setLangDropdownOpen] = useState(false);
   const langRef = useRef<HTMLDivElement>(null);
-  const userMenuRef = useRef<HTMLDivElement>(null);
   const chatBottomRef = useRef<HTMLDivElement>(null);
 
-  const currentLangObj =
-    SUPPORTED_LANGUAGES.find((l) => l.code === language) || SUPPORTED_LANGUAGES[0];
+  const isProAthleteAdmin =
+    currentTenant.type === 'PRO_PLAYER' || currentUser.role === 'PROFESSIONAL_PLAYER';
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (langRef.current && !langRef.current.contains(e.target as Node)) {
         setLangDropdownOpen(false);
       }
-      if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) {
-        setUserMenuOpen(false);
-      }
     };
-    document.addEventListener('mousedown', handleClickOutside);
+    if (langDropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+  }, [langDropdownOpen]);
 
   useEffect(() => {
     if (aiDrawerOpen) {
       chatBottomRef.current?.scrollIntoView({ behavior: 'smooth' });
     }
   }, [aiMessages, aiDrawerOpen]);
-
-  const handleGoToSettings = () => {
-    setUserMenuOpen(false);
-    if (onSelectTab) {
-      onSelectTab('settings');
-    } else {
-      setAdminTab('settings');
-    }
-  };
-
-  const handleOpenProfile = () => {
-    setUserMenuOpen(false);
-    onOpenProfileModal?.();
-  };
-
-  const handleLogout = () => {
-    setUserMenuOpen(false);
-    logoutOrExitDemo();
-  };
-
-  const isDark =
-    theme === 'dark' ||
-    adminTheme === 'dark' ||
-    (typeof document !== 'undefined' && document.documentElement.classList.contains('dark'));
-
-  const handleToggleTheme = () => {
-    const nextMode = isDark ? 'light' : 'dark';
-    const root = document.documentElement;
-    if (nextMode === 'dark') {
-      root.classList.add('dark');
-      root.classList.remove('light');
-    } else {
-      root.classList.remove('dark');
-      root.classList.add('light');
-    }
-    if (setAdminTheme) {
-      setAdminTheme(nextMode);
-    }
-    toggleTheme();
-  };
 
   const handleSendAi = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
@@ -141,6 +80,9 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
     sendAIMessage(prompt);
   };
 
+  const currentLangOption =
+    SUPPORTED_LANGUAGES.find((l) => l.code === language) || SUPPORTED_LANGUAGES[0];
+
   return (
     <>
       <header className="sticky top-0 z-50 h-14 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-3 sm:px-6 flex items-center justify-between gap-2 shadow-xs transition-colors">
@@ -152,91 +94,109 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
               S
             </div>
             {/* Texto Oficial Setmio */}
-            <div className="flex items-center">
+            <div className="flex items-center gap-2">
               <span className="font-black text-sm sm:text-base tracking-tight text-slate-900 dark:text-white leading-none">
                 Setmio
               </span>
+              {isProAthleteAdmin && (
+                <span className="hidden sm:inline-flex items-center gap-1 text-[10px] font-extrabold text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/70 border border-red-200 dark:border-red-900 px-2 py-0.5 rounded-md">
+                  <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+                  Atleta Pro · {currentTenant.shortName}
+                </span>
+              )}
             </div>
           </div>
         </div>
 
-        {/* Right: Acciones (Idioma, Tema, Asistente IA, Avatar con Dropdown) */}
+        {/* Right: Acciones del Header */}
         <div className="flex items-center gap-1.5 sm:gap-2">
-          {/* Selector de Idioma */}
-          <div className="relative" ref={langRef}>
-            <button
-              type="button"
-              onClick={() => setLangDropdownOpen(!langDropdownOpen)}
-              className="flex items-center gap-1 px-2 py-1.5 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition border border-slate-200 dark:border-slate-800"
-              aria-label="Seleccionar idioma"
-            >
-              <OfficialFlag code={currentLangObj.code} />
-              <span className="hidden sm:inline uppercase text-[11px] font-mono">{currentLangObj.code}</span>
-              <ChevronDown className="w-3 h-3 text-slate-400" />
-            </button>
+          {/* EXCEPCIÓN 1: Header Completo/Público en App de Admin Profesional */}
+          {isProAthleteAdmin && (
+            <>
+              {/* Acceso a Web Oficial / Marca Blanca */}
+              <button
+                type="button"
+                onClick={() => viewEntityWeb(currentTenant.slug)}
+                className="hidden md:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs font-bold border border-slate-200 dark:border-slate-700 transition cursor-pointer shadow-xs"
+                title={`Ver Web Oficial de Marca Blanca de ${currentTenant.name}`}
+              >
+                <Globe className="w-3.5 h-3.5 text-red-500" />
+                <span className="truncate max-w-[130px]">Web Marca Blanca</span>
+                <ExternalLink className="w-3 h-3 text-slate-400" />
+              </button>
 
-            {langDropdownOpen && (
-              <div className="absolute right-0 mt-1 w-44 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl p-1.5 z-50 animate-in fade-in-50 duration-100 text-xs">
-                <div className="px-2 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                  Idioma / Language
-                </div>
-                {SUPPORTED_LANGUAGES.map((langOpt) => (
-                  <button
-                    key={langOpt.code}
-                    onClick={() => {
-                      i18n.changeLanguage(langOpt.code);
-                      setLanguage(langOpt.code);
-                      setLangDropdownOpen(false);
-                    }}
-                    className={`w-full flex items-center gap-2 px-2.5 py-1.5 rounded-xl transition text-left ${
-                      language === langOpt.code
-                        ? 'bg-emerald-600 text-white font-bold'
-                        : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
-                    }`}
-                  >
-                    <OfficialFlag code={langOpt.code} />
-                    <span className="truncate">{langOpt.name}</span>
-                  </button>
-                ))}
+              {/* Selector directo de Idioma */}
+              <div className="relative" ref={langRef}>
+                <button
+                  type="button"
+                  onClick={() => setLangDropdownOpen(!langDropdownOpen)}
+                  className="px-2 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/80 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 transition flex items-center gap-1.5 text-xs font-bold cursor-pointer"
+                  title="Cambiar idioma de la plataforma"
+                  aria-label="Seleccionar idioma"
+                >
+                  <OfficialFlag code={language} />
+                  <span className="hidden sm:inline font-mono uppercase text-[11px] font-bold">
+                    {language.toUpperCase()}
+                  </span>
+                  <ChevronDown className="w-3 h-3 text-slate-400" />
+                </button>
+
+                {langDropdownOpen && (
+                  <div className="absolute top-full right-0 mt-2 w-52 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl py-2 z-50 animate-in fade-in zoom-in-95 duration-100">
+                    <div className="px-3 py-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100 dark:border-slate-800">
+                      Idioma de la Plataforma
+                    </div>
+                    {SUPPORTED_LANGUAGES.map((l) => (
+                      <button
+                        key={l.code}
+                        type="button"
+                        onClick={() => {
+                          i18n.changeLanguage(l.code);
+                          setLanguage(l.code);
+                          setLangDropdownOpen(false);
+                        }}
+                        className={`w-full px-3 py-2 text-xs text-left flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800 transition ${
+                          language === l.code
+                            ? 'text-red-600 dark:text-red-400 font-bold bg-red-50/60 dark:bg-red-950/40'
+                            : 'text-slate-800 dark:text-slate-200 font-medium'
+                        }`}
+                      >
+                        <span className="flex items-center gap-2">
+                          <OfficialFlag code={l.code} />
+                          <span>{l.name}</span>
+                        </span>
+                        {language === l.code && <Check className="w-3.5 h-3.5 text-red-500" />}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
-            )}
-          </div>
 
-          {/* Botón Vista Jugador (Oculto en móvil conforme a requerimiento de limpieza de barra superior) */}
-          <button
-            type="button"
-            onClick={enterWhiteLabelPlayerPreview}
-            className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 border border-emerald-300/80 dark:border-emerald-800/80 shadow-xs cursor-pointer active:scale-98"
-            title={`Probar Vista Jugador manteniendo el contexto de ${currentTenant.name}${selectedVenue && selectedVenue.id !== 'all' ? ` (${selectedVenue.shortName})` : ''}`}
-            aria-label="Vista Jugador"
-          >
-            <Eye className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-            <span className="hidden sm:inline">{t('white_label.player_view', 'Vista Jugador')}</span>
-          </button>
+              {/* Conmutador directo de Tema Claro / Oscuro */}
+              <button
+                type="button"
+                onClick={toggleTheme}
+                className="p-2 rounded-xl text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+                title={theme === 'dark' ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
+                aria-label="Cambiar tema"
+              >
+                {theme === 'dark' ? (
+                  <Sun className="w-4 h-4 text-amber-400" />
+                ) : (
+                  <Moon className="w-4 h-4 text-slate-700" />
+                )}
+              </button>
+            </>
+          )}
 
-          {/* Centro Global de Notificaciones */}
+          {/* 1. Centro Global de Notificaciones (Campanita con badge numérico dinámico) */}
           <NotificationsPopover variant="admin" />
 
-          {/* Theme Toggle */}
-          <button
-            type="button"
-            onClick={handleToggleTheme}
-            className="p-2 rounded-xl text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
-            title={isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
-            aria-label="Alternar tema"
-          >
-            {isDark ? (
-              <Sun className="w-4 h-4 text-amber-400" />
-            ) : (
-              <Moon className="w-4 h-4 text-slate-700 dark:text-slate-300" />
-            )}
-          </button>
-
-          {/* Asistente IA Elegante (Sparkles / Bot) -> Abre Bottom Sheet Drawer */}
+          {/* Asistente IA Copiloto (Bottom Sheet Drawer) */}
           <button
             type="button"
             onClick={() => setAiDrawerOpen(!aiDrawerOpen)}
-            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-bold transition border ${
+            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-bold transition border cursor-pointer ${
               aiDrawerOpen
                 ? 'bg-emerald-600 text-white border-emerald-500 shadow-sm shadow-emerald-500/30'
                 : 'bg-emerald-50 dark:bg-emerald-950/50 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 border-emerald-300/80 dark:border-emerald-800/80 shadow-xs'
@@ -251,173 +211,12 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
             <span className="font-extrabold text-[11px] hidden sm:inline">IA</span>
           </button>
 
-          {/* AVATAR DE USUARIO con MENÚ DESPLEGABLE (Mi Perfil, Ajustes del Club, Cerrar Sesión) */}
-          <div className="relative" ref={userMenuRef}>
-            <button
-              type="button"
-              onClick={() => setUserMenuOpen(!userMenuOpen)}
-              className="flex items-center gap-1.5 p-1 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-emerald-500/50 hover:bg-slate-50 dark:hover:bg-slate-800 transition group focus:outline-none"
-              aria-label="Menú de usuario"
-              aria-expanded={userMenuOpen}
-            >
-              <div className="relative shrink-0">
-                <div
-                  className="w-8 h-8 rounded-full overflow-hidden shrink-0 border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 flex items-center justify-center shadow-xs aspect-square"
-                  style={{ borderRadius: '9999px', overflow: 'hidden' }}
-                >
-                  {currentUser.avatarUrl && !avatarImgError ? (
-                    <img
-                      src={currentUser.avatarUrl}
-                      alt={currentUser.name}
-                      className="w-full h-full object-cover rounded-full block aspect-square"
-                      style={{ borderRadius: '9999px', objectFit: 'cover', width: '100%', height: '100%', display: 'block' }}
-                      loading="eager"
-                      onError={() => setAvatarImgError(true)}
-                    />
-                  ) : (
-                    <span className="text-white font-black text-xs bg-gradient-to-br from-emerald-500 to-teal-700 w-full h-full flex items-center justify-center select-none">
-                      {currentUser.name
-                        .split(' ')
-                        .map((n) => n[0])
-                        .slice(0, 2)
-                        .join('')
-                        .toUpperCase()}
-                    </span>
-                  )}
-                </div>
-                <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-white dark:ring-slate-900 pointer-events-none" />
-              </div>
-              <ChevronDown className={`w-3.5 h-3.5 text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-200 transition-transform ${userMenuOpen ? 'rotate-180' : ''}`} />
-            </button>
-
-            {/* Menú Desplegable Limpio */}
-            {userMenuOpen && (
-              <div className="absolute right-0 mt-2 w-64 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl p-2 z-50 animate-in fade-in-50 zoom-in-95 duration-100 text-xs text-slate-800 dark:text-slate-200">
-                {/* Tarjeta de Identificación */}
-                <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-950/80 border border-slate-200/80 dark:border-slate-800/80 mb-1 flex items-center gap-3">
-                  <div
-                    className="w-10 h-10 rounded-full overflow-hidden shrink-0 border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 flex items-center justify-center shadow-xs aspect-square"
-                    style={{ borderRadius: '9999px', overflow: 'hidden' }}
-                  >
-                    {currentUser.avatarUrl && !avatarImgError ? (
-                      <img
-                        src={currentUser.avatarUrl}
-                        alt={currentUser.name}
-                        className="w-full h-full object-cover rounded-full block aspect-square"
-                        style={{ borderRadius: '9999px', objectFit: 'cover', width: '100%', height: '100%', display: 'block' }}
-                        onError={() => setAvatarImgError(true)}
-                      />
-                    ) : (
-                      <span className="text-white font-black text-sm bg-emerald-600 w-full h-full flex items-center justify-center select-none">
-                        {currentUser.name.slice(0, 2).toUpperCase()}
-                      </span>
-                    )}
-                  </div>
-                  <div className="min-w-0">
-                    <div className="font-extrabold text-sm text-slate-900 dark:text-white truncate">
-                      {currentUser.name}
-                    </div>
-                    <div className="text-[11px] text-slate-500 dark:text-slate-400 truncate">
-                      {currentUser.email || 'admin@setmio.com'}
-                    </div>
-                    <div className="mt-1 inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[9px] font-mono font-bold bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                      Club Admin · {currentTenant.name}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Opciones del Dropdown */}
-                <div className="space-y-0.5 py-1">
-                  {/* Ver Web de la Entidad Activa */}
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setUserMenuOpen(false);
-                      viewEntityWeb(currentTenant.slug);
-                    }}
-                    className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold transition text-left cursor-pointer"
-                  >
-                    <Globe className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                    <span>
-                      {currentTenant.type === 'ACADEMY'
-                        ? 'Ver Web de la Academia'
-                        : currentTenant.type === 'COACH'
-                        ? 'Ver Web del Entrenador'
-                        : currentTenant.type === 'PRO_PLAYER'
-                        ? 'Ver Portfolio Pro'
-                        : t('club.menu.viewWeb', 'Ver Web del Club')}
-                    </span>
-                  </button>
-
-                  {/* 1. Mi Perfil */}
-                  <button
-                    type="button"
-                    onClick={handleOpenProfile}
-                    className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold transition text-left cursor-pointer"
-                  >
-                    <User className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                    <span>{t('club.menu.myProfile', 'Mi Perfil')}</span>
-                  </button>
-
-                  {/* 2. Ajustes del Club */}
-                  <button
-                    type="button"
-                    onClick={handleGoToSettings}
-                    className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold transition text-left cursor-pointer"
-                  >
-                    <Settings className="w-4 h-4 text-indigo-500 dark:text-indigo-400" />
-                    <span>{t('club.menu.clubSettings', 'Ajustes del Club')}</span>
-                  </button>
-                </div>
-
-                {/* Sección de Selección Rápida de Sede en Menú de Usuario (ÚNICAMENTE si el club es Multi-Sede) */}
-                {isMultiVenue && (
-                  <div className="border-t border-slate-100 dark:border-slate-800 my-1 pt-1">
-                    <div className="px-3 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center justify-between">
-                      <span>Sede Activa</span>
-                      <span className="text-emerald-500 font-bold text-[9px]">{isConsolidatedView ? 'Consolidado' : 'Sede Única'}</span>
-                    </div>
-                    <div className="space-y-0.5 px-1 max-h-36 overflow-y-auto">
-                      {venues.map((venue) => {
-                        const isSelected = selectedVenueId === venue.id;
-                        return (
-                          <button
-                            key={venue.id}
-                            type="button"
-                            onClick={() => {
-                              setSelectedVenueId(venue.id);
-                              setUserMenuOpen(false);
-                            }}
-                            className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-left text-xs transition cursor-pointer ${
-                              isSelected
-                                ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 font-bold'
-                                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
-                            }`}
-                          >
-                            <span className="truncate">{venue.shortName}</span>
-                            {isSelected && <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
-
-                <div className="border-t border-slate-100 dark:border-slate-800 my-1" />
-
-                {/* 3. Cerrar Sesión con icono LogOut hacia / */}
-                <button
-                  type="button"
-                  onClick={handleLogout}
-                  className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/50 font-bold transition text-left"
-                >
-                  <LogOut className="w-4 h-4 text-rose-500" />
-                  <span>{t('club.nav.logout', 'Cerrar Sesión')}</span>
-                </button>
-              </div>
-            )}
-          </div>
+          {/* 2. Avatar del Usuario con Menú Desplegable Unificado */}
+          <UserProfileDropdown
+            variant="admin"
+            onOpenProfileModal={onOpenProfileModal}
+            onSelectTab={onSelectTab}
+          />
         </div>
       </header>
 

@@ -1,6 +1,7 @@
 import React from 'react';
 import { useApp } from '../../../context/AppContext';
 import { AdminDashboard as ClubDashboard } from '../AdminDashboard';
+import { ProAthleteDashboard } from './ProAthleteDashboard';
 import {
   Trophy,
   Award,
@@ -26,85 +27,9 @@ export const ContextualDashboard: React.FC = () => {
     return <ClubDashboard />;
   }
 
-  // 2. PRO_PLAYER DASHBOARD
+  // 2. PRO_PLAYER DASHBOARD (Gestión integral del Jugador Profesional)
   if (currentTenant.type === 'PRO_PLAYER') {
-    const stats = currentTenant.proPlayerStats || {
-      fipRanking: 18,
-      premierRanking: 14,
-      titlesCount: 4,
-      matchesWon: 142,
-      matchesPlayed: 186,
-      partnerName: 'Juan Tello Jr.',
-      dominantHand: 'Diestro',
-      position: 'Revés',
-      racketModel: 'Bullpadel Vertex 04 Custom',
-    };
-
-    return (
-      <div className="space-y-8 text-slate-100 max-w-6xl">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 rounded-3xl bg-gradient-to-r from-red-950/80 via-slate-900 to-slate-900 border border-red-800/60 shadow-xl">
-          <div className="space-y-1">
-            <span className="text-xs font-bold text-red-400 uppercase tracking-wider">
-              Panel Profesional de Atleta · Circuito FIP / Premier
-            </span>
-            <h2 className="text-2xl font-black text-white">{currentTenant.name}</h2>
-            <p className="text-xs text-slate-400">
-              Gestión de torneos, contratos de patrocinio, material deportivo y media kit.
-            </p>
-          </div>
-
-          <button
-            onClick={() => triggerDemoToast('Inscripción Torneo', 'Formulario oficial de inscripción FIP abierto en demo.', 'info')}
-            className="px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-500 font-bold text-white text-xs shadow-lg transition"
-          >
-            Inscribirse a Próximo Torneo
-          </button>
-        </div>
-
-        {/* KPIs */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-2">
-            <span className="text-xs text-slate-400">FIP World Ranking</span>
-            <div className="text-3xl font-black text-red-400 font-mono">#{stats.fipRanking}</div>
-            <span className="text-[11px] text-emerald-400 font-semibold">+2 posiciones este mes</span>
-          </div>
-          <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-2">
-            <span className="text-xs text-slate-400">Puntos Oficiales</span>
-            <div className="text-3xl font-black text-white font-mono">3.480 pts</div>
-            <span className="text-[11px] text-slate-400">Premier Padel 2026</span>
-          </div>
-          <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-2">
-            <span className="text-xs text-slate-400">Patrocinios Activos</span>
-            <div className="text-3xl font-black text-amber-400 font-mono">4 Marcas</div>
-            <span className="text-[11px] text-amber-400">Bullpadel, Red Bull, Audi</span>
-          </div>
-          <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-2">
-            <span className="text-xs text-slate-400">Descargas Media Kit</span>
-            <div className="text-3xl font-black text-cyan-400 font-mono">148</div>
-            <span className="text-[11px] text-cyan-400">Prensa y agencias</span>
-          </div>
-        </div>
-
-        {/* Sponsor Contract Checklist */}
-        <div className="p-6 rounded-3xl bg-slate-900 border border-slate-800 space-y-4">
-          <h3 className="text-sm font-bold text-white">Compromisos con Patrocinadores (Mes en Curso)</h3>
-          <div className="space-y-2 text-xs">
-            <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-between">
-              <span className="font-semibold text-white">Bullpadel · 2 Reels en Instagram con pala Vertex 04</span>
-              <span className="text-emerald-400 font-bold flex items-center gap-1">
-                <CheckCircle2 className="w-3.5 h-3.5" /> Completado
-              </span>
-            </div>
-            <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-between">
-              <span className="font-semibold text-white">Red Bull · Clinic de tecnificación con jóvenes promesas</span>
-              <span className="text-amber-400 font-bold flex items-center gap-1">
-                <Clock className="w-3.5 h-3.5" /> Programado 24 Oct
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
+    return <ProAthleteDashboard />;
   }
 
   // 3. COACH DASHBOARD

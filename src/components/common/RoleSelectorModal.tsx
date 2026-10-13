@@ -10,6 +10,7 @@ import {
   ArrowRight,
   Sparkles,
   CheckCircle2,
+  Trophy,
 } from 'lucide-react';
 
 interface RoleSelectorModalProps {
@@ -29,7 +30,15 @@ export const RoleSelectorModal: React.FC<RoleSelectorModalProps> = ({
   isOpen,
   onClose,
 }) => {
-  const { switchUserRole, setCurrentView, triggerDemoToast, setIsCorporateLanding, t } = useApp();
+  const {
+    switchUserRole,
+    setCurrentView,
+    triggerDemoToast,
+    setIsCorporateLanding,
+    tenants,
+    switchTenant,
+    t,
+  } = useApp();
 
   if (!isOpen) return null;
 
@@ -46,6 +55,13 @@ export const RoleSelectorModal: React.FC<RoleSelectorModalProps> = ({
       role: 'TENANT_OWNER' as UserRole,
       icon: Building2,
       color: 'from-emerald-600 to-teal-700',
+      actionView: 'admin',
+    },
+    {
+      id: 'pro_player',
+      role: 'PROFESSIONAL_PLAYER' as UserRole,
+      icon: Trophy,
+      color: 'from-rose-600 to-red-700',
       actionView: 'admin',
     },
     {
@@ -73,6 +89,30 @@ export const RoleSelectorModal: React.FC<RoleSelectorModalProps> = ({
 
   const handleSelectRole = (r: DemoRoleConfig) => {
     setIsCorporateLanding(false);
+    if (r.id === 'pro_player') {
+      const proTenant = tenants.find((t) => t.type === 'PRO_PLAYER') || tenants.find((t) => t.id === 'tenant-martin-pro');
+      if (proTenant) {
+        switchTenant(proTenant.id);
+      }
+      switchUserRole('PROFESSIONAL_PLAYER');
+      setCurrentView('admin');
+      onClose();
+      triggerDemoToast(
+        `${t('demo.title', 'Entorno Demo')}: ${t('register.roles.pro_player.title', 'Jugador Profesional (Cliente Admin)')}`,
+        t('demo.roles.pro_player.access', 'Has ingresado al panel adaptado para la gestión del Jugador Profesional.'),
+        'success'
+      );
+      return;
+    }
+
+    if (r.role === 'TENANT_OWNER') {
+      const clubTenant = tenants.find((t) => t.type === 'PADEL_CLUB');
+      if (clubTenant) switchTenant(clubTenant.id);
+    } else if (r.role === 'COACH') {
+      const coachTenant = tenants.find((t) => t.type === 'COACH');
+      if (coachTenant) switchTenant(coachTenant.id);
+    }
+
     switchUserRole(r.role);
     setCurrentView(r.actionView);
     onClose();

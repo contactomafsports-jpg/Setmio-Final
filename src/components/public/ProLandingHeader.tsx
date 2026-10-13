@@ -3,6 +3,7 @@ import { useApp } from '../../context/AppContext';
 import { Trophy, Sun, Moon, ArrowLeft, Share2, Mail } from 'lucide-react';
 import { SUPPORTED_LANGUAGES } from '../../lib/i18n';
 import { OfficialFlag } from '../common/OfficialFlag';
+import { i18n } from '../../i18n';
 
 interface ProLandingHeaderProps {
   onBack?: () => void;
@@ -16,6 +17,7 @@ export const ProLandingHeader: React.FC<ProLandingHeaderProps> = ({
   badge = 'Pro Athlete',
 }) => {
   const { currentTenant, theme, toggleTheme, language, setLanguage, setPublicPage, triggerDemoToast } = useApp();
+  const [langOpen, setLangOpen] = React.useState(false);
 
   const currentLangObj =
     SUPPORTED_LANGUAGES.find((l) => l.code === language) || SUPPORTED_LANGUAGES[0];
@@ -73,12 +75,48 @@ export const ProLandingHeader: React.FC<ProLandingHeaderProps> = ({
           </div>
         </div>
 
-        {/* Right: Actions */}
+        {/* Right: Actions (Idioma, Tema, Compartir, Contacto Prensa) */}
         <div className="flex items-center gap-2 shrink-0">
+          {/* Selector de Idioma */}
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => setLangOpen(!langOpen)}
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition border border-slate-200 dark:border-slate-800 cursor-pointer"
+              aria-label="Seleccionar idioma"
+            >
+              <OfficialFlag code={currentLangObj.code} />
+              <span className="hidden sm:inline uppercase text-[11px] font-mono">{currentLangObj.code}</span>
+            </button>
+
+            {langOpen && (
+              <div className="absolute right-0 mt-1.5 w-40 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl p-1 z-50 animate-in fade-in-50 duration-100 text-xs">
+                {SUPPORTED_LANGUAGES.map((langOpt) => (
+                  <button
+                    key={langOpt.code}
+                    onClick={() => {
+                      i18n.changeLanguage(langOpt.code);
+                      setLanguage(langOpt.code);
+                      setLangOpen(false);
+                    }}
+                    className={`w-full flex items-center gap-2 px-2.5 py-1.5 rounded-xl transition text-left cursor-pointer ${
+                      language === langOpt.code
+                        ? 'bg-emerald-600 text-white font-bold'
+                        : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+                    }`}
+                  >
+                    <OfficialFlag code={langOpt.code} />
+                    <span className="truncate">{langOpt.name}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
           <button
             type="button"
             onClick={handleShare}
-            className="p-2 rounded-xl text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition border border-slate-200 dark:border-slate-800"
+            className="p-2 rounded-xl text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition border border-slate-200 dark:border-slate-800 cursor-pointer"
             title="Compartir perfil profesional"
           >
             <Share2 className="w-4 h-4" />
@@ -88,7 +126,7 @@ export const ProLandingHeader: React.FC<ProLandingHeaderProps> = ({
           <button
             type="button"
             onClick={toggleTheme}
-            className="p-2 rounded-xl text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+            className="p-2 rounded-xl text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
             title={theme === 'dark' ? 'Modo claro' : 'Modo oscuro'}
           >
             {theme === 'dark' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-slate-700" />}

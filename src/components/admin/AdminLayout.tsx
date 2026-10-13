@@ -72,79 +72,125 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
     return () => window.removeEventListener('keydown', closeOnEscape);
   }, [mobileMoreOpen]);
 
-  // 4 Main bottom tabs + Más
-  const mainDesktopTabs: { id: AdminTab; label: string; icon: React.ReactNode }[] = [
-    { id: 'dashboard', label: t('club.nav.dashboard', 'Inicio'), icon: <LayoutDashboard className="w-5 h-5" /> },
-    { id: 'agenda', label: t('club.nav.bookings', 'Reservas'), icon: <Calendar className="w-5 h-5" /> },
-    { id: 'matches', label: t('club.nav.matches', 'Partidas'), icon: <Trophy className="w-5 h-5" /> },
-    { id: 'pos_cafe', label: t('club.nav.pos', 'TPV / Caja'), icon: <CreditCard className="w-5 h-5" /> },
-  ];
+  const isProAthleteAdmin =
+    currentTenant.type === 'PRO_PLAYER' || currentUser.role === 'PROFESSIONAL_PLAYER';
+
+  // 4 Main bottom tabs + Más (contextualizados por tipo de entidad)
+  const mainDesktopTabs: { id: AdminTab; label: string; icon: React.ReactNode }[] = isProAthleteAdmin
+    ? [
+        { id: 'dashboard', label: 'Resumen Pro', icon: <LayoutDashboard className="w-5 h-5" /> },
+        { id: 'agenda', label: 'Agenda & FIP', icon: <Calendar className="w-5 h-5" /> },
+        { id: 'matches', label: 'Exhibiciones', icon: <Trophy className="w-5 h-5" /> },
+        { id: 'customers', label: 'Sponsors & Marcas', icon: <Briefcase className="w-5 h-5" /> },
+      ]
+    : [
+        { id: 'dashboard', label: t('club.nav.dashboard', 'Inicio'), icon: <LayoutDashboard className="w-5 h-5" /> },
+        { id: 'agenda', label: t('club.nav.bookings', 'Reservas'), icon: <Calendar className="w-5 h-5" /> },
+        { id: 'matches', label: t('club.nav.matches', 'Partidas'), icon: <Trophy className="w-5 h-5" /> },
+        { id: 'pos_cafe', label: t('club.nav.pos', 'TPV / Caja'), icon: <CreditCard className="w-5 h-5" /> },
+      ];
 
   // Drawer / Sidebar modules
-  const moreTabs: { id: AdminTab; label: string; icon: React.ReactNode; desc: string; badge?: string }[] = [
-    {
-      id: 'courts_management',
-      label: t('club.nav.courts_iot', 'Pistas / Domótica'),
-      icon: <Layers className="w-5 h-5 text-emerald-500" />,
-      desc: t('club.nav.courts_management_desc', 'Inventario, tarifas y domótica IoT'),
-    },
-    {
-      id: 'customers',
-      label: t('club.nav.customers', 'Socios / CRM'),
-      icon: <Users className="w-5 h-5 text-indigo-500" />,
-      desc: 'Base de datos, niveles y monedero',
-    },
-    {
-      id: 'academy',
-      label: t('club.nav.academy', 'Escuela / Entrenadores'),
-      icon: <GraduationCap className="w-5 h-5 text-purple-500" />,
-      desc: 'Grupos, alumnos y entrenadores',
-    },
-    {
-      id: 'tournaments',
-      label: t('club.nav.tournaments', 'Competiciones'),
-      icon: <Trophy className="w-5 h-5 text-amber-500" />,
-      desc: t('club.nav.tournaments_desc', 'Torneos oficiales, cuadros y rankings'),
-    },
-    {
-      id: 'web_editor',
-      label: t('club.nav.whitelabel', 'Configuración Marca Blanca'),
-      icon: <Palette className="w-5 h-5 text-emerald-500" />,
-      desc: 'Logo, colores oficiales y web del club',
-      badge: 'Marca Blanca',
-    },
-    {
-      id: 'domains',
-      label: t('club.nav.domains', 'Dominios y DNS'),
-      icon: <Globe className="w-5 h-5 text-teal-500" />,
-      desc: 'Tu propio dominio .com con SSL',
-    },
-    {
-      id: 'shop',
-      label: t('club.nav.shop', 'Tienda y Pedidos'),
-      icon: <ShoppingBag className="w-5 h-5 text-blue-500" />,
-      desc: 'Catálogo de palas e inventario',
-    },
-    {
-      id: 'teams',
-      label: t('club.nav.teams', 'Equipos del Club'),
-      icon: <Users className="w-5 h-5 text-cyan-500" />,
-      desc: 'Convocatorias y capitanes',
-    },
-    {
-      id: 'subscription',
-      label: 'Suscripción SaaS (Enterprise)',
-      icon: <Briefcase className="w-5 h-5 text-slate-500" />,
-      desc: 'Plan Enterprise Top activo',
-      badge: 'TOP',
-    },
-    {
-      id: 'settings',
-      label: t('club.nav.settings', 'Configuración Club'),
-      icon: <Settings className="w-5 h-5 text-slate-500" />,
-      desc: 'Horarios, políticas y WhatsApp',
-    },
-  ];
+  const moreTabs: { id: AdminTab; label: string; icon: React.ReactNode; desc: string; badge?: string }[] = isProAthleteAdmin
+    ? [
+        {
+          id: 'shop',
+          label: 'Servicios & Merchandising',
+          icon: <ShoppingBag className="w-5 h-5 text-purple-500" />,
+          desc: 'Clinics VIP, exhibiciones y palas firmadas',
+          badge: 'Servicios',
+        },
+        {
+          id: 'web_editor',
+          label: 'Web Marca Blanca (martinsanchez.com)',
+          icon: <Palette className="w-5 h-5 text-red-500" />,
+          desc: 'Personalización de la web oficial del atleta',
+          badge: 'Marca Blanca',
+        },
+        {
+          id: 'domains',
+          label: 'Dominio Oficial & SSL',
+          icon: <Globe className="w-5 h-5 text-teal-500" />,
+          desc: 'martinsanchez.com con DNS y SSL activo',
+        },
+        {
+          id: 'subscription',
+          label: 'Plan Elite Atleta Pro',
+          icon: <Briefcase className="w-5 h-5 text-amber-500" />,
+          desc: 'Suscripción Setmio Pro Athlete activa',
+          badge: 'PRO',
+        },
+        {
+          id: 'settings',
+          label: 'Ajustes del Atleta',
+          icon: <Settings className="w-5 h-5 text-slate-500" />,
+          desc: 'Notificaciones, agenda y canales preferidos',
+        },
+      ]
+    : [
+        {
+          id: 'courts_management',
+          label: t('club.nav.courts_iot', 'Pistas / Domótica'),
+          icon: <Layers className="w-5 h-5 text-emerald-500" />,
+          desc: t('club.nav.courts_management_desc', 'Inventario, tarifas y domótica IoT'),
+        },
+        {
+          id: 'customers',
+          label: t('club.nav.customers', 'Socios / CRM'),
+          icon: <Users className="w-5 h-5 text-indigo-500" />,
+          desc: 'Base de datos, niveles y monedero',
+        },
+        {
+          id: 'academy',
+          label: t('club.nav.academy', 'Escuela / Entrenadores'),
+          icon: <GraduationCap className="w-5 h-5 text-purple-500" />,
+          desc: 'Grupos, alumnos y entrenadores',
+        },
+        {
+          id: 'tournaments',
+          label: t('club.nav.tournaments', 'Competiciones'),
+          icon: <Trophy className="w-5 h-5 text-amber-500" />,
+          desc: t('club.nav.tournaments_desc', 'Torneos oficiales, cuadros y rankings'),
+        },
+        {
+          id: 'web_editor',
+          label: t('club.nav.whitelabel', 'Configuración Marca Blanca'),
+          icon: <Palette className="w-5 h-5 text-emerald-500" />,
+          desc: 'Logo, colores oficiales y web del club',
+          badge: 'Marca Blanca',
+        },
+        {
+          id: 'domains',
+          label: t('club.nav.domains', 'Dominios y DNS'),
+          icon: <Globe className="w-5 h-5 text-teal-500" />,
+          desc: 'Tu propio dominio .com con SSL',
+        },
+        {
+          id: 'shop',
+          label: t('club.nav.shop', 'Tienda y Pedidos'),
+          icon: <ShoppingBag className="w-5 h-5 text-blue-500" />,
+          desc: 'Catálogo de palas e inventario',
+        },
+        {
+          id: 'teams',
+          label: t('club.nav.teams', 'Equipos del Club'),
+          icon: <Users className="w-5 h-5 text-cyan-500" />,
+          desc: 'Convocatorias y capitanes',
+        },
+        {
+          id: 'subscription',
+          label: 'Suscripción SaaS (Enterprise)',
+          icon: <Briefcase className="w-5 h-5 text-slate-500" />,
+          desc: 'Plan Enterprise Top activo',
+          badge: 'TOP',
+        },
+        {
+          id: 'settings',
+          label: t('club.nav.settings', 'Configuración Club'),
+          icon: <Settings className="w-5 h-5 text-slate-500" />,
+          desc: 'Horarios, políticas y WhatsApp',
+        },
+      ];
 
   const handleSelectTab = (tab: AdminTab) => {
     if (tab === 'customers') {
@@ -171,11 +217,11 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
             </div>
             <div className="min-w-0">
               <div className="font-black text-xs text-slate-900 dark:text-white truncate tracking-wider">
-                Setmio Pro
+                {isProAthleteAdmin ? 'Setmio Pro Athlete' : 'Setmio Pro'}
               </div>
               <div className="text-[10px] text-emerald-600 dark:text-emerald-400 font-extrabold uppercase tracking-wider flex items-center gap-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                Admin Club (SaaS)
+                {isProAthleteAdmin ? 'Admin Atleta Pro' : 'Admin Club (SaaS)'}
               </div>
             </div>
           </div>
@@ -266,7 +312,9 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
             </div>
             <div className="min-w-0">
               <div className="font-bold text-slate-900 dark:text-white truncate text-[11px]">{currentUser.name}</div>
-              <div className="text-[10px] text-emerald-600 dark:text-emerald-400 font-mono font-bold truncate">Club Admin</div>
+              <div className="text-[10px] text-emerald-600 dark:text-emerald-400 font-mono font-bold truncate">
+                {isProAthleteAdmin ? 'Atleta Pro' : 'Club Admin'}
+              </div>
             </div>
           </div>
 

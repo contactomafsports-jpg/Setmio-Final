@@ -1373,6 +1373,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       setCurrentViewState('player');
     } else if (role === 'COACH') {
       setCurrentViewState('coach');
+    } else if (role === 'PROFESSIONAL_PLAYER') {
+      const proTenant = tenants.find((t) => t.type === 'PRO_PLAYER') || tenants.find((t) => t.id === 'tenant-martin-pro');
+      if (proTenant) {
+        setCurrentTenantId(proTenant.id);
+      }
+      setCurrentViewState('admin');
     } else {
       setCurrentViewState('admin');
     }

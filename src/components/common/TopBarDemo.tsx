@@ -260,9 +260,9 @@ export const TopBarDemo: React.FC = () => {
                           if (acadTenant) switchTenant(acadTenant.id);
                           setCurrentView('admin');
                         } else if (item.role === 'PROFESSIONAL_PLAYER') {
-                          const proTenant = tenants.find((t) => t.type === 'PRO_PLAYER');
+                          const proTenant = tenants.find((t) => t.type === 'PRO_PLAYER') || tenants.find((t) => t.id === 'tenant-martin-pro');
                           if (proTenant) switchTenant(proTenant.id);
-                          viewEntityWeb(proTenant?.slug);
+                          setCurrentView('admin');
                         } else if (item.role === 'SUPERADMIN') {
                           setCurrentView('hq');
                         } else {
