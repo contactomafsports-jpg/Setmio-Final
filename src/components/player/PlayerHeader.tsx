@@ -55,19 +55,42 @@ export const PlayerHeader: React.FC<PlayerHeaderProps> = ({
           )}
 
           <div className="flex items-center gap-2.5">
-            {/* Isotipo Oficial Setmio */}
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-700 text-white font-black text-sm flex items-center justify-center shadow-xs shrink-0 select-none">
-              S
-            </div>
-            {/* Texto Oficial Setmio */}
-            <div className="flex items-center gap-2">
-              <span className="font-black text-sm sm:text-base tracking-tight text-slate-900 dark:text-white leading-none">
-                Setmio Player
-              </span>
-              <span className="hidden sm:inline-flex items-center text-[10px] font-extrabold text-cyan-700 dark:text-cyan-300 bg-cyan-50 dark:bg-cyan-950/80 px-2 py-0.5 rounded-md border border-cyan-200/60 dark:border-cyan-800/60">
-                Multi-Club Neutra
-              </span>
-            </div>
+            {isWhiteLabelPlayerPreview ? (
+              <>
+                {/* Logo / Isotipo del Club Demo */}
+                <div
+                  className="w-8 h-8 rounded-xl text-white font-black text-xs flex items-center justify-center shadow-xs shrink-0 select-none"
+                  style={{ backgroundColor: currentTenant.branding?.primaryColor || '#10b981' }}
+                >
+                  {currentTenant.shortName.slice(0, 3).toUpperCase()}
+                </div>
+                {/* Texto del Club Marca Blanca */}
+                <div className="flex items-center gap-2">
+                  <span className="font-black text-sm sm:text-base tracking-tight text-slate-900 dark:text-white leading-none">
+                    {currentTenant.name}
+                  </span>
+                  <span className="hidden sm:inline-flex items-center text-[10px] font-extrabold text-emerald-800 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-950/80 px-2 py-0.5 rounded-md border border-emerald-300 dark:border-emerald-800">
+                    App Marca Blanca Club
+                  </span>
+                </div>
+              </>
+            ) : (
+              <>
+                {/* Isotipo Oficial Setmio */}
+                <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-700 text-white font-black text-sm flex items-center justify-center shadow-xs shrink-0 select-none">
+                  S
+                </div>
+                {/* Texto Oficial Setmio */}
+                <div className="flex items-center gap-2">
+                  <span className="font-black text-sm sm:text-base tracking-tight text-slate-900 dark:text-white leading-none">
+                    Setmio Player
+                  </span>
+                  <span className="hidden sm:inline-flex items-center text-[10px] font-extrabold text-cyan-700 dark:text-cyan-300 bg-cyan-50 dark:bg-cyan-950/80 px-2 py-0.5 rounded-md border border-cyan-200/60 dark:border-cyan-800/60">
+                    Multi-Club Neutra
+                  </span>
+                </div>
+              </>
+            )}
           </div>
         </div>
 

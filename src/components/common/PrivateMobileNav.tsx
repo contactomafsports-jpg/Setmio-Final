@@ -1,5 +1,14 @@
 import React from 'react';
-import { LayoutDashboard, Calendar, Trophy, CreditCard, Menu } from 'lucide-react';
+import {
+  LayoutDashboard,
+  Calendar,
+  Trophy,
+  CreditCard,
+  Menu,
+  GraduationCap,
+  Users,
+  Briefcase,
+} from 'lucide-react';
 import { useApp, AdminTab } from '../../context/AppContext';
 
 interface PrivateMobileNavProps {
@@ -15,30 +24,81 @@ export const PrivateMobileNav: React.FC<PrivateMobileNavProps> = ({
   onMore,
   moreOpen,
 }) => {
-  const { t } = useApp();
+  const { t, currentTenant, currentUser } = useApp();
 
-  const navItems = [
-    {
-      id: 'dashboard' as AdminTab,
-      label: t('club.nav.dashboard', 'Inicio'),
-      icon: LayoutDashboard,
-    },
-    {
-      id: 'agenda' as AdminTab,
-      label: t('club.nav.bookings', 'Reservas'),
-      icon: Calendar,
-    },
-    {
-      id: 'matches' as AdminTab,
-      label: t('club.nav.matches', 'Partidas'),
-      icon: Trophy,
-    },
-    {
-      id: 'pos_cafe' as AdminTab,
-      label: t('club.nav.pos', 'TPV / Caja'),
-      icon: CreditCard,
-    },
-  ];
+  const isProAthlete =
+    currentTenant.type === 'PRO_PLAYER' || currentUser.role === 'PROFESSIONAL_PLAYER';
+  const isAcademy =
+    currentTenant.type === 'ACADEMY' || currentUser.role === 'ACADEMY_MANAGER';
+
+  const navItems = isProAthlete
+    ? [
+        {
+          id: 'dashboard' as AdminTab,
+          label: 'Resumen Pro',
+          icon: LayoutDashboard,
+        },
+        {
+          id: 'agenda' as AdminTab,
+          label: 'Agenda & FIP',
+          icon: Calendar,
+        },
+        {
+          id: 'matches' as AdminTab,
+          label: 'Exhibiciones',
+          icon: Trophy,
+        },
+        {
+          id: 'customers' as AdminTab,
+          label: 'Sponsors',
+          icon: Briefcase,
+        },
+      ]
+    : isAcademy
+    ? [
+        {
+          id: 'dashboard' as AdminTab,
+          label: 'Escuela',
+          icon: LayoutDashboard,
+        },
+        {
+          id: 'academy' as AdminTab,
+          label: 'Cursos & Grupos',
+          icon: GraduationCap,
+        },
+        {
+          id: 'agenda' as AdminTab,
+          label: 'Cuadrante',
+          icon: Calendar,
+        },
+        {
+          id: 'customers' as AdminTab,
+          label: 'Alumnos',
+          icon: Users,
+        },
+      ]
+    : [
+        {
+          id: 'dashboard' as AdminTab,
+          label: t('club.nav.dashboard', 'Inicio'),
+          icon: LayoutDashboard,
+        },
+        {
+          id: 'agenda' as AdminTab,
+          label: t('club.nav.bookings', 'Reservas'),
+          icon: Calendar,
+        },
+        {
+          id: 'matches' as AdminTab,
+          label: t('club.nav.matches', 'Partidas'),
+          icon: Trophy,
+        },
+        {
+          id: 'pos_cafe' as AdminTab,
+          label: t('club.nav.pos', 'TPV / Caja'),
+          icon: CreditCard,
+        },
+      ];
 
   return (
     <nav

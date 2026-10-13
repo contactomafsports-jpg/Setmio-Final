@@ -1187,3 +1187,100 @@ INSERT INTO public.brackets (
   )
 ON CONFLICT (id) DO NOTHING;
 
+
+-- ==============================================================================
+-- 15. MÓDULO DE PAGOS, FACTURACIÓN Y PREPARACIÓN VERI*FACTU (RD 1007/2023)
+-- ==============================================================================
+
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'verifactu_status_enum') THEN
+    CREATE TYPE verifactu_status_enum AS ENUM ('pending', 'synced', 'error', 'opt_out');
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'invoice_status_enum') THEN
+    CREATE TYPE invoice_status_enum AS ENUM ('paid', 'pending', 'canceled', 'rectified');
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'invoice_type_enum') THEN
+    CREATE TYPE invoice_type_enum AS ENUM ('standard', 'simplified', 'rectificative');
+  END IF;
+END $$;
+
+CREATE TABLE IF NOT EXISTS public.invoices (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  tenant_id UUID NOT NULL REFERENCES public.tenants(id) ON DELETE CASCADE,
+  number VARCHAR(64) NOT NULL,
+  series VARCHAR(32) NOT NULL DEFAULT '2026',
+  issue_date DATE NOT NULL DEFAULT CURRENT_DATE,
+  due_date DATE,
+  status invoice_status_enum NOT NULL DEFAULT 'paid',
+  type invoice_type_enum NOT NULL DEFAULT 'standard',
+  
+  -- Cliente / Receptor
+  customer_id UUID REFERENCES public.users(id) ON DELETE SET NULL,
+  customer_name VARCHAR(255) NOT NULL,
+  customer_nif VARCHAR(32),
+  customer_email VARCHAR(255),
+  customer_phone VARCHAR(64),
+  customer_address TEXT,
+
+  -- Concepto y Desglose
+  concept TEXT NOT NULL,
+  category VARCHAR(64) NOT NULL DEFAULT 'courts',
+  items JSONB NOT NULL DEFAULT '[]'::jsonb,
+  subtotal DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+  tax_amount DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+  total DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+
+  -- Canal y Método de Cobro
+  payment_method VARCHAR(64) NOT NULL DEFAULT 'online',
+  payment_date TIMESTAMPTZ,
+
+  -- Preparación Arquitectura Veri*factu
+  verifactu_status verifactu_status_enum NOT NULL DEFAULT 'pending',
+  verifactu_hash TEXT,
+  verifactu_qr_data TEXT,
+  verifactu_synced_at TIMESTAMPTZ,
+  verifactu_error_message TEXT,
+  
+  notes TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- Índices de Rendimiento y Búsqueda
+CREATE INDEX IF NOT EXISTS idx_invoices_tenant_id ON public.invoices(tenant_id);
+CREATE INDEX IF NOT EXISTS idx_invoices_status ON public.invoices(status);
+CREATE INDEX IF NOT EXISTS idx_invoices_verifactu_status ON public.invoices(verifactu_status);
+CREATE INDEX IF NOT EXISTS idx_invoices_number ON public.invoices(number);
+
+-- RLS para Facturación
+ALTER TABLE public.invoices ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "invoices_select_policy" ON public.invoices
+  FOR SELECT USING (
+    tenant_id IN (
+      SELECT tenant_id FROM public.memberships WHERE user_id = auth.uid()
+    ) OR EXISTS (
+      SELECT 1 FROM public.users WHERE id = auth.uid() AND role = 'SUPERADMIN'
+    )
+  );
+
+CREATE POLICY "invoices_insert_policy" ON public.invoices
+  FOR INSERT WITH CHECK (
+    tenant_id IN (
+      SELECT tenant_id FROM public.memberships
+      WHERE user_id = auth.uid() AND role IN ('TENANT_OWNER', 'TENANT_ADMIN', 'RECEPTION')
+    ) OR EXISTS (
+      SELECT 1 FROM public.users WHERE id = auth.uid() AND role = 'SUPERADMIN'
+    )
+  );
+
+CREATE POLICY "invoices_update_policy" ON public.invoices
+  FOR UPDATE USING (
+    tenant_id IN (
+      SELECT tenant_id FROM public.memberships
+      WHERE user_id = auth.uid() AND role IN ('TENANT_OWNER', 'TENANT_ADMIN')
+    ) OR EXISTS (
+      SELECT 1 FROM public.users WHERE id = auth.uid() AND role = 'SUPERADMIN'
+    )
+  );

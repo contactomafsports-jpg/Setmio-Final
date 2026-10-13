@@ -20,6 +20,10 @@ import {
   ClubRanking,
   PlayerGroup,
   PlayerGroupConvocatoria,
+  Invoice,
+  InvoiceItem,
+  PlatformSaaSInvoice,
+  VerifactuStatus,
 } from '../types/database';
 import {
   INITIAL_TENANT,
@@ -40,6 +44,8 @@ import {
   INITIAL_RANKINGS,
   INITIAL_PLAYER_GROUPS,
   INITIAL_GROUP_CONVOCATORIAS,
+  INITIAL_INVOICES,
+  INITIAL_SAAS_INVOICES,
 } from '../data/initialData';
 import { fallbackLng, SupportedLanguage, TRANSLATIONS } from '../lib/i18n';
 import { i18n } from '../i18n';
@@ -323,7 +329,12 @@ const readRoute = () => {
       isCorporate: false,
     };
   }
-  if (remainingPath === '/profesor' || remainingPath.startsWith('/profesor/')) {
+  if (
+    remainingPath === '/profesor' ||
+    remainingPath.startsWith('/profesor/') ||
+    remainingPath === '/coach' ||
+    remainingPath.startsWith('/coach/')
+  ) {
     return {
       view: 'coach' as MainView,
       page: 'home' as PublicPage,
@@ -354,6 +365,14 @@ const readRoute = () => {
       admin = 'all_bookings';
     } else if (remainingPath === '/admin/reservas' || remainingPath.startsWith('/admin/reservas/')) {
       admin = 'agenda';
+    } else if (remainingPath === '/admin/facturacion' || remainingPath.startsWith('/admin/facturacion/') || remainingPath === '/admin/invoicing') {
+      admin = 'invoicing';
+    } else if (remainingPath === '/admin/escuela' || remainingPath.startsWith('/admin/escuela/') || remainingPath === '/admin/academia') {
+      admin = 'academy';
+    } else if (remainingPath === '/admin/equipos' || remainingPath.startsWith('/admin/equipos/')) {
+      admin = 'teams';
+    } else if (remainingPath === '/admin/torneos' || remainingPath.startsWith('/admin/torneos/')) {
+      admin = 'tournaments';
     } else if (remainingPath === '/admin/clientes' || remainingPath.startsWith('/admin/clientes/') || remainingPath === '/admin/socios' || remainingPath.startsWith('/admin/socios/')) {
       admin = 'customers';
     } else if (remainingPath === '/admin/partidas' || remainingPath.startsWith('/admin/partidas/')) {
@@ -576,6 +595,7 @@ interface AppContextType {
   isClubOpen: boolean;
   toggleClubOpenState: () => void;
   isWhiteLabelPlayerPreview: boolean;
+  setIsWhiteLabelPlayerPreview: (val: boolean) => void;
   enterWhiteLabelPlayerPreview: () => void;
   exitWhiteLabelPlayerPreview: () => void;
 
@@ -668,6 +688,16 @@ interface AppContextType {
   aiMessages: AIMessage[];
   sendAIMessage: (text: string) => void;
   isAiThinking: boolean;
+
+  // Facturación, Pagos y Veri*factu
+  invoices: Invoice[];
+  syncInvoiceVerifactu: (invoiceId: string) => void;
+  syncAllVerifactu: () => void;
+  createInvoice: (invoice: Partial<Invoice>) => Invoice;
+  markInvoicePaid: (invoiceId: string) => void;
+  createRectificativeInvoice: (originalInvoiceId: string, reason: string) => Invoice;
+  saasInvoices: PlatformSaaSInvoice[];
+  syncSaasInvoiceVerifactu: (invoiceId: string) => void;
 
   // Demo Toast helper
   demoToast: DemoNotificationToast | null;
@@ -2309,6 +2339,197 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return () => clearTimeout(timer);
   }, [demoToast]);
 
+  // ==========================================
+  // MÓDULO DE PAGOS, FACTURACIÓN Y VERI*FACTU
+  // ==========================================
+  const [invoices, setInvoices] = useState<Invoice[]>(() =>
+    readDemoState('setmio_demo_invoices_v1', INITIAL_INVOICES)
+  );
+
+  const [saasInvoices, setSaasInvoices] = useState<PlatformSaaSInvoice[]>(() =>
+    readDemoState('setmio_demo_saas_invoices_v1', INITIAL_SAAS_INVOICES)
+  );
+
+  const syncInvoiceVerifactu = useCallback((invoiceId: string) => {
+    setInvoices((prev) => {
+      const next = prev.map((inv) => {
+        if (inv.id !== invoiceId) return inv;
+        const hash = Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join('');
+        const qr = `https://aeat.es/verifactu?nif=B15998877&num=${encodeURIComponent(inv.number)}&tot=${inv.total.toFixed(2)}&f=${inv.issueDate.replace(/-/g, '')}`;
+        return {
+          ...inv,
+          verifactu_status: 'synced' as VerifactuStatus,
+          verifactu_hash: hash,
+          verifactu_qr_data: qr,
+          verifactu_synced_at: new Date().toISOString(),
+          verifactu_error_message: undefined,
+        };
+      });
+      saveDemoState('setmio_demo_invoices_v1', next);
+      return next;
+    });
+    triggerDemoToast(
+      'Sincronizado con Veri*factu AEAT',
+      'Factura transmitida a los servidores tributarios con encadenamiento SHA-256 y código QR generado conforme al RD 1007/2023.',
+      'success'
+    );
+  }, [triggerDemoToast]);
+
+  const syncAllVerifactu = useCallback(() => {
+    setInvoices((prev) => {
+      let count = 0;
+      const next = prev.map((inv) => {
+        if (inv.verifactu_status === 'synced') return inv;
+        count++;
+        const hash = Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join('');
+        const qr = `https://aeat.es/verifactu?nif=B15998877&num=${encodeURIComponent(inv.number)}&tot=${inv.total.toFixed(2)}&f=${inv.issueDate.replace(/-/g, '')}`;
+        return {
+          ...inv,
+          verifactu_status: 'synced' as VerifactuStatus,
+          verifactu_hash: hash,
+          verifactu_qr_data: qr,
+          verifactu_synced_at: new Date().toISOString(),
+          verifactu_error_message: undefined,
+        };
+      });
+      saveDemoState('setmio_demo_invoices_v1', next);
+      triggerDemoToast(
+        'Lote Veri*factu Sincronizado',
+        `Se han transmitido ${count} facturas pendientes a la Agencia Tributaria (AEAT) con firma digital y hash encadenado.`,
+        'success'
+      );
+      return next;
+    });
+  }, [triggerDemoToast]);
+
+  const createInvoice = useCallback((invoiceData: Partial<Invoice>) => {
+    const subtotal = Number(((invoiceData.total || 28.0) / 1.21).toFixed(2));
+    const taxAmount = Number(((invoiceData.total || 28.0) - subtotal).toFixed(2));
+    const newInv: Invoice = {
+      id: `inv-${Date.now()}`,
+      tenantId: currentTenant.id,
+      number: `FAC-2026-00${Math.floor(100 + Math.random() * 900)}`,
+      series: '2026',
+      issueDate: new Date().toISOString().slice(0, 10),
+      dueDate: new Date().toISOString().slice(0, 10),
+      status: invoiceData.status || 'paid',
+      type: invoiceData.type || 'standard',
+      customerName: invoiceData.customerName || 'Cliente General',
+      customerNif: invoiceData.customerNif || '44556677X',
+      customerEmail: invoiceData.customerEmail,
+      concept: invoiceData.concept || 'Servicios Deportivos Pádel',
+      category: invoiceData.category || 'courts',
+      items: invoiceData.items || [
+        {
+          id: `ii-${Date.now()}`,
+          description: invoiceData.concept || 'Servicios Deportivos Pádel',
+          quantity: 1,
+          unitPrice: invoiceData.total || 28.0,
+          taxPercent: 21,
+          total: invoiceData.total || 28.0,
+        },
+      ],
+      subtotal,
+      taxAmount,
+      total: invoiceData.total || 28.0,
+      paymentMethod: invoiceData.paymentMethod || 'online',
+      paymentDate: new Date().toISOString(),
+      verifactu_status: 'pending',
+      ...invoiceData,
+    };
+    setInvoices((prev) => {
+      const next = [newInv, ...prev];
+      saveDemoState('setmio_demo_invoices_v1', next);
+      return next;
+    });
+    triggerDemoToast(
+      'Factura Emitida',
+      `Factura ${newInv.number} generada para ${newInv.customerName}. Pendiente de sincronización Veri*factu.`,
+      'success'
+    );
+    return newInv;
+  }, [currentTenant.id, triggerDemoToast]);
+
+  const markInvoicePaid = useCallback((invoiceId: string) => {
+    setInvoices((prev) => {
+      const next = prev.map((inv) =>
+        inv.id === invoiceId
+          ? { ...inv, status: 'paid' as const, paymentDate: new Date().toISOString() }
+          : inv
+      );
+      saveDemoState('setmio_demo_invoices_v1', next);
+      return next;
+    });
+    triggerDemoToast('Cobro Registrado', 'La factura ha sido marcada como Pagada.', 'success');
+  }, [triggerDemoToast]);
+
+  const createRectificativeInvoice = useCallback((originalInvoiceId: string, reason: string) => {
+    let createdRec: Invoice | null = null;
+    setInvoices((prev) => {
+      const orig = prev.find((inv) => inv.id === originalInvoiceId);
+      if (!orig) return prev;
+      createdRec = {
+        id: `inv-rec-${Date.now()}`,
+        tenantId: orig.tenantId,
+        number: `REC-2026-000${Math.floor(10 + Math.random() * 90)}`,
+        series: 'REC-2026',
+        issueDate: new Date().toISOString().slice(0, 10),
+        dueDate: new Date().toISOString().slice(0, 10),
+        status: 'rectified',
+        type: 'rectificative',
+        customerId: orig.customerId,
+        customerName: orig.customerName,
+        customerNif: orig.customerNif,
+        customerEmail: orig.customerEmail,
+        concept: `Factura Rectificativa de ${orig.number}: ${reason}`,
+        category: orig.category,
+        items: orig.items.map((it) => ({
+          ...it,
+          id: `ii-rec-${Date.now()}-${it.id}`,
+          quantity: -it.quantity,
+          total: -it.total,
+        })),
+        subtotal: -orig.subtotal,
+        taxAmount: -orig.taxAmount,
+        total: -orig.total,
+        paymentMethod: orig.paymentMethod,
+        paymentDate: new Date().toISOString(),
+        verifactu_status: 'synced',
+        verifactu_hash: Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join(''),
+        verifactu_qr_data: `https://aeat.es/verifactu?nif=B15998877&num=REC&tot=${(-orig.total).toFixed(2)}`,
+        verifactu_synced_at: new Date().toISOString(),
+        notes: `Rectifica a la factura original ${orig.number}. Motivo: ${reason}`,
+      };
+      const updatedOrig = { ...orig, status: 'rectified' as const };
+      const next = [createdRec, ...prev.map((i) => (i.id === originalInvoiceId ? updatedOrig : i))];
+      saveDemoState('setmio_demo_invoices_v1', next);
+      return next;
+    });
+    triggerDemoToast(
+      'Factura Rectificativa Emitida',
+      `Se ha emitido la factura rectificativa con importe negativo y sincronización Veri*factu.`,
+      'success'
+    );
+    return createdRec!;
+  }, [triggerDemoToast]);
+
+  const syncSaasInvoiceVerifactu = useCallback((invoiceId: string) => {
+    setSaasInvoices((prev) => {
+      const next = prev.map((inv) =>
+        inv.id === invoiceId
+          ? { ...inv, verifactu_status: 'synced' as VerifactuStatus }
+          : inv
+      );
+      saveDemoState('setmio_demo_saas_invoices_v1', next);
+      return next;
+    });
+    triggerDemoToast(
+      'Factura SaaS Sincronizada',
+      'Factura de suscripción Setmio Pro transmitida al registro tributario Veri*factu.',
+      'success'
+    );
+  }, [triggerDemoToast]);
+
   return (
     <AppContext.Provider
       value={{
@@ -2384,6 +2605,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         isClubOpen,
         toggleClubOpenState,
         isWhiteLabelPlayerPreview,
+        setIsWhiteLabelPlayerPreview,
         enterWhiteLabelPlayerPreview,
         exitWhiteLabelPlayerPreview,
 
@@ -2474,6 +2696,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         aiMessages,
         sendAIMessage,
         isAiThinking,
+
+        // Facturación, Pagos y Veri*factu
+        invoices,
+        syncInvoiceVerifactu,
+        syncAllVerifactu,
+        createInvoice,
+        markInvoicePaid,
+        createRectificativeInvoice,
+        saasInvoices,
+        syncSaasInvoiceVerifactu,
 
         demoToast,
         triggerDemoToast,

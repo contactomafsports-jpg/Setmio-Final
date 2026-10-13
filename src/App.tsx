@@ -52,6 +52,7 @@ import { AdminWebEditor } from './components/admin/AdminWebEditor';
 import { AdminDomains } from './components/admin/AdminDomains';
 import { AdminSubscription } from './components/admin/AdminSubscription';
 import { AdminSettings } from './components/admin/AdminSettings';
+import { AdminInvoices } from './components/admin/AdminInvoices';
 
 // Player & HQ views
 import { PlayerPortal } from './components/player/PlayerPortal';
@@ -232,6 +233,18 @@ export function App() {
         return;
       }
       if (
+        pathname === '/gestion/facturacion' ||
+        pathname === '/admin/facturacion' ||
+        pathname === '/admin/pagos' ||
+        pathname === '/gestion/pagos' ||
+        pathname.startsWith('/admin/facturacion/') ||
+        pathname.startsWith('/gestion/facturacion/')
+      ) {
+        setCurrentView('admin');
+        setAdminTab('invoicing');
+        return;
+      }
+      if (
         pathname === '/gestion/tienda' ||
         pathname === '/admin/tienda' ||
         pathname.startsWith('/admin/tienda/') ||
@@ -387,6 +400,8 @@ export function App() {
         return <AdminCourtsManagement initialTab="iot" />;
       case 'pos_cafe':
         return <AdminCafePOS />;
+      case 'invoicing':
+        return <AdminInvoices />;
       case 'web_editor':
         return <AdminWebEditor />;
       case 'domains':

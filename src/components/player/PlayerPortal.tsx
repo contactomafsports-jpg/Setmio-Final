@@ -73,13 +73,51 @@ export const PlayerPortal: React.FC = () => {
     'overview' | 'booking' | 'matches' | 'tournaments' | 'teams' | 'academy' | 'stats' | 'profile' | 'shop' | 'notifications'
   >('overview');
 
-  // URL route sync for /jugador/perfil/notificaciones
+  const navigatePlayerTab = (tab: typeof activePlayerTab) => {
+    setActivePlayerTab(tab);
+    const tabUrls: Record<typeof activePlayerTab, string> = {
+      overview: '/jugador',
+      booking: '/jugador/reservas',
+      matches: '/jugador/partidos',
+      tournaments: '/jugador/torneos',
+      teams: '/jugador/equipos',
+      academy: '/jugador/escuela',
+      stats: '/jugador/estadisticas',
+      profile: '/jugador/perfil',
+      shop: '/jugador/tienda',
+      notifications: '/jugador/perfil/notificaciones',
+    };
+    const target = tabUrls[tab] || '/jugador';
+    if (typeof window !== 'undefined' && window.location.pathname !== target) {
+      window.history.pushState({}, '', target);
+    }
+  };
+
+  // URL route sync for independent page URLs
   React.useEffect(() => {
     const handleUrlSync = () => {
       if (typeof window !== 'undefined') {
         const path = window.location.pathname;
-        if (path === '/jugador/perfil/notificaciones' || path.endsWith('/notificaciones')) {
+        if (path === '/jugador/reservas' || path === '/app/reservas') {
+          setActivePlayerTab('booking');
+        } else if (path === '/jugador/partidos' || path === '/app/partidos') {
+          setActivePlayerTab('matches');
+        } else if (path === '/jugador/torneos' || path === '/app/torneos') {
+          setActivePlayerTab('tournaments');
+        } else if (path === '/jugador/equipos' || path === '/app/equipos') {
+          setActivePlayerTab('teams');
+        } else if (path === '/jugador/escuela' || path === '/app/escuela') {
+          setActivePlayerTab('academy');
+        } else if (path === '/jugador/estadisticas' || path === '/app/estadisticas') {
+          setActivePlayerTab('stats');
+        } else if (path === '/jugador/perfil' || path === '/app/perfil') {
+          setActivePlayerTab('profile');
+        } else if (path === '/jugador/tienda' || path === '/app/tienda') {
+          setActivePlayerTab('shop');
+        } else if (path === '/jugador/perfil/notificaciones' || path.endsWith('/notificaciones')) {
           setActivePlayerTab('notifications');
+        } else if (path === '/jugador' || path === '/app') {
+          setActivePlayerTab('overview');
         }
       }
     };
@@ -345,7 +383,7 @@ export const PlayerPortal: React.FC = () => {
         onOpenLegalModal={() => setLegalModalOpen(true)}
       />
 
-      {/* 2. PLAYER HERO PROFILE BANNER (MARCA NEUTRA SETMIO PLAYER) */}
+      {/* 2. PLAYER HERO PROFILE BANNER (MARCA ADAPTATIVA) */}
       <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-4 sm:px-6 py-5">
         <div className="max-w-5xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-4">
@@ -353,9 +391,13 @@ export const PlayerPortal: React.FC = () => {
               <img
                 src={currentUser.avatarUrl}
                 alt={currentUser.name}
-                className="w-16 h-16 rounded-2xl object-cover border-2 border-cyan-500 shadow-md"
+                className={`w-16 h-16 rounded-2xl object-cover border-2 shadow-md ${
+                  isWhiteLabelPlayerPreview ? 'border-emerald-500' : 'border-cyan-500'
+                }`}
               />
-              <span className="absolute -bottom-1 -right-1 px-1.5 py-0.5 rounded bg-cyan-500 text-slate-950 font-black text-[10px]">
+              <span className={`absolute -bottom-1 -right-1 px-1.5 py-0.5 rounded text-slate-950 font-black text-[10px] ${
+                isWhiteLabelPlayerPreview ? 'bg-emerald-500 text-white' : 'bg-cyan-500 text-slate-950'
+              }`}>
                 {currentUser.playLevel.toFixed(2)}
               </span>
             </div>
@@ -363,19 +405,33 @@ export const PlayerPortal: React.FC = () => {
             <div>
               <div className="flex items-center gap-2">
                 <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">{currentUser.name}</h1>
-                <span className="text-[10px] uppercase px-2 py-0.5 rounded bg-cyan-100 dark:bg-cyan-950 text-cyan-800 dark:text-cyan-400 border border-cyan-300 dark:border-cyan-800 font-mono font-bold">
-                  Licencia Setmio Multi-Club #SP-9402
-                </span>
+                {isWhiteLabelPlayerPreview ? (
+                  <span className="text-[10px] uppercase px-2 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800 font-mono font-bold">
+                    Socio #SM-408 · {currentTenant.shortName}
+                  </span>
+                ) : (
+                  <span className="text-[10px] uppercase px-2 py-0.5 rounded bg-cyan-100 dark:bg-cyan-950 text-cyan-800 dark:text-cyan-400 border border-cyan-300 dark:border-cyan-800 font-mono font-bold">
+                    Licencia Setmio Multi-Club #SP-9402
+                  </span>
+                )}
               </div>
               <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                Plataforma Neutra Setmio Player · ELO Global <strong>1.485 pts</strong> · Nivel Verificado {currentUser.playLevel.toFixed(2)} · Posición preferida: <strong>Revés</strong> · Diestro
+                {isWhiteLabelPlayerPreview ? (
+                  <>
+                    App Marca Blanca de <strong>{currentTenant.name}</strong> · Acceso a pistas, tienda oficial y escuela del club · Nivel {currentUser.playLevel.toFixed(2)}
+                  </>
+                ) : (
+                  <>
+                    Plataforma Neutra Setmio Player · ELO Global <strong>1.485 pts</strong> · Nivel Verificado {currentUser.playLevel.toFixed(2)} · Posición preferida: <strong>Revés</strong> · Diestro
+                  </>
+                )}
               </div>
             </div>
           </div>
 
           <div className="flex items-center gap-2">
             <button
-              onClick={() => setActivePlayerTab('booking')}
+              onClick={() => navigatePlayerTab('booking')}
               className={`px-4 py-2.5 rounded-xl font-bold text-xs shadow transition flex items-center gap-1.5 cursor-pointer ${
                 activePlayerTab === 'booking'
                   ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-950'
@@ -383,10 +439,10 @@ export const PlayerPortal: React.FC = () => {
               }`}
             >
               <Calendar className="w-4 h-4" />
-              <span>Reservas Multi-Club</span>
+              <span>{isWhiteLabelPlayerPreview ? `Reservar en ${currentTenant.shortName}` : 'Reservas Multi-Club'}</span>
             </button>
             <button
-              onClick={() => setActivePlayerTab('matches')}
+              onClick={() => navigatePlayerTab('matches')}
               className={`px-3.5 py-2.5 rounded-xl border text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
                 activePlayerTab === 'matches'
                   ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-500 text-emerald-700 dark:text-emerald-400'
@@ -394,7 +450,7 @@ export const PlayerPortal: React.FC = () => {
               }`}
             >
               <Users className="w-4 h-4" />
-              <span>Partidos Multi-Club</span>
+              <span>{isWhiteLabelPlayerPreview ? 'Partidos del Club' : 'Partidos Multi-Club'}</span>
             </button>
           </div>
         </div>
@@ -1368,6 +1424,7 @@ export const PlayerPortal: React.FC = () => {
                   { id: 'academy', label: 'Escuela & Clases', icon: GraduationCap },
                   { id: 'stats', label: 'Nivel & Estadísticas', icon: TrendingUp },
                   { id: 'profile', label: 'Mi Ficha', icon: UserRound },
+                  { id: 'shop', label: isWhiteLabelPlayerPreview ? 'Tienda TPV Club' : 'Tienda Oficial', icon: ShoppingBag },
                 ].map((item) => {
                   const Icon = item.icon;
                   const isActive = activePlayerTab === item.id;
@@ -1375,10 +1432,10 @@ export const PlayerPortal: React.FC = () => {
                     <button
                       key={item.id}
                       onClick={() => {
-                        setActivePlayerTab(item.id as typeof activePlayerTab);
+                        navigatePlayerTab(item.id as typeof activePlayerTab);
                         setMobileDrawerOpen(false);
                       }}
-                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition ${
+                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition cursor-pointer ${
                         isActive
                           ? 'bg-emerald-600 text-white font-bold'
                           : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
@@ -1428,7 +1485,7 @@ export const PlayerPortal: React.FC = () => {
         </div>
       )}
 
-      {/* 9. MOBILE-FIRST BOTTOM NAVIGATION BAR (Acción Rápida & Navegación Táctil) */}
+      {/* 9. MOBILE-FIRST BOTTOM NAVIGATION BAR (5 ITEMS ADAPTADOS CON MENÚ HAMBURGUESA) */}
       <nav className="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 py-1 px-2 flex items-center justify-around shadow-lg">
         {[
           { id: 'overview', label: 'Inicio', icon: Home },
@@ -1440,7 +1497,6 @@ export const PlayerPortal: React.FC = () => {
             badge: hasUnpaidMatch ? '!' : undefined,
           },
           { id: 'tournaments', label: 'Torneos', icon: Trophy },
-          { id: 'profile', label: 'Mi Ficha', icon: UserRound },
         ].map((tab) => {
           const Icon = tab.icon;
           const isActive = activePlayerTab === tab.id;
@@ -1448,7 +1504,7 @@ export const PlayerPortal: React.FC = () => {
             <button
               key={tab.id}
               type="button"
-              onClick={() => setActivePlayerTab(tab.id as typeof activePlayerTab)}
+              onClick={() => navigatePlayerTab(tab.id as typeof activePlayerTab)}
               className={`relative flex flex-col items-center justify-center py-1.5 px-3 rounded-xl transition cursor-pointer ${
                 isActive
                   ? 'text-emerald-600 dark:text-emerald-400 font-bold'
@@ -1470,6 +1526,21 @@ export const PlayerPortal: React.FC = () => {
             </button>
           );
         })}
+
+        {/* 5. Menú Hamburguesa 'Más' para páginas secundarias */}
+        <button
+          type="button"
+          onClick={() => setMobileDrawerOpen(true)}
+          className={`relative flex flex-col items-center justify-center py-1.5 px-3 rounded-xl transition cursor-pointer ${
+            mobileDrawerOpen
+              ? 'text-emerald-600 dark:text-emerald-400 font-bold'
+              : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+          }`}
+          aria-label="Más opciones"
+        >
+          <Menu className="w-5 h-5 stroke-2" />
+          <span className="text-[10px] mt-0.5">Más</span>
+        </button>
       </nav>
 
       {/* Ficha de Detalles de Reserva Operativa para Jugador */}

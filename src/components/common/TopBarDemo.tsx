@@ -36,6 +36,7 @@ export const TopBarDemo: React.FC = () => {
     navigateToEntityWeb,
     viewEntityWeb,
     navigateToCorporate,
+    setIsWhiteLabelPlayerPreview,
   } = useApp();
 
   const [showRoleMenu, setShowRoleMenu] = useState(false);
@@ -44,17 +45,102 @@ export const TopBarDemo: React.FC = () => {
 
   const supabaseStatus = getSupabaseStatus();
 
-  const rolesList: { role: UserRole; label: string; desc: string }[] = [
-    { role: 'TENANT_OWNER', label: 'Propietario Club', desc: 'Control total de Pádel San Mateo' },
-    { role: 'TENANT_ADMIN', label: 'Gerente / Admin', desc: 'Gestión operativa del club' },
-    { role: 'RECEPTION', label: 'Recepción y Pistas', desc: 'Agenda y atención a jugadores' },
-    { role: 'COACH', label: 'Entrenador Independiente', desc: 'Clases particulares, bonos y metodología' },
-    { role: 'ACADEMY_MANAGER', label: 'Director Academia', desc: 'Escuela de menores, adultos y admisiones' },
-    { role: 'PROFESSIONAL_PLAYER', label: 'Jugador Pro FIP', desc: 'Portfolio de atleta, circuito y sponsors' },
-    { role: 'PLAYER', label: 'Jugador Socio', desc: 'Reservas, partidos y estadísticas' },
-    { role: 'STORE_MANAGER', label: 'Responsable Tienda', desc: 'Catálogo e inventario deportivo' },
-    { role: 'TOURNAMENT_ORGANIZER', label: 'Organizador Torneos', desc: 'Cuadros y parejas' },
-    { role: 'SUPERADMIN', label: 'Superadmin HQ', desc: 'Plataforma global Setmio Padel Pro' },
+  const rolesList: {
+    id: string;
+    role: UserRole;
+    ecosystem: 'club' | 'independent' | 'neutral' | 'hq';
+    label: string;
+    desc: string;
+    tenantId?: string;
+    tenantType?: string;
+    isWhiteLabelPlayer?: boolean;
+    view: MainView;
+  }[] = [
+    // 1. Ecosistema Club (Centro de Pádel San Mateo)
+    {
+      id: 'club_admin',
+      role: 'TENANT_OWNER',
+      ecosystem: 'club',
+      label: 'Admin Club (San Mateo)',
+      desc: 'Control total de pistas, TPV y reservas',
+      tenantId: 'tenant-san-mateo-01',
+      tenantType: 'PADEL_CLUB',
+      view: 'admin',
+    },
+    {
+      id: 'coach_club',
+      role: 'COACH',
+      ecosystem: 'club',
+      label: 'Profesor de Club',
+      desc: 'Marca San Mateo, cuadrante y alumnos asignados',
+      tenantId: 'tenant-san-mateo-01',
+      tenantType: 'PADEL_CLUB',
+      view: 'coach',
+    },
+    {
+      id: 'player_club',
+      role: 'PLAYER',
+      ecosystem: 'club',
+      label: 'Jugador Socio / Club',
+      desc: 'App marca blanca: logo, pistas y TPV del club',
+      tenantId: 'tenant-san-mateo-01',
+      tenantType: 'PADEL_CLUB',
+      isWhiteLabelPlayer: true,
+      view: 'player',
+    },
+
+    // 2. Ecosistema Marca Blanca Independiente
+    {
+      id: 'coach_independent',
+      role: 'COACH',
+      ecosystem: 'independent',
+      label: 'Profesor Independiente',
+      desc: 'Carlos Varela: bonos y particulares sin pistas',
+      tenantId: 'tenant-varela-coach',
+      tenantType: 'COACH',
+      view: 'coach',
+    },
+    {
+      id: 'academy',
+      role: 'ACADEMY_MANAGER',
+      ecosystem: 'independent',
+      label: 'Escuela de Pádel',
+      desc: 'Academia Élite: colectivo profesores y cursos',
+      tenantId: 'tenant-academia-elite',
+      tenantType: 'ACADEMY',
+      view: 'admin',
+    },
+    {
+      id: 'pro_player',
+      role: 'PROFESSIONAL_PLAYER',
+      ecosystem: 'independent',
+      label: 'Jugador Profesional',
+      desc: 'Martín Diestro: patrocinios y circuito FIP',
+      tenantId: 'tenant-martin-pro',
+      tenantType: 'PRO_PLAYER',
+      view: 'admin',
+    },
+
+    // 3. Ecosistema Setmio Player (Neutra)
+    {
+      id: 'player_neutral',
+      role: 'PLAYER',
+      ecosystem: 'neutral',
+      label: 'Jugador Setmio Player',
+      desc: 'App neutra B2C: ELO global, ranking y multi-club',
+      isWhiteLabelPlayer: false,
+      view: 'player',
+    },
+
+    // 4. Superadmin HQ
+    {
+      id: 'superadmin',
+      role: 'SUPERADMIN',
+      ecosystem: 'hq',
+      label: 'Superadmin HQ',
+      desc: 'Plataforma SaaS global y facturación B2B',
+      view: 'hq',
+    },
   ];
 
   return (
@@ -239,41 +325,31 @@ export const TopBarDemo: React.FC = () => {
               </button>
 
               {showRoleMenu && (
-                <div className="absolute top-full right-0 mt-1 w-64 bg-slate-900 border border-slate-700 rounded-lg shadow-2xl py-1 z-50">
-                  <div className="px-3 py-1.5 border-b border-slate-800 text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
-                    Cambiar Rol Activo (Simulador)
+                <div className="absolute top-full right-0 mt-1 w-72 bg-slate-900 border border-slate-700 rounded-xl shadow-2xl py-1 z-50 max-h-[80vh] overflow-y-auto">
+                  <div className="px-3 py-1.5 border-b border-slate-800 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                    Simulador de Ecosistemas y Roles
                   </div>
                   {rolesList.map((item) => (
                     <button
-                      key={item.role}
+                      key={item.id}
                       onClick={() => {
-                        switchUserRole(item.role);
                         setIsCorporateLanding(false);
-                        if (item.role === 'PLAYER') {
-                          setCurrentView('player');
-                        } else if (item.role === 'COACH') {
-                          const coachTenant = tenants.find((t) => t.type === 'COACH');
-                          if (coachTenant) switchTenant(coachTenant.id);
-                          setCurrentView('coach');
-                        } else if (item.role === 'ACADEMY_MANAGER') {
-                          const acadTenant = tenants.find((t) => t.type === 'ACADEMY');
-                          if (acadTenant) switchTenant(acadTenant.id);
-                          setCurrentView('admin');
-                        } else if (item.role === 'PROFESSIONAL_PLAYER') {
-                          const proTenant = tenants.find((t) => t.type === 'PRO_PLAYER') || tenants.find((t) => t.id === 'tenant-martin-pro');
-                          if (proTenant) switchTenant(proTenant.id);
-                          setCurrentView('admin');
-                        } else if (item.role === 'SUPERADMIN') {
-                          setCurrentView('hq');
-                        } else {
-                          const clubTenant = tenants.find((t) => t.type === 'PADEL_CLUB');
-                          if (clubTenant) switchTenant(clubTenant.id);
-                          setCurrentView('admin');
+
+                        if (item.tenantId) {
+                          switchTenant(item.tenantId);
+                        } else if (item.tenantType) {
+                          const match = tenants.find((t) => t.type === item.tenantType);
+                          if (match) switchTenant(match.id);
                         }
+
+                        setIsWhiteLabelPlayerPreview(Boolean(item.isWhiteLabelPlayer));
+                        switchUserRole(item.role);
+                        setCurrentView(item.view);
                         setShowRoleMenu(false);
+
                         triggerDemoToast(
-                          'Rol Cambiado',
-                          `Cambiado al perfil "${item.label}". Se ha cargado el entorno de trabajo correspondiente.`,
+                          'Entorno Demo Actualizado',
+                          `Cambiado a "${item.label}". ${item.desc}`,
                           'info'
                         );
                       }}
@@ -283,8 +359,13 @@ export const TopBarDemo: React.FC = () => {
                           : 'text-slate-300'
                       }`}
                     >
-                      <div className="font-medium">{item.label}</div>
-                      <div className="text-[10px] text-slate-400">{item.desc}</div>
+                      <div className="flex items-center justify-between">
+                        <span className="font-semibold">{item.label}</span>
+                        <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-slate-800 text-slate-400 border border-slate-700">
+                          {item.ecosystem.toUpperCase()}
+                        </span>
+                      </div>
+                      <div className="text-[10px] text-slate-400 mt-0.5 leading-snug">{item.desc}</div>
                     </button>
                   ))}
                 </div>

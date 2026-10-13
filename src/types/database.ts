@@ -619,3 +619,80 @@ export interface ClubRanking {
   leaderboard: RankingLeaderboardEntry[];
 }
 
+// ==========================================
+// MÓDULO DE PAGOS, FACTURACIÓN Y VERI*FACTU
+// ==========================================
+
+export type VerifactuStatus = 'pending' | 'synced' | 'error' | 'opt_out';
+
+export interface InvoiceItem {
+  id: string;
+  description: string;
+  quantity: number;
+  unitPrice: number;
+  taxPercent: number; // 21, 10, 0
+  total: number;
+}
+
+export interface Invoice {
+  id: string;
+  tenantId: string;
+  number: string; // e.g. "FAC-2026-0842"
+  series: string; // e.g. "2026", "REC-2026"
+  issueDate: string; // YYYY-MM-DD
+  dueDate?: string;
+  status: 'paid' | 'pending' | 'canceled' | 'rectified';
+  type: 'standard' | 'simplified' | 'rectificative';
+  
+  // Cliente / Receptor
+  customerId?: string;
+  customerName: string;
+  customerNif?: string;
+  customerEmail?: string;
+  customerPhone?: string;
+  customerAddress?: string;
+
+  // Concepto y desglose
+  concept: string;
+  category: 'courts' | 'academy' | 'tournaments' | 'shop' | 'pos' | 'membership' | 'general';
+  items: InvoiceItem[];
+  subtotal: number;
+  taxAmount: number;
+  total: number;
+  
+  // Canal y método de cobro
+  paymentMethod: 'online' | 'pos_terminal' | 'cash' | 'wallet' | 'bank_transfer' | 'sepa';
+  paymentDate?: string;
+  
+  // Preparación para Veri*factu (RD 1007/2023 - Sistema de Emisión de Facturas Verificables AEAT)
+  verifactu_status: VerifactuStatus;
+  verifactu_hash?: string;
+  verifactu_qr_data?: string;
+  verifactu_synced_at?: string;
+  verifactu_error_message?: string;
+  
+  notes?: string;
+}
+
+// Facturación SaaS de la Plataforma Setmio para Superadmin HQ
+export interface PlatformSaaSInvoice {
+  id: string;
+  number: string;
+  tenantId: string;
+  tenantName: string;
+  planId: PlanTier;
+  amount: number;
+  taxAmount: number;
+  total: number;
+  currency: string;
+  billingPeriod: 'monthly' | 'yearly';
+  issueDate: string;
+  dueDate: string;
+  status: 'paid' | 'pending' | 'failed';
+  paymentGateway: 'stripe' | 'sepa_b2b';
+  verifactu_status: VerifactuStatus;
+  customerNif: string;
+  customerAddress: string;
+  downloadUrl?: string;
+}
+

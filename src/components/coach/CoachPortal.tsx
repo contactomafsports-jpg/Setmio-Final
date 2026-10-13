@@ -168,6 +168,37 @@ export const CoachPortal: React.FC = () => {
   const [showMoreDrawer, setShowMoreDrawer] = useState(false);
   const [searchStudent, setSearchStudent] = useState('');
 
+  const isClubCoach = currentTenant.type === 'PADEL_CLUB';
+
+  const navigateCoachTab = (tab: typeof activeTab) => {
+    setActiveTab(tab);
+    const tabUrls: Record<typeof activeTab, string> = {
+      agenda: '/coach/agenda',
+      students: '/coach/alumnos',
+      availability: '/coach/horarios',
+      rates: '/coach/tarifas',
+    };
+    const target = tabUrls[tab] || '/coach';
+    if (typeof window !== 'undefined' && window.location.pathname !== target) {
+      window.history.pushState({}, '', target);
+    }
+  };
+
+  React.useEffect(() => {
+    const handleUrlSync = () => {
+      if (typeof window !== 'undefined') {
+        const path = window.location.pathname;
+        if (path === '/coach/alumnos') setActiveTab('students');
+        else if (path === '/coach/horarios') setActiveTab('availability');
+        else if (path === '/coach/tarifas') setActiveTab('rates');
+        else if (path === '/coach/agenda' || path === '/coach') setActiveTab('agenda');
+      }
+    };
+    handleUrlSync();
+    window.addEventListener('popstate', handleUrlSync);
+    return () => window.removeEventListener('popstate', handleUrlSync);
+  }, []);
+
   // Form states for new class
   const [newType, setNewType] = useState<'individual' | 'pair' | 'group_monthly'>('individual');
   const [newStudent, setNewStudent] = useState('');
@@ -220,20 +251,30 @@ export const CoachPortal: React.FC = () => {
       <header className="sticky top-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-4 sm:px-6 py-3">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center font-black text-white text-base shadow-md">
+            <div className={`w-10 h-10 rounded-2xl flex items-center justify-center font-black text-white text-base shadow-md ${
+              isClubCoach
+                ? 'bg-gradient-to-br from-emerald-500 to-teal-700'
+                : 'bg-gradient-to-br from-indigo-500 to-purple-600'
+            }`}>
               <GraduationCap className="w-5 h-5" />
             </div>
             <div>
               <div className="flex items-center gap-2">
                 <h1 className="text-base font-bold text-slate-900 dark:text-white leading-tight">
-                  Portal del Profesor / Entrenador
+                  {isClubCoach ? `Profesor de Club · ${currentTenant.name}` : `Profesor Independiente · ${currentTenant.shortName}`}
                 </h1>
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-indigo-100 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800">
-                  FEP COACH PRO
+                <span className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold border ${
+                  isClubCoach
+                    ? 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 border-emerald-300 dark:border-emerald-800'
+                    : 'bg-indigo-100 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-400 border-indigo-200 dark:border-indigo-800'
+                }`}>
+                  {isClubCoach ? 'PROFESOR OFICIAL CLUB' : 'MARCA BLANCA'}
                 </span>
               </div>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                {currentTenant.shortName} · {currentUser.name}
+                {isClubCoach
+                  ? `Acceso restringido a tus clases asignadas y alumnos de ${currentTenant.shortName}`
+                  : `Perfil profesional personal, bonos y clases privadas (sin alquiler de pistas)`}
               </p>
             </div>
           </div>
@@ -264,13 +305,19 @@ export const CoachPortal: React.FC = () => {
       {/* Main Container */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
         {/* Welcome Coach Card with KPIs */}
-        <section className="p-6 rounded-3xl bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white border border-indigo-900/60 shadow-xl">
+        <section className={`p-6 rounded-3xl text-white shadow-xl border ${
+          isClubCoach
+            ? 'bg-gradient-to-r from-slate-900 via-emerald-950 to-slate-900 border-emerald-900/60'
+            : 'bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 border-indigo-900/60'
+        }`}>
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div className="flex items-center gap-4">
               <img
                 src={currentUser.avatarUrl || 'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=200&q=80'}
                 alt={currentUser.name}
-                className="w-16 h-16 rounded-2xl object-cover ring-2 ring-indigo-400 shadow-md"
+                className={`w-16 h-16 rounded-2xl object-cover ring-2 shadow-md ${
+                  isClubCoach ? 'ring-emerald-400' : 'ring-indigo-400'
+                }`}
               />
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
@@ -279,13 +326,15 @@ export const CoachPortal: React.FC = () => {
                     <Star className="w-3.5 h-3.5 fill-amber-400" /> 4.95 (48 reseñas)
                   </span>
                 </div>
-                <p className="text-xs text-indigo-200 font-medium">
-                  Directora de Tecnificación & Entrenadora Nacional Nivel 2 FEP
+                <p className="text-xs text-slate-300 font-medium">
+                  {isClubCoach
+                    ? `Entrenador Oficial de ${currentTenant.name} · Asignado a Cuadrante Pistas 1, 2 y 3`
+                    : 'Entrenador Nacional Nivel 2 FEP · Clases particulares, bonos y metodología propia'}
                 </p>
                 <div className="flex items-center gap-3 text-[11px] text-slate-300 pt-1">
-                  <span>Tarifa base: <strong>38,00 € / hora</strong></span>
+                  <span>Tarifa sesión: <strong>{isClubCoach ? '38,00 €' : '45,00 €'} / hora</strong></span>
                   <span>·</span>
-                  <span>Pista preferente: Central WPT</span>
+                  <span>{isClubCoach ? 'Pistas oficiales del club' : 'Servicios particulares y bonos'}</span>
                 </div>
               </div>
             </div>
@@ -822,14 +871,14 @@ export const CoachPortal: React.FC = () => {
         </div>
       )}
 
-      {/* MOBILE BOTTOM NAVIGATION BAR */}
+      {/* MOBILE BOTTOM NAVIGATION BAR (5 ITEMS EXACTOS NATIVE-LIKE) */}
       <nav
         aria-label="Navegación móvil del profesor"
-        className="md:hidden fixed bottom-0 inset-x-0 z-[60] bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 grid grid-cols-6 px-1 pt-1 pb-[calc(0.25rem+env(safe-area-inset-bottom))] text-[10px] shadow-lg"
+        className="md:hidden fixed bottom-0 inset-x-0 z-[60] bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 grid grid-cols-5 px-1 pt-1 pb-[calc(0.25rem+env(safe-area-inset-bottom))] text-[10px] shadow-lg"
       >
         <button
-          onClick={() => setActiveTab('agenda')}
-          className={`flex flex-col items-center justify-center py-1.5 rounded-xl transition ${
+          onClick={() => navigateCoachTab('agenda')}
+          className={`flex flex-col items-center justify-center py-1.5 rounded-xl transition cursor-pointer ${
             activeTab === 'agenda'
               ? 'text-indigo-600 dark:text-indigo-400 font-bold'
               : 'text-slate-500 dark:text-slate-400'
@@ -840,8 +889,8 @@ export const CoachPortal: React.FC = () => {
         </button>
 
         <button
-          onClick={() => setActiveTab('students')}
-          className={`flex flex-col items-center justify-center py-1.5 rounded-xl transition ${
+          onClick={() => navigateCoachTab('students')}
+          className={`flex flex-col items-center justify-center py-1.5 rounded-xl transition cursor-pointer ${
             activeTab === 'students'
               ? 'text-indigo-600 dark:text-indigo-400 font-bold'
               : 'text-slate-500 dark:text-slate-400'
@@ -853,7 +902,7 @@ export const CoachPortal: React.FC = () => {
 
         <button
           onClick={() => setShowNewClassModal(true)}
-          className="flex flex-col items-center justify-center py-1 text-white"
+          className="flex flex-col items-center justify-center py-1 text-white cursor-pointer"
         >
           <div className="w-10 h-10 -mt-4 rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg border-2 border-white dark:border-slate-900">
             <Plus className="w-5 h-5" />
@@ -862,8 +911,8 @@ export const CoachPortal: React.FC = () => {
         </button>
 
         <button
-          onClick={() => setActiveTab('availability')}
-          className={`flex flex-col items-center justify-center py-1.5 rounded-xl transition ${
+          onClick={() => navigateCoachTab('availability')}
+          className={`flex flex-col items-center justify-center py-1.5 rounded-xl transition cursor-pointer ${
             activeTab === 'availability'
               ? 'text-indigo-600 dark:text-indigo-400 font-bold'
               : 'text-slate-500 dark:text-slate-400'
@@ -875,19 +924,14 @@ export const CoachPortal: React.FC = () => {
 
         <button
           onClick={() => setShowMoreDrawer(true)}
-          className="flex flex-col items-center justify-center py-1.5 rounded-xl text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+          className={`flex flex-col items-center justify-center py-1.5 rounded-xl transition cursor-pointer ${
+            showMoreDrawer
+              ? 'text-indigo-600 dark:text-indigo-400 font-bold'
+              : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+          }`}
         >
           <Menu className="w-5 h-5 mb-0.5" />
           <span>Más</span>
-        </button>
-
-        <button
-          onClick={logoutOrExitDemo}
-          className="flex flex-col items-center justify-center py-1.5 rounded-xl text-rose-600 dark:text-rose-400 hover:text-rose-700 font-semibold"
-          title="Cerrar Sesión / Salir Demo"
-        >
-          <LogOut className="w-5 h-5 mb-0.5 text-rose-600 dark:text-rose-400" />
-          <span>Salir</span>
         </button>
       </nav>
 

@@ -28,6 +28,7 @@ import {
   Unlock,
   User,
   Layers,
+  Receipt,
 } from 'lucide-react';
 import { AdminHeader } from './AdminHeader';
 import { PrivateMobileNav } from '../common/PrivateMobileNav';
@@ -99,6 +100,13 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
           icon: <ShoppingBag className="w-5 h-5 text-purple-500" />,
           desc: 'Clinics VIP, exhibiciones y palas firmadas',
           badge: 'Servicios',
+        },
+        {
+          id: 'invoicing',
+          label: 'Facturación & Patrocinios',
+          icon: <Receipt className="w-5 h-5 text-emerald-500" />,
+          desc: 'Facturas de patrocinio, exhibiciones y Veri*factu',
+          badge: 'Veri*factu',
         },
         {
           id: 'web_editor',
@@ -176,6 +184,13 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
           label: t('club.nav.teams', 'Equipos del Club'),
           icon: <Users className="w-5 h-5 text-cyan-500" />,
           desc: 'Convocatorias y capitanes',
+        },
+        {
+          id: 'invoicing',
+          label: 'Pagos y Facturación',
+          icon: <Receipt className="w-5 h-5 text-emerald-500" />,
+          desc: 'Dashboard financiero, facturas y Veri*factu AEAT',
+          badge: 'Veri*factu',
         },
         {
           id: 'subscription',
