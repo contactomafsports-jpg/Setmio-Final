@@ -12,6 +12,7 @@ import {
   Minimize2,
   X,
   Send,
+  Building2,
 } from 'lucide-react';
 import { NotificationsPopover } from '../common/NotificationsPopover';
 import { UserProfileDropdown } from '../common/UserProfileDropdown';
@@ -39,13 +40,21 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
     aiMessages,
     sendAIMessage,
     isAiThinking,
+    isMultiVenue,
+    venues,
+    selectedVenueId,
+    selectedVenue,
+    setSelectedVenueId,
+    isConsolidatedView,
     t,
   } = useApp();
 
   const [aiDrawerOpen, setAiDrawerOpen] = useState(false);
   const [aiInputText, setAiInputText] = useState('');
   const [langDropdownOpen, setLangDropdownOpen] = useState(false);
+  const [venueDropdownOpen, setVenueDropdownOpen] = useState(false);
   const langRef = useRef<HTMLDivElement>(null);
+  const venueRef = useRef<HTMLDivElement>(null);
   const chatBottomRef = useRef<HTMLDivElement>(null);
 
   const isProAthleteAdmin =
@@ -56,12 +65,15 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
       if (langRef.current && !langRef.current.contains(e.target as Node)) {
         setLangDropdownOpen(false);
       }
+      if (venueRef.current && !venueRef.current.contains(e.target as Node)) {
+        setVenueDropdownOpen(false);
+      }
     };
-    if (langDropdownOpen) {
+    if (langDropdownOpen || venueDropdownOpen) {
       document.addEventListener('mousedown', handleClickOutside);
     }
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [langDropdownOpen]);
+  }, [langDropdownOpen, venueDropdownOpen]);
 
   useEffect(() => {
     if (aiDrawerOpen) {
@@ -86,17 +98,17 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
   return (
     <>
       <header className="sticky top-0 z-50 h-14 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-3 sm:px-6 flex items-center justify-between gap-2 shadow-xs transition-colors">
-        {/* Left: IDENTIDAD DE MARCA OFICIAL SETMIO (Isotipo + Texto oficial) */}
+        {/* Left: IDENTIDAD DE MARCA OFICIAL SETMIO PRO (Isotipo + Texto oficial) */}
         <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-2.5 shrink-0">
             {/* Isotipo Oficial Setmio */}
             <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-700 text-white font-black text-sm flex items-center justify-center shadow-xs shrink-0 select-none">
               S
             </div>
-            {/* Texto Oficial Setmio */}
+            {/* Texto Oficial Setmio Pro (Actualizado tanto en móvil como en escritorio) */}
             <div className="flex items-center gap-2">
               <span className="font-black text-sm sm:text-base tracking-tight text-slate-900 dark:text-white leading-none">
-                Setmio
+                Setmio Pro
               </span>
               {isProAthleteAdmin && (
                 <span className="hidden sm:inline-flex items-center gap-1 text-[10px] font-extrabold text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/70 border border-red-200 dark:border-red-900 px-2 py-0.5 rounded-md">
@@ -106,88 +118,142 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
               )}
             </div>
           </div>
+
+          {/* Selector Global de Sede Activa (Directo en cabecera si el Administrador gestiona múltiples sedes) */}
+          {isMultiVenue && (
+            <div className="hidden lg:flex items-center ml-1 sm:ml-2">
+              <div className="relative" ref={venueRef}>
+                <button
+                  type="button"
+                  onClick={() => setVenueDropdownOpen(!venueDropdownOpen)}
+                  className="px-2.5 py-1.5 rounded-xl border border-emerald-500/30 bg-emerald-50/70 dark:bg-emerald-950/50 hover:bg-emerald-100/70 text-emerald-800 dark:text-emerald-300 transition flex items-center gap-1.5 text-xs font-bold cursor-pointer"
+                  title="Cambiar sede asignada"
+                >
+                  <Building2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                  <span className="truncate max-w-[170px]">
+                    {selectedVenue?.shortName || selectedVenue?.name || 'Sede'}
+                  </span>
+                  <ChevronDown className="w-3 h-3 text-emerald-600 dark:text-emerald-400 opacity-70" />
+                </button>
+
+                {venueDropdownOpen && (
+                  <div className="absolute top-full left-0 mt-2 w-64 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl py-2 z-50 animate-in fade-in zoom-in-95 duration-100">
+                    <div className="px-3 py-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                      <span>Sedes Asignadas</span>
+                      <span className="text-emerald-600 dark:text-emerald-400 font-bold text-[9px] bg-emerald-50 dark:bg-emerald-950 px-1.5 py-0.5 rounded">
+                        {isConsolidatedView ? 'Consolidado' : 'Sede Única'}
+                      </span>
+                    </div>
+                    <div className="max-h-56 overflow-y-auto py-1">
+                      {venues.map((v) => {
+                        const isSelected = selectedVenueId === v.id;
+                        return (
+                          <button
+                            key={v.id}
+                            type="button"
+                            onClick={() => {
+                              setSelectedVenueId(v.id);
+                              setVenueDropdownOpen(false);
+                            }}
+                            className={`w-full px-3 py-2 text-xs text-left flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800 transition ${
+                              isSelected
+                                ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 font-bold'
+                                : 'text-slate-700 dark:text-slate-300'
+                            }`}
+                          >
+                            <div className="truncate">
+                              <div className="font-bold">{v.name}</div>
+                              <div className="text-[10px] text-slate-400 font-normal">{v.city} · {v.courtsCount} pistas</div>
+                            </div>
+                            {isSelected && <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0 ml-1" />}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Right: Acciones del Header */}
         <div className="flex items-center gap-1.5 sm:gap-2">
-          {/* EXCEPCIÓN 1: Header Completo/Público en App de Admin Profesional */}
+          {/* Web Oficial / Marca Blanca (para atleta pro) */}
           {isProAthleteAdmin && (
-            <>
-              {/* Acceso a Web Oficial / Marca Blanca */}
-              <button
-                type="button"
-                onClick={() => viewEntityWeb(currentTenant.slug)}
-                className="hidden md:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs font-bold border border-slate-200 dark:border-slate-700 transition cursor-pointer shadow-xs"
-                title={`Ver Web Oficial de Marca Blanca de ${currentTenant.name}`}
-              >
-                <Globe className="w-3.5 h-3.5 text-red-500" />
-                <span className="truncate max-w-[130px]">Web Marca Blanca</span>
-                <ExternalLink className="w-3 h-3 text-slate-400" />
-              </button>
-
-              {/* Selector directo de Idioma */}
-              <div className="relative" ref={langRef}>
-                <button
-                  type="button"
-                  onClick={() => setLangDropdownOpen(!langDropdownOpen)}
-                  className="px-2 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/80 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 transition flex items-center gap-1.5 text-xs font-bold cursor-pointer"
-                  title="Cambiar idioma de la plataforma"
-                  aria-label="Seleccionar idioma"
-                >
-                  <OfficialFlag code={language} />
-                  <span className="hidden sm:inline font-mono uppercase text-[11px] font-bold">
-                    {language.toUpperCase()}
-                  </span>
-                  <ChevronDown className="w-3 h-3 text-slate-400" />
-                </button>
-
-                {langDropdownOpen && (
-                  <div className="absolute top-full right-0 mt-2 w-52 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl py-2 z-50 animate-in fade-in zoom-in-95 duration-100">
-                    <div className="px-3 py-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100 dark:border-slate-800">
-                      Idioma de la Plataforma
-                    </div>
-                    {SUPPORTED_LANGUAGES.map((l) => (
-                      <button
-                        key={l.code}
-                        type="button"
-                        onClick={() => {
-                          i18n.changeLanguage(l.code);
-                          setLanguage(l.code);
-                          setLangDropdownOpen(false);
-                        }}
-                        className={`w-full px-3 py-2 text-xs text-left flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800 transition ${
-                          language === l.code
-                            ? 'text-red-600 dark:text-red-400 font-bold bg-red-50/60 dark:bg-red-950/40'
-                            : 'text-slate-800 dark:text-slate-200 font-medium'
-                        }`}
-                      >
-                        <span className="flex items-center gap-2">
-                          <OfficialFlag code={l.code} />
-                          <span>{l.name}</span>
-                        </span>
-                        {language === l.code && <Check className="w-3.5 h-3.5 text-red-500" />}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              {/* Conmutador directo de Tema Claro / Oscuro */}
-              <button
-                type="button"
-                onClick={toggleTheme}
-                className="p-2 rounded-xl text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
-                title={theme === 'dark' ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
-                aria-label="Cambiar tema"
-              >
-                {theme === 'dark' ? (
-                  <Sun className="w-4 h-4 text-amber-400" />
-                ) : (
-                  <Moon className="w-4 h-4 text-slate-700" />
-                )}
-              </button>
-            </>
+            <button
+              type="button"
+              onClick={() => viewEntityWeb(currentTenant.slug)}
+              className="hidden md:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs font-bold border border-slate-200 dark:border-slate-700 transition cursor-pointer shadow-xs"
+              title={`Ver Web Oficial de Marca Blanca de ${currentTenant.name}`}
+            >
+              <Globe className="w-3.5 h-3.5 text-red-500" />
+              <span className="truncate max-w-[130px]">Web Marca Blanca</span>
+              <ExternalLink className="w-3 h-3 text-slate-400" />
+            </button>
           )}
+
+          {/* Selector de Idiomas Restaurado (Disponible en Admin Club y Admin Pro) */}
+          <div className="relative" ref={langRef}>
+            <button
+              type="button"
+              onClick={() => setLangDropdownOpen(!langDropdownOpen)}
+              className="px-2 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/80 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 transition flex items-center gap-1.5 text-xs font-bold cursor-pointer"
+              title="Cambiar idioma de la plataforma"
+              aria-label="Seleccionar idioma"
+            >
+              <OfficialFlag code={language} />
+              <span className="hidden sm:inline font-mono uppercase text-[11px] font-bold">
+                {language.toUpperCase()}
+              </span>
+              <ChevronDown className="w-3 h-3 text-slate-400" />
+            </button>
+
+            {langDropdownOpen && (
+              <div className="absolute top-full right-0 mt-2 w-56 max-h-80 overflow-y-auto bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl py-2 z-50 animate-in fade-in zoom-in-95 duration-100">
+                <div className="px-3 py-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100 dark:border-slate-800">
+                  Idiomas Soportados
+                </div>
+                {SUPPORTED_LANGUAGES.map((l) => (
+                  <button
+                    key={l.code}
+                    type="button"
+                    onClick={() => {
+                      i18n.changeLanguage(l.code);
+                      setLanguage(l.code);
+                      setLangDropdownOpen(false);
+                    }}
+                    className={`w-full px-3 py-2 text-xs text-left flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800 transition ${
+                      language === l.code
+                        ? 'text-emerald-600 dark:text-emerald-400 font-bold bg-emerald-50/60 dark:bg-emerald-950/40'
+                        : 'text-slate-800 dark:text-slate-200 font-medium'
+                    }`}
+                  >
+                    <span className="flex items-center gap-2">
+                      <OfficialFlag code={l.code} />
+                      <span>{l.name}</span>
+                    </span>
+                    {language === l.code && <Check className="w-3.5 h-3.5 text-emerald-500" />}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Conmutador directo de Tema Claro / Oscuro */}
+          <button
+            type="button"
+            onClick={toggleTheme}
+            className="p-2 rounded-xl text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+            title={theme === 'dark' ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
+            aria-label="Cambiar tema"
+          >
+            {theme === 'dark' ? (
+              <Sun className="w-4 h-4 text-amber-400" />
+            ) : (
+              <Moon className="w-4 h-4 text-slate-700" />
+            )}
+          </button>
 
           {/* 1. Centro Global de Notificaciones (Campanita con badge numérico dinámico) */}
           <NotificationsPopover variant="admin" />

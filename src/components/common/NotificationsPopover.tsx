@@ -101,26 +101,34 @@ export const NotificationsPopover: React.FC<NotificationsPopoverProps> = ({ vari
 
   return (
     <div className="relative" ref={dropdownRef}>
-      {/* Botón Campana con Badge */}
+      {/* Botón Campana con Badge siempre visible */}
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="relative p-2 rounded-xl text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+        className="relative w-9 h-9 flex items-center justify-center shrink-0 rounded-xl text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
         title="Centro de Notificaciones"
         aria-label="Abrir centro de notificaciones"
         aria-expanded={isOpen}
       >
-        <Bell className="w-4 h-4" />
+        <Bell className="w-4 h-4 shrink-0 text-slate-700 dark:text-slate-300" />
         {unreadNotificationsCount > 0 && (
-          <span className="absolute top-1.5 right-1.5 min-w-[16px] h-4 px-1 rounded-full bg-emerald-500 text-white font-black text-[9px] flex items-center justify-center leading-none ring-2 ring-white dark:ring-slate-900 animate-in zoom-in-75 duration-150">
+          <span className="absolute -top-0.5 -right-0.5 min-w-[17px] h-4 px-1 rounded-full bg-emerald-500 text-white font-black text-[9px] flex items-center justify-center leading-none ring-2 ring-white dark:ring-slate-900 shadow-xs pointer-events-none animate-in zoom-in-75 duration-150">
             {unreadNotificationsCount > 9 ? '9+' : unreadNotificationsCount}
           </span>
         )}
       </button>
 
-      {/* Desplegable de Avisos Recientes */}
+      {/* Desplegable de Avisos Recientes (Ajustado para no cortarse en móvil) */}
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-80 sm:w-96 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl p-0 z-50 animate-in fade-in-50 zoom-in-95 duration-100 text-xs overflow-hidden">
+        <>
+          {/* Mobile Backdrop Overlay para cerrar y evitar desbordamiento */}
+          <div
+            className="sm:hidden fixed inset-0 bg-slate-950/40 z-40 backdrop-blur-2xs animate-in fade-in duration-100"
+            onClick={() => setIsOpen(false)}
+            aria-hidden="true"
+          />
+
+          <div className="fixed inset-x-3 top-16 sm:absolute sm:inset-auto sm:right-0 sm:top-full sm:mt-2 w-auto sm:w-96 max-w-sm sm:max-w-none rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl p-0 z-50 animate-in fade-in-50 zoom-in-95 duration-100 text-xs overflow-hidden">
           {/* Header */}
           <div className="p-3.5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50/70 dark:bg-slate-950/50">
             <div className="flex items-center gap-2">
@@ -244,7 +252,8 @@ export const NotificationsPopover: React.FC<NotificationsPopoverProps> = ({ vari
             </button>
           </div>
         </div>
-      )}
+      </>
+    )}
     </div>
   );
 };

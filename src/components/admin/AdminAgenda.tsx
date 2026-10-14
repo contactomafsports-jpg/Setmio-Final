@@ -34,6 +34,8 @@ export const AdminAgenda: React.FC = () => {
     selectedVenueId,
     triggerDemoToast,
     navigateToPlayerProfile,
+    addCustomer,
+    sendNotification,
     currentView,
     t,
   } = useApp();
@@ -109,21 +111,25 @@ export const AdminAgenda: React.FC = () => {
   }, [currentDate]);
 
   // New reservation from reception
+  const [formVenueId, setFormVenueId] = useState<string>(() => {
+    return selectedVenueId !== 'all' ? selectedVenueId : (venues[1]?.id || venues[0]?.id || 'venue-san-mateo');
+  });
   const [newCourtId, setNewCourtId] = useState(courts[0]?.id || 'court-1');
   const [newTime, setNewTime] = useState('17:00');
   const [durationMinutes, setDurationMinutes] = useState<60 | 90 | 120>(90);
   const [clientType, setClientType] = useState<'existing' | 'new' | 'anonymous' | 'block'>('existing');
   const [selectedMember, setSelectedMember] = useState('Carlos Méndez (Socio 108)');
   const [newClientName, setNewClientName] = useState('');
+  const [newClientEmail, setNewClientEmail] = useState('');
   const [newClientPhone, setNewClientPhone] = useState('');
   const [newSplit, setNewSplit] = useState(false);
   
   // Interactive 4 players for split payment
-  const [splitPlayers, setSplitPlayers] = useState<Array<{ name: string; isMember: boolean }>>([
-    { name: 'Carlos Méndez', isMember: true },
-    { name: 'Pablo Vello', isMember: true },
-    { name: 'Lucas Piñeiro', isMember: false },
-    { name: 'David Castro', isMember: false },
+  const [splitPlayers, setSplitPlayers] = useState<Array<{ name: string; isMember: boolean; phone?: string; email?: string }>>([
+    { name: 'Carlos Méndez', isMember: true, email: 'carlos.mendez@galiciapadel.com', phone: '+34 611 22 33 44' },
+    { name: 'Pablo Vello', isMember: true, email: 'pablo.vello@email.es', phone: '+34 622 33 44 55' },
+    { name: 'Lucas Piñeiro', isMember: false, email: 'lucas.pineiro@email.es', phone: '+34 633 44 55 66' },
+    { name: 'David Castro', isMember: false, email: 'david.castro@email.es', phone: '+34 644 55 66 77' },
   ]);
 
   const clubRegisteredPlayers = React.useMemo(() => [
@@ -191,12 +197,16 @@ export const AdminAgenda: React.FC = () => {
   const handleCreateSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const court = courts.find((c) => c.id === newCourtId) || courts[0];
-    const targetVenue = court.venueId ? venues.find((v) => v.id === court.venueId) : venues[1] || venues[0];
+    const targetVenue = isMultiVenue
+      ? (venues.find((v) => v.id === formVenueId) || venues[1] || venues[0])
+      : (court.venueId ? venues.find((v) => v.id === court.venueId) : venues[1] || venues[0]);
     const startISO = `${currentDate}T${newTime}:00`;
     const hours = durationMinutes / 60;
     const finalPrice = clientType === 'block' ? 0 : court.hourlyRate * hours;
     
     let clientDisplayName = 'Cliente Mostrador';
+    let createdCustomerId: string | undefined = undefined;
+
     if (clientType === 'block') {
       clientDisplayName = `BLOQUEO: ${newClientName || 'Mantenimiento / Evento Club'}`;
     } else if (clientType === 'existing') {
@@ -204,7 +214,21 @@ export const AdminAgenda: React.FC = () => {
     } else if (clientType === 'anonymous') {
       clientDisplayName = 'Anónimo / Cliente Ocasional';
     } else {
-      clientDisplayName = newClientName || 'Cliente Mostrador';
+      // 1. Crear nuevo cliente en la base de datos (CRM)
+      const newCust = addCustomer({
+        name: newClientName.trim() || 'Nuevo Cliente',
+        email: newClientEmail.trim() || `cliente.${Date.now()}@setmio.com`,
+        phone: newClientPhone.trim() || '+34 600 00 00 00',
+        level: 3.5,
+        isMember: false,
+      });
+      createdCustomerId = newCust.id;
+      clientDisplayName = newCust.name;
+      triggerDemoToast(
+        'Nuevo Cliente Registrado',
+        `Ficha CRM creada para ${newCust.name} (${newCust.email}). Asignado como titular de la reserva.`,
+        'success'
+      );
     }
 
     const memberDiscountPercent = currentTenant.settings?.policies?.memberCourtDiscountPercent ?? 20;
@@ -213,9 +237,10 @@ export const AdminAgenda: React.FC = () => {
     if (newSplit && clientType !== 'block') {
       const baseShare = finalPrice / 4;
       participants = splitPlayers.map((p, idx) => {
+        const playerName = idx === 0 && clientType === 'new' ? clientDisplayName : (p.name || `Jugador ${idx + 1}`);
         const discounted = p.isMember ? baseShare * (1 - memberDiscountPercent / 100) : baseShare;
         return {
-          name: p.name || `Jugador ${idx + 1}`,
+          name: playerName,
           paid: idx === 0,
           amount: parseFloat(discounted.toFixed(2)),
         };
@@ -231,13 +256,13 @@ export const AdminAgenda: React.FC = () => {
     const endM = totalMinutes % 60;
     const endISO = `${currentDate}T${String(endH).padStart(2, '0')}:${String(endM).padStart(2, '0')}:00`;
 
-    createBooking({
+    const newBooking = createBooking({
       courtId: court.id,
       courtName: court.name,
       venueId: targetVenue?.id,
       venueName: targetVenue?.name,
       venueShortName: targetVenue?.shortName,
-      creatorId: clientType === 'existing' ? 'socio-member' : clientType === 'anonymous' ? 'anon-guest' : 'reception-client',
+      creatorId: createdCustomerId || (clientType === 'existing' ? 'socio-member' : clientType === 'anonymous' ? 'anon-guest' : 'reception-client'),
       creatorName: clientDisplayName,
       startTime: startISO,
       endTime: endISO,
@@ -248,12 +273,41 @@ export const AdminAgenda: React.FC = () => {
       mode: 'competitive',
       gender: 'mixed',
       participants,
-      notes: clientType === 'block' ? 'Pista bloqueada administrativamente por recepción.' : clientType === 'anonymous' ? 'Reserva mostrador anónima sin datos personales registrados.' : undefined,
+      notes: clientType === 'block'
+        ? 'Pista bloqueada administrativamente por recepción.'
+        : clientType === 'anonymous'
+        ? 'Reserva mostrador anónima sin datos personales registrados.'
+        : clientType === 'new'
+        ? `Cliente nuevo registrado en reserva: ${newClientEmail} · ${newClientPhone}`
+        : undefined,
     });
+
+    // 2. Si es pago dividido, emitir notificaciones individuales a los 4 jugadores
+    if (newSplit && clientType !== 'block') {
+      splitPlayers.forEach((p, idx) => {
+        const pName = idx === 0 && clientType === 'new' ? clientDisplayName : p.name;
+        const pAmount = (finalPrice / 4).toFixed(2);
+        sendNotification({
+          title: `🎾 Convocatoria y Pago Pendiente (${pAmount} €)`,
+          message: `Hola ${pName}, has sido añadido a la reserva de ${court.name} para el ${currentDate} a las ${newTime} h. Confirma tu plaza y realiza el pago de tu cuota de ${pAmount} €.`,
+          type: 'booking',
+          actionUrl: `/partida/${newBooking.id}`,
+        });
+      });
+
+      triggerDemoToast(
+        'Pago Dividido · Avisos Enviados',
+        `Se han emitido 4 notificaciones individuales con enlace directo a la pasarela de pago para cada jugador.`,
+        'success'
+      );
+    } else {
+      triggerDemoToast('Reserva Registrada', `Reserva creada con éxito en ${court.name}.`, 'success');
+    }
 
     setShowNewModal(false);
     setNewClientName('');
-    triggerDemoToast('Reserva Registrada', `Reserva creada con éxito en ${court.name}.`, 'success');
+    setNewClientEmail('');
+    setNewClientPhone('');
   };
 
   // Convert Booking to Drawer & BookingListItem format

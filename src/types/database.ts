@@ -256,6 +256,23 @@ export interface Booking {
   isScoreHiddenInPublicProfile?: boolean;
 }
 
+export interface CustomerItem {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  memberNum: string;
+  level: number;
+  balance: number;
+  isMember: boolean;
+  matches: number;
+  avatarUrl?: string;
+  hand?: string;
+  position?: string;
+  status?: string;
+  createdAt?: string;
+}
+
 export interface OpenMatchSlotRequest {
   id: string;
   playerName: string;
@@ -572,6 +589,7 @@ export interface NotificationItem {
   type: 'booking' | 'match' | 'tournament' | 'system' | 'payment';
   timestamp: string;
   read: boolean;
+  actionUrl?: string;
 }
 
 export interface DiscountCoupon {

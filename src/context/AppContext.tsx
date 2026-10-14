@@ -24,6 +24,7 @@ import {
   InvoiceItem,
   PlatformSaaSInvoice,
   VerifactuStatus,
+  CustomerItem,
 } from '../types/database';
 import {
   INITIAL_TENANT,
@@ -46,6 +47,7 @@ import {
   INITIAL_GROUP_CONVOCATORIAS,
   INITIAL_INVOICES,
   INITIAL_SAAS_INVOICES,
+  INITIAL_CUSTOMERS,
 } from '../data/initialData';
 import { fallbackLng, SupportedLanguage, TRANSLATIONS } from '../lib/i18n';
 import { i18n } from '../i18n';
@@ -53,6 +55,8 @@ import { LOCALES } from '../locales';
 import { checkPermission, PermissionAction, PermissionCheckResult } from '../lib/permissions';
 
 export type MainView = 'public' | 'admin' | 'player' | 'coach' | 'hq';
+
+export type { CustomerItem };
 
 export interface ClubVenue {
   id: string; // 'all' or venue id
@@ -676,8 +680,12 @@ interface AppContextType {
   notifications: NotificationItem[];
   unreadNotificationsCount: number;
   markNotificationsAsRead: () => void;
+  sendNotification: (notif: { title: string; message: string; type?: NotificationItem['type']; actionUrl?: string }) => void;
 
-  // CRM Player Profile Navigation
+  // CRM Player Profile & Customers Database
+  customers: CustomerItem[];
+  addCustomer: (customer: Omit<CustomerItem, 'id' | 'memberNum' | 'matches' | 'balance' | 'level'> & { balance?: number; isMember?: boolean; level?: number }) => CustomerItem;
+  updateCustomer: (id: string, updates: Partial<CustomerItem>) => void;
   selectedCustomerId: string | null;
   setSelectedCustomerId: (id: string | null) => void;
   playerOriginTab: AdminTab | null;
@@ -2234,6 +2242,70 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
   };
 
+  const sendNotification = useCallback((notif: { title: string; message: string; type?: NotificationItem['type']; actionUrl?: string }) => {
+    const newItem: NotificationItem = {
+      id: `notif-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+      title: notif.title,
+      message: notif.message,
+      type: notif.type || 'system',
+      timestamp: 'Ahora mismo',
+      read: false,
+      actionUrl: notif.actionUrl,
+    };
+    setNotifications((prev) => [newItem, ...prev]);
+  }, []);
+
+  // CRM Player Profile & Customers Database
+  const [customers, setCustomers] = useState<CustomerItem[]>(() => {
+    return readDemoState<CustomerItem[]>('setmio_customers', INITIAL_CUSTOMERS);
+  });
+
+  const addCustomer = useCallback(
+    (customerData: Omit<CustomerItem, 'id' | 'memberNum' | 'matches' | 'balance' | 'level'> & { balance?: number; isMember?: boolean; level?: number }): CustomerItem => {
+      const newCust: CustomerItem = {
+        id: `c-${Date.now()}`,
+        name: customerData.name,
+        email: customerData.email,
+        phone: customerData.phone,
+        memberNum: customerData.isMember ? `SM-${Math.floor(100 + Math.random() * 900)}` : 'Nuevo',
+        level: customerData.level ?? 3.5,
+        balance: customerData.balance ?? 0,
+        isMember: customerData.isMember ?? false,
+        matches: 0,
+        avatarUrl:
+          customerData.avatarUrl ||
+          'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=200&q=80',
+        hand: customerData.hand || 'Diestro',
+        position: customerData.position || 'Ambas',
+        status: 'Activo (Al día)',
+        createdAt: new Date().toISOString(),
+      };
+      setCustomers((prev) => {
+        const next = [newCust, ...prev];
+        try {
+          localStorage.setItem('setmio_customers', JSON.stringify(next));
+        } catch {
+          // ignore
+        }
+        return next;
+      });
+      return newCust;
+    },
+    []
+  );
+
+  const updateCustomer = useCallback((id: string, updates: Partial<CustomerItem>) => {
+    setCustomers((prev) => {
+      const next = prev.map((c) => (c.id === id ? { ...c, ...updates } : c));
+      try {
+        localStorage.setItem('setmio_customers', JSON.stringify(next));
+      } catch {
+        // ignore
+      }
+      return next;
+    });
+  }, []);
+
   // CRM Player Profile Navigation
   const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(null);
   const [playerOriginTab, setPlayerOriginTab] = useState<AdminTab | null>(null);
@@ -2686,6 +2758,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         notifications,
         unreadNotificationsCount,
         markNotificationsAsRead,
+        sendNotification,
+
+        customers,
+        addCustomer,
+        updateCustomer,
 
         selectedCustomerId,
         setSelectedCustomerId,
