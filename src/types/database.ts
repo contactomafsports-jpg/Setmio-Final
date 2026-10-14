@@ -148,6 +148,20 @@ export interface Tenant {
     };
     coupons?: DiscountCoupon[];
     classVouchers?: ClassVoucher[];
+    globalPaymentOption?: 'both' | 'online_only' | 'counter_only';
+    categoryPaymentRules?: {
+      membersAllowedMethods: ('online' | 'counter' | 'wallet')[];
+      nonMembersAllowedMethods: ('online' | 'counter')[];
+      requireOnlineForNonMembers: boolean;
+    };
+    discountRules?: {
+      memberCourtDiscountPercent: number;
+      memberMatchDiscountPercent: number;
+      memberAcademyDiscountPercent: number;
+      memberTournamentDiscountPercent: number;
+      staffDiscountPercent: number;
+      coachDiscountPercent: number;
+    };
   };
   // Specific contextual metadata
   proPlayerStats?: {
@@ -271,6 +285,10 @@ export interface CustomerItem {
   position?: string;
   status?: string;
   createdAt?: string;
+  paymentMethodPermission?: 'default' | 'all' | 'online_only' | 'counter_allowed';
+  customDiscountType?: 'none' | 'percent' | 'free_tariff' | 'staff' | 'coach';
+  customDiscountPercent?: number;
+  roleInClub?: 'member' | 'coach' | 'staff' | 'vip' | 'regular';
 }
 
 export interface OpenMatchSlotRequest {
@@ -300,6 +318,7 @@ export interface OpenMatch {
   minLevel: number;
   maxLevel: number;
   pricePerPlayer: number;
+  memberPricePerPlayer?: number;
   status: 'open' | 'full' | 'completed' | 'canceled';
   mode?: 'competitive' | 'friendly';
   matchScore?: string;

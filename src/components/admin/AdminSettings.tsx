@@ -46,6 +46,7 @@ import {
   Truck,
   Package,
   Bell,
+  Users,
 } from 'lucide-react';
 import { AdminNotificationSettings } from './AdminNotificationSettings';
 
@@ -123,6 +124,28 @@ export const AdminSettings: React.FC = () => {
     cancellationPenaltyPercent: currentTenant.settings?.policies?.cancellationPenaltyPercent ?? 50,
     memberCourtDiscountPercent: currentTenant.settings?.policies?.memberCourtDiscountPercent ?? 20,
     memberShopDiscountPercent: currentTenant.settings?.policies?.memberShopDiscountPercent ?? 10,
+  });
+
+  // Global Payment Option: 'both' | 'online_only' | 'counter_only'
+  const [globalPaymentOption, setGlobalPaymentOption] = useState<'both' | 'online_only' | 'counter_only'>(
+    currentTenant.settings?.globalPaymentOption ?? 'both'
+  );
+
+  // Category-based payment rules (Socios vs No Socios)
+  const [categoryPaymentRules, setCategoryPaymentRules] = useState({
+    membersAllowedMethods: currentTenant.settings?.categoryPaymentRules?.membersAllowedMethods ?? ['online', 'counter', 'wallet'],
+    nonMembersAllowedMethods: currentTenant.settings?.categoryPaymentRules?.nonMembersAllowedMethods ?? ['online', 'counter'],
+    requireOnlineForNonMembers: currentTenant.settings?.categoryPaymentRules?.requireOnlineForNonMembers ?? false,
+  });
+
+  // Advanced Global/Categorical Discount Rules
+  const [discountRules, setDiscountRules] = useState({
+    memberCourtDiscountPercent: currentTenant.settings?.discountRules?.memberCourtDiscountPercent ?? 20,
+    memberMatchDiscountPercent: currentTenant.settings?.discountRules?.memberMatchDiscountPercent ?? 20,
+    memberAcademyDiscountPercent: currentTenant.settings?.discountRules?.memberAcademyDiscountPercent ?? 15,
+    memberTournamentDiscountPercent: currentTenant.settings?.discountRules?.memberTournamentDiscountPercent ?? 25,
+    staffDiscountPercent: currentTenant.settings?.discountRules?.staffDiscountPercent ?? 100, // 100% = Tarifa 0€ (Gratis)
+    coachDiscountPercent: currentTenant.settings?.discountRules?.coachDiscountPercent ?? 100, // 100% = Tarifa 0€ (Gratis)
   });
 
   // 3. Discount Coupons State
@@ -209,11 +232,14 @@ export const AdminSettings: React.FC = () => {
         policies,
         coupons,
         classVouchers: vouchers,
+        globalPaymentOption,
+        categoryPaymentRules,
+        discountRules,
       },
     });
     triggerDemoToast(
       t('settings.saveSuccess', 'Configuración del Club Guardada'),
-      t('settings.saveSuccessDesc', 'Las políticas y métodos de pago han sido actualizados.'),
+      'Métodos de pago globales, reglas por categoría y reglas de descuento actualizados.',
       'success'
     );
   };
@@ -950,6 +976,172 @@ export const AdminSettings: React.FC = () => {
           ====================================================================== */}
       {activeSection === 'payments' && (
         <form onSubmit={handleSavePaymentsAndPolicies} className="space-y-6 text-xs">
+          {/* A. OPCIONES DE PAGO GLOBALES DEL CLUB */}
+          <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-4 shadow-sm">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-3">
+              <div>
+                <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                  <ShieldCheck className="w-4 h-4 text-emerald-500" />
+                  <span>Opciones de Pago Globales del Club</span>
+                </h3>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                  Define la política general de cobro para reservas, partidas y actividades en el club.
+                </p>
+              </div>
+              <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold bg-emerald-50 dark:bg-emerald-950 px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800 self-start sm:self-auto">
+                Política General
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <button
+                type="button"
+                onClick={() => setGlobalPaymentOption('both')}
+                className={`p-4 rounded-2xl border text-left transition cursor-pointer flex flex-col justify-between ${
+                  globalPaymentOption === 'both'
+                    ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-500 text-emerald-900 dark:text-emerald-200 font-bold shadow-2xs'
+                    : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400'
+                }`}
+              >
+                <div className="flex items-center gap-2 mb-2">
+                  <span className={`w-3.5 h-3.5 rounded-full border-2 flex items-center justify-center ${globalPaymentOption === 'both' ? 'border-emerald-600 bg-emerald-600' : 'border-slate-400'}`}>
+                    {globalPaymentOption === 'both' && <span className="w-1.5 h-1.5 rounded-full bg-white" />}
+                  </span>
+                  <span className="font-bold text-xs text-slate-900 dark:text-white">Ambos (Online y En Club)</span>
+                </div>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed font-normal">
+                  Permite abonar por pasarela web/app o en mostrador/recepción a la llegada.
+                </p>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setGlobalPaymentOption('online_only')}
+                className={`p-4 rounded-2xl border text-left transition cursor-pointer flex flex-col justify-between ${
+                  globalPaymentOption === 'online_only'
+                    ? 'bg-indigo-50 dark:bg-indigo-950/60 border-indigo-500 text-indigo-900 dark:text-indigo-200 font-bold shadow-2xs'
+                    : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400'
+                }`}
+              >
+                <div className="flex items-center gap-2 mb-2">
+                  <span className={`w-3.5 h-3.5 rounded-full border-2 flex items-center justify-center ${globalPaymentOption === 'online_only' ? 'border-indigo-600 bg-indigo-600' : 'border-slate-400'}`}>
+                    {globalPaymentOption === 'online_only' && <span className="w-1.5 h-1.5 rounded-full bg-white" />}
+                  </span>
+                  <span className="font-bold text-xs text-slate-900 dark:text-white">Solo Pago Online</span>
+                </div>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed font-normal">
+                  Exige pago con tarjeta bancaria o monedero en la web/app antes de confirmar la plaza.
+                </p>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setGlobalPaymentOption('counter_only')}
+                className={`p-4 rounded-2xl border text-left transition cursor-pointer flex flex-col justify-between ${
+                  globalPaymentOption === 'counter_only'
+                    ? 'bg-amber-50 dark:bg-amber-950/60 border-amber-500 text-amber-900 dark:text-amber-200 font-bold shadow-2xs'
+                    : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400'
+                }`}
+              >
+                <div className="flex items-center gap-2 mb-2">
+                  <span className={`w-3.5 h-3.5 rounded-full border-2 flex items-center justify-center ${globalPaymentOption === 'counter_only' ? 'border-amber-600 bg-amber-600' : 'border-slate-400'}`}>
+                    {globalPaymentOption === 'counter_only' && <span className="w-1.5 h-1.5 rounded-full bg-white" />}
+                  </span>
+                  <span className="font-bold text-xs text-slate-900 dark:text-white">Solo En Club</span>
+                </div>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed font-normal">
+                  Todas las reservas y plazas se liquidan en el TPV físico del mostrador o cafetería.
+                </p>
+              </button>
+            </div>
+          </div>
+
+          {/* B. REGLAS DE FORMAS DE PAGO POR CATEGORÍA (SOCIOS VS. NO SOCIOS) */}
+          <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-4 shadow-sm">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-3">
+              <div>
+                <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                  <Users className="w-4 h-4 text-purple-500" />
+                  <span>Personalización por Categoría: Socios vs. No Socios</span>
+                </h3>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                  Establece medios de pago permitidos y exigencias de cobro previo diferenciadas por colectivo.
+                </p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Regla para Socios */}
+              <div className="p-4 rounded-2xl bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800/60 space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-emerald-900 dark:text-emerald-200 flex items-center gap-1.5 text-xs">
+                    <Shield className="w-3.5 h-3.5 text-emerald-600" />
+                    <span>Socios del Club</span>
+                  </span>
+                  <span className="text-[10px] font-black uppercase text-emerald-700 bg-emerald-100 dark:bg-emerald-900 px-2 py-0.5 rounded-md">
+                    Máxima Flexibilidad
+                  </span>
+                </div>
+                <p className="text-[11px] text-slate-600 dark:text-slate-300">
+                  Formas de pago autorizadas para socios en reservas de pistas y partidas:
+                </p>
+                <div className="space-y-1.5 text-xs">
+                  <label className="flex items-center gap-2 cursor-pointer text-slate-800 dark:text-slate-200">
+                    <input type="checkbox" checked={true} readOnly className="rounded text-emerald-600" />
+                    <span>Permitir saldo de Monedero virtual</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer text-slate-800 dark:text-slate-200">
+                    <input type="checkbox" checked={true} readOnly className="rounded text-emerald-600" />
+                    <span>Permitir abono diferido en Mostrador (al jugar)</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer text-slate-800 dark:text-slate-200">
+                    <input type="checkbox" checked={true} readOnly className="rounded text-emerald-600" />
+                    <span>Pasarela Online (Tarjeta / Stripe)</span>
+                  </label>
+                </div>
+              </div>
+
+              {/* Regla para No Socios */}
+              <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-slate-900 dark:text-white flex items-center gap-1.5 text-xs">
+                    <Users className="w-3.5 h-3.5 text-slate-500" />
+                    <span>No Socios / Invitados</span>
+                  </span>
+                  <span className="text-[10px] font-bold text-slate-500 bg-slate-200 dark:bg-slate-800 px-2 py-0.5 rounded-md">
+                    Control de Impagos
+                  </span>
+                </div>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                  Condiciones aplicables a jugadores externos y usuarios esporádicos:
+                </p>
+                <div className="space-y-2 text-xs">
+                  <label className="flex items-center justify-between p-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 cursor-pointer">
+                    <div>
+                      <span className="font-bold text-slate-900 dark:text-white block text-xs">
+                        Pago Online Obligatorio Previo
+                      </span>
+                      <span className="text-[10px] text-slate-400">
+                        Evita cancelaciones imprevistas y no-shows de externos
+                      </span>
+                    </div>
+                    <input
+                      type="checkbox"
+                      checked={categoryPaymentRules.requireOnlineForNonMembers}
+                      onChange={(e) =>
+                        setCategoryPaymentRules({
+                          ...categoryPaymentRules,
+                          requireOnlineForNonMembers: e.target.checked,
+                        })
+                      }
+                      className="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500 cursor-pointer"
+                    />
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* 1. MÉTODOS DE PAGO ACTIVOS */}
           <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-5 shadow-sm">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-3">
@@ -1350,6 +1542,179 @@ export const AdminSettings: React.FC = () => {
                     className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-mono font-bold text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 pr-8"
                   />
                   <span className="absolute right-3 top-2 text-slate-400 font-bold">%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* 3. SISTEMA AVANZADO DE REGLAS DE DESCUENTO DEL CLUB */}
+          <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-5 shadow-sm">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-3">
+              <div>
+                <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                  <Percent className="w-4 h-4 text-emerald-500" />
+                  <span>Sistema de Precios y Reglas de Descuento Avanzado</span>
+                </h3>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                  Aplica reglas globales o por colectivo a: Reservas de Pista, Partidas Play!, Clases de Escuela y Torneos.
+                </p>
+              </div>
+              <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold bg-emerald-50 dark:bg-emerald-950 px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800 self-start sm:self-auto">
+                Descuentos & Tarifas 0€
+              </span>
+            </div>
+
+            {/* Grid 4 Ámbitos Principales */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {/* 1. Reservas de Pista */}
+              <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 space-y-2">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
+                  Reservas de Pista
+                </span>
+                <label className="block text-slate-800 dark:text-slate-200 font-bold text-xs">
+                  Descuento Socios (%)
+                </label>
+                <div className="relative">
+                  <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    value={discountRules.memberCourtDiscountPercent}
+                    onChange={(e) =>
+                      setDiscountRules({
+                        ...discountRules,
+                        memberCourtDiscountPercent: parseInt(e.target.value) || 0,
+                      })
+                    }
+                    className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-mono font-bold text-slate-900 dark:text-white pr-8 focus:outline-none focus:border-emerald-500"
+                  />
+                  <span className="absolute right-3 top-2 text-slate-400 font-bold">%</span>
+                </div>
+                <span className="text-[10px] text-slate-400 block">Deducido en alquiler de pista completa</span>
+              </div>
+
+              {/* 2. Partidas Abiertas */}
+              <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 space-y-2">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
+                  Partidas Play!
+                </span>
+                <label className="block text-slate-800 dark:text-slate-200 font-bold text-xs">
+                  Descuento Socios (%)
+                </label>
+                <div className="relative">
+                  <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    value={discountRules.memberMatchDiscountPercent}
+                    onChange={(e) =>
+                      setDiscountRules({
+                        ...discountRules,
+                        memberMatchDiscountPercent: parseInt(e.target.value) || 0,
+                      })
+                    }
+                    className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-mono font-bold text-slate-900 dark:text-white pr-8 focus:outline-none focus:border-emerald-500"
+                  />
+                  <span className="absolute right-3 top-2 text-slate-400 font-bold">%</span>
+                </div>
+                <span className="text-[10px] text-slate-400 block">Diferencial en cuota individual por plaza</span>
+              </div>
+
+              {/* 3. Escuela y Cursos */}
+              <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 space-y-2">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">
+                  Escuela & Cursos
+                </span>
+                <label className="block text-slate-800 dark:text-slate-200 font-bold text-xs">
+                  Descuento Socios (%)
+                </label>
+                <div className="relative">
+                  <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    value={discountRules.memberAcademyDiscountPercent}
+                    onChange={(e) =>
+                      setDiscountRules({
+                        ...discountRules,
+                        memberAcademyDiscountPercent: parseInt(e.target.value) || 0,
+                      })
+                    }
+                    className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-mono font-bold text-slate-900 dark:text-white pr-8 focus:outline-none focus:border-emerald-500"
+                  />
+                  <span className="absolute right-3 top-2 text-slate-400 font-bold">%</span>
+                </div>
+                <span className="text-[10px] text-slate-400 block">Bonificación en cuota mensual/trimestral</span>
+              </div>
+
+              {/* 4. Torneos y Competiciones */}
+              <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 space-y-2">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-rose-600 dark:text-rose-400">
+                  Torneos Oficiales
+                </span>
+                <label className="block text-slate-800 dark:text-slate-200 font-bold text-xs">
+                  Descuento Socios (%)
+                </label>
+                <div className="relative">
+                  <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    value={discountRules.memberTournamentDiscountPercent}
+                    onChange={(e) =>
+                      setDiscountRules({
+                        ...discountRules,
+                        memberTournamentDiscountPercent: parseInt(e.target.value) || 0,
+                      })
+                    }
+                    className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-mono font-bold text-slate-900 dark:text-white pr-8 focus:outline-none focus:border-emerald-500"
+                  />
+                  <span className="absolute right-3 top-2 text-slate-400 font-bold">%</span>
+                </div>
+                <span className="text-[10px] text-slate-400 block">Tarifa reducida en inscripción de parejas</span>
+              </div>
+            </div>
+
+            {/* Colectivos Especiales: Tarifa 0€ / Gratis */}
+            <div className="pt-3 border-t border-slate-100 dark:border-slate-800">
+              <h4 className="font-bold text-slate-900 dark:text-white text-xs mb-3 flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                <span>Tarifas Especiales para Colectivos del Club (Tarifa 0€ / Gratis)</span>
+              </h4>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {/* Monitores / Profesores */}
+                <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 flex items-center justify-between gap-3">
+                  <div>
+                    <span className="font-bold text-slate-900 dark:text-white block text-xs">
+                      Profesores y Entrenadores Oficiales
+                    </span>
+                    <span className="text-[10px] text-slate-500 dark:text-slate-400">
+                      Entrenamientos personales y uso de pistas de tecnificación
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <span className="px-2.5 py-1 rounded-full text-[10px] font-black bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20">
+                      {discountRules.coachDiscountPercent === 100 ? 'Tarifa 0€ (Gratis)' : `${discountRules.coachDiscountPercent}% Dto.`}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Personal del Club / Staff */}
+                <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 flex items-center justify-between gap-3">
+                  <div>
+                    <span className="font-bold text-slate-900 dark:text-white block text-xs">
+                      Personal y Empleados del Club (Staff)
+                    </span>
+                    <span className="text-[10px] text-slate-500 dark:text-slate-400">
+                      Acceso libre o bonificado a instalaciones y reservas internas
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <span className="px-2.5 py-1 rounded-full text-[10px] font-black bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 border border-indigo-500/20">
+                      {discountRules.staffDiscountPercent === 100 ? 'Tarifa 0€ (Gratis)' : `${discountRules.staffDiscountPercent}% Dto.`}
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>

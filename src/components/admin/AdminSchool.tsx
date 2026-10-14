@@ -44,6 +44,7 @@ export interface SchoolStudent {
   paymentStatus: 'paid' | 'pending' | 'scholarship';
   attendancesCount: number;
   joinDate: string;
+  avatarUrl?: string;
 }
 
 export interface SchoolGroupItem {
@@ -255,6 +256,8 @@ export const AdminSchool: React.FC = () => {
   const {
     coaches,
     courts,
+    customers,
+    navigateToPlayerProfile,
     triggerDemoToast,
     currentTenant,
     playerGroups,
@@ -308,6 +311,7 @@ export const AdminSchool: React.FC = () => {
     memberFee: 55.0,
     nonMemberFee: 75.0,
     maxStudents: 4,
+    notes: '',
   });
 
   // Class Form State (para Clases sueltas / clínicas puntuales)
@@ -683,25 +687,42 @@ export const AdminSchool: React.FC = () => {
           ===================================================================== */}
       {selectedGroupDetail ? (
         <div className="space-y-6 animate-in fade-in duration-150">
-          {/* Header con botón dinámico inteligente de volver */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200 dark:border-slate-800">
+          {/* Header Superior con Botón Volver Rediseñado y Acciones Principales */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200/80 dark:border-slate-800">
             <button
               type="button"
               onClick={() => setSelectedGroupDetail(null)}
-              className="inline-flex items-center gap-2 text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition cursor-pointer self-start"
+              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800 shadow-2xs font-bold text-xs transition cursor-pointer active:scale-95 group self-start"
             >
-              <ArrowLeft className="w-4 h-4" />
-              <span>{t('school.backToSchool', 'Ir a la Escuela')}</span>
+              <ArrowLeft className="w-4 h-4 text-emerald-500 group-hover:-translate-x-0.5 transition-transform" />
+              <span>{t('school.backToSchool', 'Volver al Listado de Escuela')}</span>
             </button>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap self-start sm:self-auto">
+              {/* Botón Pasar Lista Rápido */}
+              <button
+                type="button"
+                onClick={() =>
+                  triggerDemoToast(
+                    t('school.attendance', 'Pasar Lista de Asistencia'),
+                    `Asistencias y firmas guardadas para ${selectedGroupDetail.name}.`,
+                    'success'
+                  )
+                }
+                className="px-3.5 py-2 rounded-xl bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 font-bold text-xs border border-slate-200 dark:border-slate-700 shadow-2xs transition flex items-center gap-1.5 cursor-pointer active:scale-95"
+              >
+                <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                <span>{t('school.attendance', 'Pasar Lista')}</span>
+              </button>
+
+              {/* Botones de cobertura de plazas si hay huecos */}
               {selectedGroupDetail.maxStudents - selectedGroupDetail.currentStudents > 0 && (
                 <>
                   <button
                     type="button"
                     onClick={() => handleOpenNotifyGroupForClass(selectedGroupDetail)}
                     className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-95"
-                    title="Convocatoria instantánea a grupos de jugadores (WhatsApp)"
+                    title="Convocatoria instantánea a grupos de jugadores"
                   >
                     <Megaphone className="w-3.5 h-3.5" />
                     <span>Notificar a Grupo ({selectedGroupDetail.maxStudents - selectedGroupDetail.currentStudents} libres)</span>
@@ -709,41 +730,78 @@ export const AdminSchool: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setConfirmPublishClass(selectedGroupDetail)}
-                    className="px-3.5 py-2 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 border border-emerald-500/30 text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shadow-xs"
+                    className="px-3 py-2 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 border border-emerald-500/30 text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-95"
                   >
                     <Bell className="w-3.5 h-3.5" />
-                    <span>{t('school.publishSpots', 'Publicar Plazas')}</span>
+                    <span>{t('school.publishSpots', 'Publicar')}</span>
                   </button>
                   <button
                     type="button"
                     onClick={() => setInviteModalGroup(selectedGroupDetail)}
-                    className="px-3.5 py-2 rounded-xl bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 hover:bg-purple-100 border border-purple-500/30 text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shadow-xs"
+                    className="px-3 py-2 rounded-xl bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 hover:bg-purple-100 border border-purple-500/30 text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-95"
                   >
                     <UserPlus className="w-3.5 h-3.5" />
-                    <span>{t('school.inviteToCover', 'Invitar Alumnos')}</span>
+                    <span>{t('school.inviteToCover', 'Invitar')}</span>
                   </button>
                 </>
               )}
+
+              {/* Editar Curso/Clase */}
+              <button
+                type="button"
+                onClick={() => {
+                  setEditingGroup(selectedGroupDetail);
+                  setGroupFormData({
+                    name: selectedGroupDetail.name,
+                    periodicity: selectedGroupDetail.type === 'single_class' ? 'course_monthly' : selectedGroupDetail.type,
+                    levelCategory: selectedGroupDetail.levelCategory,
+                    coachName: selectedGroupDetail.coachName,
+                    schedule: selectedGroupDetail.schedule,
+                    days: selectedGroupDetail.days,
+                    courtName: selectedGroupDetail.courtName,
+                    registrationFee: selectedGroupDetail.registrationFee || 0,
+                    memberFee: selectedGroupDetail.memberFee,
+                    nonMemberFee: selectedGroupDetail.nonMemberFee,
+                    maxStudents: selectedGroupDetail.maxStudents,
+                    notes: selectedGroupDetail.notes || '',
+                  });
+                  setIsNewGroupModalOpen(true);
+                }}
+                className="px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs transition cursor-pointer"
+                title="Editar datos del curso"
+              >
+                <Edit2 className="w-3.5 h-3.5" />
+              </button>
             </div>
           </div>
 
-          {/* Tarjeta Principal de Información Técnica */}
-          <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-5">
+          {/* Tarjeta Principal de Información Técnica (Estilo Drawer de Reservas) */}
+          <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-sm space-y-6">
+            {/* Cabecera Técnica con Badges */}
             <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
-              <div className="space-y-1">
-                <span className="text-[10px] font-extrabold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/70 px-2.5 py-0.5 rounded-md border border-emerald-500/20">
-                  {selectedGroupDetail.durationLabel}
-                </span>
-                <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white mt-1">
+              <div className="space-y-2">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-[10px] font-black uppercase tracking-wider text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/80 px-2.5 py-0.5 rounded-md border border-emerald-500/30">
+                    {selectedGroupDetail.durationLabel}
+                  </span>
+                  <span className="text-[10px] font-bold text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/80 px-2.5 py-0.5 rounded-md border border-indigo-500/20">
+                    {selectedGroupDetail.levelCategory}
+                  </span>
+                  <span className="text-[10px] font-mono font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-md">
+                    {selectedGroupDetail.days.join(' · ')}
+                  </span>
+                </div>
+
+                <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
                   {selectedGroupDetail.name}
                 </h1>
                 <p className="text-xs text-slate-500 dark:text-slate-400">
-                  {selectedGroupDetail.levelCategory} · {selectedGroupDetail.days.join(', ')}
+                  {selectedGroupDetail.notes || 'Entrenamiento metodológico con monitor titulado y seguimiento de evolución técnica.'}
                 </p>
               </div>
 
-              {/* Tarifas */}
-              <div className="bg-slate-50 dark:bg-slate-950 p-3.5 rounded-2xl border border-slate-200/60 dark:border-slate-800 flex items-center gap-4 text-right">
+              {/* Bloque Tarifas con Tarifa Socio vs No Socio y Ahorro */}
+              <div className="bg-slate-50 dark:bg-slate-950 p-4 rounded-2xl border border-slate-200/60 dark:border-slate-800 flex items-center gap-4 text-right shrink-0">
                 {selectedGroupDetail.registrationFee !== undefined && (
                   <div>
                     <div className="text-[10px] text-slate-400 uppercase font-bold">
@@ -761,6 +819,9 @@ export const AdminSchool: React.FC = () => {
                   <div className="text-base font-black font-mono text-emerald-600 dark:text-emerald-400">
                     {selectedGroupDetail.memberFee.toFixed(2)} €
                   </div>
+                  <span className="text-[9px] text-emerald-500 font-bold block">
+                    -{(selectedGroupDetail.nonMemberFee - selectedGroupDetail.memberFee).toFixed(0)}€ Dto. Socio
+                  </span>
                 </div>
                 <div>
                   <div className="text-[10px] text-slate-500 uppercase font-bold">
@@ -769,65 +830,92 @@ export const AdminSchool: React.FC = () => {
                   <div className="text-sm font-black font-mono text-slate-700 dark:text-slate-300">
                     {selectedGroupDetail.nonMemberFee.toFixed(2)} €
                   </div>
+                  <span className="text-[9px] text-slate-400 block font-normal">tarifa externa</span>
                 </div>
               </div>
             </div>
 
-            {/* Parrilla de datos operativos */}
+            {/* Parrilla Operativa: Pista, Horario y Profesor */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-3 border-t border-slate-100 dark:border-slate-800 text-xs">
-              <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-950/50 border border-slate-200/60 dark:border-slate-800 flex items-center gap-3">
-                <GraduationCap className="w-5 h-5 text-emerald-500 shrink-0" />
-                <div>
-                  <div className="text-[10px] text-slate-400 font-bold uppercase">
-                    {t('school.assignedCoach', 'Profesor')}
+              {/* Profesor */}
+              <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950/70 border border-slate-200/60 dark:border-slate-800 flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 font-bold flex items-center justify-center shrink-0">
+                    <GraduationCap className="w-5 h-5" />
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const coachFound = coachesList.find((c) => c.name === selectedGroupDetail.coachName);
-                      if (coachFound) {
-                        setSelectedCoachDetail(coachFound);
-                        setSelectedGroupDetail(null);
-                        setActiveMainTab('coaches');
-                      }
-                    }}
-                    className="font-bold text-slate-900 dark:text-white hover:text-emerald-500 transition cursor-pointer text-left"
-                  >
-                    {selectedGroupDetail.coachName} →
-                  </button>
+                  <div>
+                    <div className="text-[10px] text-slate-400 font-bold uppercase">Profesor Asignado</div>
+                    <div className="font-bold text-slate-900 dark:text-white">{selectedGroupDetail.coachName}</div>
+                    <div className="text-[10px] text-emerald-600 dark:text-emerald-400">Monitor Titulado FEP</div>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const coachFound = coachesList.find((c) => c.name === selectedGroupDetail.coachName);
+                    if (coachFound) {
+                      setSelectedCoachDetail(coachFound);
+                      setSelectedGroupDetail(null);
+                      setActiveMainTab('coaches');
+                    }
+                  }}
+                  className="p-1 rounded-lg text-slate-400 hover:text-emerald-500 transition cursor-pointer"
+                  title="Ver Perfil del Profesor"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+
+              {/* Horario y Días */}
+              <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950/70 border border-slate-200/60 dark:border-slate-800 flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 font-bold flex items-center justify-center shrink-0">
+                  <Clock className="w-5 h-5" />
+                </div>
+                <div>
+                  <div className="text-[10px] text-slate-400 font-bold uppercase">Horario & Frecuencia</div>
+                  <div className="font-bold text-slate-900 dark:text-white font-mono">{selectedGroupDetail.schedule}</div>
+                  <div className="text-[10px] text-slate-500 dark:text-slate-400">{selectedGroupDetail.days.join(', ')}</div>
                 </div>
               </div>
 
-              <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-950/50 border border-slate-200/60 dark:border-slate-800 flex items-center gap-3">
-                <Clock className="w-5 h-5 text-emerald-500 shrink-0" />
+              {/* Pista y Domótica */}
+              <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950/70 border border-slate-200/60 dark:border-slate-800 flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 font-bold flex items-center justify-center shrink-0">
+                  <MapPin className="w-5 h-5" />
+                </div>
                 <div>
-                  <div className="text-[10px] text-slate-400 font-bold uppercase">
-                    {t('school.scheduleDays', 'Horario')}
-                  </div>
-                  <div className="font-bold text-slate-900 dark:text-white">
-                    {selectedGroupDetail.schedule}
+                  <div className="text-[10px] text-slate-400 font-bold uppercase">Pista & Control de Acceso</div>
+                  <div className="font-bold text-slate-900 dark:text-white">{selectedGroupDetail.courtName}</div>
+                  <div className="text-[10px] text-purple-600 dark:text-purple-400 flex items-center gap-1 font-mono font-bold">
+                    <span>PIN: 4821#</span>
+                    <span className="text-[9px] bg-purple-100 dark:bg-purple-950/80 px-1.5 rounded-xs">Domótica Activa</span>
                   </div>
                 </div>
               </div>
+            </div>
 
-              <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-950/50 border border-slate-200/60 dark:border-slate-800 flex items-center gap-3">
-                <MapPin className="w-5 h-5 text-emerald-500 shrink-0" />
-                <div>
-                  <div className="text-[10px] text-slate-400 font-bold uppercase">
-                    {t('school.assignedCourt', 'Pista')}
-                  </div>
-                  <div className="font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
-                    <span>{selectedGroupDetail.courtName}</span>
-                    <span className="text-[10px] text-emerald-600 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-950 px-1.5 py-0.5 rounded-sm">
-                      PIN Activo
-                    </span>
-                  </div>
-                </div>
+            {/* Barra de Ocupación de Plazas */}
+            <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950/70 border border-slate-200/60 dark:border-slate-800 space-y-2">
+              <div className="flex items-center justify-between text-xs">
+                <span className="font-bold text-slate-700 dark:text-slate-300">
+                  Ocupación de Plazas: {selectedGroupDetail.students.length} de {selectedGroupDetail.maxStudents} plazas asignadas
+                </span>
+                <span className="font-bold font-mono text-emerald-600 dark:text-emerald-400">
+                  {selectedGroupDetail.maxStudents - selectedGroupDetail.students.length > 0
+                    ? `${selectedGroupDetail.maxStudents - selectedGroupDetail.students.length} plazas libres disponibles`
+                    : 'Grupo Completo (100%)'}
+                </span>
+              </div>
+              <div className="w-full bg-slate-200 dark:bg-slate-800 h-2 rounded-full overflow-hidden">
+                <div
+                  className="bg-emerald-500 h-full rounded-full transition-all duration-300"
+                  style={{ width: `${Math.round((selectedGroupDetail.students.length / selectedGroupDetail.maxStudents) * 100)}%` }}
+                />
               </div>
             </div>
           </div>
 
-          {/* Lista de Alumnos del Grupo */}
+          {/* Lista de Alumnos del Grupo (Con Avatares y Enlace a Perfil de Usuario) */}
           <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
             <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
               <div className="flex items-center gap-2">
@@ -852,39 +940,57 @@ export const AdminSchool: React.FC = () => {
             </div>
 
             <div className="divide-y divide-slate-100 dark:divide-slate-800 text-xs">
-              {selectedGroupDetail.students.map((studentName, idx) => (
-                <div key={idx} className="py-3 flex items-center justify-between gap-3">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold flex items-center justify-center text-xs">
-                      {studentName.charAt(0)}
-                    </div>
-                    <div>
-                      <div className="font-bold text-slate-900 dark:text-white">{studentName}</div>
-                      <div className="text-[11px] text-slate-400">Alumno regular · Pago domiciliado</div>
-                    </div>
-                  </div>
+              {selectedGroupDetail.students.map((studentName, idx) => {
+                const customerMatch = customers.find(
+                  (c) => c.name.toLowerCase() === studentName.toLowerCase()
+                );
+                const avatar =
+                  customerMatch?.avatarUrl ||
+                  `https://images.unsplash.com/photo-${1534528741775 + idx * 200}?auto=format&fit=crop&w=120&q=80`;
 
-                  <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950 px-2.5 py-1 rounded-full border border-emerald-500/20">
-                      {t('school.studentPaid', 'Al Día')}
-                    </span>
+                return (
+                  <div key={idx} className="py-3 flex items-center justify-between gap-3 group">
                     <button
                       type="button"
-                      onClick={() =>
-                        triggerDemoToast(
-                          'Ficha del Alumno',
-                          `Abriendo historial de ${studentName}.`,
-                          'info'
-                        )
-                      }
-                      className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition"
-                      title="Ver Ficha"
+                      onClick={() => navigateToPlayerProfile(studentName, 'academy')}
+                      className="flex items-center gap-3 text-left cursor-pointer group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition"
+                      title="Ver Perfil de Usuario"
                     >
-                      <ChevronRight className="w-4 h-4" />
+                      <img
+                        src={avatar}
+                        alt={studentName}
+                        className="w-9 h-9 rounded-full object-cover ring-2 ring-slate-200 dark:ring-slate-700 group-hover:ring-emerald-500 transition-all shrink-0"
+                      />
+                      <div>
+                        <div className="font-bold text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition flex items-center gap-1.5">
+                          <span>{studentName}</span>
+                          <span className="text-[10px] text-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity">
+                            → Perfil
+                          </span>
+                        </div>
+                        <div className="text-[11px] text-slate-400">
+                          {customerMatch?.isMember ? '⭐ Socio Oficial' : 'Alumno Regular'} · Nivel {customerMatch?.level?.toFixed(2) || '3.50'}
+                        </div>
+                      </div>
                     </button>
+
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950 px-2.5 py-1 rounded-full border border-emerald-500/20">
+                        {t('school.studentPaid', 'Al Día')}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => navigateToPlayerProfile(studentName, 'academy')}
+                        className="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-emerald-50 dark:hover:bg-emerald-950 text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 text-[11px] font-bold transition flex items-center gap-1 cursor-pointer"
+                        title="Ver Perfil"
+                      >
+                        <span>Perfil</span>
+                        <ChevronRight className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
 
             {selectedGroupDetail.waitingList.length > 0 && (
@@ -1037,7 +1143,7 @@ export const AdminSchool: React.FC = () => {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <div className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
-                Academia & Cursos Oficiales
+                Academia & Cursos
               </div>
               <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight mt-0.5">
                 Escuela de Pádel — {currentTenant.name}
@@ -1047,53 +1153,53 @@ export const AdminSchool: React.FC = () => {
               </p>
             </div>
 
-            {/* Botonera Superior Alineada (4 Acciones Diferenciadas - Tarea 6) */}
+            {/* Botonera Superior Alineada (Icono único por botón) */}
             <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto shrink-0">
-              {/* 1. + Nuevo Grupo */}
+              {/* 1. Nuevo Grupo */}
               <button
                 type="button"
                 onClick={() => {
                   setEditingGroup(null);
                   setIsNewGroupModalOpen(true);
                 }}
-                className="px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1.5 shadow-xs transition active:scale-95 cursor-pointer whitespace-nowrap"
+                className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1.5 shadow-xs transition active:scale-95 cursor-pointer whitespace-nowrap"
                 title="Crear grupo periódico con matrícula y cuota"
               >
                 <Plus className="w-3.5 h-3.5" />
-                <span>+ Nuevo Grupo</span>
+                <span>Nuevo Grupo</span>
               </button>
 
-              {/* 2. + Nueva Clase */}
+              {/* 2. Nueva Clase */}
               <button
                 type="button"
                 onClick={() => setIsNewClassModalOpen(true)}
-                className="px-3 py-2 rounded-xl bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-800 font-bold text-xs flex items-center gap-1.5 shadow-2xs transition active:scale-95 cursor-pointer whitespace-nowrap"
+                className="px-3.5 py-2 rounded-xl bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-800 font-bold text-xs flex items-center gap-1.5 shadow-2xs transition active:scale-95 cursor-pointer whitespace-nowrap"
                 title="Publicar clase suelta o clínica"
               >
                 <Plus className="w-3.5 h-3.5 text-emerald-500" />
-                <span>+ Nueva Clase</span>
+                <span>Nueva Clase</span>
               </button>
 
-              {/* 3. + Añadir Alumno */}
+              {/* 3. Nuevo Alumno */}
               <button
                 type="button"
                 onClick={() => setIsNewStudentModalOpen(true)}
-                className="px-3 py-2 rounded-xl bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-800 font-bold text-xs flex items-center gap-1.5 shadow-2xs transition active:scale-95 cursor-pointer whitespace-nowrap"
+                className="px-3.5 py-2 rounded-xl bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-800 font-bold text-xs flex items-center gap-1.5 shadow-2xs transition active:scale-95 cursor-pointer whitespace-nowrap"
                 title="Matricular alumno directamente"
               >
                 <UserPlus className="w-3.5 h-3.5 text-indigo-500" />
-                <span>+ Añadir Alumno</span>
+                <span>Nuevo Alumno</span>
               </button>
 
-              {/* 4. + Añadir Profesor */}
+              {/* 4. Nuevo Profesor */}
               <button
                 type="button"
                 onClick={() => setIsNewCoachModalOpen(true)}
-                className="px-3 py-2 rounded-xl bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-800 font-bold text-xs flex items-center gap-1.5 shadow-2xs transition active:scale-95 cursor-pointer whitespace-nowrap"
+                className="px-3.5 py-2 rounded-xl bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-800 font-bold text-xs flex items-center gap-1.5 shadow-2xs transition active:scale-95 cursor-pointer whitespace-nowrap"
                 title="Dar de alta nuevo entrenador"
               >
                 <GraduationCap className="w-3.5 h-3.5 text-amber-500" />
-                <span>+ Añadir Profesor</span>
+                <span>Nuevo Profesor</span>
               </button>
             </div>
           </div>
@@ -1282,6 +1388,7 @@ export const AdminSchool: React.FC = () => {
                               memberFee: group.memberFee,
                               nonMemberFee: group.nonMemberFee,
                               maxStudents: group.maxStudents,
+                              notes: group.notes || '',
                             });
                             setIsNewGroupModalOpen(true);
                           }}
@@ -1405,66 +1512,112 @@ export const AdminSchool: React.FC = () => {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-medium">
-                      {filteredStudents.map((st) => (
-                        <tr key={st.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/40 transition">
-                          <td className="py-3 px-4">
-                            <div className="flex items-center gap-3">
-                              <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-bold flex items-center justify-center text-xs">
-                                {st.name.charAt(0)}
+                      {filteredStudents.map((st, sIdx) => {
+                        const studentCustomer = customers.find(
+                          (c) =>
+                            c.name.toLowerCase() === st.name.toLowerCase() ||
+                            c.email.toLowerCase() === st.email.toLowerCase()
+                        );
+                        const fallbackAvatars = [
+                          'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80',
+                          'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&q=80',
+                          'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=120&q=80',
+                          'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=120&q=80',
+                          'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=120&q=80',
+                          'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=120&q=80',
+                        ];
+                        const avatarUrl =
+                          st.avatarUrl ||
+                          studentCustomer?.avatarUrl ||
+                          fallbackAvatars[sIdx % fallbackAvatars.length];
+
+                        return (
+                          <tr
+                            key={st.id}
+                            className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition group cursor-pointer"
+                          >
+                            <td className="py-3 px-4">
+                              <button
+                                type="button"
+                                onClick={() => navigateToPlayerProfile(st.name, 'academy')}
+                                className="flex items-center gap-3 text-left cursor-pointer group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition"
+                                title="Ver Perfil de Usuario"
+                              >
+                                <img
+                                  src={avatarUrl}
+                                  alt={st.name}
+                                  className="w-9 h-9 rounded-full object-cover ring-2 ring-slate-200 dark:ring-slate-700 group-hover:ring-emerald-500 transition-all shrink-0"
+                                />
+                                <div>
+                                  <div className="font-bold text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition flex items-center gap-1.5">
+                                    <span>{st.name}</span>
+                                    <span className="text-[10px] text-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity">
+                                      → Perfil
+                                    </span>
+                                  </div>
+                                  <div className="text-[11px] text-slate-400">{st.phone}</div>
+                                </div>
+                              </button>
+                            </td>
+                            <td className="py-3 px-4">
+                              <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400">
+                                {st.level}
+                              </span>
+                            </td>
+                            <td className="py-3 px-4">
+                              <div className="text-slate-900 dark:text-white font-medium">{st.groupName}</div>
+                              <div className="text-[10px] text-slate-400">
+                                {st.type === 'regular' ? 'Grupo Regular' : 'Sesión Suelta'}
                               </div>
-                              <div>
-                                <div className="font-bold text-slate-900 dark:text-white">{st.name}</div>
-                                <div className="text-[11px] text-slate-400">{st.phone}</div>
+                            </td>
+                            <td className="py-3 px-4">
+                              {st.paymentStatus === 'paid' ? (
+                                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                                  {t('school.studentPaid', 'Al Día')}
+                                </span>
+                              ) : st.paymentStatus === 'pending' ? (
+                                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 dark:bg-amber-950 text-amber-600 dark:text-amber-400 border border-amber-500/20">
+                                  {t('school.studentPending', 'Cuota Pendiente')}
+                                </span>
+                              ) : (
+                                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 dark:bg-blue-950 text-blue-600 dark:text-blue-400 border border-blue-500/20">
+                                  {t('school.studentScholarship', 'Becado')}
+                                </span>
+                              )}
+                            </td>
+                            <td className="py-3 px-4 font-mono font-bold text-slate-900 dark:text-white">
+                              {st.attendancesCount} sesiones
+                            </td>
+                            <td className="py-3 px-4 text-right">
+                              <div className="flex items-center justify-end gap-1.5">
+                                <button
+                                  type="button"
+                                  onClick={() => navigateToPlayerProfile(st.name, 'academy')}
+                                  className="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-emerald-50 dark:hover:bg-emerald-950/60 text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 text-[11px] font-bold transition flex items-center gap-1 cursor-pointer border border-slate-200/60 dark:border-slate-700"
+                                  title="Ver Perfil de Usuario"
+                                >
+                                  <span>Perfil</span>
+                                  <ChevronRight className="w-3.5 h-3.5" />
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    triggerDemoToast(
+                                      'Contacto WhatsApp',
+                                      `Enviando mensaje a ${st.name} (${st.phone}).`,
+                                      'info'
+                                    )
+                                  }
+                                  className="p-1.5 rounded-lg text-slate-400 hover:text-emerald-500 transition cursor-pointer"
+                                  title="Contactar"
+                                >
+                                  <MessageCircle className="w-4 h-4" />
+                                </button>
                               </div>
-                            </div>
-                          </td>
-                          <td className="py-3 px-4">
-                            <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400">
-                              {st.level}
-                            </span>
-                          </td>
-                          <td className="py-3 px-4">
-                            <div className="text-slate-900 dark:text-white font-medium">{st.groupName}</div>
-                            <div className="text-[10px] text-slate-400">
-                              {st.type === 'regular' ? 'Grupo Regular' : 'Sesión Suelta'}
-                            </div>
-                          </td>
-                          <td className="py-3 px-4">
-                            {st.paymentStatus === 'paid' ? (
-                              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-                                {t('school.studentPaid', 'Al Día')}
-                              </span>
-                            ) : st.paymentStatus === 'pending' ? (
-                              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 dark:bg-amber-950 text-amber-600 dark:text-amber-400 border border-amber-500/20">
-                                {t('school.studentPending', 'Cuota Pendiente')}
-                              </span>
-                            ) : (
-                              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 dark:bg-blue-950 text-blue-600 dark:text-blue-400 border border-blue-500/20">
-                                {t('school.studentScholarship', 'Becado')}
-                              </span>
-                            )}
-                          </td>
-                          <td className="py-3 px-4 font-mono font-bold text-slate-900 dark:text-white">
-                            {st.attendancesCount} sesiones
-                          </td>
-                          <td className="py-3 px-4 text-right">
-                            <button
-                              type="button"
-                              onClick={() =>
-                                triggerDemoToast(
-                                  'Contacto WhatsApp',
-                                  `Enviando mensaje a ${st.name} (${st.phone}).`,
-                                  'info'
-                                )
-                              }
-                              className="p-1.5 rounded-lg text-slate-400 hover:text-emerald-500 transition cursor-pointer"
-                              title="Contactar"
-                            >
-                              <MessageCircle className="w-4 h-4" />
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
+                            </td>
+                          </tr>
+                        );
+                      })}
                     </tbody>
                   </table>
                 </div>
@@ -2266,6 +2419,337 @@ export const AdminSchool: React.FC = () => {
                 Sí, Eliminar Grupo
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* =====================================================================
+          MODAL: NUEVO ALUMNO / MATRICULACIÓN
+          ===================================================================== */}
+      {isNewStudentModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-xs animate-in fade-in duration-150">
+          <div className="w-full max-w-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl text-slate-900 dark:text-slate-100 space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+              <div className="flex items-center gap-2.5">
+                <div className="p-2 rounded-xl bg-indigo-50 dark:bg-indigo-950/80 text-indigo-600 dark:text-indigo-400">
+                  <UserPlus className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-base font-black text-slate-900 dark:text-white">
+                    Matricular Nuevo Alumno
+                  </h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                    Inscripción de alumno en grupos regulares o clases sueltas
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsNewStudentModalOpen(false)}
+                className="p-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleStudentSubmit} className="space-y-3.5 text-xs">
+              <div>
+                <label className="block text-slate-700 dark:text-slate-300 mb-1 font-bold">
+                  Nombre Completo *
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Ej. Carlos Martínez Alarcón"
+                  value={studentFormData.name}
+                  onChange={(e) => setStudentFormData({ ...studentFormData, name: e.target.value })}
+                  className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 font-medium"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-slate-700 dark:text-slate-300 mb-1 font-bold">
+                    Teléfono / WhatsApp
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="+34 600 000 000"
+                    value={studentFormData.phone}
+                    onChange={(e) => setStudentFormData({ ...studentFormData, phone: e.target.value })}
+                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-700 dark:text-slate-300 mb-1 font-bold">
+                    Correo Electrónico
+                  </label>
+                  <input
+                    type="email"
+                    placeholder="carlos@email.com"
+                    value={studentFormData.email}
+                    onChange={(e) => setStudentFormData({ ...studentFormData, email: e.target.value })}
+                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-slate-700 dark:text-slate-300 mb-1 font-bold">
+                    Nivel de Juego (Escala ELO)
+                  </label>
+                  <select
+                    value={studentFormData.level}
+                    onChange={(e) => setStudentFormData({ ...studentFormData, level: e.target.value })}
+                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 font-mono"
+                  >
+                    {[1.0, 1.5, 2.0, 2.5, 3.0, 3.25, 3.5, 3.75, 4.0, 4.25, 4.5, 5.0, 5.5, 6.0].map((lvl) => (
+                      <option key={lvl} value={lvl.toFixed(1)}>
+                        Nivel {lvl.toFixed(1)} {lvl <= 2.5 ? '· Iniciación' : lvl <= 4.0 ? '· Intermedio' : '· Avanzado / Competición'}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-slate-700 dark:text-slate-300 mb-1 font-bold">
+                    Modalidad
+                  </label>
+                  <select
+                    value={studentFormData.type}
+                    onChange={(e) =>
+                      setStudentFormData({
+                        ...studentFormData,
+                        type: e.target.value as 'regular' | 'single',
+                      })
+                    }
+                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                  >
+                    <option value="regular">Grupo Regular (Cuota Mensual / Trimestral)</option>
+                    <option value="single">Clase Suelta / Sesión Individual</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-slate-700 dark:text-slate-300 mb-1 font-bold">
+                    Grupo Asignado
+                  </label>
+                  <select
+                    value={studentFormData.groupName}
+                    onChange={(e) => setStudentFormData({ ...studentFormData, groupName: e.target.value })}
+                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                  >
+                    {groups.map((g) => (
+                      <option key={g.id} value={g.name}>
+                        {g.name} ({g.students.length}/{g.maxStudents} plazas)
+                      </option>
+                    ))}
+                    <option value="Clases Particulares">Clases Particulares (Sin grupo)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-slate-700 dark:text-slate-300 mb-1 font-bold">
+                    Estado de Cuota
+                  </label>
+                  <select
+                    value={studentFormData.paymentStatus}
+                    onChange={(e) =>
+                      setStudentFormData({
+                        ...studentFormData,
+                        paymentStatus: e.target.value as 'paid' | 'pending' | 'scholarship',
+                      })
+                    }
+                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                  >
+                    <option value="paid">Al Día / Pagado</option>
+                    <option value="pending">Cuota Pendiente</option>
+                    <option value="scholarship">Beca Deportiva Club (0€)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setIsNewStudentModalOpen(false)}
+                  className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold transition cursor-pointer"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold transition shadow-sm active:scale-95 cursor-pointer flex items-center gap-1.5"
+                >
+                  <UserPlus className="w-4 h-4" />
+                  <span>Matricular Alumno</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* =====================================================================
+          MODAL: NUEVO PROFESOR / ENTRENADOR
+          ===================================================================== */}
+      {isNewCoachModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-xs animate-in fade-in duration-150">
+          <div className="w-full max-w-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl text-slate-900 dark:text-slate-100 space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+              <div className="flex items-center gap-2.5">
+                <div className="p-2 rounded-xl bg-amber-50 dark:bg-amber-950/80 text-amber-600 dark:text-amber-400">
+                  <GraduationCap className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-base font-black text-slate-900 dark:text-white">
+                    Alta de Nuevo Profesor
+                  </h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                    Registrar nuevo monitor o entrenador oficial en la academia
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsNewCoachModalOpen(false)}
+                className="p-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleCoachSubmit} className="space-y-3.5 text-xs">
+              <div>
+                <label className="block text-slate-700 dark:text-slate-300 mb-1 font-bold">
+                  Nombre Completo del Profesor *
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Ej. Lucas Domínguez"
+                  value={coachFormData.name}
+                  onChange={(e) => setCoachFormData({ ...coachFormData, name: e.target.value })}
+                  className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 font-medium"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-slate-700 dark:text-slate-300 mb-1 font-bold">
+                    Cargo / Especialidad
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Ej. Monitor de Tecnificación"
+                    value={coachFormData.roleTitle}
+                    onChange={(e) => setCoachFormData({ ...coachFormData, roleTitle: e.target.value })}
+                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-700 dark:text-slate-300 mb-1 font-bold">
+                    Titulación Oficial
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Ej. Monitor Nacional Nivel 2 FEP"
+                    value={coachFormData.certification}
+                    onChange={(e) => setCoachFormData({ ...coachFormData, certification: e.target.value })}
+                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-slate-700 dark:text-slate-300 mb-1 font-bold">
+                    Teléfono de Contacto
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="+34 655 000 000"
+                    value={coachFormData.phone}
+                    onChange={(e) => setCoachFormData({ ...coachFormData, phone: e.target.value })}
+                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-700 dark:text-slate-300 mb-1 font-bold">
+                    Correo Electrónico
+                  </label>
+                  <input
+                    type="email"
+                    placeholder="lucas@padelsanmateo.es"
+                    value={coachFormData.email}
+                    onChange={(e) => setCoachFormData({ ...coachFormData, email: e.target.value })}
+                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-slate-700 dark:text-slate-300 mb-1 font-bold">
+                    Tarifa Horaria (€/hora)
+                  </label>
+                  <input
+                    type="number"
+                    step="0.5"
+                    min="10"
+                    value={coachFormData.hourlyRate}
+                    onChange={(e) => setCoachFormData({ ...coachFormData, hourlyRate: parseFloat(e.target.value) || 0 })}
+                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 font-mono"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-700 dark:text-slate-300 mb-1 font-bold">
+                    Horas Semanales Asignadas
+                  </label>
+                  <input
+                    type="number"
+                    min="1"
+                    max="60"
+                    value={coachFormData.weeklyHours}
+                    onChange={(e) => setCoachFormData({ ...coachFormData, weeklyHours: parseInt(e.target.value) || 0 })}
+                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 font-mono"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-slate-700 dark:text-slate-300 mb-1 font-bold">
+                  Biografía & Trayectoria
+                </label>
+                <textarea
+                  rows={2}
+                  placeholder="Breve reseña sobre experiencia docente y torneos..."
+                  value={coachFormData.bio}
+                  onChange={(e) => setCoachFormData({ ...coachFormData, bio: e.target.value })}
+                  className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 resize-none"
+                />
+              </div>
+
+              <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setIsNewCoachModalOpen(false)}
+                  className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold transition cursor-pointer"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-bold transition shadow-sm active:scale-95 cursor-pointer flex items-center gap-1.5"
+                >
+                  <GraduationCap className="w-4 h-4" />
+                  <span>Dar de Alta Profesor</span>
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

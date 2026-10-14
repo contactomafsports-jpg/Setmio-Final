@@ -55,6 +55,8 @@ export const AdminMatches: React.FC = () => {
     navigateToPlayerProfile,
     playerGroups,
     sendGroupConvocatoria,
+    customers,
+    sendNotification,
     t,
   } = useApp();
 
@@ -215,18 +217,36 @@ export const AdminMatches: React.FC = () => {
   const [creatorName, setCreatorName] = useState('Club ' + (currentTenant?.name || 'Pádel San Mateo'));
   const [creatorLevel, setCreatorLevel] = useState(4.0);
   const [creatorPosition, setCreatorPosition] = useState<'drive' | 'reves' | 'both'>('drive');
+  const [selectedCreatorCustomerId, setSelectedCreatorCustomerId] = useState<string>('c-1');
+  const [creatorSearchQuery, setCreatorSearchQuery] = useState('');
+  const [isCreatorDropdownOpen, setIsCreatorDropdownOpen] = useState(false);
   const [selectedCourtId, setSelectedCourtId] = useState(courts[0]?.id || 'court-1');
   const [matchDate, setMatchDate] = useState('2026-10-10');
   const [matchTime, setMatchTime] = useState('19:30');
   const [minLevel, setMinLevel] = useState(3.0);
   const [maxLevel, setMaxLevel] = useState(4.25);
   const [pricePerPlayer, setPricePerPlayer] = useState(7.5);
+  const [memberPricePerPlayer, setMemberPricePerPlayer] = useState(6.0);
   const [matchMode, setMatchMode] = useState<'competitive' | 'friendly'>('competitive');
   const [visibility, setVisibility] = useState<'public' | 'private' | 'group'>('public');
   const [restrictedGroupName, setRestrictedGroupName] = useState('Equipo A Masculino');
   const [gender, setGender] = useState<'male' | 'female' | 'mixed'>('male');
   const [paymentMode, setPaymentMode] = useState<'split' | 'single'>('split');
   const [paymentPolicy, setPaymentPolicy] = useState<'online_only' | 'counter_only' | 'both'>('both');
+
+  // Initial slot assignments during match creation
+  const [slot2PlayerId, setSlot2PlayerId] = useState<string>('none');
+  const [slot3PlayerId, setSlot3PlayerId] = useState<string>('none');
+  const [slot4PlayerId, setSlot4PlayerId] = useState<string>('none');
+
+  // ELO Scale standard
+  const ELO_SCALE = useMemo(
+    () => [
+      1.0, 1.25, 1.5, 1.75, 2.0, 2.25, 2.5, 2.75, 3.0, 3.25, 3.5, 3.75,
+      4.0, 4.25, 4.5, 4.75, 5.0, 5.25, 5.5, 5.75, 6.0, 6.25, 6.5, 6.75, 7.0,
+    ],
+    []
+  );
 
   // Add / Invite player form state
   const [inviteTab, setInviteTab] = useState<'registered' | 'external' | 'guest'>('registered');
@@ -335,6 +355,46 @@ export const AdminMatches: React.FC = () => {
       ? `${currentTenant.name} (Club Oficial)`
       : creatorName.trim() || 'Organizador';
 
+    // Build initial players list based on creator and pre-assigned slots
+    const initialPlayers: OpenMatch['players'] = [
+      {
+        id: `p-${Date.now()}-creator`,
+        name: isClubCreator ? `Admin · ${currentTenant.name}` : finalCreatorName,
+        level: Number(creatorLevel) || 4.0,
+        position: creatorPosition,
+        paid: true,
+      },
+    ];
+
+    const invitedSlotIds = [slot2PlayerId, slot3PlayerId, slot4PlayerId].filter(
+      (id) => id && id !== 'none'
+    );
+    const notifiedPlayerNames: string[] = [];
+
+    invitedSlotIds.forEach((cId, idx) => {
+      const cust = customers.find((c) => c.id === cId);
+      if (cust) {
+        notifiedPlayerNames.push(cust.name);
+        const slotPrice = cust.isMember ? memberPricePerPlayer : pricePerPlayer;
+        initialPlayers.push({
+          id: `p-${Date.now()}-${idx + 2}`,
+          name: cust.name,
+          level: cust.level || 3.5,
+          position: (cust.position?.toLowerCase() === 'reves' ? 'reves' : 'drive') as any,
+          paid: false,
+          customPrice: slotPrice,
+        });
+
+        // Enviar automáticamente notificación a cada jugador añadido para aceptar y pagar su plaza
+        sendNotification({
+          title: 'Convocatoria de Partida: Plaza Asignada',
+          message: `${finalCreatorName} te ha asignado una plaza en la partida del ${matchDate} a las ${matchTime} h en ${court.name}. Importe: ${slotPrice.toFixed(2)} €. Entra para aceptar y pagar tu plaza.`,
+          type: 'match',
+          actionUrl: '/admin/partidas',
+        });
+      }
+    });
+
     createOpenMatch({
       courtId: court.id,
       courtName: court.name,
@@ -345,7 +405,8 @@ export const AdminMatches: React.FC = () => {
       minLevel: Number(minLevel),
       maxLevel: Number(maxLevel),
       pricePerPlayer: Number(pricePerPlayer),
-      status: 'open',
+      memberPricePerPlayer: Number(memberPricePerPlayer),
+      status: initialPlayers.length >= 4 ? 'full' : 'open',
       mode: matchMode,
       visibility,
       restrictedGroupName: visibility === 'group' ? restrictedGroupName : undefined,
@@ -353,21 +414,19 @@ export const AdminMatches: React.FC = () => {
       isClubCreated: isClubCreator,
       paymentMode,
       paymentPolicy,
-      players: [
-        {
-          id: `p-${Date.now()}`,
-          name: isClubCreator ? `Admin · ${currentTenant.name}` : finalCreatorName,
-          level: Number(creatorLevel) || 4.0,
-          position: creatorPosition,
-          paid: true,
-        },
-      ],
+      players: initialPlayers,
     });
 
     setShowCreateModal(false);
+    setSlot2PlayerId('none');
+    setSlot3PlayerId('none');
+    setSlot4PlayerId('none');
+
     triggerDemoToast(
       t('matches.toastCreatedTitle', 'Partida Publicada con Éxito'),
-      `Partida en ${court.name} (${gender === 'male' ? 'Masculina' : gender === 'female' ? 'Femenina' : 'Mixta'}) · ${visibility === 'public' ? 'Pública' : visibility === 'group' ? `Grupo: ${restrictedGroupName}` : 'Privada'} · Cobro: ${paymentMode === 'split' ? 'Split 1/4' : 'Pago Único'}.`,
+      notifiedPlayerNames.length > 0
+        ? `Partida creada en ${court.name}. Se ha enviado notificación automática a ${notifiedPlayerNames.join(', ')} para confirmar y abonar su plaza.`
+        : `Partida en ${court.name} (${gender === 'male' ? 'Masculina' : gender === 'female' ? 'Femenina' : 'Mixta'}) · Cobro: ${paymentMode === 'split' ? 'Split 1/4' : 'Pago Único'}.`,
       'success'
     );
   };
@@ -379,6 +438,45 @@ export const AdminMatches: React.FC = () => {
     const finalCreatorName = isClubCreator
       ? `${currentTenant.name} (Club Oficial)`
       : creatorName.trim() || 'Organizador';
+
+    const initialPlayers: OpenMatch['players'] = [
+      {
+        id: `p-${Date.now()}-creator`,
+        name: isClubCreator ? `Admin · ${currentTenant.name}` : finalCreatorName,
+        level: Number(creatorLevel) || 4.0,
+        position: creatorPosition,
+        paid: true,
+      },
+    ];
+
+    const invitedSlotIds = [slot2PlayerId, slot3PlayerId, slot4PlayerId].filter(
+      (id) => id && id !== 'none'
+    );
+    const notifiedPlayerNames: string[] = [];
+
+    invitedSlotIds.forEach((cId, idx) => {
+      const cust = customers.find((c) => c.id === cId);
+      if (cust) {
+        notifiedPlayerNames.push(cust.name);
+        const slotPrice = cust.isMember ? memberPricePerPlayer : pricePerPlayer;
+        initialPlayers.push({
+          id: `p-${Date.now()}-${idx + 2}`,
+          name: cust.name,
+          level: cust.level || 3.5,
+          position: (cust.position?.toLowerCase() === 'reves' ? 'reves' : 'drive') as any,
+          paid: false,
+          customPrice: slotPrice,
+        });
+
+        // Enviar automáticamente notificación a cada jugador añadido para aceptar y pagar su plaza
+        sendNotification({
+          title: 'Convocatoria de Partida: Plaza Asignada',
+          message: `${finalCreatorName} te ha asignado una plaza en la partida del ${matchDate} a las ${matchTime} h en ${court.name}. Importe: ${slotPrice.toFixed(2)} €. Entra para aceptar y pagar tu plaza.`,
+          type: 'match',
+          actionUrl: '/admin/partidas',
+        });
+      }
+    });
 
     const newMatchData: OpenMatch = {
       id: `match-${Date.now()}`,
@@ -392,7 +490,8 @@ export const AdminMatches: React.FC = () => {
       minLevel: Number(minLevel),
       maxLevel: Number(maxLevel),
       pricePerPlayer: Number(pricePerPlayer),
-      status: 'open',
+      memberPricePerPlayer: Number(memberPricePerPlayer),
+      status: initialPlayers.length >= 4 ? 'full' : 'open',
       mode: matchMode,
       visibility,
       restrictedGroupName: visibility === 'group' ? restrictedGroupName : undefined,
@@ -400,22 +499,20 @@ export const AdminMatches: React.FC = () => {
       isClubCreated: isClubCreator,
       paymentMode,
       paymentPolicy,
-      players: [
-        {
-          id: `p-${Date.now()}`,
-          name: isClubCreator ? `Admin · ${currentTenant.name}` : finalCreatorName,
-          level: Number(creatorLevel) || 4.0,
-          position: creatorPosition,
-          paid: true,
-        },
-      ],
+      players: initialPlayers,
     };
 
     createOpenMatch(newMatchData);
     setShowCreateModal(false);
+    setSlot2PlayerId('none');
+    setSlot3PlayerId('none');
+    setSlot4PlayerId('none');
+
     triggerDemoToast(
       t('matches.toastCreatedTitle', 'Partida Publicada con Éxito'),
-      `Partida creada en ${court.name}. Configura la convocatoria para el grupo de jugadores.`,
+      notifiedPlayerNames.length > 0
+        ? `Partida creada en ${court.name}. Notificación automática remitida a ${notifiedPlayerNames.join(', ')} para aceptar y abonar su plaza.`
+        : `Partida creada en ${court.name}. Configura la convocatoria para el grupo de jugadores.`,
       'success'
     );
     handleOpenNotifyGroup(newMatchData);
@@ -1922,18 +2019,144 @@ export const AdminMatches: React.FC = () => {
                 </div>
 
                 {!isClubCreator && (
-                  <div>
-                    <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1">
-                      Nombre del Socio Organizador:
-                    </label>
-                    <input
-                      type="text"
-                      value={creatorName}
-                      onChange={(e) => setCreatorName(e.target.value)}
-                      placeholder="Ej. Carlos Méndez"
-                      className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-bold text-slate-900 dark:text-white"
-                      required
-                    />
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400">
+                        Socio u Organizador Registrado:
+                      </label>
+                      <span className="text-[10px] text-slate-400">
+                        {customers.length} socios/clientes disponibles
+                      </span>
+                    </div>
+
+                    {/* Selector / Combobox con Autocompletado */}
+                    <div className="relative">
+                      <div className="relative">
+                        <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                        <input
+                          type="text"
+                          value={creatorSearchQuery}
+                          onFocus={() => setIsCreatorDropdownOpen(true)}
+                          onChange={(e) => {
+                            setCreatorSearchQuery(e.target.value);
+                            setIsCreatorDropdownOpen(true);
+                          }}
+                          placeholder={
+                            customers.find((c) => c.id === selectedCreatorCustomerId)
+                              ? `${customers.find((c) => c.id === selectedCreatorCustomerId)?.name} (Escribe para buscar otro...)`
+                              : 'Buscar socio por nombre, socio # o teléfono...'
+                          }
+                          className="w-full pl-9 pr-8 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-bold text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:border-emerald-500 shadow-2xs"
+                        />
+                        {creatorSearchQuery && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setCreatorSearchQuery('');
+                              setIsCreatorDropdownOpen(true);
+                            }}
+                            className="absolute right-2.5 top-1/2 -translate-y-1/2 p-0.5 rounded-full text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                          >
+                            <X className="w-3.5 h-3.5" />
+                          </button>
+                        )}
+                      </div>
+
+                      {/* Dropdown flotante con autocompletado y scroll */}
+                      {isCreatorDropdownOpen && (
+                        <div className="absolute left-0 right-0 top-full mt-1.5 z-30 max-h-56 overflow-y-auto rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl p-1 space-y-0.5">
+                          {(() => {
+                            const filtered = customers.filter(
+                              (c) =>
+                                !creatorSearchQuery.trim() ||
+                                c.name.toLowerCase().includes(creatorSearchQuery.toLowerCase()) ||
+                                (c.memberNum && c.memberNum.toLowerCase().includes(creatorSearchQuery.toLowerCase())) ||
+                                (c.phone && c.phone.includes(creatorSearchQuery)) ||
+                                (c.email && c.email.toLowerCase().includes(creatorSearchQuery.toLowerCase()))
+                            );
+
+                            if (filtered.length === 0) {
+                              return (
+                                <div className="p-3 text-center text-xs text-slate-400">
+                                  No se encontraron usuarios con "{creatorSearchQuery}"
+                                </div>
+                              );
+                            }
+
+                            return filtered.map((c) => {
+                              const isSelected = c.id === selectedCreatorCustomerId;
+                              return (
+                                <button
+                                  key={c.id}
+                                  type="button"
+                                  onClick={() => {
+                                    setSelectedCreatorCustomerId(c.id);
+                                    setCreatorName(c.name);
+                                    setCreatorLevel(c.level || 4.0);
+                                    setCreatorPosition(c.position?.toLowerCase() === 'reves' ? 'reves' : 'drive');
+                                    setCreatorSearchQuery('');
+                                    setIsCreatorDropdownOpen(false);
+                                  }}
+                                  className={`w-full p-2 rounded-xl flex items-center justify-between gap-2.5 text-left transition cursor-pointer ${
+                                    isSelected
+                                      ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-900 dark:text-emerald-200 font-bold'
+                                      : 'hover:bg-slate-50 dark:hover:bg-slate-800/60 text-slate-700 dark:text-slate-300'
+                                  }`}
+                                >
+                                  <div className="flex items-center gap-2.5 min-w-0">
+                                    <img
+                                      src={c.avatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80'}
+                                      alt={c.name}
+                                      className="w-7 h-7 rounded-full object-cover shrink-0"
+                                    />
+                                    <div className="min-w-0">
+                                      <div className="text-xs font-bold text-slate-900 dark:text-white truncate">
+                                        {c.name}
+                                      </div>
+                                      <div className="text-[10px] text-slate-400">
+                                        Nivel {c.level?.toFixed(2) || '3.50'} · Socio {c.memberNum || `#${c.id}`}
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div className="flex items-center gap-1.5 shrink-0">
+                                    {c.isMember && (
+                                      <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300">
+                                        Socio
+                                      </span>
+                                    )}
+                                    {isSelected && <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />}
+                                  </div>
+                                </button>
+                              );
+                            });
+                          })()}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Previsualización del Organizador Seleccionado */}
+                    {(() => {
+                      const selectedCust = customers.find((c) => c.id === selectedCreatorCustomerId);
+                      if (!selectedCust) return null;
+                      return (
+                        <div className="flex items-center gap-2.5 p-2 rounded-xl bg-emerald-50/70 dark:bg-emerald-950/40 border border-emerald-500/20 text-emerald-900 dark:text-emerald-200 text-xs">
+                          <img
+                            src={selectedCust.avatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80'}
+                            alt={selectedCust.name}
+                            className="w-6 h-6 rounded-full object-cover shrink-0"
+                          />
+                          <div className="min-w-0 flex-1">
+                            <span className="font-bold truncate block">{selectedCust.name}</span>
+                            <span className="text-[10px] text-slate-500 dark:text-slate-400">
+                              Nivel {selectedCust.level?.toFixed(2)} · {selectedCust.position || 'Revés/Drive'} · Socio {selectedCust.memberNum || `#${selectedCust.id}`}
+                            </span>
+                          </div>
+                          <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-emerald-200/60 dark:bg-emerald-900/60 text-emerald-800 dark:text-emerald-300 shrink-0">
+                            {selectedCust.isMember ? 'Socio Oficial' : 'Cliente'}
+                          </span>
+                        </div>
+                      );
+                    })()}
                   </div>
                 )}
               </div>
@@ -2168,51 +2391,218 @@ export const AdminMatches: React.FC = () => {
                 </div>
               </div>
 
-              {/* Niveles ELO y Precio */}
-              <div className="grid grid-cols-3 gap-3">
+              {/* Niveles ELO (Escala Estándar 1.0 - 7.0) */}
+              <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1 text-[11px]">
-                    Nivel Mínimo
+                    Nivel Mínimo (Escala ELO)
                   </label>
-                  <input
-                    type="number"
-                    step="0.25"
-                    min="1.0"
-                    max="7.0"
+                  <select
                     value={minLevel}
                     onChange={(e) => setMinLevel(parseFloat(e.target.value))}
-                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-mono font-bold text-slate-900 dark:text-white"
-                    required
-                  />
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-mono font-bold text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                  >
+                    {ELO_SCALE.map((lvl) => (
+                      <option key={`min-${lvl}`} value={lvl}>
+                        Nivel {lvl.toFixed(2)}
+                      </option>
+                    ))}
+                  </select>
                 </div>
                 <div>
                   <label className="block font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1 text-[11px]">
-                    Nivel Máximo
+                    Nivel Máximo (Escala ELO)
                   </label>
-                  <input
-                    type="number"
-                    step="0.25"
-                    min="1.0"
-                    max="7.0"
+                  <select
                     value={maxLevel}
                     onChange={(e) => setMaxLevel(parseFloat(e.target.value))}
-                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-mono font-bold text-slate-900 dark:text-white"
-                    required
-                  />
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-mono font-bold text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                  >
+                    {ELO_SCALE.map((lvl) => (
+                      <option key={`max-${lvl}`} value={lvl}>
+                        Nivel {lvl.toFixed(2)}
+                      </option>
+                    ))}
+                  </select>
                 </div>
-                <div>
-                  <label className="block font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1 text-[11px]">
-                    Precio/Jug. (€)
-                  </label>
-                  <input
-                    type="number"
-                    step="0.5"
-                    min="1.0"
-                    value={pricePerPlayer}
-                    onChange={(e) => setPricePerPlayer(parseFloat(e.target.value))}
-                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-mono font-bold text-slate-900 dark:text-white"
-                    required
-                  />
+              </div>
+
+              {/* Sistema de Precios Avanzado: Precio General y Precio Especial Socios */}
+              <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800 space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider text-[11px] flex items-center gap-1.5">
+                    <DollarSign className="w-3.5 h-3.5 text-emerald-500" />
+                    <span>Tarifas por Plaza Individual</span>
+                  </span>
+                  <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold bg-emerald-50 dark:bg-emerald-950 px-2 py-0.5 rounded-md border border-emerald-500/20">
+                    Ahorro Socio: {(pricePerPlayer - memberPricePerPlayer).toFixed(2)} €
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block font-bold text-slate-600 dark:text-slate-400 mb-1 text-[11px]">
+                      Precio General (No Socios)
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="number"
+                        step="0.5"
+                        min="1.0"
+                        value={pricePerPlayer}
+                        onChange={(e) => setPricePerPlayer(parseFloat(e.target.value))}
+                        className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-mono font-bold text-slate-900 dark:text-white"
+                        required
+                      />
+                      <span className="absolute right-3 top-2 text-xs font-bold text-slate-400">€/jug.</span>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block font-bold text-emerald-700 dark:text-emerald-400 mb-1 text-[11px] flex items-center gap-1">
+                      <span>Precio Especial Socios</span>
+                      <Shield className="w-3 h-3 text-emerald-500" />
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="number"
+                        step="0.5"
+                        min="0.0"
+                        value={memberPricePerPlayer}
+                        onChange={(e) => setMemberPricePerPlayer(parseFloat(e.target.value))}
+                        className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-emerald-300 dark:border-emerald-800 rounded-xl text-xs font-mono font-bold text-emerald-600 dark:text-emerald-400 focus:outline-none focus:border-emerald-500"
+                        required
+                      />
+                      <span className="absolute right-3 top-2 text-xs font-bold text-emerald-600 dark:text-emerald-400">€/jug.</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Gestión de Plazas e Invitaciones Directas */}
+              <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800 space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider text-[11px] flex items-center gap-1.5">
+                    <Users className="w-3.5 h-3.5 text-purple-500" />
+                    <span>Gestión de Plazas e Invitaciones</span>
+                  </span>
+                  <span className="text-[10px] text-slate-400">4 plazas totales</span>
+                </div>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
+                  Asigna jugadores registrados a las plazas disponibles. Al publicar la partida, el sistema enviará automáticamente una notificación a cada jugador para aceptar y abonar su plaza.
+                </p>
+
+                <div className="space-y-2.5">
+                  {/* Plaza 1: Organizador */}
+                  <div className="flex items-center justify-between p-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs">
+                    <div className="flex items-center gap-2">
+                      <span className="w-5 h-5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 font-black text-[10px] flex items-center justify-center">
+                        1
+                      </span>
+                      <span className="font-bold text-slate-900 dark:text-white">
+                        {isClubCreator ? `Organizador (Club ${currentTenant.name})` : creatorName}
+                      </span>
+                    </div>
+                    <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950 px-2 py-0.5 rounded-md">
+                      Plaza Titular
+                    </span>
+                  </div>
+
+                  {/* Plaza 2 */}
+                  <div className="p-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-1.5 text-xs">
+                    <div className="flex items-center justify-between">
+                      <span className="font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5 text-[11px]">
+                        <span className="w-4 h-4 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-black text-[10px] flex items-center justify-center">
+                          2
+                        </span>
+                        <span>Plaza 2:</span>
+                      </span>
+                      {slot2PlayerId !== 'none' && (
+                        <span className="text-[10px] font-bold text-purple-600 dark:text-purple-400 flex items-center gap-1">
+                          <Send className="w-3 h-3" />
+                          <span>Se notificará para pagar</span>
+                        </span>
+                      )}
+                    </div>
+                    <select
+                      value={slot2PlayerId}
+                      onChange={(e) => setSlot2PlayerId(e.target.value)}
+                      className="w-full px-2.5 py-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-medium text-slate-900 dark:text-white"
+                    >
+                      <option value="none">-- Plaza libre (Abierta a inscripción pública) --</option>
+                      {customers
+                        .filter((c) => c.name !== creatorName && c.id !== slot3PlayerId && c.id !== slot4PlayerId)
+                        .map((c) => (
+                          <option key={`slot2-${c.id}`} value={c.id}>
+                            {c.name} (Nivel {c.level?.toFixed(2)}) {c.isMember ? '· Socio' : ''}
+                          </option>
+                        ))}
+                    </select>
+                  </div>
+
+                  {/* Plaza 3 */}
+                  <div className="p-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-1.5 text-xs">
+                    <div className="flex items-center justify-between">
+                      <span className="font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5 text-[11px]">
+                        <span className="w-4 h-4 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-black text-[10px] flex items-center justify-center">
+                          3
+                        </span>
+                        <span>Plaza 3:</span>
+                      </span>
+                      {slot3PlayerId !== 'none' && (
+                        <span className="text-[10px] font-bold text-purple-600 dark:text-purple-400 flex items-center gap-1">
+                          <Send className="w-3 h-3" />
+                          <span>Se notificará para pagar</span>
+                        </span>
+                      )}
+                    </div>
+                    <select
+                      value={slot3PlayerId}
+                      onChange={(e) => setSlot3PlayerId(e.target.value)}
+                      className="w-full px-2.5 py-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-medium text-slate-900 dark:text-white"
+                    >
+                      <option value="none">-- Plaza libre (Abierta a inscripción pública) --</option>
+                      {customers
+                        .filter((c) => c.name !== creatorName && c.id !== slot2PlayerId && c.id !== slot4PlayerId)
+                        .map((c) => (
+                          <option key={`slot3-${c.id}`} value={c.id}>
+                            {c.name} (Nivel {c.level?.toFixed(2)}) {c.isMember ? '· Socio' : ''}
+                          </option>
+                        ))}
+                    </select>
+                  </div>
+
+                  {/* Plaza 4 */}
+                  <div className="p-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-1.5 text-xs">
+                    <div className="flex items-center justify-between">
+                      <span className="font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5 text-[11px]">
+                        <span className="w-4 h-4 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-black text-[10px] flex items-center justify-center">
+                          4
+                        </span>
+                        <span>Plaza 4:</span>
+                      </span>
+                      {slot4PlayerId !== 'none' && (
+                        <span className="text-[10px] font-bold text-purple-600 dark:text-purple-400 flex items-center gap-1">
+                          <Send className="w-3 h-3" />
+                          <span>Se notificará para pagar</span>
+                        </span>
+                      )}
+                    </div>
+                    <select
+                      value={slot4PlayerId}
+                      onChange={(e) => setSlot4PlayerId(e.target.value)}
+                      className="w-full px-2.5 py-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-medium text-slate-900 dark:text-white"
+                    >
+                      <option value="none">-- Plaza libre (Abierta a inscripción pública) --</option>
+                      {customers
+                        .filter((c) => c.name !== creatorName && c.id !== slot2PlayerId && c.id !== slot3PlayerId)
+                        .map((c) => (
+                          <option key={`slot4-${c.id}`} value={c.id}>
+                            {c.name} (Nivel {c.level?.toFixed(2)}) {c.isMember ? '· Socio' : ''}
+                          </option>
+                        ))}
+                    </select>
+                  </div>
                 </div>
               </div>
 

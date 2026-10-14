@@ -58,6 +58,11 @@ export const OpenMatchesView: React.FC = () => {
   const [matchTime, setMatchTime] = useState('19:30');
   const [minLevel, setMinLevel] = useState(3.5);
   const [maxLevel, setMaxLevel] = useState(4.25);
+
+  const ELO_SCALE = [
+    1.0, 1.25, 1.5, 1.75, 2.0, 2.25, 2.5, 2.75, 3.0, 3.25, 3.5, 3.75,
+    4.0, 4.25, 4.5, 4.75, 5.0, 5.25, 5.5, 5.75, 6.0, 6.25, 6.5, 6.75, 7.0,
+  ];
   const [pricePerPlayer, setPricePerPlayer] = useState(8.0);
   const [creatorPosition, setCreatorPosition] = useState<'drive' | 'reves' | 'both'>('drive');
   const [matchGender, setMatchGender] = useState<'male' | 'female' | 'mixed'>('mixed');
@@ -1029,31 +1034,35 @@ export const OpenMatchesView: React.FC = () => {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
-                    Nivel Mínimo ({minLevel.toFixed(2)})
+                    Nivel Mínimo (Escala ELO)
                   </label>
-                  <input
-                    type="number"
-                    step="0.25"
-                    min="1.0"
-                    max="7.0"
+                  <select
                     value={minLevel}
                     onChange={(e) => setMinLevel(parseFloat(e.target.value))}
-                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-slate-900 dark:text-white font-mono font-bold"
-                  />
+                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-slate-900 dark:text-white font-mono font-bold focus:outline-none focus:border-emerald-500 cursor-pointer"
+                  >
+                    {ELO_SCALE.map((lvl) => (
+                      <option key={`pub-min-${lvl}`} value={lvl}>
+                        Nivel {lvl.toFixed(2)}
+                      </option>
+                    ))}
+                  </select>
                 </div>
                 <div>
                   <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
-                    Nivel Máximo ({maxLevel.toFixed(2)})
+                    Nivel Máximo (Escala ELO)
                   </label>
-                  <input
-                    type="number"
-                    step="0.25"
-                    min="1.0"
-                    max="7.0"
+                  <select
                     value={maxLevel}
                     onChange={(e) => setMaxLevel(parseFloat(e.target.value))}
-                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-slate-900 dark:text-white font-mono font-bold"
-                  />
+                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-slate-900 dark:text-white font-mono font-bold focus:outline-none focus:border-emerald-500 cursor-pointer"
+                  >
+                    {ELO_SCALE.map((lvl) => (
+                      <option key={`pub-max-${lvl}`} value={lvl}>
+                        Nivel {lvl.toFixed(2)}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
 

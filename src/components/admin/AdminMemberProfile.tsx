@@ -95,6 +95,12 @@ export const AdminMemberProfile: React.FC<AdminMemberProfileProps> = ({ member, 
   });
 
   const [currentBalance, setCurrentBalance] = useState(member.balance);
+  const [paymentPermission, setPaymentPermission] = useState<'default' | 'all' | 'online_only' | 'counter_allowed'>(
+    (member as any).paymentMethodPermission || 'default'
+  );
+  const [customDiscount, setCustomDiscount] = useState<string>(
+    (member as any).customDiscountType || 'none'
+  );
 
   // Modals state
   const [allMatchesModalOpen, setAllMatchesModalOpen] = useState(false);
@@ -1030,6 +1036,64 @@ export const AdminMemberProfile: React.FC<AdminMemberProfileProps> = ({ member, 
                 </div>
               )}
             </div>
+
+            {/* Configuración individual de formas de pago y tarifas para este socio */}
+            {isAdmin && (
+              <div className="mt-4 pt-3.5 border-t border-slate-200/80 dark:border-slate-800 space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-slate-800 dark:text-slate-200 text-xs flex items-center gap-1.5">
+                    <Shield className="w-3.5 h-3.5 text-emerald-500" />
+                    <span>Formas de Pago Autorizadas & Reglas de Descuento Individual</span>
+                  </span>
+                  <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold bg-emerald-50 dark:bg-emerald-950 px-2 py-0.5 rounded-md border border-emerald-500/20">
+                    Reglas CRM Personalizadas
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                  <div>
+                    <label className="block text-slate-600 dark:text-slate-400 font-bold mb-1 text-[11px]">
+                      Vías de Pago Permitidas:
+                    </label>
+                    <select
+                      value={paymentPermission}
+                      onChange={(e) => {
+                        const val = e.target.value as any;
+                        setPaymentPermission(val);
+                        triggerDemoToast('Permisos de Pago Actualizados', `Formas de pago para ${memberData.name} guardadas con éxito.`, 'success');
+                      }}
+                      className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl font-bold text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                    >
+                      <option value="default">Por defecto según categoría ({memberData.isMember ? 'Socio Oficial' : 'Cliente'})</option>
+                      <option value="counter_allowed">Permitir Pago en Mostrador / Recepción</option>
+                      <option value="online_only">Exigir Exclusivamente Pago Online Previo</option>
+                      <option value="all">Todas las vías autorizadas (Online, Mostrador, Monedero)</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-slate-600 dark:text-slate-400 font-bold mb-1 text-[11px]">
+                      Tarifa Especial / Descuento Asignado:
+                    </label>
+                    <select
+                      value={customDiscount}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setCustomDiscount(val);
+                        triggerDemoToast('Tarifa Actualizada', `Tarifa para ${memberData.name} actualizada: ${val === 'free_staff' ? 'Tarifa 0€ Staff (Gratis)' : val === 'free_coach' ? 'Tarifa 0€ Monitor (Gratis)' : val === 'vip_25' ? 'Descuento VIP 25%' : 'Tarifa Estándar'}.`, 'success');
+                      }}
+                      className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl font-bold text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                    >
+                      <option value="none">Tarifa Estándar del Club</option>
+                      <option value="free_staff">Tarifa 0€ (Gratis) — Personal y Empleados (Staff)</option>
+                      <option value="free_coach">Tarifa 0€ (Gratis) — Monitor / Profesor Oficial</option>
+                      <option value="vip_25">Descuento Especial VIP (25% en reservas y partidas)</option>
+                      <option value="vip_50">Descuento Convenio (50% en reservas)</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         )}
       </section>
