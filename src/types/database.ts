@@ -281,6 +281,7 @@ export interface CustomerItem {
   isMember: boolean;
   matches: number;
   avatarUrl?: string;
+  venueId?: string;
   hand?: string;
   position?: string;
   status?: string;

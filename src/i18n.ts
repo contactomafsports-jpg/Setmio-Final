@@ -36,12 +36,6 @@ const getInitialLanguage = (): string => {
   } catch {
     // Ignore storage issues
   }
-  if (typeof navigator !== 'undefined' && navigator.language) {
-    const navCode = navigator.language.split('-')[0].toLowerCase();
-    if (Object.keys(resources).includes(navCode)) {
-      return navCode;
-    }
-  }
   return 'es';
 };
 

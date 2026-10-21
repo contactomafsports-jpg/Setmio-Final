@@ -951,14 +951,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     } catch {
       // Ignore
     }
-    if (i18n) {
-      const i18nLang = normalizeSupportedLanguage(i18n.resolvedLanguage || i18n.language);
-      if (i18nLang) return i18nLang;
-    }
-    if (typeof navigator !== 'undefined') {
-      const navLang = normalizeSupportedLanguage(navigator.language);
-      if (navLang) return navLang;
-    }
     return 'es';
   });
 

@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { OfficialFlag } from './OfficialFlag';
 import { i18n } from '../../i18n';
+import { SUPPORTED_LANGUAGES, SupportedLanguage } from '../../lib/i18n';
 
 interface UserProfileDropdownProps {
   variant?: 'admin' | 'player' | 'coach';
@@ -53,6 +54,7 @@ export const UserProfileDropdown: React.FC<UserProfileDropdownProps> = ({
   } = useApp();
 
   const [isOpen, setIsOpen] = useState(false);
+  const [isLanguageExpanded, setIsLanguageExpanded] = useState(false);
   const [avatarImgError, setAvatarImgError] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -94,9 +96,9 @@ export const UserProfileDropdown: React.FC<UserProfileDropdownProps> = ({
     }
   };
 
-  const handleLanguageChange = (langCode: 'es' | 'en') => {
+  const handleLanguageChange = (langCode: SupportedLanguage | string) => {
     i18n.changeLanguage(langCode);
-    setLanguage(langCode);
+    setLanguage(langCode as SupportedLanguage);
   };
 
   const handleGoToSettings = () => {
@@ -289,49 +291,56 @@ export const UserProfileDropdown: React.FC<UserProfileDropdownProps> = ({
               </div>
             </div>
 
-            {/* Selector de Idioma (Español / Inglés) */}
-            <div className="flex items-center justify-between p-2 rounded-xl bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800/80">
-              <div className="flex items-center gap-2">
-                <Globe className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                <div>
-                  <div className="font-bold text-xs text-slate-900 dark:text-white">
+            {/* Selector Completo e Interactivo de Idiomas */}
+            <div className="rounded-xl bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800/80 p-2.5 space-y-2">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Globe className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                  <span className="font-bold text-xs text-slate-900 dark:text-white">
                     Idioma
-                  </div>
-                  <div className="text-[10px] text-slate-500 dark:text-slate-400">
-                    Español / English
-                  </div>
+                  </span>
                 </div>
+                <button
+                  type="button"
+                  onClick={() => setIsLanguageExpanded((prev) => !prev)}
+                  className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-[11px] font-bold text-slate-700 dark:text-slate-300 hover:border-emerald-500 cursor-pointer transition shadow-2xs"
+                  title="Cambiar idioma de la plataforma"
+                >
+                  <OfficialFlag code={language} />
+                  <span>{SUPPORTED_LANGUAGES.find((l) => l.code === language)?.name || 'Español'}</span>
+                  <ChevronDown className={`w-3 h-3 text-slate-400 transition-transform duration-200 ${isLanguageExpanded ? 'rotate-180' : ''}`} />
+                </button>
               </div>
 
-              {/* Selector interactivo ES / EN */}
-              <div className="flex items-center bg-slate-200/80 dark:bg-slate-900 p-0.5 rounded-xl text-[11px] font-bold border border-slate-300/60 dark:border-slate-800">
-                <button
-                  type="button"
-                  onClick={() => handleLanguageChange('es')}
-                  className={`px-2.5 py-1 rounded-lg flex items-center gap-1 transition cursor-pointer ${
-                    language === 'es'
-                      ? 'bg-emerald-600 text-white shadow-2xs font-extrabold'
-                      : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
-                  }`}
-                  title="Cambiar idioma a Español"
-                >
-                  <OfficialFlag code="es" />
-                  <span>Español</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleLanguageChange('en')}
-                  className={`px-2.5 py-1 rounded-lg flex items-center gap-1 transition cursor-pointer ${
-                    language === 'en'
-                      ? 'bg-emerald-600 text-white shadow-2xs font-extrabold'
-                      : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
-                  }`}
-                  title="Change language to English"
-                >
-                  <OfficialFlag code="en" />
-                  <span>English</span>
-                </button>
-              </div>
+              {/* Lista completa de todos los idiomas con banderas oficiales */}
+              {isLanguageExpanded && (
+                <div className="grid grid-cols-2 gap-1 max-h-48 overflow-y-auto pr-0.5 pt-1.5 border-t border-slate-200/70 dark:border-slate-800/80">
+                  {SUPPORTED_LANGUAGES.map((l) => {
+                    const isSelected = language === l.code;
+                    return (
+                      <button
+                        key={l.code}
+                        type="button"
+                        onClick={() => {
+                          handleLanguageChange(l.code);
+                          setIsLanguageExpanded(false);
+                        }}
+                        className={`flex items-center justify-between p-1.5 rounded-lg text-xs text-left transition cursor-pointer border ${
+                          isSelected
+                            ? 'bg-emerald-50 dark:bg-emerald-950/70 border-emerald-500 text-emerald-800 dark:text-emerald-300 font-bold shadow-2xs'
+                            : 'bg-white dark:bg-slate-900 border-slate-200/80 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/60'
+                        }`}
+                      >
+                        <span className="flex items-center gap-1.5 truncate">
+                          <OfficialFlag code={l.code} />
+                          <span className="truncate text-[11px]">{l.name}</span>
+                        </span>
+                        {isSelected && <Check className="w-3 h-3 text-emerald-600 shrink-0 ml-1" />}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           </div>
 

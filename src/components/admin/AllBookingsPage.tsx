@@ -54,7 +54,7 @@ export const AllBookingsPage: React.FC<AllBookingsPageProps> = ({
   }, []);
 
   const [searchTerm, setSearchTerm] = useState('');
-  const [timeFilter, setTimeFilter] = useState<'all' | 'upcoming' | 'past'>('all');
+  const [timeFilter, setTimeFilter] = useState<'upcoming' | 'past'>('upcoming');
   const [statusFilter, setStatusFilter] = useState<'all' | 'confirmed' | 'pending' | 'canceled'>('all');
   const [courtFilter, setCourtFilter] = useState<string>('all');
   const [venueFilter, setVenueFilter] = useState<string>('all');
@@ -195,7 +195,8 @@ export const AllBookingsPage: React.FC<AllBookingsPageProps> = ({
       const matchesCourt = courtFilter === 'all' || b.courtId === courtFilter;
 
       // 5. Filter by venue (Only if Multi-Sede)
-      const matchesVenue = !isMultiVenue || venueFilter === 'all' || b.venueId === venueFilter;
+      const bVenue = b.venueId || courts.find((c) => c.id === b.courtId)?.venueId || 'venue-san-mateo';
+      const matchesVenue = !isMultiVenue || venueFilter === 'all' || bVenue === venueFilter;
 
       // 6. Filter by date
       const matchesDate = !dateFilter || b.startTime.startsWith(dateFilter);
@@ -258,30 +259,37 @@ export const AllBookingsPage: React.FC<AllBookingsPageProps> = ({
     });
   };
 
-  // KPIs
-  const totalCount = bookings.length;
-  const confirmedCount = bookings.filter((b) => b.status === 'confirmed' || b.status === 'completed').length;
-  const pendingCount = bookings.filter((b) => b.paymentStatus === 'pending' || b.status === 'pending').length;
-  const totalAmountSum = bookings
+  // KPIs Dinámicos filtrados por la Sede Activa (venueFilter)
+  const venueFilteredBookingsForKpis = useMemo(() => {
+    if (venueFilter === 'all') return bookings;
+    return bookings.filter((b) => {
+      const bVenue = b.venueId || courts.find((c) => c.id === b.courtId)?.venueId || 'venue-san-mateo';
+      return bVenue === venueFilter;
+    });
+  }, [bookings, venueFilter, courts]);
+
+  const totalCount = venueFilteredBookingsForKpis.length;
+  const confirmedCount = venueFilteredBookingsForKpis.filter(
+    (b) => b.status === 'confirmed' || b.status === 'completed'
+  ).length;
+  const pendingCount = venueFilteredBookingsForKpis.filter(
+    (b) => b.paymentStatus === 'pending' || b.paymentStatus === 'partially_paid' || b.status === 'pending'
+  ).length;
+  const totalAmountSum = venueFilteredBookingsForKpis
     .filter((b) => b.status !== 'canceled')
     .reduce((acc, curr) => acc + (curr.totalPrice || 0), 0);
 
   return (
-    <div className="space-y-6 text-slate-900 dark:text-slate-100 max-w-7xl mx-auto pb-12">
+    <div className="space-y-5 text-slate-900 dark:text-slate-100 max-w-7xl mx-auto pb-12">
       {/* ======================================================================
-          HEADER DE PÁGINA (Sin etiqueta verde obsoleta, botones corregidos)
+          HEADER DE PÁGINA (Solo para vista de página completa, no modal)
           ====================================================================== */}
-      {!isModal ? (
+      {!isModal && (
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="min-w-0">
-            <div className="flex items-center gap-2">
-              <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight truncate">
-                {t('allBookings.title', 'Historial de Reservas')}
-              </h1>
-            </div>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 truncate">
-              {t('allBookings.subtitle', 'Histórico completo y gestión operativa de reservas')}
-            </p>
+            <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight truncate">
+              {t('allBookings.title', 'Historial de Reservas')}
+            </h1>
           </div>
 
           {/* Botonera Superior */}
@@ -307,20 +315,52 @@ export const AllBookingsPage: React.FC<AllBookingsPageProps> = ({
             </button>
           </div>
         </div>
-      ) : (
-        <div className="flex items-center justify-between gap-3 pb-2 border-b border-slate-200 dark:border-slate-800">
-          <p className="text-xs text-slate-500 dark:text-slate-400">
-            Filtra y gestiona el histórico de reservas sin perder tu fecha activa en el cuadrante.
-          </p>
-          <button
-            type="button"
-            onClick={handleOpenNewBooking}
-            className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md flex items-center gap-1.5 transition active:scale-95 cursor-pointer whitespace-nowrap"
-            title="Crear nueva reserva de pista"
-          >
-            <Plus className="w-4 h-4 shrink-0" />
-            <span>{t('allBookings.newBtn', 'Nueva reserva')}</span>
-          </button>
+      )}
+
+      {/* ======================================================================
+          FILTRO GLOBAL DE SEDE (Afecta tanto a las métricas como a la tabla)
+          ====================================================================== */}
+      {isMultiVenue && (
+        <div className="flex flex-wrap items-center justify-between gap-3 p-3.5 sm:p-4 rounded-2xl bg-white dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 shadow-xs">
+          <div className="flex items-center gap-2">
+            <Building2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+            <span className="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-slate-200">
+              Sede Activa:
+            </span>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-1.5">
+            <button
+              type="button"
+              onClick={() => setVenueFilter('all')}
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer border ${
+                venueFilter === 'all'
+                  ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs'
+                  : 'bg-slate-50 dark:bg-slate-900 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-slate-300'
+              }`}
+            >
+              Todas las Sedes
+            </button>
+            {venues
+              .filter((v) => v.id !== 'all')
+              .map((v) => {
+                const isSelected = venueFilter === v.id;
+                return (
+                  <button
+                    key={v.id}
+                    type="button"
+                    onClick={() => setVenueFilter(v.id)}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer border ${
+                      isSelected
+                        ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs'
+                        : 'bg-slate-50 dark:bg-slate-900 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-slate-300'
+                    }`}
+                  >
+                    {v.shortName || v.name}
+                  </button>
+                );
+              })}
+          </div>
         </div>
       )}
 
@@ -390,24 +430,8 @@ export const AllBookingsPage: React.FC<AllBookingsPageProps> = ({
             )}
           </div>
 
-          {/* Selectores de Sede (si Multi-Sede), Pista y Fecha */}
+          {/* Selectores de Pista y Fecha */}
           <div className="flex flex-wrap items-center gap-1.5 shrink-0">
-            {/* Filtro de Sede ÚNICAMENTE en Multi-Sede (Condicionalidad Dinámica Tarea 1) */}
-            {isMultiVenue && (
-              <select
-                value={venueFilter}
-                onChange={(e) => setVenueFilter(e.target.value)}
-                className="px-2.5 py-2 bg-white dark:bg-slate-900 border border-indigo-200 dark:border-indigo-800/80 rounded-xl text-xs text-indigo-900 dark:text-indigo-200 focus:outline-none focus:border-indigo-500 transition font-bold shadow-2xs cursor-pointer max-w-[150px]"
-                title="Filtrar por Sede"
-              >
-                <option value="all">Todas las Sedes</option>
-                {venues.filter(v => v.id !== 'all').map((venue) => (
-                  <option key={venue.id} value={venue.id}>
-                    {venue.shortName}
-                  </option>
-                ))}
-              </select>
-            )}
 
             {/* Selector de Pista */}
             <select
@@ -451,18 +475,6 @@ export const AllBookingsPage: React.FC<AllBookingsPageProps> = ({
           <div className="inline-flex w-full p-1 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 text-xs gap-1 shadow-2xs">
             <button
               type="button"
-              onClick={() => setTimeFilter('all')}
-              className={`flex-1 py-1 px-2 rounded-lg font-bold text-[11px] transition text-center cursor-pointer ${
-                timeFilter === 'all'
-                  ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white shadow-xs'
-                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-              }`}
-            >
-              {t('allBookings.timeFilter.all', 'Todas')}
-            </button>
-
-            <button
-              type="button"
               onClick={() => setTimeFilter('upcoming')}
               className={`flex-1 py-1 px-2 rounded-lg font-bold text-[11px] transition text-center cursor-pointer flex items-center justify-center gap-1 ${
                 timeFilter === 'upcoming'
@@ -471,7 +483,7 @@ export const AllBookingsPage: React.FC<AllBookingsPageProps> = ({
               }`}
             >
               <Clock className="w-3 h-3" />
-              <span>{t('allBookings.timeFilter.upcoming', 'Futuras / Hoy')}</span>
+              <span>Futuras / Pendientes</span>
             </button>
 
             <button
@@ -484,7 +496,7 @@ export const AllBookingsPage: React.FC<AllBookingsPageProps> = ({
               }`}
             >
               <CheckCircle2 className="w-3 h-3" />
-              <span>{t('allBookings.timeFilter.past', 'Pasadas')}</span>
+              <span>Pasadas / Efectuadas</span>
             </button>
           </div>
 

@@ -18,6 +18,10 @@ import {
   ArrowRight,
   FileSpreadsheet,
   Building2,
+  User,
+  UserCheck,
+  Search,
+  ChevronDown,
 } from 'lucide-react';
 
 const VENUE_THEMES: Record<string, {
@@ -35,7 +39,7 @@ const VENUE_THEMES: Record<string, {
 }> = {
   'venue-san-mateo': {
     name: 'Sede Central (San Mateo)',
-    shortName: 'San Mateo',
+    shortName: 'San Mateo (Centro)',
     dotBg: 'bg-emerald-500',
     badgeBg: 'bg-emerald-50 dark:bg-emerald-950/70',
     badgeBorder: 'border-emerald-300 dark:border-emerald-800',
@@ -48,42 +52,42 @@ const VENUE_THEMES: Record<string, {
   },
   'venue-coruna': {
     name: 'Sede A Coruña (Matogrande)',
-    shortName: 'A Coruña',
-    dotBg: 'bg-indigo-500',
-    badgeBg: 'bg-indigo-50 dark:bg-indigo-950/70',
-    badgeBorder: 'border-indigo-300 dark:border-indigo-800',
-    badgeText: 'text-indigo-800 dark:text-indigo-300',
-    slotBg: 'bg-indigo-50/95 dark:bg-indigo-950/75',
-    slotBorder: 'border-indigo-500/70 dark:border-indigo-500/80',
-    hoverBorder: 'hover:border-indigo-600 dark:hover:border-indigo-400',
-    pinText: 'text-indigo-700 dark:text-indigo-400',
-    accentText: 'group-hover:text-indigo-600 dark:group-hover:text-indigo-400',
+    shortName: 'A Coruña (Norte)',
+    dotBg: 'bg-blue-600',
+    badgeBg: 'bg-blue-50 dark:bg-blue-950/70',
+    badgeBorder: 'border-blue-300 dark:border-blue-800',
+    badgeText: 'text-blue-800 dark:text-blue-300',
+    slotBg: 'bg-blue-50/95 dark:bg-blue-950/75',
+    slotBorder: 'border-blue-500/70 dark:border-blue-500/80',
+    hoverBorder: 'hover:border-blue-600 dark:hover:border-blue-400',
+    pinText: 'text-blue-700 dark:text-blue-400',
+    accentText: 'group-hover:text-blue-600 dark:group-hover:text-blue-400',
   },
   'venue-santiago': {
     name: 'Sede Santiago (Compostela)',
-    shortName: 'Santiago',
-    dotBg: 'bg-amber-500',
-    badgeBg: 'bg-amber-50 dark:bg-amber-950/70',
-    badgeBorder: 'border-amber-300 dark:border-amber-800',
-    badgeText: 'text-amber-800 dark:text-amber-300',
-    slotBg: 'bg-amber-50/95 dark:bg-amber-950/75',
-    slotBorder: 'border-amber-500/70 dark:border-amber-500/80',
-    hoverBorder: 'hover:border-amber-600 dark:hover:border-amber-400',
-    pinText: 'text-amber-700 dark:text-amber-400',
-    accentText: 'group-hover:text-amber-600 dark:group-hover:text-amber-400',
+    shortName: 'Santiago (Sur)',
+    dotBg: 'bg-orange-500',
+    badgeBg: 'bg-orange-50 dark:bg-orange-950/70',
+    badgeBorder: 'border-orange-300 dark:border-orange-800',
+    badgeText: 'text-orange-800 dark:text-orange-300',
+    slotBg: 'bg-orange-50/95 dark:bg-orange-950/75',
+    slotBorder: 'border-orange-500/70 dark:border-orange-500/80',
+    hoverBorder: 'hover:border-orange-600 dark:hover:border-orange-400',
+    pinText: 'text-orange-700 dark:text-orange-400',
+    accentText: 'group-hover:text-orange-600 dark:group-hover:text-orange-400',
   },
   'venue-vigo': {
     name: 'Sede Vigo (Rías Baixas)',
-    shortName: 'Vigo',
-    dotBg: 'bg-sky-500',
-    badgeBg: 'bg-sky-50 dark:bg-sky-950/70',
-    badgeBorder: 'border-sky-300 dark:border-sky-800',
-    badgeText: 'text-sky-800 dark:text-sky-300',
-    slotBg: 'bg-sky-50/95 dark:bg-sky-950/75',
-    slotBorder: 'border-sky-500/70 dark:border-sky-500/80',
-    hoverBorder: 'hover:border-sky-600 dark:hover:border-sky-400',
-    pinText: 'text-sky-700 dark:text-sky-400',
-    accentText: 'group-hover:text-sky-600 dark:group-hover:text-sky-400',
+    shortName: 'Vigo (Arena)',
+    dotBg: 'bg-purple-600',
+    badgeBg: 'bg-purple-50 dark:bg-purple-950/70',
+    badgeBorder: 'border-purple-300 dark:border-purple-800',
+    badgeText: 'text-purple-800 dark:text-purple-300',
+    slotBg: 'bg-purple-50/95 dark:bg-purple-950/75',
+    slotBorder: 'border-purple-500/70 dark:border-purple-500/80',
+    hoverBorder: 'hover:border-purple-600 dark:hover:border-purple-400',
+    pinText: 'text-purple-700 dark:text-purple-400',
+    accentText: 'group-hover:text-purple-600 dark:group-hover:text-purple-400',
   },
 };
 
@@ -98,6 +102,7 @@ export const AdminAgenda: React.FC = () => {
   const {
     courts,
     bookings,
+    customers,
     createBooking,
     updateBooking,
     cancelBooking,
@@ -194,11 +199,83 @@ export const AdminAgenda: React.FC = () => {
   const [newTime, setNewTime] = useState('17:00');
   const [durationMinutes, setDurationMinutes] = useState<60 | 90 | 120>(90);
   const [clientType, setClientType] = useState<'existing' | 'new' | 'anonymous' | 'block'>('existing');
+  const [isAnonymousQuick, setIsAnonymousQuick] = useState(false);
+  const [memberSearchQuery, setMemberSearchQuery] = useState('');
+  const [isMemberDropdownOpen, setIsMemberDropdownOpen] = useState(false);
+  const [selectedCustomer, setSelectedCustomer] = useState<any>(null);
   const [selectedMember, setSelectedMember] = useState('Carlos Méndez (Socio 108)');
   const [newClientName, setNewClientName] = useState('');
   const [newClientEmail, setNewClientEmail] = useState('');
   const [newClientPhone, setNewClientPhone] = useState('');
   const [newSplit, setNewSplit] = useState(false);
+
+  const currentCourt = courts.find((c) => c.id === newCourtId) || courts[0];
+  const targetVenueId = currentCourt?.venueId || formVenueId || (selectedVenueId !== 'all' ? selectedVenueId : undefined);
+
+  // Dynamic registered socios/usuarios filtered by active venue (or all venues if global)
+  const venueRegisteredCustomers = React.useMemo(() => {
+    let list = customers || [];
+    if (selectedVenueId !== 'all' && targetVenueId && targetVenueId !== 'all') {
+      list = list.filter((c) => !c.venueId || c.venueId === targetVenueId);
+    }
+    return list;
+  }, [customers, targetVenueId, selectedVenueId]);
+
+  const searchedCustomers = React.useMemo(() => {
+    if (!memberSearchQuery.trim()) return venueRegisteredCustomers;
+    const q = memberSearchQuery.toLowerCase().trim();
+    return venueRegisteredCustomers.filter(
+      (c) =>
+        c.name.toLowerCase().includes(q) ||
+        c.phone.toLowerCase().includes(q) ||
+        (c.memberNum && c.memberNum.toLowerCase().includes(q)) ||
+        (c.email && c.email.toLowerCase().includes(q))
+    );
+  }, [venueRegisteredCustomers, memberSearchQuery]);
+
+  React.useEffect(() => {
+    if (!selectedCustomer && venueRegisteredCustomers.length > 0) {
+      const first = venueRegisteredCustomers[0];
+      setSelectedCustomer(first);
+      setSelectedMember(first.name);
+      setNewClientName(first.name);
+      setNewClientPhone(first.phone);
+      setNewClientEmail(first.email);
+    }
+  }, [venueRegisteredCustomers, selectedCustomer]);
+
+  const handleToggleAnonymousQuick = () => {
+    if (!isAnonymousQuick) {
+      setIsAnonymousQuick(true);
+      setClientType('anonymous');
+      setNewClientName('Cliente Mostrador / Anónimo');
+      setSelectedMember('Cliente Mostrador / Anónimo');
+      setNewClientPhone('+34 600 00 00 00');
+    } else {
+      setIsAnonymousQuick(false);
+      setClientType('existing');
+      const first = venueRegisteredCustomers[0] || customers[0];
+      if (first) {
+        setSelectedCustomer(first);
+        setSelectedMember(first.name);
+        setNewClientName(first.name);
+        setNewClientPhone(first.phone);
+        setNewClientEmail(first.email);
+      }
+    }
+  };
+
+  const handleSelectCustomer = (cust: any) => {
+    setSelectedCustomer(cust);
+    setSelectedMember(cust.name);
+    setNewClientName(cust.name);
+    setNewClientPhone(cust.phone || '');
+    setNewClientEmail(cust.email || '');
+    setIsAnonymousQuick(false);
+    setClientType('existing');
+    setIsMemberDropdownOpen(false);
+    setMemberSearchQuery('');
+  };
   
   // Interactive 4 players for split payment
   const [splitPlayers, setSplitPlayers] = useState<Array<{ name: string; isMember: boolean; phone?: string; email?: string }>>([
@@ -872,25 +949,18 @@ export const AdminAgenda: React.FC = () => {
                   <h2 className="text-base sm:text-lg font-black text-slate-900 dark:text-white">
                     Historial de Reservas
                   </h2>
-                  <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                    Histórico consolidado · Manteniendo el contexto del cuadrante activo
-                  </p>
                 </div>
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2.5">
                 <button
                   type="button"
-                  onClick={() => {
-                    setShowAllBookingsView(false);
-                    if (typeof window !== 'undefined') {
-                      window.history.pushState({}, '', '/admin/reservas');
-                    }
-                  }}
-                  className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs flex items-center gap-1.5 transition cursor-pointer"
+                  onClick={() => setShowNewModal(true)}
+                  className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md flex items-center gap-1.5 transition active:scale-95 cursor-pointer whitespace-nowrap"
+                  title="Crear nueva reserva de pista"
                 >
-                  <ArrowRight className="w-3.5 h-3.5 rotate-180" />
-                  <span>Volver a la Agenda</span>
+                  <Plus className="w-4 h-4 shrink-0" />
+                  <span>Nueva reserva</span>
                 </button>
                 <button
                   type="button"
