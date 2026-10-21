@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useApp } from '../../context/AppContext';
+import { useApp, INITIAL_VENUES } from '../../context/AppContext';
 import { Booking, Court } from '../../types/database';
 import { ReservationDrawer, ReservationDrawerData } from './ReservationDrawer';
 import { BookingListItem, BookingListItemData } from './BookingListItem';
@@ -17,7 +17,82 @@ import {
   X,
   ArrowRight,
   FileSpreadsheet,
+  Building2,
 } from 'lucide-react';
+
+const VENUE_THEMES: Record<string, {
+  name: string;
+  shortName: string;
+  dotBg: string;
+  badgeBg: string;
+  badgeBorder: string;
+  badgeText: string;
+  slotBg: string;
+  slotBorder: string;
+  hoverBorder: string;
+  pinText: string;
+  accentText: string;
+}> = {
+  'venue-san-mateo': {
+    name: 'Sede Central (San Mateo)',
+    shortName: 'San Mateo',
+    dotBg: 'bg-emerald-500',
+    badgeBg: 'bg-emerald-50 dark:bg-emerald-950/70',
+    badgeBorder: 'border-emerald-300 dark:border-emerald-800',
+    badgeText: 'text-emerald-800 dark:text-emerald-300',
+    slotBg: 'bg-emerald-50/95 dark:bg-emerald-950/75',
+    slotBorder: 'border-emerald-500/70 dark:border-emerald-500/80',
+    hoverBorder: 'hover:border-emerald-600 dark:hover:border-emerald-400',
+    pinText: 'text-emerald-700 dark:text-emerald-400',
+    accentText: 'group-hover:text-emerald-600 dark:group-hover:text-emerald-400',
+  },
+  'venue-coruna': {
+    name: 'Sede A Coruña (Matogrande)',
+    shortName: 'A Coruña',
+    dotBg: 'bg-indigo-500',
+    badgeBg: 'bg-indigo-50 dark:bg-indigo-950/70',
+    badgeBorder: 'border-indigo-300 dark:border-indigo-800',
+    badgeText: 'text-indigo-800 dark:text-indigo-300',
+    slotBg: 'bg-indigo-50/95 dark:bg-indigo-950/75',
+    slotBorder: 'border-indigo-500/70 dark:border-indigo-500/80',
+    hoverBorder: 'hover:border-indigo-600 dark:hover:border-indigo-400',
+    pinText: 'text-indigo-700 dark:text-indigo-400',
+    accentText: 'group-hover:text-indigo-600 dark:group-hover:text-indigo-400',
+  },
+  'venue-santiago': {
+    name: 'Sede Santiago (Compostela)',
+    shortName: 'Santiago',
+    dotBg: 'bg-amber-500',
+    badgeBg: 'bg-amber-50 dark:bg-amber-950/70',
+    badgeBorder: 'border-amber-300 dark:border-amber-800',
+    badgeText: 'text-amber-800 dark:text-amber-300',
+    slotBg: 'bg-amber-50/95 dark:bg-amber-950/75',
+    slotBorder: 'border-amber-500/70 dark:border-amber-500/80',
+    hoverBorder: 'hover:border-amber-600 dark:hover:border-amber-400',
+    pinText: 'text-amber-700 dark:text-amber-400',
+    accentText: 'group-hover:text-amber-600 dark:group-hover:text-amber-400',
+  },
+  'venue-vigo': {
+    name: 'Sede Vigo (Rías Baixas)',
+    shortName: 'Vigo',
+    dotBg: 'bg-sky-500',
+    badgeBg: 'bg-sky-50 dark:bg-sky-950/70',
+    badgeBorder: 'border-sky-300 dark:border-sky-800',
+    badgeText: 'text-sky-800 dark:text-sky-300',
+    slotBg: 'bg-sky-50/95 dark:bg-sky-950/75',
+    slotBorder: 'border-sky-500/70 dark:border-sky-500/80',
+    hoverBorder: 'hover:border-sky-600 dark:hover:border-sky-400',
+    pinText: 'text-sky-700 dark:text-sky-400',
+    accentText: 'group-hover:text-sky-600 dark:group-hover:text-sky-400',
+  },
+};
+
+const getVenueTheme = (venueId?: string) => {
+  if (venueId && VENUE_THEMES[venueId]) {
+    return VENUE_THEMES[venueId];
+  }
+  return VENUE_THEMES['venue-san-mateo'];
+};
 
 export const AdminAgenda: React.FC = () => {
   const {
@@ -32,6 +107,7 @@ export const AdminAgenda: React.FC = () => {
     isMultiVenue,
     venues,
     selectedVenueId,
+    setSelectedVenueId,
     triggerDemoToast,
     navigateToPlayerProfile,
     addCustomer,
@@ -148,20 +224,27 @@ export const AdminAgenda: React.FC = () => {
     '09:00', '10:30', '12:00', '13:30', '15:00', '16:30', '17:00', '18:30', '19:00', '20:00', '21:30'
   ];
 
-  // Filter displayed courts according to multi-venue selection
+  // Venues disponibles (en caso de existir varias sedes)
+  const availableVenues = React.useMemo(() => {
+    return venues && venues.length > 1 ? venues : INITIAL_VENUES;
+  }, [venues]);
+
+  const isAllVenuesSelected = selectedVenueId === 'all';
+
+  // Filter displayed courts according to venue selection
   const displayedCourts = React.useMemo(() => {
-    if (!isMultiVenue || selectedVenueId === 'all') {
+    if (selectedVenueId === 'all') {
       return courts;
     }
     return courts.filter((c) => c.venueId === selectedVenueId || (!c.venueId && selectedVenueId === 'venue-san-mateo'));
-  }, [courts, isMultiVenue, selectedVenueId]);
+  }, [courts, selectedVenueId]);
 
   const getBookingForSlot = (courtId: string, time: string) => {
     return bookings.find((b) => {
       if (b.courtId !== courtId || b.status === 'canceled') return false;
 
-      // Filter strictly by active venue
-      if (isMultiVenue && selectedVenueId !== 'all') {
+      // Filter strictly by active venue if a specific venue is selected
+      if (selectedVenueId !== 'all') {
         const c = courts.find((item) => item.id === courtId);
         const venue = b.venueId || c?.venueId || 'venue-san-mateo';
         if (venue !== selectedVenueId) return false;
@@ -320,13 +403,17 @@ export const AdminAgenda: React.FC = () => {
       statusText = 'Pagado';
     }
 
+    const court = courts.find((c) => c.id === b.courtId);
+    const resolvedVenueId = b.venueId || court?.venueId || 'venue-san-mateo';
+    const venueObj = INITIAL_VENUES.find((v) => v.id === resolvedVenueId);
+
     return {
       id: b.id,
-      venueId: b.venueId,
-      venueName: b.venueName,
-      venueShortName: b.venueShortName,
+      venueId: resolvedVenueId,
+      venueName: b.venueName || venueObj?.name,
+      venueShortName: b.venueShortName || venueObj?.shortName,
       courtId: b.courtId,
-      courtName: b.courtName,
+      courtName: b.courtName || court?.name || 'Pista',
       courtType: 'Indoor Cristal Pro',
       startTime: b.startTime,
       endTime: b.endTime,
@@ -374,14 +461,14 @@ export const AdminAgenda: React.FC = () => {
       if (b.status === 'canceled') return false;
       const bDate = b.startTime.includes('T') ? b.startTime.split('T')[0] : b.startTime.slice(0, 10);
       if (bDate !== currentDate) return false;
-      if (isMultiVenue && selectedVenueId !== 'all') {
+      if (selectedVenueId !== 'all') {
         const court = courts.find((c) => c.id === b.courtId);
         const venue = b.venueId || court?.venueId || 'venue-san-mateo';
         if (venue !== selectedVenueId) return false;
       }
       return true;
     });
-  }, [bookings, currentDate, isMultiVenue, selectedVenueId, courts]);
+  }, [bookings, currentDate, selectedVenueId, courts]);
 
   const isPlayerRole =
     currentView === 'player' ||
@@ -398,24 +485,58 @@ export const AdminAgenda: React.FC = () => {
         <div className="w-full sm:w-auto min-w-0">
           <div className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
             <Calendar className="w-3.5 h-3.5 text-emerald-500" />
-            <span>{t('agenda.eyebrow', 'Cuadrante Diario & Control de Ocupación')}</span>
+            <span>{t('agenda.eyebrow', 'Cuadrante Ocupación')}</span>
           </div>
           <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight mt-0.5">
             {t('agenda.title', 'Reservas y Disponibilidad')}
           </h1>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 hidden sm:block">
-            {isMultiVenue && selectedVenueId !== 'all'
-              ? `Filtrado activo: ${venues.find((v) => v.id === selectedVenueId)?.shortName || 'Sede Seleccionada'}`
+            {selectedVenueId !== 'all'
+              ? `Filtrado activo: ${availableVenues.find((v) => v.id === selectedVenueId)?.shortName || 'Sede Seleccionada'}`
               : t('agenda.subtitle', 'Cuadrante interactivo y gestión diaria de pistas del club')}
           </p>
         </div>
 
         {/* Botonera Superior Responsive:
-            - Vista Móvil: Fila 1 con [Selector de Fecha] y [+ Nueva reserva] uno al lado del otro.
-                           Fila 2 inmediatamente debajo con [Historial reservas].
-            - Vista Escritorio: Los 3 elementos en la misma fila horizontal: [Selector de Fecha] + [+ Nueva reserva] + [Historial reservas]. */}
-        <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-2.5 w-full sm:w-auto shrink-0">
-          {/* Fila 1 en móvil / componentes horizontales en desktop */}
+            - Selector de Sede Dinámico
+            - Selector de Fecha
+            - Botón Nueva Reserva
+            - Historial Reservas */}
+        <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-2.5 w-full sm:w-auto shrink-0 flex-wrap">
+          {/* Selector de Sede Dinámico (en caso de existir varias sedes) */}
+          {availableVenues.length > 1 && (
+            <div className="w-full sm:w-auto relative inline-flex items-center justify-between bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-1 shadow-xs transition hover:border-emerald-500/50 shrink-0">
+              <div className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-slate-700 dark:text-slate-200 w-full sm:w-auto justify-between sm:justify-start">
+                <div className="flex items-center gap-1.5">
+                  <Building2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                  <span className="text-slate-400 font-medium">Sede:</span>
+                </div>
+                <select
+                  value={selectedVenueId}
+                  onChange={(e) => setSelectedVenueId(e.target.value)}
+                  className="bg-transparent font-bold text-slate-900 dark:text-white cursor-pointer focus:outline-hidden text-xs pr-1"
+                  aria-label="Filtrar por sede"
+                >
+                  <option value="all" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-bold">
+                    Todas las sedes
+                  </option>
+                  {availableVenues
+                    .filter((v) => v.id !== 'all')
+                    .map((v) => (
+                      <option
+                        key={v.id}
+                        value={v.id}
+                        className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+                      >
+                        {v.shortName || v.name}
+                      </option>
+                    ))}
+                </select>
+              </div>
+            </div>
+          )}
+
+          {/* Fila en móvil: Selector de Fecha + Botón Nueva Reserva */}
           <div className="flex items-center gap-2 w-full sm:w-auto">
             {/* Selector de Fecha */}
             <div className="flex-1 sm:flex-none relative inline-flex items-center justify-between bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-1 shadow-xs transition hover:border-emerald-500/50 shrink-0">
@@ -458,18 +579,18 @@ export const AdminAgenda: React.FC = () => {
               </button>
             </div>
 
-            {/* Botón + Nueva Reserva */}
+            {/* Botón Nueva Reserva (Único icono +) */}
             <button
               type="button"
               onClick={() => setShowNewModal(true)}
               className="px-3.5 sm:px-4 py-2.5 sm:py-2 rounded-2xl bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-black text-xs shadow-sm transition shrink-0 whitespace-nowrap cursor-pointer flex items-center justify-center gap-1.5"
             >
               <Plus className="w-3.5 h-3.5 shrink-0" />
-              <span>+ Nueva reserva</span>
+              <span>Nueva reserva</span>
             </button>
           </div>
 
-          {/* Fila 2 en móvil (inmediatamente debajo a ancho completo) / tercer elemento en fila horizontal en desktop */}
+          {/* Historial reservas */}
           <button
             type="button"
             onClick={() => {
@@ -486,18 +607,49 @@ export const AdminAgenda: React.FC = () => {
         </div>
       </div>
 
-      {/* Indicador de sede activa en Multi-Sede */}
-      {isMultiVenue && selectedVenueId !== 'all' && (
+      {/* Indicador de sede activa si se filtra por sede específica */}
+      {selectedVenueId !== 'all' && (
         <div className="flex items-center justify-between px-4 py-2.5 rounded-2xl bg-indigo-50/70 dark:bg-indigo-950/40 border border-indigo-200/80 dark:border-indigo-800/60 text-xs">
           <div className="flex items-center gap-2 text-indigo-900 dark:text-indigo-200 font-bold">
             <span className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse" />
             <span>
-              Sede Activa: {venues.find((v) => v.id === selectedVenueId)?.name || 'Sede'} ({displayedCourts.length} pistas en cuadrante)
+              Sede Activa: {availableVenues.find((v) => v.id === selectedVenueId)?.name || 'Sede'} ({displayedCourts.length} pistas en cuadrante)
             </span>
           </div>
           <span className="text-[11px] text-indigo-600 dark:text-indigo-400 font-semibold">
             {dayBookings.length} reservas para este día
           </span>
+        </div>
+      )}
+
+      {/* ======================================================================
+          LEYENDA DESCRIPTIVA MULTISEDE
+          (Visible únicamente cuando está seleccionada la opción "Todas las sedes")
+          ====================================================================== */}
+      {selectedVenueId === 'all' && (
+        <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 rounded-2xl bg-white dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 shadow-xs">
+          <div className="flex items-center gap-2">
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-white">
+              Leyenda de Sedes en Cuadrante Consolidado:
+            </span>
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            {availableVenues
+              .filter((v) => v.id !== 'all')
+              .map((v) => {
+                const theme = getVenueTheme(v.id);
+                return (
+                  <div
+                    key={v.id}
+                    className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-bold border shadow-2xs ${theme.badgeBg} ${theme.badgeBorder} ${theme.badgeText}`}
+                  >
+                    <span className={`w-2.5 h-2.5 rounded-full ${theme.dotBg} ring-2 ring-white dark:ring-slate-900 shrink-0`} />
+                    <span>{v.shortName || v.name}</span>
+                  </div>
+                );
+              })}
+          </div>
         </div>
       )}
 
@@ -518,31 +670,46 @@ export const AdminAgenda: React.FC = () => {
               <div className="p-3 text-center text-slate-500 dark:text-slate-400 font-bold border-r border-slate-200 dark:border-slate-700/80 flex items-center justify-center">
                 Hora
               </div>
-              {displayedCourts.map((court) => (
-                <div
-                  key={court.id}
-                  className="p-3 border-r border-slate-200 dark:border-slate-700/80 last:border-r-0 flex flex-col justify-between"
-                >
-                  <div className="font-extrabold text-slate-900 dark:text-white truncate text-[11px]">
-                    {court.name.split('—')[0]}
+              {displayedCourts.map((court) => {
+                const courtVenueTheme = getVenueTheme(court.venueId);
+                return (
+                  <div
+                    key={court.id}
+                    className="p-3 border-r border-slate-200 dark:border-slate-700/80 last:border-r-0 flex flex-col justify-between"
+                  >
+                    <div>
+                      {selectedVenueId === 'all' && (
+                        <div className="mb-1">
+                          <span
+                            className={`inline-flex items-center gap-1 text-[9px] font-extrabold px-1.5 py-0.5 rounded-md border truncate max-w-full ${courtVenueTheme.badgeBg} ${courtVenueTheme.badgeBorder} ${courtVenueTheme.badgeText}`}
+                          >
+                            <span className={`w-1.5 h-1.5 rounded-full ${courtVenueTheme.dotBg} shrink-0`} />
+                            <span className="truncate">{courtVenueTheme.shortName}</span>
+                          </span>
+                        </div>
+                      )}
+                      <div className="font-extrabold text-slate-900 dark:text-white truncate text-[11px]">
+                        {court.name.split('—')[0]}
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between text-[10px] text-slate-500 dark:text-slate-400 mt-1">
+                      <span className="font-semibold text-emerald-600 dark:text-emerald-400">{court.hourlyRate}€/h</span>
+                      <button
+                        type="button"
+                        onClick={() => toggleCourtLight(court.id)}
+                        className={`p-1 rounded transition cursor-pointer ${
+                          court.isLightOn
+                            ? 'text-amber-500 hover:text-amber-400'
+                            : 'text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300'
+                        }`}
+                        title="Conmutar focos"
+                      >
+                        <Zap className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
                   </div>
-                  <div className="flex items-center justify-between text-[10px] text-slate-500 dark:text-slate-400 mt-1">
-                    <span className="font-semibold text-emerald-600 dark:text-emerald-400">{court.hourlyRate}€/h</span>
-                    <button
-                      type="button"
-                      onClick={() => toggleCourtLight(court.id)}
-                      className={`p-1 rounded transition cursor-pointer ${
-                        court.isLightOn
-                          ? 'text-amber-500 hover:text-amber-400'
-                          : 'text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300'
-                      }`}
-                      title="Conmutar focos"
-                    >
-                      <Zap className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
 
             {/* Time Rows dinámicas */}
@@ -561,6 +728,9 @@ export const AdminAgenda: React.FC = () => {
 
                 {displayedCourts.map((court) => {
                   const booking = getBookingForSlot(court.id, time);
+                  const courtVenueId = court.venueId || booking?.venueId || 'venue-san-mateo';
+                  const venueTheme = getVenueTheme(courtVenueId);
+
                   return (
                     <div
                       key={court.id}
@@ -570,10 +740,28 @@ export const AdminAgenda: React.FC = () => {
                         <button
                           type="button"
                           onClick={() => handleOpenBooking(booking)}
-                          className="w-full h-full p-2 rounded-xl bg-slate-100 dark:bg-slate-800 border border-emerald-500/40 text-left hover:border-emerald-500 dark:hover:border-emerald-400 transition shadow-xs group cursor-pointer"
+                          className={`w-full h-full p-2 rounded-xl text-left transition shadow-xs group cursor-pointer border ${
+                            selectedVenueId === 'all'
+                              ? `${venueTheme.slotBg} ${venueTheme.slotBorder} ${venueTheme.hoverBorder}`
+                              : 'bg-slate-100 dark:bg-slate-800 border-emerald-500/40 hover:border-emerald-500 dark:hover:border-emerald-400'
+                          }`}
                         >
-                          <div className="font-bold text-slate-900 dark:text-white truncate text-[11px] group-hover:text-emerald-500 dark:group-hover:text-emerald-400 transition">
-                            {booking.creatorName}
+                          <div className="flex items-center justify-between gap-1">
+                            <div
+                              className={`font-bold text-slate-900 dark:text-white truncate text-[11px] transition ${
+                                selectedVenueId === 'all'
+                                  ? venueTheme.accentText
+                                  : 'group-hover:text-emerald-500 dark:group-hover:text-emerald-400'
+                              }`}
+                            >
+                              {booking.creatorName}
+                            </div>
+                            {selectedVenueId === 'all' && (
+                              <span
+                                className={`w-2 h-2 rounded-full shrink-0 ${venueTheme.dotBg} ring-1 ring-white/60 dark:ring-black/40`}
+                                title={venueTheme.name}
+                              />
+                            )}
                           </div>
                           <div className="text-[10px] text-slate-500 dark:text-slate-300 flex items-center justify-between font-medium mt-0.5">
                             <span className="font-bold">
@@ -581,7 +769,13 @@ export const AdminAgenda: React.FC = () => {
                                 ? `${(booking.participants?.[0]?.amount || (booking.totalPrice / 4)).toFixed(2)}€`
                                 : `${booking.totalPrice}€`}
                             </span>
-                            <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400">
+                            <span
+                              className={`font-mono font-bold ${
+                                selectedVenueId === 'all'
+                                  ? venueTheme.pinText
+                                  : 'text-emerald-600 dark:text-emerald-400'
+                              }`}
+                            >
                               PIN {booking.accessPin || '4821#'}
                             </span>
                           </div>

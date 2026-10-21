@@ -34,6 +34,7 @@ import { AdminHeader } from './AdminHeader';
 import { PrivateMobileNav } from '../common/PrivateMobileNav';
 import { SUPPORTED_LANGUAGES, SupportedLanguage } from '../../lib/i18n';
 import { OfficialFlag } from '../common/OfficialFlag';
+import { i18n } from '../../i18n';
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -417,6 +418,92 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
                   <ChevronRight className="w-4 h-4 text-slate-400 shrink-0" />
                 </button>
               ))}
+            </div>
+
+            {/* ======================================================================
+                AJUSTES MÓVILES: CONMUTADOR DE TEMA & SELECTOR DE IDIOMAS
+                ====================================================================== */}
+            <div className="pt-2 border-t border-slate-100 dark:border-slate-800 space-y-3">
+              {/* Conmutador de Modo Claro / Oscuro */}
+              <div className="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-xl bg-white dark:bg-slate-900 shadow-xs">
+                    {theme === 'dark' ? (
+                      <Moon className="w-5 h-5 text-indigo-400" />
+                    ) : (
+                      <Sun className="w-5 h-5 text-amber-500" />
+                    )}
+                  </div>
+                  <div>
+                    <div className="font-bold text-xs text-slate-900 dark:text-white">
+                      Modo {theme === 'dark' ? 'Oscuro' : 'Claro'}
+                    </div>
+                    <div className="text-[10px] text-slate-500 dark:text-slate-400">
+                      Conmutar apariencia visual
+                    </div>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={toggleTheme}
+                  className="px-3 py-1.5 rounded-xl font-bold text-xs bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 hover:border-emerald-500 transition cursor-pointer flex items-center gap-1.5 shadow-2xs"
+                  aria-label="Cambiar tema"
+                >
+                  {theme === 'dark' ? (
+                    <>
+                      <Sun className="w-3.5 h-3.5 text-amber-400" />
+                      <span>Modo Claro</span>
+                    </>
+                  ) : (
+                    <>
+                      <Moon className="w-3.5 h-3.5 text-indigo-500" />
+                      <span>Modo Oscuro</span>
+                    </>
+                  )}
+                </button>
+              </div>
+
+              {/* Selector Completo de Idiomas con Banderas Oficiales */}
+              <div className="rounded-2xl bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800 p-3 space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Globe className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                    <span className="font-bold text-xs text-slate-900 dark:text-white">
+                      Idioma de la Plataforma
+                    </span>
+                  </div>
+                  <span className="text-[10px] font-mono uppercase font-bold text-slate-500 dark:text-slate-400">
+                    {SUPPORTED_LANGUAGES.find((l) => l.code === language)?.name || language.toUpperCase()}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-1.5 max-h-48 overflow-y-auto pr-1">
+                  {SUPPORTED_LANGUAGES.map((l) => {
+                    const isSelected = language === l.code;
+                    return (
+                      <button
+                        key={l.code}
+                        type="button"
+                        onClick={() => {
+                          i18n.changeLanguage(l.code);
+                          setLanguage(l.code);
+                        }}
+                        className={`flex items-center justify-between p-2 rounded-xl text-xs text-left transition cursor-pointer border ${
+                          isSelected
+                            ? 'bg-emerald-50 dark:bg-emerald-950/70 border-emerald-500 text-emerald-800 dark:text-emerald-300 font-bold shadow-2xs'
+                            : 'bg-white dark:bg-slate-900 border-slate-200/80 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-slate-300'
+                        }`}
+                      >
+                        <span className="flex items-center gap-2 truncate">
+                          <OfficialFlag code={l.code} />
+                          <span className="truncate">{l.name}</span>
+                        </span>
+                        {isSelected && <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0 ml-1" />}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
             </div>
 
             {/* Action Buttons in Drawer */}

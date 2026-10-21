@@ -1766,7 +1766,7 @@ export const esLocale: Record<string, string> = {
   "crm.intervalAnnual": "Anual",
   "crm.toastZeroFee": "Registrado con Cuota 0€ (Exenta)",
   "crm.goToMembers": "Ir a Socios & CRM",
-  "agenda.eyebrow": "Cuadrante Oficial & Ocupación",
+  "agenda.eyebrow": "Cuadrante Ocupación",
   "agenda.title": "Reservas y Disponibilidad",
   "agenda.subtitle": "Cuadrante interactivo, franjas horarias y ocupación diaria del club.",
   "agenda.clientTypeAnonymous": "Anónimo / Ocasional",

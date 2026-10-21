@@ -193,8 +193,8 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
             </button>
           )}
 
-          {/* Selector de Idiomas Restaurado (Disponible en Admin Club y Admin Pro) */}
-          <div className="relative" ref={langRef}>
+          {/* Selector de Idiomas (Oculto en barra superior móvil, disponible en Menú Hamburguesa móvil y en Escritorio) */}
+          <div className="hidden md:block relative" ref={langRef}>
             <button
               type="button"
               onClick={() => setLangDropdownOpen(!langDropdownOpen)}
@@ -240,11 +240,11 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
             )}
           </div>
 
-          {/* Conmutador directo de Tema Claro / Oscuro */}
+          {/* Conmutador directo de Tema Claro / Oscuro (Oculto en barra superior móvil, disponible en Menú Hamburguesa móvil y en Escritorio) */}
           <button
             type="button"
             onClick={toggleTheme}
-            className="p-2 rounded-xl text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+            className="hidden md:inline-flex p-2 rounded-xl text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
             title={theme === 'dark' ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
             aria-label="Cambiar tema"
           >
