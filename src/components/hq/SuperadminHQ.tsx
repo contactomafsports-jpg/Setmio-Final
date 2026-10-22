@@ -97,6 +97,12 @@ export const SuperadminHQ: React.FC = () => {
           <p className="text-xs text-slate-400">
             Control de empresas cliente, suscripciones de software, catálogo de planes y auditoría global.
           </p>
+          <div className="pt-1 flex items-center gap-2 text-xs text-slate-300">
+            <span className="text-slate-400 text-[11px]">Cuenta vinculada por defecto:</span>
+            <span className="font-mono text-purple-300 bg-purple-950/60 px-2 py-0.5 rounded border border-purple-800 text-[11px] font-bold">
+              {currentUser.email || 'contactomafsports@gmail.com'}
+            </span>
+          </div>
         </div>
 
         <div className="flex flex-wrap items-center gap-2">

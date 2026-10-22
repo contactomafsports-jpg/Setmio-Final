@@ -24,6 +24,8 @@ export const PlayerHeader: React.FC<PlayerHeaderProps> = ({
     cart,
     isWhiteLabelPlayerPreview,
     selectedVenue,
+    activeDemoAccount,
+    switchDemoAccount,
   } = useApp();
 
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -34,6 +36,13 @@ export const PlayerHeader: React.FC<PlayerHeaderProps> = ({
     ? `${currentTenant.shortName} (${selectedVenue.shortName})`
     : currentTenant.shortName;
 
+  const whiteLabelBadge =
+    currentTenant.type === 'ACADEMY'
+      ? 'App Marca Blanca Escuela · Alumno'
+      : currentTenant.type === 'COACH'
+      ? 'App Marca Blanca Profesor · Alumno'
+      : 'App Marca Blanca Club · Socio';
+
   return (
     <>
       <header
@@ -41,7 +50,7 @@ export const PlayerHeader: React.FC<PlayerHeaderProps> = ({
           isWhiteLabelPlayerPreview ? 'top-10' : 'top-0'
         } z-50 h-14 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-3 sm:px-6 flex items-center justify-between gap-2 shadow-xs transition-colors`}
       >
-        {/* Lado Izquierdo: Logo/Marca Setmio */}
+        {/* Lado Izquierdo: Logo/Marca Condicional */}
         <div className="flex items-center gap-2 sm:gap-3 min-w-0">
           {onToggleMobileDrawer && (
             <button
@@ -54,39 +63,39 @@ export const PlayerHeader: React.FC<PlayerHeaderProps> = ({
             </button>
           )}
 
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-2.5 min-w-0">
             {isWhiteLabelPlayerPreview ? (
               <>
-                {/* Logo / Isotipo del Club Demo */}
+                {/* Logo / Isotipo de la Entidad Marca Blanca */}
                 <div
                   className="w-8 h-8 rounded-xl text-white font-black text-xs flex items-center justify-center shadow-xs shrink-0 select-none"
                   style={{ backgroundColor: currentTenant.branding?.primaryColor || '#10b981' }}
                 >
                   {currentTenant.shortName.slice(0, 3).toUpperCase()}
                 </div>
-                {/* Texto del Club Marca Blanca */}
-                <div className="flex items-center gap-2">
-                  <span className="font-black text-sm sm:text-base tracking-tight text-slate-900 dark:text-white leading-none">
+                {/* Texto de la Entidad Marca Blanca */}
+                <div className="flex items-center gap-2 min-w-0">
+                  <span className="font-black text-sm sm:text-base tracking-tight text-slate-900 dark:text-white leading-none truncate">
                     {currentTenant.name}
                   </span>
-                  <span className="hidden sm:inline-flex items-center text-[10px] font-extrabold text-emerald-800 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-950/80 px-2 py-0.5 rounded-md border border-emerald-300 dark:border-emerald-800">
-                    App Marca Blanca Club
+                  <span className="hidden sm:inline-flex items-center text-[10px] font-extrabold text-emerald-800 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-950/80 px-2 py-0.5 rounded-md border border-emerald-300 dark:border-emerald-800 shrink-0">
+                    {whiteLabelBadge}
                   </span>
                 </div>
               </>
             ) : (
               <>
-                {/* Isotipo Oficial Setmio */}
+                {/* Isotipo Oficial Setmio Player */}
                 <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-700 text-white font-black text-sm flex items-center justify-center shadow-xs shrink-0 select-none">
                   S
                 </div>
-                {/* Texto Oficial Setmio */}
-                <div className="flex items-center gap-2">
+                {/* Texto Oficial Setmio Player */}
+                <div className="flex items-center gap-2 min-w-0">
                   <span className="font-black text-sm sm:text-base tracking-tight text-slate-900 dark:text-white leading-none">
                     Setmio Player
                   </span>
                   <span className="hidden sm:inline-flex items-center text-[10px] font-extrabold text-cyan-700 dark:text-cyan-300 bg-cyan-50 dark:bg-cyan-950/80 px-2 py-0.5 rounded-md border border-cyan-200/60 dark:border-cyan-800/60">
-                    Multi-Club Neutra
+                    B2C Multi-Club Neutra
                   </span>
                 </div>
               </>

@@ -222,25 +222,52 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
 
   return (
     <div data-admin-shell className="min-h-screen bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 flex flex-col md:flex-row pb-20 md:pb-0 transition-colors duration-200 w-full max-w-full overflow-x-hidden font-sans">
-      {/* DESKTOP SIDEBAR (Marca Setmio B2B SaaS) */}
+      {/* DESKTOP SIDEBAR (Marca Setmio B2B SaaS o Marca Blanca si es Recepción) */}
       <aside className="hidden md:flex flex-col w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 shrink-0">
-        {/* Setmio SaaS Official Brand Header in Admin */}
+        {/* Header de Identidad en Sidebar */}
         <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
-          <div className="flex items-center gap-2.5 min-w-0">
-            {/* Setmio Logo Badge */}
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-700 text-white font-black flex items-center justify-center shrink-0 text-sm shadow-sm select-none">
-              S
-            </div>
-            <div className="min-w-0">
-              <div className="font-black text-xs text-slate-900 dark:text-white truncate tracking-wider">
-                {isProAthleteAdmin ? 'Setmio Pro Athlete' : 'Setmio Pro'}
+          {currentUser.role === 'RECEPTION' ? (
+            /* Vista Recepción: Marca Blanca Propia del Club */
+            <div className="flex items-center gap-2.5 min-w-0">
+              <div
+                className="w-9 h-9 rounded-xl text-white font-black flex items-center justify-center shrink-0 text-xs shadow-sm select-none"
+                style={{ backgroundColor: currentTenant.branding?.primaryColor || '#10b981' }}
+              >
+                {currentTenant.shortName.slice(0, 3).toUpperCase()}
               </div>
-              <div className="text-[10px] text-emerald-600 dark:text-emerald-400 font-extrabold uppercase tracking-wider flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                {isProAthleteAdmin ? 'Admin Atleta Pro' : 'Admin Club (SaaS)'}
+              <div className="min-w-0">
+                <div className="font-black text-xs text-slate-900 dark:text-white truncate tracking-wider">
+                  {currentTenant.name}
+                </div>
+                <div className="text-[10px] text-teal-600 dark:text-teal-400 font-extrabold uppercase tracking-wider flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-teal-500 animate-pulse" />
+                  Recepción · Marca Blanca
+                </div>
               </div>
             </div>
-          </div>
+          ) : (
+            /* Vista Admin Club / Escuela / Profesor / Atleta: Setmio Pro Oficial */
+            <div className="flex items-center gap-2.5 min-w-0">
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-700 text-white font-black flex items-center justify-center shrink-0 text-sm shadow-sm select-none">
+                S
+              </div>
+              <div className="min-w-0">
+                <div className="font-black text-xs text-slate-900 dark:text-white truncate tracking-wider">
+                  {isProAthleteAdmin ? 'Setmio Pro Athlete' : 'Setmio Pro'}
+                </div>
+                <div className="text-[10px] text-emerald-600 dark:text-emerald-400 font-extrabold uppercase tracking-wider flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  {isProAthleteAdmin
+                    ? 'Admin Atleta Pro'
+                    : currentTenant.type === 'ACADEMY'
+                    ? 'Admin Escuela (SaaS)'
+                    : currentTenant.type === 'COACH'
+                    ? 'Admin Profesor (SaaS)'
+                    : 'Admin Club (SaaS)'}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Sidebar Navigation */}

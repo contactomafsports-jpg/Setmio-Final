@@ -47,6 +47,8 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
     setSelectedVenueId,
     isConsolidatedView,
     t,
+    switchDemoAccount,
+    activeDemoAccount,
   } = useApp();
 
   const [aiDrawerOpen, setAiDrawerOpen] = useState(false);
@@ -59,6 +61,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
 
   const isProAthleteAdmin =
     currentTenant.type === 'PRO_PLAYER' || currentUser.role === 'PROFESSIONAL_PLAYER';
+  const isReception = currentUser.role === 'RECEPTION';
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -98,26 +101,99 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
   return (
     <>
       <header className="sticky top-0 z-50 h-14 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-3 sm:px-6 flex items-center justify-between gap-2 shadow-xs transition-colors">
-        {/* Left: IDENTIDAD DE MARCA OFICIAL SETMIO PRO (Isotipo + Texto oficial) */}
+        {/* Left: BRANDING CONDICIONAL (Recepción = Marca Blanca Club / Admin = Oficial Setmio Pro) */}
         <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-          <div className="flex items-center gap-2.5 shrink-0">
-            {/* Isotipo Oficial Setmio */}
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-700 text-white font-black text-sm flex items-center justify-center shadow-xs shrink-0 select-none">
-              S
-            </div>
-            {/* Texto Oficial Setmio Pro (Actualizado tanto en móvil como en escritorio) */}
-            <div className="flex items-center gap-2">
-              <span className="font-black text-sm sm:text-base tracking-tight text-slate-900 dark:text-white leading-none">
-                Setmio Pro
-              </span>
-              {isProAthleteAdmin && (
-                <span className="hidden sm:inline-flex items-center gap-1 text-[10px] font-extrabold text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/70 border border-red-200 dark:border-red-900 px-2 py-0.5 rounded-md">
-                  <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
-                  Atleta Pro · {currentTenant.shortName}
+          {isReception ? (
+            /* Vista Recepción: Marca Blanca propia del Club de ejemplo */
+            <div className="flex items-center gap-2.5 shrink-0">
+              <div
+                className="w-8 h-8 rounded-xl text-white font-black text-xs flex items-center justify-center shadow-xs shrink-0 select-none"
+                style={{ backgroundColor: currentTenant.branding?.primaryColor || '#10b981' }}
+              >
+                {currentTenant.shortName.slice(0, 3).toUpperCase()}
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="font-black text-sm sm:text-base tracking-tight text-slate-900 dark:text-white leading-none">
+                  {currentTenant.name}
                 </span>
-              )}
+                <span className="hidden sm:inline-flex items-center gap-1 text-[10px] font-extrabold text-teal-700 dark:text-teal-300 bg-teal-50 dark:bg-teal-950/70 border border-teal-200 dark:border-teal-900 px-2 py-0.5 rounded-md">
+                  Recepción · Marca Blanca Club
+                </span>
+              </div>
             </div>
-          </div>
+          ) : (
+            /* Vista Admin Club / Escuela / Profesor / Atleta: Branding Oficial Setmio Pro */
+            <div className="flex items-center gap-2.5 shrink-0">
+              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-700 text-white font-black text-sm flex items-center justify-center shadow-xs shrink-0 select-none">
+                S
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="font-black text-sm sm:text-base tracking-tight text-slate-900 dark:text-white leading-none">
+                  Setmio Pro
+                </span>
+                {isProAthleteAdmin ? (
+                  <span className="hidden sm:inline-flex items-center gap-1 text-[10px] font-extrabold text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/70 border border-red-200 dark:border-red-900 px-2 py-0.5 rounded-md">
+                    <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+                    Atleta Pro · {currentTenant.shortName}
+                  </span>
+                ) : currentTenant.type === 'ACADEMY' ? (
+                  <span className="hidden sm:inline-flex items-center gap-1 text-[10px] font-extrabold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/70 border border-indigo-200 dark:border-indigo-900 px-2 py-0.5 rounded-md">
+                    Admin Escuela · {currentTenant.shortName}
+                  </span>
+                ) : currentTenant.type === 'COACH' ? (
+                  <span className="hidden sm:inline-flex items-center gap-1 text-[10px] font-extrabold text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-950/70 border border-sky-200 dark:border-sky-900 px-2 py-0.5 rounded-md">
+                    Admin Profesor · {currentTenant.shortName}
+                  </span>
+                ) : (
+                  <span className="hidden sm:inline-flex items-center gap-1 text-[10px] font-extrabold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/70 border border-emerald-200 dark:border-emerald-900 px-2 py-0.5 rounded-md">
+                    Admin Club · {currentTenant.shortName}
+                  </span>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Selector Rápido de Roles Anidados (Demo Club) */}
+          {activeDemoAccount === 'club' && (
+            <div className="hidden xl:flex items-center ml-2 bg-slate-100 dark:bg-slate-800/80 p-0.5 rounded-xl border border-slate-200 dark:border-slate-700">
+              <button
+                type="button"
+                onClick={() => switchDemoAccount('club', 'admin')}
+                className={`px-2 py-1 rounded-lg text-[10px] font-bold transition cursor-pointer ${
+                  currentUser.role === 'TENANT_OWNER'
+                    ? 'bg-white dark:bg-slate-900 text-emerald-600 dark:text-emerald-400 shadow-xs'
+                    : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
+                }`}
+              >
+                Admin Club
+              </button>
+              <button
+                type="button"
+                onClick={() => switchDemoAccount('club', 'player')}
+                className="px-2 py-1 rounded-lg text-[10px] font-bold text-slate-500 hover:text-slate-900 dark:hover:text-white transition cursor-pointer"
+              >
+                Jugador Club [MB]
+              </button>
+              <button
+                type="button"
+                onClick={() => switchDemoAccount('club', 'coach')}
+                className="px-2 py-1 rounded-lg text-[10px] font-bold text-slate-500 hover:text-slate-900 dark:hover:text-white transition cursor-pointer"
+              >
+                Profesor [MB]
+              </button>
+              <button
+                type="button"
+                onClick={() => switchDemoAccount('club', 'reception')}
+                className={`px-2 py-1 rounded-lg text-[10px] font-bold transition cursor-pointer ${
+                  isReception
+                    ? 'bg-white dark:bg-slate-900 text-teal-600 dark:text-teal-400 shadow-xs'
+                    : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
+                }`}
+              >
+                Recepción [MB]
+              </button>
+            </div>
+          )}
 
           {/* Selector Global de Sede Activa (Directo en cabecera si el Administrador gestiona múltiples sedes) */}
           {isMultiVenue && (

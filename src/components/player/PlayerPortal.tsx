@@ -67,6 +67,8 @@ export const PlayerPortal: React.FC = () => {
     venues,
     cancelBooking,
     t,
+    switchDemoAccount,
+    activeDemoAccount,
   } = useApp();
 
   const [activePlayerTab, setActivePlayerTab] = useState<
@@ -322,56 +324,80 @@ export const PlayerPortal: React.FC = () => {
   // Renderiza la App neutra Setmio Player con la marca Setmio (sin vinculación ni presencia de logos de clubes terceros)
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 pb-[calc(6rem+env(safe-area-inset-bottom))] transition-colors duration-200 w-full max-w-full overflow-x-hidden">
-      {/* 0. TOP DEMO AUDIT BAR: Estado 2: Usuario Registrado */}
-      <aside
-        aria-label="Selector de estado del simulador Setmio Player"
-        className="sticky top-0 z-50 bg-slate-900 text-white px-4 py-2 border-b border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs"
-      >
-        <div className="flex items-center gap-2">
-          <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse shrink-0" />
-          <span className="font-extrabold text-emerald-400">
-            Estado 2: Usuario Registrado · App Neutra Setmio Player
-          </span>
-          <span className="hidden lg:inline text-slate-400">
-            (Sin vinculación a clubes terceros · ELO global, reservas y partidos multi-club)
-          </span>
-        </div>
-
-        <button
-          type="button"
-          onClick={() => {
-            setPlayerAuthState('visitor');
-            triggerDemoToast(
-              'Estado 1: Visitante / No Registrado',
-              'Renderizando la Web corporativa oficial de Setmio con opciones de registro/login.',
-              'info'
-            );
-          }}
-          className="px-3 py-1 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 font-bold text-xs transition cursor-pointer self-start sm:self-auto"
-        >
-          Simular Estado 1: Visitante / No Registrado →
-        </button>
-      </aside>
-
-      {/* 0.B FIXED TOP FLOATING BANNER (When testing White Label Player View) */}
-      {isWhiteLabelPlayerPreview && (
+      {/* 0. TOP DEMO BANNER: Condicional según si es Marca Blanca o Demo Setmio Player Neutra */}
+      {isWhiteLabelPlayerPreview ? (
+        /* Vista Anidada de Cliente con Marca Blanca (Club / Academia / Profesor) */
         <aside
-          aria-label="Banner de conmutación a modo administración"
-          className="sticky top-9 z-40 bg-slate-950/95 backdrop-blur-md border-b border-emerald-500/40 px-4 py-2 text-white shadow-xl flex items-center justify-between gap-3 animate-in slide-in-from-top-2 duration-200"
+          aria-label="Banner de modo jugador con Marca Blanca"
+          className="sticky top-0 z-50 bg-slate-950/95 backdrop-blur-md border-b border-emerald-500/40 px-4 py-2 text-white shadow-xl flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs"
         >
-          <div className="flex items-center gap-2 min-w-0 text-xs">
+          <div className="flex items-center gap-2 min-w-0">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0" />
             <span className="font-bold text-white truncate">
-              {t('white_label.banner_notice', 'Probando app de jugador con Marca Blanca')} · <span className="text-emerald-300 font-extrabold">{clubDisplayName}</span>
+              Vista Anidada con Marca Blanca · <span className="text-emerald-300 font-extrabold">{clubDisplayName}</span>
+            </span>
+            <span className="text-[10px] uppercase font-mono px-1.5 py-0.2 rounded bg-emerald-950 text-emerald-300 border border-emerald-800 hidden md:inline">
+              {currentTenant.type === 'ACADEMY' ? 'Escuela' : currentTenant.type === 'COACH' ? 'Profesor' : 'Club'}
+            </span>
+          </div>
+
+          <div className="flex items-center gap-2">
+            {currentTenant.type === 'ACADEMY' ? (
+              <button
+                type="button"
+                onClick={() => switchDemoAccount('academy', 'admin')}
+                className="shrink-0 px-3 py-1 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-md transition cursor-pointer"
+              >
+                ← Volver a Admin Escuela
+              </button>
+            ) : currentTenant.type === 'COACH' ? (
+              <button
+                type="button"
+                onClick={() => switchDemoAccount('coach', 'coach')}
+                className="shrink-0 px-3 py-1 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs shadow-md transition cursor-pointer"
+              >
+                ← Volver a Panel Profesor
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => switchDemoAccount('club', 'admin')}
+                className="shrink-0 px-3 py-1 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md transition cursor-pointer"
+              >
+                ← Volver a Admin Club
+              </button>
+            )}
+          </div>
+        </aside>
+      ) : (
+        /* Demo Setmio Player Neutra B2C */
+        <aside
+          aria-label="Selector de estado del simulador Setmio Player"
+          className="sticky top-0 z-50 bg-slate-900 text-white px-4 py-2 border-b border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs"
+        >
+          <div className="flex items-center gap-2">
+            <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-pulse shrink-0" />
+            <span className="font-extrabold text-cyan-400">
+              Demo Setmio Player · App Neutra B2C
+            </span>
+            <span className="hidden lg:inline text-slate-400">
+              (Sin vinculación a clubes terceros · ELO global, reservas y partidos multi-club)
             </span>
           </div>
 
           <button
             type="button"
-            onClick={exitWhiteLabelPlayerPreview}
-            className="shrink-0 px-3.5 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs shadow-md transition hover:scale-105 active:scale-95 flex items-center gap-1.5"
+            onClick={() => {
+              setPlayerAuthState('visitor');
+              triggerDemoToast(
+                'Estado Visitante',
+                'Renderizando la portada pública corporativa de Setmio con login/registro.',
+                'info'
+              );
+            }}
+            className="px-3 py-1 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 font-bold text-xs transition cursor-pointer self-start sm:self-auto"
           >
-            <span>{t('white_label.return_admin', `← Volver a Gestión (${currentTenant.shortName})`)}</span>
+            Simular Estado Visitante / Landing →
           </button>
         </aside>
       )}

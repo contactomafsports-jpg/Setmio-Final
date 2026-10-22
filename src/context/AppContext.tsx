@@ -603,6 +603,13 @@ interface AppContextType {
   enterWhiteLabelPlayerPreview: () => void;
   exitWhiteLabelPlayerPreview: () => void;
 
+  // Main Demo Accounts & Nested Roles
+  activeDemoAccount: 'club' | 'academy' | 'coach' | 'pro_athlete' | 'setmio_player' | 'superadmin';
+  switchDemoAccount: (
+    demoId: 'club' | 'academy' | 'coach' | 'pro_athlete' | 'setmio_player' | 'superadmin',
+    subRole?: string
+  ) => void;
+
   courts: Court[];
   addCourt: (courtData: Omit<Court, 'id' | 'tenantId'>) => Court;
   updateCourt: (courtId: string, updates: Partial<Court>) => void;
@@ -738,7 +745,7 @@ const ROLE_PROFILES: Record<UserRole, UserSession> = {
   SUPERADMIN: {
     id: 'user-superadmin-01',
     name: 'Superadministrador Setmio HQ',
-    email: 'admin@setmio.com',
+    email: 'contactomafsports@gmail.com',
     role: 'SUPERADMIN',
     avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
     playLevel: 4.5,
@@ -842,6 +849,27 @@ const ROLE_PROFILES: Record<UserRole, UserSession> = {
 };
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  // Demo Toast (Declared early so all hooks/handlers can reference it)
+  const [demoToast, setDemoToast] = useState<DemoNotificationToast | null>(null);
+
+  const triggerDemoToast = useCallback((
+    title: string,
+    description: string,
+    type: 'info' | 'success' | 'warning' = 'info'
+  ) => {
+    setDemoToast({ id: `toast-${Date.now()}`, title, description, type });
+  }, []);
+
+  const clearDemoToast = useCallback(() => setDemoToast(null), []);
+
+  useEffect(() => {
+    if (!demoToast) return;
+    const timer = setTimeout(() => {
+      setDemoToast(null);
+    }, 4500);
+    return () => clearTimeout(timer);
+  }, [demoToast]);
+
   // --- AISLAMIENTO ABSOLUTO DE TEMAS ---
   // 1. Tema de la Web Pública de Setmio (SaaS Corporativo)
   const [corporateTheme, setCorporateThemeState] = useState<ThemeMode>(() => {
@@ -1597,6 +1625,128 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       'info'
     );
   };
+
+  // Main Demo Accounts & Nested Roles
+  const activeDemoAccount: 'club' | 'academy' | 'coach' | 'pro_athlete' | 'setmio_player' | 'superadmin' =
+    currentUser.role === 'SUPERADMIN' || currentView === 'hq'
+      ? 'superadmin'
+      : currentTenant.type === 'PRO_PLAYER' || currentUser.role === 'PROFESSIONAL_PLAYER'
+      ? 'pro_athlete'
+      : currentTenant.type === 'ACADEMY'
+      ? 'academy'
+      : currentTenant.type === 'COACH'
+      ? 'coach'
+      : currentView === 'player' && !isWhiteLabelPlayerPreview
+      ? 'setmio_player'
+      : 'club';
+
+  const switchDemoAccount = useCallback(
+    (
+      demoId: 'club' | 'academy' | 'coach' | 'pro_athlete' | 'setmio_player' | 'superadmin',
+      subRole?: string
+    ) => {
+      setIsCorporateLanding(false);
+
+      if (demoId === 'club') {
+        const clubTenant =
+          tenants.find((t) => t.id === 'tenant-san-mateo-01') ||
+          tenants.find((t) => t.type === 'PADEL_CLUB') ||
+          tenants[0];
+        if (clubTenant) setCurrentTenantId(clubTenant.id);
+
+        if (subRole === 'player' || subRole === 'jugador') {
+          setIsWhiteLabelPlayerPreview(true);
+          setCurrentUser(ROLE_PROFILES.PLAYER);
+          setCurrentViewState('player');
+          triggerDemoToast('Demo Club · Jugador Club', 'Vista de la app con la marca blanca oficial de San Mateo.', 'info');
+        } else if (subRole === 'coach' || subRole === 'profesor') {
+          setIsWhiteLabelPlayerPreview(false);
+          setCurrentUser(ROLE_PROFILES.COACH);
+          setCurrentViewState('coach');
+          triggerDemoToast('Demo Club · Profesor', 'Portal de entrenador con cuadrante y clases de San Mateo.', 'info');
+        } else if (subRole === 'reception' || subRole === 'recepcion') {
+          setIsWhiteLabelPlayerPreview(false);
+          setCurrentUser(ROLE_PROFILES.RECEPTION);
+          setCurrentViewState('admin');
+          triggerDemoToast('Demo Club · Recepción', 'Panel de mostrador y control de accesos con marca blanca de San Mateo.', 'info');
+        } else {
+          // Default: Administrador Club
+          setIsWhiteLabelPlayerPreview(false);
+          setCurrentUser(ROLE_PROFILES.TENANT_OWNER);
+          setCurrentViewState('admin');
+          triggerDemoToast('Demo Club · Administrador Club', 'Panel de gestión global con branding oficial Setmio Pro.', 'success');
+        }
+      } else if (demoId === 'academy') {
+        const acadTenant =
+          tenants.find((t) => t.id === 'tenant-academia-elite') ||
+          tenants.find((t) => t.type === 'ACADEMY') ||
+          currentTenant;
+        if (acadTenant) setCurrentTenantId(acadTenant.id);
+
+        if (subRole === 'student' || subRole === 'alumno' || subRole === 'player') {
+          setIsWhiteLabelPlayerPreview(true);
+          setCurrentUser(ROLE_PROFILES.PLAYER);
+          setCurrentViewState('player');
+          triggerDemoToast('Demo Academia · Vista Alumno', 'App del alumno con la marca blanca de Academia Pádel Élite.', 'info');
+        } else {
+          // Default: Administrador Escuela
+          setIsWhiteLabelPlayerPreview(false);
+          setCurrentUser(ROLE_PROFILES.ACADEMY_MANAGER);
+          setCurrentViewState('admin');
+          triggerDemoToast('Demo Academia · Administrador Escuela', 'Gestión de profesores, cursos y matrículas con Setmio Pro.', 'success');
+        }
+      } else if (demoId === 'coach') {
+        const coachTenant =
+          tenants.find((t) => t.id === 'tenant-varela-coach') ||
+          tenants.find((t) => t.type === 'COACH') ||
+          currentTenant;
+        if (coachTenant) setCurrentTenantId(coachTenant.id);
+
+        if (subRole === 'student' || subRole === 'alumno') {
+          setIsWhiteLabelPlayerPreview(true);
+          setCurrentUser(ROLE_PROFILES.PLAYER);
+          setCurrentViewState('player');
+          triggerDemoToast('Demo Profesor · Vista Alumno', 'App del alumno con la marca personalizada del profesor Carlos Varela.', 'info');
+        } else if (subRole === 'player' || subRole === 'jugador') {
+          setIsWhiteLabelPlayerPreview(false);
+          setCurrentUser(ROLE_PROFILES.PLAYER);
+          setCurrentViewState('player');
+          triggerDemoToast('Demo Profesor · Vista Jugador', 'Perfil de jugador propio del profesor para reservas y torneos.', 'info');
+        } else {
+          // Default: Panel Profesor Independiente
+          setIsWhiteLabelPlayerPreview(false);
+          setCurrentUser(ROLE_PROFILES.COACH);
+          setCurrentViewState('coach');
+          triggerDemoToast('Demo Profesor Independiente', 'Gestión personal de bonos y clases privadas con Setmio Pro.', 'success');
+        }
+      } else if (demoId === 'pro_athlete') {
+        const proTenant =
+          tenants.find((t) => t.id === 'tenant-martin-pro') ||
+          tenants.find((t) => t.type === 'PRO_PLAYER') ||
+          currentTenant;
+        if (proTenant) setCurrentTenantId(proTenant.id);
+
+        setIsWhiteLabelPlayerPreview(false);
+        setCurrentUser(ROLE_PROFILES.PROFESSIONAL_PLAYER);
+        setCurrentViewState('admin');
+        triggerDemoToast('Demo Atleta Profesional', 'Gestión de sponsors, torneos FIP y rendimiento con Setmio Pro.', 'success');
+      } else if (demoId === 'setmio_player') {
+        const clubTenant = tenants.find((t) => t.id === 'tenant-san-mateo-01') || tenants[0];
+        if (clubTenant) setCurrentTenantId(clubTenant.id);
+
+        setIsWhiteLabelPlayerPreview(false);
+        setCurrentUser(ROLE_PROFILES.PLAYER);
+        setCurrentViewState('player');
+        triggerDemoToast('Demo Setmio Player', 'App neutra B2C para jugador amateur (reserva multiclub, ELO y partidos).', 'success');
+      } else if (demoId === 'superadmin') {
+        setIsWhiteLabelPlayerPreview(false);
+        setCurrentUser(ROLE_PROFILES.SUPERADMIN);
+        setCurrentViewState('hq');
+        triggerDemoToast('Demo Superadministrador Setmio HQ', 'Sesión vinculada a contactomafsports@gmail.com.', 'success');
+      }
+    },
+    [tenants, currentTenant, triggerDemoToast]
+  );
 
   // Helper for guaranteed collision-free unique IDs across rapid or batch actions
   const generateUniqueId = (prefix: string) =>
@@ -2382,27 +2532,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }, 600);
   };
 
-  // Demo Toast
-  const [demoToast, setDemoToast] = useState<DemoNotificationToast | null>(null);
-
-  const triggerDemoToast = useCallback((
-    title: string,
-    description: string,
-    type: 'info' | 'success' | 'warning' = 'info'
-  ) => {
-    setDemoToast({ id: `toast-${Date.now()}`, title, description, type });
-  }, []);
-
-  const clearDemoToast = useCallback(() => setDemoToast(null), []);
-
-  useEffect(() => {
-    if (!demoToast) return;
-    const timer = setTimeout(() => {
-      setDemoToast(null);
-    }, 4500);
-    return () => clearTimeout(timer);
-  }, [demoToast]);
-
   // ==========================================
   // MÓDULO DE PAGOS, FACTURACIÓN Y VERI*FACTU
   // ==========================================
@@ -2672,6 +2801,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         setIsWhiteLabelPlayerPreview,
         enterWhiteLabelPlayerPreview,
         exitWhiteLabelPlayerPreview,
+
+        activeDemoAccount,
+        switchDemoAccount,
 
         courts,
         addCourt,
