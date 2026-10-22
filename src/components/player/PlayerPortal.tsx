@@ -33,6 +33,9 @@ import {
   Flame,
   LogOut,
   ShoppingBag,
+  UserPlus,
+  Search,
+  Swords,
 } from 'lucide-react';
 import { BookingFlow } from '../public/BookingFlow';
 import { OpenMatchesView } from '../public/OpenMatchesView';
@@ -72,7 +75,7 @@ export const PlayerPortal: React.FC = () => {
   } = useApp();
 
   const [activePlayerTab, setActivePlayerTab] = useState<
-    'overview' | 'booking' | 'matches' | 'tournaments' | 'teams' | 'academy' | 'stats' | 'profile' | 'shop' | 'notifications'
+    'overview' | 'booking' | 'matches' | 'tournaments' | 'teams' | 'academy' | 'stats' | 'profile' | 'shop' | 'notifications' | 'friends'
   >('overview');
 
   const navigatePlayerTab = (tab: typeof activePlayerTab) => {
@@ -88,6 +91,7 @@ export const PlayerPortal: React.FC = () => {
       profile: '/jugador/perfil',
       shop: '/jugador/tienda',
       notifications: '/jugador/perfil/notificaciones',
+      friends: '/jugador/amigos',
     };
     const target = tabUrls[tab] || '/jugador';
     if (typeof window !== 'undefined' && window.location.pathname !== target) {
@@ -104,6 +108,8 @@ export const PlayerPortal: React.FC = () => {
           setActivePlayerTab('booking');
         } else if (path === '/jugador/partidos' || path === '/app/partidos') {
           setActivePlayerTab('matches');
+        } else if (path === '/jugador/amigos' || path === '/app/amigos') {
+          setActivePlayerTab('friends');
         } else if (path === '/jugador/torneos' || path === '/app/torneos') {
           setActivePlayerTab('tournaments');
         } else if (path === '/jugador/equipos' || path === '/app/equipos') {
@@ -139,6 +145,89 @@ export const PlayerPortal: React.FC = () => {
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
   const [tournamentSubTab, setTournamentSubTab] = useState<'inscribed' | 'in_progress' | 'upcoming'>('inscribed');
   const [selectedPlayerDrawerData, setSelectedPlayerDrawerData] = useState<ReservationDrawerData | null>(null);
+
+  // Amigos y Parejas de Juego
+  interface PlayerFriendItem {
+    id: string;
+    name: string;
+    avatarUrl: string;
+    level: number;
+    position: 'Drive' | 'Revés' | 'Ambas';
+    matchesTogether: number;
+    winRate: number;
+    status: 'available' | 'in_match' | 'offline';
+    club: string;
+    memberNum: string;
+  }
+
+  const [friendsList, setFriendsList] = useState<PlayerFriendItem[]>([
+    {
+      id: 'friend-mateo',
+      name: 'Mateo Varela',
+      avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80',
+      level: 5.5,
+      position: 'Revés' as const,
+      matchesTogether: 24,
+      winRate: 75,
+      status: 'available' as const,
+      club: 'Centro Pádel San Mateo',
+      memberNum: 'SM-104',
+    },
+    {
+      id: 'friend-lucas',
+      name: 'Lucas Piñeiro',
+      avatarUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=200&q=80',
+      level: 4.0,
+      position: 'Drive' as const,
+      matchesTogether: 16,
+      winRate: 68,
+      status: 'available' as const,
+      club: 'Centro Pádel San Mateo',
+      memberNum: 'SM-218',
+    },
+    {
+      id: 'friend-david',
+      name: 'David Castro',
+      avatarUrl: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=200&q=80',
+      level: 3.75,
+      position: 'Ambas' as const,
+      matchesTogether: 9,
+      winRate: 55,
+      status: 'in_match' as const,
+      club: 'Centro Pádel San Mateo',
+      memberNum: 'SM-331',
+    },
+    {
+      id: 'friend-elena',
+      name: 'Elena Permuy',
+      avatarUrl: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=200&q=80',
+      level: 3.8,
+      position: 'Drive' as const,
+      matchesTogether: 12,
+      winRate: 70,
+      status: 'available' as const,
+      club: 'Academia Pádel Élite',
+      memberNum: 'APE-055',
+    },
+    {
+      id: 'friend-hugo',
+      name: 'Hugo Ramos',
+      avatarUrl: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=200&q=80',
+      level: 4.25,
+      position: 'Revés' as const,
+      matchesTogether: 8,
+      winRate: 62,
+      status: 'offline' as const,
+      club: 'Matogrande Sport Club',
+      memberNum: 'MC-149',
+    },
+  ]);
+  const [friendSearchQuery, setFriendSearchQuery] = useState('');
+  const [friendPositionFilter, setFriendPositionFilter] = useState<'all' | 'Drive' | 'Revés' | 'Ambas'>('all');
+  const [addFriendModalOpen, setAddFriendModalOpen] = useState(false);
+  const [newFriendName, setNewFriendName] = useState('');
+  const [newFriendLevel, setNewFriendLevel] = useState('3.75');
+  const [newFriendPosition, setNewFriendPosition] = useState<'Drive' | 'Revés' | 'Ambas'>('Drive');
 
   const userPendingPaymentMatch = openMatches.find((m) =>
     m.players.some((p) => p.name === currentUser.name && !p.paid)
@@ -485,33 +574,61 @@ export const PlayerPortal: React.FC = () => {
       {/* 3. DESKTOP / TABLET SUB-TABS NAVIGATION */}
       <div className="hidden lg:block bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800">
         <div className="max-w-5xl mx-auto px-6">
-          <nav className="flex space-x-2 py-2" aria-label="Pestañas de navegación">
-            {[
-              { id: 'overview', label: 'Mi Espacio Neutro', icon: Home },
-              { id: 'booking', label: 'Reservas Multi-Club', icon: Calendar },
-              { id: 'matches', label: 'Partidos Abiertos Multi-Club', icon: Users },
-              { id: 'stats', label: 'ELO & Estadísticas', icon: TrendingUp },
-              { id: 'tournaments', label: 'Mis Competiciones', icon: Trophy },
-              { id: 'teams', label: 'Mis Equipos', icon: Shield },
-              { id: 'profile', label: 'Mi Ficha', icon: UserRound },
-            ].map((tab) => {
-              const Icon = tab.icon;
-              const isActive = activePlayerTab === tab.id;
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => setActivePlayerTab(tab.id as typeof activePlayerTab)}
-                  className={`px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
-                    isActive
-                      ? 'bg-emerald-600 text-white shadow-sm'
-                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800'
-                  }`}
-                >
-                  <Icon className="w-4 h-4" />
-                  <span>{tab.label}</span>
-                </button>
-              );
-            })}
+          <nav className="flex items-center justify-between py-2" aria-label="Pestañas de navegación">
+            <div className="flex space-x-1.5 overflow-x-auto">
+              {[
+                { id: 'booking', label: 'Reservar Pistas', icon: Calendar },
+                { id: 'matches', label: 'Partidos Abiertos', icon: Users, badge: hasUnpaidMatch ? '!' : undefined },
+                { id: 'stats', label: 'Mi Nivel ELO', icon: TrendingUp },
+                { id: 'overview', label: 'Mis Reservas', icon: Clock },
+                { id: 'friends', label: 'Amigos', icon: UserRound },
+              ].map((tab) => {
+                const Icon = tab.icon;
+                const isActive = activePlayerTab === tab.id;
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActivePlayerTab(tab.id as typeof activePlayerTab)}
+                    className={`relative px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
+                      isActive
+                        ? 'bg-emerald-600 text-white shadow-sm'
+                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800'
+                    }`}
+                  >
+                    <Icon className="w-4 h-4" />
+                    <span>{tab.label}</span>
+                    {tab.badge && (
+                      <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping ml-0.5" />
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+
+            <div className="flex items-center space-x-1 border-l border-slate-200 dark:border-slate-800 pl-3">
+              {[
+                { id: 'tournaments', label: 'Torneos', icon: Trophy },
+                { id: 'teams', label: 'Equipos', icon: Shield },
+                { id: 'profile', label: 'Mi Ficha', icon: User },
+              ].map((tab) => {
+                const Icon = tab.icon;
+                const isActive = activePlayerTab === tab.id;
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActivePlayerTab(tab.id as typeof activePlayerTab)}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-medium transition flex items-center gap-1 cursor-pointer ${
+                      isActive
+                        ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white font-bold'
+                        : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                    }`}
+                  >
+                    <Icon className="w-3.5 h-3.5" />
+                    <span>{tab.label}</span>
+                  </button>
+                );
+              })}
+            </div>
           </nav>
         </div>
       </div>
@@ -1308,47 +1425,233 @@ export const PlayerPortal: React.FC = () => {
             </div>
           </div>
         )}
+
+        {/* FRIENDS TAB (Amigos & Red de Jugadores - Requerimiento Setmio Player) */}
+        {activePlayerTab === 'friends' && (
+          <div className="space-y-6 animate-in fade-in duration-150">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <h2 className="text-xl font-black text-slate-900 dark:text-white flex items-center gap-2">
+                  <UserRound className="w-5 h-5 text-emerald-500" />
+                  <span>Amigos & Compañeros de Juego</span>
+                </h2>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                  Conecta con jugadores según su nivel ELO y posición en pista para armar partidos y parejas.
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setAddFriendModalOpen(true)}
+                className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md transition flex items-center gap-1.5 self-start sm:self-auto cursor-pointer active:scale-95"
+              >
+                <UserPlus className="w-4 h-4" />
+                <span>Añadir Amigo</span>
+              </button>
+            </div>
+
+            {/* Search & Filter Toolbar */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs">
+              <div className="relative flex-1">
+                <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                <input
+                  type="text"
+                  value={friendSearchQuery}
+                  onChange={(e) => setFriendSearchQuery(e.target.value)}
+                  placeholder="Buscar amigos por nombre, club o nº de socio..."
+                  className="w-full pl-9 pr-4 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                />
+              </div>
+
+              <div className="flex items-center gap-1.5 overflow-x-auto">
+                <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider mr-1">Lado:</span>
+                {(['all', 'Drive', 'Revés', 'Ambas'] as const).map((pos) => (
+                  <button
+                    key={pos}
+                    type="button"
+                    onClick={() => setFriendPositionFilter(pos)}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
+                      friendPositionFilter === pos
+                        ? 'bg-emerald-600 text-white shadow-xs'
+                        : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                    }`}
+                  >
+                    {pos === 'all' ? 'Todos' : pos}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Friends Cards Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {friendsList
+                .filter((friend) => {
+                  const matchesSearch =
+                    friend.name.toLowerCase().includes(friendSearchQuery.toLowerCase()) ||
+                    friend.club.toLowerCase().includes(friendSearchQuery.toLowerCase()) ||
+                    friend.memberNum.toLowerCase().includes(friendSearchQuery.toLowerCase());
+                  const matchesPosition =
+                    friendPositionFilter === 'all' || friend.position === friendPositionFilter;
+                  return matchesSearch && matchesPosition;
+                })
+                .map((friend) => (
+                  <div
+                    key={friend.id}
+                    className="p-5 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-4 hover:border-emerald-500/40 transition flex flex-col justify-between"
+                  >
+                    <div className="space-y-3">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex items-center gap-3">
+                          <div className="relative">
+                            <img
+                              src={friend.avatarUrl}
+                              alt={friend.name}
+                              className="w-12 h-12 rounded-2xl object-cover border border-slate-200 dark:border-slate-700 shadow-xs"
+                            />
+                            <span
+                              className={`absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-2 border-white dark:border-slate-900 ${
+                                friend.status === 'available'
+                                  ? 'bg-emerald-500'
+                                  : friend.status === 'in_match'
+                                  ? 'bg-amber-500'
+                                  : 'bg-slate-400'
+                              }`}
+                              title={
+                                friend.status === 'available'
+                                  ? 'Disponible'
+                                  : friend.status === 'in_match'
+                                  ? 'En partido'
+                                  : 'Desconectado'
+                              }
+                            />
+                          </div>
+
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <h3 className="font-extrabold text-sm text-slate-900 dark:text-white">
+                                {friend.name}
+                              </h3>
+                              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
+                                #{friend.memberNum}
+                              </span>
+                            </div>
+                            <div className="text-xs text-slate-500 dark:text-slate-400">
+                              {friend.club}
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="text-right">
+                          <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-500/20 text-emerald-700 dark:text-emerald-400 font-mono font-black text-xs">
+                            <TrendingUp className="w-3.5 h-3.5" />
+                            <span>{friend.level.toFixed(2)} ELO</span>
+                          </div>
+                          <div className="text-[10px] font-bold text-slate-400 uppercase mt-0.5">
+                            {friend.position}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Stat summary pills */}
+                      <div className="grid grid-cols-2 gap-2 p-3 rounded-2xl bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800/80 text-xs">
+                        <div>
+                          <div className="text-[10px] text-slate-400 uppercase font-semibold">Partidos Juntos</div>
+                          <div className="font-bold text-slate-900 dark:text-white font-mono text-sm">
+                            {friend.matchesTogether} partidos
+                          </div>
+                        </div>
+                        <div>
+                          <div className="text-[10px] text-slate-400 uppercase font-semibold">Victorias Pareja</div>
+                          <div className="font-bold text-emerald-600 dark:text-emerald-400 font-mono text-sm">
+                            {friend.winRate}% ganados
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="pt-2 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between gap-2">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          triggerDemoToast(
+                            'Invitación Enviada',
+                            `Se ha enviado una invitación a ${friend.name} para unirse a tu próximo partido.`,
+                            'success'
+                          );
+                          setActivePlayerTab('matches');
+                        }}
+                        className="flex-1 py-1.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-xs transition cursor-pointer active:scale-95"
+                      >
+                        <Users className="w-3.5 h-3.5" />
+                        <span>Invitar a Partido</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          triggerDemoToast(
+                            'Reto Directo Enviado',
+                            `Has lanzado un reto de partido a ${friend.name}. Recibirá notificación en su app.`,
+                            'info'
+                          );
+                        }}
+                        className="py-1.5 px-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs transition cursor-pointer"
+                        title="Retar a partido"
+                      >
+                        <Swords className="w-3.5 h-3.5" />
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setFriendsList((prev) => prev.filter((f) => f.id !== friend.id));
+                          triggerDemoToast(
+                            'Amigo Eliminado',
+                            `${friend.name} ha sido eliminado de tu lista de amigos.`,
+                            'info'
+                          );
+                        }}
+                        className="py-1.5 px-2.5 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 text-xs transition cursor-pointer"
+                        title="Eliminar de amigos"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+            </div>
+
+            {/* Empty State */}
+            {friendsList.filter((friend) => {
+              const matchesSearch =
+                friend.name.toLowerCase().includes(friendSearchQuery.toLowerCase()) ||
+                friend.club.toLowerCase().includes(friendSearchQuery.toLowerCase()) ||
+                friend.memberNum.toLowerCase().includes(friendSearchQuery.toLowerCase());
+              const matchesPosition =
+                friendPositionFilter === 'all' || friend.position === friendPositionFilter;
+              return matchesSearch && matchesPosition;
+            }).length === 0 && (
+              <div className="p-8 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-center space-y-3">
+                <Users className="w-8 h-8 text-slate-400 mx-auto" />
+                <h3 className="font-bold text-sm text-slate-900 dark:text-white">No se han encontrado amigos</h3>
+                <p className="text-xs text-slate-500 max-w-sm mx-auto">
+                  Prueba a cambiar el filtro de posición o el término de búsqueda, o añade un nuevo compañero de juego.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setFriendSearchQuery('');
+                    setFriendPositionFilter('all');
+                  }}
+                  className="px-3.5 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-200 cursor-pointer"
+                >
+                  Restablecer Filtros
+                </button>
+              </div>
+            )}
+          </div>
+        )}
       </main>
-
-      {/* 5. NATIVE MOBILE BOTTOM BAR (Clean, accessible, no overlapping text!) */}
-      <nav
-        aria-label="Navegación móvil del jugador"
-        className="lg:hidden fixed bottom-0 inset-x-0 z-40 border-t border-slate-200 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl px-2 pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] shadow-[0_-8px_25px_rgba(15,23,42,0.08)] grid grid-cols-6 gap-1"
-      >
-        {[
-          { id: 'overview', label: 'Inicio', icon: Home },
-          { id: 'booking', label: 'Reservar', icon: Calendar },
-          { id: 'matches', label: 'Partidos', icon: Users },
-          { id: 'tournaments', label: 'Torneos', icon: Trophy },
-          { id: 'teams', label: 'Equipos', icon: Shield },
-        ].map((item) => {
-          const Icon = item.icon;
-          const isActive = activePlayerTab === item.id;
-          return (
-            <button
-              key={item.id}
-              onClick={() => setActivePlayerTab(item.id as typeof activePlayerTab)}
-              className={`flex flex-col items-center justify-center py-1 rounded-xl transition ${
-                isActive
-                  ? 'text-emerald-600 dark:text-emerald-400 font-bold'
-                  : 'text-slate-500 dark:text-slate-400'
-              }`}
-            >
-              <Icon className="w-5 h-5 mb-0.5" />
-              <span className="text-[10px] leading-tight truncate">{item.label}</span>
-            </button>
-          );
-        })}
-
-        <button
-          onClick={logoutOrExitDemo}
-          className="flex flex-col items-center justify-center py-1 rounded-xl text-rose-600 dark:text-rose-400 font-semibold"
-          title="Cerrar Sesión / Salir Demo"
-        >
-          <LogOut className="w-5 h-5 mb-0.5 text-rose-600 dark:text-rose-400" />
-          <span className="text-[10px] leading-tight truncate">Salir</span>
-        </button>
-      </nav>
 
       {/* 6. MODAL PERFIL PÚBLICO DEL JUGADOR */}
       {publicProfileModalOpen && (
@@ -1442,14 +1745,15 @@ export const PlayerPortal: React.FC = () => {
 
               <div className="space-y-1 text-xs font-semibold">
                 {[
-                  { id: 'overview', label: 'Mi Espacio', icon: Home },
                   { id: 'booking', label: 'Reservar Pista', icon: Calendar },
                   { id: 'matches', label: 'Partidos Abiertos', icon: Users },
+                  { id: 'stats', label: 'Mi Nivel ELO', icon: TrendingUp },
+                  { id: 'overview', label: 'Mis Reservas', icon: Clock },
+                  { id: 'friends', label: 'Amigos & Parejas', icon: UserRound },
                   { id: 'tournaments', label: 'Mis Competiciones', icon: Trophy },
                   { id: 'teams', label: 'Mis Equipos', icon: Shield },
                   { id: 'academy', label: 'Escuela & Clases', icon: GraduationCap },
-                  { id: 'stats', label: 'Nivel & Estadísticas', icon: TrendingUp },
-                  { id: 'profile', label: 'Mi Ficha', icon: UserRound },
+                  { id: 'profile', label: 'Mi Ficha', icon: User },
                   { id: 'shop', label: isWhiteLabelPlayerPreview ? 'Tienda TPV Club' : 'Tienda Oficial', icon: ShoppingBag },
                 ].map((item) => {
                   const Icon = item.icon;
@@ -1511,10 +1815,9 @@ export const PlayerPortal: React.FC = () => {
         </div>
       )}
 
-      {/* 9. MOBILE-FIRST BOTTOM NAVIGATION BAR (5 ITEMS ADAPTADOS CON MENÚ HAMBURGUESA) */}
-      <nav className="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 py-1 px-2 flex items-center justify-around shadow-lg">
+      {/* 9. MOBILE-FIRST BOTTOM NAVIGATION BAR (5 ITEMS CANÓNICOS DE JUGADOR AMATEUR + MÁS) */}
+      <nav className="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 py-1 px-1 flex items-center justify-around shadow-lg">
         {[
-          { id: 'overview', label: 'Inicio', icon: Home },
           { id: 'booking', label: 'Reservar', icon: Calendar },
           {
             id: 'matches',
@@ -1522,7 +1825,9 @@ export const PlayerPortal: React.FC = () => {
             icon: Users,
             badge: hasUnpaidMatch ? '!' : undefined,
           },
-          { id: 'tournaments', label: 'Torneos', icon: Trophy },
+          { id: 'stats', label: 'Mi ELO', icon: TrendingUp },
+          { id: 'overview', label: 'Reservas', icon: Clock },
+          { id: 'friends', label: 'Amigos', icon: UserRound },
         ].map((tab) => {
           const Icon = tab.icon;
           const isActive = activePlayerTab === tab.id;
@@ -1531,7 +1836,7 @@ export const PlayerPortal: React.FC = () => {
               key={tab.id}
               type="button"
               onClick={() => navigatePlayerTab(tab.id as typeof activePlayerTab)}
-              className={`relative flex flex-col items-center justify-center py-1.5 px-3 rounded-xl transition cursor-pointer ${
+              className={`relative flex flex-col items-center justify-center py-1.5 px-2 rounded-xl transition cursor-pointer ${
                 isActive
                   ? 'text-emerald-600 dark:text-emerald-400 font-bold'
                   : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
@@ -1553,11 +1858,11 @@ export const PlayerPortal: React.FC = () => {
           );
         })}
 
-        {/* 5. Menú Hamburguesa 'Más' para páginas secundarias */}
+        {/* 6. Menú Hamburguesa 'Más' para páginas secundarias */}
         <button
           type="button"
           onClick={() => setMobileDrawerOpen(true)}
-          className={`relative flex flex-col items-center justify-center py-1.5 px-3 rounded-xl transition cursor-pointer ${
+          className={`relative flex flex-col items-center justify-center py-1.5 px-2 rounded-xl transition cursor-pointer ${
             mobileDrawerOpen
               ? 'text-emerald-600 dark:text-emerald-400 font-bold'
               : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
@@ -1568,6 +1873,111 @@ export const PlayerPortal: React.FC = () => {
           <span className="text-[10px] mt-0.5">Más</span>
         </button>
       </nav>
+
+      {/* MODAL AÑADIR NUEVO AMIGO */}
+      {addFriendModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm animate-in fade-in duration-150">
+          <div className="relative w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl text-slate-900 dark:text-slate-100 space-y-4">
+            <button
+              onClick={() => setAddFriendModalOpen(false)}
+              className="absolute top-4 right-4 p-2 rounded-xl text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className="flex items-center gap-2">
+              <UserPlus className="w-5 h-5 text-emerald-500" />
+              <h3 className="text-lg font-black text-slate-900 dark:text-white">
+                Añadir Nuevo Amigo
+              </h3>
+            </div>
+
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (!newFriendName.trim()) return;
+                const newFriend = {
+                  id: `friend-${Date.now()}`,
+                  name: newFriendName.trim(),
+                  avatarUrl: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=200&q=80',
+                  level: parseFloat(newFriendLevel) || 3.75,
+                  position: newFriendPosition,
+                  matchesTogether: 0,
+                  winRate: 0,
+                  status: 'available' as const,
+                  club: currentTenant.name,
+                  memberNum: `SP-${Math.floor(100 + Math.random() * 900)}`,
+                };
+                setFriendsList((prev) => [newFriend, ...prev]);
+                setNewFriendName('');
+                setAddFriendModalOpen(false);
+                triggerDemoToast(
+                  'Amigo Añadido',
+                  `${newFriend.name} ha sido añadido a tu lista de amigos y compañeros.`,
+                  'success'
+                );
+              }}
+              className="space-y-4 text-xs"
+            >
+              <div>
+                <label className="block text-slate-600 dark:text-slate-400 font-bold mb-1">Nombre Completo o Email:</label>
+                <input
+                  type="text"
+                  required
+                  value={newFriendName}
+                  onChange={(e) => setNewFriendName(e.target.value)}
+                  placeholder="ej. Mario Gómez"
+                  className="w-full px-3.5 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-slate-600 dark:text-slate-400 font-bold mb-1">Nivel ELO:</label>
+                  <select
+                    value={newFriendLevel}
+                    onChange={(e) => setNewFriendLevel(e.target.value)}
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white"
+                  >
+                    {[1.0, 1.5, 2.0, 2.5, 3.0, 3.25, 3.5, 3.75, 4.0, 4.25, 4.5, 4.75, 5.0, 5.5, 6.0, 7.0].map((lvl) => (
+                      <option key={lvl} value={lvl.toFixed(2)}>{lvl.toFixed(2)}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-slate-600 dark:text-slate-400 font-bold mb-1">Posición en Pista:</label>
+                  <select
+                    value={newFriendPosition}
+                    onChange={(e) => setNewFriendPosition(e.target.value as typeof newFriendPosition)}
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white"
+                  >
+                    <option value="Drive">Drive (Derecha)</option>
+                    <option value="Revés">Revés (Izquierda)</option>
+                    <option value="Ambas">Ambas Posiciones</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="pt-2 flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setAddFriendModalOpen(false)}
+                  className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold cursor-pointer"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold shadow-md cursor-pointer"
+                >
+                  Guardar Amigo
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* Ficha de Detalles de Reserva Operativa para Jugador */}
       {selectedPlayerDrawerData && (

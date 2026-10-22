@@ -604,9 +604,9 @@ interface AppContextType {
   exitWhiteLabelPlayerPreview: () => void;
 
   // Main Demo Accounts & Nested Roles
-  activeDemoAccount: 'club' | 'academy' | 'coach' | 'pro_athlete' | 'setmio_player' | 'superadmin';
+  activeDemoAccount: 'club' | 'academy' | 'coach' | 'pro_athlete' | 'organizer' | 'setmio_player' | 'superadmin';
   switchDemoAccount: (
-    demoId: 'club' | 'academy' | 'coach' | 'pro_athlete' | 'setmio_player' | 'superadmin',
+    demoId: 'club' | 'academy' | 'coach' | 'pro_athlete' | 'organizer' | 'setmio_player' | 'superadmin',
     subRole?: string
   ) => void;
 
@@ -1627,9 +1627,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   // Main Demo Accounts & Nested Roles
-  const activeDemoAccount: 'club' | 'academy' | 'coach' | 'pro_athlete' | 'setmio_player' | 'superadmin' =
+  const activeDemoAccount: 'club' | 'academy' | 'coach' | 'pro_athlete' | 'organizer' | 'setmio_player' | 'superadmin' =
     currentUser.role === 'SUPERADMIN' || currentView === 'hq'
       ? 'superadmin'
+      : currentTenant.type === 'TOURNAMENT_ORGANIZER' || currentUser.role === 'TOURNAMENT_ORGANIZER'
+      ? 'organizer'
       : currentTenant.type === 'PRO_PLAYER' || currentUser.role === 'PROFESSIONAL_PLAYER'
       ? 'pro_athlete'
       : currentTenant.type === 'ACADEMY'
@@ -1642,7 +1644,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const switchDemoAccount = useCallback(
     (
-      demoId: 'club' | 'academy' | 'coach' | 'pro_athlete' | 'setmio_player' | 'superadmin',
+      demoId: 'club' | 'academy' | 'coach' | 'pro_athlete' | 'organizer' | 'setmio_player' | 'superadmin',
       subRole?: string
     ) => {
       setIsCorporateLanding(false);
@@ -1730,6 +1732,18 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         setCurrentUser(ROLE_PROFILES.PROFESSIONAL_PLAYER);
         setCurrentViewState('admin');
         triggerDemoToast('Demo Atleta Profesional', 'Gestión de sponsors, torneos FIP y rendimiento con Setmio Pro.', 'success');
+      } else if (demoId === 'organizer') {
+        const organizerTenant =
+          tenants.find((t) => t.id === 'tenant-circuito-norte') ||
+          tenants.find((t) => t.type === 'TOURNAMENT_ORGANIZER') ||
+          currentTenant;
+        if (organizerTenant) setCurrentTenantId(organizerTenant.id);
+
+        setIsWhiteLabelPlayerPreview(false);
+        setCurrentUser(ROLE_PROFILES.TOURNAMENT_ORGANIZER);
+        setCurrentViewState('admin');
+        setAdminTabState('tournaments');
+        triggerDemoToast('Demo Organizador de Eventos', 'Gestión de competiciones, ligas, patrocinadores y sedes con Setmio Pro.', 'success');
       } else if (demoId === 'setmio_player') {
         const clubTenant = tenants.find((t) => t.id === 'tenant-san-mateo-01') || tenants[0];
         if (clubTenant) setCurrentTenantId(clubTenant.id);

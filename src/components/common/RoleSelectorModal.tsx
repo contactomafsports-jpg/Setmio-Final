@@ -32,7 +32,7 @@ export const RoleSelectorModal: React.FC<RoleSelectorModalProps> = ({
   if (!isOpen) return null;
 
   const handleLaunch = (
-    demoId: 'club' | 'academy' | 'coach' | 'pro_athlete' | 'setmio_player' | 'superadmin',
+    demoId: 'club' | 'academy' | 'coach' | 'pro_athlete' | 'organizer' | 'setmio_player' | 'superadmin',
     subRole?: string
   ) => {
     switchDemoAccount(demoId, subRole);
@@ -64,7 +64,7 @@ export const RoleSelectorModal: React.FC<RoleSelectorModalProps> = ({
             <span>Arquitectura Oficial de Cuentas Demo & Marcas Blancas</span>
           </div>
           <h2 id="role-modal-title" className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
-            6 Cuentas Demo Principales
+            7 Cuentas Demo Principales
           </h2>
           <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
             Los perfiles de cliente y profesor están anidados dentro de sus correspondientes demos para probar la conmutación entre marcas blancas y el panel de administración Setmio Pro.
@@ -74,8 +74,8 @@ export const RoleSelectorModal: React.FC<RoleSelectorModalProps> = ({
         {/* Filter Pills */}
         <div className="flex flex-wrap items-center gap-2 border-b border-slate-200 dark:border-slate-800 pb-3">
           {[
-            { id: 'all', label: 'Todas las 6 Demos' },
-            { id: 'business', label: 'Clubes & Profesionales' },
+            { id: 'all', label: 'Todas las 7 Demos' },
+            { id: 'business', label: 'Clubes, Eventos & Profesionales' },
             { id: 'player_hq', label: 'Setmio Player & Superadmin' },
           ].map((tab) => (
             <button
@@ -340,7 +340,52 @@ export const RoleSelectorModal: React.FC<RoleSelectorModalProps> = ({
             </div>
           )}
 
-          {/* 5. DEMO SETMIO PLAYER (B2C) */}
+          {/* 5. DEMO ORGANIZADOR DE EVENTOS (NUEVO ROL) */}
+          {(activeFilter === 'all' || activeFilter === 'business') && (
+            <div className="rounded-2xl bg-slate-50 dark:bg-slate-950/70 border border-slate-200 dark:border-slate-800 p-5 flex flex-col justify-between space-y-4 hover:border-amber-500 dark:hover:border-amber-500 transition shadow-xs">
+              <div className="space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-600 to-orange-700 text-white flex items-center justify-center shadow-xs">
+                    <Layers className="w-5 h-5" />
+                  </div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300">
+                    Circuito Galego Pádel
+                  </span>
+                </div>
+
+                <div>
+                  <h3 className="text-base font-extrabold text-slate-900 dark:text-white">
+                    5. Demo Organizador de Eventos
+                  </h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
+                    Rol exclusivo para gestión de Competiciones, Ligas oficiales, Patrocinadores y Sedes de Evento (sin TPV de club ni pistas físicas propias).
+                  </p>
+                </div>
+
+                <div className="p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 text-xs space-y-1">
+                  <div className="flex items-center justify-between text-slate-600 dark:text-slate-300">
+                    <span>Branding:</span>
+                    <strong className="text-amber-600 dark:text-amber-400">Setmio Pro Event Organizer</strong>
+                  </div>
+                  <div className="flex items-center justify-between text-slate-600 dark:text-slate-300">
+                    <span>Módulos:</span>
+                    <span className="font-semibold text-slate-900 dark:text-white">Torneos, Ligas, Sponsors & Sedes</span>
+                  </div>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => handleLaunch('organizer')}
+                className="w-full py-2 px-3 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm transition cursor-pointer"
+              >
+                <span>Entrar a Demo Organizador</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          )}
+
+          {/* 6. DEMO SETMIO PLAYER (B2C) */}
           {(activeFilter === 'all' || activeFilter === 'player_hq') && (
             <div className="rounded-2xl bg-slate-50 dark:bg-slate-950/70 border border-slate-200 dark:border-slate-800 p-5 flex flex-col justify-between space-y-4 hover:border-cyan-500 dark:hover:border-cyan-500 transition shadow-xs">
               <div className="space-y-2.5">
@@ -355,7 +400,7 @@ export const RoleSelectorModal: React.FC<RoleSelectorModalProps> = ({
 
                 <div>
                   <h3 className="text-base font-extrabold text-slate-900 dark:text-white">
-                    5. Demo Setmio Player
+                    6. Demo Setmio Player
                   </h3>
                   <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
                     Entorno dedicado para el jugador amateur: reserva en red multi-club, partidas abiertas, ranking y ELO global oficial.
@@ -385,7 +430,7 @@ export const RoleSelectorModal: React.FC<RoleSelectorModalProps> = ({
             </div>
           )}
 
-          {/* 6. DEMO SUPERADMINISTRADOR */}
+          {/* 7. DEMO SUPERADMINISTRADOR */}
           {(activeFilter === 'all' || activeFilter === 'player_hq') && (
             <div className="rounded-2xl bg-slate-50 dark:bg-slate-950/70 border border-slate-200 dark:border-slate-800 p-5 flex flex-col justify-between space-y-4 hover:border-purple-500 dark:hover:border-purple-500 transition shadow-xs">
               <div className="space-y-2.5">
@@ -400,7 +445,7 @@ export const RoleSelectorModal: React.FC<RoleSelectorModalProps> = ({
 
                 <div>
                   <h3 className="text-base font-extrabold text-slate-900 dark:text-white">
-                    6. Demo Superadministrador
+                    7. Demo Superadministrador
                   </h3>
                   <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
                     Consola global de Setmio: aprovisionamiento de tenants, planes B2B, facturación recurrente SaaS y auditoría.

@@ -8,6 +8,8 @@ import {
   GraduationCap,
   Users,
   Briefcase,
+  Layers,
+  Building2,
 } from 'lucide-react';
 import { useApp, AdminTab } from '../../context/AppContext';
 
@@ -26,79 +28,53 @@ export const PrivateMobileNav: React.FC<PrivateMobileNavProps> = ({
 }) => {
   const { t, currentTenant, currentUser } = useApp();
 
-  const isProAthlete =
-    currentTenant.type === 'PRO_PLAYER' || currentUser.role === 'PROFESSIONAL_PLAYER';
+  const isCoach =
+    currentTenant.type === 'COACH' || currentUser.role === 'COACH';
   const isAcademy =
     currentTenant.type === 'ACADEMY' || currentUser.role === 'ACADEMY_MANAGER';
+  const isProAthlete =
+    currentTenant.type === 'PRO_PLAYER' || currentUser.role === 'PROFESSIONAL_PLAYER';
+  const isOrganizer =
+    currentTenant.type === 'TOURNAMENT_ORGANIZER' || currentUser.role === 'TOURNAMENT_ORGANIZER';
 
-  const navItems = isProAthlete
-    ? [
-        {
-          id: 'dashboard' as AdminTab,
-          label: 'Resumen Pro',
-          icon: LayoutDashboard,
-        },
-        {
-          id: 'agenda' as AdminTab,
-          label: 'Agenda & FIP',
-          icon: Calendar,
-        },
-        {
-          id: 'matches' as AdminTab,
-          label: 'Exhibiciones',
-          icon: Trophy,
-        },
-        {
-          id: 'customers' as AdminTab,
-          label: 'Sponsors',
-          icon: Briefcase,
-        },
-      ]
-    : isAcademy
-    ? [
-        {
-          id: 'dashboard' as AdminTab,
-          label: 'Escuela',
-          icon: LayoutDashboard,
-        },
-        {
-          id: 'academy' as AdminTab,
-          label: 'Cursos & Grupos',
-          icon: GraduationCap,
-        },
-        {
-          id: 'agenda' as AdminTab,
-          label: 'Cuadrante',
-          icon: Calendar,
-        },
-        {
-          id: 'customers' as AdminTab,
-          label: 'Alumnos',
-          icon: Users,
-        },
-      ]
-    : [
-        {
-          id: 'dashboard' as AdminTab,
-          label: t('club.nav.dashboard', 'Inicio'),
-          icon: LayoutDashboard,
-        },
-        {
-          id: 'agenda' as AdminTab,
-          label: t('club.nav.bookings', 'Reservas'),
-          icon: Calendar,
-        },
-        {
-          id: 'matches' as AdminTab,
-          label: t('club.nav.matches', 'Partidas'),
-          icon: Trophy,
-        },
-        {
-          id: 'pos_cafe' as AdminTab,
-          label: t('club.nav.pos', 'TPV / Caja'),
-          icon: CreditCard,
-        },
-      ];
+  let navItems: { id: AdminTab; label: string; icon: React.ComponentType<{ className?: string; strokeWidth?: number }> }[] = [];
+
+  if (isOrganizer) {
+    navItems = [
+      { id: 'tournaments', label: 'Torneos', icon: Trophy },
+      { id: 'matches', label: 'Ligas', icon: Layers },
+      { id: 'customers', label: 'Sponsors', icon: Briefcase },
+      { id: 'courts_management', label: 'Sedes', icon: Building2 },
+    ];
+  } else if (isCoach) {
+    navItems = [
+      { id: 'academy', label: 'Mis Clases', icon: GraduationCap },
+      { id: 'customers', label: 'Alumnos', icon: Users },
+      { id: 'agenda', label: 'Calendario', icon: Calendar },
+      { id: 'settings', label: 'Tarifas', icon: CreditCard },
+    ];
+  } else if (isAcademy) {
+    navItems = [
+      { id: 'academy', label: 'Cursos', icon: GraduationCap },
+      { id: 'agenda', label: 'Asistencia', icon: Calendar },
+      { id: 'customers', label: 'Alumnos', icon: Users },
+      { id: 'invoicing', label: 'Pagos', icon: CreditCard },
+    ];
+  } else if (isProAthlete) {
+    navItems = [
+      { id: 'agenda', label: 'Agenda FIP', icon: Calendar },
+      { id: 'customers', label: 'Sponsors', icon: Briefcase },
+      { id: 'dashboard', label: 'Rendimiento', icon: LayoutDashboard },
+      { id: 'matches', label: 'Estadísticas', icon: Trophy },
+    ];
+  } else {
+    navItems = [
+      { id: 'courts_management', label: 'Pistas', icon: Layers },
+      { id: 'agenda', label: 'Reservas', icon: Calendar },
+      { id: 'pos_cafe', label: 'TPV / Caja', icon: CreditCard },
+      { id: 'customers', label: 'Miembros', icon: Users },
+    ];
+  }
 
   return (
     <nav
