@@ -19,6 +19,7 @@ import { UserProfileDropdown } from '../common/UserProfileDropdown';
 import { OfficialFlag } from '../common/OfficialFlag';
 import { SUPPORTED_LANGUAGES } from '../../lib/i18n';
 import { i18n } from '../../i18n';
+import { getAdminNavConfig } from '../../lib/adminNavigation';
 
 interface AdminHeaderProps {
   onOpenProfileModal?: () => void;
@@ -62,6 +63,9 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
   const isProAthleteAdmin =
     currentTenant.type === 'PRO_PLAYER' || currentUser.role === 'PROFESSIONAL_PLAYER';
   const isReception = currentUser.role === 'RECEPTION';
+
+  const navConfig = getAdminNavConfig(currentTenant, currentUser, isMultiVenue, venues);
+  const { hasMultipleVenues } = navConfig;
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -195,8 +199,8 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
             </div>
           )}
 
-          {/* Selector Global de Sede Activa (Directo en cabecera si el Administrador gestiona múltiples sedes) */}
-          {isMultiVenue && (
+          {/* Selector Global de Sede Activa (SOLO si el Club gestiona múltiples localizaciones físicas) */}
+          {hasMultipleVenues && (
             <div className="hidden lg:flex items-center ml-1 sm:ml-2">
               <div className="relative" ref={venueRef}>
                 <button

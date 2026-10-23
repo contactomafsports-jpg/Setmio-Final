@@ -17,6 +17,7 @@ import {
 import { OfficialFlag } from './OfficialFlag';
 import { i18n } from '../../i18n';
 import { SUPPORTED_LANGUAGES, SupportedLanguage } from '../../lib/i18n';
+import { getAdminNavConfig } from '../../lib/adminNavigation';
 
 interface UserProfileDropdownProps {
   variant?: 'admin' | 'player' | 'coach';
@@ -57,6 +58,9 @@ export const UserProfileDropdown: React.FC<UserProfileDropdownProps> = ({
   const [isLanguageExpanded, setIsLanguageExpanded] = useState(false);
   const [avatarImgError, setAvatarImgError] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const navConfig = getAdminNavConfig(currentTenant, currentUser, isMultiVenue, venues);
+  const { hasMultipleVenues } = navConfig;
 
   // Close on outside click
   useEffect(() => {
@@ -392,8 +396,8 @@ export const UserProfileDropdown: React.FC<UserProfileDropdownProps> = ({
             </button>
           </div>
 
-          {/* 4. SELECTOR DE SEDE ACTIVA (SOLO MULTI-SEDE) */}
-          {isMultiVenue && (
+          {/* 4. SELECTOR DE SEDE ACTIVA (SOLO si el Club gestiona múltiples localizaciones físicas) */}
+          {hasMultipleVenues && (
             <div className="py-2">
               <div className="px-2 pb-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center justify-between">
                 <span className="flex items-center gap-1.5">

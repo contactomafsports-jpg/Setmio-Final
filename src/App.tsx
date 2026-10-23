@@ -382,8 +382,17 @@ export function App() {
       case 'all_bookings':
       case 'bookings':
         return <AdminAgenda />;
-      case 'courts_management':
+      case 'courts_management': {
+        const hasNoCourtsInfrastructure =
+          currentTenant.type === 'COACH' ||
+          currentUser.role === 'COACH' ||
+          currentTenant.type === 'PRO_PLAYER' ||
+          currentUser.role === 'PROFESSIONAL_PLAYER';
+        if (hasNoCourtsInfrastructure) {
+          return <ContextualDashboard />;
+        }
         return <AdminCourtsManagement />;
+      }
       case 'matches':
         return <AdminMatches />;
       case 'customers':
@@ -396,8 +405,17 @@ export function App() {
         return <AdminTournaments />;
       case 'shop':
         return <AdminShopOrders />;
-      case 'smart_courts':
+      case 'smart_courts': {
+        const hasNoCourtsInfrastructure =
+          currentTenant.type === 'COACH' ||
+          currentUser.role === 'COACH' ||
+          currentTenant.type === 'PRO_PLAYER' ||
+          currentUser.role === 'PROFESSIONAL_PLAYER';
+        if (hasNoCourtsInfrastructure) {
+          return <ContextualDashboard />;
+        }
         return <AdminCourtsManagement initialTab="iot" />;
+      }
       case 'pos_cafe':
         return <AdminCafePOS />;
       case 'invoicing':
