@@ -33,6 +33,10 @@ import {
   TrendingDown,
   Minus,
   Save,
+  Split,
+  LayoutGrid,
+  Phone,
+  Mail,
 } from 'lucide-react';
 
 export interface ProBracketMatch {
@@ -237,6 +241,8 @@ export const AdminTournaments: React.FC = () => {
     rankings,
     createRanking,
     linkTournamentToRanking,
+    customers,
+    navigateToPlayerProfile,
     t,
   } = useApp();
 
@@ -258,6 +264,24 @@ export const AdminTournaments: React.FC = () => {
   // Sub-tab inside the dedicated detail view
   const [detailSubTab, setDetailSubTab] = useState<'info' | 'draws' | 'schedule' | 'inscriptions'>('info');
   const [selectedDrawCategory, setSelectedDrawCategory] = useState<string>('1ª Categoría Masculina');
+
+  // Modo de visualización de cuadro: 'horizontal' (árbol deslizante) vs 'list' (columnas)
+  const [bracketViewMode, setBracketViewMode] = useState<'horizontal' | 'list'>('horizontal');
+
+  // Modal de detalles del partido
+  const [selectedBracketMatchForDetail, setSelectedBracketMatchForDetail] = useState<ProBracketMatch | null>(null);
+
+  // Modal de perfil público del jugador
+  const [publicProfilePlayer, setPublicProfilePlayer] = useState<{
+    name: string;
+    avatarUrl: string;
+    level: number;
+    phone: string;
+    email: string;
+    matches: number;
+    position: string;
+    hand: string;
+  } | null>(null);
 
   const [posterModalUrl, setPosterModalUrl] = useState<string | null>(null);
   const [tournamentSearch, setTournamentSearch] = useState('');
@@ -346,6 +370,48 @@ export const AdminTournaments: React.FC = () => {
     { id: 'sp-2', name: 'Bullpadel Oficial', logoUrl: 'https://images.unsplash.com/photo-1554068865-24cecd4e34b8?auto=format&fit=crop&w=200&q=80', websiteUrl: 'https://bullpadel.com', description: 'Pala oficial del torneo y paleteros para campeones.' },
     { id: 'sp-3', name: 'Clínica Fisioterapia Narón', logoUrl: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=200&q=80', websiteUrl: 'https://fisionaron.es', description: 'Atención fisioterapéutica en pista durante semifinales y finales.' },
   ];
+
+  const DEMO_PLAYER_AVATARS: Record<string, string> = {
+    'Carlos Méndez': 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=200&q=80',
+    'Diego Soto': 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=200&q=80',
+    'Javier Fraga': 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=200&q=80',
+    'Alberto Pena': 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=200&q=80',
+    'Lucas Gómez': 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80',
+    'Elena Permuy': 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=200&q=80',
+    'Lucas Dopico': 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=200&q=80',
+    'Sara Fandiño': 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
+    'Mateo Varela': 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80',
+    'Rubén Loureiro': 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=200&q=80',
+    'Brais Barreiro': 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=200&q=80',
+    'Marcos Castro': 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=200&q=80',
+    'Pablo Rey Jr.': 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=200&q=80',
+    'Manuel Permuy Jr.': 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80',
+    'David Morales': 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=200&q=80',
+    'Iván Blanco': 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=200&q=80',
+  };
+
+  const getPlayerAvatar = (name: string): string => {
+    const cleanName = name.trim();
+    if (DEMO_PLAYER_AVATARS[cleanName]) return DEMO_PLAYER_AVATARS[cleanName];
+    const found = customers?.find((c) => c.name.toLowerCase() === cleanName.toLowerCase());
+    if (found?.avatarUrl) return found.avatarUrl;
+    return 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80';
+  };
+
+  const handleViewPlayerProfile = (name: string) => {
+    const cleanName = name.trim();
+    const found = customers?.find((c) => c.name.toLowerCase() === cleanName.toLowerCase());
+    setPublicProfilePlayer({
+      name: cleanName,
+      avatarUrl: getPlayerAvatar(cleanName),
+      level: found?.level || 4.25,
+      phone: found?.phone || '+34 600 12 34 56',
+      email: found?.email || `${cleanName.toLowerCase().replace(/\s+/g, '.')}@email.es`,
+      matches: found?.matches || 24,
+      position: found?.position || 'Revés',
+      hand: found?.hand || 'Diestro',
+    });
+  };
 
   // URL Sync
   useEffect(() => {
@@ -1014,42 +1080,16 @@ export const AdminTournaments: React.FC = () => {
             VISTA 2: PÁGINA DETALLE DEL TORNEO (/admin/competiciones/[id])
             ====================================================================== */
         <div className="space-y-6 animate-in fade-in duration-150">
-          {/* Barra Superior de Navegación & Acciones Limpia y Minimalista */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-slate-200/80 dark:border-slate-800">
-            {/* Botón Volver Rediseñado Minimalista */}
+          {/* Botón Volver Rediseñado Minimalista para dar total protagonismo a la imagen y título */}
+          <div className="flex items-center pb-1">
             <button
               type="button"
               onClick={handleBackToList}
-              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800 shadow-2xs font-bold text-xs transition cursor-pointer active:scale-95 group self-start"
+              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-slate-100 dark:hover:bg-slate-800/60 font-semibold text-xs transition cursor-pointer active:scale-95 group"
             >
-              <ArrowLeft className="w-4 h-4 text-emerald-500 group-hover:-translate-x-0.5 transition-transform" />
-              <span>{t('tournaments.btn_back', 'Volver al Listado de Torneos')}</span>
+              <ArrowLeft className="w-4 h-4 text-emerald-500 group-hover:-translate-x-1 transition-transform" />
+              <span>{t('tournaments.btn_back', 'Volver a competiciones')}</span>
             </button>
-
-            {/* Acciones Reubicadas Fuera del Contenedor de Imagen */}
-            <div className="flex items-center gap-2.5 self-start sm:self-auto flex-wrap">
-              <button
-                type="button"
-                onClick={() => setPosterModalUrl(selectedTournament.bannerUrl)}
-                className="px-3.5 py-2 rounded-xl bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 font-bold text-xs border border-slate-200 dark:border-slate-700 shadow-2xs transition flex items-center gap-1.5 cursor-pointer active:scale-95"
-                title="Ver Cartel Oficial"
-              >
-                <Eye className="w-4 h-4 text-emerald-500" />
-                <span>{t('tournaments.btn_view_poster', 'Ver cartel')}</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  setSelectedTournamentForInscription(selectedTournament.id);
-                  setIsInscriptionModalOpen(true);
-                }}
-                className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md transition flex items-center gap-1.5 cursor-pointer active:scale-95"
-              >
-                <Users className="w-4 h-4" />
-                <span>{t('tournaments.btn_register_pair', 'Inscribir Pareja')}</span>
-              </button>
-            </div>
           </div>
 
           {/* Cabecera / Primer Contenedor del Torneo: Máximo Contraste y Legibilidad */}
@@ -1125,6 +1165,31 @@ export const AdminTournaments: React.FC = () => {
                   </span>
                   <span className="text-[10px] text-slate-400 block font-medium">y textil oficial</span>
                 </div>
+              </div>
+
+              {/* Botones de Acción dentro del primer contenedor */}
+              <div className="flex flex-wrap items-center justify-end gap-2.5 pt-3 border-t border-slate-100 dark:border-slate-800">
+                <button
+                  type="button"
+                  onClick={() => setPosterModalUrl(selectedTournament.bannerUrl)}
+                  className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold text-xs border border-slate-200 dark:border-slate-700 transition flex items-center gap-1.5 cursor-pointer active:scale-95 shadow-2xs"
+                  title="Ver Cartel Oficial"
+                >
+                  <Eye className="w-4 h-4 text-emerald-500" />
+                  <span>{t('tournaments.btn_view_poster', 'Ver cartel')}</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedTournamentForInscription(selectedTournament.id);
+                    setIsInscriptionModalOpen(true);
+                  }}
+                  className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md transition flex items-center gap-1.5 cursor-pointer active:scale-95"
+                >
+                  <Users className="w-4 h-4" />
+                  <span>{t('tournaments.btn_register_pair', 'Inscribirse parejas')}</span>
+                </button>
               </div>
             </div>
           </div>

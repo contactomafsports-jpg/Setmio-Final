@@ -35,6 +35,8 @@ import {
   ShoppingBag,
   Info,
   ExternalLink,
+  Building2,
+  History,
 } from 'lucide-react';
 
 interface LinkedChargeMeta {
@@ -43,6 +45,17 @@ interface LinkedChargeMeta {
   isWalletTopup?: boolean;
   memberId?: string;
   memberName?: string;
+}
+
+export interface POSTransactionItem {
+  id: string;
+  time: string;
+  concept: string;
+  amount: number;
+  paymentMethod: string;
+  venueId?: string;
+  venueName?: string;
+  customerName?: string;
 }
 
 export const AdminCafePOS: React.FC = () => {
@@ -59,6 +72,8 @@ export const AdminCafePOS: React.FC = () => {
     posPendingCharge,
     setPosPendingCharge,
     setAdminTab,
+    isMultiVenue,
+    venues,
     t,
   } = useApp();
 
@@ -103,6 +118,53 @@ export const AdminCafePOS: React.FC = () => {
       setPaymentMethod(availablePaymentMethods[0].id);
     }
   }, [availablePaymentMethods, paymentMethod]);
+
+  const hasMultipleVenues = Boolean(isMultiVenue) && Array.isArray(venues) && venues.length > 1;
+  const [posVenueFilter, setPosVenueFilter] = useState<string>('all');
+  const [transactionsModalOpen, setTransactionsModalOpen] = useState(false);
+
+  const [posTransactions, setPosTransactions] = useState<POSTransactionItem[]>([
+    {
+      id: 'tx-101',
+      time: '09:15',
+      concept: '2x Agua Mineral + 1x Café Espresso',
+      amount: 5.5,
+      paymentMethod: 'Tarjeta',
+      venueId: venues?.[0]?.id || 'v-1',
+      venueName: venues?.[0]?.name || 'Sede Principal',
+      customerName: 'Carlos Méndez',
+    },
+    {
+      id: 'tx-102',
+      time: '10:00',
+      concept: 'Reserva Pista 2 (10:00) — Cuota 1/4',
+      amount: 7.0,
+      paymentMethod: 'Efectivo',
+      venueId: venues?.[0]?.id || 'v-1',
+      venueName: venues?.[0]?.name || 'Sede Principal',
+      customerName: 'Diego Soto',
+    },
+    {
+      id: 'tx-103',
+      time: '11:20',
+      concept: 'Bote Bolas Head Pro S + 2x Powerade',
+      amount: 12.0,
+      paymentMethod: 'Monedero Socio',
+      venueId: venues?.[1]?.id || venues?.[0]?.id || 'v-2',
+      venueName: venues?.[1]?.name || 'Sede Indoor Norte',
+      customerName: 'Ana Belén Vázquez',
+    },
+    {
+      id: 'tx-104',
+      time: '12:45',
+      concept: 'Recarga Monedero Socio (#SM-390)',
+      amount: 50.0,
+      paymentMethod: 'Tarjeta',
+      venueId: venues?.[0]?.id || 'v-1',
+      venueName: venues?.[0]?.name || 'Sede Principal',
+      customerName: 'Elena Permuy',
+    },
+  ]);
 
   // Modal: Asignar Reserva / Pago de Jugador
   const [assignModalOpen, setAssignModalOpen] = useState(false);
@@ -249,8 +311,31 @@ export const AdminCafePOS: React.FC = () => {
       }
     });
 
-    setSessionSalesTotal((prev) => prev + cartTotal);
+    const activeVenueObj = hasMultipleVenues && posVenueFilter !== 'all'
+      ? venues.find((v) => v.id === posVenueFilter)
+      : (venues?.[0] || undefined);
+
     const methodLabel = availablePaymentMethods.find((m) => m.id === paymentMethod)?.label || 'TPV';
+
+    const customerMeta =
+      posCart.find((i) => i.meta?.memberName)?.meta?.memberName ||
+      posCart.find((i) => i.meta?.participantName)?.meta?.participantName ||
+      'Cliente Mostrador';
+
+    const newTx: POSTransactionItem = {
+      id: `tx-${Date.now()}`,
+      time: new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }),
+      concept: posCart.map((i) => `${i.qty}x ${i.product.name}`).join(', '),
+      amount: cartTotal,
+      paymentMethod: methodLabel,
+      venueId: activeVenueObj?.id,
+      venueName: activeVenueObj?.name,
+      customerName: customerMeta,
+    };
+
+    setPosTransactions((prev) => [newTx, ...prev]);
+    setSessionSalesTotal((prev) => prev + cartTotal);
+
     triggerDemoToast(
       'Venta Cobrada en TPV',
       `Ticket emitido por ${cartTotal.toFixed(2)} € pagado con ${methodLabel}. Reservas y monederos actualizados.`,
@@ -432,9 +517,21 @@ export const AdminCafePOS: React.FC = () => {
     setProductFormModalOpen(false);
   };
 
+  const filteredTransactions = posTransactions.filter((tx) => {
+    if (hasMultipleVenues && posVenueFilter !== 'all') {
+      return tx.venueId === posVenueFilter;
+    }
+    return true;
+  });
+
   const filteredBookings = bookings.filter((b) => {
     const term = bookingSearch.toLowerCase().trim();
-    return !term || b.creatorName.toLowerCase().includes(term) || b.courtName.toLowerCase().includes(term);
+    const matchTerm = !term || b.creatorName.toLowerCase().includes(term) || b.courtName.toLowerCase().includes(term);
+    if (!matchTerm) return false;
+    if (hasMultipleVenues && posVenueFilter !== 'all') {
+      if (b.venueId && b.venueId !== posVenueFilter) return false;
+    }
+    return true;
   });
 
   const filteredMembers = demoMembers.filter((m) => {
@@ -459,6 +556,42 @@ export const AdminCafePOS: React.FC = () => {
 
         {/* Acciones superiores y Caja: responsive layout anti-solapamiento */}
         <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2 sm:gap-2.5 w-full lg:w-auto">
+          {/* Selector de Sede: SOLO visible si el club es Multi-Sede */}
+          {hasMultipleVenues && (
+            <div className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200/80 dark:border-slate-700/80 shadow-2xs text-xs font-bold col-span-2 sm:col-span-1">
+              <Building2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+              <span className="text-[11px] text-slate-500 dark:text-slate-400 hidden sm:inline">Sede:</span>
+              <select
+                value={posVenueFilter}
+                onChange={(e) => setPosVenueFilter(e.target.value)}
+                className="bg-transparent text-slate-900 dark:text-white font-bold outline-hidden cursor-pointer w-full sm:w-auto"
+              >
+                <option value="all" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">
+                  Todas las sedes
+                </option>
+                {venues.map((v) => (
+                  <option key={v.id} value={v.id} className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">
+                    {v.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+
+          {/* Historial de Transacciones del Turno */}
+          <button
+            type="button"
+            onClick={() => setTransactionsModalOpen(true)}
+            className="px-3 sm:px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold text-xs border border-slate-200/80 dark:border-slate-700/80 shadow-xs flex items-center justify-center gap-1.5 transition active:scale-95 cursor-pointer"
+            title="Ver y filtrar transacciones por sede"
+          >
+            <History className="w-4 h-4 text-blue-500 shrink-0" />
+            <span className="truncate">Transacciones</span>
+            <span className="font-mono text-[10px] px-1.5 py-0.2 rounded bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300">
+              {filteredTransactions.length}
+            </span>
+          </button>
+
           {/* Asignar Reserva / Pago de Jugador */}
           <button
             type="button"
@@ -476,7 +609,7 @@ export const AdminCafePOS: React.FC = () => {
             className="px-3 sm:px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold text-xs border border-slate-200/80 dark:border-slate-700/80 shadow-xs flex items-center justify-center gap-1.5 transition active:scale-95 cursor-pointer"
           >
             <Calculator className="w-4 h-4 text-amber-500 shrink-0" />
-            <span className="truncate">Arqueo de Caja</span>
+            <span className="truncate">Arqueo</span>
           </button>
 
           {/* Catálogo de Productos */}
@@ -720,6 +853,106 @@ export const AdminCafePOS: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* ======================================================================
+          2.5 MODAL: HISTORIAL Y LISTADO DE TRANSACCIONES DEL TURNO
+          ====================================================================== */}
+      {transactionsModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 backdrop-blur-sm p-4 animate-in fade-in duration-150">
+          <div className="relative w-full max-w-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl text-slate-900 dark:text-slate-100 space-y-4 max-h-[90vh] overflow-y-auto">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 dark:border-slate-800 pb-4">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-blue-100 dark:bg-blue-950 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold">
+                  <History className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-black text-slate-900 dark:text-white">
+                    Transacciones y Tickets del Turno
+                  </h3>
+                  <p className="text-xs text-slate-500">
+                    Registro de cobros emitidos en TPV de cafetería, reservas y recargas
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                {/* Filtro de sede dentro del modal si es multi-sede */}
+                {hasMultipleVenues && (
+                  <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-xs font-bold border border-slate-200/80 dark:border-slate-700/80">
+                    <Building2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                    <select
+                      value={posVenueFilter}
+                      onChange={(e) => setPosVenueFilter(e.target.value)}
+                      className="bg-transparent text-slate-900 dark:text-white font-bold outline-hidden cursor-pointer"
+                    >
+                      <option value="all" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">Todas las sedes</option>
+                      {venues.map((v) => (
+                        <option key={v.id} value={v.id} className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">
+                          {v.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+
+                <button
+                  type="button"
+                  onClick={() => setTransactionsModalOpen(false)}
+                  className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+
+            {/* Listado de Transacciones */}
+            {filteredTransactions.length === 0 ? (
+              <div className="p-8 text-center text-slate-500 text-xs">
+                No hay transacciones registradas para la sede seleccionada en este turno.
+              </div>
+            ) : (
+              <div className="divide-y divide-slate-100 dark:divide-slate-800/80">
+                {filteredTransactions.map((tx) => (
+                  <div key={tx.id} className="py-3 flex items-center justify-between gap-4 text-xs">
+                    <div className="min-w-0 flex-1 space-y-0.5">
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono font-bold text-slate-500 text-[11px]">{tx.time}</span>
+                        <span className="font-bold text-slate-900 dark:text-white truncate">{tx.concept}</span>
+                        {hasMultipleVenues && tx.venueName && (
+                          <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+                            {tx.venueName}
+                          </span>
+                        )}
+                      </div>
+                      <div className="text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-2">
+                        <span>{tx.customerName || 'Cliente Mostrador'}</span>
+                        <span>·</span>
+                        <span className="text-emerald-600 dark:text-emerald-400 font-medium">{tx.paymentMethod}</span>
+                      </div>
+                    </div>
+
+                    <div className="text-right shrink-0">
+                      <div className="font-mono font-black text-sm text-emerald-600 dark:text-emerald-400">
+                        +{tx.amount.toFixed(2)} €
+                      </div>
+                      <div className="text-[10px] text-slate-400 font-mono">OK / Cobrado</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs">
+              <span className="text-slate-500 font-semibold">
+                Total Transacciones Mostradas ({filteredTransactions.length}):
+              </span>
+              <span className="font-mono font-black text-base text-slate-900 dark:text-white">
+                {filteredTransactions.reduce((acc, t) => acc + t.amount, 0).toFixed(2)} €
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ======================================================================
           3. MODAL: CIERRE / ARQUEO DE CAJA DEL TURNO

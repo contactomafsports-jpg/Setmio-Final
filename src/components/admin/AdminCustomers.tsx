@@ -261,9 +261,25 @@ export const AdminCustomers: React.FC = () => {
   });
 
   const [search, setSearch] = useState('');
-  const [filterType, setFilterType] = useState<'all' | 'members' | 'casual'>('all');
+  const [filterType, setFilterType] = useState<'all' | 'members' | 'non_members'>('all');
   const [selectedCustomer, setSelectedCustomer] = useState<CustomerItem | null>(null);
   const [publicProfileModalCustomer, setPublicProfileModalCustomer] = useState<CustomerItem | null>(null);
+
+  // Estados de Edición y Eliminación de Miembros / Socios
+  const [editingCustomer, setEditingCustomer] = useState<CustomerItem | null>(null);
+  const [customerToDelete, setCustomerToDelete] = useState<CustomerItem | null>(null);
+  const [editCustomerForm, setEditCustomerForm] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    memberNum: '',
+    level: 3.5,
+    balance: 0,
+    isMember: true,
+    position: 'Revés',
+    hand: 'Diestro',
+    status: 'Activo (Al día)',
+  });
 
   // Subtab: Socios CRM vs Grupos / Listas de Distribución (Sustituto de WhatsApp)
   const [crmSubTab, setCrmSubTab] = useState<'members' | 'groups'>('members');
@@ -274,6 +290,22 @@ export const AdminCustomers: React.FC = () => {
   const [isGroupMembersModalOpen, setIsGroupMembersModalOpen] = useState(false);
   const [selectedGroupForAction, setSelectedGroupForAction] = useState<PlayerGroup | null>(null);
   const [forcePreviewGroups, setForcePreviewGroups] = useState(false);
+
+  // Estados de Edición y Eliminación de Grupos
+  const [editingGroup, setEditingGroup] = useState<PlayerGroup | null>(null);
+  const [groupToDelete, setGroupToDelete] = useState<PlayerGroup | null>(null);
+  const [editGroupForm, setEditGroupForm] = useState({
+    name: '',
+    category: 'level' as 'level' | 'academy' | 'venue' | 'social',
+    description: '',
+    minLevel: '3.50',
+    maxLevel: '4.00',
+  });
+
+  // Estado para gestión masiva de miembros en un grupo
+  const [groupMembersTab, setGroupMembersTab] = useState<'current' | 'bulk'>('current');
+  const [bulkMemberSearch, setBulkMemberSearch] = useState('');
+  const [selectedBulkMemberNames, setSelectedBulkMemberNames] = useState<string[]>([]);
 
   // New Group Form state
   const [newGroupName, setNewGroupName] = useState('');
@@ -517,6 +549,207 @@ export const AdminCustomers: React.FC = () => {
     );
   };
 
+  // Handlers de Edición y Eliminación de Miembros / Clientes
+  const handleOpenEditCustomer = (cust: CustomerItem) => {
+    setEditingCustomer(cust);
+    setEditCustomerForm({
+      name: cust.name,
+      email: cust.email,
+      phone: cust.phone,
+      memberNum: cust.memberNum,
+      level: cust.level,
+      balance: cust.balance,
+      isMember: cust.isMember,
+      position: cust.position || 'Revés',
+      hand: cust.hand || 'Diestro',
+      status: cust.status || (cust.isMember ? 'Activo (Socio)' : 'No socio'),
+    });
+  };
+
+  const handleSaveEditCustomer = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingCustomer) return;
+
+    const updatedList = customerList.map((c) =>
+      c.id === editingCustomer.id
+        ? {
+            ...c,
+            name: editCustomerForm.name.trim(),
+            email: editCustomerForm.email.trim().toLowerCase(),
+            phone: editCustomerForm.phone.trim(),
+            memberNum: editCustomerForm.isMember ? (editCustomerForm.memberNum || c.memberNum) : 'Casual',
+            level: Number(editCustomerForm.level),
+            balance: Number(editCustomerForm.balance),
+            isMember: editCustomerForm.isMember,
+            position: editCustomerForm.position,
+            hand: editCustomerForm.hand,
+            status: editCustomerForm.isMember ? (c.status.includes('Activo') ? c.status : 'Activo (Socio)') : 'No socio',
+          }
+        : c
+    );
+
+    setCustomerList(updatedList);
+    try {
+      localStorage.setItem('setmio_demo_customers', JSON.stringify(updatedList));
+    } catch {
+      // ignore
+    }
+
+    setEditingCustomer(null);
+    triggerDemoToast(
+      'Socio Actualizado',
+      `Los datos de ${editCustomerForm.name} han sido actualizados con éxito.`,
+      'success'
+    );
+  };
+
+  const handleConfirmDeleteCustomer = () => {
+    if (!customerToDelete) return;
+    const updatedList = customerList.filter((c) => c.id !== customerToDelete.id);
+    setCustomerList(updatedList);
+    try {
+      localStorage.setItem('setmio_demo_customers', JSON.stringify(updatedList));
+    } catch {
+      // ignore
+    }
+
+    triggerDemoToast(
+      'Socio Eliminado',
+      `La ficha de ${customerToDelete.name} ha sido eliminada del club.`,
+      'info'
+    );
+    setCustomerToDelete(null);
+  };
+
+  // Handlers de Edición y Eliminación de Grupos
+  const handleOpenEditGroup = (group: PlayerGroup) => {
+    setEditingGroup(group);
+    setEditGroupForm({
+      name: group.name,
+      category: group.category,
+      description: group.description,
+      minLevel: group.minLevel !== undefined ? group.minLevel.toFixed(2) : '3.50',
+      maxLevel: group.maxLevel !== undefined ? group.maxLevel.toFixed(2) : '4.00',
+    });
+  };
+
+  const handleSaveEditGroup = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingGroup) return;
+
+    const minL = editGroupForm.minLevel ? parseFloat(editGroupForm.minLevel) : undefined;
+    const maxL = editGroupForm.maxLevel ? parseFloat(editGroupForm.maxLevel) : undefined;
+
+    updatePlayerGroup(editingGroup.id, {
+      name: editGroupForm.name.trim(),
+      category: editGroupForm.category,
+      description: editGroupForm.description.trim(),
+      minLevel: minL,
+      maxLevel: maxL,
+    });
+
+    setEditingGroup(null);
+    triggerDemoToast(
+      'Grupo Actualizado',
+      `Los cambios en el grupo "${editGroupForm.name}" han sido guardados.`,
+      'success'
+    );
+  };
+
+  const handleConfirmDeleteGroup = () => {
+    if (!groupToDelete) return;
+    deletePlayerGroup(groupToDelete.id);
+    triggerDemoToast(
+      'Grupo Eliminado',
+      `El grupo "${groupToDelete.name}" ha sido eliminado.`,
+      'info'
+    );
+    setGroupToDelete(null);
+  };
+
+  // Handlers de gestión masiva de miembros en grupos
+  const handleBulkAddMembersToGroup = (playerNamesToAdd: string[]) => {
+    if (!selectedGroupForAction || playerNamesToAdd.length === 0) return;
+    const currentNames = selectedGroupForAction.playerNames || [];
+    const newNames = Array.from(new Set([...currentNames, ...playerNamesToAdd]));
+    const updatedMembersData = customerList
+      .filter((c) => newNames.includes(c.name))
+      .map((c) => ({
+        id: c.id,
+        name: c.name,
+        level: c.level,
+        phone: c.phone,
+        email: c.email,
+        isMember: c.isMember,
+        avatarUrl: c.avatarUrl,
+      }));
+
+    updatePlayerGroup(selectedGroupForAction.id, {
+      playerNames: newNames,
+      memberCount: newNames.length,
+      members: updatedMembersData,
+    });
+
+    setSelectedGroupForAction((prev) =>
+      prev
+        ? {
+            ...prev,
+            playerNames: newNames,
+            memberCount: newNames.length,
+            members: updatedMembersData,
+          }
+        : null
+    );
+
+    setSelectedBulkMemberNames([]);
+    triggerDemoToast(
+      'Miembros Añadidos',
+      `${playerNamesToAdd.length} socio(s) añadidos a ${selectedGroupForAction.name}.`,
+      'success'
+    );
+  };
+
+  const handleBulkRemoveMembersFromGroup = (playerNamesToRemove: string[]) => {
+    if (!selectedGroupForAction || playerNamesToRemove.length === 0) return;
+    const currentNames = selectedGroupForAction.playerNames || [];
+    const newNames = currentNames.filter((n) => !playerNamesToRemove.includes(n));
+    const updatedMembersData = customerList
+      .filter((c) => newNames.includes(c.name))
+      .map((c) => ({
+        id: c.id,
+        name: c.name,
+        level: c.level,
+        phone: c.phone,
+        email: c.email,
+        isMember: c.isMember,
+        avatarUrl: c.avatarUrl,
+      }));
+
+    updatePlayerGroup(selectedGroupForAction.id, {
+      playerNames: newNames,
+      memberCount: newNames.length,
+      members: updatedMembersData,
+    });
+
+    setSelectedGroupForAction((prev) =>
+      prev
+        ? {
+            ...prev,
+            playerNames: newNames,
+            memberCount: newNames.length,
+            members: updatedMembersData,
+          }
+        : null
+    );
+
+    setSelectedBulkMemberNames([]);
+    triggerDemoToast(
+      'Miembros Retirados',
+      `${playerNamesToRemove.length} socio(s) retirados del grupo ${selectedGroupForAction.name}.`,
+      'info'
+    );
+  };
+
   // Grupos y Convocatorias Handlers
   const isProOrEnterprise =
     currentTenant.planId === 'pro' || currentTenant.planId === 'elite' || forcePreviewGroups;
@@ -639,7 +872,7 @@ export const AdminCustomers: React.FC = () => {
     const matchType =
       filterType === 'all' ||
       (filterType === 'members' && c.isMember) ||
-      (filterType === 'casual' && !c.isMember);
+      (filterType === 'non_members' && !c.isMember);
     return matchSearch && matchType;
   });
 
@@ -781,7 +1014,7 @@ export const AdminCustomers: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setFilterType('all')}
-                className={`px-3 py-1.5 rounded-lg transition ${
+                className={`px-3 py-1.5 rounded-lg transition cursor-pointer ${
                   filterType === 'all'
                     ? 'bg-emerald-600 text-white shadow-xs'
                     : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
@@ -792,24 +1025,24 @@ export const AdminCustomers: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setFilterType('members')}
-                className={`px-3 py-1.5 rounded-lg transition ${
+                className={`px-3 py-1.5 rounded-lg transition cursor-pointer ${
                   filterType === 'members'
                     ? 'bg-emerald-600 text-white shadow-xs'
                     : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                 }`}
               >
-                Socios con Cuota ({customerList.filter((c) => c.isMember).length})
+                Socios ({customerList.filter((c) => c.isMember).length})
               </button>
               <button
                 type="button"
-                onClick={() => setFilterType('casual')}
-                className={`px-3 py-1.5 rounded-lg transition ${
-                  filterType === 'casual'
+                onClick={() => setFilterType('non_members')}
+                className={`px-3 py-1.5 rounded-lg transition cursor-pointer ${
+                  filterType === 'non_members'
                     ? 'bg-emerald-600 text-white shadow-xs'
                     : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                 }`}
               >
-                Esporádicos ({customerList.filter((c) => !c.isMember).length})
+                No socios ({customerList.filter((c) => !c.isMember).length})
               </button>
             </div>
           </div>
@@ -869,7 +1102,7 @@ export const AdminCustomers: React.FC = () => {
                             <span>Socio #{customer.memberNum}</span>
                           </span>
                         ) : (
-                          <span className="text-[11px] text-slate-400 font-medium">Esporádico</span>
+                          <span className="text-[11px] text-slate-400 font-medium">No socio</span>
                         )}
                       </td>
                       <td className="py-3 px-4">
@@ -877,14 +1110,32 @@ export const AdminCustomers: React.FC = () => {
                           {customer.balance.toFixed(2)} €
                         </span>
                       </td>
-                      <td className="py-3 px-4 text-right space-x-2">
-                        <button
-                          type="button"
-                          onClick={() => handleSelectCustomer(customer)}
-                          className="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-700 hover:bg-emerald-500 hover:text-white text-slate-700 dark:text-slate-200 text-xs font-bold transition"
-                        >
-                          Ver Ficha CRM
-                        </button>
+                      <td className="py-3 px-4 text-right">
+                        <div className="flex items-center justify-end gap-1.5">
+                          <button
+                            type="button"
+                            onClick={() => handleSelectCustomer(customer)}
+                            className="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-700 hover:bg-emerald-500 hover:text-white text-slate-700 dark:text-slate-200 text-xs font-bold transition cursor-pointer"
+                          >
+                            Ver Ficha
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleOpenEditCustomer(customer)}
+                            className="p-1.5 rounded-lg text-slate-500 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-700 transition cursor-pointer"
+                            title="Editar socio o cliente"
+                          >
+                            <Edit3 className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setCustomerToDelete(customer)}
+                            className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition cursor-pointer"
+                            title="Eliminar socio o cliente"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -1198,8 +1449,17 @@ export const AdminCustomers: React.FC = () => {
                           <div className="flex items-center gap-1.5">
                             <button
                               type="button"
-                              onClick={() => deletePlayerGroup(group.id)}
-                              className="p-1.5 rounded-lg text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition"
+                              onClick={() => handleOpenEditGroup(group)}
+                              className="p-1.5 rounded-lg text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+                              title="Editar grupo"
+                            >
+                              <Edit3 className="w-3.5 h-3.5" />
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => setGroupToDelete(group)}
+                              className="p-1.5 rounded-lg text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition cursor-pointer"
                               title="Eliminar grupo"
                             >
                               <Trash2 className="w-3.5 h-3.5" />
@@ -1960,10 +2220,10 @@ export const AdminCustomers: React.FC = () => {
         </div>
       )}
 
-      {/* MODAL 3: VER MIEMBROS DEL GRUPO */}
+      {/* MODAL 3: VER Y GESTIONAR MIEMBROS DEL GRUPO (CON GESTIÓN MASIVA) */}
       {isGroupMembersModalOpen && selectedGroupForAction && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-sm animate-in fade-in duration-150">
-          <div className="relative w-full max-w-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl text-slate-900 dark:text-slate-100 space-y-4 max-h-[85vh] overflow-y-auto">
+          <div className="relative w-full max-w-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl text-slate-900 dark:text-slate-100 space-y-4 max-h-[85vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
@@ -1971,7 +2231,7 @@ export const AdminCustomers: React.FC = () => {
                 </div>
                 <div>
                   <h3 className="text-base font-black text-slate-900 dark:text-white">
-                    Miembros de: {selectedGroupForAction.name}
+                    {selectedGroupForAction.name}
                   </h3>
                   <p className="text-[11px] text-slate-500 dark:text-slate-400">
                     {selectedGroupForAction.memberCount} jugadores registrados en la lista
@@ -1981,47 +2241,191 @@ export const AdminCustomers: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setIsGroupMembersModalOpen(false)}
-                className="p-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white"
+                className="p-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <div className="space-y-2 text-xs">
-              <div className="divide-y divide-slate-100 dark:divide-slate-800">
-                {selectedGroupForAction.playerNames.map((name, idx) => {
-                  const customer = customerList.find((c) => c.name === name);
-                  return (
-                    <div key={idx} className="py-2.5 flex items-center justify-between">
-                      <div className="flex items-center gap-2.5">
-                        <img
-                          src={customer?.avatarUrl || 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=200&q=80'}
-                          alt={name}
-                          className="w-8 h-8 rounded-full object-cover"
-                        />
-                        <div>
-                          <div className="font-bold text-slate-900 dark:text-white">{name}</div>
-                          <div className="text-[11px] text-slate-400">
-                            {customer?.phone || '+34 600 00 00 00'}
+            {/* Sub-tabs: Lista Actual vs Gestión Masiva */}
+            <div className="flex items-center gap-1 p-1 bg-slate-100 dark:bg-slate-800/80 rounded-xl text-xs font-bold">
+              <button
+                type="button"
+                onClick={() => setGroupMembersTab('current')}
+                className={`flex-1 py-1.5 rounded-lg transition cursor-pointer text-center ${
+                  groupMembersTab === 'current'
+                    ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xs'
+                    : 'text-slate-600 dark:text-slate-400'
+                }`}
+              >
+                Miembros Actuales ({selectedGroupForAction.playerNames.length})
+              </button>
+              <button
+                type="button"
+                onClick={() => setGroupMembersTab('bulk')}
+                className={`flex-1 py-1.5 rounded-lg transition cursor-pointer text-center ${
+                  groupMembersTab === 'bulk'
+                    ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xs'
+                    : 'text-slate-600 dark:text-slate-400'
+                }`}
+              >
+                Añadir / Quitar en Lote
+              </button>
+            </div>
+
+            {/* TAB 1: Lista de Miembros Actuales */}
+            {groupMembersTab === 'current' && (
+              <div className="space-y-2 text-xs">
+                <div className="divide-y divide-slate-100 dark:divide-slate-800 max-h-72 overflow-y-auto pr-1">
+                  {selectedGroupForAction.playerNames.map((name, idx) => {
+                    const customer = customerList.find((c) => c.name === name);
+                    return (
+                      <div key={idx} className="py-2.5 flex items-center justify-between">
+                        <div className="flex items-center gap-2.5">
+                          <img
+                            src={customer?.avatarUrl || 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=200&q=80'}
+                            alt={name}
+                            className="w-8 h-8 rounded-full object-cover"
+                          />
+                          <div>
+                            <div className="font-bold text-slate-900 dark:text-white">{name}</div>
+                            <div className="text-[11px] text-slate-400">
+                              {customer?.phone || '+34 600 00 00 00'}
+                            </div>
                           </div>
                         </div>
-                      </div>
 
-                      <div className="flex items-center gap-2">
-                        <span className="px-2 py-0.5 rounded font-mono font-bold text-[11px] bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20">
-                          Niv {customer ? customer.level.toFixed(2) : '3.80'}
-                        </span>
-                        {customer?.isMember && (
-                          <span className="text-[10px] font-bold text-slate-500">
-                            Socio
+                        <div className="flex items-center gap-2">
+                          <span className="px-2 py-0.5 rounded font-mono font-bold text-[11px] bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20">
+                            Niv {customer ? customer.level.toFixed(2) : '3.80'}
                           </span>
-                        )}
+                          <button
+                            type="button"
+                            onClick={() => handleBulkRemoveMembersFromGroup([name])}
+                            className="p-1 rounded text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition"
+                            title="Quitar del grupo"
+                          >
+                            <X className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
                       </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
+                </div>
               </div>
-            </div>
+            )}
+
+            {/* TAB 2: Gestión y Selección Múltiple de Miembros */}
+            {groupMembersTab === 'bulk' && (
+              <div className="space-y-3 text-xs">
+                <div className="relative">
+                  <Search className="absolute left-3 top-2.5 w-4 h-4 text-slate-400" />
+                  <input
+                    type="text"
+                    value={bulkMemberSearch}
+                    onChange={(e) => setBulkMemberSearch(e.target.value)}
+                    placeholder="Buscar jugador por nombre o teléfono..."
+                    className="w-full pl-9 pr-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                  />
+                </div>
+
+                <div className="flex items-center justify-between text-[11px] text-slate-500">
+                  <span>Seleccionados para acción: <strong>{selectedBulkMemberNames.length}</strong></span>
+                  <div className="space-x-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const allFiltered = customerList
+                          .filter((c) => !bulkMemberSearch || c.name.toLowerCase().includes(bulkMemberSearch.toLowerCase()))
+                          .map((c) => c.name);
+                        setSelectedBulkMemberNames(allFiltered);
+                      }}
+                      className="text-emerald-600 dark:text-emerald-400 font-bold hover:underline cursor-pointer"
+                    >
+                      Seleccionar todos
+                    </button>
+                    <span>·</span>
+                    <button
+                      type="button"
+                      onClick={() => setSelectedBulkMemberNames([])}
+                      className="text-slate-400 hover:underline cursor-pointer"
+                    >
+                      Deseleccionar
+                    </button>
+                  </div>
+                </div>
+
+                <div className="max-h-60 overflow-y-auto space-y-1.5 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-2 bg-slate-50/50 dark:bg-slate-950/50">
+                  {customerList
+                    .filter((c) => !bulkMemberSearch || c.name.toLowerCase().includes(bulkMemberSearch.toLowerCase()))
+                    .map((cust) => {
+                      const isAlreadyInGroup = selectedGroupForAction.playerNames.includes(cust.name);
+                      const isChecked = selectedBulkMemberNames.includes(cust.name);
+
+                      return (
+                        <label
+                          key={cust.id}
+                          className={`flex items-center justify-between p-2 rounded-xl transition cursor-pointer ${
+                            isChecked
+                              ? 'bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-500/30'
+                              : 'hover:bg-white dark:hover:bg-slate-800/80 border border-transparent'
+                          }`}
+                        >
+                          <div className="flex items-center gap-2.5 min-w-0">
+                            <input
+                              type="checkbox"
+                              checked={isChecked}
+                              onChange={(e) => {
+                                if (e.target.checked) {
+                                  setSelectedBulkMemberNames([...selectedBulkMemberNames, cust.name]);
+                                } else {
+                                  setSelectedBulkMemberNames(selectedBulkMemberNames.filter((n) => n !== cust.name));
+                                }
+                              }}
+                              className="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500"
+                            />
+                            <div className="truncate">
+                              <span className="font-bold text-slate-900 dark:text-white block truncate">{cust.name}</span>
+                              <span className="text-[10px] text-slate-400">{cust.phone} · Nivel {cust.level.toFixed(2)}</span>
+                            </div>
+                          </div>
+
+                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0 ${
+                            isAlreadyInGroup
+                              ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300'
+                              : 'bg-slate-200 text-slate-600 dark:bg-slate-800 dark:text-slate-400'
+                          }`}>
+                            {isAlreadyInGroup ? 'En el grupo' : 'No incluido'}
+                          </span>
+                        </label>
+                      );
+                    })}
+                </div>
+
+                {/* Botones de acción masiva */}
+                <div className="flex items-center gap-2 pt-1">
+                  <button
+                    type="button"
+                    disabled={selectedBulkMemberNames.length === 0}
+                    onClick={() => handleBulkAddMembersToGroup(selectedBulkMemberNames)}
+                    className="flex-1 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 text-white font-bold text-xs shadow-xs transition flex items-center justify-center gap-1 cursor-pointer"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>Añadir al grupo ({selectedBulkMemberNames.length})</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    disabled={selectedBulkMemberNames.length === 0}
+                    onClick={() => handleBulkRemoveMembersFromGroup(selectedBulkMemberNames)}
+                    className="flex-1 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 disabled:opacity-40 text-white font-bold text-xs shadow-xs transition flex items-center justify-center gap-1 cursor-pointer"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                    <span>Quitar del grupo ({selectedBulkMemberNames.length})</span>
+                  </button>
+                </div>
+              </div>
+            )}
 
             <div className="pt-2 flex justify-between gap-2 border-t border-slate-100 dark:border-slate-800">
               <button
@@ -2030,7 +2434,7 @@ export const AdminCustomers: React.FC = () => {
                   setIsGroupMembersModalOpen(false);
                   handleOpenConvocatoriaModal(selectedGroupForAction);
                 }}
-                className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-sm flex items-center gap-1.5"
+                className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-sm flex items-center gap-1.5 cursor-pointer"
               >
                 <Send className="w-3.5 h-3.5" />
                 <span>Notificar a este Grupo</span>
@@ -2038,9 +2442,393 @@ export const AdminCustomers: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setIsGroupMembersModalOpen(false)}
-                className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs"
+                className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs cursor-pointer"
               >
                 Cerrar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ======================================================================
+          MODAL: EDITAR SOCIO / CLIENTE
+          ====================================================================== */}
+      {editingCustomer && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-sm animate-in fade-in duration-150">
+          <div className="relative w-full max-w-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl text-slate-900 dark:text-slate-100 space-y-4 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+              <div className="flex items-center gap-2">
+                <Edit3 className="w-5 h-5 text-emerald-500" />
+                <h3 className="text-base font-black text-slate-900 dark:text-white">
+                  Editar Socio / Cliente
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setEditingCustomer(null)}
+                className="p-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveEditCustomer} className="space-y-3.5 text-xs">
+              <div>
+                <label className="block text-slate-700 dark:text-slate-300 mb-1 font-bold">
+                  Nombre Completo
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={editCustomerForm.name}
+                  onChange={(e) => setEditCustomerForm({ ...editCustomerForm, name: e.target.value })}
+                  className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-slate-700 dark:text-slate-300 mb-1 font-bold">
+                    Email
+                  </label>
+                  <input
+                    type="email"
+                    required
+                    value={editCustomerForm.email}
+                    onChange={(e) => setEditCustomerForm({ ...editCustomerForm, email: e.target.value })}
+                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-slate-700 dark:text-slate-300 mb-1 font-bold">
+                    Teléfono
+                  </label>
+                  <input
+                    type="tel"
+                    required
+                    value={editCustomerForm.phone}
+                    onChange={(e) => setEditCustomerForm({ ...editCustomerForm, phone: e.target.value })}
+                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-slate-700 dark:text-slate-300 mb-1 font-bold">
+                    Tipo de Usuario
+                  </label>
+                  <select
+                    value={editCustomerForm.isMember ? 'member' : 'non_member'}
+                    onChange={(e) => setEditCustomerForm({ ...editCustomerForm, isMember: e.target.value === 'member' })}
+                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                  >
+                    <option value="member">Socio del Club</option>
+                    <option value="non_member">No socio (Externo)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-slate-700 dark:text-slate-300 mb-1 font-bold">
+                    Nº de Socio
+                  </label>
+                  <input
+                    type="text"
+                    disabled={!editCustomerForm.isMember}
+                    value={editCustomerForm.memberNum}
+                    onChange={(e) => setEditCustomerForm({ ...editCustomerForm, memberNum: e.target.value })}
+                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 disabled:opacity-50 font-mono"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-slate-700 dark:text-slate-300 mb-1 font-bold">
+                    Nivel Play! (1.00 - 7.00)
+                  </label>
+                  <input
+                    type="number"
+                    step="0.05"
+                    min="1"
+                    max="7"
+                    value={editCustomerForm.level}
+                    onChange={(e) => setEditCustomerForm({ ...editCustomerForm, level: parseFloat(e.target.value) || 3.5 })}
+                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 font-mono"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-slate-700 dark:text-slate-300 mb-1 font-bold">
+                    Saldo Monedero (€)
+                  </label>
+                  <input
+                    type="number"
+                    step="0.5"
+                    value={editCustomerForm.balance}
+                    onChange={(e) => setEditCustomerForm({ ...editCustomerForm, balance: parseFloat(e.target.value) || 0 })}
+                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 font-mono"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-slate-700 dark:text-slate-300 mb-1 font-bold">
+                    Posición en Pista
+                  </label>
+                  <select
+                    value={editCustomerForm.position}
+                    onChange={(e) => setEditCustomerForm({ ...editCustomerForm, position: e.target.value })}
+                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                  >
+                    <option value="Revés">Revés</option>
+                    <option value="Drive">Drive</option>
+                    <option value="Ambas">Ambas</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-slate-700 dark:text-slate-300 mb-1 font-bold">
+                    Mano Hábil
+                  </label>
+                  <select
+                    value={editCustomerForm.hand}
+                    onChange={(e) => setEditCustomerForm({ ...editCustomerForm, hand: e.target.value })}
+                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                  >
+                    <option value="Diestro">Diestro</option>
+                    <option value="Zurdo">Zurdo</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="pt-3 flex justify-end gap-2 border-t border-slate-100 dark:border-slate-800">
+                <button
+                  type="button"
+                  onClick={() => setEditingCustomer(null)}
+                  className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs cursor-pointer"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-sm flex items-center gap-1.5 cursor-pointer"
+                >
+                  <Check className="w-4 h-4" />
+                  <span>Guardar Cambios</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ======================================================================
+          MODAL: CONFIRMACIÓN OBLIGATORIA DE ELIMINACIÓN DE SOCIO / CLIENTE
+          ====================================================================== */}
+      {customerToDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-sm animate-in fade-in duration-150">
+          <div className="relative w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl text-slate-900 dark:text-slate-100 space-y-4">
+            <div className="w-12 h-12 rounded-2xl bg-rose-100 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center mx-auto">
+              <AlertCircle className="w-6 h-6" />
+            </div>
+
+            <div className="text-center space-y-1.5">
+              <h3 className="text-base font-black text-slate-900 dark:text-white">
+                ¿Eliminar ficha de {customerToDelete.name}?
+              </h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                Esta acción es irreversible. Se eliminará el registro de socio/cliente, historial de cuotas y monedero de forma permanente.
+              </p>
+            </div>
+
+            <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800 text-xs space-y-1">
+              <div className="flex justify-between">
+                <span className="text-slate-500">Socio:</span>
+                <span className="font-bold text-slate-900 dark:text-white">{customerToDelete.name}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-500">Número:</span>
+                <span className="font-mono font-bold">{customerToDelete.memberNum}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-500">Saldo pendiente:</span>
+                <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400">{customerToDelete.balance.toFixed(2)} €</span>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 pt-2">
+              <button
+                type="button"
+                onClick={() => setCustomerToDelete(null)}
+                className="flex-1 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs transition cursor-pointer"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmDeleteCustomer}
+                className="flex-1 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs shadow-md transition cursor-pointer"
+              >
+                Sí, Eliminar Socio
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ======================================================================
+          MODAL: EDITAR GRUPO DE JUGADORES
+          ====================================================================== */}
+      {editingGroup && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-sm animate-in fade-in duration-150">
+          <div className="relative w-full max-w-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl text-slate-900 dark:text-slate-100 space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+              <div className="flex items-center gap-2">
+                <Edit3 className="w-5 h-5 text-emerald-500" />
+                <h3 className="text-base font-black text-slate-900 dark:text-white">
+                  Editar Grupo de Jugadores
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setEditingGroup(null)}
+                className="p-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveEditGroup} className="space-y-3.5 text-xs">
+              <div>
+                <label className="block text-slate-700 dark:text-slate-300 mb-1 font-bold">
+                  Nombre del Grupo
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={editGroupForm.name}
+                  onChange={(e) => setEditGroupForm({ ...editGroupForm, name: e.target.value })}
+                  className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-slate-700 dark:text-slate-300 mb-1 font-bold">
+                  Categoría
+                </label>
+                <select
+                  value={editGroupForm.category}
+                  onChange={(e) => setEditGroupForm({ ...editGroupForm, category: e.target.value as any })}
+                  className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                >
+                  <option value="level">Nivel ELO / Matchmaking</option>
+                  <option value="academy">Escuela / Alumnos</option>
+                  <option value="venue">Sede / Ubicación</option>
+                  <option value="social">Competición / Social</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-slate-700 dark:text-slate-300 mb-1 font-bold">
+                  Descripción
+                </label>
+                <textarea
+                  rows={2}
+                  value={editGroupForm.description}
+                  onChange={(e) => setEditGroupForm({ ...editGroupForm, description: e.target.value })}
+                  className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-slate-700 dark:text-slate-300 mb-1 font-bold">
+                    Nivel Mínimo ELO
+                  </label>
+                  <input
+                    type="number"
+                    step="0.05"
+                    min="1"
+                    max="7"
+                    value={editGroupForm.minLevel}
+                    onChange={(e) => setEditGroupForm({ ...editGroupForm, minLevel: e.target.value })}
+                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 font-mono"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-700 dark:text-slate-300 mb-1 font-bold">
+                    Nivel Máximo ELO
+                  </label>
+                  <input
+                    type="number"
+                    step="0.05"
+                    min="1"
+                    max="7"
+                    value={editGroupForm.maxLevel}
+                    onChange={(e) => setEditGroupForm({ ...editGroupForm, maxLevel: e.target.value })}
+                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 font-mono"
+                  />
+                </div>
+              </div>
+
+              <div className="pt-3 flex justify-end gap-2 border-t border-slate-100 dark:border-slate-800">
+                <button
+                  type="button"
+                  onClick={() => setEditingGroup(null)}
+                  className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs cursor-pointer"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-sm flex items-center gap-1.5 cursor-pointer"
+                >
+                  <Check className="w-4 h-4" />
+                  <span>Guardar Cambios</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ======================================================================
+          MODAL: CONFIRMACIÓN OBLIGATORIA DE BORRADO DE GRUPO
+          ====================================================================== */}
+      {groupToDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-sm animate-in fade-in duration-150">
+          <div className="relative w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl text-slate-900 dark:text-slate-100 space-y-4">
+            <div className="w-12 h-12 rounded-2xl bg-rose-100 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center mx-auto">
+              <AlertCircle className="w-6 h-6" />
+            </div>
+
+            <div className="text-center space-y-1.5">
+              <h3 className="text-base font-black text-slate-900 dark:text-white">
+                ¿Eliminar el grupo "{groupToDelete.name}"?
+              </h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                Esta acción eliminará el grupo de convocatoria y su lista de distribución. Los socios no serán eliminados de la base de datos.
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2 pt-2">
+              <button
+                type="button"
+                onClick={() => setGroupToDelete(null)}
+                className="flex-1 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs transition cursor-pointer"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmDeleteGroup}
+                className="flex-1 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs shadow-md transition cursor-pointer"
+              >
+                Sí, Eliminar Grupo
               </button>
             </div>
           </div>

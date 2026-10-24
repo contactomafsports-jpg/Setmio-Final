@@ -979,9 +979,9 @@ export const AdminMatches: React.FC = () => {
         </div>
       </div>
 
-      {/* 3. Filtros Responsive: Pestañas de estado y Botón de filtro a la misma altura */}
+      {/* 3. Filtros Responsive: Pestañas de estado, Selector de Sede (si multi-sede) y Botón de filtro */}
       <div className="space-y-3">
-        <div className="p-2 sm:p-2.5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-2xs flex items-center justify-between gap-2">
+        <div className="p-2 sm:p-2.5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-2xs flex items-center justify-between gap-2 flex-wrap">
           {/* Segmented Control de Estado (Visible de forma permanente) */}
           <div className="inline-flex items-center p-1 rounded-xl bg-slate-100 dark:bg-slate-800/80 border border-slate-200/60 dark:border-slate-700/60 text-xs font-bold overflow-x-auto shrink min-w-0">
             <button
@@ -1019,26 +1019,51 @@ export const AdminMatches: React.FC = () => {
             </button>
           </div>
 
-          {/* Botón de Filtro Responsive: a la misma altura, condensado en icono de filtro sin texto en móvil */}
-          <button
-            type="button"
-            onClick={openFilterModal}
-            className={`p-2 sm:px-3.5 sm:py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shrink-0 border ${
-              activeFiltersCount > 0
-                ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-500 text-emerald-700 dark:text-emerald-300 shadow-2xs'
-                : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700/80'
-            }`}
-            title="Abrir filtros avanzados"
-            aria-label="Filtros avanzados"
-          >
-            <Filter className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-            <span className="hidden sm:inline">Filtros</span>
-            {activeFiltersCount > 0 && (
-              <span className="w-4 h-4 rounded-full bg-emerald-500 text-white font-black text-[9px] flex items-center justify-center leading-none">
-                {activeFiltersCount}
-              </span>
+          <div className="flex items-center gap-2">
+            {/* Selector de Sede (Visible ÚNICAMENTE para Clubes Multi-Sede) */}
+            {Boolean(isMultiVenue) && Array.isArray(venues) && venues.length > 1 && (
+              <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200/60 dark:border-slate-700/60 text-xs font-bold text-slate-700 dark:text-slate-300 shadow-2xs">
+                <Building2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                <span className="text-[11px] text-slate-500 dark:text-slate-400 hidden sm:inline">Sede:</span>
+                <select
+                  value={venueFilter}
+                  onChange={(e) => setVenueFilter(e.target.value)}
+                  className="bg-transparent text-xs font-bold text-slate-800 dark:text-slate-200 focus:outline-none cursor-pointer pr-1"
+                  aria-label="Filtrar partidas por sede"
+                >
+                  <option value="all">Todas las Sedes</option>
+                  {venues
+                    .filter((v) => v.id !== 'all')
+                    .map((v) => (
+                      <option key={v.id} value={v.id}>
+                        {v.shortName || v.name}
+                      </option>
+                    ))}
+                </select>
+              </div>
             )}
-          </button>
+
+            {/* Botón de Filtro Responsive: a la misma altura, condensado en icono de filtro sin texto en móvil */}
+            <button
+              type="button"
+              onClick={openFilterModal}
+              className={`p-2 sm:px-3.5 sm:py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shrink-0 border ${
+                activeFiltersCount > 0
+                  ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-500 text-emerald-700 dark:text-emerald-300 shadow-2xs'
+                  : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700/80'
+              }`}
+              title="Abrir filtros avanzados"
+              aria-label="Filtros avanzados"
+            >
+              <Filter className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+              <span className="hidden sm:inline">Filtros</span>
+              {activeFiltersCount > 0 && (
+                <span className="w-4 h-4 rounded-full bg-emerald-500 text-white font-black text-[9px] flex items-center justify-center leading-none">
+                  {activeFiltersCount}
+                </span>
+              )}
+            </button>
+          </div>
         </div>
 
         {/* Chips de filtros activos para borrado rápido */}

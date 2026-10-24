@@ -1,5 +1,5 @@
 import React from 'react';
-import { Menu } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { useApp, AdminTab } from '../../context/AppContext';
 import { getAdminNavConfig } from '../../lib/adminNavigation';
 
@@ -52,21 +52,25 @@ export const PrivateMobileNav: React.FC<PrivateMobileNavProps> = ({
         );
       })}
 
-      {/* 5. Botón Más (Despliega el Drawer táctil unificado) */}
+      {/* 5º El botón flotante "+" (Despliega el menú que contiene Pistas, Miembros y más) */}
       <button
         type="button"
         onClick={onMore}
-        className={`flex flex-col items-center justify-center gap-1 py-1 px-2.5 rounded-2xl transition-all duration-150 active:scale-95 cursor-pointer ${
-          moreOpen
-            ? 'text-emerald-600 dark:text-emerald-400 font-extrabold'
-            : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
-        }`}
-        aria-label="Abrir menú de más opciones"
+        className="flex flex-col items-center justify-center gap-0.5 py-0.5 px-2 rounded-2xl transition-all duration-150 active:scale-95 cursor-pointer text-slate-600 dark:text-slate-300 hover:text-emerald-600"
+        aria-label="Más módulos (+)"
       >
-        <div className={`p-1 rounded-xl transition ${moreOpen ? 'bg-emerald-50 dark:bg-emerald-950/80' : ''}`}>
-          <Menu className="w-5 h-5" strokeWidth={moreOpen ? 2.5 : 1.75} />
+        <div
+          className={`w-9 h-9 rounded-full flex items-center justify-center shadow-md transition-all duration-200 ${
+            moreOpen
+              ? 'bg-emerald-600 text-white rotate-45 scale-105 shadow-emerald-600/30'
+              : 'bg-emerald-500 hover:bg-emerald-600 text-white shadow-emerald-500/25 hover:scale-105'
+          }`}
+        >
+          <Plus className="w-5 h-5 transition-transform duration-200" strokeWidth={2.5} />
         </div>
-        <span className="text-[10px] tracking-tight">{t('club.nav.more', 'Más')}</span>
+        <span className="text-[10px] font-bold tracking-tight text-slate-600 dark:text-slate-400">
+          {moreOpen ? 'Cerrar' : '+'}
+        </span>
       </button>
     </nav>
   );

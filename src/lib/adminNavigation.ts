@@ -95,17 +95,24 @@ export function getAdminNavConfig(
 
     primaryItems = [
       {
+        id: 'dashboard',
+        label: 'Inicio',
+        icon: LayoutDashboard,
+        desc: 'Cuadro de mandos y resumen del club',
+        isPrimary: true,
+      },
+      {
         id: 'agenda',
-        label: 'Cuadrante de Reservas',
+        label: 'Reservas',
         icon: Calendar,
         desc: 'Reservas del día y turnos de juego',
         isPrimary: true,
       },
       {
-        id: 'courts_management',
-        label: 'Pistas & Domótica',
-        icon: Layers,
-        desc: 'Estado de pistas y luces en tiempo real',
+        id: 'matches',
+        label: 'Partidas',
+        icon: Trophy,
+        desc: 'Partidos abiertos de jugadores y plazas libres',
         isPrimary: true,
       },
       {
@@ -115,21 +122,21 @@ export function getAdminNavConfig(
         desc: 'Cobros de reservas, suplementos y cafetería',
         isPrimary: true,
       },
+    ];
+
+    secondaryItems = [
+      {
+        id: 'courts_management',
+        label: 'Pistas & Domótica',
+        icon: Layers,
+        desc: 'Estado de pistas y luces en tiempo real',
+        isPrimary: false,
+      },
       {
         id: 'customers',
         label: 'Miembros & Clientes',
         icon: Users,
         desc: 'Búsqueda rápida de socios y cobros de monedero',
-        isPrimary: true,
-      },
-    ];
-
-    secondaryItems = [
-      {
-        id: 'matches',
-        label: 'Partidas Abiertas',
-        icon: Trophy,
-        desc: 'Partidos abiertos de jugadores y plazas libres',
         isPrimary: false,
       },
       {
@@ -481,17 +488,24 @@ export function getAdminNavConfig(
 
     primaryItems = [
       {
-        id: 'courts_management',
-        label: 'Pistas',
-        icon: Layers,
-        desc: 'Pistas, domótica IoT y control de accesos',
+        id: 'dashboard',
+        label: 'Inicio',
+        icon: LayoutDashboard,
+        desc: 'Cuadro de mandos y resumen del club',
         isPrimary: true,
       },
       {
         id: 'agenda',
-        label: 'Cuadrante de Reservas',
+        label: 'Reservas',
         icon: Calendar,
         desc: 'Cuadrante diario de pistas, reservas y turnos',
+        isPrimary: true,
+      },
+      {
+        id: 'matches',
+        label: 'Partidas',
+        icon: Trophy,
+        desc: 'Partidos abiertos de jugadores y división de pagos',
         isPrimary: true,
       },
       {
@@ -501,16 +515,23 @@ export function getAdminNavConfig(
         desc: 'Cobros en mostrador, cafetería y caja diaria',
         isPrimary: true,
       },
+    ];
+
+    secondaryItems = [
+      {
+        id: 'courts_management',
+        label: 'Pistas & Domótica',
+        icon: Layers,
+        desc: 'Pistas, domótica IoT y control de accesos',
+        isPrimary: false,
+      },
       {
         id: 'customers',
         label: 'Miembros',
         icon: Users,
         desc: 'Directorio de socios, cartera y niveles de juego',
-        isPrimary: true,
+        isPrimary: false,
       },
-    ];
-
-    secondaryItems = [
       {
         id: 'tournaments',
         label: 'Torneos',
@@ -531,13 +552,6 @@ export function getAdminNavConfig(
         icon: Receipt,
         desc: 'Dashboard financiero, facturas y Veri*factu AEAT',
         badge: 'Veri*factu',
-        isPrimary: false,
-      },
-      {
-        id: 'matches',
-        label: 'Partidas Abiertas',
-        icon: Trophy,
-        desc: 'Partidos abiertos de jugadores y división de pagos',
         isPrimary: false,
       },
       {
