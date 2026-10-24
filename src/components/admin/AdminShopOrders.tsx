@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useApp } from '../../context/AppContext';
 import { Product } from '../../types/database';
 import {
@@ -30,8 +30,39 @@ import {
   Receipt,
   Printer,
   ChevronRight,
+  ChevronLeft,
   Sparkles,
+  MapPin,
+  Building2,
+  Eye,
+  Send,
+  Layers,
+  Clock,
+  ExternalLink,
+  Share2,
 } from 'lucide-react';
+
+export interface ShopOrder {
+  id: string;
+  customerName: string;
+  customerType: 'member' | 'walk_in';
+  memberNum?: string;
+  items: {
+    productId: string;
+    productName: string;
+    category: string;
+    quantity: number;
+    unitPrice: number;
+    subtotal: number;
+  }[];
+  totalAmount: number;
+  paymentMethod: 'card' | 'cash' | 'wallet' | 'direct_debit';
+  status: 'entregado' | 'preparado' | 'pendiente' | 'cancelado';
+  createdAt: string;
+  venueId?: string;
+  venueName?: string;
+  notes?: string;
+}
 
 interface OrderItem {
   product: Product;
@@ -51,32 +82,170 @@ const MOCK_CUSTOMERS: MockCustomer[] = [
   { id: 'c-2', name: 'Diego Soto', memberNum: 'SM-409', balance: 18.5, email: 'diego.soto@email.es' },
   { id: 'c-3', name: 'Laura Gómez', memberNum: 'SM-410', balance: 62.0, email: 'laura.gomez@padelclub.com' },
   { id: 'c-4', name: 'Marcos Varela', memberNum: 'SM-411', balance: 10.0, email: 'marcos.varela@email.com' },
+  { id: 'c-5', name: 'Ana Belén Vázquez', memberNum: 'SM-412', balance: 85.0, email: 'anabelen@padelgalicia.com' },
+];
+
+const INITIAL_ORDERS: ShopOrder[] = [
+  {
+    id: 'PED-2026-804',
+    customerName: 'Carlos Méndez',
+    customerType: 'member',
+    memberNum: 'SM-408',
+    items: [
+      { productId: 'prod-1', productName: 'Bullpadel Vertex 04 2026', category: 'palas', quantity: 1, unitPrice: 285.0, subtotal: 285.0 },
+      { productId: 'prod-2', productName: 'Bote Pelotas Head Padel Pro S', category: 'pelotas', quantity: 2, unitPrice: 7.0, subtotal: 14.0 },
+    ],
+    totalAmount: 299.0,
+    paymentMethod: 'card',
+    status: 'entregado',
+    createdAt: 'Hoy, 12:45',
+    venueId: 'venue-san-mateo',
+    venueName: 'Sede Central Narón',
+    notes: 'Recogido en mostrador de pro shop.',
+  },
+  {
+    id: 'PED-2026-803',
+    customerName: 'Laura Gómez',
+    customerType: 'member',
+    memberNum: 'SM-410',
+    items: [
+      { productId: 'prod-4', productName: 'Zapatillas Asics Gel-Resolution Padel', category: 'ropa', quantity: 1, unitPrice: 145.0, subtotal: 145.0 },
+    ],
+    totalAmount: 145.0,
+    paymentMethod: 'wallet',
+    status: 'preparado',
+    createdAt: 'Hoy, 11:20',
+    venueId: 'venue-coruna',
+    venueName: 'Sede A Coruña',
+    notes: 'Preparado en recepción para entrega antes de su partido.',
+  },
+  {
+    id: 'PED-2026-802',
+    customerName: 'Diego Soto',
+    customerType: 'member',
+    memberNum: 'SM-409',
+    items: [
+      { productId: 'prod-2', productName: 'Cajón 24 Botes Pelotas Head Padel Pro S', category: 'pelotas', quantity: 1, unitPrice: 120.0, subtotal: 120.0 },
+      { productId: 'prod-5', productName: 'Pack 3 Overgrips Wilson Pro Comfort', category: 'accesorios', quantity: 3, unitPrice: 6.0, subtotal: 18.0 },
+    ],
+    totalAmount: 138.0,
+    paymentMethod: 'direct_debit',
+    status: 'entregado',
+    createdAt: 'Ayer, 18:30',
+    venueId: 'venue-san-mateo',
+    venueName: 'Sede Central Narón',
+  },
+  {
+    id: 'PED-2026-801',
+    customerName: 'Cliente Mostrador (Venta Rápida)',
+    customerType: 'walk_in',
+    items: [
+      { productId: 'prod-5', productName: 'Pack 3 Overgrips Wilson Pro Comfort', category: 'accesorios', quantity: 2, unitPrice: 6.0, subtotal: 12.0 },
+      { productId: 'prod-2', productName: 'Bote Pelotas Head Padel Pro S', category: 'pelotas', quantity: 1, unitPrice: 7.0, subtotal: 7.0 },
+    ],
+    totalAmount: 19.0,
+    paymentMethod: 'cash',
+    status: 'entregado',
+    createdAt: 'Ayer, 16:15',
+    venueId: 'venue-santiago',
+    venueName: 'Sede Santiago',
+  },
+  {
+    id: 'PED-2026-800',
+    customerName: 'Marcos Varela',
+    customerType: 'member',
+    memberNum: 'SM-411',
+    items: [
+      { productId: 'prod-3', productName: 'Nox AT10 Genius Agustín Tapia 18K', category: 'palas', quantity: 1, unitPrice: 299.0, subtotal: 299.0 },
+    ],
+    totalAmount: 299.0,
+    paymentMethod: 'card',
+    status: 'pendiente',
+    createdAt: '02/10/2026',
+    venueId: 'venue-san-mateo',
+    venueName: 'Sede Central Narón',
+    notes: 'Pendiente de llegada de almacén central.',
+  },
 ];
 
 export const AdminShopOrders: React.FC = () => {
-  const { products, triggerDemoToast, currentTenant, t } = useApp();
+  const { products, triggerDemoToast, currentTenant, t, isMultiVenue, venues, navigateToPlayerProfile, addToCart } = useApp();
 
-  // Navigation View State: 'dashboard' | 'products' | 'new_order'
-  const [activeView, setActiveView] = useState<'dashboard' | 'products' | 'new_order'>(() => {
+  // Navigation View State: 'dashboard' | 'products' | 'orders' | 'new_order'
+  const [activeView, setActiveView] = useState<'dashboard' | 'products' | 'orders' | 'new_order'>(() => {
     if (typeof window !== 'undefined') {
       const p = window.location.pathname;
-      if (p.includes('/productos')) return 'products';
       if (p.includes('/pedidos/nuevo') || p.includes('/nuevo-pedido')) return 'new_order';
+      if (p.includes('/pedidos')) return 'orders';
+      if (p.includes('/productos')) return 'products';
     }
     return 'dashboard';
   });
 
-  const [productList, setProductList] = useState<Product[]>(products);
+  // Display mode in products view: 'carousels' | 'grid'
+  const [catalogDisplayMode, setCatalogDisplayMode] = useState<'carousels' | 'grid'>('carousels');
+
+  // Product List with Multi-Venue Stock initialization
+  const [productList, setProductList] = useState<Product[]>(() => {
+    return products.map((p, idx) => {
+      // Seed multi-venue stock breakdown if not already present
+      const total = p.stock || 8;
+      const sanMateo = Math.ceil(total * 0.6);
+      const coruna = Math.floor(total * 0.25);
+      const santiago = Math.max(0, total - sanMateo - coruna);
+
+      return {
+        ...p,
+        specs: p.specs || {
+          Forma: idx % 2 === 0 ? 'Diamante' : 'Lágrima',
+          Balance: idx % 2 === 0 ? 'Alto (Potencia)' : 'Medio (Control)',
+          Peso: '365 - 375 gr',
+          Núcleo: 'Goma MultiEVA Soft',
+          Marco: '100% CarbonTube',
+          Nivel: 'Avanzado / Profesional',
+        },
+        venueStock: {
+          'venue-san-mateo': sanMateo,
+          'venue-coruna': coruna,
+          'venue-santiago': santiago,
+        },
+      } as Product & { venueStock?: Record<string, number> };
+    });
+  });
+
+  // Orders State
+  const [orders, setOrders] = useState<ShopOrder[]>(() => {
+    try {
+      const saved = localStorage.getItem('setmio_demo_shop_orders_v2');
+      return saved ? JSON.parse(saved) : INITIAL_ORDERS;
+    } catch {
+      return INITIAL_ORDERS;
+    }
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('setmio_demo_shop_orders_v2', JSON.stringify(orders));
+    } catch {
+      // Ignore
+    }
+  }, [orders]);
+
+  // Filters & Search
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [stockFilter, setStockFilter] = useState<'all' | 'low' | 'out'>('all');
+  const [orderStatusFilter, setOrderStatusFilter] = useState<'all' | 'pendiente' | 'preparado' | 'entregado' | 'cancelado'>('all');
+  const [orderVenueFilter, setOrderVenueFilter] = useState<string>('all');
   const [timeRange, setTimeRange] = useState<'day' | 'month'>('month');
-  const [hoveredChartIndex, setHoveredChartIndex] = useState<number | null>(null);
 
   // Modals
   const [isNewProductModalOpen, setIsNewProductModalOpen] = useState(false);
-  const [stockModalProduct, setStockModalProduct] = useState<Product | null>(null);
+  const [selectedProductDetail, setSelectedProductDetail] = useState<(Product & { venueStock?: Record<string, number> }) | null>(null);
+  const [selectedOrderDetail, setSelectedOrderDetail] = useState<ShopOrder | null>(null);
+  const [stockModalProduct, setStockModalProduct] = useState<(Product & { venueStock?: Record<string, number> }) | null>(null);
   const [stockAdjustment, setStockAdjustment] = useState<number>(10);
+  const [stockAdjustmentVenue, setStockAdjustmentVenue] = useState<string>('venue-san-mateo');
   const [stockMinAlert, setStockMinAlert] = useState<number>(3);
 
   // New Order State
@@ -86,27 +255,26 @@ export const AdminShopOrders: React.FC = () => {
   const [orderPaymentMethod, setOrderPaymentMethod] = useState<'card' | 'cash' | 'wallet' | 'direct_debit'>('card');
   const [orderDiscount, setOrderDiscount] = useState<number>(0);
   const [orderNotes, setOrderNotes] = useState<string>('');
+  const [orderVenue, setOrderVenue] = useState<string>('venue-san-mateo');
   const [lastCreatedOrderId, setLastCreatedOrderId] = useState<string | null>(null);
 
-  // Sync route on popstate
-  useEffect(() => {
-    const handlePopState = () => {
-      if (typeof window !== 'undefined') {
-        const p = window.location.pathname;
-        if (p.includes('/productos')) {
-          setActiveView('products');
-        } else if (p.includes('/pedidos/nuevo') || p.includes('/nuevo-pedido')) {
-          setActiveView('new_order');
-        } else {
-          setActiveView('dashboard');
-        }
-      }
-    };
-    window.addEventListener('popstate', handlePopState);
-    return () => window.removeEventListener('popstate', handlePopState);
-  }, []);
+  // Refs for category carousel horizontal scroll
+  const carouselRefs = {
+    palas: useRef<HTMLDivElement>(null),
+    pelotas: useRef<HTMLDivElement>(null),
+    ropa: useRef<HTMLDivElement>(null),
+    accesorios: useRef<HTMLDivElement>(null),
+  };
 
-  const navigateTo = (view: 'dashboard' | 'products' | 'new_order', url: string) => {
+  const scrollCarousel = (cat: 'palas' | 'pelotas' | 'ropa' | 'accesorios', direction: 'left' | 'right') => {
+    const el = carouselRefs[cat]?.current;
+    if (el) {
+      const scrollAmount = 340;
+      el.scrollBy({ left: direction === 'left' ? -scrollAmount : scrollAmount, behavior: 'smooth' });
+    }
+  };
+
+  const navigateTo = (view: 'dashboard' | 'products' | 'orders' | 'new_order', url: string) => {
     setActiveView(view);
     if (typeof window !== 'undefined') {
       window.history.pushState({}, '', url);
@@ -122,8 +290,9 @@ export const AdminShopOrders: React.FC = () => {
     price: 180,
     costPrice: 110,
     stock: 8,
+    targetVenue: 'venue-san-mateo',
     imageUrl: 'https://images.unsplash.com/photo-1554068865-24cecd4e34b8?auto=format&fit=crop&w=400&q=80',
-    description: 'Pala oficial de competición con fibra de carbono 12K.',
+    description: 'Pala oficial de competición con fibra de carbono 12K y tubular 100% de grafeno.',
   });
 
   // Sales Chart Data
@@ -195,9 +364,7 @@ export const AdminShopOrders: React.FC = () => {
     },
   ];
 
-  // Categories
-  const categories = ['all', 'palas', 'pelotas', 'accesorios', 'ropa'];
-
+  // Filtered Products for Grid View
   const filteredProducts = productList.filter((p) => {
     const matchSearch =
       p.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -210,108 +377,156 @@ export const AdminShopOrders: React.FC = () => {
     return matchSearch && matchCategory && matchStock;
   });
 
+  // Filtered Orders
+  const filteredOrders = orders.filter((o) => {
+    const matchSearch =
+      o.id.toLowerCase().includes(search.toLowerCase()) ||
+      o.customerName.toLowerCase().includes(search.toLowerCase()) ||
+      o.items.some((i) => i.productName.toLowerCase().includes(search.toLowerCase()));
+
+    const matchStatus = orderStatusFilter === 'all' || o.status === orderStatusFilter;
+    const matchVenue = orderVenueFilter === 'all' || o.venueId === orderVenueFilter;
+
+    return matchSearch && matchStatus && matchVenue;
+  });
+
   // Handle Create Product
   const handleCreateProduct = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newProductForm.name.trim()) return;
 
-    const created: Product = {
+    const initialStock = Number(newProductForm.stock);
+    const created = {
       id: `prod-${Date.now()}`,
       tenantId: currentTenant.id,
       name: newProductForm.name.trim(),
       brand: newProductForm.brand.trim(),
       category: newProductForm.category,
       price: Number(newProductForm.price),
-      stock: Number(newProductForm.stock),
+      stock: initialStock,
       imageUrl: newProductForm.imageUrl,
       description: newProductForm.description,
       isFeatured: true,
-      specs: {},
-    };
+      specs: {
+        Forma: 'Lágrima',
+        Balance: 'Medio',
+        Peso: '365 gr',
+        Núcleo: 'Goma EVA Pro',
+        Marco: 'Carbono 100%',
+        Nivel: 'Competición',
+      },
+      venueStock: {
+        [newProductForm.targetVenue]: initialStock,
+      },
+    } as Product & { venueStock?: Record<string, number> };
 
     setProductList((prev) => [created, ...prev]);
     setIsNewProductModalOpen(false);
     triggerDemoToast(
       'Producto Creado',
-      `"${created.name}" añadido al catálogo de la tienda con ${created.stock} unidades.`,
+      `"${created.name}" añadido al catálogo con ${created.stock} unidades.`,
       'success'
     );
   };
 
-  // Handle Save Stock Adjustment
+  // Handle Save Stock Adjustment (with Multi-Venue Assignment)
   const handleSaveStock = () => {
     if (!stockModalProduct) return;
-    const newStock = Math.max(0, stockModalProduct.stock + stockAdjustment);
+    const currentVenueStock = stockModalProduct.venueStock || {};
+    const existingInVenue = currentVenueStock[stockAdjustmentVenue] || 0;
+    const newInVenue = Math.max(0, existingInVenue + stockAdjustment);
+
+    const updatedVenueStock = {
+      ...currentVenueStock,
+      [stockAdjustmentVenue]: newInVenue,
+    };
+
+    const newTotalStock = Object.values(updatedVenueStock).reduce((a, b) => a + b, 0);
+
     setProductList((prev) =>
-      prev.map((p) => (p.id === stockModalProduct.id ? { ...p, stock: newStock } : p))
+      prev.map((p) =>
+        p.id === stockModalProduct.id
+          ? { ...p, stock: newTotalStock, venueStock: updatedVenueStock }
+          : p
+      )
     );
+
+    const venueObj = venues?.find((v) => v.id === stockAdjustmentVenue);
     triggerDemoToast(
       'Stock Actualizado',
-      `Nuevo inventario de "${stockModalProduct.name}": ${newStock} unidades disponibles. Alerta mínima en ${stockMinAlert} uds.`,
+      `Inventario de "${stockModalProduct.name}" actualizado en ${venueObj?.name || 'Sede Seleccionada'}: ${newInVenue} uds (${newTotalStock} totales).`,
       'success'
     );
     setStockModalProduct(null);
   };
 
-  // Order Cart Helpers
-  const addToCart = (product: Product) => {
-    setOrderCart((prev) => {
-      const existing = prev.find((item) => item.product.id === product.id);
-      if (existing) {
-        if (existing.quantity >= product.stock) {
-          triggerDemoToast('Stock Limitado', `Solo hay ${product.stock} unidades disponibles en tienda.`, 'warning');
-          return prev;
-        }
-        return prev.map((item) =>
-          item.product.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
-        );
-      }
-      return [...prev, { product, quantity: 1 }];
-    });
+  // Handle Update Order Status
+  const handleUpdateOrderStatus = (orderId: string, newStatus: ShopOrder['status']) => {
+    setOrders((prev) =>
+      prev.map((o) => (o.id === orderId ? { ...o, status: newStatus } : o))
+    );
+    triggerDemoToast(
+      'Estado del Pedido Actualizado',
+      `El pedido ${orderId} ahora está marcado como "${newStatus.toUpperCase()}".`,
+      'success'
+    );
   };
 
-  const updateCartQuantity = (productId: string, quantity: number) => {
-    if (quantity <= 0) {
-      setOrderCart((prev) => prev.filter((item) => item.product.id !== productId));
-    } else {
-      setOrderCart((prev) =>
-        prev.map((item) => (item.product.id === productId ? { ...item, quantity } : item))
-      );
-    }
-  };
-
-  // Calculation for Order
-  const subtotalCart = orderCart.reduce((acc, item) => acc + item.product.price * item.quantity, 0);
-  const discountAmount = (subtotalCart * orderDiscount) / 100;
-  const taxableAmount = Math.max(0, subtotalCart - discountAmount);
-  const taxAmount = taxableAmount * 0.21;
-  const totalOrderAmount = taxableAmount;
-
-  // Handle Complete Order
-  const handleCompleteOrder = (e: React.FormEvent) => {
-    e.preventDefault();
+  // Handle Complete New Order
+  const handleCompleteOrder = () => {
     if (orderCart.length === 0) {
-      triggerDemoToast('Carrito Vacío', 'Añade al menos un producto para crear el pedido.', 'warning');
+      triggerDemoToast('Cesta vacía', 'Añade al menos un producto para procesar el pedido.', 'warning');
       return;
     }
 
-    // Decrement stock in productList
+    const subtotal = orderCart.reduce((acc, item) => acc + item.product.price * item.quantity, 0);
+    const total = Math.max(0, subtotal - orderDiscount);
+    const orderId = `PED-2026-${Math.floor(805 + Math.random() * 50)}`;
+
+    const venueObj = venues?.find((v) => v.id === orderVenue);
+
+    const newOrder: ShopOrder = {
+      id: orderId,
+      customerName: orderCustomerType === 'member' && selectedCustomer ? selectedCustomer.name : 'Cliente Mostrador (Venta Rápida)',
+      customerType: orderCustomerType,
+      memberNum: selectedCustomer?.memberNum,
+      items: orderCart.map((ci) => ({
+        productId: ci.product.id,
+        productName: ci.product.name,
+        category: ci.product.category,
+        quantity: ci.quantity,
+        unitPrice: ci.product.price,
+        subtotal: ci.product.price * ci.quantity,
+      })),
+      totalAmount: total,
+      paymentMethod: orderPaymentMethod,
+      status: 'entregado',
+      createdAt: 'Ahora mismo',
+      venueId: orderVenue,
+      venueName: venueObj?.name || 'Sede Central Narón',
+      notes: orderNotes || undefined,
+    };
+
+    // Deduct stock from product list
     setProductList((prev) =>
       prev.map((p) => {
-        const inCart = orderCart.find((ci) => ci.product.id === p.id);
-        if (inCart) {
-          return { ...p, stock: Math.max(0, p.stock - inCart.quantity) };
+        const cartItem = orderCart.find((ci) => ci.product.id === p.id);
+        if (cartItem) {
+          const newTotal = Math.max(0, p.stock - cartItem.quantity);
+          const currentVs = (p as any).venueStock || {};
+          const currentInVenue = currentVs[orderVenue] || newTotal;
+          const updatedVs = { ...currentVs, [orderVenue]: Math.max(0, currentInVenue - cartItem.quantity) };
+          return { ...p, stock: newTotal, venueStock: updatedVs };
         }
         return p;
       })
     );
 
-    const generatedOrderId = `ORD-${Math.floor(100000 + Math.random() * 900000)}`;
-    setLastCreatedOrderId(generatedOrderId);
-
+    setOrders((prev) => [newOrder, ...prev]);
+    setLastCreatedOrderId(orderId);
     triggerDemoToast(
-      t('shop.orderSuccess', 'Pedido Creado con Éxito'),
-      t('shop.orderSuccessDetail', 'Se ha descontado el stock y registrado el cobro en caja.'),
+      '¡Venta Completada!',
+      `Ticket #${orderId} registrado por un importe de ${total.toFixed(2)} €. Stock actualizado.`,
       'success'
     );
   };
@@ -324,9 +539,17 @@ export const AdminShopOrders: React.FC = () => {
     setLastCreatedOrderId(null);
   };
 
+  // Helper for Product Margin
+  const getProductCost = (price: number) => Math.round(price * 0.58);
+  const getProductMarginPercent = (price: number) => {
+    const cost = getProductCost(price);
+    return Math.round(((price - cost) / price) * 100);
+  };
+
   // Metric aggregates
   const totalCatalogUnits = productList.reduce((acc, p) => acc + p.stock, 0);
   const totalCatalogValue = productList.reduce((acc, p) => acc + p.price * p.stock, 0);
+  const pendingOrdersCount = orders.filter((o) => o.status === 'pendiente' || o.status === 'preparado').length;
 
   return (
     <div className="space-y-6 text-slate-900 dark:text-slate-100 max-w-7xl mx-auto pb-16">
@@ -345,9 +568,9 @@ export const AdminShopOrders: React.FC = () => {
               </button>
               <ChevronRight className="w-3.5 h-3.5" />
               <span className="text-emerald-600 dark:text-emerald-400 font-bold">
-                {activeView === 'products'
-                  ? t('shop.catalogTitle', 'Catálogo Completo de Productos')
-                  : t('shop.newOrderTitle', 'Crear Nuevo Pedido')}
+                {activeView === 'products' && 'Catálogo & Carruseles de Productos'}
+                {activeView === 'orders' && 'Módulo de Pedidos & Ventas'}
+                {activeView === 'new_order' && 'Crear Nuevo Pedido'}
               </span>
             </div>
           )}
@@ -357,13 +580,15 @@ export const AdminShopOrders: React.FC = () => {
           </div>
           <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight mt-0.5">
             {activeView === 'dashboard' && `Tienda Oficial & Inventario — ${currentTenant.name}`}
-            {activeView === 'products' && t('shop.catalogTitle', 'Catálogo Completo de Productos')}
-            {activeView === 'new_order' && t('shop.newOrderTitle', 'Crear Nuevo Pedido — Tienda Oficial')}
+            {activeView === 'products' && 'Catálogo de Productos & Carruseles'}
+            {activeView === 'orders' && 'Gestión de Pedidos & Clientes'}
+            {activeView === 'new_order' && 'Crear Nuevo Pedido — Tienda Oficial'}
           </h1>
           <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
-            {activeView === 'dashboard' && 'Métricas de ingresos, ventas por período, productos más vendidos y gestión de existencias.'}
-            {activeView === 'products' && t('shop.catalogSubtitle', 'Gestión integral de existencias, tarifas y alertas de reposición.')}
-            {activeView === 'new_order' && t('shop.newOrderSubtitle', 'Venta directa de material, accesorios y consumibles con cargo en caja o monedero.')}
+            {activeView === 'dashboard' && 'Métricas de facturación, carruseles de material, inventario multi-sede y arqueo.'}
+            {activeView === 'products' && 'Listas desplazables por categorías, fichas técnicas con márgenes y existencias por instalación.'}
+            {activeView === 'orders' && 'Historial de compras, tickets de caja, preparación de material y seguimiento de socios.'}
+            {activeView === 'new_order' && 'Venta en mostrador con descuento, imputación a socio o cliente de paso y stock en tiempo real.'}
           </p>
         </div>
 
@@ -376,11 +601,30 @@ export const AdminShopOrders: React.FC = () => {
               className="px-3.5 py-2.5 rounded-xl bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700/80 text-slate-700 dark:text-slate-300 font-bold text-xs flex items-center gap-1.5 border border-slate-200 dark:border-slate-700 shadow-xs transition active:scale-95 cursor-pointer"
             >
               <ArrowLeft className="w-4 h-4" />
-              <span>{t('shop.backToShop', 'Volver a Resumen de Tienda')}</span>
+              <span>Volver a Resumen</span>
             </button>
           )}
 
-          {/* Botón "+ Nuevo Pedido" (secundario al lado de Nuevo Producto) */}
+          {/* Botón "Lista de Pedidos" con badge de pendientes */}
+          <button
+            type="button"
+            onClick={() => navigateTo('orders', '/admin/tienda/pedidos')}
+            className={`px-4 py-2.5 rounded-xl font-bold text-xs flex items-center gap-2 border shadow-xs transition active:scale-95 cursor-pointer relative ${
+              activeView === 'orders'
+                ? 'bg-emerald-600 text-white border-transparent'
+                : 'bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700/70 text-slate-800 dark:text-slate-200 border-slate-200 dark:border-slate-700'
+            }`}
+          >
+            <Receipt className="w-4 h-4 text-emerald-500" />
+            <span>Lista de Pedidos</span>
+            {pendingOrdersCount > 0 && (
+              <span className="px-1.5 py-0.2 rounded-full bg-amber-500 text-slate-950 font-black text-[10px]">
+                {pendingOrdersCount}
+              </span>
+            )}
+          </button>
+
+          {/* Botón "+ Nuevo Pedido" */}
           <button
             type="button"
             onClick={() => {
@@ -394,19 +638,80 @@ export const AdminShopOrders: React.FC = () => {
             }`}
           >
             <ShoppingBag className="w-4 h-4 text-emerald-500" />
-            <span>{t('shop.newOrder', '+ Nuevo Pedido')}</span>
+            <span>+ Nuevo Pedido</span>
           </button>
 
-          {/* Botón "Nuevo Producto" con UN SOLO icono + */}
+          {/* Botón "Nuevo Producto" */}
           <button
             type="button"
             onClick={() => setIsNewProductModalOpen(true)}
             className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-2 shadow-xs transition active:scale-95 cursor-pointer"
           >
             <Plus className="w-4 h-4" />
-            <span>{t('shop.newProduct', 'Nuevo Producto')}</span>
+            <span>Nuevo Producto</span>
           </button>
         </div>
+      </div>
+
+      {/* BARRA DE NAVEGACIÓN MODULAR DE LA TIENDA */}
+      <div className="flex items-center gap-1 bg-white dark:bg-slate-900 p-1.5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xs text-xs font-bold overflow-x-auto">
+        <button
+          type="button"
+          onClick={() => navigateTo('dashboard', '/admin/tienda')}
+          className={`px-4 py-2 rounded-xl transition flex items-center gap-2 cursor-pointer ${
+            activeView === 'dashboard'
+              ? 'bg-emerald-600 text-white'
+              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+          }`}
+        >
+          <BarChart3 className="w-4 h-4" />
+          <span>Dashboard & Finanzas</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => navigateTo('products', '/admin/tienda/productos')}
+          className={`px-4 py-2 rounded-xl transition flex items-center gap-2 cursor-pointer ${
+            activeView === 'products'
+              ? 'bg-emerald-600 text-white'
+              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+          }`}
+        >
+          <Layers className="w-4 h-4" />
+          <span>Catálogo & Carruseles</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => navigateTo('orders', '/admin/tienda/pedidos')}
+          className={`px-4 py-2 rounded-xl transition flex items-center gap-2 cursor-pointer ${
+            activeView === 'orders'
+              ? 'bg-emerald-600 text-white'
+              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+          }`}
+        >
+          <Receipt className="w-4 h-4" />
+          <span>Gestión de Pedidos</span>
+          <span className="px-1.5 py-0.2 rounded-full bg-slate-200 dark:bg-slate-800 text-[10px] font-mono">
+            {orders.length}
+          </span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => {
+            resetNewOrder();
+            navigateTo('new_order', '/admin/tienda/pedidos/nuevo');
+          }}
+          className={`px-4 py-2 rounded-xl transition flex items-center gap-2 cursor-pointer ${
+            activeView === 'new_order'
+              ? 'bg-emerald-600 text-white'
+              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+          }`}
+        >
+          <Plus className="w-4 h-4" />
+          <span>Terminal de Venta (TPV)</span>
+        </button>
       </div>
 
       {/* ======================================================================
@@ -449,483 +754,691 @@ export const AdminShopOrders: React.FC = () => {
                 <Percent className="w-4 h-4 text-amber-500" />
               </div>
               <div className="text-2xl font-black font-mono text-slate-900 dark:text-white">
-                87,68 €
+                87,60 €
               </div>
               <div className="text-[11px] text-slate-500 dark:text-slate-400">
-                Margen comercial: 38%
+                Margen medio aprox. 42%
               </div>
             </div>
 
             <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-1">
               <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
-                <span className="font-extrabold uppercase text-[10px]">Alertas de Stock</span>
-                <AlertTriangle className="w-4 h-4 text-amber-500" />
+                <span className="font-extrabold uppercase text-[10px]">Valor del Stock</span>
+                <Boxes className="w-4 h-4 text-indigo-500" />
               </div>
-              <div className="text-2xl font-black font-mono text-amber-500">
-                2 Artículos
+              <div className="text-2xl font-black font-mono text-slate-900 dark:text-white">
+                {totalCatalogValue.toLocaleString('es-ES')} €
               </div>
-              <div className="text-[11px] text-amber-600 dark:text-amber-400 font-bold">
-                Por debajo de 5 unidades
+              <div className="text-[11px] text-slate-500 dark:text-slate-400">
+                {totalCatalogUnits} uds en almacén
               </div>
             </div>
           </div>
 
-          {/* 3. Dashboard Financiero: Gráfico de Ventas Interactivo & Más Vendidos */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-            {/* Gráfico de Ventas Interactivo con Tooltip y Responsividad Corregida */}
-            <div className="lg:col-span-7 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 p-5 shadow-xs space-y-4 min-w-0">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          {/* Gráfico y Top Sellers */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <div className="lg:col-span-8 p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-4">
+              <div className="flex items-center justify-between">
                 <div>
-                  <h2 className="text-base font-black text-slate-900 dark:text-white flex items-center gap-2">
-                    <BarChart3 className="w-4 h-4 text-emerald-500" />
-                    <span>{t('shop.chartTitle', 'Evolución Financiera de Ventas')}</span>
+                  <h2 className="text-base font-black text-slate-900 dark:text-white">
+                    Evolución de Ingresos de Pro Shop
                   </h2>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">
-                    {t('shop.chartSubtitle', 'Comparativa de facturación consolidada en tienda')}
-                  </p>
+                  <p className="text-xs text-slate-500">Histórico de ventas mensuales con desglose de pedidos.</p>
                 </div>
 
-                <div className="flex items-center bg-slate-100 dark:bg-slate-800 p-1 rounded-xl text-xs font-bold shrink-0 self-start sm:self-auto">
+                <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl text-xs font-bold">
                   <button
                     type="button"
-                    onClick={() => {
-                      setTimeRange('day');
-                      setHoveredChartIndex(null);
-                    }}
-                    className={`px-3 py-1 rounded-lg transition cursor-pointer ${
-                      timeRange === 'day'
-                        ? 'bg-emerald-600 text-white shadow-xs'
-                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                    onClick={() => setTimeRange('month')}
+                    className={`px-2.5 py-1 rounded-lg transition ${
+                      timeRange === 'month' ? 'bg-white dark:bg-slate-900 text-emerald-600 shadow-xs' : 'text-slate-500'
                     }`}
                   >
-                    {t('shop.chartWeekly', 'Semanal / Días')}
+                    Meses
                   </button>
                   <button
                     type="button"
-                    onClick={() => {
-                      setTimeRange('month');
-                      setHoveredChartIndex(null);
-                    }}
-                    className={`px-3 py-1 rounded-lg transition cursor-pointer ${
-                      timeRange === 'month'
-                        ? 'bg-emerald-600 text-white shadow-xs'
-                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                    onClick={() => setTimeRange('day')}
+                    className={`px-2.5 py-1 rounded-lg transition ${
+                      timeRange === 'day' ? 'bg-white dark:bg-slate-900 text-emerald-600 shadow-xs' : 'text-slate-500'
                     }`}
                   >
-                    {t('shop.chartMonthly', 'Mensual')}
+                    Semana
                   </button>
                 </div>
               </div>
 
-              {/* Contenedor del Gráfico con Fix Responsive Completo */}
-              <div className="pt-6 pb-2 w-full min-w-0">
-                <div className="relative w-full min-w-0">
-                  <div className="w-full min-w-0 flex items-end justify-between gap-1 sm:gap-2.5 h-48 border-b border-slate-100 dark:border-slate-800 pb-2">
-                    {chartData.map((d, idx) => {
-                      const heightPercent = Math.max(12, Math.round((d.sales / maxSale) * 100));
-                      const isHovered = hoveredChartIndex === idx;
+              {/* Bar Chart Visual */}
+              <div className="h-60 pt-4 flex items-end gap-2 sm:gap-3">
+                {chartData.map((d, i) => {
+                  const heightPercent = Math.round((d.sales / maxSale) * 100);
+                  const isCurrent = i === chartData.length - 1;
 
-                      return (
-                        <div
-                          key={idx}
-                          onMouseEnter={() => setHoveredChartIndex(idx)}
-                          onMouseLeave={() => setHoveredChartIndex(null)}
-                          onClick={() => setHoveredChartIndex(idx)}
-                          className="flex-1 min-w-0 flex flex-col items-center gap-1.5 h-full justify-end relative group cursor-pointer"
-                        >
-                          {/* TOOLTIP INTERACTIVO FLOTANTE AL PASAR EL CURSOR */}
-                          {isHovered && (
-                            <div className="absolute bottom-[calc(100%+10px)] left-1/2 -translate-x-1/2 z-30 pointer-events-none w-44 p-3 rounded-2xl bg-slate-950/95 dark:bg-slate-900/95 text-white border border-slate-700 shadow-2xl backdrop-blur-md animate-in fade-in zoom-in-95 duration-150">
-                              <div className="flex items-center justify-between border-b border-slate-800 pb-1.5 mb-1.5">
-                                <span className="text-[10px] font-bold text-slate-300 uppercase tracking-wider">
-                                  {d.fullLabel}
-                                </span>
-                                <span className="text-[10px] font-mono font-bold text-emerald-400">
-                                  {d.orders} {t('shop.ordersCount', 'pedidos')}
-                                </span>
-                              </div>
-                              <div className="space-y-0.5">
-                                <div className="text-[10px] text-slate-400">
-                                  {t('shop.totalAccumulated', 'Total acumulado')}:
-                                </div>
-                                <div className="text-sm font-black font-mono text-emerald-300">
-                                  {d.sales.toLocaleString('es-ES', { minimumFractionDigits: 2 })} €
-                                </div>
-                                <div className="text-[9px] text-slate-400 pt-0.5 flex items-center justify-between">
-                                  <span>{t('shop.averageTicket', 'Ticket medio')}:</span>
-                                  <span className="font-mono text-slate-200">
-                                    {(d.sales / d.orders).toFixed(2)} €
-                                  </span>
-                                </div>
-                              </div>
-                              {/* Flecha indicadora */}
-                              <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-slate-950 dark:bg-slate-900 border-r border-b border-slate-700 rotate-45" />
-                            </div>
-                          )}
-
-                          {/* Barra estilizada */}
-                          <div
-                            className={`w-full max-w-[22px] sm:max-w-[34px] rounded-t-xl transition-all duration-200 shadow-xs ${
-                              isHovered
-                                ? 'bg-gradient-to-t from-emerald-500 to-teal-300 scale-y-105 shadow-md shadow-emerald-500/20'
-                                : 'bg-gradient-to-t from-emerald-600 to-emerald-400 group-hover:from-emerald-500 group-hover:to-emerald-300'
-                            }`}
-                            style={{ height: `${heightPercent}%` }}
-                          />
-
-                          {/* Etiqueta inferior del eje X */}
-                          <span
-                            className={`text-[9px] sm:text-[10px] font-mono font-bold transition-colors ${
-                              isHovered
-                                ? 'text-emerald-600 dark:text-emerald-400 scale-105'
-                                : 'text-slate-500 dark:text-slate-400'
-                            }`}
-                          >
-                            {d.label}
-                          </span>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-between text-[11px] text-slate-400 pt-2 font-mono">
-                  <span>0 €</span>
-                  <span className="text-[10px] text-slate-500 italic">Pasa el cursor sobre cada barra para ver importe acumulado</span>
-                  <span>Pico: {maxSale.toLocaleString('es-ES')} €</span>
-                </div>
+                  return (
+                    <div key={d.label} className="flex-1 flex flex-col items-center gap-2 group h-full justify-end">
+                      <div className="text-[10px] font-mono text-slate-400 opacity-0 group-hover:opacity-100 transition">
+                        {d.sales}€
+                      </div>
+                      <div
+                        style={{ height: `${heightPercent}%` }}
+                        className={`w-full rounded-xl transition-all ${
+                          isCurrent
+                            ? 'bg-emerald-600 hover:bg-emerald-500'
+                            : 'bg-slate-200 dark:bg-slate-800 hover:bg-emerald-500/50'
+                        }`}
+                      />
+                      <span className="text-[10px] font-bold text-slate-500">{d.label}</span>
+                    </div>
+                  );
+                })}
               </div>
             </div>
 
-            {/* SECCIÓN "MÁS VENDIDOS" (Con botón a la derecha "Todos los productos") */}
-            <div className="lg:col-span-5 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 p-5 shadow-xs space-y-3.5">
+            {/* Top Ventas */}
+            <div className="lg:col-span-4 p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-4">
               <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2.5">
                 <h2 className="text-base font-black text-slate-900 dark:text-white flex items-center gap-2">
-                  <Boxes className="w-4 h-4 text-emerald-500" />
-                  <span>{t('shop.topSellersTitle', 'Más vendidos')}</span>
+                  <Sparkles className="w-4 h-4 text-amber-500" />
+                  <span>Top Ventas del Mes</span>
                 </h2>
-
-                {/* Enlace/Botón a la derecha: "Todos los productos" -> /admin/tienda/productos */}
                 <button
                   type="button"
                   onClick={() => navigateTo('products', '/admin/tienda/productos')}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-emerald-50 dark:bg-slate-800 dark:hover:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 font-bold text-xs transition border border-slate-200 dark:border-slate-700/80 cursor-pointer group"
-                  title="Ver catálogo completo de productos"
+                  className="text-xs text-emerald-600 font-bold hover:underline"
                 >
-                  <span>{t('shop.allProducts', 'Todos los productos')}</span>
-                  <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                  Ver Catálogo
                 </button>
               </div>
 
-              <div className="space-y-2.5">
-                {topSellers.map((item, index) => (
+              <div className="space-y-3">
+                {topSellers.map((item, idx) => (
                   <div
                     key={item.id}
-                    className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800 flex items-center justify-between gap-3 text-xs hover:border-emerald-500/50 transition shadow-xs"
+                    className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800 flex items-center justify-between gap-3 text-xs"
                   >
                     <div className="flex items-center gap-2.5 min-w-0">
-                      <span className="w-5 h-5 rounded-lg bg-slate-200 dark:bg-slate-800 font-mono font-black text-[11px] flex items-center justify-center shrink-0">
-                        {index + 1}
+                      <span className="font-mono font-black text-slate-400 w-4 text-center">
+                        #{idx + 1}
                       </span>
                       <img
                         src={item.avatar}
                         alt={item.name}
-                        className="w-10 h-10 rounded-xl object-cover shrink-0 border border-slate-200 dark:border-slate-800"
+                        className="w-10 h-10 rounded-xl object-cover shrink-0"
                       />
                       <div className="min-w-0">
                         <div className="font-bold text-slate-900 dark:text-white truncate">
                           {item.name}
                         </div>
-                        <div className="text-[10px] text-slate-500 dark:text-slate-400">
+                        <div className="text-[11px] text-slate-400">
                           {item.unitsSold} uds vendidas · Stock: {item.stock}
                         </div>
                       </div>
                     </div>
 
-                    <div className="text-right shrink-0">
-                      <div className="font-mono font-black text-emerald-600 dark:text-emerald-400">
-                        {item.revenue.toFixed(2)} €
-                      </div>
-                      <span className="text-[9px] uppercase font-bold text-slate-400">Facturado</span>
-                    </div>
+                    <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400 shrink-0">
+                      {item.revenue.toLocaleString('es-ES')} €
+                    </span>
                   </div>
                 ))}
               </div>
             </div>
           </div>
 
-          {/* 4. Vista previa rápida del Catálogo en Portada */}
-          <div className="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 p-5 shadow-xs space-y-4">
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+          {/* Carrusel Destacado en Dashboard */}
+          <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
               <div>
-                <h3 className="text-sm font-black text-slate-900 dark:text-white flex items-center gap-2">
-                  <Package className="w-4 h-4 text-emerald-500" />
-                  <span>Artículos en Stock ({filteredProducts.length})</span>
-                </h3>
-                <p className="text-xs text-slate-500 dark:text-slate-400">
-                  Acceso rápido a gestión de stock y precios
-                </p>
+                <h2 className="text-base font-black text-slate-900 dark:text-white flex items-center gap-2">
+                  <ShoppingBag className="w-5 h-5 text-emerald-500" />
+                  <span>Palas y Material de Alta Competición (Carrusel Rápido)</span>
+                </h2>
+                <p className="text-xs text-slate-500">Desplaza horizontalmente para consultar unidades o vender en caja.</p>
               </div>
 
               <div className="flex items-center gap-2">
                 <button
                   type="button"
-                  onClick={() => navigateTo('products', '/admin/tienda/productos')}
-                  className="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs font-bold flex items-center gap-1.5 transition"
+                  onClick={() => scrollCarousel('palas', 'left')}
+                  className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 transition cursor-pointer"
                 >
-                  <span>{t('shop.allProducts', 'Todos los productos')}</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => scrollCarousel('palas', 'right')}
+                  className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 transition cursor-pointer"
+                >
+                  <ChevronRight className="w-4 h-4" />
                 </button>
               </div>
             </div>
 
-            {/* Grid de Productos resumido */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {filteredProducts.slice(0, 4).map((p) => {
-                const isLowStock = p.stock <= 4;
-                return (
+            <div
+              ref={carouselRefs.palas}
+              className="flex items-stretch gap-4 overflow-x-auto pb-3 snap-x scrollbar-none scroll-smooth"
+            >
+              {productList
+                .filter((p) => p.category === 'palas')
+                .map((p) => (
                   <div
                     key={p.id}
-                    className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800 space-y-3 flex flex-col justify-between hover:border-emerald-500/50 transition shadow-xs group"
+                    onClick={() => setSelectedProductDetail(p as any)}
+                    className="w-72 shrink-0 p-4 rounded-3xl bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800 hover:border-emerald-500/50 transition cursor-pointer flex flex-col justify-between group shadow-xs"
                   >
                     <div>
-                      <div className="relative h-32 rounded-xl overflow-hidden bg-slate-200 dark:bg-slate-800 mb-2">
+                      <div className="relative h-36 rounded-2xl overflow-hidden bg-slate-200 dark:bg-slate-800 mb-3">
                         <img
                           src={p.imageUrl}
                           alt={p.name}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform"
                         />
-                        <span className="absolute top-2 left-2 px-2 py-0.5 rounded-md bg-slate-950/80 text-white font-mono font-bold text-[9px] uppercase tracking-wider backdrop-blur-xs">
+                        <span className="absolute top-2 left-2 px-2 py-0.5 rounded-md bg-slate-950/80 text-white font-mono font-bold text-[9px] uppercase backdrop-blur-xs">
                           {p.brand}
                         </span>
-                        {isLowStock && (
-                          <span className="absolute top-2 right-2 px-2 py-0.5 rounded-md bg-amber-500 text-slate-950 font-bold text-[9px] uppercase shadow-xs">
-                            Stock Bajo
-                          </span>
-                        )}
-                      </div>
-
-                      <h4 className="font-bold text-xs text-slate-900 dark:text-white line-clamp-2">
-                        {p.name}
-                      </h4>
-                      <div className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 capitalize">
-                        Categoría: {p.category}
-                      </div>
-                    </div>
-
-                    <div className="pt-2 border-t border-slate-200/60 dark:border-slate-800/80 flex items-center justify-between">
-                      <div>
-                        <div className="font-mono font-black text-sm text-emerald-600 dark:text-emerald-400">
-                          {p.price.toFixed(2)} €
-                        </div>
-                        <span className={`text-[10px] font-semibold ${isLowStock ? 'text-amber-500 font-bold' : 'text-slate-400'}`}>
-                          Stock: {p.stock} uds
+                        <span className="absolute top-2 right-2 px-2 py-0.5 rounded-md bg-emerald-600 text-white font-bold text-[9px]">
+                          Margen ~{getProductMarginPercent(p.price)}%
                         </span>
                       </div>
 
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setStockModalProduct(p);
-                          setStockAdjustment(10);
-                        }}
-                        className="px-2.5 py-1.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 hover:border-emerald-500 font-bold text-[11px] transition cursor-pointer shadow-xs"
-                      >
-                        {t('shop.manageStock', 'Gestionar Stock')}
-                      </button>
+                      <h3 className="font-black text-sm text-slate-900 dark:text-white line-clamp-1">
+                        {p.name}
+                      </h3>
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 line-clamp-2">
+                        {p.description}
+                      </p>
                     </div>
+
+                    <div className="pt-3 mt-3 border-t border-slate-200/60 dark:border-slate-800 flex items-center justify-between text-xs">
+                      <div>
+                        <span className="text-[10px] text-slate-400 block">PVP Oficial</span>
+                        <span className="font-mono font-black text-base text-emerald-600 dark:text-emerald-400">
+                          {p.price.toFixed(2)} €
+                        </span>
+                      </div>
+
+                      <div className="text-right">
+                        <span className="text-[10px] text-slate-400 block">Stock Disponible</span>
+                        <span className="font-mono font-bold text-slate-700 dark:text-slate-300">
+                          {p.stock} uds
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ======================================================================
+          VISTA 2: CATÁLOGO COMPLETO & CARRUSELES HORIZONTALES POR CATEGORÍA
+          ====================================================================== */}
+      {activeView === 'products' && (
+        <div className="space-y-6 animate-in fade-in duration-150">
+          {/* Barra de Controles y Selector de Vista (Carruseles vs Cuadrícula) */}
+          <div className="p-4 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-3">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+              <div className="relative flex-1 max-w-md">
+                <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  placeholder="Buscar producto por nombre, marca o modelo..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="w-full pl-9 pr-4 py-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                />
+              </div>
+
+              {/* Selector de Modo: Carruseles vs Cuadrícula */}
+              <div className="flex items-center gap-1 bg-slate-50 dark:bg-slate-950 p-1 rounded-xl border border-slate-200 dark:border-slate-800 text-xs font-bold">
+                <button
+                  type="button"
+                  onClick={() => setCatalogDisplayMode('carousels')}
+                  className={`px-3 py-1.5 rounded-lg transition cursor-pointer flex items-center gap-1.5 ${
+                    catalogDisplayMode === 'carousels'
+                      ? 'bg-emerald-600 text-white'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                  }`}
+                >
+                  <Layers className="w-3.5 h-3.5" />
+                  <span>Carruseles por Categoría</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setCatalogDisplayMode('grid')}
+                  className={`px-3 py-1.5 rounded-lg transition cursor-pointer flex items-center gap-1.5 ${
+                    catalogDisplayMode === 'grid'
+                      ? 'bg-emerald-600 text-white'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                  }`}
+                >
+                  <Boxes className="w-3.5 h-3.5" />
+                  <span>Cuadrícula & Filtros</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* MODO A: CARRUSELES HORIZONTALES DESPLAZABLES POR CATEGORÍA */}
+          {catalogDisplayMode === 'carousels' && (
+            <div className="space-y-8">
+              {[
+                { key: 'palas' as const, title: '🎾 Palas de Pádel de Competición & Control', subtitle: 'Modelos de gama alta con carbono 12K y tubular de grafeno' },
+                { key: 'pelotas' as const, title: '🟡 Pelotas & Cajones de Torneo', subtitle: 'Botes presurizados homologados por la FIP y Federación Gallega' },
+                { key: 'ropa' as const, title: '👕 Textil Técnico & Calzado Pro', subtitle: 'Zapatillas con suela de espiga para pádel y equipaciones transpirables' },
+                { key: 'accesorios' as const, title: '🎒 Accesorios, Overgrips & Paleteros', subtitle: 'Protectores de marco, grips acolchados y bolsas térmicas' },
+              ].map((categoryItem) => {
+                const categoryProducts = productList.filter((p) => p.category === categoryItem.key);
+
+                return (
+                  <div
+                    key={categoryItem.key}
+                    className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-4"
+                  >
+                    <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+                      <div>
+                        <h2 className="text-base font-black text-slate-900 dark:text-white flex items-center gap-2">
+                          <span>{categoryItem.title}</span>
+                          <span className="px-2 py-0.5 rounded-md bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 text-[10px] font-mono font-bold">
+                            {categoryProducts.length} modelos
+                          </span>
+                        </h2>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                          {categoryItem.subtitle}
+                        </p>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => scrollCarousel(categoryItem.key, 'left')}
+                          className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 transition cursor-pointer"
+                        >
+                          <ChevronLeft className="w-4 h-4" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => scrollCarousel(categoryItem.key, 'right')}
+                          className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 transition cursor-pointer"
+                        >
+                          <ChevronRight className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+
+                    {categoryProducts.length === 0 ? (
+                      <div className="py-8 text-center text-xs text-slate-400">
+                        No hay productos registrados en esta categoría.
+                      </div>
+                    ) : (
+                      <div
+                        ref={carouselRefs[categoryItem.key]}
+                        className="flex items-stretch gap-4 overflow-x-auto pb-4 snap-x scrollbar-none scroll-smooth"
+                      >
+                        {categoryProducts.map((p) => {
+                          const isLowStock = p.stock > 0 && p.stock <= 4;
+                          const isOut = p.stock === 0;
+
+                          return (
+                            <div
+                              key={p.id}
+                              className="w-72 shrink-0 p-4 rounded-3xl bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800 hover:border-emerald-500/50 transition flex flex-col justify-between group shadow-xs"
+                            >
+                              <div>
+                                <div
+                                  onClick={() => setSelectedProductDetail(p as any)}
+                                  className="relative h-40 rounded-2xl overflow-hidden bg-slate-200 dark:bg-slate-800 mb-3 cursor-pointer"
+                                >
+                                  <img
+                                    src={p.imageUrl}
+                                    alt={p.name}
+                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                                  />
+                                  <span className="absolute top-2 left-2 px-2 py-0.5 rounded-md bg-slate-950/80 text-white font-mono font-bold text-[9px] uppercase backdrop-blur-xs">
+                                    {p.brand}
+                                  </span>
+                                  {isLowStock && (
+                                    <span className="absolute top-2 right-2 px-2 py-0.5 rounded-md bg-amber-500 text-slate-950 font-bold text-[9px] uppercase shadow-xs">
+                                      Stock Bajo
+                                    </span>
+                                  )}
+                                  {isOut && (
+                                    <span className="absolute top-2 right-2 px-2 py-0.5 rounded-md bg-rose-600 text-white font-bold text-[9px] uppercase shadow-xs">
+                                      Agotado
+                                    </span>
+                                  )}
+                                </div>
+
+                                <h3
+                                  onClick={() => setSelectedProductDetail(p as any)}
+                                  className="font-black text-sm text-slate-900 dark:text-white line-clamp-1 hover:text-emerald-600 transition cursor-pointer"
+                                >
+                                  {p.name}
+                                </h3>
+                                <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 line-clamp-2">
+                                  {p.description}
+                                </p>
+                              </div>
+
+                              <div className="pt-3 mt-3 border-t border-slate-200/60 dark:border-slate-800 space-y-2.5">
+                                <div className="flex items-center justify-between text-xs">
+                                  <div>
+                                    <span className="text-[10px] text-slate-400 block font-medium">PVP</span>
+                                    <div className="font-mono font-black text-base text-emerald-600 dark:text-emerald-400">
+                                      {p.price.toFixed(2)} €
+                                    </div>
+                                  </div>
+                                  <div className="text-right">
+                                    <span className="text-[10px] text-slate-400 block font-medium">Stock Total</span>
+                                    <span
+                                      className={`text-xs font-mono font-bold ${
+                                        isOut
+                                          ? 'text-rose-600'
+                                          : isLowStock
+                                          ? 'text-amber-500'
+                                          : 'text-slate-700 dark:text-slate-200'
+                                      }`}
+                                    >
+                                      {p.stock} uds
+                                    </span>
+                                  </div>
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-2">
+                                  <button
+                                    type="button"
+                                    onClick={() => setSelectedProductDetail(p as any)}
+                                    className="w-full py-1.5 px-2 rounded-xl bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 font-bold text-xs transition cursor-pointer shadow-xs text-center flex items-center justify-center gap-1"
+                                  >
+                                    <Eye className="w-3.5 h-3.5" />
+                                    <span>Ficha</span>
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      addToCart(p);
+                                      navigateTo('new_order', '/admin/tienda/pedidos/nuevo');
+                                    }}
+                                    className="w-full py-1.5 px-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition cursor-pointer shadow-xs text-center flex items-center justify-center gap-1"
+                                  >
+                                    <ShoppingBag className="w-3.5 h-3.5" />
+                                    <span>Vender</span>
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
                   </div>
                 );
               })}
             </div>
-          </div>
+          )}
+
+          {/* MODO B: VISTA CUADRÍCULA CON FILTROS CLÁSICOS */}
+          {catalogDisplayMode === 'grid' && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                {filteredProducts.map((p) => (
+                  <div
+                    key={p.id}
+                    className="p-4 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 space-y-3 flex flex-col justify-between hover:border-emerald-500/50 transition shadow-xs group"
+                  >
+                    <div>
+                      <div
+                        onClick={() => setSelectedProductDetail(p as any)}
+                        className="relative h-40 rounded-2xl overflow-hidden bg-slate-200 dark:bg-slate-800 mb-3 cursor-pointer"
+                      >
+                        <img
+                          src={p.imageUrl}
+                          alt={p.name}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                        />
+                        <span className="absolute top-2 left-2 px-2 py-0.5 rounded-md bg-slate-950/80 text-white font-mono font-bold text-[9px] uppercase backdrop-blur-xs">
+                          {p.brand}
+                        </span>
+                      </div>
+
+                      <h3
+                        onClick={() => setSelectedProductDetail(p as any)}
+                        className="font-black text-sm text-slate-900 dark:text-white line-clamp-1 hover:text-emerald-600 transition cursor-pointer"
+                      >
+                        {p.name}
+                      </h3>
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 line-clamp-2">
+                        {p.description}
+                      </p>
+                    </div>
+
+                    <div className="pt-3 border-t border-slate-100 dark:border-slate-800 space-y-2">
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="font-mono font-black text-emerald-600 dark:text-emerald-400">
+                          {p.price.toFixed(2)} €
+                        </span>
+                        <span className="font-mono font-bold text-slate-500">
+                          {p.stock} uds
+                        </span>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setSelectedProductDetail(p as any)}
+                          className="w-full py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs"
+                        >
+                          Detalles
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            addToCart(p);
+                            navigateTo('new_order', '/admin/tienda/pedidos/nuevo');
+                          }}
+                          className="w-full py-1.5 rounded-xl bg-emerald-600 text-white font-bold text-xs"
+                        >
+                          Vender
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       )}
 
       {/* ======================================================================
-          VISTA 2: LISTADO COMPLETO DE PRODUCTOS (/admin/tienda/productos)
+          VISTA 3: MÓDULO DE GESTIÓN DE PEDIDOS
           ====================================================================== */}
-      {activeView === 'products' && (
-        <div className="space-y-5 animate-in fade-in duration-150">
-          {/* Métricas rápidas del inventario */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
-            <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-xs">
-              <span className="text-[10px] font-bold text-slate-500 uppercase">Referencias Totales</span>
-              <div className="text-2xl font-black font-mono text-slate-900 dark:text-white mt-1">
-                {productList.length} artículos
+      {activeView === 'orders' && (
+        <div className="space-y-6 animate-in fade-in duration-150">
+          {/* Métricas de Pedidos */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
+            <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-1">
+              <span className="text-[10px] text-slate-400 uppercase font-black">Total Pedidos</span>
+              <div className="text-2xl font-black font-mono text-slate-900 dark:text-white">
+                {orders.length}
               </div>
+              <div className="text-[11px] text-slate-500">tickets emitidos</div>
             </div>
-            <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-xs">
-              <span className="text-[10px] font-bold text-slate-500 uppercase">Unidades en Almacén</span>
-              <div className="text-2xl font-black font-mono text-emerald-600 dark:text-emerald-400 mt-1">
-                {totalCatalogUnits} unidades
+
+            <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-1">
+              <span className="text-[10px] text-slate-400 uppercase font-black">Pendientes / Preparados</span>
+              <div className="text-2xl font-black font-mono text-amber-500">
+                {pendingOrdersCount}
               </div>
+              <div className="text-[11px] text-amber-600 font-bold">por entregar en mano</div>
             </div>
-            <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-xs">
-              <span className="text-[10px] font-bold text-slate-500 uppercase">Valoración Stock PVP</span>
-              <div className="text-2xl font-black font-mono text-slate-900 dark:text-white mt-1">
-                {totalCatalogValue.toLocaleString('es-ES', { minimumFractionDigits: 2 })} €
+
+            <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-1">
+              <span className="text-[10px] text-slate-400 uppercase font-black">Facturación Pedidos</span>
+              <div className="text-2xl font-black font-mono text-emerald-600 dark:text-emerald-400">
+                {orders.reduce((acc, o) => acc + o.totalAmount, 0).toLocaleString('es-ES')} €
               </div>
+              <div className="text-[11px] text-emerald-600 font-bold">100% cobrado</div>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-1">
+              <span className="text-[10px] text-slate-400 uppercase font-black">Ticket Medio</span>
+              <div className="text-2xl font-black font-mono text-slate-900 dark:text-white">
+                {(orders.reduce((acc, o) => acc + o.totalAmount, 0) / (orders.length || 1)).toFixed(2)} €
+              </div>
+              <div className="text-[11px] text-slate-500">promedio por compra</div>
             </div>
           </div>
 
-          {/* Filtros y Buscador */}
-          <div className="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 p-5 shadow-xs space-y-4">
-            <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+          {/* Filtros de Pedidos */}
+          <div className="p-4 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-3">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
               <div className="relative flex-1 max-w-md">
-                <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                 <input
                   type="text"
-                  placeholder="Buscar producto por nombre o marca..."
+                  placeholder="Buscar por Nº de Pedido, Cliente o Producto..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="w-full pl-9 pr-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                  className="w-full pl-9 pr-4 py-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
                 />
               </div>
 
-              <div className="flex flex-wrap items-center gap-2">
-                <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl text-xs font-bold overflow-x-auto no-scrollbar">
-                  {categories.map((cat) => (
-                    <button
-                      key={cat}
-                      type="button"
-                      onClick={() => setSelectedCategory(cat)}
-                      className={`px-3 py-1.5 rounded-lg transition capitalize whitespace-nowrap cursor-pointer ${
-                        selectedCategory === cat
-                          ? 'bg-emerald-600 text-white shadow-xs'
-                          : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-                      }`}
-                    >
-                      {cat === 'all' ? t('shop.filterAll', 'Todos') : cat}
-                    </button>
-                  ))}
-                </div>
+              {/* Filtro de Estado */}
+              <div className="flex items-center gap-1 bg-slate-50 dark:bg-slate-950 p-1 rounded-xl border border-slate-200 dark:border-slate-800 text-xs font-bold">
+                {(['all', 'pendiente', 'preparado', 'entregado'] as const).map((st) => (
+                  <button
+                    key={st}
+                    type="button"
+                    onClick={() => setOrderStatusFilter(st)}
+                    className={`px-3 py-1.5 rounded-lg transition capitalize cursor-pointer ${
+                      orderStatusFilter === st
+                        ? 'bg-emerald-600 text-white'
+                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                    }`}
+                  >
+                    {st === 'all' ? 'Todos los Estados' : st}
+                  </button>
+                ))}
+              </div>
 
+              {/* Filtro de Sede */}
+              {isMultiVenue && (
                 <select
-                  value={stockFilter}
-                  onChange={(e) => setStockFilter(e.target.value as any)}
+                  value={orderVenueFilter}
+                  onChange={(e) => setOrderVenueFilter(e.target.value)}
                   className="px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs font-bold text-slate-700 dark:text-slate-300 focus:outline-none focus:border-emerald-500"
                 >
-                  <option value="all">Todo el stock</option>
-                  <option value="low">Stock Bajo (&le; 4 uds)</option>
-                  <option value="out">Sin Stock (0 uds)</option>
+                  <option value="all">Todas las Sedes</option>
+                  <option value="venue-san-mateo">Sede Central Narón</option>
+                  <option value="venue-coruna">Sede A Coruña</option>
+                  <option value="venue-santiago">Sede Santiago</option>
                 </select>
-              </div>
+              )}
             </div>
+          </div>
 
-            {/* Grid Completo de Productos */}
-            {filteredProducts.length === 0 ? (
-              <div className="p-12 text-center text-slate-500 dark:text-slate-400 space-y-2">
-                <Package className="w-10 h-10 mx-auto text-slate-400 opacity-60" />
-                <div className="font-bold text-sm">No se encontraron productos</div>
-                <p className="text-xs">Prueba con otros términos de búsqueda o cambia los filtros de categoría.</p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pt-2">
-                {filteredProducts.map((p) => {
-                  const isLowStock = p.stock > 0 && p.stock <= 4;
-                  const isOut = p.stock === 0;
-
-                  return (
-                    <div
-                      key={p.id}
-                      className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800 space-y-3 flex flex-col justify-between hover:border-emerald-500/50 transition shadow-xs group"
-                    >
-                      <div>
-                        <div className="relative h-36 rounded-xl overflow-hidden bg-slate-200 dark:bg-slate-800 mb-3">
-                          <img
-                            src={p.imageUrl}
-                            alt={p.name}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform"
-                          />
-                          <span className="absolute top-2 left-2 px-2.5 py-0.5 rounded-md bg-slate-950/80 text-white font-mono font-bold text-[9px] uppercase tracking-wider backdrop-blur-xs">
-                            {p.brand}
-                          </span>
-                          {isLowStock && (
-                            <span className="absolute top-2 right-2 px-2 py-0.5 rounded-md bg-amber-500 text-slate-950 font-bold text-[9px] uppercase shadow-xs">
-                              Stock Bajo
-                            </span>
-                          )}
-                          {isOut && (
-                            <span className="absolute top-2 right-2 px-2 py-0.5 rounded-md bg-rose-600 text-white font-bold text-[9px] uppercase shadow-xs">
-                              Agotado
-                            </span>
-                          )}
-                        </div>
-
-                        <h3 className="font-black text-sm text-slate-900 dark:text-white line-clamp-2">
-                          {p.name}
-                        </h3>
-                        <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 line-clamp-2">
-                          {p.description}
-                        </p>
-                        <div className="mt-2 flex items-center gap-2 text-[10px] text-slate-500 dark:text-slate-400 capitalize">
-                          <span className="px-2 py-0.5 rounded-md bg-slate-200 dark:bg-slate-800 font-bold">
-                            {p.category}
-                          </span>
-                          <span>ID: {p.id}</span>
-                        </div>
-                      </div>
-
-                      <div className="pt-3 border-t border-slate-200/60 dark:border-slate-800/80 space-y-2.5">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <span className="text-[10px] text-slate-400 block font-medium">PVP</span>
-                            <div className="font-mono font-black text-base text-emerald-600 dark:text-emerald-400">
-                              {p.price.toFixed(2)} €
-                            </div>
-                          </div>
-                          <div className="text-right">
-                            <span className="text-[10px] text-slate-400 block font-medium">Existencias</span>
-                            <span
-                              className={`text-xs font-mono font-bold ${
-                                isOut
-                                  ? 'text-rose-600'
-                                  : isLowStock
-                                  ? 'text-amber-500'
-                                  : 'text-slate-700 dark:text-slate-200'
-                              }`}
+          {/* Tabla de Pedidos */}
+          <div className="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 overflow-hidden shadow-xs">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs">
+                <thead className="bg-slate-50 dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 text-[11px] font-black uppercase tracking-wider text-slate-400">
+                  <tr>
+                    <th className="py-3 px-4">Ticket</th>
+                    <th className="py-3 px-4">Cliente</th>
+                    <th className="py-3 px-4">Artículos</th>
+                    <th className="py-3 px-3">Sede</th>
+                    <th className="py-3 px-3">Total</th>
+                    <th className="py-3 px-3">Pago</th>
+                    <th className="py-3 px-3">Estado</th>
+                    <th className="py-3 px-4 text-right">Acción</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800/80">
+                  {filteredOrders.map((o) => (
+                    <tr key={o.id} className="hover:bg-slate-50 dark:hover:bg-slate-850 transition">
+                      <td className="py-3.5 px-4 font-mono font-bold text-emerald-600 dark:text-emerald-400">
+                        {o.id}
+                        <div className="text-[10px] text-slate-400 font-normal">{o.createdAt}</div>
+                      </td>
+                      <td className="py-3.5 px-4">
+                        <div className="font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+                          <span>{o.customerName}</span>
+                          {o.memberNum && (
+                            <button
+                              type="button"
+                              onClick={() => navigateToPlayerProfile(o.customerName, 'pos_cafe')}
+                              className="text-[10px] text-emerald-600 font-bold hover:underline cursor-pointer"
+                              title="Ver ficha socio CRM"
                             >
-                              {p.stock} uds
-                            </span>
-                          </div>
+                              ({o.memberNum})
+                            </button>
+                          )}
                         </div>
-
-                        <div className="grid grid-cols-2 gap-2">
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setStockModalProduct(p);
-                              setStockAdjustment(10);
-                            }}
-                            className="w-full py-2 rounded-xl bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 font-bold text-xs transition cursor-pointer shadow-xs text-center"
-                          >
-                            {t('shop.manageStock', 'Gestionar Stock')}
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              addToCart(p);
-                              navigateTo('new_order', '/admin/tienda/pedidos/nuevo');
-                            }}
-                            className="w-full py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition cursor-pointer shadow-xs text-center flex items-center justify-center gap-1"
-                          >
-                            <ShoppingBag className="w-3.5 h-3.5" />
-                            <span>Vender</span>
-                          </button>
+                      </td>
+                      <td className="py-3.5 px-4">
+                        <div className="space-y-0.5">
+                          {o.items.map((it, idx) => (
+                            <div key={idx} className="text-slate-600 dark:text-slate-300">
+                              <strong className="text-slate-900 dark:text-white">{it.quantity}x</strong> {it.productName}
+                            </div>
+                          ))}
                         </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
+                      </td>
+                      <td className="py-3.5 px-3">
+                        <span className="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-[10px] font-bold">
+                          {o.venueName || 'Sede Central'}
+                        </span>
+                      </td>
+                      <td className="py-3.5 px-3 font-mono font-black text-slate-900 dark:text-white">
+                        {o.totalAmount.toFixed(2)} €
+                      </td>
+                      <td className="py-3.5 px-3">
+                        <span className="capitalize text-slate-600 dark:text-slate-400">
+                          {o.paymentMethod === 'card' && 'Tarjeta'}
+                          {o.paymentMethod === 'cash' && 'Efectivo'}
+                          {o.paymentMethod === 'wallet' && 'Monedero'}
+                          {o.paymentMethod === 'direct_debit' && 'Domiciliación'}
+                        </span>
+                      </td>
+                      <td className="py-3.5 px-3">
+                        <select
+                          value={o.status}
+                          onChange={(e) => handleUpdateOrderStatus(o.id, e.target.value as any)}
+                          className={`px-2 py-1 rounded-xl text-[10px] font-black uppercase cursor-pointer border ${
+                            o.status === 'entregado'
+                              ? 'bg-emerald-50 dark:bg-emerald-950 text-emerald-700 border-emerald-300 dark:border-emerald-800'
+                              : o.status === 'preparado'
+                              ? 'bg-cyan-50 dark:bg-cyan-950 text-cyan-700 border-cyan-300 dark:border-cyan-800'
+                              : 'bg-amber-50 dark:bg-amber-950 text-amber-800 border-amber-300 dark:border-amber-800'
+                          }`}
+                        >
+                          <option value="pendiente">Pendiente</option>
+                          <option value="preparado">Preparado</option>
+                          <option value="entregado">Entregado</option>
+                          <option value="cancelado">Cancelado</option>
+                        </select>
+                      </td>
+                      <td className="py-3.5 px-4 text-right">
+                        <button
+                          type="button"
+                          onClick={() => setSelectedOrderDetail(o)}
+                          className="px-3 py-1 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-emerald-600 hover:text-white transition font-bold text-xs cursor-pointer shadow-xs"
+                        >
+                          Ver Ticket
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       )}
 
       {/* ======================================================================
-          VISTA 3: CREACIÓN DE NUEVO PEDIDO (/admin/tienda/pedidos/nuevo)
+          VISTA 4: CREACIÓN DE NUEVO PEDIDO (/admin/tienda/pedidos/nuevo)
           ====================================================================== */}
       {activeView === 'new_order' && (
         <div className="space-y-6 animate-in fade-in duration-150">
@@ -940,60 +1453,45 @@ export const AdminShopOrders: React.FC = () => {
                   Ticket Registrado: {lastCreatedOrderId}
                 </span>
                 <h2 className="text-xl font-black text-slate-900 dark:text-white mt-1">
-                  ¡Pedido Completado y Cobrado!
+                  ¡Venta Completada con Éxito!
                 </h2>
                 <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-md mx-auto">
                   El stock de los productos ha sido actualizado en tiempo real y el importe ha quedado reflejado en el arqueo del TPV.
                 </p>
               </div>
 
-              <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-left text-xs space-y-2">
-                <div className="flex justify-between font-bold">
-                  <span>Importe total cobrado:</span>
-                  <span className="font-mono text-emerald-600 dark:text-emerald-400 text-sm">
-                    {totalOrderAmount.toFixed(2)} €
-                  </span>
-                </div>
-                <div className="flex justify-between text-slate-500">
-                  <span>Método de pago:</span>
-                  <span className="capitalize">{orderPaymentMethod}</span>
-                </div>
-                <div className="flex justify-between text-slate-500">
-                  <span>Cliente:</span>
-                  <span>{orderCustomerType === 'walk_in' ? 'Cliente de Mostrador' : selectedCustomer?.name}</span>
-                </div>
-              </div>
-
-              <div className="flex items-center justify-center gap-3 pt-2">
+              <div className="pt-4 flex flex-col sm:flex-row gap-2 justify-center">
                 <button
                   type="button"
-                  onClick={() => resetNewOrder()}
-                  className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-xs transition cursor-pointer"
+                  onClick={resetNewOrder}
+                  className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition shadow-xs cursor-pointer"
                 >
-                  + Crear Otro Pedido
+                  + Nueva Venta / Pedido
                 </button>
                 <button
                   type="button"
-                  onClick={() => navigateTo('dashboard', '/admin/tienda')}
-                  className="px-5 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-800 dark:text-slate-200 font-bold text-xs transition cursor-pointer"
+                  onClick={() => navigateTo('orders', '/admin/tienda/pedidos')}
+                  className="px-5 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs transition cursor-pointer"
                 >
-                  Volver al Panel
+                  Ver Lista de Pedidos
                 </button>
               </div>
             </div>
           ) : (
-            /* Formulario completo de Nuevo Pedido */
-            <form onSubmit={handleCompleteOrder} className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-              {/* Columna Izquierda: Configuración del Pedido y Selección de Productos */}
+            /* Pantalla del TPV / Terminal de Pedidos */
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+              {/* Columna Izquierda: Selección de Cliente y Catálogo Rápido */}
               <div className="lg:col-span-7 space-y-5">
-                {/* 1. Selector de Cliente */}
-                <div className="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 p-5 shadow-xs space-y-3.5">
-                  <h3 className="text-sm font-black text-slate-900 dark:text-white flex items-center gap-2">
-                    <User className="w-4 h-4 text-emerald-500" />
-                    <span>{t('shop.selectCustomer', 'Cliente / Socio')}</span>
-                  </h3>
+                {/* 1. Tipo de Cliente */}
+                <div className="p-5 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-3">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-sm font-black text-slate-900 dark:text-white flex items-center gap-2">
+                      <User className="w-4 h-4 text-emerald-500" />
+                      <span>1. Identificación del Cliente</span>
+                    </h3>
+                  </div>
 
-                  <div className="grid grid-cols-2 gap-2 text-xs">
+                  <div className="grid grid-cols-2 gap-3 text-xs">
                     <button
                       type="button"
                       onClick={() => {
@@ -1007,7 +1505,7 @@ export const AdminShopOrders: React.FC = () => {
                       }`}
                     >
                       <div className="flex items-center justify-between mb-1">
-                        <span>{t('shop.walkInCustomer', 'Cliente Mostrador (Venta rápida)')}</span>
+                        <span>Cliente Mostrador (Venta rápida)</span>
                         {orderCustomerType === 'walk_in' && <Check className="w-4 h-4 text-emerald-600" />}
                       </div>
                       <span className="text-[10px] font-normal opacity-80 block">Sin registro en ficha de socio</span>
@@ -1041,7 +1539,6 @@ export const AdminShopOrders: React.FC = () => {
                           const found = MOCK_CUSTOMERS.find((c) => c.id === e.target.value);
                           setSelectedCustomer(found || null);
                         }}
-                        required
                         className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs font-medium text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
                       >
                         <option value="">-- Elige un socio del club --</option>
@@ -1055,20 +1552,18 @@ export const AdminShopOrders: React.FC = () => {
                   )}
                 </div>
 
-                {/* 2. Añadir Artículos desde la Tienda */}
-                <div className="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 p-5 shadow-xs space-y-3.5">
+                {/* 2. Catálogo para Añadir al Carrito */}
+                <div className="p-5 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-3.5">
                   <div className="flex items-center justify-between">
                     <h3 className="text-sm font-black text-slate-900 dark:text-white flex items-center gap-2">
                       <ShoppingBag className="w-4 h-4 text-emerald-500" />
-                      <span>{t('shop.selectProducts', 'Artículos del Pedido')}</span>
+                      <span>2. Seleccionar Artículos para el Pedido</span>
                     </h3>
-                    <span className="text-xs text-slate-400">Haz clic en (+) para añadir</span>
+                    <span className="text-xs text-slate-400">Clic en (+) para añadir</span>
                   </div>
 
-                  {/* Listado horizontal o grid para selección rápida */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-72 overflow-y-auto pr-1">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-80 overflow-y-auto pr-1">
                     {productList.map((product) => {
-                      const inCart = orderCart.find((ci) => ci.product.id === product.id);
                       const isOutOfStock = product.stock <= 0;
 
                       return (
@@ -1080,7 +1575,7 @@ export const AdminShopOrders: React.FC = () => {
                             <img
                               src={product.imageUrl}
                               alt={product.name}
-                              className="w-9 h-9 rounded-xl object-cover shrink-0"
+                              className="w-10 h-10 rounded-xl object-cover shrink-0"
                             />
                             <div className="min-w-0">
                               <div className="font-bold text-slate-900 dark:text-white truncate">
@@ -1095,15 +1590,24 @@ export const AdminShopOrders: React.FC = () => {
                           <button
                             type="button"
                             disabled={isOutOfStock}
-                            onClick={() => addToCart(product)}
+                            onClick={() => {
+                              const existing = orderCart.find((ci) => ci.product.id === product.id);
+                              if (existing) {
+                                setOrderCart((prev) =>
+                                  prev.map((ci) =>
+                                    ci.product.id === product.id ? { ...ci, quantity: ci.quantity + 1 } : ci
+                                  )
+                                );
+                              } else {
+                                setOrderCart((prev) => [...prev, { product, quantity: 1 }]);
+                              }
+                            }}
                             className={`p-2 rounded-xl font-bold transition shrink-0 cursor-pointer ${
                               isOutOfStock
                                 ? 'bg-slate-200 dark:bg-slate-800 text-slate-400 cursor-not-allowed'
-                                : inCart
-                                ? 'bg-emerald-600 text-white'
-                                : 'bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-emerald-600 hover:text-white'
+                                : 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-xs'
                             }`}
-                            title="Añadir al pedido"
+                            title="Añadir a la cesta"
                           >
                             <Plus className="w-4 h-4" />
                           </button>
@@ -1113,19 +1617,19 @@ export const AdminShopOrders: React.FC = () => {
                   </div>
                 </div>
 
-                {/* 3. Método de Pago y Descuentos */}
-                <div className="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 p-5 shadow-xs space-y-3.5">
+                {/* 3. Forma de Pago y Sede de Venta */}
+                <div className="p-5 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-3.5">
                   <h3 className="text-sm font-black text-slate-900 dark:text-white flex items-center gap-2">
                     <CreditCard className="w-4 h-4 text-emerald-500" />
-                    <span>{t('shop.paymentMethod', 'Forma de Pago')}</span>
+                    <span>3. Método de Cobro & Sede</span>
                   </h3>
 
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs">
                     {[
-                      { id: 'card', label: t('shop.paymentCard', 'Tarjeta / TPV'), icon: CreditCard },
-                      { id: 'cash', label: t('shop.paymentCash', 'Efectivo'), icon: Banknote },
-                      { id: 'wallet', label: t('shop.paymentWallet', 'Saldo Monedero'), icon: Wallet },
-                      { id: 'direct_debit', label: t('shop.paymentDirectDebit', 'Domiciliación'), icon: Receipt },
+                      { id: 'card', label: 'Tarjeta / TPV', icon: CreditCard },
+                      { id: 'cash', label: 'Efectivo', icon: Banknote },
+                      { id: 'wallet', label: 'Saldo Monedero', icon: Wallet },
+                      { id: 'direct_debit', label: 'Domiciliación', icon: Receipt },
                     ].map((m) => {
                       const Icon = m.icon;
                       const isSelected = orderPaymentMethod === m.id;
@@ -1147,180 +1651,438 @@ export const AdminShopOrders: React.FC = () => {
                     })}
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-                    <div>
+                  {isMultiVenue && (
+                    <div className="pt-2">
                       <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                        Descuento (%)
+                        Sede de Salida de Stock
                       </label>
                       <select
-                        value={orderDiscount}
-                        onChange={(e) => setOrderDiscount(Number(e.target.value))}
-                        className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs font-bold text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                        value={orderVenue}
+                        onChange={(e) => setOrderVenue(e.target.value)}
+                        className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-medium text-slate-900 dark:text-white"
                       >
-                        <option value={0}>Sin descuento (0%)</option>
-                        <option value={5}>5% Descuento Socio</option>
-                        <option value={10}>10% Descuento Promoción</option>
-                        <option value={15}>15% Descuento Especial</option>
-                        <option value={20}>20% Liquidación</option>
+                        <option value="venue-san-mateo">Sede Central Narón</option>
+                        <option value="venue-coruna">Sede A Coruña</option>
+                        <option value="venue-santiago">Sede Santiago</option>
                       </select>
                     </div>
-
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                        Notas del Pedido
-                      </label>
-                      <input
-                        type="text"
-                        placeholder="Ej: Entregado en mano en pista 3..."
-                        value={orderNotes}
-                        onChange={(e) => setOrderNotes(e.target.value)}
-                        className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
-                      />
-                    </div>
-                  </div>
+                  )}
                 </div>
               </div>
 
-              {/* Columna Derecha: Resumen del Pedido (Carrito Activo) */}
-              <div className="lg:col-span-5 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 p-5 shadow-xs space-y-4 sticky top-6">
-                <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2.5">
+              {/* Columna Derecha: Resumen del Ticket y Confirmación */}
+              <div className="lg:col-span-5 p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-md space-y-4 sticky top-6">
+                <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
                   <h3 className="text-base font-black text-slate-900 dark:text-white flex items-center gap-2">
                     <Receipt className="w-4 h-4 text-emerald-500" />
-                    <span>{t('shop.orderSummary', 'Desglose de Cobro')}</span>
+                    <span>Ticket de Compra</span>
                   </h3>
-                  <span className="text-xs font-mono font-bold text-slate-400">
-                    {orderCart.length} líneas
+                  <span className="text-xs font-mono font-bold text-emerald-600">
+                    {orderCart.reduce((a, b) => a + b.quantity, 0)} artículos
                   </span>
                 </div>
 
-                {/* Items seleccionados en el carrito */}
                 {orderCart.length === 0 ? (
-                  <div className="p-8 text-center text-slate-400 space-y-2 border border-dashed border-slate-200 dark:border-slate-800 rounded-2xl">
+                  <div className="py-12 text-center text-xs text-slate-400 space-y-2">
                     <ShoppingBag className="w-8 h-8 mx-auto opacity-40" />
-                    <div className="text-xs font-bold">El carrito está vacío</div>
-                    <p className="text-[11px]">Selecciona artículos de la lista de la izquierda.</p>
+                    <div>No hay artículos en el pedido todavía.</div>
+                    <p className="text-[11px]">Añade productos desde el panel izquierdo.</p>
                   </div>
                 ) : (
-                  <div className="space-y-2.5 max-h-64 overflow-y-auto pr-1">
-                    {orderCart.map((item) => (
-                      <div
-                        key={item.product.id}
-                        className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800 flex items-center justify-between gap-3 text-xs"
-                      >
-                        <div className="min-w-0">
-                          <div className="font-bold text-slate-900 dark:text-white truncate">
-                            {item.product.name}
+                  <div className="space-y-3">
+                    <div className="space-y-2 max-h-60 overflow-y-auto pr-1">
+                      {orderCart.map((item) => (
+                        <div
+                          key={item.product.id}
+                          className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800 flex items-center justify-between text-xs"
+                        >
+                          <div className="min-w-0 pr-2">
+                            <div className="font-bold text-slate-900 dark:text-white truncate">
+                              {item.product.name}
+                            </div>
+                            <div className="text-[10px] text-slate-400">
+                              {item.product.price.toFixed(2)} € / ud
+                            </div>
                           </div>
-                          <div className="text-[10px] text-slate-400 font-mono">
-                            {item.product.price.toFixed(2)} € / ud
+
+                          <div className="flex items-center gap-2 shrink-0">
+                            <span className="font-mono font-bold text-slate-900 dark:text-white">
+                              {(item.product.price * item.quantity).toFixed(2)} €
+                            </span>
+                            <div className="flex items-center gap-1 bg-white dark:bg-slate-800 rounded-lg p-0.5 border border-slate-200 dark:border-slate-700">
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  if (item.quantity === 1) {
+                                    setOrderCart((prev) => prev.filter((ci) => ci.product.id !== item.product.id));
+                                  } else {
+                                    setOrderCart((prev) =>
+                                      prev.map((ci) =>
+                                        ci.product.id === item.product.id ? { ...ci, quantity: ci.quantity - 1 } : ci
+                                      )
+                                    );
+                                  }
+                                }}
+                                className="w-5 h-5 rounded flex items-center justify-center font-bold hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer"
+                              >
+                                -
+                              </button>
+                              <span className="w-5 text-center font-mono font-bold">{item.quantity}</span>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setOrderCart((prev) =>
+                                    prev.map((ci) =>
+                                      ci.product.id === item.product.id ? { ...ci, quantity: ci.quantity + 1 } : ci
+                                    )
+                                  );
+                                }}
+                                className="w-5 h-5 rounded flex items-center justify-center font-bold hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer"
+                              >
+                                +
+                              </button>
+                            </div>
                           </div>
                         </div>
+                      ))}
+                    </div>
 
-                        <div className="flex items-center gap-2 shrink-0">
-                          {/* Controles de Cantidad */}
-                          <div className="flex items-center bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-0.5">
-                            <button
-                              type="button"
-                              onClick={() => updateCartQuantity(item.product.id, item.quantity - 1)}
-                              className="px-2 py-0.5 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg text-slate-600 dark:text-slate-300 font-bold"
-                            >
-                              -
-                            </button>
-                            <span className="px-2 font-mono font-bold text-xs">{item.quantity}</span>
-                            <button
-                              type="button"
-                              onClick={() => updateCartQuantity(item.product.id, item.quantity + 1)}
-                              className="px-2 py-0.5 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg text-slate-600 dark:text-slate-300 font-bold"
-                            >
-                              +
-                            </button>
-                          </div>
+                    {/* Descuentos & Totales */}
+                    <div className="pt-3 border-t border-slate-100 dark:border-slate-800 space-y-2 text-xs">
+                      <div className="flex items-center justify-between text-slate-500">
+                        <span>Subtotal (PVP con IVA):</span>
+                        <span className="font-mono font-bold text-slate-900 dark:text-white">
+                          {orderCart
+                            .reduce((a, b) => a + b.product.price * b.quantity, 0)
+                            .toFixed(2)}{' '}
+                          €
+                        </span>
+                      </div>
 
-                          <div className="font-mono font-black text-slate-900 dark:text-white text-xs w-16 text-right">
-                            {(item.product.price * item.quantity).toFixed(2)} €
-                          </div>
-
-                          <button
-                            type="button"
-                            onClick={() => updateCartQuantity(item.product.id, 0)}
-                            className="p-1 text-slate-400 hover:text-rose-500 transition"
-                            title="Eliminar"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
+                      <div className="flex items-center justify-between">
+                        <span className="text-slate-500">Descuento aplicado:</span>
+                        <div className="flex items-center gap-1">
+                          <input
+                            type="number"
+                            min="0"
+                            value={orderDiscount}
+                            onChange={(e) => setOrderDiscount(Number(e.target.value))}
+                            className="w-16 px-2 py-0.5 rounded bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 font-mono text-right text-xs"
+                          />
+                          <span>€</span>
                         </div>
                       </div>
-                    ))}
+
+                      <div className="flex items-center justify-between pt-2 border-t border-slate-200 dark:border-slate-800 text-sm font-black text-slate-900 dark:text-white">
+                        <span>Total a Cobrar:</span>
+                        <span className="text-xl font-mono text-emerald-600 dark:text-emerald-400">
+                          {Math.max(
+                            0,
+                            orderCart.reduce((a, b) => a + b.product.price * b.quantity, 0) - orderDiscount
+                          ).toFixed(2)}{' '}
+                          €
+                        </span>
+                      </div>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={handleCompleteOrder}
+                      className="w-full py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-sm transition shadow-md active:scale-95 cursor-pointer flex items-center justify-center gap-2 mt-2"
+                    >
+                      <Check className="w-5 h-5" />
+                      <span>Cobrar y Emitir Ticket</span>
+                    </button>
                   </div>
                 )}
-
-                {/* Resumen de totales */}
-                <div className="space-y-2 pt-3 border-t border-slate-100 dark:border-slate-800 text-xs">
-                  <div className="flex justify-between text-slate-500">
-                    <span>{t('shop.subtotal', 'Subtotal neto')}</span>
-                    <span className="font-mono font-bold text-slate-800 dark:text-slate-200">
-                      {subtotalCart.toFixed(2)} €
-                    </span>
-                  </div>
-
-                  {orderDiscount > 0 && (
-                    <div className="flex justify-between text-emerald-600 dark:text-emerald-400 font-medium">
-                      <span>{t('shop.discount', 'Descuento aplicado')} ({orderDiscount}%)</span>
-                      <span className="font-mono font-bold">-{discountAmount.toFixed(2)} €</span>
-                    </div>
-                  )}
-
-                  <div className="flex justify-between text-slate-500">
-                    <span>{t('shop.tax', 'IVA (21% incluido)')}</span>
-                    <span className="font-mono">{taxAmount.toFixed(2)} €</span>
-                  </div>
-
-                  <div className="pt-2 border-t border-slate-200 dark:border-slate-700 flex justify-between items-baseline">
-                    <span className="text-sm font-black text-slate-900 dark:text-white">
-                      {t('shop.total', 'Total a Cobrar')}
-                    </span>
-                    <span className="text-2xl font-black font-mono text-emerald-600 dark:text-emerald-400">
-                      {totalOrderAmount.toFixed(2)} €
-                    </span>
-                  </div>
-                </div>
-
-                {/* Botón de Confirmar Pedido */}
-                <button
-                  type="submit"
-                  disabled={orderCart.length === 0}
-                  className={`w-full py-3.5 rounded-2xl font-black text-xs flex items-center justify-center gap-2 shadow-lg transition active:scale-[0.98] cursor-pointer ${
-                    orderCart.length === 0
-                      ? 'bg-slate-300 dark:bg-slate-800 text-slate-500 cursor-not-allowed shadow-none'
-                      : 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-500/20'
-                  }`}
-                >
-                  <CheckCircle2 className="w-4 h-4" />
-                  <span>{t('shop.completeOrder', 'Confirmar y Cobrar Pedido')}</span>
-                </button>
               </div>
-            </form>
+            </div>
           )}
         </div>
       )}
 
       {/* =====================================================================
-          MODAL: NUEVO PRODUCTO EN CATÁLOGO
+          MODAL: DETALLES COMPLETOS DEL PRODUCTO (CLICK EN CUALQUIER ÍTEM)
+          ===================================================================== */}
+      {selectedProductDetail && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-sm animate-in fade-in duration-150">
+          <div className="relative w-full max-w-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl text-slate-900 dark:text-slate-100 space-y-6 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+              <div className="flex items-center gap-2">
+                <Tag className="w-5 h-5 text-emerald-500" />
+                <h3 className="text-base font-black text-slate-900 dark:text-white">
+                  Ficha Oficial del Producto
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setSelectedProductDetail(null)}
+                className="p-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-12 gap-6">
+              {/* Imagen y Tags */}
+              <div className="sm:col-span-5 space-y-3">
+                <div className="relative h-60 rounded-2xl overflow-hidden bg-slate-200 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+                  <img
+                    src={selectedProductDetail.imageUrl}
+                    alt={selectedProductDetail.name}
+                    className="w-full h-full object-cover"
+                  />
+                  <span className="absolute top-2 left-2 px-2.5 py-0.5 rounded-md bg-slate-950/80 text-white font-mono font-bold text-[10px] uppercase">
+                    {selectedProductDetail.brand}
+                  </span>
+                  <span className="absolute bottom-2 left-2 px-2.5 py-0.5 rounded-md bg-emerald-600 text-white font-bold text-[10px] uppercase">
+                    {selectedProductDetail.category}
+                  </span>
+                </div>
+
+                <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800 text-xs space-y-1">
+                  <div className="flex items-center justify-between text-slate-400 text-[10px] uppercase font-bold">
+                    <span>Rentabilidad Comercial</span>
+                    <span className="text-emerald-600">Margen Bruto</span>
+                  </div>
+                  <div className="flex items-center justify-between font-mono font-black text-sm text-slate-900 dark:text-white">
+                    <span>Coste: {getProductCost(selectedProductDetail.price)} €</span>
+                    <span className="text-emerald-600">
+                      +{selectedProductDetail.price - getProductCost(selectedProductDetail.price)} € (~
+                      {getProductMarginPercent(selectedProductDetail.price)}%)
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Información y Especificaciones Técnicas */}
+              <div className="sm:col-span-7 space-y-4">
+                <div>
+                  <h2 className="text-xl font-black text-slate-900 dark:text-white">
+                    {selectedProductDetail.name}
+                  </h2>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                    {selectedProductDetail.description}
+                  </p>
+                </div>
+
+                {/* Precios y Stock General */}
+                <div className="grid grid-cols-2 gap-3 p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800">
+                  <div>
+                    <span className="text-[10px] text-slate-400 uppercase font-black block">PVP con IVA</span>
+                    <span className="text-2xl font-black font-mono text-emerald-600 dark:text-emerald-400">
+                      {selectedProductDetail.price.toFixed(2)} €
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] text-slate-400 uppercase font-black block">Existencias Totales</span>
+                    <span className="text-2xl font-black font-mono text-slate-900 dark:text-white">
+                      {selectedProductDetail.stock} uds
+                    </span>
+                  </div>
+                </div>
+
+                {/* Desglose Multi-Sede del Producto */}
+                <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800 space-y-2.5 text-xs">
+                  <div className="flex items-center justify-between">
+                    <span className="font-black text-slate-900 dark:text-white flex items-center gap-1.5">
+                      <Building2 className="w-4 h-4 text-emerald-500" />
+                      <span>Distribución de Stock por Sede</span>
+                    </span>
+                    <span className="text-[10px] text-slate-400">Club Multi-Sede Galicia</span>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    {[
+                      { id: 'venue-san-mateo', name: 'Sede Central Narón', defaultVal: Math.ceil(selectedProductDetail.stock * 0.6) },
+                      { id: 'venue-coruna', name: 'Sede A Coruña', defaultVal: Math.floor(selectedProductDetail.stock * 0.25) },
+                      { id: 'venue-santiago', name: 'Sede Santiago', defaultVal: Math.max(0, selectedProductDetail.stock - Math.ceil(selectedProductDetail.stock * 0.6) - Math.floor(selectedProductDetail.stock * 0.25)) },
+                    ].map((v) => {
+                      const stockInV = selectedProductDetail.venueStock?.[v.id] ?? v.defaultVal;
+
+                      return (
+                        <div key={v.id} className="flex items-center justify-between p-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+                          <span className="font-bold text-slate-700 dark:text-slate-300">{v.name}</span>
+                          <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400">
+                            {stockInV} unidades
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Especificaciones Técnicas */}
+                {selectedProductDetail.specs && (
+                  <div className="space-y-1.5 text-xs">
+                    <span className="font-black text-slate-900 dark:text-white uppercase text-[10px] block">
+                      Especificaciones Técnicas:
+                    </span>
+                    <div className="grid grid-cols-2 gap-2">
+                      {Object.entries(selectedProductDetail.specs).map(([k, val]) => (
+                        <div key={k} className="p-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800">
+                          <span className="text-[10px] text-slate-400 block">{k}</span>
+                          <span className="font-bold text-slate-800 dark:text-slate-200">{val}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Acciones de la Ficha */}
+            <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-3">
+              <button
+                type="button"
+                onClick={() => {
+                  setStockModalProduct(selectedProductDetail);
+                  setStockAdjustment(10);
+                }}
+                className="py-2.5 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold text-xs transition cursor-pointer flex items-center gap-1.5"
+              >
+                <Boxes className="w-4 h-4 text-emerald-500" />
+                <span>Entrada / Ajuste de Stock</span>
+              </button>
+
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setSelectedProductDetail(null)}
+                  className="py-2.5 px-4 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs transition cursor-pointer"
+                >
+                  Cerrar
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    addToCart(selectedProductDetail);
+                    setSelectedProductDetail(null);
+                    navigateTo('new_order', '/admin/tienda/pedidos/nuevo');
+                  }}
+                  className="py-2.5 px-5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition shadow-xs cursor-pointer flex items-center gap-2"
+                >
+                  <ShoppingBag className="w-4 h-4" />
+                  <span>Vender en Mostrador</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* =====================================================================
+          MODAL: TICKET DETALLADO DE PEDIDO
+          ===================================================================== */}
+      {selectedOrderDetail && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-sm animate-in fade-in duration-150">
+          <div className="relative w-full max-w-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl text-slate-900 dark:text-slate-100 space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+              <div className="flex items-center gap-2">
+                <Receipt className="w-5 h-5 text-emerald-500" />
+                <h3 className="text-base font-black text-slate-900 dark:text-white">
+                  Ticket de Venta #{selectedOrderDetail.id}
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setSelectedOrderDetail(null)}
+                className="p-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="space-y-3 text-xs">
+              <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-400">Cliente:</span>
+                  <strong className="text-slate-900 dark:text-white">{selectedOrderDetail.customerName}</strong>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-400">Sede:</span>
+                  <span className="font-bold text-slate-700 dark:text-slate-300">{selectedOrderDetail.venueName || 'Sede Central'}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-400">Fecha y Hora:</span>
+                  <span className="font-mono text-slate-700 dark:text-slate-300">{selectedOrderDetail.createdAt}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-400">Método de Pago:</span>
+                  <span className="font-bold uppercase text-emerald-600">{selectedOrderDetail.paymentMethod}</span>
+                </div>
+              </div>
+
+              {/* Desglose de Líneas */}
+              <div className="space-y-1.5">
+                <span className="text-[10px] text-slate-400 font-black uppercase">Artículos Adquiridos:</span>
+                {selectedOrderDetail.items.map((item, idx) => (
+                  <div key={idx} className="p-2.5 rounded-xl bg-white dark:bg-slate-850 border border-slate-200 dark:border-slate-800 flex items-center justify-between">
+                    <div>
+                      <span className="font-bold text-slate-900 dark:text-white">{item.quantity}x {item.productName}</span>
+                      <div className="text-[10px] text-slate-400">{item.unitPrice.toFixed(2)} € / ud</div>
+                    </div>
+                    <span className="font-mono font-bold text-slate-900 dark:text-white">
+                      {item.subtotal.toFixed(2)} €
+                    </span>
+                  </div>
+                ))}
+              </div>
+
+              <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-sm font-black">
+                <span>Total Abonado:</span>
+                <span className="text-xl font-mono text-emerald-600 dark:text-emerald-400">
+                  {selectedOrderDetail.totalAmount.toFixed(2)} €
+                </span>
+              </div>
+
+              <div className="pt-3 flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    window.print();
+                    triggerDemoToast('Imprimiendo Ticket', `Ticket ${selectedOrderDetail.id} enviado a la impresora de caja.`, 'info');
+                  }}
+                  className="flex-1 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-bold transition flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <Printer className="w-4 h-4" />
+                  <span>Imprimir Ticket</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    triggerDemoToast('Enviado por WhatsApp', `Copia del ticket enviada al móvil de ${selectedOrderDetail.customerName}.`, 'success');
+                  }}
+                  className="flex-1 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold transition flex items-center justify-center gap-2 cursor-pointer shadow-xs"
+                >
+                  <Share2 className="w-4 h-4" />
+                  <span>Enviar por WhatsApp</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* =====================================================================
+          MODAL: NUEVO PRODUCTO
           ===================================================================== */}
       {isNewProductModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-sm animate-in fade-in duration-150">
           <div className="relative w-full max-w-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl text-slate-900 dark:text-slate-100 space-y-4 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
               <div className="flex items-center gap-2">
-                <Package className="w-5 h-5 text-emerald-500" />
+                <Plus className="w-5 h-5 text-emerald-500" />
                 <h3 className="text-base font-black text-slate-900 dark:text-white">
-                  Añadir Producto a la Tienda
+                  Añadir Nuevo Producto al Catálogo
                 </h3>
               </div>
               <button
                 type="button"
                 onClick={() => setIsNewProductModalOpen(false)}
-                className="p-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white"
+                className="p-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -1329,12 +2091,12 @@ export const AdminShopOrders: React.FC = () => {
             <form onSubmit={handleCreateProduct} className="space-y-3.5 text-xs">
               <div>
                 <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
-                  Nombre del Producto *
+                  Nombre Comercial del Producto *
                 </label>
                 <input
                   type="text"
                   required
-                  placeholder="Ej: Pala Bullpadel Hack 03 2026"
+                  placeholder="Ej: Siux Diablo Revolution 3 Pro"
                   value={newProductForm.name}
                   onChange={(e) => setNewProductForm({ ...newProductForm, name: e.target.value })}
                   className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
@@ -1348,6 +2110,7 @@ export const AdminShopOrders: React.FC = () => {
                   </label>
                   <input
                     type="text"
+                    required
                     value={newProductForm.brand}
                     onChange={(e) => setNewProductForm({ ...newProductForm, brand: e.target.value })}
                     className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
@@ -1360,19 +2123,13 @@ export const AdminShopOrders: React.FC = () => {
                   </label>
                   <select
                     value={newProductForm.category}
-                    onChange={(e) =>
-                      setNewProductForm({
-                        ...newProductForm,
-                        category: e.target.value as Product['category'],
-                      })
-                    }
+                    onChange={(e) => setNewProductForm({ ...newProductForm, category: e.target.value as any })}
                     className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
                   >
-                    <option value="palas">Palas de Pádel</option>
-                    <option value="pelotas">Pelotas y Botes</option>
-                    <option value="accesorios">Accesorios y Grips</option>
-                    <option value="ropa">Ropa y Textil</option>
-                    <option value="zapatillas">Zapatillas de Pádel</option>
+                    <option value="palas">Palas</option>
+                    <option value="pelotas">Pelotas</option>
+                    <option value="ropa">Ropa & Calzado</option>
+                    <option value="accesorios">Accesorios & Grips</option>
                   </select>
                 </div>
               </div>
@@ -1380,12 +2137,11 @@ export const AdminShopOrders: React.FC = () => {
               <div className="grid grid-cols-3 gap-3">
                 <div>
                   <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
-                    Precio Venta (€) *
+                    PVP con IVA (€)
                   </label>
                   <input
                     type="number"
                     step="0.5"
-                    required
                     value={newProductForm.price}
                     onChange={(e) => setNewProductForm({ ...newProductForm, price: Number(e.target.value) })}
                     className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl font-mono text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
@@ -1394,7 +2150,7 @@ export const AdminShopOrders: React.FC = () => {
 
                 <div>
                   <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
-                    Coste Prov. (€)
+                    Coste Compra (€)
                   </label>
                   <input
                     type="number"
@@ -1419,6 +2175,23 @@ export const AdminShopOrders: React.FC = () => {
                 </div>
               </div>
 
+              {isMultiVenue && (
+                <div>
+                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                    Sede Inicial de Recepción
+                  </label>
+                  <select
+                    value={newProductForm.targetVenue}
+                    onChange={(e) => setNewProductForm({ ...newProductForm, targetVenue: e.target.value })}
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white"
+                  >
+                    <option value="venue-san-mateo">Sede Central Narón</option>
+                    <option value="venue-coruna">Sede A Coruña</option>
+                    <option value="venue-santiago">Sede Santiago</option>
+                  </select>
+                </div>
+              )}
+
               <div>
                 <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
                   URL de Imagen Oficial
@@ -1435,13 +2208,13 @@ export const AdminShopOrders: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setIsNewProductModalOpen(false)}
-                  className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold transition"
+                  className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold transition cursor-pointer"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold transition shadow-xs"
+                  className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold transition shadow-xs cursor-pointer"
                 >
                   Guardar en Catálogo
                 </button>
@@ -1452,7 +2225,7 @@ export const AdminShopOrders: React.FC = () => {
       )}
 
       {/* =====================================================================
-          MODAL: GESTIÓN DE STOCK & ENTRADA DE MERCANCÍA
+          MODAL: GESTIÓN DE STOCK & ENTRADA MULTI-SEDE DE MERCANCÍA
           ===================================================================== */}
       {stockModalProduct && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-sm animate-in fade-in duration-150">
@@ -1467,7 +2240,7 @@ export const AdminShopOrders: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setStockModalProduct(null)}
-                className="p-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white"
+                className="p-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -1475,11 +2248,28 @@ export const AdminShopOrders: React.FC = () => {
 
             <div className="space-y-3 text-xs">
               <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 flex items-center justify-between">
-                <span className="text-slate-500 dark:text-slate-400">Stock Actual en Tienda:</span>
+                <span className="text-slate-500 dark:text-slate-400">Stock Total en Club:</span>
                 <span className="font-mono font-black text-base text-slate-900 dark:text-white">
                   {stockModalProduct.stock} unidades
                 </span>
               </div>
+
+              {isMultiVenue && (
+                <div>
+                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                    Sede a la que Asignar / Sumar Mercancía
+                  </label>
+                  <select
+                    value={stockAdjustmentVenue}
+                    onChange={(e) => setStockAdjustmentVenue(e.target.value)}
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white"
+                  >
+                    <option value="venue-san-mateo">Sede Central Narón</option>
+                    <option value="venue-coruna">Sede A Coruña</option>
+                    <option value="venue-santiago">Sede Santiago</option>
+                  </select>
+                </div>
+              )}
 
               <div>
                 <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
@@ -1506,22 +2296,18 @@ export const AdminShopOrders: React.FC = () => {
                 />
               </div>
 
-              <div className="p-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-500/20 text-[11px] text-emerald-700 dark:text-emerald-300 font-medium">
-                Stock resultante tras confirmar: <strong>{stockModalProduct.stock + stockAdjustment}</strong> unidades.
-              </div>
-
               <div className="pt-2 flex justify-end gap-2">
                 <button
                   type="button"
                   onClick={() => setStockModalProduct(null)}
-                  className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold transition"
+                  className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold transition cursor-pointer"
                 >
                   Cancelar
                 </button>
                 <button
                   type="button"
                   onClick={handleSaveStock}
-                  className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold transition shadow-xs"
+                  className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold transition shadow-xs cursor-pointer"
                 >
                   Confirmar Entrada
                 </button>

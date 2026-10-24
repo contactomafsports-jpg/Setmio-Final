@@ -583,7 +583,7 @@ export const AdminCustomers: React.FC = () => {
             isMember: editCustomerForm.isMember,
             position: editCustomerForm.position,
             hand: editCustomerForm.hand,
-            status: editCustomerForm.isMember ? (c.status.includes('Activo') ? c.status : 'Activo (Socio)') : 'No socio',
+            status: editCustomerForm.isMember ? (c.status?.includes('Activo') ? c.status : 'Activo (Socio)') : 'No socio',
           }
         : c
     );
