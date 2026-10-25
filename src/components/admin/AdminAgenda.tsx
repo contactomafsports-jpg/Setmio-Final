@@ -356,10 +356,9 @@ export const AdminAgenda: React.FC = () => {
 
   const handleCreateSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const court = courts.find((c) => c.id === newCourtId) || courts[0];
-    const targetVenue = isMultiVenue
-      ? (venues.find((v) => v.id === formVenueId) || venues[1] || venues[0])
-      : (court.venueId ? venues.find((v) => v.id === court.venueId) : venues[1] || venues[0]);
+    const court = courts.find((c) => c.id === newCourtId) || displayedCourts[0] || courts[0];
+    const resolvedCourtVenueId = court.venueId || (selectedVenueId !== 'all' ? selectedVenueId : 'venue-san-mateo');
+    const targetVenue = venues.find((v) => v.id === resolvedCourtVenueId) || venues[1] || venues[0];
     const startISO = `${currentDate}T${newTime}:00`;
     const hours = durationMinutes / 60;
     const finalPrice = clientType === 'block' ? 0 : court.hourlyRate * hours;
@@ -1124,7 +1123,7 @@ export const AdminAgenda: React.FC = () => {
                     onChange={(e) => setNewCourtId(e.target.value)}
                     className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-2.5 py-2 text-xs font-semibold text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
                   >
-                    {courts.map((court) => (
+                    {displayedCourts.map((court) => (
                       <option key={court.id} value={court.id}>
                         {court.name.split('—')[0]} ({court.hourlyRate}€/h)
                       </option>

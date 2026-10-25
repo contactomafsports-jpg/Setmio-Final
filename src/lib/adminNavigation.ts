@@ -13,6 +13,7 @@ import {
   Settings,
   LayoutDashboard,
   Building2,
+  UserCheck,
   LucideIcon,
 } from 'lucide-react';
 import { AdminTab, ClubVenue, UserSession } from '../context/AppContext';
@@ -599,10 +600,10 @@ export function getAdminNavConfig(
         isPrimary: false,
       },
       {
-        id: 'dashboard',
-        label: 'Cuadro de Mando',
-        icon: LayoutDashboard,
-        desc: 'Métricas clave de facturación y ocupación',
+        id: 'staff',
+        label: 'Personal & Profesores',
+        icon: UserCheck,
+        desc: 'Gestión de empleados, turnos laborales y registro de acciones',
         isPrimary: false,
       },
     ];

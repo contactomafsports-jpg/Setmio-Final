@@ -36,6 +36,7 @@ export const AllBookingsPage: React.FC<AllBookingsPageProps> = ({
     courts,
     venues,
     selectedVenueId,
+    setSelectedVenueId,
     isMultiVenue,
     createBooking,
     setAdminTab,
@@ -54,12 +55,24 @@ export const AllBookingsPage: React.FC<AllBookingsPageProps> = ({
   }, []);
 
   const [searchTerm, setSearchTerm] = useState('');
-  const [timeFilter, setTimeFilter] = useState<'upcoming' | 'past'>('upcoming');
+  const [timeFilter, setTimeFilter] = useState<'all' | 'upcoming' | 'past'>('all');
   const [statusFilter, setStatusFilter] = useState<'all' | 'confirmed' | 'pending' | 'canceled'>('all');
   const [courtFilter, setCourtFilter] = useState<string>('all');
-  const [venueFilter, setVenueFilter] = useState<string>('all');
+  const [venueFilter, setVenueFilter] = useState<string>(selectedVenueId || 'all');
   const [dateFilter, setDateFilter] = useState<string>('');
   const [selectedDrawerBooking, setSelectedDrawerBooking] = useState<ReservationDrawerData | null>(null);
+
+  // Sincronizar bidireccionalmente con selectedVenueId de AppContext
+  useEffect(() => {
+    if (selectedVenueId) {
+      setVenueFilter(selectedVenueId);
+    }
+  }, [selectedVenueId]);
+
+  const handleVenueFilterChange = (vId: string) => {
+    setVenueFilter(vId);
+    setSelectedVenueId(vId);
+  };
 
   // Modal Nueva Reserva Integrado (Soluciona Tarea 2)
   const [isNewBookingModalOpen, setIsNewBookingModalOpen] = useState(false);
@@ -332,7 +345,7 @@ export const AllBookingsPage: React.FC<AllBookingsPageProps> = ({
           <div className="flex flex-wrap items-center gap-1.5">
             <button
               type="button"
-              onClick={() => setVenueFilter('all')}
+              onClick={() => handleVenueFilterChange('all')}
               className={`px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer border ${
                 venueFilter === 'all'
                   ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs'
@@ -349,7 +362,7 @@ export const AllBookingsPage: React.FC<AllBookingsPageProps> = ({
                   <button
                     key={v.id}
                     type="button"
-                    onClick={() => setVenueFilter(v.id)}
+                    onClick={() => handleVenueFilterChange(v.id)}
                     className={`px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer border ${
                       isSelected
                         ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs'
@@ -471,8 +484,21 @@ export const AllBookingsPage: React.FC<AllBookingsPageProps> = ({
 
         {/* Fila 2: Segmented Controls Minimalistas Ultra-Compactos (Temporal + Pago) */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-          {/* 1. Filtro Temporal: Pasadas vs Futuras */}
+          {/* 1. Filtro Temporal: Todas vs Futuras vs Pasadas */}
           <div className="inline-flex w-full p-1 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 text-xs gap-1 shadow-2xs">
+            <button
+              type="button"
+              onClick={() => setTimeFilter('all')}
+              className={`flex-1 py-1 px-2 rounded-lg font-bold text-[11px] transition text-center cursor-pointer flex items-center justify-center gap-1 ${
+                timeFilter === 'all'
+                  ? 'bg-emerald-600 text-white shadow-xs'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400'
+              }`}
+            >
+              <Calendar className="w-3 h-3" />
+              <span>Todas</span>
+            </button>
+
             <button
               type="button"
               onClick={() => setTimeFilter('upcoming')}
@@ -483,7 +509,7 @@ export const AllBookingsPage: React.FC<AllBookingsPageProps> = ({
               }`}
             >
               <Clock className="w-3 h-3" />
-              <span>Futuras / Pendientes</span>
+              <span>Futuras</span>
             </button>
 
             <button
@@ -496,7 +522,7 @@ export const AllBookingsPage: React.FC<AllBookingsPageProps> = ({
               }`}
             >
               <CheckCircle2 className="w-3 h-3" />
-              <span>Pasadas / Efectuadas</span>
+              <span>Pasadas</span>
             </button>
           </div>
 

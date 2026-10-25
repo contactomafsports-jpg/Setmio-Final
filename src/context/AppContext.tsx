@@ -242,6 +242,7 @@ const routeForAdminTab: Record<AdminTab, string> = {
   customers: '/gestion/clientes',
   teams: '/gestion/equipos',
   academy: '/gestion/escuela',
+  staff: '/gestion/personal',
   tournaments: '/gestion/torneos',
   shop: '/gestion/tienda',
   smart_courts: '/gestion/pistas-inteligentes',
@@ -373,6 +374,8 @@ const readRoute = () => {
       admin = 'invoicing';
     } else if (remainingPath === '/admin/escuela' || remainingPath.startsWith('/admin/escuela/') || remainingPath === '/admin/academia') {
       admin = 'academy';
+    } else if (remainingPath === '/admin/personal' || remainingPath.startsWith('/admin/personal/') || remainingPath === '/admin/profesores' || remainingPath.startsWith('/admin/profesores/') || remainingPath === '/gestion/personal') {
+      admin = 'staff';
     } else if (remainingPath === '/admin/equipos' || remainingPath.startsWith('/admin/equipos/')) {
       admin = 'teams';
     } else if (remainingPath === '/admin/torneos' || remainingPath.startsWith('/admin/torneos/')) {
@@ -412,6 +415,24 @@ const readRoute = () => {
       view: 'admin' as MainView,
       page: 'home' as PublicPage,
       admin: 'customers' as AdminTab,
+      player: 'dashboard' as PlayerTab,
+      clubSlug: activeClubSlug,
+      isCorporate: false,
+    };
+  }
+  if (
+    remainingPath === '/personal' ||
+    remainingPath.startsWith('/personal/') ||
+    remainingPath === '/gestion/personal' ||
+    remainingPath.startsWith('/gestion/personal/') ||
+    remainingPath === '/profesores' ||
+    remainingPath.startsWith('/profesores/') ||
+    remainingPath === '/gestion/profesores'
+  ) {
+    return {
+      view: 'admin' as MainView,
+      page: 'home' as PublicPage,
+      admin: 'staff' as AdminTab,
       player: 'dashboard' as PlayerTab,
       clubSlug: activeClubSlug,
       isCorporate: false,
@@ -465,6 +486,7 @@ export type AdminTab =
   | 'customers'
   | 'teams'
   | 'academy'
+  | 'staff'
   | 'tournaments'
   | 'shop'
   | 'smart_courts'
@@ -684,6 +706,7 @@ interface AppContextType {
   recordCafeSale: (product: CafeProduct, qty: number) => void;
 
   auditLogs: AuditLogItem[];
+  addAuditLog: (entry: { actor?: string; role?: string; action: string; target: string; details: string; timestamp?: string }) => void;
   notifications: NotificationItem[];
   unreadNotificationsCount: number;
   markNotificationsAsRead: () => void;
@@ -2737,6 +2760,22 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     );
   }, [triggerDemoToast]);
 
+  const addAuditLog = useCallback(
+    (entry: { actor?: string; role?: string; action: string; target: string; details: string; timestamp?: string }) => {
+      const newLog: AuditLogItem = {
+        id: generateUniqueId('log'),
+        timestamp: entry.timestamp || 'Ahora mismo',
+        actor: entry.actor || currentUser.email,
+        role: entry.role || currentUser.role,
+        action: entry.action,
+        target: entry.target,
+        details: entry.details,
+      };
+      setAuditLogs((prev) => [newLog, ...prev]);
+    },
+    [currentUser]
+  );
+
   return (
     <AppContext.Provider
       value={{
@@ -2893,6 +2932,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         recordCafeSale,
 
         auditLogs,
+        addAuditLog,
         notifications,
         unreadNotificationsCount,
         markNotificationsAsRead,

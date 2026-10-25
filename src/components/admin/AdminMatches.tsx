@@ -220,6 +220,9 @@ export const AdminMatches: React.FC = () => {
   const [selectedCreatorCustomerId, setSelectedCreatorCustomerId] = useState<string>('c-1');
   const [creatorSearchQuery, setCreatorSearchQuery] = useState('');
   const [isCreatorDropdownOpen, setIsCreatorDropdownOpen] = useState(false);
+  const [modalVenueId, setModalVenueId] = useState<string>(
+    venues.find((v) => v.id !== 'all')?.id || 'venue-san-mateo'
+  );
   const [selectedCourtId, setSelectedCourtId] = useState(courts[0]?.id || 'court-1');
   const [matchDate, setMatchDate] = useState('2026-10-10');
   const [matchTime, setMatchTime] = useState('19:30');
@@ -233,6 +236,48 @@ export const AdminMatches: React.FC = () => {
   const [gender, setGender] = useState<'male' | 'female' | 'mixed'>('male');
   const [paymentMode, setPaymentMode] = useState<'split' | 'single'>('split');
   const [paymentPolicy, setPaymentPolicy] = useState<'online_only' | 'counter_only' | 'both'>('both');
+
+  // Helper minimalista para formateo de hora y duración: "10:00 - 11:30 (1h 30m)"
+  const formatMatchTimeWithDuration = (startTimeStr: string, durationMinutes: number = 90) => {
+    let timePart = '19:30';
+    if (startTimeStr.includes('T')) {
+      timePart = startTimeStr.replace('Z', '').split('T')[1]?.slice(0, 5) || '19:30';
+    } else if (startTimeStr.includes(':')) {
+      timePart = startTimeStr.slice(0, 5);
+    }
+
+    const [hStr, mStr] = timePart.split(':');
+    const startH = parseInt(hStr || '19', 10);
+    const startM = parseInt(mStr || '30', 10);
+    const totalStartMinutes = startH * 60 + startM;
+    const totalEndMinutes = totalStartMinutes + durationMinutes;
+
+    const endH = Math.floor(totalEndMinutes / 60) % 24;
+    const endM = totalEndMinutes % 60;
+    const endTimePart = `${String(endH).padStart(2, '0')}:${String(endM).padStart(2, '0')}`;
+
+    const durH = Math.floor(durationMinutes / 60);
+    const durM = durationMinutes % 60;
+    const durationLabel =
+      durM > 0
+        ? durH > 0
+          ? `${durH}h ${durM}m`
+          : `${durM}m`
+        : `${durH}h`;
+
+    return `${timePart} - ${endTimePart} (${durationLabel})`;
+  };
+
+  // Pistas filtradas por la sede seleccionada en el formulario de creación
+  const availableModalCourts = useMemo(() => {
+    if (isMultiVenue && isClubCreator && modalVenueId) {
+      const filtered = courts.filter(
+        (c) => c.venueId === modalVenueId || (!c.venueId && modalVenueId === 'venue-san-mateo')
+      );
+      return filtered.length > 0 ? filtered : courts;
+    }
+    return courts;
+  }, [courts, isMultiVenue, isClubCreator, modalVenueId]);
 
   // Initial slot assignments during match creation
   const [slot2PlayerId, setSlot2PlayerId] = useState<string>('none');
@@ -395,9 +440,16 @@ export const AdminMatches: React.FC = () => {
       }
     });
 
+    const chosenVenue = isMultiVenue && isClubCreator
+      ? (venues.find((v) => v.id === modalVenueId) || venues[1] || venues[0])
+      : (court.venueId ? venues.find((v) => v.id === court.venueId) : venues[1] || venues[0]);
+
     createOpenMatch({
       courtId: court.id,
       courtName: court.name,
+      venueId: isMultiVenue ? chosenVenue?.id : court.venueId,
+      venueName: isMultiVenue ? chosenVenue?.name : court.venueName,
+      venueShortName: isMultiVenue ? chosenVenue?.shortName : undefined,
       creatorName: finalCreatorName,
       creatorLevel: Number(creatorLevel) || 4.0,
       startTime: startISO,
@@ -1354,7 +1406,7 @@ export const AdminMatches: React.FC = () => {
                     <div className="min-w-0">
                       <div className="flex items-center gap-1.5 text-xs font-mono font-bold text-slate-800 dark:text-slate-200">
                         <Clock className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-                        <span>{startDateFormatted} · {startTimeFormatted}</span>
+                        <span>{startDateFormatted} · {formatMatchTimeWithDuration(m.startTime, m.durationMinutes)}</span>
                       </div>
                       <div className="text-sm font-black text-slate-900 dark:text-white mt-0.5 truncate group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition">
                         {m.courtName}
@@ -1660,12 +1712,12 @@ export const AdminMatches: React.FC = () => {
                 <h3 className="text-lg font-black text-slate-900 dark:text-white mt-1">
                   {selectedMatchForDetail.courtName} · Partida Play!
                 </h3>
-                <p className="text-xs text-slate-500 dark:text-slate-400">
-                  {selectedMatchForDetail.startTime.split('T')[0]} a las{' '}
-                  {selectedMatchForDetail.startTime.includes('T')
-                    ? selectedMatchForDetail.startTime.split('T')[1].slice(0, 5)
-                    : '19:30'}{' '}
-                  · {selectedMatchForDetail.durationMinutes} min
+                <p className="text-xs text-slate-500 dark:text-slate-400 font-mono font-medium flex items-center gap-1.5 mt-0.5">
+                  <Clock className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                  <span>
+                    {selectedMatchForDetail.startTime.split('T')[0]} ·{' '}
+                    {formatMatchTimeWithDuration(selectedMatchForDetail.startTime, selectedMatchForDetail.durationMinutes)}
+                  </span>
                 </p>
               </div>
 
@@ -1717,10 +1769,30 @@ export const AdminMatches: React.FC = () => {
                 </span>
               </div>
               <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800">
-                <span className="text-[10px] uppercase font-bold text-slate-400 block">Modalidad Cobro</span>
-                <span className="text-sm font-mono font-black text-slate-900 dark:text-white">
-                  {selectedMatchForDetail.pricePerPlayer.toFixed(2)} € <span className="text-[10px] font-normal text-slate-500">/jug.</span>
+                <span className="text-[10px] uppercase font-bold text-slate-400 block">
+                  {selectedMatchForDetail.memberPricePerPlayer &&
+                  selectedMatchForDetail.memberPricePerPlayer > 0 &&
+                  selectedMatchForDetail.memberPricePerPlayer !== selectedMatchForDetail.pricePerPlayer
+                    ? 'Tarifas Socio / No Socio'
+                    : 'Tarifa por Plaza'}
                 </span>
+                {selectedMatchForDetail.memberPricePerPlayer &&
+                selectedMatchForDetail.memberPricePerPlayer > 0 &&
+                selectedMatchForDetail.memberPricePerPlayer !== selectedMatchForDetail.pricePerPlayer ? (
+                  <div className="text-[11px] font-mono font-black mt-0.5 leading-tight">
+                    <span className="text-emerald-600 dark:text-emerald-400 block">
+                      Socio: {selectedMatchForDetail.memberPricePerPlayer.toFixed(2)} €
+                    </span>
+                    <span className="text-slate-600 dark:text-slate-300 block">
+                      No socio: {selectedMatchForDetail.pricePerPlayer.toFixed(2)} €
+                    </span>
+                  </div>
+                ) : (
+                  <span className="text-sm font-mono font-black text-slate-900 dark:text-white">
+                    {selectedMatchForDetail.pricePerPlayer.toFixed(2)} €{' '}
+                    <span className="text-[10px] font-normal text-slate-500">/jug.</span>
+                  </span>
+                )}
               </div>
               <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800">
                 <span className="text-[10px] uppercase font-bold text-slate-400 block">Plazas Libres</span>
@@ -2370,6 +2442,46 @@ export const AdminMatches: React.FC = () => {
                 </div>
               </div>
 
+              {/* Selector de Sede (Obligatorio en entornos multi-sede si es creado por el club) */}
+              {Boolean(isMultiVenue) && (
+                <div>
+                  <label className="block font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1 text-[11px] flex items-center justify-between">
+                    <span className="flex items-center gap-1.5">
+                      <Building2 className="w-3.5 h-3.5 text-emerald-500" />
+                      <span>Sede del Club {isClubCreator && <strong className="text-rose-500">*</strong>}</span>
+                    </span>
+                    {isClubCreator && (
+                      <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold bg-emerald-50 dark:bg-emerald-950 px-2 py-0.5 rounded">
+                        Obligatorio
+                      </span>
+                    )}
+                  </label>
+                  <select
+                    required={isClubCreator}
+                    value={modalVenueId}
+                    onChange={(e) => {
+                      const vId = e.target.value;
+                      setModalVenueId(vId);
+                      const venueCourts = courts.filter(
+                        (c) => c.venueId === vId || (!c.venueId && vId === 'venue-san-mateo')
+                      );
+                      if (venueCourts.length > 0) {
+                        setSelectedCourtId(venueCourts[0].id);
+                      }
+                    }}
+                    className="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-bold text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                  >
+                    {venues
+                      .filter((v) => v.id !== 'all')
+                      .map((v) => (
+                        <option key={v.id} value={v.id}>
+                          {v.name} ({v.shortName})
+                        </option>
+                      ))}
+                  </select>
+                </div>
+              )}
+
               {/* Pista asignada */}
               <div>
                 <label className="block font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1 text-[11px]">
@@ -2380,7 +2492,7 @@ export const AdminMatches: React.FC = () => {
                   onChange={(e) => setSelectedCourtId(e.target.value)}
                   className="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-bold text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
                 >
-                  {courts.map((c) => (
+                  {availableModalCourts.map((c) => (
                     <option key={c.id} value={c.id}>
                       {c.name} ({c.surface})
                     </option>

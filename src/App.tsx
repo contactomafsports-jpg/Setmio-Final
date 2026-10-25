@@ -53,6 +53,7 @@ import { AdminDomains } from './components/admin/AdminDomains';
 import { AdminSubscription } from './components/admin/AdminSubscription';
 import { AdminSettings } from './components/admin/AdminSettings';
 import { AdminInvoices } from './components/admin/AdminInvoices';
+import { AdminStaff } from './components/admin/AdminStaff';
 
 // Player & HQ views
 import { PlayerPortal } from './components/player/PlayerPortal';
@@ -177,6 +178,18 @@ export function App() {
       ) {
         setCurrentView('admin');
         setAdminTab('agenda');
+        return;
+      }
+      if (
+        pathname === '/admin/personal' ||
+        pathname === '/gestion/personal' ||
+        pathname === '/admin/profesores' ||
+        pathname === '/gestion/profesores' ||
+        pathname.startsWith('/admin/personal/') ||
+        pathname.startsWith('/gestion/personal/')
+      ) {
+        setCurrentView('admin');
+        setAdminTab('staff');
         return;
       }
       if (pathname === '/admin/pistas' || pathname === '/gestion/pistas') {
@@ -401,6 +414,8 @@ export function App() {
         return <AdminTeams />;
       case 'academy':
         return <AdminSchool />;
+      case 'staff':
+        return <AdminStaff />;
       case 'tournaments':
         return <AdminTournaments />;
       case 'shop':
