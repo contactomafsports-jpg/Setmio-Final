@@ -1043,10 +1043,10 @@ export const AdminMatches: React.FC = () => {
           <button
             type="button"
             onClick={() => setShowCreateModal(true)}
-            className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md flex items-center gap-1.5 transition active:scale-95 cursor-pointer"
+            className="px-4 py-2 rounded-xl bg-[#87F229] hover:bg-[#97f842] text-[#0B1A2D] font-black text-xs shadow-md shadow-[#87F229]/25 flex items-center gap-1.5 transition active:scale-95 cursor-pointer"
           >
-            <Plus className="w-4 h-4" />
-            <span>{t('matches.btnNew', 'Nueva partida')}</span>
+            <Plus className="w-4 h-4 stroke-[3]" />
+            <span>{t('matches.btnNew', 'Crear Partida')}</span>
           </button>
         </div>
       </div>

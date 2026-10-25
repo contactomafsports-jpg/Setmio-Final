@@ -1,41 +1,30 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
   <defs>
-    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#020617"/>
-      <stop offset="50%" stop-color="#0f172a"/>
-      <stop offset="100%" stop-color="#042f2e"/>
-    </linearGradient>
-    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#10b981"/>
-      <stop offset="50%" stop-color="#06b6d4"/>
-      <stop offset="100%" stop-color="#3b82f6"/>
-    </linearGradient>
-    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
-      <feGaussianBlur stdDeviation="12" result="blur" />
-      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    <!-- Fondo Azul Profundo Setmio (#0B1A2D) -->
+    <rect id="appIconBase" width="512" height="512" rx="128" fill="#0B1A2D" />
+    <filter id="ballGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="0" stdDeviation="8" floodColor="#87F229" floodOpacity="0.75" />
     </filter>
   </defs>
-  <rect width="512" height="512" rx="120" fill="url(#bg)"/>
-  <!-- Padel Racket Head -->
-  <path d="M 256,90 C 170,90 120,150 120,240 C 120,310 170,355 220,375 L 220,440 C 220,448 226,455 234,455 L 278,455 C 286,455 292,448 292,440 L 292,375 C 342,355 392,310 392,240 C 392,150 342,90 256,90 Z" fill="none" stroke="url(#accent)" stroke-width="18" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)" />
-  <!-- Racket Sweet Spot Inner Rim -->
-  <ellipse cx="256" cy="235" rx="85" ry="95" fill="#0f172a" stroke="#10b981" stroke-width="4" opacity="0.6"/>
-  <!-- Padel Hole Perforations Grid -->
-  <circle cx="256" cy="180" r="7" fill="#10b981" />
-  <circle cx="230" cy="195" r="7" fill="#06b6d4" />
-  <circle cx="282" cy="195" r="7" fill="#06b6d4" />
-  <circle cx="210" cy="225" r="7" fill="#10b981" />
-  <circle cx="256" cy="225" r="8" fill="#ffffff" />
-  <circle cx="302" cy="225" r="7" fill="#10b981" />
-  <circle cx="225" cy="255" r="7" fill="#06b6d4" />
-  <circle cx="256" cy="255" r="7" fill="#10b981" />
-  <circle cx="287" cy="255" r="7" fill="#06b6d4" />
-  <circle cx="240" cy="285" r="7" fill="#10b981" />
-  <circle cx="272" cy="285" r="7" fill="#10b981" />
-  <circle cx="256" cy="315" r="7" fill="#06b6d4" />
-  <!-- Racket Grip details -->
-  <line x1="228" y1="395" x2="284" y2="405" stroke="#334155" stroke-width="4"/>
-  <line x1="228" y1="415" x2="284" y2="425" stroke="#334155" stroke-width="4"/>
-  <!-- Wrist cord -->
-  <path d="M 256,455 C 256,480 270,490 280,480 C 290,470 280,455 265,455" fill="none" stroke="#10b981" stroke-width="4" stroke-linecap="round"/>
+
+  <!-- Base redondeada del icono -->
+  <rect width="512" height="512" rx="128" fill="#0B1A2D" />
+
+  <!-- Símbolo Isotipo Oficial SETMIO PÁDEL -->
+  <g transform="translate(36, 36) scale(4.4)">
+    <!-- Pelota de pádel Verde Lima (#87F229) -->
+    <circle cx="76" cy="17" r="7.5" fill="#87F229" filter="url(#ballGlow)" />
+
+    <!-- Franja Superior Dinámica -->
+    <path
+      d="M 62 25 C 66.5 25 68 29.5 64.5 34 L 43.5 64.5 C 41 68 36.5 69 32.5 66.5 L 26.5 62 C 22.5 59.5 22 55 24.5 51.5 L 45.5 21 C 48.5 17 55 16.5 60 21 L 62 25 Z"
+      fill="#FFFFFF"
+    />
+
+    <!-- Franja Inferior Dinámica -->
+    <path
+      d="M 76 37.5 C 80 41 79.5 45.5 77 49 L 56 79.5 C 53 84 46.5 84.5 41.5 81 L 39.5 79.5 C 35.5 76.5 35 72 37.5 68.5 L 58.5 38 C 61 34.5 65.5 33.5 69.5 36 L 76 37.5 Z"
+      fill="#FFFFFF"
+    />
+  </g>
 </svg>

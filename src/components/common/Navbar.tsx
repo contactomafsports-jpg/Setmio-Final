@@ -27,6 +27,7 @@ import {
   Briefcase,
   LogOut,
 } from 'lucide-react';
+import { SetmioLogo } from './SetmioLogo';
 
 interface NavbarProps {
   onOpenCart: () => void;
@@ -127,28 +128,22 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCart, onOpenAuth, onOpenDe
       <header className="sticky top-0 z-50 w-full max-w-full overflow-x-hidden bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 transition-colors duration-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-14 sm:h-16">
-            {/* Brand Logo & Name */}
+            {/* Brand Logo & Name con Marca Blanca del Club */}
             <button
               onClick={() => handleNavClick('home')}
-              className="min-w-0 flex items-center gap-2 text-left focus:outline-none group"
+              className="min-w-0 flex items-center gap-2 text-left focus:outline-none group cursor-pointer"
             >
-              {currentTenant.branding.logoUrl ? (
-                <img src={currentTenant.branding.logoUrl} alt="" className="h-8 w-8 shrink-0 rounded-lg object-contain bg-white border border-slate-200 p-1 group-hover:scale-105 transition-transform" />
-              ) : (
-                <div className="h-8 w-8 shrink-0 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-700 flex items-center justify-center font-black text-white text-sm shadow-md shadow-emerald-500/20 group-hover:scale-105 transition-transform">
-                  {currentTenant.shortName.split(/\s+/).map((part) => part[0]).join('').slice(0, 2).toUpperCase()}
-                </div>
-              )}
-              <div>
-                <div className="max-w-[160px] truncate text-sm font-semibold tracking-tight text-slate-900 dark:text-white sm:max-w-none sm:text-lg group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
-                  {currentTenant.name}
-                </div>
-              </div>
+              <SetmioLogo
+                variant="horizontal"
+                size="sm"
+                showSubtitle={false}
+                whiteLabelTenant={currentTenant}
+              />
             </button>
 
             <button
               onClick={navigateToCorporate}
-              className="hidden xl:inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 text-[11px] font-bold text-slate-700 dark:text-slate-300 hover:text-emerald-700 dark:hover:text-emerald-400 transition border border-slate-200 dark:border-slate-700"
+              className="hidden xl:inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-[#8B5CF6]/15 text-[11px] font-bold text-slate-700 dark:text-slate-300 hover:text-[#8B5CF6] transition border border-slate-200 dark:border-slate-700 cursor-pointer"
               title="Volver a la plataforma corporativa de Setmio SaaS"
             >
               <span>← Setmio SaaS</span>

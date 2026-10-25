@@ -1,25 +1,36 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap');
 @import "tailwindcss";
 
 @variant dark (&:where(.dark, .dark *));
 
 @theme {
-  --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
-  --color-brand-ink: #10221d;
-  --color-brand-moss: #185c43;
-  --color-brand-lime: #c7f36b;
-  --color-brand-paper: #f5f6f1;
+  --font-sans: "Inter", "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Inter", "Manrope", sans-serif;
+
+  /* PALETA OFICIAL SETMIO PÁDEL (image_16.png) */
+  --color-setmio-dark: #0B1A2D;       /* Azul profundo: Fondo principal, base corporativa, modo oscuro */
+  --color-setmio-violet: #8B5CF6;     /* Violeta: Acento corporativo, SaaS, elementos activos, tecnología */
+  --color-setmio-lime: #87F229;       /* Verde lima: Acento deportivo, energía, botones de acción principal/CTAs */
+  --color-setmio-white: #FFFFFF;      /* Blanco: Textos principales, fondos de tarjetas claras */
+  --color-setmio-gray-light: #E5E7EB; /* Gris claro: Superficies secundarias */
+  --color-setmio-gray-text: #64748B;  /* Gris azulado: Texto muted/secundario */
+
+  /* Aliases para compatibilidad con el ecosistema */
+  --color-brand-ink: #0B1A2D;
+  --color-brand-moss: #8B5CF6;
+  --color-brand-lime: #87F229;
+  --color-brand-paper: #FFFFFF;
 }
 
 :root {
-  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
-  color: #10221d;
-  background: #f5f6f1;
-  --color-primary: #185c43;
-  --color-secondary: #10221d;
-  --color-accent: #c7f36b;
-  --color-background: #f5f6f1;
-  --color-foreground: #10221d;
+  font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  color: #0B1A2D;
+  background: #FFFFFF;
+  --color-primary: #8B5CF6;
+  --color-secondary: #0B1A2D;
+  --color-accent: #87F229;
+  --color-background: #FFFFFF;
+  --color-foreground: #0B1A2D;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
 }
@@ -34,9 +45,10 @@ button, [role="button"], a { transition-property: transform, color, background-c
 button:active, [role="button"]:active, a:active { transform: scale(.98); }
 button:not(:disabled), [role="button"], a { cursor: pointer; }
 button:disabled { cursor: not-allowed; }
-::selection { background: #c7f36b; color: #10221d; }
+::selection { background: #87F229; color: #0B1A2D; }
 
-.dark body, body.dark { background: #0b1512; color: #f5f6f1; }
+/* MODO OSCURO CORPORATIVO SETMIO PÁDEL (#0B1A2D - Azul Profundo) */
+.dark body, body.dark { background: #0B1A2D; color: #FFFFFF; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: .01ms !important; }
@@ -45,15 +57,45 @@ button:disabled { cursor: not-allowed; }
 @keyframes float-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 .animate-float-in { animation: float-in .45s ease-out both; }
 
-[data-admin-shell] { background: #eef1ec; }
-.dark [data-admin-shell] { background: #0b1512; }
+/* Contenedores de Administración en Azul Profundo (#0B1A2D) */
+[data-admin-shell] { background: #F8FAFC; }
+.dark [data-admin-shell] { background: #0B1A2D; }
 
-.hero-glow { background: radial-gradient(circle at 75% 10%, rgba(199,243,107,.23), transparent 32%), linear-gradient(120deg, #10221d 0%, #163a2d 55%, #10221d 100%); }
+/* Destellos de Luz Geométricos en Violeta (#8B5CF6) y Verde Lima (#87F229) de image_16.png */
+.geometric-flare-violet {
+  background: radial-gradient(circle at 10% 20%, rgba(139, 92, 246, 0.28) 0%, transparent 45%),
+              linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, transparent 60%);
+}
+.geometric-flare-lime {
+  background: radial-gradient(circle at 90% 80%, rgba(135, 242, 41, 0.22) 0%, transparent 45%),
+              linear-gradient(315deg, rgba(135, 242, 41, 0.12) 0%, transparent 60%);
+}
+.setmio-hero-glow {
+  background: radial-gradient(circle at 15% 15%, rgba(139, 92, 246, 0.32) 0%, transparent 40%),
+              radial-gradient(circle at 85% 75%, rgba(135, 242, 41, 0.25) 0%, transparent 42%),
+              linear-gradient(145deg, #071220 0%, #0B1A2D 50%, #0F233B 100%);
+}
+.setmio-diagonal-beam {
+  position: relative;
+  overflow: hidden;
+}
+.setmio-diagonal-beam::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -20%;
+  width: 140%;
+  height: 200%;
+  background: linear-gradient(125deg, transparent 40%, rgba(139, 92, 246, 0.18) 48%, rgba(135, 242, 41, 0.15) 52%, transparent 60%);
+  pointer-events: none;
+  transform: rotate(-12deg);
+}
+
 .card-lift { transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease; }
 .scroll-reveal { opacity: 0; transform: translateY(22px); transition: opacity .7s ease, transform .7s cubic-bezier(.22,1,.36,1); }
 .scroll-reveal.is-visible { opacity: 1; transform: translateY(0); }
 @media (prefers-reduced-motion: reduce) { .scroll-reveal { opacity: 1; transform: none; transition: none; } }
-.card-lift:hover { transform: translateY(-3px); box-shadow: 0 18px 45px rgba(16,34,29,.11); }
+.card-lift:hover { transform: translateY(-3px); box-shadow: 0 18px 45px rgba(11,26,45,.14); }
 @media (prefers-reduced-motion: reduce) { .card-lift:hover { transform: none; } }
 
 @media (max-width: 767px) {
@@ -62,18 +104,23 @@ button:disabled { cursor: not-allowed; }
 }
 
 @media (min-width: 768px) {
-  [data-admin-shell] main { background: linear-gradient(135deg, #eef1ec 0%, #f6f7f3 55%, #edf2ed 100%); }
-  .dark [data-admin-shell] main { background: #0b1512; }
+  [data-admin-shell] main { background: linear-gradient(135deg, #F8FAFC 0%, #FFFFFF 55%, #F1F5F9 100%); }
+  .dark [data-admin-shell] main { background: #0B1A2D; }
 }
 
-.dark .bg-slate-900 { background-color: #10221d; }
-.dark .bg-slate-950 { background-color: #0b1512; }
-.dark .border-slate-800 { border-color: #233c33; }
-.dark .text-slate-100 { color: #f5f6f1; }
-.dark .text-slate-400 { color: #9eb0a7; }
-.dark .text-slate-500 { color: #81958b; }
+/* Modos oscuros adaptados a la base #0B1A2D (Azul Profundo) */
+.dark .bg-slate-900 { background-color: #0E2239; }
+.dark .bg-slate-950 { background-color: #071220; }
+.dark .border-slate-800 { border-color: #1A314D; }
+.dark .border-slate-700 { border-color: #244163; }
+.dark .text-slate-100 { color: #FFFFFF; }
+.dark .text-slate-400 { color: #94A3B8; }
+.dark .text-slate-500 { color: #64748B; }
 
-input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-visible { outline: 3px solid rgba(199,243,107,.75); outline-offset: 2px; }
+input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-visible {
+  outline: 3px solid rgba(135, 242, 41, 0.75);
+  outline-offset: 2px;
+}
 
 @media print {
   nav, aside, header, button, .no-print { display: none !important; }
@@ -93,29 +140,30 @@ input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-
   }
 }
 
-:root { font-family: 'DM Sans', Inter, sans-serif; }
-h1, h2, h3, h4 { font-family: 'Manrope', 'DM Sans', sans-serif; letter-spacing: -.025em; }
-
-@tailwind utilities;
+:root { font-family: 'Inter', 'DM Sans', sans-serif; }
+h1, h2, h3, h4 { font-family: 'Inter', 'Manrope', sans-serif; letter-spacing: -.025em; }
 
 @layer utilities {
   .text-balance { text-wrap: balance; }
 }
 
-/* Setmio design system */
 @layer base {
   body { font-feature-settings: "cv11", "ss01"; }
 }
 
-/* Club theme tokens are injected by AppContext so the club's palette updates
-   across the public site and private shells without a page reload. */
-.bg-emerald-600 { background-color: var(--color-primary) !important; }
-.hover\:bg-emerald-500:hover { background-color: color-mix(in srgb, var(--color-primary) 86%, white) !important; }
-.text-emerald-600 { color: var(--color-primary) !important; }
-.border-emerald-500, .border-emerald-600 { border-color: var(--color-primary) !important; }
-.from-emerald-500 { --tw-gradient-from: var(--color-primary) var(--tw-gradient-from-position) !important; }
-.ring-emerald-500 { --tw-ring-color: var(--color-primary) !important; }
-.focus\:ring-emerald-500:focus { --tw-ring-color: var(--color-primary) !important; }
+/* SISTEMA DINÁMICO DE MARCA BLANCA POR CLUB:
+   Permite que cada club sobrescriba dinámicamente sus colores institucionales
+   mientras que la identidad Setmio Pádel es la base para la plataforma global y SaaS. */
+.bg-club-primary { background-color: var(--color-primary) !important; }
+.text-club-primary { color: var(--color-primary) !important; }
+.border-club-primary { border-color: var(--color-primary) !important; }
+
+/* Tokens de compatibilidad para vistas delegadas de club */
+[data-white-label="true"] .bg-emerald-600 { background-color: var(--color-primary) !important; }
+[data-white-label="true"] .hover\:bg-emerald-500:hover { background-color: color-mix(in srgb, var(--color-primary) 86%, white) !important; }
+[data-white-label="true"] .text-emerald-600 { color: var(--color-primary) !important; }
+[data-white-label="true"] .border-emerald-500, [data-white-label="true"] .border-emerald-600 { border-color: var(--color-primary) !important; }
+[data-white-label="true"] .from-emerald-500 { --tw-gradient-from: var(--color-primary) var(--tw-gradient-from-position) !important; }
 
 @supports (padding: env(safe-area-inset-bottom)) {
   .safe-area-bottom { padding-bottom: max(.5rem, env(safe-area-inset-bottom)); }

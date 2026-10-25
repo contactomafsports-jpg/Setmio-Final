@@ -20,6 +20,7 @@ import { OfficialFlag } from '../common/OfficialFlag';
 import { SUPPORTED_LANGUAGES } from '../../lib/i18n';
 import { i18n } from '../../i18n';
 import { getAdminNavConfig } from '../../lib/adminNavigation';
+import { SetmioLogo } from '../common/SetmioLogo';
 
 interface AdminHeaderProps {
   onOpenProfileModal?: () => void;
@@ -126,31 +127,27 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
               </div>
             </div>
           ) : (
-            /* Vista Admin Club / Escuela / Profesor / Atleta: Branding Oficial Setmio Pro */
+            /* Vista Admin Club / Escuela / Profesor / Atleta: Branding Oficial Setmio Pro con Isotipo Dual Stripe */
             <div className="flex items-center gap-2.5 shrink-0">
-              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-700 text-white font-black text-sm flex items-center justify-center shadow-xs shrink-0 select-none">
-                S
-              </div>
+              <SetmioLogo variant="horizontal" size="xs" showSubtitle={true} />
               <div className="flex items-center gap-2">
-                <span className="font-black text-sm sm:text-base tracking-tight text-slate-900 dark:text-white leading-none">
-                  Setmio Pro
-                </span>
                 {isProAthleteAdmin ? (
-                  <span className="hidden sm:inline-flex items-center gap-1 text-[10px] font-extrabold text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/70 border border-red-200 dark:border-red-900 px-2 py-0.5 rounded-md">
+                  <span className="hidden sm:inline-flex items-center gap-1 text-[10px] font-extrabold text-red-400 bg-red-950/70 border border-red-800 px-2 py-0.5 rounded-md">
                     <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
                     Atleta Pro · {currentTenant.shortName}
                   </span>
                 ) : currentTenant.type === 'ACADEMY' ? (
-                  <span className="hidden sm:inline-flex items-center gap-1 text-[10px] font-extrabold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/70 border border-indigo-200 dark:border-indigo-900 px-2 py-0.5 rounded-md">
+                  <span className="hidden sm:inline-flex items-center gap-1 text-[10px] font-extrabold text-[#c4b5fd] bg-[#8B5CF6]/15 border border-[#8B5CF6]/30 px-2 py-0.5 rounded-md">
                     Admin Escuela · {currentTenant.shortName}
                   </span>
                 ) : currentTenant.type === 'COACH' ? (
-                  <span className="hidden sm:inline-flex items-center gap-1 text-[10px] font-extrabold text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-950/70 border border-sky-200 dark:border-sky-900 px-2 py-0.5 rounded-md">
+                  <span className="hidden sm:inline-flex items-center gap-1 text-[10px] font-extrabold text-sky-400 bg-sky-950/70 border border-sky-800 px-2 py-0.5 rounded-md">
                     Admin Profesor · {currentTenant.shortName}
                   </span>
                 ) : (
-                  <span className="hidden sm:inline-flex items-center gap-1 text-[10px] font-extrabold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/70 border border-emerald-200 dark:border-emerald-900 px-2 py-0.5 rounded-md">
-                    Admin Club · {currentTenant.shortName}
+                  <span className="hidden sm:inline-flex items-center gap-1 text-[10px] font-extrabold text-[#c4b5fd] bg-[#8B5CF6]/15 border border-[#8B5CF6]/40 px-2 py-0.5 rounded-md">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#87F229] animate-pulse" />
+                    SaaS Pro · {currentTenant.shortName}
                   </span>
                 )}
               </div>

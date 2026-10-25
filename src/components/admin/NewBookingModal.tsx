@@ -851,7 +851,7 @@ export const NewBookingModal: React.FC<NewBookingModalProps> = ({
             </button>
             <button
               type="submit"
-              className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs shadow-md transition active:scale-95 cursor-pointer"
+              className="px-5 py-2.5 rounded-xl bg-[#87F229] hover:bg-[#97f842] text-[#0B1A2D] font-black text-xs shadow-md shadow-[#87F229]/25 transition active:scale-95 cursor-pointer"
             >
               {clientType === 'block' ? 'Confirmar Bloqueo' : 'Confirmar Reserva'}
             </button>

@@ -1,6 +1,7 @@
 import React from 'react';
 import { useApp } from '../../context/AppContext';
 import { Instagram, Facebook, Mail, Phone, Lock, ExternalLink } from 'lucide-react';
+import { SetmioLogo } from './SetmioLogo';
 
 interface CorporateFooterProps {
   minimized?: boolean;
@@ -42,15 +43,12 @@ export const CorporateFooter: React.FC<CorporateFooterProps> = ({ minimized = fa
   // Minimized Footer for Auth pages (/login & /registro) to prevent distractions
   if (minimized) {
     return (
-      <footer className="border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-500 dark:text-slate-400 py-6 text-xs transition-colors">
+      <footer className="border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0B1A2D] text-slate-500 dark:text-slate-400 py-6 text-xs transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
           <div className="flex items-center gap-2">
-            <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-gradient-to-br from-emerald-500 to-teal-700 text-white font-black text-xs">
-              S
-            </span>
-            <span className="font-black text-slate-900 dark:text-white tracking-tight">{t('footer.brandName', 'SETMIO PADEL PRO')}</span>
+            <SetmioLogo variant="horizontal" size="xs" showSubtitle={true} />
             <span className="hidden md:inline text-slate-400">·</span>
-            <span className="hidden md:inline text-[11px] text-slate-500">
+            <span className="hidden md:inline text-[11px] text-slate-500 dark:text-slate-400">
               {t('footer.tagline', 'Software de marca blanca para clubes y profesionales del pádel.')}
             </span>
           </div>
@@ -63,7 +61,7 @@ export const CorporateFooter: React.FC<CorporateFooterProps> = ({ minimized = fa
             <button
               type="button"
               onClick={() => navigateTo('/contacto', 'contact')}
-              className="hover:text-emerald-600 dark:hover:text-emerald-400 transition"
+              className="hover:text-[#8B5CF6] dark:hover:text-[#a78bfa] transition"
             >
               {t('footer.privacy', 'Privacidad & Cookies')}
             </button>
@@ -71,7 +69,7 @@ export const CorporateFooter: React.FC<CorporateFooterProps> = ({ minimized = fa
             <button
               type="button"
               onClick={() => navigateTo('/contacto', 'contact')}
-              className="hover:text-emerald-600 dark:hover:text-emerald-400 transition"
+              className="hover:text-[#8B5CF6] dark:hover:text-[#a78bfa] transition"
             >
               {t('footer.legal', 'Aviso Legal')}
             </button>
@@ -83,15 +81,16 @@ export const CorporateFooter: React.FC<CorporateFooterProps> = ({ minimized = fa
 
   // Full Corporate Footer for Portada (/), Blog (/blog), and Public pages
   return (
-    <footer id="contacto" className="bg-slate-950 text-slate-400 py-16 border-t border-slate-800 text-xs">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-4 gap-10">
+    <footer id="contacto" className="bg-[#0B1A2D] text-slate-400 py-16 border-t border-[#1A314D] text-xs relative overflow-hidden">
+      {/* Resplandor sutil geométrico en footer */}
+      <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-[#8B5CF6]/10 to-transparent pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-80 h-80 bg-gradient-to-tr from-[#87F229]/5 to-transparent pointer-events-none" />
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-4 gap-10 relative z-10">
         {/* Brand & Mission Column */}
         <div className="space-y-4">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-700 flex items-center justify-center text-white font-black text-sm shadow-md shadow-emerald-500/20">
-              S
-            </div>
-            <span className="text-base font-black text-white tracking-tight">{t('footer.brandName', 'SETMIO PADEL PRO')}</span>
+            <SetmioLogo variant="horizontal" size="sm" showSubtitle={true} theme="dark" />
           </div>
           <p className="text-slate-400 leading-relaxed text-[11px]">
             {t('footer.description', 'Software de Marca Blanca integral para profesionales del pádel. Incluye Web Pública, App de Gestión Interna, App para Personal y Clientes, y Agente de IA para web y redes.')}

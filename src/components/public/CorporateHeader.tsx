@@ -4,6 +4,7 @@ import { useApp } from '../../context/AppContext';
 import { SUPPORTED_LANGUAGES, SupportedLanguage } from '../../lib/i18n';
 import { i18n } from '../../i18n';
 import { OfficialFlag } from '../common/OfficialFlag';
+import { SetmioLogo } from '../common/SetmioLogo';
 
 interface CorporateHeaderProps {
   onOpenDemo?: () => void;
@@ -59,10 +60,11 @@ export function CorporateHeader({ onOpenDemo, onOpenAuth, onOpenRegister }: Corp
   }, [open]);
 
   return (
-    <header className={`fixed top-0 left-0 right-0 z-50 w-full max-w-full border-b border-slate-200 dark:border-slate-800 bg-white/90 dark:bg-slate-950/90 backdrop-blur-md transition-shadow duration-200 ${
-      scrolled ? 'shadow-sm' : 'shadow-none'
+    <header className={`fixed top-0 left-0 right-0 z-50 w-full max-w-full border-b border-slate-200 dark:border-slate-800 bg-white/95 dark:bg-[#0B1A2D]/95 backdrop-blur-md transition-shadow duration-200 ${
+      scrolled ? 'shadow-md shadow-[#0B1A2D]/10 dark:shadow-[#071220]/50' : 'shadow-none'
     } text-slate-900 dark:text-white`}>
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+        {/* Logotipo Oficial SETMIO PÁDEL con Isotipo y Wordmark */}
         <button
           type="button"
           onClick={() => {
@@ -71,12 +73,10 @@ export function CorporateHeader({ onOpenDemo, onOpenAuth, onOpenRegister }: Corp
             window.dispatchEvent(new PopStateEvent('popstate'));
             window.scrollTo({ top: 0, behavior: 'instant' });
           }}
-          className="flex items-center gap-2 font-black tracking-tight text-slate-900 dark:text-white cursor-pointer"
+          className="flex items-center gap-2 cursor-pointer focus:outline-none group"
+          title="SETMIO PÁDEL — Plataforma SaaS"
         >
-          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-700 text-white shadow-md shadow-emerald-500/20">
-            S
-          </span>
-          <span>SETMIO</span>
+          <SetmioLogo variant="horizontal" size="sm" showSubtitle={true} />
         </button>
 
         <div className="flex items-center gap-1 sm:gap-2">
@@ -148,68 +148,76 @@ export function CorporateHeader({ onOpenDemo, onOpenAuth, onOpenRegister }: Corp
 
         {/* Desktop Navigation Links */}
         <nav className="hidden items-center gap-3 xl:gap-4 text-xs font-bold lg:flex text-slate-700 dark:text-slate-300" aria-label={t('nav.mainNav', 'Navegación principal')}>
-          <a href="/" onClick={(event) => navigate(event, '/')} className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+          <a href="/" onClick={(event) => navigate(event, '/')} className="hover:text-[#8B5CF6] dark:hover:text-[#a78bfa] transition-colors">
             {t('nav.home', 'Inicio')}
           </a>
-          <a href="/soluciones" onClick={(event) => navigate(event, '/soluciones')} className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+          <a href="/soluciones" onClick={(event) => navigate(event, '/soluciones')} className="hover:text-[#8B5CF6] dark:hover:text-[#a78bfa] transition-colors">
             {t('nav.solutions', 'Soluciones')}
           </a>
-          <a href="/modulos" onClick={(event) => navigate(event, '/modulos')} className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+          <a href="/modulos" onClick={(event) => navigate(event, '/modulos')} className="hover:text-[#8B5CF6] dark:hover:text-[#a78bfa] transition-colors">
             {t('nav.features', 'Módulos')}
           </a>
-          <a href="/domotica" onClick={(event) => navigate(event, '/domotica')} className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+          <a href="/domotica" onClick={(event) => navigate(event, '/domotica')} className="hover:text-[#8B5CF6] dark:hover:text-[#a78bfa] transition-colors">
             {t('nav.domotica', 'Domótica')}
           </a>
           <button
             type="button"
             onClick={onOpenDemo}
-            className="rounded-lg bg-emerald-600/10 hover:bg-emerald-600 hover:text-white text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 px-2.5 py-1.5 transition-colors font-bold cursor-pointer"
+            className="rounded-lg bg-[#8B5CF6]/15 hover:bg-[#8B5CF6] hover:text-white text-[#8B5CF6] dark:text-[#a78bfa] border border-[#8B5CF6]/30 px-2.5 py-1.5 transition-colors font-bold cursor-pointer"
           >
             {t('nav.demo', 'Ver Demo')}
           </button>
-          <a href="/precios" onClick={(event) => navigate(event, '/precios')} className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+          <a href="/precios" onClick={(event) => navigate(event, '/precios')} className="hover:text-[#8B5CF6] dark:hover:text-[#a78bfa] transition-colors">
             {t('nav.pricing', 'Precios')}
           </a>
-          <a href="/blog" onClick={(event) => navigate(event, '/blog')} className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+          <a href="/blog" onClick={(event) => navigate(event, '/blog')} className="hover:text-[#8B5CF6] dark:hover:text-[#a78bfa] transition-colors">
             {t('nav.blog', 'Blog')}
           </a>
-          <a href="/contacto" onClick={(event) => navigate(event, '/contacto')} className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+          <a href="/contacto" onClick={(event) => navigate(event, '/contacto')} className="hover:text-[#8B5CF6] dark:hover:text-[#a78bfa] transition-colors">
             {t('nav.contact', 'Contacto')}
           </a>
           <button
             type="button"
             onClick={onOpenAuth}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 dark:border-slate-700 px-3 py-1.5 text-slate-800 dark:text-slate-100 hover:border-emerald-500 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors cursor-pointer"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 dark:border-slate-700 px-3 py-1.5 text-slate-800 dark:text-slate-100 hover:border-[#8B5CF6] hover:text-[#8B5CF6] dark:hover:text-[#a78bfa] transition-colors cursor-pointer"
           >
-            <Lock className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+            <Lock className="w-3.5 h-3.5 text-[#8B5CF6]" />
             <span>{t('nav.userAccess', 'Acceso Usuarios / Socios')}</span>
+          </button>
+          <button
+            type="button"
+            onClick={handleRegisterClick}
+            className="inline-flex items-center gap-1.5 rounded-xl bg-[#87F229] hover:bg-[#99f846] text-[#0B1A2D] px-3.5 py-1.5 text-xs font-black shadow-md shadow-[#87F229]/25 hover:shadow-lg hover:shadow-[#87F229]/35 hover:scale-[1.02] active:scale-[0.98] transition cursor-pointer"
+          >
+            <span>{t('nav.register', 'Empezar')}</span>
+            <ArrowRight className="w-3.5 h-3.5" />
           </button>
         </nav>
       </div>
       {open && <div className="fixed inset-0 top-16 overscroll-none bg-slate-950/40" onClick={close}>
-        <nav className="max-h-[calc(100dvh-4rem)] overflow-y-auto overscroll-contain bg-white p-5 shadow-2xl dark:bg-slate-950 text-slate-900 dark:text-slate-100" onClick={(event) => event.stopPropagation()} aria-label={t('nav.mobileMenu', 'Menú móvil')}>
+        <nav className="max-h-[calc(100dvh-4rem)] overflow-y-auto overscroll-contain bg-white p-5 shadow-2xl dark:bg-[#0B1A2D] text-slate-900 dark:text-white" onClick={(event) => event.stopPropagation()} aria-label={t('nav.mobileMenu', 'Menú móvil')}>
           <div className="grid gap-1 text-sm font-bold">
             {menuItems.map(([Icon, key, label, href]) => {
               if (key === 'nav.demo') {
                 return (
-                  <button key={key} type="button" onClick={() => { close(); onOpenDemo?.(); }} className="flex items-center justify-between rounded-xl p-3 text-left text-slate-800 dark:text-slate-200 hover:bg-emerald-50 dark:hover:bg-slate-900">
-                    <span className="flex items-center gap-3"><Icon className="h-4 w-4 text-emerald-600" />{t(key, label)}</span>
+                  <button key={key} type="button" onClick={() => { close(); onOpenDemo?.(); }} className="flex items-center justify-between rounded-xl p-3 text-left text-slate-800 dark:text-slate-200 hover:bg-[#8B5CF6]/10 dark:hover:bg-[#8B5CF6]/20">
+                    <span className="flex items-center gap-3"><Icon className="h-4 w-4 text-[#8B5CF6]" />{t(key, label)}</span>
                     <ArrowRight className="h-4 w-4 text-slate-400" />
                   </button>
                 );
               }
               return href ? (
-                <a key={key} onClick={(event) => navigate(event, href)} href={href} className="flex items-center justify-between rounded-xl p-3 text-slate-800 dark:text-slate-200 hover:bg-emerald-50 dark:hover:bg-slate-900">
-                  <span className="flex items-center gap-3"><Icon className="h-4 w-4 text-emerald-600" />{t(key, label)}</span>
+                <a key={key} onClick={(event) => navigate(event, href)} href={href} className="flex items-center justify-between rounded-xl p-3 text-slate-800 dark:text-slate-200 hover:bg-[#8B5CF6]/10 dark:hover:bg-[#8B5CF6]/20">
+                  <span className="flex items-center gap-3"><Icon className="h-4 w-4 text-[#8B5CF6]" />{t(key, label)}</span>
                   <ArrowRight className="h-4 w-4 text-slate-400" />
                 </a>
               ) : null;
             })}
           </div>
           <div className="mt-4 grid gap-2 border-t border-slate-200 pt-4 dark:border-slate-800">
-            <button type="button" onClick={() => setLanguageMenuOpen((value) => !value)} className="flex items-center justify-between rounded-xl p-3 text-left text-sm font-bold text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-900" aria-expanded={languageMenuOpen}><span className="flex items-center gap-3"><Globe className="h-4 w-4 text-emerald-600" /><OfficialFlag code={language} /> {t('nav.language', 'Idioma')}: {SUPPORTED_LANGUAGES.find((item) => item.code === language)?.name ?? t('language.es', 'Español')}</span><span>⌄</span></button>{languageMenuOpen && <div className="grid grid-cols-2 gap-2 rounded-xl bg-slate-50 p-2 dark:bg-slate-900">{SUPPORTED_LANGUAGES.map((item) => <button type="button" key={item.code} onClick={() => { i18n.changeLanguage(item.code); setLanguage(item.code); setLanguageMenuOpen(false); }} className={`rounded-lg px-2 py-2 text-left text-xs font-bold hover:bg-emerald-100 dark:hover:bg-slate-800 ${language === item.code ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300' : 'text-slate-800 dark:text-slate-200'}`}><OfficialFlag code={item.code} /> <span className="ml-1">{item.name}</span></button>)}</div>}
-            <button type="button" onClick={handleRegisterClick} className="rounded-xl bg-emerald-600 px-4 py-3 text-sm font-black text-white">{t('nav.register', 'Registrarse')} <ArrowRight className="ml-1 inline h-4 w-4" /></button>
-            <button type="button" onClick={() => { close(); onOpenAuth?.(); }} className="rounded-xl border border-slate-300 px-4 py-3 text-sm font-bold text-slate-800 dark:text-slate-200 dark:border-slate-700 hover:border-emerald-500 hover:text-emerald-600 transition"><Lock className="mr-2 inline h-4 w-4 text-emerald-600" />{t('nav.userAccess', 'Acceso Usuarios / Socios')}</button>
+            <button type="button" onClick={() => setLanguageMenuOpen((value) => !value)} className="flex items-center justify-between rounded-xl p-3 text-left text-sm font-bold text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-900" aria-expanded={languageMenuOpen}><span className="flex items-center gap-3"><Globe className="h-4 w-4 text-[#8B5CF6]" /><OfficialFlag code={language} /> {t('nav.language', 'Idioma')}: {SUPPORTED_LANGUAGES.find((item) => item.code === language)?.name ?? t('language.es', 'Español')}</span><span>⌄</span></button>{languageMenuOpen && <div className="grid grid-cols-2 gap-2 rounded-xl bg-slate-50 p-2 dark:bg-slate-900">{SUPPORTED_LANGUAGES.map((item) => <button type="button" key={item.code} onClick={() => { i18n.changeLanguage(item.code); setLanguage(item.code); setLanguageMenuOpen(false); }} className={`rounded-lg px-2 py-2 text-left text-xs font-bold hover:bg-[#8B5CF6]/20 ${language === item.code ? 'bg-[#8B5CF6]/20 text-[#8B5CF6] dark:text-[#a78bfa]' : 'text-slate-800 dark:text-slate-200'}`}><OfficialFlag code={item.code} /> <span className="ml-1">{item.name}</span></button>)}</div>}
+            <button type="button" onClick={handleRegisterClick} className="rounded-xl bg-[#87F229] hover:bg-[#99f846] px-4 py-3 text-sm font-black text-[#0B1A2D] shadow-lg shadow-[#87F229]/25">{t('nav.register', 'Empezar Gratis')} <ArrowRight className="ml-1 inline h-4 w-4" /></button>
+            <button type="button" onClick={() => { close(); onOpenAuth?.(); }} className="rounded-xl border border-slate-300 px-4 py-3 text-sm font-bold text-slate-800 dark:text-slate-200 dark:border-slate-700 hover:border-[#8B5CF6] hover:text-[#8B5CF6] transition"><Lock className="mr-2 inline h-4 w-4 text-[#8B5CF6]" />{t('nav.userAccess', 'Acceso Usuarios / Socios')}</button>
           </div>
         </nav>
       </div>}

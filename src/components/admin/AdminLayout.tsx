@@ -17,6 +17,7 @@ import { SUPPORTED_LANGUAGES } from '../../lib/i18n';
 import { OfficialFlag } from '../common/OfficialFlag';
 import { i18n } from '../../i18n';
 import { getAdminNavConfig } from '../../lib/adminNavigation';
+import { SetmioLogo } from '../common/SetmioLogo';
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -88,13 +89,13 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   };
 
   return (
-    <div data-admin-shell className="min-h-screen bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 flex flex-col md:flex-row pb-20 md:pb-0 transition-colors duration-200 w-full max-w-full overflow-x-hidden font-sans">
+    <div data-admin-shell className="min-h-screen bg-slate-50 dark:bg-[#0B1A2D] text-slate-900 dark:text-slate-100 flex flex-col md:flex-row pb-20 md:pb-0 transition-colors duration-200 w-full max-w-full overflow-x-hidden font-sans">
       {/* ======================================================================
           SIDEBAR LATERAL UNIFICADO (ESCRITORIO / TABLET)
           - En Marca Blanca (Recepción): Menú único, adaptado y limpio
           - En Modo Admin SaaS: Jerarquía unificada idéntica a la navegación móvil
           ====================================================================== */}
-      <aside className="hidden md:flex flex-col w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 shrink-0 select-none">
+      <aside className="hidden md:flex flex-col w-64 bg-white dark:bg-[#071220] border-r border-slate-200 dark:border-slate-800 shrink-0 select-none">
         {/* Cabecera de Identidad en Sidebar */}
         <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
           {isReception ? (
@@ -119,15 +120,13 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
           ) : (
             /* Vista Admin Club / Escuela / Profesor / Atleta: Setmio Pro Oficial */
             <div className="flex items-center gap-2.5 min-w-0">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-700 text-white font-black flex items-center justify-center shrink-0 text-sm shadow-sm select-none">
-                S
-              </div>
+              <SetmioLogo variant="symbol" size="sm" />
               <div className="min-w-0">
                 <div className="font-black text-xs text-slate-900 dark:text-white truncate tracking-wider">
                   {roleTitle}
                 </div>
-                <div className="text-[10px] text-emerald-600 dark:text-emerald-400 font-extrabold uppercase tracking-wider flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                <div className="text-[10px] text-[#8B5CF6] font-extrabold uppercase tracking-wider flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#87F229] animate-pulse" />
                   {roleSubtitle}
                 </div>
               </div>
@@ -153,9 +152,10 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
                     key={tab.id}
                     type="button"
                     onClick={() => handleSelectTab(tab.id)}
+                    style={isActive ? { backgroundColor: currentTenant.branding?.primaryColor || '#10b981' } : undefined}
                     className={`w-full flex items-center justify-between px-3 py-2.5 rounded-2xl font-bold transition cursor-pointer ${
                       isActive
-                        ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/20'
+                        ? 'text-white shadow-md'
                         : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white'
                     }`}
                   >
@@ -168,7 +168,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
               })}
             </div>
           ) : (
-            /* VISTA ADMINISTRACIÓN: Jerarquía Estructurada y Sincronizada */
+            /* VISTA ADMINISTRACIÓN: Jerarquía Estructurada y Sincronizada con Setmio Violet */
             <>
               {/* Bloque 1: Operaciones Principales (Compartidas con la barra inferior móvil) */}
               <div className="space-y-1">
@@ -187,7 +187,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
                       onClick={() => handleSelectTab(tab.id)}
                       className={`w-full flex items-center justify-between px-3 py-2.5 rounded-2xl font-bold transition cursor-pointer ${
                         isActive
-                          ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/20'
+                          ? 'bg-[#8B5CF6] text-white shadow-md shadow-[#8B5CF6]/30'
                           : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white'
                       }`}
                     >
@@ -215,7 +215,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
                       onClick={() => handleSelectTab(tab.id)}
                       className={`w-full flex items-center justify-between px-3 py-2 rounded-2xl font-medium transition cursor-pointer ${
                         isActive
-                          ? 'bg-emerald-600 text-white font-bold shadow-md'
+                          ? 'bg-[#8B5CF6] text-white font-bold shadow-md shadow-[#8B5CF6]/25'
                           : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white'
                       }`}
                     >
@@ -228,7 +228,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
                           className={`text-[9px] uppercase px-1.5 py-0.5 rounded font-mono font-bold shrink-0 ${
                             isActive
                               ? 'bg-white/20 text-white'
-                              : 'bg-slate-100 dark:bg-slate-800 text-emerald-600 dark:text-emerald-400'
+                              : 'bg-slate-100 dark:bg-slate-800 text-[#8B5CF6]'
                           }`}
                         >
                           {tab.badge}
@@ -243,7 +243,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
         </div>
 
         {/* Pie de Usuario en Sidebar */}
-        <div className="p-3 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 flex items-center justify-between text-xs">
+        <div className="p-3 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-[#050c17] flex items-center justify-between text-xs">
           <div className="flex items-center gap-2 min-w-0">
             <div
               className="w-8 h-8 rounded-full overflow-hidden shrink-0 border border-slate-300 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 flex items-center justify-center aspect-square"
@@ -317,15 +317,13 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
         <div className="md:hidden fixed inset-0 z-50 flex flex-col justify-end bg-slate-950/70 backdrop-blur-sm animate-in fade-in duration-200">
           <div className="bg-white dark:bg-slate-900 rounded-t-3xl border-t border-slate-200 dark:border-slate-800 p-5 space-y-4 max-h-[85vh] overflow-y-auto shadow-2xl">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-700 text-white font-black flex items-center justify-center text-xs shadow-xs select-none">
-                  S
-                </div>
+              <div className="flex items-center gap-2.5">
+                <SetmioLogo variant="symbol" size="sm" />
                 <div>
                   <div className="font-extrabold text-sm text-slate-900 dark:text-white">
                     Más Módulos & Herramientas
                   </div>
-                  <div className="text-[10px] text-slate-500">
+                  <div className="text-[10px] text-[#8B5CF6] font-bold">
                     {roleTitle} · {currentTenant.name}
                   </div>
                 </div>
@@ -351,13 +349,13 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
                     onClick={() => handleSelectTab(tab.id)}
                     className={`w-full flex items-center justify-between p-3 rounded-2xl border transition text-left cursor-pointer ${
                       isActive
-                        ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-500 text-emerald-950 dark:text-emerald-200'
+                        ? 'bg-[#8B5CF6]/10 dark:bg-[#8B5CF6]/20 border-[#8B5CF6] text-[#8B5CF6] dark:text-[#a78bfa]'
                         : 'bg-slate-50 dark:bg-slate-950/50 border-slate-200/80 dark:border-slate-800 text-slate-900 dark:text-white hover:border-slate-300'
                     }`}
                   >
                     <div className="flex items-center gap-3 min-w-0">
                       <div className="p-2 rounded-xl bg-white dark:bg-slate-900 shadow-xs shrink-0">
-                        <Icon className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                        <Icon className={`w-4 h-4 ${isActive ? 'text-[#8B5CF6]' : 'text-slate-500 dark:text-slate-400'}`} />
                       </div>
                       <div className="min-w-0">
                         <div className="font-bold text-xs truncate">{tab.label}</div>
@@ -368,7 +366,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
                       {tab.badge && (
-                        <span className="text-[9px] uppercase px-1.5 py-0.5 rounded font-mono font-bold bg-slate-200 dark:bg-slate-800 text-emerald-600 dark:text-emerald-400">
+                        <span className="text-[9px] uppercase px-1.5 py-0.5 rounded font-mono font-bold bg-slate-200 dark:bg-slate-800 text-[#8B5CF6]">
                           {tab.badge}
                         </span>
                       )}

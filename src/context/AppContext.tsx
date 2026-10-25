@@ -1383,15 +1383,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     if (window.location.pathname !== path) window.history.pushState({}, '', nextUrl);
   }, [isCorporateLanding, currentTenant.slug, currentView, publicPage, adminTab, playerTab]);
 
-  useEffect(() => {
-    const root = document.documentElement;
-    const { primaryColor, secondaryColor, accentColor } = currentTenant.branding;
-    root.style.setProperty('--color-primary', primaryColor || '#185c43');
-    root.style.setProperty('--color-secondary', secondaryColor || '#10221d');
-    root.style.setProperty('--color-accent', accentColor || '#c7f36b');
-    root.style.setProperty('--color-background', '#f5f6f1');
-    root.style.setProperty('--color-foreground', secondaryColor || '#10221d');
-  }, [currentTenant.branding]);
 
   const updateCurrentTenant = (updated: Partial<Tenant>) => {
     // Check if locked demo
@@ -1442,6 +1433,39 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [currentUser, setCurrentUser] = useState<UserSession>(
     initialRoute.view === 'player' ? ROLE_PROFILES.PLAYER : ROLE_PROFILES.TENANT_OWNER
   );
+
+  // ARQUITECTURA DINÁMICA DE MARCA BLANCA POR CLUB VS IDENTIDAD GLOBAL SETMIO PÁDEL
+  useEffect(() => {
+    const root = document.documentElement;
+    // Comprobar si la vista activa es de Marca Blanca asignada a un Club/Entidad específica
+    const isClubWhiteLabelView =
+      !isCorporateLanding &&
+      currentView !== 'hq' &&
+      (currentView === 'player' ||
+        currentView === 'coach' ||
+        (currentView === 'public' && !isCorporateLanding) ||
+        (currentView === 'admin' && (currentUser.role === 'STAFF' || (currentUser as any).isReception)));
+
+    if (isClubWhiteLabelView && currentTenant?.branding) {
+      // SOBRESCRITURA DE ESTILOS: El Club aplica sus colores corporativos e identidad
+      const { primaryColor, secondaryColor, accentColor } = currentTenant.branding;
+      root.setAttribute('data-white-label', 'true');
+      root.style.setProperty('--color-primary', primaryColor || '#10b981');
+      root.style.setProperty('--color-secondary', secondaryColor || '#0B1A2D');
+      root.style.setProperty('--color-accent', accentColor || '#87F229');
+      root.style.setProperty('--color-background', '#FFFFFF');
+      root.style.setProperty('--color-foreground', secondaryColor || '#0B1A2D');
+    } else {
+      // IDENTIDAD GLOBAL OFICIAL SETMIO PÁDEL (image_16.png)
+      // Azul Profundo (#0B1A2D), Violeta SaaS (#8B5CF6) y Verde Lima (#87F229)
+      root.setAttribute('data-white-label', 'false');
+      root.style.setProperty('--color-primary', '#8B5CF6'); // Violeta corporativo
+      root.style.setProperty('--color-secondary', '#0B1A2D'); // Azul profundo
+      root.style.setProperty('--color-accent', '#87F229'); // Verde lima deportivo
+      root.style.setProperty('--color-background', '#0B1A2D');
+      root.style.setProperty('--color-foreground', '#FFFFFF');
+    }
+  }, [isCorporateLanding, currentView, currentUser.role, currentTenant?.branding]);
 
   const switchUserRole = (role: UserRole) => {
     const profile = ROLE_PROFILES[role] || ROLE_PROFILES.PLAYER;
