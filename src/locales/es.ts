@@ -1943,6 +1943,8 @@ export const esLocale: Record<string, string> = {
   "pos.paymentMethods.stripeTerminal": "Stripe Terminal",
   "pos.paymentMethods.pushCharge": "Cobro Push / App",
   "pos.paymentMethods.wallet": "Monedero Socio",
+  "pos.selectedPaymentMethod": "Método seleccionado:",
+  "pos.chargeWithMethod": "Cobrar con",
   "settings.payments.activeMethods": "Métodos de Pago Activos",
   "settings.payments.autoSynced": "Sincronizado automáticamente con TPV",
 };

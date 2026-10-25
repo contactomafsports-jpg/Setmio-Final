@@ -308,6 +308,7 @@ export const AdminCafePOS: React.FC = () => {
   };
 
   const cartTotal = posCart.reduce((acc, item) => acc + item.product.price * item.qty, 0);
+  const activePaymentMethodObj = availablePaymentMethods.find((m) => m.id === paymentMethod) || availablePaymentMethods[0];
 
   const handleChargeSale = () => {
     if (posCart.length === 0) return;
@@ -845,6 +846,14 @@ export const AdminCafePOS: React.FC = () => {
 
           {/* Cart Total & Action */}
           <div className="pt-3 border-t border-slate-100 dark:border-slate-700/60 space-y-3">
+            <div className="flex items-center justify-between text-xs">
+              <span className="text-slate-500 font-medium">{t('pos.selectedPaymentMethod', 'Método seleccionado:')}</span>
+              <span className="font-bold text-slate-800 dark:text-slate-200 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20">
+                {activePaymentMethodObj && <activePaymentMethodObj.icon className="w-3.5 h-3.5 text-emerald-500" />}
+                <span>{activePaymentMethodObj?.label}</span>
+              </span>
+            </div>
+
             <div className="flex items-center justify-between">
               <span className="text-xs font-bold text-slate-500">Total a Cobrar:</span>
               <span className="text-2xl font-black font-mono text-slate-900 dark:text-white">
@@ -859,7 +868,9 @@ export const AdminCafePOS: React.FC = () => {
               className="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 text-white font-black text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer active:scale-95"
             >
               <CheckCircle2 className="w-4 h-4" />
-              <span>Cobrar e Imprimir Ticket ({cartTotal.toFixed(2)} €)</span>
+              <span>
+                {t('pos.chargeWithMethod', 'Cobrar con')} {activePaymentMethodObj?.label || 'TPV'} ({cartTotal.toFixed(2)} €)
+              </span>
             </button>
           </div>
         </div>

@@ -613,7 +613,7 @@ export interface NotificationItem {
   timestamp: string;
   read: boolean;
   actionUrl?: string;
-  originSection?: 'agenda' | 'matches' | 'tournaments' | 'pos_cafe' | 'courts_management' | 'customers' | 'settings';
+  originSection?: 'agenda' | 'all_bookings' | 'matches' | 'tournaments' | 'pos_cafe' | 'courts_management' | 'customers' | 'settings' | 'academy' | 'staff';
   originLabel?: string;
   metadata?: Record<string, string>;
 }

@@ -1943,6 +1943,8 @@ export const enLocale: Record<string, string> = {
   "pos.paymentMethods.stripeTerminal": "Stripe Terminal",
   "pos.paymentMethods.pushCharge": "Push / App Charge",
   "pos.paymentMethods.wallet": "Member Wallet",
+  "pos.selectedPaymentMethod": "Selected method:",
+  "pos.chargeWithMethod": "Charge with",
   "settings.payments.activeMethods": "Active Payment Methods",
   "settings.payments.autoSynced": "Auto-synced with POS",
 };

@@ -120,24 +120,35 @@ export const NotificationsPopover: React.FC<NotificationsPopoverProps> = ({ vari
 
   const handleDirectAction = (notif: NotificationItem) => {
     setSelectedNotification(null);
+    setCurrentView('admin');
+
+    const tabPathMap: Record<string, string> = {
+      agenda: '/admin/reservas',
+      all_bookings: '/admin/reservas/todas',
+      matches: '/admin/partidas',
+      pos_cafe: '/admin/tpv',
+      tournaments: '/admin/competiciones',
+      courts_management: '/admin/pistas',
+      customers: '/admin/socios',
+      academy: '/admin/escuela',
+      settings: '/admin/ajustes',
+      staff: '/admin/profesores',
+    };
 
     // Resolve target tab from originSection or type
-    const origin = notif.originSection;
-    if (origin) {
-      setAdminTab(origin);
-      return;
-    }
+    const origin = (notif.originSection || (
+      notif.type === 'booking' ? 'agenda' :
+      notif.type === 'match' ? 'matches' :
+      notif.type === 'tournament' ? 'tournaments' :
+      notif.type === 'payment' ? 'pos_cafe' :
+      'agenda'
+    )) as any;
 
-    if (notif.type === 'booking') {
-      setAdminTab('agenda');
-    } else if (notif.type === 'match') {
-      setAdminTab('matches');
-    } else if (notif.type === 'tournament') {
-      setAdminTab('tournaments');
-    } else if (notif.type === 'payment') {
-      setAdminTab('pos_cafe');
-    } else {
-      setAdminTab('agenda');
+    setAdminTab(origin);
+
+    if (typeof window !== 'undefined' && tabPathMap[origin]) {
+      window.history.pushState(null, '', tabPathMap[origin]);
+      window.dispatchEvent(new PopStateEvent('popstate'));
     }
   };
 
@@ -153,18 +164,24 @@ export const NotificationsPopover: React.FC<NotificationsPopoverProps> = ({ vari
     switch (origin) {
       case 'agenda':
         return { label: 'Ir al Cuadrante de Reservas', sectionName: 'Agenda & Reservas' };
+      case 'all_bookings':
+        return { label: 'Ver Historial de Reservas', sectionName: 'Todas las Reservas' };
       case 'matches':
         return { label: 'Ir a Partidas Abiertas', sectionName: 'Partidas Play!' };
       case 'pos_cafe':
-        return { label: 'Ir a TPV / Caja', sectionName: 'TPV / Caja Mostrador' };
+        return { label: 'Ir a TPV / Caja Mostrador', sectionName: 'TPV / Caja Mostrador' };
       case 'tournaments':
-        return { label: 'Ir a Torneos y Cuadros', sectionName: 'Competiciones' };
+        return { label: 'Ir a Competiciones & Cuadros', sectionName: 'Competiciones' };
       case 'courts_management':
         return { label: 'Ir a Pistas & Domótica', sectionName: 'Pistas e Instalaciones' };
       case 'customers':
-        return { label: 'Ver Ficha de Clientes', sectionName: 'Miembros & Socios' };
+        return { label: 'Ver Ficha de Clientes / Socios', sectionName: 'Miembros & Socios' };
+      case 'academy':
+        return { label: 'Ir a Escuela & Cursos', sectionName: 'Escuela de Pádel' };
       case 'settings':
-        return { label: 'Ir a Ajustes del Club', sectionName: 'Configuración' };
+        return { label: 'Ir a Configuración del Club', sectionName: 'Configuración' };
+      case 'staff':
+        return { label: 'Ir a Gestión de Profesores', sectionName: 'Personal & Entrenadores' };
       default:
         return { label: 'Ir a la sección de origen', sectionName: 'Administración' };
     }
