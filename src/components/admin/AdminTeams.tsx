@@ -115,6 +115,9 @@ export interface ClubTeamFull {
   category: string;
   gender: 'masculino' | 'femenino' | 'mixto';
   ageGroup: 'absoluto' | 'veteranos' | 'menores';
+  venueId?: string;
+  venueName?: string;
+  photoUrl?: string;
   captainName: string;
   coachName: string;
   coachSpecialty?: string;
@@ -135,6 +138,9 @@ const INITIAL_TEAMS: ClubTeamFull[] = [
     category: '1ª Categoría FGP',
     gender: 'masculino',
     ageGroup: 'absoluto',
+    venueId: 'venue-1',
+    venueName: 'Sede Central Narón',
+    photoUrl: 'https://images.unsplash.com/photo-1554068865-24cecd4e34b8?auto=format&fit=crop&w=800&q=80',
     captainName: 'Carlos Méndez',
     coachName: 'Mateo Varela',
     coachSpecialty: 'Alta Competición FIP & FGP',
@@ -274,6 +280,9 @@ const INITIAL_TEAMS: ClubTeamFull[] = [
     category: '2ª División FGP',
     gender: 'femenino',
     ageGroup: 'absoluto',
+    venueId: 'venue-1',
+    venueName: 'Sede Central Narón',
+    photoUrl: 'https://images.unsplash.com/photo-1599586120429-48281b6f0ece?auto=format&fit=crop&w=800&q=80',
     captainName: 'Ana Belén Vázquez',
     coachName: 'Laura Senra',
     coachSpecialty: 'Técnica de Defensa & Dobles Femeninos',
@@ -351,6 +360,9 @@ const INITIAL_TEAMS: ClubTeamFull[] = [
     category: 'Liga Veteranos +40',
     gender: 'masculino',
     ageGroup: 'veteranos',
+    venueId: 'venue-2',
+    venueName: 'Sede Puerto Dársena',
+    photoUrl: 'https://images.unsplash.com/photo-1526676037777-05a232554f77?auto=format&fit=crop&w=800&q=80',
     captainName: 'Marcos Blanco',
     coachName: 'Mateo Varela',
     coachSpecialty: 'Estrategia Veteranos & Control de Juego',
@@ -391,7 +403,7 @@ const INITIAL_TEAMS: ClubTeamFull[] = [
 ];
 
 export const AdminTeams: React.FC = () => {
-  const { currentTenant, triggerDemoToast, navigateToPlayerProfile, customers, coaches } = useApp();
+  const { currentTenant, triggerDemoToast, navigateToPlayerProfile, customers, coaches, venues, isMultiVenue } = useApp();
 
   const [teams, setTeams] = useState<ClubTeamFull[]>(() => {
     try {
@@ -407,6 +419,8 @@ export const AdminTeams: React.FC = () => {
   const [search, setSearch] = useState('');
   const [filterGender, setFilterGender] = useState<'all' | 'masculino' | 'femenino' | 'mixto'>('all');
   const [filterAge, setFilterAge] = useState<'all' | 'absoluto' | 'veteranos' | 'menores'>('all');
+  const [filterVenue, setFilterVenue] = useState<string>('all');
+  const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
 
   // Modals
   const [isNewTeamModalOpen, setIsNewTeamModalOpen] = useState(false);
@@ -422,9 +436,11 @@ export const AdminTeams: React.FC = () => {
     category: '1ª Categoría FGP',
     gender: 'masculino' as 'masculino' | 'femenino' | 'mixto',
     ageGroup: 'absoluto' as 'absoluto' | 'veteranos' | 'menores',
+    venueId: venues?.[0]?.id || 'venue-1',
     captainName: '',
     coachName: 'Mateo Varela',
     initialPlayersText: '',
+    photoUrl: 'https://images.unsplash.com/photo-1554068865-24cecd4e34b8?auto=format&fit=crop&w=800&q=80',
   });
 
   const [newPlayerForm, setNewPlayerForm] = useState({
@@ -505,6 +521,9 @@ export const AdminTeams: React.FC = () => {
       category: newTeamForm.category,
       gender: newTeamForm.gender,
       ageGroup: newTeamForm.ageGroup,
+      venueId: newTeamForm.venueId,
+      venueName: venues?.find((v) => v.id === newTeamForm.venueId)?.name || 'Sede Principal',
+      photoUrl: newTeamForm.photoUrl || 'https://images.unsplash.com/photo-1554068865-24cecd4e34b8?auto=format&fit=crop&w=800&q=80',
       captainName: newTeamForm.captainName || (parsedPlayers[0]?.name ?? 'Sin asignar'),
       coachName: newTeamForm.coachName,
       coachSpecialty: 'Entrenador de Equipo Federado',
@@ -735,13 +754,20 @@ ${declined.map((p) => `• ${p.playerName}`).join('\n')}
     const matchSearch =
       t.name.toLowerCase().includes(search.toLowerCase()) ||
       t.category.toLowerCase().includes(search.toLowerCase()) ||
-      t.captainName.toLowerCase().includes(search.toLowerCase());
+      t.captainName.toLowerCase().includes(search.toLowerCase()) ||
+      t.coachName.toLowerCase().includes(search.toLowerCase());
 
     const matchGender = filterGender === 'all' || t.gender === filterGender;
     const matchAge = filterAge === 'all' || t.ageGroup === filterAge;
+    const matchVenue = !isMultiVenue || filterVenue === 'all' || t.venueId === filterVenue;
 
-    return matchSearch && matchGender && matchAge;
+    return matchSearch && matchGender && matchAge && matchVenue;
   });
+
+  const activeFiltersCount =
+    (filterGender !== 'all' ? 1 : 0) +
+    (filterAge !== 'all' ? 1 : 0) +
+    (isMultiVenue && filterVenue !== 'all' ? 1 : 0);
 
   // =========================================================================
   // VISTA DE DETALLES DEL EQUIPO SELECCIONADO (REDiseño ESPECTACULAR)
@@ -756,7 +782,7 @@ ${declined.map((p) => `• ${p.playerName}`).join('\n')}
     return (
       <div className="space-y-6 text-slate-900 dark:text-slate-100 max-w-7xl mx-auto pb-16 animate-in fade-in duration-150">
         {/* Barra superior de regreso y acciones */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200/80 dark:border-slate-800">
           <button
             type="button"
             onClick={() => {
@@ -781,6 +807,11 @@ ${declined.map((p) => `• ${p.playerName}`).join('\n')}
 
         {/* HERO CARD DEL EQUIPO: DISEÑO PREMIUM */}
         <div className="relative overflow-hidden rounded-3xl bg-linear-to-br from-slate-900 via-slate-850 to-slate-950 text-white p-6 sm:p-8 border border-slate-800 shadow-xl space-y-6">
+          {selectedTeam.photoUrl && (
+            <div className="absolute inset-0 opacity-15 mix-blend-luminosity pointer-events-none">
+              <img src={selectedTeam.photoUrl} alt="" className="w-full h-full object-cover" />
+            </div>
+          )}
           <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
           <div className="absolute bottom-0 left-1/3 w-64 h-64 bg-cyan-500/10 rounded-full blur-2xl pointer-events-none" />
 
@@ -812,7 +843,9 @@ ${declined.map((p) => `• ${p.playerName}`).join('\n')}
                 <span>·</span>
                 <span>
                   Sede Oficial:{' '}
-                  <strong className="text-white font-semibold">Pádel San Mateo (Central)</strong>
+                  <strong className="text-white font-semibold">
+                    {selectedTeam.venueName || (isMultiVenue && venues?.[0]?.name) || currentTenant.name}
+                  </strong>
                 </span>
               </p>
 
@@ -2036,7 +2069,7 @@ ${declined.map((p) => `• ${p.playerName}`).join('\n')}
             Equipos y Plantillas del Club — {currentTenant.name}
           </h1>
           <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
-            Gestión de capitanes, listas de jugadores, desplazamientos externos con mapa y entrenamientos.
+            Gestión de capitanes, listas de jugadores, sedes, desplazamientos externos con mapa y entrenamientos.
           </p>
         </div>
 
@@ -2046,132 +2079,344 @@ ${declined.map((p) => `• ${p.playerName}`).join('\n')}
           className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-2 shadow-xs transition active:scale-95 cursor-pointer self-start sm:self-auto"
         >
           <Plus className="w-4 h-4" />
-          <span>+ Nuevo Equipo</span>
+          <span>Nuevo Equipo</span>
         </button>
       </div>
 
-      {/* 2. Filtros de Categoría, Sexo, Edad y Buscador */}
+      {/* 2. Barra de Búsqueda y Botón Desplegable de Filtros Minimalista */}
       <div className="p-4 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-3">
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-          <div className="relative flex-1 max-w-md">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+          <div className="relative flex-1 max-w-lg">
+            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
               type="text"
-              placeholder="Buscar por equipo, categoría o capitán..."
+              placeholder="Buscar por equipo, categoría, capitán o entrenador..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+              className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-emerald-500 transition"
             />
-          </div>
-
-          {/* Filtros de Género */}
-          <div className="flex items-center gap-1 bg-slate-50 dark:bg-slate-950 p-1 rounded-xl border border-slate-200 dark:border-slate-800 text-xs font-bold">
-            <span className="text-[10px] text-slate-400 px-2 uppercase font-extrabold">Sexo:</span>
-            {(['all', 'masculino', 'femenino', 'mixto'] as const).map((g) => (
+            {search && (
               <button
-                key={g}
                 type="button"
-                onClick={() => setFilterGender(g)}
-                className={`px-2.5 py-1 rounded-lg transition capitalize cursor-pointer ${
-                  filterGender === g
-                    ? 'bg-emerald-600 text-white'
-                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-                }`}
+                onClick={() => setSearch('')}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 dark:hover:text-white cursor-pointer"
               >
-                {g === 'all' ? 'Todos' : g}
+                <X className="w-3.5 h-3.5" />
               </button>
-            ))}
+            )}
           </div>
 
-          {/* Filtros de Edad */}
-          <div className="flex items-center gap-1 bg-slate-50 dark:bg-slate-950 p-1 rounded-xl border border-slate-200 dark:border-slate-800 text-xs font-bold">
-            <span className="text-[10px] text-slate-400 px-2 uppercase font-extrabold">Edad:</span>
-            {(['all', 'absoluto', 'veteranos', 'menores'] as const).map((a) => (
-              <button
-                key={a}
-                type="button"
-                onClick={() => setFilterAge(a)}
-                className={`px-2.5 py-1 rounded-lg transition capitalize cursor-pointer ${
-                  filterAge === a
-                    ? 'bg-emerald-600 text-white'
-                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-                }`}
-              >
-                {a === 'all' ? 'Todos' : a}
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* 3. Grid de Tarjetas de Equipos Oficiales */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-        {filteredTeams.map((team) => (
-          <div
-            key={team.id}
-            className="p-5 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 hover:border-emerald-500/50 shadow-sm space-y-4 flex flex-col justify-between transition group"
-          >
-            <div className="space-y-3">
-              <div className="flex items-center justify-between text-xs">
-                <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 font-black text-[10px] uppercase border border-emerald-500/20">
-                  {team.category}
+          <div className="flex items-center gap-2 self-start sm:self-auto">
+            {/* Botón Icono Filtros Minimalista */}
+            <button
+              type="button"
+              onClick={() => setIsFilterModalOpen(true)}
+              className={`px-3.5 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 cursor-pointer border shadow-2xs active:scale-95 ${
+                activeFiltersCount > 0
+                  ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-500 text-emerald-700 dark:text-emerald-300'
+                  : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-slate-300 dark:hover:border-slate-700'
+              }`}
+            >
+              <Filter className={`w-4 h-4 ${activeFiltersCount > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-500'}`} />
+              <span>Filtros</span>
+              {activeFiltersCount > 0 && (
+                <span className="w-5 h-5 rounded-full bg-emerald-600 text-white font-mono text-[10px] flex items-center justify-center font-bold">
+                  {activeFiltersCount}
                 </span>
-                <span className="text-[10px] font-mono text-slate-400 capitalize">
-                  {team.gender} · {team.ageGroup}
-                </span>
-              </div>
-
-              <h2 className="text-base font-black text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition">
-                {team.name}
-              </h2>
-
-              <div className="space-y-1.5 text-xs text-slate-500 dark:text-slate-400 pt-1 border-t border-slate-100 dark:border-slate-800">
-                <div className="flex items-center justify-between">
-                  <span>Capitán Responsable:</span>
-                  <strong className="text-slate-800 dark:text-slate-200">{team.captainName}</strong>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span>Entrenador:</span>
-                  <span className="font-semibold text-slate-700 dark:text-slate-300">{team.coachName}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span>Plantilla Inscrita:</span>
-                  <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400">
-                    {team.players.length} jugadores
-                  </span>
-                </div>
-              </div>
-
-              {team.callouts.length > 0 && (
-                <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800 text-[11px] text-slate-600 dark:text-slate-400 flex items-center justify-between">
-                  <span className="flex items-center gap-1.5">
-                    <Navigation className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-                    <span>Próximo partido fuera</span>
-                  </span>
-                  <span className="font-bold text-slate-900 dark:text-white">
-                    {team.callouts[0].date.split(' ')[0]}
-                  </span>
-                </div>
               )}
-            </div>
+            </button>
 
-            <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs">
+            {activeFiltersCount > 0 && (
               <button
                 type="button"
                 onClick={() => {
-                  setSelectedTeam(team);
-                  setActiveTeamTab('players');
-                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                  setFilterGender('all');
+                  setFilterAge('all');
+                  setFilterVenue('all');
                 }}
-                className="w-full py-2.5 rounded-xl bg-slate-100 hover:bg-emerald-600 hover:text-white dark:bg-slate-800 dark:hover:bg-emerald-600 text-slate-800 dark:text-slate-200 font-bold transition flex items-center justify-center gap-1.5 cursor-pointer shadow-xs"
+                className="text-xs text-slate-500 dark:text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 font-semibold transition cursor-pointer px-2 py-1"
               >
-                <span>Ficha del Equipo & Convocatorias</span>
-                <ChevronRight className="w-4 h-4" />
+                Limpiar filtros
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Chips activos si hay filtros */}
+        {activeFiltersCount > 0 && (
+          <div className="flex flex-wrap items-center gap-1.5 pt-2 border-t border-slate-100 dark:border-slate-800 text-xs">
+            <span className="text-[11px] font-bold text-slate-400">Filtros aplicados:</span>
+            {filterGender !== 'all' && (
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-medium capitalize">
+                <span>Género: {filterGender}</span>
+                <button type="button" onClick={() => setFilterGender('all')} className="hover:text-rose-500"><X className="w-3 h-3" /></button>
+              </span>
+            )}
+            {filterAge !== 'all' && (
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-medium capitalize">
+                <span>Edad: {filterAge}</span>
+                <button type="button" onClick={() => setFilterAge('all')} className="hover:text-rose-500"><X className="w-3 h-3" /></button>
+              </span>
+            )}
+            {isMultiVenue && filterVenue !== 'all' && (
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20 font-medium">
+                <MapPin className="w-3 h-3 text-emerald-500" />
+                <span>Sede: {venues.find((v) => v.id === filterVenue)?.name || filterVenue}</span>
+                <button type="button" onClick={() => setFilterVenue('all')} className="hover:text-rose-500"><X className="w-3 h-3" /></button>
+              </span>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* 3. Grid de Tarjetas de Equipos Oficiales con Imagen Integrada */}
+      {filteredTeams.length === 0 ? (
+        <div className="p-12 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 text-center space-y-3">
+          <Shield className="w-10 h-10 text-slate-400 mx-auto opacity-50" />
+          <h3 className="text-base font-bold text-slate-900 dark:text-white">No hay equipos que coincidan con la búsqueda</h3>
+          <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto">
+            Prueba a modificar los filtros de género, edad o sede para ver más equipos registrados.
+          </p>
+          <button
+            type="button"
+            onClick={() => {
+              setSearch('');
+              setFilterGender('all');
+              setFilterAge('all');
+              setFilterVenue('all');
+            }}
+            className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs cursor-pointer hover:bg-slate-200 transition"
+          >
+            Restablecer todos los filtros
+          </button>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredTeams.map((team) => (
+            <div
+              key={team.id}
+              className="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 hover:border-emerald-500/50 shadow-sm overflow-hidden flex flex-col justify-between transition group hover:shadow-md"
+            >
+              {/* Imagen representativa del equipo integrada en la cabecera */}
+              <div className="relative h-44 w-full bg-slate-950 overflow-hidden">
+                <img
+                  src={team.photoUrl || 'https://images.unsplash.com/photo-1554068865-24cecd4e34b8?auto=format&fit=crop&w=800&q=80'}
+                  alt={team.name}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/30 to-transparent" />
+
+                <div className="absolute top-3 left-3 right-3 flex items-center justify-between gap-2">
+                  <span className="px-2.5 py-1 rounded-full bg-emerald-500 text-slate-950 font-black text-[10px] uppercase shadow-sm">
+                    {team.category}
+                  </span>
+                  <span className="px-2.5 py-1 rounded-full bg-slate-950/80 backdrop-blur-xs text-white text-[10px] font-bold border border-white/20 capitalize">
+                    {team.gender} · {team.ageGroup}
+                  </span>
+                </div>
+
+                {/* Sede chip si aplica */}
+                {team.venueName && (
+                  <div className="absolute bottom-3 left-3 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-900/90 backdrop-blur-xs text-white text-[10px] font-bold border border-white/20 shadow-sm">
+                    <MapPin className="w-3 h-3 text-emerald-400 shrink-0" />
+                    <span className="truncate max-w-[200px]">{team.venueName}</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Contenido descriptivo del equipo */}
+              <div className="p-5 space-y-4 flex-1 flex flex-col justify-between">
+                <div className="space-y-3">
+                  <h2 className="text-base font-black text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition leading-tight">
+                    {team.name}
+                  </h2>
+
+                  <div className="space-y-2 text-xs text-slate-500 dark:text-slate-400 pt-2 border-t border-slate-100 dark:border-slate-800">
+                    <div className="flex items-center justify-between">
+                      <span className="flex items-center gap-1.5 text-slate-500 dark:text-slate-400">
+                        <Crown className="w-3.5 h-3.5 text-amber-500" />
+                        <span>Capitán:</span>
+                      </span>
+                      <strong className="text-slate-900 dark:text-slate-100 font-bold">{team.captainName}</strong>
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <span>Entrenador:</span>
+                      <span className="font-semibold text-slate-700 dark:text-slate-300">{team.coachName}</span>
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <span>Plantilla Oficial:</span>
+                      <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400">
+                        {team.players.length} fichas
+                      </span>
+                    </div>
+                  </div>
+
+                  {team.callouts.length > 0 && (
+                    <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800 text-[11px] text-slate-600 dark:text-slate-400 flex items-center justify-between">
+                      <span className="flex items-center gap-1.5">
+                        <Navigation className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                        <span>Próximo encuentro fuera</span>
+                      </span>
+                      <span className="font-bold text-slate-900 dark:text-white">
+                        {team.callouts[0].date.split(' ')[0]}
+                      </span>
+                    </div>
+                  )}
+                </div>
+
+                <div className="pt-3 border-t border-slate-100 dark:border-slate-800">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSelectedTeam(team);
+                      setActiveTeamTab('players');
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }}
+                    className="w-full py-2.5 rounded-xl bg-slate-100 hover:bg-emerald-600 hover:text-white dark:bg-slate-800 dark:hover:bg-emerald-600 text-slate-800 dark:text-slate-200 font-bold text-xs transition flex items-center justify-center gap-1.5 cursor-pointer shadow-xs active:scale-95"
+                  >
+                    <span>Ficha del Equipo & Convocatorias</span>
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* =====================================================================
+          MODAL MINIMALISTA DE FILTROS (GÉNERO, EDAD Y MULTI-SEDE)
+          ===================================================================== */}
+      {isFilterModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-sm animate-in fade-in duration-150">
+          <div className="relative w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl space-y-5 text-slate-900 dark:text-slate-100">
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+              <div className="flex items-center gap-2">
+                <Filter className="w-5 h-5 text-emerald-500" />
+                <h3 className="text-base font-black text-slate-900 dark:text-white">
+                  Filtros de Equipos
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsFilterModalOpen(false)}
+                className="p-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="space-y-4 text-xs">
+              {/* Filtro Multi-Sede (si el club gestiona múltiples sedes) */}
+              {isMultiVenue && venues.length > 1 && (
+                <div>
+                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1.5 flex items-center gap-1.5">
+                    <MapPin className="w-3.5 h-3.5 text-emerald-500" />
+                    <span>Sede / Localización del Club:</span>
+                  </label>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setFilterVenue('all')}
+                      className={`p-2.5 rounded-xl border text-left font-bold transition cursor-pointer ${
+                        filterVenue === 'all'
+                          ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-500 text-emerald-700 dark:text-emerald-300'
+                          : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-slate-300'
+                      }`}
+                    >
+                      Todas las Sedes
+                    </button>
+                    {venues.map((v) => (
+                      <button
+                        key={v.id}
+                        type="button"
+                        onClick={() => setFilterVenue(v.id)}
+                        className={`p-2.5 rounded-xl border text-left font-bold transition cursor-pointer truncate ${
+                          filterVenue === v.id
+                            ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-500 text-emerald-700 dark:text-emerald-300'
+                            : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-slate-300'
+                        }`}
+                      >
+                        {v.name}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Filtro de Género */}
+              <div>
+                <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                  Modalidad / Género:
+                </label>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                  {(['all', 'masculino', 'femenino', 'mixto'] as const).map((g) => (
+                    <button
+                      key={g}
+                      type="button"
+                      onClick={() => setFilterGender(g)}
+                      className={`py-2 px-3 rounded-xl border text-center font-bold capitalize transition cursor-pointer ${
+                        filterGender === g
+                          ? 'bg-emerald-600 text-white border-emerald-600 shadow-2xs'
+                          : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-slate-300'
+                      }`}
+                    >
+                      {g === 'all' ? 'Todos' : g}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Filtro de Edad */}
+              <div>
+                <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                  Categoría de Edad:
+                </label>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                  {(['all', 'absoluto', 'veteranos', 'menores'] as const).map((a) => (
+                    <button
+                      key={a}
+                      type="button"
+                      onClick={() => setFilterAge(a)}
+                      className={`py-2 px-3 rounded-xl border text-center font-bold capitalize transition cursor-pointer ${
+                        filterAge === a
+                          ? 'bg-emerald-600 text-white border-emerald-600 shadow-2xs'
+                          : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-slate-300'
+                      }`}
+                    >
+                      {a === 'all' ? 'Todos' : a}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-3">
+              <button
+                type="button"
+                onClick={() => {
+                  setFilterGender('all');
+                  setFilterAge('all');
+                  setFilterVenue('all');
+                }}
+                className="px-4 py-2 rounded-xl text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white font-bold text-xs cursor-pointer"
+              >
+                Limpiar Todo
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setIsFilterModalOpen(false)}
+                className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition shadow-xs cursor-pointer active:scale-95"
+              >
+                Aplicar Filtros
               </button>
             </div>
           </div>
-        ))}
-      </div>
+        </div>
+      )}
 
       {/* =====================================================================
           MODAL: NUEVO EQUIPO
@@ -2293,12 +2538,47 @@ ${declined.map((p) => `• ${p.playerName}`).join('\n')}
                 </div>
               </div>
 
+              {/* Sede del Club si es multi-sede */}
+              {isMultiVenue && venues.length > 1 && (
+                <div>
+                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1 flex items-center gap-1.5">
+                    <MapPin className="w-3.5 h-3.5 text-emerald-500" />
+                    <span>Sede Oficial del Equipo *</span>
+                  </label>
+                  <select
+                    value={newTeamForm.venueId}
+                    onChange={(e) => setNewTeamForm({ ...newTeamForm, venueId: e.target.value })}
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                  >
+                    {venues.map((v) => (
+                      <option key={v.id} value={v.id}>
+                        {v.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
+              {/* Imagen representativa del equipo */}
+              <div>
+                <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  URL de Imagen Representativa (Foto del Equipo / Cartel)
+                </label>
+                <input
+                  type="url"
+                  placeholder="https://images.unsplash.com/photo-..."
+                  value={newTeamForm.photoUrl}
+                  onChange={(e) => setNewTeamForm({ ...newTeamForm, photoUrl: e.target.value })}
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 font-mono text-[11px]"
+                />
+              </div>
+
               <div>
                 <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
                   Jugadores de la Plantilla (uno por línea)
                 </label>
                 <textarea
-                  rows={4}
+                  rows={3}
                   placeholder={'Carlos Méndez\nDiego Soto\nMateo Varela'}
                   value={newTeamForm.initialPlayersText}
                   onChange={(e) => setNewTeamForm({ ...newTeamForm, initialPlayersText: e.target.value })}

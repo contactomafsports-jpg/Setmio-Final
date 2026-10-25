@@ -521,88 +521,90 @@ export const AdminSettings: React.FC = () => {
         </p>
       </div>
 
-      {/* Selector de Pestañas: General vs Pagos vs Promociones vs IA */}
-      <div className="flex flex-wrap items-center gap-2 border-b border-slate-200 dark:border-slate-800 pb-3">
-        <button
-          type="button"
-          onClick={() => setActiveSection('general')}
-          className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 cursor-pointer ${
-            activeSection === 'general'
-              ? 'bg-emerald-600 text-white shadow-xs'
-              : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800 hover:border-slate-300'
-          }`}
-        >
-          <Settings className="w-4 h-4" />
-          <span>Configuración General</span>
-        </button>
+      {/* Selector de Pestañas Horizontales Limpias y Coherentes con el Diseño Global */}
+      <div className="overflow-x-auto no-scrollbar pb-1">
+        <div className="inline-flex items-center gap-1.5 p-1.5 bg-slate-100 dark:bg-slate-900/90 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xs min-w-max">
+          <button
+            type="button"
+            onClick={() => setActiveSection('general')}
+            className={`px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 cursor-pointer ${
+              activeSection === 'general'
+                ? 'bg-white dark:bg-emerald-600 text-slate-900 dark:text-white shadow-xs'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white/60 dark:hover:bg-slate-800/60'
+            }`}
+          >
+            <Settings className={`w-4 h-4 ${activeSection === 'general' ? 'text-emerald-600 dark:text-white' : 'text-slate-500'}`} />
+            <span>Configuración General</span>
+          </button>
 
-        <button
-          type="button"
-          onClick={() => setActiveSection('payments')}
-          className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 cursor-pointer ${
-            activeSection === 'payments'
-              ? 'bg-emerald-600 text-white shadow-xs'
-              : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800 hover:border-slate-300'
-          }`}
-        >
-          <CreditCard className="w-4 h-4" />
-          <span>{t('settings.tabs.payments', 'Métodos de Pago & Políticas')}</span>
-        </button>
+          <button
+            type="button"
+            onClick={() => setActiveSection('payments')}
+            className={`px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 cursor-pointer ${
+              activeSection === 'payments'
+                ? 'bg-white dark:bg-emerald-600 text-slate-900 dark:text-white shadow-xs'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white/60 dark:hover:bg-slate-800/60'
+            }`}
+          >
+            <CreditCard className={`w-4 h-4 ${activeSection === 'payments' ? 'text-emerald-600 dark:text-white' : 'text-slate-500'}`} />
+            <span>{t('settings.tabs.payments', 'Métodos de Pago & Políticas')}</span>
+          </button>
 
-        <button
-          type="button"
-          onClick={() => setActiveSection('promos')}
-          className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 cursor-pointer ${
-            activeSection === 'promos'
-              ? 'bg-emerald-600 text-white shadow-xs'
-              : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800 hover:border-slate-300'
-          }`}
-        >
-          <Tag className="w-4 h-4" />
-          <span>{t('settings.tabs.promos', 'Cupones y Bonos')}</span>
-        </button>
+          <button
+            type="button"
+            onClick={() => setActiveSection('promos')}
+            className={`px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 cursor-pointer ${
+              activeSection === 'promos'
+                ? 'bg-white dark:bg-emerald-600 text-slate-900 dark:text-white shadow-xs'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white/60 dark:hover:bg-slate-800/60'
+            }`}
+          >
+            <Tag className={`w-4 h-4 ${activeSection === 'promos' ? 'text-emerald-600 dark:text-white' : 'text-slate-500'}`} />
+            <span>{t('settings.tabs.promos', 'Cupones y Bonos')}</span>
+          </button>
 
-        <button
-          type="button"
-          onClick={() => setActiveSection('ai')}
-          className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 cursor-pointer ${
-            activeSection === 'ai'
-              ? 'bg-emerald-600 text-white shadow-xs'
-              : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800 hover:border-slate-300'
-          }`}
-        >
-          <Sparkles className="w-4 h-4 text-amber-400" />
-          <span>Configuración de IA & Agentes Multicanal</span>
-          <span className="px-1.5 py-0.2 rounded bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 font-mono text-[9px] font-black">
-            NUEVO
-          </span>
-        </button>
+          <button
+            type="button"
+            onClick={() => setActiveSection('ai')}
+            className={`px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 cursor-pointer ${
+              activeSection === 'ai'
+                ? 'bg-white dark:bg-emerald-600 text-slate-900 dark:text-white shadow-xs'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white/60 dark:hover:bg-slate-800/60'
+            }`}
+          >
+            <Sparkles className={`w-4 h-4 ${activeSection === 'ai' ? 'text-amber-500 dark:text-amber-300' : 'text-amber-500'}`} />
+            <span>IA & Agentes Multicanal</span>
+            <span className="px-1.5 py-0.2 rounded-full bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 font-mono text-[9px] font-black border border-amber-300 dark:border-amber-800">
+              NUEVO
+            </span>
+          </button>
 
-        <button
-          type="button"
-          onClick={() => setActiveSection('shipping')}
-          className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 cursor-pointer ${
-            activeSection === 'shipping'
-              ? 'bg-emerald-600 text-white shadow-xs'
-              : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800 hover:border-slate-300'
-          }`}
-        >
-          <Truck className="w-4 h-4 text-emerald-500" />
-          <span>{t('shop.shippingSettings', 'Configuración de Envíos')}</span>
-        </button>
+          <button
+            type="button"
+            onClick={() => setActiveSection('shipping')}
+            className={`px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 cursor-pointer ${
+              activeSection === 'shipping'
+                ? 'bg-white dark:bg-emerald-600 text-slate-900 dark:text-white shadow-xs'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white/60 dark:hover:bg-slate-800/60'
+            }`}
+          >
+            <Truck className={`w-4 h-4 ${activeSection === 'shipping' ? 'text-emerald-600 dark:text-white' : 'text-slate-500'}`} />
+            <span>{t('shop.shippingSettings', 'Envíos & Logística')}</span>
+          </button>
 
-        <button
-          type="button"
-          onClick={() => setActiveSection('notifications')}
-          className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 cursor-pointer ${
-            activeSection === 'notifications'
-              ? 'bg-emerald-600 text-white shadow-xs'
-              : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800 hover:border-slate-300'
-          }`}
-        >
-          <Bell className="w-4 h-4 text-emerald-500" />
-          <span>Notificaciones & Plantillas</span>
-        </button>
+          <button
+            type="button"
+            onClick={() => setActiveSection('notifications')}
+            className={`px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 cursor-pointer ${
+              activeSection === 'notifications'
+                ? 'bg-white dark:bg-emerald-600 text-slate-900 dark:text-white shadow-xs'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white/60 dark:hover:bg-slate-800/60'
+            }`}
+          >
+            <Bell className={`w-4 h-4 ${activeSection === 'notifications' ? 'text-emerald-600 dark:text-white' : 'text-slate-500'}`} />
+            <span>Notificaciones & Avisos</span>
+          </button>
+        </div>
       </div>
 
       {/* ======================================================================
