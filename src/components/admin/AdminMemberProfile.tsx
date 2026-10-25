@@ -111,7 +111,7 @@ export const AdminMemberProfile: React.FC<AdminMemberProfileProps> = ({ member, 
   const [selectedRivalDetail, setSelectedRivalDetail] = useState<any | null>(null);
 
   // Interactive Chart state
-  const [chartTimeframe, setChartTimeframe] = useState<'6m' | 'season' | 'all'>('6m');
+  const [chartTimeframe, setChartTimeframe] = useState<'weekly' | '6m' | 'season' | 'all'>('weekly');
   const [hoveredPointIndex, setHoveredPointIndex] = useState<number | null>(null);
 
   // Horizontal Carousels Smooth Scroll Refs
@@ -188,8 +188,66 @@ export const AdminMemberProfile: React.FC<AdminMemberProfileProps> = ({ member, 
     points: 2450,
   };
 
-  // Histórico de Nivel ELO mes a mes (Gráficos)
-  const eloHistoryPoints = [
+  // Histórico de Nivel ELO Semanal (Últimas 6 Semanas)
+  const weeklyEloPoints = [
+    {
+      month: 'Sem 38',
+      fullName: 'Semana 38 · 15-21 Sep',
+      level: 3.70,
+      elo: 1570,
+      matches: 2,
+      milestone: 'Entrenamiento táctico y victoria en partido amistoso',
+      delta: '+0.05',
+    },
+    {
+      month: 'Sem 39',
+      fullName: 'Semana 39 · 22-28 Sep',
+      level: 3.75,
+      elo: 1595,
+      matches: 3,
+      milestone: '🥈 Finalista Torneo de Otoño San Mateo',
+      delta: '+0.05',
+    },
+    {
+      month: 'Sem 40',
+      fullName: 'Semana 40 · 29 Sep - 05 Oct',
+      level: 3.78,
+      elo: 1610,
+      matches: 2,
+      milestone: 'Victoria en Partido Abierto Play! Nivel 4.0',
+      delta: '+0.03',
+    },
+    {
+      month: 'Sem 41',
+      fullName: 'Semana 41 · 06-12 Oct',
+      level: 3.80,
+      elo: 1620,
+      matches: 2,
+      milestone: 'Victoria vs Pareja Cabeza de Serie #2',
+      delta: '+0.02',
+    },
+    {
+      month: 'Sem 42',
+      fullName: 'Semana 42 · 13-19 Oct',
+      level: 3.82,
+      elo: 1630,
+      matches: 3,
+      milestone: 'Semifinales Liga Interclubes Rías Altas',
+      delta: '+0.02',
+    },
+    {
+      month: 'Sem 43',
+      fullName: 'Semana 43 · Actual',
+      level: Number((memberData.level || 3.85).toFixed(2)),
+      elo: 1640,
+      matches: 2,
+      milestone: 'Certificación FEP Oficial · Nivel Consolidado Top 3%',
+      delta: '+0.03',
+    },
+  ];
+
+  // Histórico de Nivel ELO mes a mes (Últimos 6 Meses)
+  const monthlyEloPoints = [
     {
       month: 'May',
       fullName: 'Mayo 2026',
@@ -245,6 +303,81 @@ export const AdminMemberProfile: React.FC<AdminMemberProfileProps> = ({ member, 
       delta: '+0.10',
     },
   ];
+
+  // Dataset activo según el selector de periodo
+  const eloHistoryPoints = useMemo(() => {
+    switch (chartTimeframe) {
+      case 'weekly':
+        return weeklyEloPoints;
+      case 'season':
+        return [
+          { month: 'Ene', fullName: 'Enero 2026', level: 3.25, elo: 1320, matches: 5, milestone: 'Pretemporada de Club', delta: '+0.00' },
+          { month: 'Mar', fullName: 'Marzo 2026', level: 3.35, elo: 1370, matches: 6, milestone: 'Inicio Torneos de Primavera', delta: '+0.10' },
+          { month: 'May', fullName: 'Mayo 2026', level: 3.45, elo: 1430, matches: 7, milestone: 'Ascenso a 2ª Categoría FEP', delta: '+0.10' },
+          { month: 'Jul', fullName: 'Julio 2026', level: 3.60, elo: 1500, matches: 8, milestone: 'Semifinales Liga Interclubes', delta: '+0.15' },
+          { month: 'Sep', fullName: 'Septiembre 2026', level: 3.75, elo: 1595, matches: 8, milestone: 'Finalista Open San Mateo', delta: '+0.15' },
+          { month: 'Oct', fullName: 'Octubre 2026', level: Number((memberData.level || 3.85).toFixed(2)), elo: 1640, matches: 4, milestone: 'Consolidación Top 3% Oficial', delta: '+0.10' },
+        ];
+      case 'all':
+        return [
+          { month: '2023', fullName: 'Año 2023', level: 2.80, elo: 1100, matches: 22, milestone: 'Comienzo federado', delta: '+0.00' },
+          { month: '2024 S1', fullName: '2024 Semestre 1', level: 3.05, elo: 1220, matches: 28, milestone: 'Primer título social', delta: '+0.25' },
+          { month: '2024 S2', fullName: '2024 Semestre 2', level: 3.25, elo: 1310, matches: 34, milestone: 'Consolidación en 3ª cat', delta: '+0.20' },
+          { month: '2025 S1', fullName: '2025 Semestre 1', level: 3.45, elo: 1420, matches: 30, milestone: 'Ascenso a 2ª categoría', delta: '+0.20' },
+          { month: '2025 S2', fullName: '2025 Semestre 2', level: 3.65, elo: 1540, matches: 36, milestone: 'Campeón Torneo Nocturno', delta: '+0.20' },
+          { month: '2026', fullName: '2026 Temporada Actual', level: Number((memberData.level || 3.85).toFixed(2)), elo: 1640, matches: 38, milestone: 'Top 3% Ranking Club', delta: '+0.20' },
+        ];
+      case '6m':
+      default:
+        return monthlyEloPoints;
+    }
+  }, [chartTimeframe, memberData.level]);
+
+  // Coordenadas responsivas calculadas dinámicamente para el lienzo SVG (evitando desbordamiento)
+  const chartPoints = useMemo(() => {
+    const startX = 65;
+    const endX = 535;
+    const minY = 30; // Nivel 4.00
+    const maxY = 170; // Nivel 3.20
+    const minLevel = 3.20;
+    const maxLevel = 4.00;
+    const count = eloHistoryPoints.length;
+    const step = count > 1 ? (endX - startX) / (count - 1) : 0;
+
+    return eloHistoryPoints.map((item, idx) => {
+      const x = Math.round(startX + idx * step);
+      const clampedLevel = Math.max(minLevel, Math.min(maxLevel, item.level));
+      const ratio = (clampedLevel - minLevel) / (maxLevel - minLevel);
+      const y = Math.round(maxY - ratio * (maxY - minY));
+      return { x, y, item, idx };
+    });
+  }, [eloHistoryPoints]);
+
+  // Generación matemática de curva cúbica bezier continua y suave
+  const { linePath, areaPath } = useMemo(() => {
+    if (chartPoints.length === 0) return { linePath: '', areaPath: '' };
+    if (chartPoints.length === 1) {
+      const p = chartPoints[0];
+      return { linePath: `M ${p.x} ${p.y}`, areaPath: '' };
+    }
+
+    let line = `M ${chartPoints[0].x} ${chartPoints[0].y}`;
+    for (let i = 0; i < chartPoints.length - 1; i++) {
+      const p0 = chartPoints[i];
+      const p1 = chartPoints[i + 1];
+      const cpX1 = Math.round(p0.x + (p1.x - p0.x) * 0.5);
+      const cpY1 = p0.y;
+      const cpX2 = Math.round(p0.x + (p1.x - p0.x) * 0.5);
+      const cpY2 = p1.y;
+      line += ` C ${cpX1} ${cpY1}, ${cpX2} ${cpY2}, ${p1.x} ${p1.y}`;
+    }
+
+    const first = chartPoints[0];
+    const last = chartPoints[chartPoints.length - 1];
+    const area = `${line} L ${last.x} 180 L ${first.x} 180 Z`;
+
+    return { linePath: line, areaPath: area };
+  }, [chartPoints]);
 
   // Top 5 Compañeros habituales (carrusel horizontal full-width)
   const frequentPartners = [
@@ -1199,8 +1332,8 @@ export const AdminMemberProfile: React.FC<AdminMemberProfileProps> = ({ member, 
         </div>
       </div>
 
-      {/* 5. GRÁFICO DEDICADO: EVOLUCIÓN DE NIVEL ELO EN LOS ÚLTIMOS MESES */}
-      <section className="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 p-5 sm:p-6 shadow-sm space-y-4">
+      {/* 5. GRÁFICO DEDICADO: EVOLUCIÓN DE NIVEL ELO EN LOS ÚLTIMOS MESES / SEMANAS */}
+      <section className="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 p-4 sm:p-6 shadow-sm space-y-4">
         {/* Cabecera del gráfico con selector de periodo y badge oficial */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 dark:border-slate-800 pb-3.5">
           <div className="flex items-center gap-2.5">
@@ -1212,7 +1345,7 @@ export const AdminMemberProfile: React.FC<AdminMemberProfileProps> = ({ member, 
                 <h3 className="font-black text-sm sm:text-base text-slate-900 dark:text-white">
                   Evolución de Nivel ELO & Histórico de Puntuación
                 </h3>
-                <span className="hidden sm:inline-flex px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800">
+                <span className="hidden sm:inline-flex px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800 font-mono">
                   {levelTrend.delta} ({levelTrend.percentage})
                 </span>
               </div>
@@ -1222,14 +1355,31 @@ export const AdminMemberProfile: React.FC<AdminMemberProfileProps> = ({ member, 
             </div>
           </div>
 
-          {/* Selector interactivo de periodo */}
-          <div className="flex items-center gap-1 p-1 bg-slate-100 dark:bg-slate-800/90 rounded-xl text-xs shrink-0 self-start sm:self-auto">
+          {/* Selector interactivo de periodo con scroll horizontal en móvil para evitar rotura de diseño */}
+          <div className="flex items-center gap-1 p-1 bg-slate-100 dark:bg-slate-800/90 rounded-xl text-xs shrink-0 max-w-full overflow-x-auto no-scrollbar self-start sm:self-auto">
             <button
               type="button"
-              onClick={() => setChartTimeframe('6m')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
+              onClick={() => {
+                setChartTimeframe('weekly');
+                setHoveredPointIndex(null);
+              }}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer whitespace-nowrap ${
+                chartTimeframe === 'weekly'
+                  ? 'bg-white dark:bg-slate-900 text-emerald-600 dark:text-emerald-400 shadow-xs'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+              }`}
+            >
+              Semanales (6 Sem.)
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setChartTimeframe('6m');
+                setHoveredPointIndex(null);
+              }}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer whitespace-nowrap ${
                 chartTimeframe === '6m'
-                  ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xs'
+                  ? 'bg-white dark:bg-slate-900 text-emerald-600 dark:text-emerald-400 shadow-xs'
                   : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
@@ -1237,10 +1387,13 @@ export const AdminMemberProfile: React.FC<AdminMemberProfileProps> = ({ member, 
             </button>
             <button
               type="button"
-              onClick={() => setChartTimeframe('season')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
+              onClick={() => {
+                setChartTimeframe('season');
+                setHoveredPointIndex(null);
+              }}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer whitespace-nowrap ${
                 chartTimeframe === 'season'
-                  ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xs'
+                  ? 'bg-white dark:bg-slate-900 text-emerald-600 dark:text-emerald-400 shadow-xs'
                   : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
@@ -1248,10 +1401,13 @@ export const AdminMemberProfile: React.FC<AdminMemberProfileProps> = ({ member, 
             </button>
             <button
               type="button"
-              onClick={() => setChartTimeframe('all')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
+              onClick={() => {
+                setChartTimeframe('all');
+                setHoveredPointIndex(null);
+              }}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer whitespace-nowrap ${
                 chartTimeframe === 'all'
-                  ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xs'
+                  ? 'bg-white dark:bg-slate-900 text-emerald-600 dark:text-emerald-400 shadow-xs'
                   : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
@@ -1260,160 +1416,167 @@ export const AdminMemberProfile: React.FC<AdminMemberProfileProps> = ({ member, 
           </div>
         </div>
 
-        {/* Lienzo SVG interactivo de alta fidelidad */}
+        {/* Lienzo SVG interactivo de alta fidelidad responsivo */}
         <div className="relative pt-2 pb-1">
-          <div className="h-56 sm:h-64 w-full">
-            <svg
-              viewBox="0 0 600 200"
-              className="w-full h-full overflow-visible"
-              preserveAspectRatio="none"
-            >
-              <defs>
-                <linearGradient id="eloAreaGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#10b981" stopOpacity="0.32" />
-                  <stop offset="60%" stopColor="#10b981" stopOpacity="0.08" />
-                  <stop offset="100%" stopColor="#10b981" stopOpacity="0.00" />
-                </linearGradient>
-                <filter id="glowShadow" x="-20%" y="-20%" width="140%" height="140%">
-                  <feDropShadow dx="0" dy="4" stdDeviation="4" floodColor="#10b981" floodOpacity="0.4" />
-                </filter>
-              </defs>
+          {/* Indicador de ayuda en pantallas móviles */}
+          <div className="sm:hidden flex items-center justify-between text-[11px] text-slate-400 dark:text-slate-500 pb-1.5 px-0.5">
+            <span className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-medium">
+              <Activity className="w-3 h-3" />
+              <span>Desliza para explorar</span>
+            </span>
+            <span className="font-mono text-[10px]">Toca los puntos para detalles</span>
+          </div>
 
-              {/* Líneas horizontales de referencia con marcas de nivel FEP y puntos ELO */}
-              {[
-                { y: 30, level: '4.00', elo: '1,700' },
-                { y: 65, level: '3.80', elo: '1,620' },
-                { y: 100, level: '3.60', elo: '1,510' },
-                { y: 135, level: '3.40', elo: '1,420' },
-                { y: 170, level: '3.20', elo: '1,350' },
-              ].map((line, idx) => (
-                <g key={idx}>
-                  <line
-                    x1="45"
-                    y1={line.y}
-                    x2="590"
-                    y2={line.y}
-                    stroke="currentColor"
-                    className="text-slate-100 dark:text-slate-800/80"
-                    strokeWidth="1"
-                    strokeDasharray={idx === 1 ? 'none' : '3 3'}
-                  />
-                  <text
-                    x="5"
-                    y={line.y + 4}
-                    className="text-[10px] font-mono fill-slate-400 dark:fill-slate-500 font-semibold"
-                  >
-                    Nv {line.level}
-                  </text>
-                  <text
-                    x="595"
-                    y={line.y + 4}
-                    className="text-[9px] font-mono fill-slate-300 dark:fill-slate-600 hidden sm:inline"
-                    textAnchor="start"
-                  >
-                    {line.elo}
-                  </text>
-                </g>
-              ))}
+          {/* Envoltura con desplazamiento horizontal controlado para pantallas estrechas */}
+          <div className="w-full overflow-x-auto no-scrollbar pb-1">
+            <div className="h-56 sm:h-64 min-w-[500px] sm:min-w-full w-full">
+              <svg
+                viewBox="0 0 600 200"
+                className="w-full h-full select-none"
+                preserveAspectRatio="none"
+              >
+                <defs>
+                  <linearGradient id="eloAreaGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#10b981" stopOpacity="0.32" />
+                    <stop offset="60%" stopColor="#10b981" stopOpacity="0.08" />
+                    <stop offset="100%" stopColor="#10b981" stopOpacity="0.00" />
+                  </linearGradient>
+                  <filter id="glowShadow" x="-20%" y="-20%" width="140%" height="140%">
+                    <feDropShadow dx="0" dy="4" stdDeviation="4" floodColor="#10b981" floodOpacity="0.4" />
+                  </filter>
+                </defs>
 
-              {/* Curva y Área de evolución de Nivel ELO */}
-              {/* Coordenadas X: May(70), Jun(170), Jul(270), Ago(370), Sep(470), Oct(570) */}
-              {/* Coordenadas Y: 3.35(143), 3.40(135), 3.55(108), 3.65(91), 3.75(74), 3.85(56) */}
-              <path
-                d="M 70 143 C 120 143, 120 135, 170 135 C 220 135, 220 108, 270 108 C 320 108, 320 91, 370 91 C 420 91, 420 74, 470 74 C 520 74, 520 56, 570 56 L 570 180 L 70 180 Z"
-                fill="url(#eloAreaGradient)"
-              />
-
-              <path
-                d="M 70 143 C 120 143, 120 135, 170 135 C 220 135, 220 108, 270 108 C 320 108, 320 91, 370 91 C 420 91, 420 74, 470 74 C 520 74, 520 56, 570 56"
-                fill="none"
-                stroke="#10b981"
-                strokeWidth="3.5"
-                strokeLinecap="round"
-                filter="url(#glowShadow)"
-              />
-
-              {/* Puntos de datos interactivos con animaciones y tooltips */}
-              {[
-                { x: 70, y: 143, idx: 0 },
-                { x: 170, y: 135, idx: 1 },
-                { x: 270, y: 108, idx: 2 },
-                { x: 370, y: 91, idx: 3 },
-                { x: 470, y: 74, idx: 4 },
-                { x: 570, y: 56, idx: 5 },
-              ].map((pt) => {
-                const item = eloHistoryPoints[pt.idx];
-                const isHovered = hoveredPointIndex === pt.idx;
-                return (
-                  <g
-                    key={pt.idx}
-                    className="cursor-pointer group"
-                    onMouseEnter={() => setHoveredPointIndex(pt.idx)}
-                    onMouseLeave={() => setHoveredPointIndex(null)}
-                    onClick={() => setHoveredPointIndex(pt.idx)}
-                  >
-                    {/* Anillo de enfoque al pasar el cursor */}
-                    <circle
-                      cx={pt.x}
-                      cy={pt.y}
-                      r={isHovered ? 12 : 7}
-                      fill="#10b981"
-                      fillOpacity={isHovered ? 0.25 : 0.15}
-                      className="transition-all duration-200"
+                {/* Líneas horizontales de referencia con marcas de nivel FEP y puntos ELO */}
+                {[
+                  { y: 30, level: '4.00', elo: '1,700' },
+                  { y: 65, level: '3.80', elo: '1,620' },
+                  { y: 100, level: '3.60', elo: '1,510' },
+                  { y: 135, level: '3.40', elo: '1,420' },
+                  { y: 170, level: '3.20', elo: '1,350' },
+                ].map((line, idx) => (
+                  <g key={idx}>
+                    <line
+                      x1="45"
+                      y1={line.y}
+                      x2="540"
+                      y2={line.y}
+                      stroke="currentColor"
+                      className="text-slate-100 dark:text-slate-800/80"
+                      strokeWidth="1"
+                      strokeDasharray={idx === 1 ? 'none' : '3 3'}
                     />
-                    {/* Punto principal */}
-                    <circle
-                      cx={pt.x}
-                      cy={pt.y}
-                      r={isHovered ? 6 : 4.5}
-                      fill="#ffffff"
-                      stroke="#10b981"
-                      strokeWidth={isHovered ? 3 : 2.5}
-                      className="transition-all duration-200 dark:fill-slate-900"
-                    />
-
-                    {/* Valor numérico flotante permanente */}
                     <text
-                      x={pt.x}
-                      y={pt.y - 10}
-                      textAnchor="middle"
-                      className={`text-[10px] font-mono font-bold transition-all duration-200 ${
-                        isHovered
-                          ? 'fill-emerald-600 dark:fill-emerald-400 text-xs'
-                          : 'fill-slate-700 dark:fill-slate-300'
-                      }`}
+                      x="6"
+                      y={line.y + 4}
+                      className="text-[10px] font-mono fill-slate-400 dark:fill-slate-500 font-semibold"
                     >
-                      {item.level.toFixed(2)}
+                      Nv {line.level}
                     </text>
-
-                    {/* Etiqueta del mes inferior */}
                     <text
-                      x={pt.x}
-                      y="195"
-                      textAnchor="middle"
-                      className={`text-[11px] font-bold font-mono transition-colors ${
-                        isHovered
-                          ? 'fill-emerald-600 dark:fill-emerald-400'
-                          : 'fill-slate-500 dark:fill-slate-400'
-                      }`}
+                      x="585"
+                      y={line.y + 4}
+                      className="text-[9px] font-mono fill-slate-400 dark:fill-slate-600"
+                      textAnchor="end"
                     >
-                      {item.month}
+                      {line.elo}
                     </text>
                   </g>
-                );
-              })}
-            </svg>
+                ))}
+
+                {/* Área bajo la curva calculada dinámicamente */}
+                {areaPath && (
+                  <path
+                    d={areaPath}
+                    fill="url(#eloAreaGradient)"
+                  />
+                )}
+
+                {/* Curva principal calculada dinámicamente */}
+                {linePath && (
+                  <path
+                    d={linePath}
+                    fill="none"
+                    stroke="#10b981"
+                    strokeWidth="3.5"
+                    strokeLinecap="round"
+                    filter="url(#glowShadow)"
+                  />
+                )}
+
+                {/* Puntos de datos interactivos generados dinámicamente sin salirse de los límites */}
+                {chartPoints.map((pt) => {
+                  const isHovered = hoveredPointIndex === pt.idx;
+                  return (
+                    <g
+                      key={pt.idx}
+                      className="cursor-pointer group"
+                      onMouseEnter={() => setHoveredPointIndex(pt.idx)}
+                      onMouseLeave={() => setHoveredPointIndex(null)}
+                      onClick={() => setHoveredPointIndex(pt.idx)}
+                    >
+                      {/* Anillo de enfoque al interactuar */}
+                      <circle
+                        cx={pt.x}
+                        cy={pt.y}
+                        r={isHovered ? 12 : 7}
+                        fill="#10b981"
+                        fillOpacity={isHovered ? 0.25 : 0.15}
+                        className="transition-all duration-200"
+                      />
+                      {/* Punto central */}
+                      <circle
+                        cx={pt.x}
+                        cy={pt.y}
+                        r={isHovered ? 6 : 4.5}
+                        fill="#ffffff"
+                        stroke="#10b981"
+                        strokeWidth={isHovered ? 3 : 2.5}
+                        className="transition-all duration-200 dark:fill-slate-900"
+                      />
+
+                      {/* Valor numérico flotante */}
+                      <text
+                        x={pt.x}
+                        y={pt.y - 10}
+                        textAnchor="middle"
+                        className={`text-[10px] font-mono font-bold transition-all duration-200 ${
+                          isHovered
+                            ? 'fill-emerald-600 dark:fill-emerald-400 text-xs font-black'
+                            : 'fill-slate-700 dark:fill-slate-300'
+                        }`}
+                      >
+                        {pt.item.level.toFixed(2)}
+                      </text>
+
+                      {/* Etiqueta del periodo / semana inferior */}
+                      <text
+                        x={pt.x}
+                        y="194"
+                        textAnchor="middle"
+                        className={`text-[11px] font-bold font-mono transition-colors ${
+                          isHovered
+                            ? 'fill-emerald-600 dark:fill-emerald-400'
+                            : 'fill-slate-500 dark:fill-slate-400'
+                        }`}
+                      >
+                        {pt.item.month}
+                      </text>
+                    </g>
+                  );
+                })}
+              </svg>
+            </div>
           </div>
 
           {/* Tooltip flotante con información rica del hito deportivo seleccionado o activo */}
-          {hoveredPointIndex !== null && (
+          {hoveredPointIndex !== null && eloHistoryPoints[hoveredPointIndex] && (
             <div className="mt-3 p-3 rounded-2xl bg-slate-900 dark:bg-slate-950 text-white border border-emerald-500/40 shadow-xl flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs animate-in fade-in zoom-in-95 duration-150">
               <div className="flex items-center gap-2.5">
                 <div className="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-mono font-black text-xs shrink-0">
                   Nv {eloHistoryPoints[hoveredPointIndex].level.toFixed(2)}
                 </div>
                 <div>
-                  <div className="font-bold flex items-center gap-2">
+                  <div className="font-bold flex items-center gap-2 flex-wrap">
                     <span>{eloHistoryPoints[hoveredPointIndex].fullName}</span>
                     <span className="font-mono text-emerald-400 text-[11px]">
                       {eloHistoryPoints[hoveredPointIndex].elo} pts ELO
@@ -1428,32 +1591,40 @@ export const AdminMemberProfile: React.FC<AdminMemberProfileProps> = ({ member, 
                 </div>
               </div>
 
-              <div className="text-right text-[11px] text-slate-400 shrink-0 font-mono">
+              <div className="text-left sm:text-right text-[11px] text-slate-400 shrink-0 font-mono">
                 {eloHistoryPoints[hoveredPointIndex].matches} partidos disputados
               </div>
             </div>
           )}
         </div>
 
-        {/* Resumen inferior de indicadores clave del gráfico */}
+        {/* Resumen inferior de indicadores clave del gráfico responsivo y protegido contra desbordamientos */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-3 border-t border-slate-100 dark:border-slate-800 text-xs">
-          <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800">
-            <span className="text-[10px] text-slate-400 uppercase font-bold block">Nivel Inicial (May)</span>
-            <span className="font-mono font-bold text-slate-800 dark:text-slate-200 text-sm">3.40 FEP</span>
+          <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800 min-w-0">
+            <span className="text-[10px] text-slate-400 uppercase font-bold block truncate">
+              {chartTimeframe === 'weekly' ? 'Nivel Inicio Semanal' : 'Nivel Inicial (May)'}
+            </span>
+            <span className="font-mono font-bold text-slate-800 dark:text-slate-200 text-xs sm:text-sm truncate block">
+              {chartTimeframe === 'weekly' ? '3.70 FEP' : '3.40 FEP'}
+            </span>
           </div>
-          <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800">
-            <span className="text-[10px] text-slate-400 uppercase font-bold block">Nivel Máximo</span>
-            <span className="font-mono font-bold text-slate-800 dark:text-slate-200 text-sm">3.88 FEP</span>
+          <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800 min-w-0">
+            <span className="text-[10px] text-slate-400 uppercase font-bold block truncate">Nivel Máximo</span>
+            <span className="font-mono font-bold text-slate-800 dark:text-slate-200 text-xs sm:text-sm truncate block">
+              3.88 FEP
+            </span>
           </div>
-          <div className="p-2.5 rounded-xl bg-emerald-50/60 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-800/80">
-            <span className="text-[10px] text-emerald-700 dark:text-emerald-400 uppercase font-bold block">Nivel Consolidado</span>
-            <span className="font-mono font-bold text-emerald-700 dark:text-emerald-300 text-sm">
+          <div className="p-2.5 rounded-xl bg-emerald-50/60 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-800/80 min-w-0">
+            <span className="text-[10px] text-emerald-700 dark:text-emerald-400 uppercase font-bold block truncate">Nivel Consolidado</span>
+            <span className="font-mono font-bold text-emerald-700 dark:text-emerald-300 text-xs sm:text-sm truncate block">
               {levelTrend.currentLevel.toFixed(2)} FEP (~1,640 ELO)
             </span>
           </div>
-          <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800">
-            <span className="text-[10px] text-slate-400 uppercase font-bold block">Fiabilidad Oficial</span>
-            <span className="font-mono font-bold text-slate-800 dark:text-slate-200 text-sm">96% (38 Partidos)</span>
+          <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800 min-w-0">
+            <span className="text-[10px] text-slate-400 uppercase font-bold block truncate">Fiabilidad Oficial</span>
+            <span className="font-mono font-bold text-slate-800 dark:text-slate-200 text-xs sm:text-sm truncate block">
+              96% (38 Partidos)
+            </span>
           </div>
         </div>
       </section>
