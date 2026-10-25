@@ -70,6 +70,7 @@ export const AdminCourtsManagement: React.FC<AdminCourtsManagementProps> = ({
   // Multi-venue segmenting: In multi-venue mode, the entire section is obligatorily segmented by venue
   const realVenues = (venues || []).filter((v) => v.id !== 'all');
   const isMultiVenueActive = Boolean(isMultiVenue) && realVenues.length > 1;
+  const isAllVenuesSelected = selectedVenueId === 'all';
   const effectiveVenueId =
     selectedVenueId && selectedVenueId !== 'all'
       ? selectedVenueId
@@ -86,6 +87,7 @@ export const AdminCourtsManagement: React.FC<AdminCourtsManagementProps> = ({
   // Courts segmented by venue in multi-venue mode
   const venueCourts = courts.filter((c) => {
     if (!isMultiVenueActive) return true;
+    if (isAllVenuesSelected) return true;
     return c.venueId ? c.venueId === effectiveVenueId : effectiveVenueId === realVenues[0]?.id;
   });
 
@@ -257,6 +259,7 @@ export const AdminCourtsManagement: React.FC<AdminCourtsManagementProps> = ({
 
   const venueSmartDevices = smartDevices.filter((d) => {
     if (!isMultiVenueActive) return true;
+    if (isAllVenuesSelected) return true;
     const assignedCourt = courts.find((c) => c.id === d.courtId);
     const courtVenueId = assignedCourt?.venueId || realVenues[0]?.id;
     return courtVenueId === effectiveVenueId;
@@ -363,8 +366,28 @@ export const AdminCourtsManagement: React.FC<AdminCourtsManagementProps> = ({
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setSelectedVenueId('all')}
+              className={`px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 cursor-pointer border ${
+                isAllVenuesSelected
+                  ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs'
+                  : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-800 hover:border-emerald-500/50'
+              }`}
+            >
+              <Building2 className="w-3.5 h-3.5" />
+              <span>Todas las Sedes</span>
+              <span
+                className={`px-1.5 py-0.2 rounded-md text-[10px] font-mono font-bold ${
+                  isAllVenuesSelected ? 'bg-white/25 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
+                }`}
+              >
+                {courts.length} pistas
+              </span>
+            </button>
+
             {realVenues.map((v) => {
-              const isSelected = effectiveVenueId === v.id;
+              const isSelected = !isAllVenuesSelected && effectiveVenueId === v.id;
               const count = courts.filter((c) => (c.venueId ? c.venueId === v.id : v.id === realVenues[0]?.id)).length;
               return (
                 <button

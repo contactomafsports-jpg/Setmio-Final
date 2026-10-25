@@ -33,10 +33,13 @@ import {
   TrendingDown,
   Minus,
   Save,
-  Split,
   LayoutGrid,
   Phone,
   Mail,
+  Share2,
+  FileText,
+  List,
+  GitBranch,
 } from 'lucide-react';
 
 export interface ProBracketMatch {
@@ -849,26 +852,17 @@ export const AdminTournaments: React.FC = () => {
                       <div className="p-5 sm:p-6 flex-1 flex flex-col justify-between space-y-4">
                         <div className="space-y-2">
                           <div className="flex flex-wrap items-center justify-between gap-2">
-                            <div className="flex flex-wrap items-center gap-2">
-                              <span className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-500/20 px-2.5 py-0.5 rounded-full">
-                                {tournament.categories.map((c) => c.name).join(' · ')}
-                              </span>
-                              <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400">
-                                {tournament.rankingCategory || 'Circuito Setmio Oro'}
-                              </span>
-                            </div>
-
-                            <div className="text-right">
-                              <span className="text-xs text-slate-400">Cuota: </span>
-                              <span className="font-mono font-black text-sm text-slate-900 dark:text-white">
-                                {tournament.entryFee.toFixed(2)} €
-                              </span>
-                            </div>
+                            <span className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-500/20 px-2.5 py-0.5 rounded-full">
+                              {tournament.rankingCategory || 'Circuito Setmio Oro'}
+                            </span>
+                            <span className="text-[11px] text-slate-400 font-mono font-medium">
+                              {tournament.format || 'Cuadro Eliminatorio'}
+                            </span>
                           </div>
 
                           <h2
                             onClick={() => handleOpenDetail(tournament)}
-                            className="text-lg font-black text-slate-900 dark:text-white tracking-tight hover:text-emerald-500 transition cursor-pointer"
+                            className="text-lg sm:text-xl font-black text-slate-900 dark:text-white tracking-tight hover:text-emerald-500 transition cursor-pointer"
                           >
                             {tournament.title}
                           </h2>
@@ -878,7 +872,7 @@ export const AdminTournaments: React.FC = () => {
                         </div>
 
                         {/* Resumen Ejecutivo */}
-                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-3 border-t border-slate-100 dark:border-slate-800 text-xs">
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-2 border-t border-slate-100 dark:border-slate-800 text-xs">
                           <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-950/70 border border-slate-200/60 dark:border-slate-800/80">
                             <span className="text-[10px] text-slate-400 font-bold uppercase block">Inscritos</span>
                             <span className="font-black text-slate-900 dark:text-white font-mono text-xs">
@@ -914,8 +908,39 @@ export const AdminTournaments: React.FC = () => {
                           </div>
                         </div>
 
-                        {/* Barra de Acciones de la Tarjeta con botón Inscribirse directo */}
-                        <div className="pt-2 flex flex-wrap items-center justify-between gap-2.5">
+                        {/* Categorías y Cuota Oficial (Reubicadas aquí, justo antes de los botones de acción para máxima claridad) */}
+                        <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-950/80 border border-slate-200/80 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                          <div className="space-y-1">
+                            <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider block">
+                              Categorías Oficiales:
+                            </span>
+                            <div className="flex flex-wrap items-center gap-1.5">
+                              {tournament.categories.map((c) => (
+                                <span
+                                  key={c.name}
+                                  className="text-[11px] font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-100/70 dark:bg-emerald-950/70 border border-emerald-500/25 px-2.5 py-0.5 rounded-lg"
+                                >
+                                  {c.name}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+
+                          <div className="sm:text-right shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-200/60 dark:border-slate-800">
+                            <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider block">
+                              Cuota Inscripción:
+                            </span>
+                            <div className="flex items-baseline sm:justify-end gap-1 font-mono">
+                              <span className="text-base font-black text-slate-900 dark:text-white">
+                                {tournament.entryFee.toFixed(2)} €
+                              </span>
+                              <span className="text-[10px] text-slate-500 dark:text-slate-400 font-sans">/ jugador</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Barra de Acciones de la Tarjeta con botón Ver torneo destacado */}
+                        <div className="pt-2 flex flex-wrap items-center justify-between gap-2.5 border-t border-slate-100 dark:border-slate-800/80">
                           <div className="flex items-center gap-2">
                             {/* Botón Ver Cartel compacto */}
                             <button
@@ -945,7 +970,7 @@ export const AdminTournaments: React.FC = () => {
                           <button
                             type="button"
                             onClick={() => handleOpenDetail(tournament)}
-                            className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition shadow-sm flex items-center gap-2 cursor-pointer active:scale-95 ml-auto"
+                            className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs transition shadow-sm hover:shadow-md flex items-center gap-2 cursor-pointer active:scale-95 ml-auto"
                           >
                             <span>{t('tournaments.btn_view_tournament', 'Ver torneo')}</span>
                             <ArrowRight className="w-4 h-4" />
@@ -1300,10 +1325,10 @@ export const AdminTournaments: React.FC = () => {
           {/* CONTENIDO PESTAÑA DETALLE 2: CUADRO DE CRUCES / BRACKETS (ESTILO PROFESIONAL) */}
           {detailSubTab === 'draws' && (
             <div className="space-y-6 animate-in fade-in duration-150">
-              {/* Barra de Categorías del Cuadro & Acción de Agenda */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs">
+              {/* Barra Superior: Categorías del Cuadro + Selector de Vista (Horizontal vs Lista) + Bloquear Pistas */}
+              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 p-4 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs">
                 {/* Selector de Categoría para el Cuadro */}
-                <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+                <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
                   {['1ª Categoría Masculina', '2ª Categoría Masculina', '1ª Categoría Femenina', '3ª Mixta Open'].map((cat) => (
                     <button
                       key={cat}
@@ -1320,221 +1345,586 @@ export const AdminTournaments: React.FC = () => {
                   ))}
                 </div>
 
-                <button
-                  type="button"
-                  onClick={handleBlockCourtsInAgenda}
-                  className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition flex items-center gap-1.5 shadow-xs cursor-pointer self-start sm:self-auto"
-                >
-                  <Calendar className="w-4 h-4" />
-                  <span>{t('tournaments.sync_agenda', 'Bloquear Pistas en Agenda')}</span>
-                </button>
-              </div>
-
-              {/* Visualizador de Cuadros/Cruces Estilo Pádel Profesional */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {/* 1. Cuartos de Final */}
-                <div className="space-y-3">
-                  <div className="text-xs font-black uppercase tracking-wider text-slate-400 px-1 flex items-center justify-between">
-                    <div className="flex items-center gap-1.5">
-                      <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
-                      <span>{t('tournaments.roundQuarter', 'Cuartos de Final')}</span>
-                    </div>
-                    <span className="text-[10px] text-slate-400 font-mono">4 Partidos</span>
+                {/* Controles de la Derecha: Selector de Modo de Visualización y Bloqueo */}
+                <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
+                  {/* Selector de Modo: Cuadro Horizontal Deslizante vs Formato Lista */}
+                  <div className="inline-flex p-1 bg-slate-100 dark:bg-slate-800 rounded-2xl border border-slate-200/80 dark:border-slate-700 shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => setBracketViewMode('horizontal')}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
+                        bracketViewMode === 'horizontal'
+                          ? 'bg-white dark:bg-slate-700 text-emerald-600 dark:text-white shadow-2xs'
+                          : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                      }`}
+                      title="Vista típica en árbol de cruces horizontal de pádel con scroll deslizante"
+                    >
+                      <GitBranch className="w-3.5 h-3.5 text-emerald-500" />
+                      <span>Cuadro Horizontal</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setBracketViewMode('list')}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
+                        bracketViewMode === 'list'
+                          ? 'bg-white dark:bg-slate-700 text-emerald-600 dark:text-white shadow-2xs'
+                          : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                      }`}
+                      title="Vista en columnas / listado de partidos"
+                    >
+                      <List className="w-3.5 h-3.5" />
+                      <span>Formato Lista</span>
+                    </button>
                   </div>
 
-                  {filteredCategoryBrackets
-                    .filter((b) => b.round === 'Cuartos')
-                    .map((m) => (
-                      <div
-                        key={m.id}
-                        className={`p-4 rounded-2xl bg-white dark:bg-slate-900 border shadow-xs space-y-2.5 text-xs transition ${
-                          m.status === 'live'
-                            ? 'border-emerald-500 ring-2 ring-emerald-500/20'
-                            : 'border-slate-200 dark:border-slate-800 hover:border-emerald-500/40'
-                        }`}
-                      >
-                        {/* Cabecera del partido */}
-                        <div className="flex items-center justify-between text-[11px] border-b border-slate-100 dark:border-slate-800 pb-1.5">
-                          <span className="text-slate-400 font-mono">{m.scheduledTime}</span>
-                          <div className="flex items-center gap-1.5">
-                            {m.status === 'live' ? (
-                              <span className="flex items-center gap-1 text-[10px] font-black uppercase text-emerald-600 dark:text-emerald-400 animate-pulse">
-                                <Radio className="w-3 h-3" />
-                                {t('tournaments.match_live', 'En Directo')}
-                              </span>
-                            ) : m.status === 'completed' ? (
-                              <span className="text-[10px] font-bold text-slate-400">
-                                {t('tournaments.match_completed', 'Finalizado')}
-                              </span>
-                            ) : (
-                              <span className="text-[10px] font-bold text-amber-500">
-                                {m.courtName}
-                              </span>
-                            )}
-                          </div>
-                        </div>
-
-                        {/* Equipos y Marcadores */}
-                        <div className="space-y-1.5 pt-0.5">
-                          <div
-                            className={`flex items-center justify-between p-1.5 rounded-lg ${
-                              m.winner === 1 ? 'bg-emerald-50 dark:bg-emerald-950/50 font-black' : ''
-                            }`}
-                          >
-                            <div className="flex items-center gap-1.5 truncate">
-                              {m.seed1 && (
-                                <span className="text-[9px] font-mono px-1 py-0.2 rounded bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
-                                  {m.seed1}
-                                </span>
-                              )}
-                              <span className="truncate text-slate-900 dark:text-white">{m.team1}</span>
-                            </div>
-                            <div className="flex items-center gap-2 font-mono font-bold">
-                              <span>{m.set1Team1 ?? '-'}</span>
-                              <span>{m.set2Team1 ?? '-'}</span>
-                              {m.set3Team1 ? <span>{m.set3Team1}</span> : null}
-                            </div>
-                          </div>
-
-                          <div
-                            className={`flex items-center justify-between p-1.5 rounded-lg ${
-                              m.winner === 2 ? 'bg-emerald-50 dark:bg-emerald-950/50 font-black' : ''
-                            }`}
-                          >
-                            <div className="flex items-center gap-1.5 truncate">
-                              {m.seed2 && (
-                                <span className="text-[9px] font-mono px-1 py-0.2 rounded bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
-                                  {m.seed2}
-                                </span>
-                              )}
-                              <span className="truncate text-slate-700 dark:text-slate-300">{m.team2}</span>
-                            </div>
-                            <div className="flex items-center gap-2 font-mono font-bold text-slate-500">
-                              <span>{m.set1Team2 ?? '-'}</span>
-                              <span>{m.set2Team2 ?? '-'}</span>
-                              {m.set3Team2 ? <span>{m.set3Team2}</span> : null}
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Botón interactivo para Anotar Marcador */}
-                        <div className="pt-1.5 border-t border-slate-100 dark:border-slate-800 flex justify-end">
-                          <button
-                            type="button"
-                            onClick={() => handleOpenScoreEditor(m)}
-                            className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1 cursor-pointer"
-                          >
-                            <Edit3 className="w-3 h-3" />
-                            <span>{t('tournaments.edit_score', 'Anotar Marcador')}</span>
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                </div>
-
-                {/* 2. Semifinales */}
-                <div className="space-y-3">
-                  <div className="text-xs font-black uppercase tracking-wider text-slate-400 px-1 flex items-center justify-between">
-                    <div className="flex items-center gap-1.5">
-                      <span className="w-2.5 h-2.5 rounded-full bg-blue-500" />
-                      <span>{t('tournaments.roundSemi', 'Semifinales')}</span>
-                    </div>
-                    <span className="text-[10px] text-slate-400 font-mono">2 Partidos</span>
-                  </div>
-
-                  {filteredCategoryBrackets
-                    .filter((b) => b.round === 'Semifinal')
-                    .map((m) => (
-                      <div
-                        key={m.id}
-                        className={`p-4 rounded-2xl bg-white dark:bg-slate-900 border shadow-xs space-y-2.5 text-xs transition ${
-                          m.status === 'live'
-                            ? 'border-emerald-500 ring-2 ring-emerald-500/20'
-                            : 'border-slate-200 dark:border-slate-800 hover:border-emerald-500/40'
-                        }`}
-                      >
-                        <div className="flex items-center justify-between text-[11px] border-b border-slate-100 dark:border-slate-800 pb-1.5">
-                          <span className="text-slate-400 font-mono">{m.scheduledTime}</span>
-                          <span className="font-bold text-emerald-600 dark:text-emerald-400">{m.courtName}</span>
-                        </div>
-
-                        <div className="space-y-1.5 pt-0.5">
-                          <div className="flex items-center justify-between p-1.5 rounded-lg">
-                            <span className="font-bold text-slate-900 dark:text-white truncate">{m.team1}</span>
-                            <div className="flex items-center gap-2 font-mono font-bold text-emerald-600">
-                              <span>{m.set1Team1 ?? '-'}</span>
-                              <span>{m.set2Team1 ?? '-'}</span>
-                            </div>
-                          </div>
-                          <div className="flex items-center justify-between p-1.5 rounded-lg">
-                            <span className="text-slate-600 dark:text-slate-300 truncate">{m.team2}</span>
-                            <div className="flex items-center gap-2 font-mono text-slate-400">
-                              <span>{m.set1Team2 ?? '-'}</span>
-                              <span>{m.set2Team2 ?? '-'}</span>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="pt-1.5 border-t border-slate-100 dark:border-slate-800 flex justify-end">
-                          <button
-                            type="button"
-                            onClick={() => handleOpenScoreEditor(m)}
-                            className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1 cursor-pointer"
-                          >
-                            <Edit3 className="w-3 h-3" />
-                            <span>{t('tournaments.edit_score', 'Anotar Marcador')}</span>
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                </div>
-
-                {/* 3. Gran Final */}
-                <div className="space-y-3">
-                  <div className="text-xs font-black uppercase tracking-wider text-slate-400 px-1 flex items-center justify-between">
-                    <div className="flex items-center gap-1.5">
-                      <span className="w-2.5 h-2.5 rounded-full bg-amber-500" />
-                      <span>{t('tournaments.roundFinal', 'Gran Final')}</span>
-                    </div>
-                    <span className="text-[10px] text-amber-500 font-bold">Trofeo Oficial</span>
-                  </div>
-
-                  {filteredCategoryBrackets
-                    .filter((b) => b.round === 'Final')
-                    .map((m) => (
-                      <div
-                        key={m.id}
-                        className="p-5 rounded-2xl bg-gradient-to-br from-amber-500/10 via-white to-white dark:from-amber-950/20 dark:via-slate-900 dark:to-slate-900 border border-amber-300 dark:border-amber-800/80 shadow-sm space-y-3 text-xs"
-                      >
-                        <div className="flex items-center justify-between text-[11px] text-amber-700 dark:text-amber-400 font-bold border-b border-amber-200 dark:border-amber-900/50 pb-1.5">
-                          <span>{m.scheduledTime}</span>
-                          <span>{m.courtName}</span>
-                        </div>
-                        <div className="space-y-2 pt-0.5">
-                          <div className="flex items-center justify-between font-black text-slate-900 dark:text-white text-sm">
-                            <span className="truncate">{m.team1}</span>
-                            <Trophy className="w-4 h-4 text-amber-500 shrink-0" />
-                          </div>
-                          <div className="flex items-center justify-between text-slate-600 dark:text-slate-300">
-                            <span className="truncate">{m.team2}</span>
-                            <span className="font-mono text-slate-400">-</span>
-                          </div>
-                        </div>
-
-                        <div className="pt-2 border-t border-amber-100 dark:border-amber-900/50 flex justify-end">
-                          <button
-                            type="button"
-                            onClick={() => handleOpenScoreEditor(m)}
-                            className="text-[11px] font-bold text-amber-600 dark:text-amber-400 hover:underline flex items-center gap-1 cursor-pointer"
-                          >
-                            <Edit3 className="w-3 h-3" />
-                            <span>{t('tournaments.edit_score', 'Anotar Marcador')}</span>
-                          </button>
-                        </div>
-                      </div>
-                    ))}
+                  <button
+                    type="button"
+                    onClick={handleBlockCourtsInAgenda}
+                    className="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-slate-800 dark:hover:bg-slate-700 text-white font-bold text-xs transition flex items-center gap-1.5 shadow-xs cursor-pointer shrink-0"
+                  >
+                    <Calendar className="w-4 h-4 text-emerald-400" />
+                    <span>Bloquear en Agenda</span>
+                  </button>
                 </div>
               </div>
+
+              {/* MODO 1: CUADRO HORIZONTAL DESLIZANTE (Típico de Pádel/Tenis con interactividad en cada llave) */}
+              {bracketViewMode === 'horizontal' ? (
+                <div className="rounded-3xl bg-slate-900 border border-slate-800 p-5 sm:p-6 shadow-xl space-y-4">
+                  {/* Encabezado descriptivo del cuadro interactivo */}
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800/80 pb-3 text-xs">
+                    <div className="flex items-center gap-2">
+                      <div className="p-1.5 rounded-lg bg-emerald-500/20 text-emerald-400">
+                        <Trophy className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <span className="font-bold text-white block">
+                          Cuadro Oficial Eliminatorio · {selectedDrawCategory}
+                        </span>
+                        <span className="text-[11px] text-slate-400">
+                          Desplaza horizontalmente para ver las rondas. Haz clic sobre cualquier cruce para abrir la ficha detallada del partido.
+                        </span>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 text-[11px] text-emerald-400 font-mono">
+                      <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                      <span>Interactivo · Clic para detalles o actas</span>
+                    </div>
+                  </div>
+
+                  {/* Contenedor Horizontal Deslizante */}
+                  <div className="overflow-x-auto pb-4 pt-2 scrollbar-thin">
+                    <div className="flex items-stretch gap-6 min-w-[1020px] py-2">
+                      {/* 1. CUARTOS DE FINAL */}
+                      <div className="w-72 shrink-0 flex flex-col justify-between space-y-3">
+                        <div className="p-2.5 rounded-xl bg-slate-800/90 border border-slate-700/80 flex items-center justify-between text-xs">
+                          <span className="font-black uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
+                            <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                            Cuartos de Final
+                          </span>
+                          <span className="text-[10px] text-slate-400 font-mono">4 Partidos</span>
+                        </div>
+
+                        <div className="space-y-4 flex-1 flex flex-col justify-around">
+                          {filteredCategoryBrackets
+                            .filter((b) => b.round === 'Cuartos')
+                            .map((m) => (
+                              <div
+                                key={m.id}
+                                onClick={() => setSelectedBracketMatchForDetail(m)}
+                                className={`p-3 rounded-2xl bg-slate-800/90 hover:bg-slate-800 border transition-all cursor-pointer group shadow-sm hover:border-emerald-500 hover:shadow-emerald-500/10 active:scale-[0.99] ${
+                                  m.status === 'live'
+                                    ? 'border-emerald-500 ring-2 ring-emerald-500/30'
+                                    : 'border-slate-700/80'
+                                }`}
+                                title="Haz clic para ver todos los detalles y estadísticas del partido"
+                              >
+                                <div className="flex items-center justify-between text-[10px] font-mono border-b border-slate-700/60 pb-1 mb-1.5">
+                                  <span className="text-slate-400 flex items-center gap-1">
+                                    <Clock className="w-3 h-3 text-emerald-400" />
+                                    {m.scheduledTime}
+                                  </span>
+                                  {m.status === 'live' ? (
+                                    <span className="text-emerald-400 font-black animate-pulse uppercase text-[9px]">
+                                      ● En Juego
+                                    </span>
+                                  ) : (
+                                    <span className="text-slate-400">{m.courtName}</span>
+                                  )}
+                                </div>
+
+                                {/* Parejas */}
+                                <div className="space-y-1 text-xs">
+                                  <div
+                                    className={`flex items-center justify-between p-1 rounded-lg transition ${
+                                      m.winner === 1 ? 'bg-emerald-500/20 text-emerald-300 font-black' : 'text-slate-200'
+                                    }`}
+                                  >
+                                    <div className="flex items-center gap-1.5 truncate">
+                                      {m.seed1 && (
+                                        <span className="text-[9px] font-mono px-1 py-0.2 rounded bg-slate-700 text-slate-300">
+                                          {m.seed1}
+                                        </span>
+                                      )}
+                                      <span className="truncate">{m.team1}</span>
+                                    </div>
+                                    <div className="flex items-center gap-1.5 font-mono font-bold ml-2">
+                                      <span className="w-3 text-center">{m.set1Team1 ?? '-'}</span>
+                                      <span className="w-3 text-center">{m.set2Team1 ?? '-'}</span>
+                                      {m.set3Team1 ? <span className="w-3 text-center">{m.set3Team1}</span> : null}
+                                    </div>
+                                  </div>
+
+                                  <div
+                                    className={`flex items-center justify-between p-1 rounded-lg transition ${
+                                      m.winner === 2 ? 'bg-emerald-500/20 text-emerald-300 font-black' : 'text-slate-400'
+                                    }`}
+                                  >
+                                    <div className="flex items-center gap-1.5 truncate">
+                                      {m.seed2 && (
+                                        <span className="text-[9px] font-mono px-1 py-0.2 rounded bg-slate-700 text-slate-300">
+                                          {m.seed2}
+                                        </span>
+                                      )}
+                                      <span className="truncate">{m.team2}</span>
+                                    </div>
+                                    <div className="flex items-center gap-1.5 font-mono font-bold ml-2">
+                                      <span className="w-3 text-center">{m.set1Team2 ?? '-'}</span>
+                                      <span className="w-3 text-center">{m.set2Team2 ?? '-'}</span>
+                                      {m.set3Team2 ? <span className="w-3 text-center">{m.set3Team2}</span> : null}
+                                    </div>
+                                  </div>
+                                </div>
+
+                                <div className="mt-2 pt-1.5 border-t border-slate-700/60 flex items-center justify-between text-[10px]">
+                                  <span className="text-slate-500 group-hover:text-emerald-400 transition flex items-center gap-1 font-semibold">
+                                    <span>Ver Detalles</span>
+                                    <ChevronRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
+                                  </span>
+                                  <button
+                                    type="button"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleOpenScoreEditor(m);
+                                    }}
+                                    className="text-emerald-400 hover:text-emerald-300 font-bold flex items-center gap-1 cursor-pointer"
+                                  >
+                                    <Edit3 className="w-3 h-3" />
+                                    <span>Marcador</span>
+                                  </button>
+                                </div>
+                              </div>
+                            ))}
+                        </div>
+                      </div>
+
+                      {/* CONECTOR CUARTOS -> SEMIFINAL */}
+                      <div className="w-6 shrink-0 flex flex-col justify-around py-10 opacity-70">
+                        <div className="h-44 border-r-2 border-t-2 border-b-2 border-emerald-500/40 rounded-r-2xl" />
+                        <div className="h-44 border-r-2 border-t-2 border-b-2 border-emerald-500/40 rounded-r-2xl" />
+                      </div>
+
+                      {/* 2. SEMIFINALES */}
+                      <div className="w-72 shrink-0 flex flex-col justify-between space-y-3">
+                        <div className="p-2.5 rounded-xl bg-slate-800/90 border border-slate-700/80 flex items-center justify-between text-xs">
+                          <span className="font-black uppercase tracking-wider text-blue-400 flex items-center gap-1.5">
+                            <span className="w-2 h-2 rounded-full bg-blue-400" />
+                            Semifinales
+                          </span>
+                          <span className="text-[10px] text-slate-400 font-mono">2 Partidos</span>
+                        </div>
+
+                        <div className="space-y-8 flex-1 flex flex-col justify-around py-8">
+                          {filteredCategoryBrackets
+                            .filter((b) => b.round === 'Semifinal')
+                            .map((m) => (
+                              <div
+                                key={m.id}
+                                onClick={() => setSelectedBracketMatchForDetail(m)}
+                                className={`p-3.5 rounded-2xl bg-slate-800/90 hover:bg-slate-800 border transition-all cursor-pointer group shadow-sm hover:border-blue-400 hover:shadow-blue-500/10 active:scale-[0.99] ${
+                                  m.status === 'live'
+                                    ? 'border-blue-400 ring-2 ring-blue-400/30'
+                                    : 'border-slate-700/80'
+                                }`}
+                                title="Haz clic para ver todos los detalles del partido"
+                              >
+                                <div className="flex items-center justify-between text-[10px] font-mono border-b border-slate-700/60 pb-1 mb-1.5">
+                                  <span className="text-slate-400 flex items-center gap-1">
+                                    <Clock className="w-3 h-3 text-blue-400" />
+                                    {m.scheduledTime}
+                                  </span>
+                                  <span className="text-blue-400 font-bold">{m.courtName}</span>
+                                </div>
+
+                                <div className="space-y-1 text-xs">
+                                  <div
+                                    className={`flex items-center justify-between p-1 rounded-lg transition ${
+                                      m.winner === 1 ? 'bg-blue-500/20 text-blue-300 font-black' : 'text-slate-200'
+                                    }`}
+                                  >
+                                    <span className="truncate">{m.team1}</span>
+                                    <div className="flex items-center gap-1.5 font-mono font-bold ml-2">
+                                      <span className="w-3 text-center">{m.set1Team1 ?? '-'}</span>
+                                      <span className="w-3 text-center">{m.set2Team1 ?? '-'}</span>
+                                    </div>
+                                  </div>
+                                  <div
+                                    className={`flex items-center justify-between p-1 rounded-lg transition ${
+                                      m.winner === 2 ? 'bg-blue-500/20 text-blue-300 font-black' : 'text-slate-400'
+                                    }`}
+                                  >
+                                    <span className="truncate">{m.team2}</span>
+                                    <div className="flex items-center gap-1.5 font-mono font-bold ml-2">
+                                      <span className="w-3 text-center">{m.set1Team2 ?? '-'}</span>
+                                      <span className="w-3 text-center">{m.set2Team2 ?? '-'}</span>
+                                    </div>
+                                  </div>
+                                </div>
+
+                                <div className="mt-2 pt-1.5 border-t border-slate-700/60 flex items-center justify-between text-[10px]">
+                                  <span className="text-slate-500 group-hover:text-blue-300 transition flex items-center gap-1 font-semibold">
+                                    <span>Ver Detalles</span>
+                                    <ChevronRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
+                                  </span>
+                                  <button
+                                    type="button"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleOpenScoreEditor(m);
+                                    }}
+                                    className="text-blue-400 hover:text-blue-300 font-bold flex items-center gap-1 cursor-pointer"
+                                  >
+                                    <Edit3 className="w-3 h-3" />
+                                    <span>Marcador</span>
+                                  </button>
+                                </div>
+                              </div>
+                            ))}
+                        </div>
+                      </div>
+
+                      {/* CONECTOR SEMIFINAL -> FINAL */}
+                      <div className="w-6 shrink-0 flex flex-col justify-center py-20 opacity-70">
+                        <div className="h-64 border-r-2 border-t-2 border-b-2 border-amber-400/50 rounded-r-2xl" />
+                      </div>
+
+                      {/* 3. GRAN FINAL */}
+                      <div className="w-80 shrink-0 flex flex-col justify-between space-y-3">
+                        <div className="p-2.5 rounded-xl bg-gradient-to-r from-amber-500/20 to-amber-600/20 border border-amber-500/40 flex items-center justify-between text-xs">
+                          <span className="font-black uppercase tracking-wider text-amber-300 flex items-center gap-1.5">
+                            <Trophy className="w-4 h-4 text-amber-400" />
+                            Gran Final Oficial
+                          </span>
+                          <span className="text-[10px] text-amber-400 font-mono font-bold">Trofeo FEP</span>
+                        </div>
+
+                        <div className="flex-1 flex flex-col justify-center py-8">
+                          {filteredCategoryBrackets
+                            .filter((b) => b.round === 'Final')
+                            .map((m) => (
+                              <div
+                                key={m.id}
+                                onClick={() => setSelectedBracketMatchForDetail(m)}
+                                className="p-5 rounded-3xl bg-gradient-to-br from-amber-950/40 via-slate-900 to-slate-900 border-2 border-amber-400/80 shadow-lg space-y-3 cursor-pointer group hover:border-amber-300 hover:shadow-amber-500/20 transition-all active:scale-[0.99]"
+                                title="Haz clic para ver todos los detalles del partido de la Final"
+                              >
+                                <div className="flex items-center justify-between text-[11px] text-amber-400 font-mono font-bold border-b border-amber-500/30 pb-2">
+                                  <span className="flex items-center gap-1">
+                                    <Clock className="w-3.5 h-3.5" />
+                                    {m.scheduledTime}
+                                  </span>
+                                  <span>{m.courtName}</span>
+                                </div>
+
+                                <div className="space-y-2 py-1">
+                                  <div className="flex items-center justify-between font-black text-white text-sm p-1.5 rounded-xl bg-amber-500/10">
+                                    <span className="truncate">{m.team1}</span>
+                                    <Trophy className="w-4 h-4 text-amber-400 shrink-0" />
+                                  </div>
+                                  <div className="flex items-center justify-between text-slate-300 text-sm p-1.5">
+                                    <span className="truncate">{m.team2}</span>
+                                    <span className="font-mono text-slate-400">-</span>
+                                  </div>
+                                </div>
+
+                                <div className="pt-2 border-t border-amber-500/30 flex items-center justify-between text-xs">
+                                  <span className="text-amber-300 group-hover:text-amber-200 transition font-bold flex items-center gap-1">
+                                    <span>Ficha Oficial de la Final</span>
+                                    <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+                                  </span>
+                                  <button
+                                    type="button"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleOpenScoreEditor(m);
+                                    }}
+                                    className="px-2.5 py-1 rounded-lg bg-amber-500 text-slate-950 font-black text-[11px] hover:bg-amber-400 transition cursor-pointer flex items-center gap-1"
+                                  >
+                                    <Edit3 className="w-3 h-3" />
+                                    <span>Marcador</span>
+                                  </button>
+                                </div>
+                              </div>
+                            ))}
+                        </div>
+                      </div>
+
+                      {/* 4. CAMPEONES / PODIO */}
+                      <div className="w-64 shrink-0 flex flex-col justify-center">
+                        <div className="p-6 rounded-3xl bg-gradient-to-br from-amber-500/15 via-slate-800 to-slate-900 border border-amber-500/40 text-center space-y-3">
+                          <div className="w-14 h-14 rounded-2xl bg-amber-500/20 text-amber-400 flex items-center justify-center mx-auto ring-4 ring-amber-500/20">
+                            <Trophy className="w-7 h-7" />
+                          </div>
+                          <div>
+                            <span className="text-[10px] uppercase font-mono font-bold tracking-wider text-amber-400 block">
+                              Campeones Oficiales
+                            </span>
+                            <div className="font-black text-white text-sm mt-1">
+                              Carlos Méndez / Diego Soto
+                            </div>
+                            <span className="text-[11px] text-slate-400 mt-0.5 block">
+                              1ª Categoría Masculina
+                            </span>
+                          </div>
+                          <div className="pt-2 border-t border-slate-700/80 text-[10px] font-mono text-emerald-400">
+                            Premio: 800 € + Trofeo Oro WPT
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                /* MODO 2: FORMATO LISTA / COLUMNAS */
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {/* 1. Cuartos de Final */}
+                  <div className="space-y-3">
+                    <div className="text-xs font-black uppercase tracking-wider text-slate-400 px-1 flex items-center justify-between">
+                      <div className="flex items-center gap-1.5">
+                        <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
+                        <span>{t('tournaments.roundQuarter', 'Cuartos de Final')}</span>
+                      </div>
+                      <span className="text-[10px] text-slate-400 font-mono">4 Partidos</span>
+                    </div>
+
+                    {filteredCategoryBrackets
+                      .filter((b) => b.round === 'Cuartos')
+                      .map((m) => (
+                        <div
+                          key={m.id}
+                          onClick={() => setSelectedBracketMatchForDetail(m)}
+                          className={`p-4 rounded-2xl bg-white dark:bg-slate-900 border shadow-xs space-y-2.5 text-xs transition cursor-pointer hover:border-emerald-500/60 hover:shadow-md ${
+                            m.status === 'live'
+                              ? 'border-emerald-500 ring-2 ring-emerald-500/20'
+                              : 'border-slate-200 dark:border-slate-800'
+                          }`}
+                          title="Haz clic para ver la ficha del partido"
+                        >
+                          <div className="flex items-center justify-between text-[11px] border-b border-slate-100 dark:border-slate-800 pb-1.5">
+                            <span className="text-slate-400 font-mono">{m.scheduledTime}</span>
+                            <div className="flex items-center gap-1.5">
+                              {m.status === 'live' ? (
+                                <span className="flex items-center gap-1 text-[10px] font-black uppercase text-emerald-600 dark:text-emerald-400 animate-pulse">
+                                  <Radio className="w-3 h-3" />
+                                  {t('tournaments.match_live', 'En Directo')}
+                                </span>
+                              ) : m.status === 'completed' ? (
+                                <span className="text-[10px] font-bold text-slate-400">
+                                  {t('tournaments.match_completed', 'Finalizado')}
+                                </span>
+                              ) : (
+                                <span className="text-[10px] font-bold text-amber-500">
+                                  {m.courtName}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+
+                          <div className="space-y-1.5 pt-0.5">
+                            <div
+                              className={`flex items-center justify-between p-1.5 rounded-lg ${
+                                m.winner === 1 ? 'bg-emerald-50 dark:bg-emerald-950/50 font-black' : ''
+                              }`}
+                            >
+                              <div className="flex items-center gap-1.5 truncate">
+                                {m.seed1 && (
+                                  <span className="text-[9px] font-mono px-1 py-0.2 rounded bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+                                    {m.seed1}
+                                  </span>
+                                )}
+                                <span className="truncate text-slate-900 dark:text-white">{m.team1}</span>
+                              </div>
+                              <div className="flex items-center gap-2 font-mono font-bold">
+                                <span>{m.set1Team1 ?? '-'}</span>
+                                <span>{m.set2Team1 ?? '-'}</span>
+                                {m.set3Team1 ? <span>{m.set3Team1}</span> : null}
+                              </div>
+                            </div>
+
+                            <div
+                              className={`flex items-center justify-between p-1.5 rounded-lg ${
+                                m.winner === 2 ? 'bg-emerald-50 dark:bg-emerald-950/50 font-black' : ''
+                              }`}
+                            >
+                              <div className="flex items-center gap-1.5 truncate">
+                                {m.seed2 && (
+                                  <span className="text-[9px] font-mono px-1 py-0.2 rounded bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+                                    {m.seed2}
+                                  </span>
+                                )}
+                                <span className="truncate text-slate-700 dark:text-slate-300">{m.team2}</span>
+                              </div>
+                              <div className="flex items-center gap-2 font-mono font-bold text-slate-500">
+                                <span>{m.set1Team2 ?? '-'}</span>
+                                <span>{m.set2Team2 ?? '-'}</span>
+                                {m.set3Team2 ? <span>{m.set3Team2}</span> : null}
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="pt-1.5 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[11px]">
+                            <span className="text-slate-400 hover:text-emerald-500 transition flex items-center gap-1 font-semibold">
+                              <span>Ficha de Partido</span>
+                              <ChevronRight className="w-3 h-3" />
+                            </span>
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleOpenScoreEditor(m);
+                              }}
+                              className="font-bold text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1 cursor-pointer"
+                            >
+                              <Edit3 className="w-3 h-3" />
+                              <span>{t('tournaments.edit_score', 'Anotar Marcador')}</span>
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+
+                  {/* 2. Semifinales */}
+                  <div className="space-y-3">
+                    <div className="text-xs font-black uppercase tracking-wider text-slate-400 px-1 flex items-center justify-between">
+                      <div className="flex items-center gap-1.5">
+                        <span className="w-2.5 h-2.5 rounded-full bg-blue-500" />
+                        <span>{t('tournaments.roundSemi', 'Semifinales')}</span>
+                      </div>
+                      <span className="text-[10px] text-slate-400 font-mono">2 Partidos</span>
+                    </div>
+
+                    {filteredCategoryBrackets
+                      .filter((b) => b.round === 'Semifinal')
+                      .map((m) => (
+                        <div
+                          key={m.id}
+                          onClick={() => setSelectedBracketMatchForDetail(m)}
+                          className={`p-4 rounded-2xl bg-white dark:bg-slate-900 border shadow-xs space-y-2.5 text-xs transition cursor-pointer hover:border-blue-400 hover:shadow-md ${
+                            m.status === 'live'
+                              ? 'border-blue-400 ring-2 ring-blue-400/20'
+                              : 'border-slate-200 dark:border-slate-800'
+                          }`}
+                          title="Haz clic para ver la ficha del partido"
+                        >
+                          <div className="flex items-center justify-between text-[11px] border-b border-slate-100 dark:border-slate-800 pb-1.5">
+                            <span className="text-slate-400 font-mono">{m.scheduledTime}</span>
+                            <span className="font-bold text-blue-500">{m.courtName}</span>
+                          </div>
+
+                          <div className="space-y-1.5 pt-0.5">
+                            <div className="flex items-center justify-between p-1.5 rounded-lg">
+                              <span className="font-bold text-slate-900 dark:text-white truncate">{m.team1}</span>
+                              <div className="flex items-center gap-2 font-mono font-bold text-blue-500">
+                                <span>{m.set1Team1 ?? '-'}</span>
+                                <span>{m.set2Team1 ?? '-'}</span>
+                              </div>
+                            </div>
+                            <div className="flex items-center justify-between p-1.5 rounded-lg">
+                              <span className="text-slate-600 dark:text-slate-300 truncate">{m.team2}</span>
+                              <div className="flex items-center gap-2 font-mono text-slate-400">
+                                <span>{m.set1Team2 ?? '-'}</span>
+                                <span>{m.set2Team2 ?? '-'}</span>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="pt-1.5 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[11px]">
+                            <span className="text-slate-400 hover:text-blue-500 transition flex items-center gap-1 font-semibold">
+                              <span>Ficha de Partido</span>
+                              <ChevronRight className="w-3 h-3" />
+                            </span>
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleOpenScoreEditor(m);
+                              }}
+                              className="font-bold text-blue-500 hover:underline flex items-center gap-1 cursor-pointer"
+                            >
+                              <Edit3 className="w-3 h-3" />
+                              <span>{t('tournaments.edit_score', 'Anotar Marcador')}</span>
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+
+                  {/* 3. Gran Final */}
+                  <div className="space-y-3">
+                    <div className="text-xs font-black uppercase tracking-wider text-slate-400 px-1 flex items-center justify-between">
+                      <div className="flex items-center gap-1.5">
+                        <span className="w-2.5 h-2.5 rounded-full bg-amber-500" />
+                        <span>{t('tournaments.roundFinal', 'Gran Final')}</span>
+                      </div>
+                      <span className="text-[10px] text-amber-500 font-bold">Trofeo Oficial</span>
+                    </div>
+
+                    {filteredCategoryBrackets
+                      .filter((b) => b.round === 'Final')
+                      .map((m) => (
+                        <div
+                          key={m.id}
+                          onClick={() => setSelectedBracketMatchForDetail(m)}
+                          className="p-5 rounded-2xl bg-gradient-to-br from-amber-500/10 via-white to-white dark:from-amber-950/20 dark:via-slate-900 dark:to-slate-900 border border-amber-300 dark:border-amber-800/80 shadow-sm space-y-3 text-xs cursor-pointer hover:border-amber-400 hover:shadow-md transition"
+                          title="Haz clic para ver la ficha del partido"
+                        >
+                          <div className="flex items-center justify-between text-[11px] text-amber-700 dark:text-amber-400 font-bold border-b border-amber-200 dark:border-amber-900/50 pb-1.5">
+                            <span>{m.scheduledTime}</span>
+                            <span>{m.courtName}</span>
+                          </div>
+                          <div className="space-y-2 pt-0.5">
+                            <div className="flex items-center justify-between font-black text-slate-900 dark:text-white text-sm">
+                              <span className="truncate">{m.team1}</span>
+                              <Trophy className="w-4 h-4 text-amber-500 shrink-0" />
+                            </div>
+                            <div className="flex items-center justify-between text-slate-600 dark:text-slate-300">
+                              <span className="truncate">{m.team2}</span>
+                              <span className="font-mono text-slate-400">-</span>
+                            </div>
+                          </div>
+
+                          <div className="pt-2 border-t border-amber-100 dark:border-amber-900/50 flex items-center justify-between text-[11px]">
+                            <span className="text-amber-600 dark:text-amber-400 font-bold flex items-center gap-1">
+                              <span>Ficha de la Final</span>
+                              <ChevronRight className="w-3 h-3" />
+                            </span>
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleOpenScoreEditor(m);
+                              }}
+                              className="font-bold text-amber-600 dark:text-amber-400 hover:underline flex items-center gap-1 cursor-pointer"
+                            >
+                              <Edit3 className="w-3 h-3" />
+                              <span>{t('tournaments.edit_score', 'Anotar Marcador')}</span>
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
@@ -2162,6 +2552,256 @@ export const AdminTournaments: React.FC = () => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* ======================================================================
+          MODAL: DETALLES OFICIALES DEL PARTIDO DEL TORNEO (ACTA Y ESTADÍSTICAS)
+          ====================================================================== */}
+      {selectedBracketMatchForDetail && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/75 backdrop-blur-sm animate-in fade-in duration-150">
+          <div className="relative w-full max-w-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-7 shadow-2xl space-y-5 text-slate-900 dark:text-slate-100 max-h-[90vh] overflow-y-auto">
+            {/* Header */}
+            <div className="flex items-start justify-between border-b border-slate-100 dark:border-slate-800 pb-4">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="px-2.5 py-0.5 rounded-lg text-[10px] font-black uppercase tracking-wider bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-500/25">
+                    {selectedBracketMatchForDetail.round === 'Final' ? 'Gran Final Oficial' : selectedBracketMatchForDetail.round}
+                  </span>
+                  <span className="text-xs font-bold text-slate-500 dark:text-slate-400">
+                    {selectedBracketMatchForDetail.category}
+                  </span>
+                  {selectedBracketMatchForDetail.status === 'live' ? (
+                    <span className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-emerald-500 text-slate-950 animate-pulse">
+                      <Radio className="w-3 h-3" />
+                      En Juego
+                    </span>
+                  ) : selectedBracketMatchForDetail.status === 'completed' ? (
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+                      ✓ Finalizado
+                    </span>
+                  ) : (
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 dark:bg-blue-950 text-blue-600 dark:text-blue-400">
+                      Programado
+                    </span>
+                  )}
+                </div>
+                <h2 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white tracking-tight">
+                  Acta Oficial de Partido — {selectedTournament.title}
+                </h2>
+              </div>
+              <button
+                type="button"
+                onClick={() => setSelectedBracketMatchForDetail(null)}
+                className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* MARCADOR OFICIAL Y ENFRENTAMIENTO */}
+            <div className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800 space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {/* Pareja 1 */}
+                <div className={`p-4 rounded-xl border transition ${
+                  selectedBracketMatchForDetail.winner === 1
+                    ? 'bg-emerald-50/80 dark:bg-emerald-950/40 border-emerald-500/50 shadow-xs'
+                    : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800'
+                }`}>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-[10px] font-bold text-slate-400 uppercase">Pareja A</span>
+                    {selectedBracketMatchForDetail.seed1 && (
+                      <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
+                        Cabeza Serie: {selectedBracketMatchForDetail.seed1}
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <img
+                      src={getPlayerAvatar(selectedBracketMatchForDetail.team1.split('/')[0])}
+                      alt={selectedBracketMatchForDetail.team1}
+                      className="w-10 h-10 rounded-full object-cover ring-2 ring-emerald-500/30"
+                    />
+                    <div className="font-bold text-sm text-slate-900 dark:text-white leading-tight">
+                      {selectedBracketMatchForDetail.team1}
+                    </div>
+                  </div>
+                  {selectedBracketMatchForDetail.winner === 1 && (
+                    <div className="mt-3 pt-2 border-t border-emerald-500/20 text-xs font-black text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
+                      <Trophy className="w-4 h-4 text-emerald-500" />
+                      <span>Ganadores del Encuentro</span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Pareja 2 */}
+                <div className={`p-4 rounded-xl border transition ${
+                  selectedBracketMatchForDetail.winner === 2
+                    ? 'bg-emerald-50/80 dark:bg-emerald-950/40 border-emerald-500/50 shadow-xs'
+                    : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800'
+                }`}>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-[10px] font-bold text-slate-400 uppercase">Pareja B</span>
+                    {selectedBracketMatchForDetail.seed2 && (
+                      <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
+                        Cabeza Serie: {selectedBracketMatchForDetail.seed2}
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <img
+                      src={getPlayerAvatar(selectedBracketMatchForDetail.team2.split('/')[0])}
+                      alt={selectedBracketMatchForDetail.team2}
+                      className="w-10 h-10 rounded-full object-cover ring-2 ring-emerald-500/30"
+                    />
+                    <div className="font-bold text-sm text-slate-900 dark:text-white leading-tight">
+                      {selectedBracketMatchForDetail.team2}
+                    </div>
+                  </div>
+                  {selectedBracketMatchForDetail.winner === 2 && (
+                    <div className="mt-3 pt-2 border-t border-emerald-500/20 text-xs font-black text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
+                      <Trophy className="w-4 h-4 text-emerald-500" />
+                      <span>Ganadores del Encuentro</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Tanteo Oficial por Sets */}
+              <div className="rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-3.5">
+                <div className="text-[10px] uppercase font-bold text-slate-400 mb-2">Marcador Oficial por Sets:</div>
+                <div className="grid grid-cols-4 gap-2 text-center">
+                  <div className="p-2 rounded-lg bg-slate-50 dark:bg-slate-950 font-bold text-xs text-slate-500">Pareja</div>
+                  <div className="p-2 rounded-lg bg-slate-50 dark:bg-slate-950 font-bold text-xs text-slate-500">Set 1</div>
+                  <div className="p-2 rounded-lg bg-slate-50 dark:bg-slate-950 font-bold text-xs text-slate-500">Set 2</div>
+                  <div className="p-2 rounded-lg bg-slate-50 dark:bg-slate-950 font-bold text-xs text-slate-500">Set 3</div>
+
+                  <div className="p-2 text-left truncate font-bold text-xs">{selectedBracketMatchForDetail.team1}</div>
+                  <div className="p-2 font-mono font-black text-sm">{selectedBracketMatchForDetail.set1Team1 ?? '-'}</div>
+                  <div className="p-2 font-mono font-black text-sm">{selectedBracketMatchForDetail.set2Team1 ?? '-'}</div>
+                  <div className="p-2 font-mono font-black text-sm">{selectedBracketMatchForDetail.set3Team1 ?? '-'}</div>
+
+                  <div className="p-2 text-left truncate font-bold text-xs">{selectedBracketMatchForDetail.team2}</div>
+                  <div className="p-2 font-mono font-black text-sm text-slate-500">{selectedBracketMatchForDetail.set1Team2 ?? '-'}</div>
+                  <div className="p-2 font-mono font-black text-sm text-slate-500">{selectedBracketMatchForDetail.set2Team2 ?? '-'}</div>
+                  <div className="p-2 font-mono font-black text-sm text-slate-500">{selectedBracketMatchForDetail.set3Team2 ?? '-'}</div>
+                </div>
+              </div>
+            </div>
+
+            {/* DETALLES OPERATIVOS & JUEZ ÁRBITRO */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs">
+              <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800">
+                <span className="text-[10px] text-slate-400 font-bold block">Pista Asignada:</span>
+                <span className="font-bold text-slate-900 dark:text-white flex items-center gap-1 mt-0.5">
+                  <MapPin className="w-3.5 h-3.5 text-emerald-500" />
+                  {selectedBracketMatchForDetail.courtName}
+                </span>
+              </div>
+
+              <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800">
+                <span className="text-[10px] text-slate-400 font-bold block">Horario Oficial:</span>
+                <span className="font-bold text-slate-900 dark:text-white flex items-center gap-1 mt-0.5">
+                  <Clock className="w-3.5 h-3.5 text-emerald-500" />
+                  {selectedBracketMatchForDetail.scheduledTime}
+                </span>
+              </div>
+
+              <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800">
+                <span className="text-[10px] text-slate-400 font-bold block">Juez Árbitro FEP:</span>
+                <span className="font-bold text-slate-900 dark:text-white flex items-center gap-1 mt-0.5">
+                  <Shield className="w-3.5 h-3.5 text-emerald-500" />
+                  R. Méndez (N2)
+                </span>
+              </div>
+
+              <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800">
+                <span className="text-[10px] text-slate-400 font-bold block">Pelota Oficial:</span>
+                <span className="font-bold text-slate-900 dark:text-white flex items-center gap-1 mt-0.5">
+                  <Award className="w-3.5 h-3.5 text-amber-500" />
+                  Bullpadel Next Pro
+                </span>
+              </div>
+            </div>
+
+            {/* ESTADÍSTICAS OFICIALES DEL ENCUENTRO */}
+            <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800 text-xs space-y-2">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
+                Estadísticas del Encuentro (Puntos de Oro & Eficiencia):
+              </span>
+              <div className="grid grid-cols-3 gap-2 text-center">
+                <div className="p-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800">
+                  <span className="text-[10px] text-slate-400 block">Puntos de Oro</span>
+                  <span className="font-mono font-black text-sm text-emerald-600 dark:text-emerald-400">4 / 6 ganados</span>
+                </div>
+                <div className="p-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800">
+                  <span className="text-[10px] text-slate-400 block">Breaks Convertidos</span>
+                  <span className="font-mono font-black text-sm text-slate-900 dark:text-white">5 de 9</span>
+                </div>
+                <div className="p-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800">
+                  <span className="text-[10px] text-slate-400 block">Duración Real</span>
+                  <span className="font-mono font-black text-sm text-slate-900 dark:text-white">1h 28m</span>
+                </div>
+              </div>
+            </div>
+
+            {/* BOTONERA INFERIOR */}
+            <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-2.5">
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    triggerDemoToast(
+                      'Acta Oficial Generada',
+                      `Descargando acta arbitral en PDF del partido ${selectedBracketMatchForDetail.team1} vs ${selectedBracketMatchForDetail.team2}.`,
+                      'info'
+                    );
+                  }}
+                  className="px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs transition flex items-center gap-1.5 cursor-pointer"
+                >
+                  <FileText className="w-3.5 h-3.5 text-emerald-500" />
+                  <span>Descargar Acta PDF</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    triggerDemoToast(
+                      'Resultado Notificado',
+                      `Aviso enviado por WhatsApp a los 4 jugadores del cruce.`,
+                      'success'
+                    );
+                  }}
+                  className="px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs transition flex items-center gap-1.5 cursor-pointer"
+                >
+                  <Share2 className="w-3.5 h-3.5 text-blue-500" />
+                  <span>Notificar Parejas</span>
+                </button>
+              </div>
+
+              <div className="flex items-center gap-2 ml-auto">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const matchToEdit = selectedBracketMatchForDetail;
+                    setSelectedBracketMatchForDetail(null);
+                    handleOpenScoreEditor(matchToEdit);
+                  }}
+                  className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition shadow-xs flex items-center gap-1.5 cursor-pointer"
+                >
+                  <Edit3 className="w-3.5 h-3.5" />
+                  <span>Modificar Marcador / Acta</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSelectedBracketMatchForDetail(null)}
+                  className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs transition cursor-pointer"
+                >
+                  Cerrar
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}

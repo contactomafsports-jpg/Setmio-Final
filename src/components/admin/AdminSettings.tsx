@@ -396,6 +396,14 @@ export const AdminSettings: React.FC = () => {
   const [bookingAdvanceDays, setBookingAdvanceDays] = useState(currentTenant.settings.bookingAdvanceDays);
   const [cancellationHours, setCancellationHours] = useState(currentTenant.settings.cancellationWindowHours);
   const [splitPayment, setSplitPayment] = useState(currentTenant.settings.splitPaymentAllowed);
+  const [allowPlayerCustomDurations, setAllowPlayerCustomDurations] = useState<boolean>(() => {
+    try {
+      const saved = localStorage.getItem('setmio_allow_player_durations');
+      return saved !== null ? JSON.parse(saved) : true;
+    } catch {
+      return true;
+    }
+  });
 
   const [contactEmail, setContactEmail] = useState(currentTenant.contactEmail);
   const [contactPhone, setContactPhone] = useState(currentTenant.contactPhone);
@@ -470,6 +478,7 @@ export const AdminSettings: React.FC = () => {
     e.preventDefault();
     try {
       localStorage.setItem('setmio_club_weekly_schedule', JSON.stringify(weeklySchedule));
+      localStorage.setItem('setmio_allow_player_durations', JSON.stringify(allowPlayerCustomDurations));
     } catch {
       // Ignore
     }
@@ -764,6 +773,61 @@ export const AdminSettings: React.FC = () => {
                     }`}
                   >
                     {splitPayment ? 'Activado (1/4 por jugador)' : 'Desactivado (100% titular)'}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Duración Permitida para Partidas de Jugadores (Requerimiento Bloque 2) */}
+            <div className="pt-3 border-t border-slate-100 dark:border-slate-800">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                  <div className="text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2">
+                    <Clock className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                    <span>Duración Permitida para Partidas Abiertas y Reservas</span>
+                  </div>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                    El estándar oficial de pádel es 90 min. Puedes permitir además turnos de 60 min y 120 min para los jugadores en la app.
+                  </p>
+                </div>
+                <div className="inline-flex p-1 bg-slate-100 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setAllowPlayerCustomDurations(false);
+                      try {
+                        localStorage.setItem('setmio_allow_player_durations', JSON.stringify(false));
+                      } catch {
+                        // ignore
+                      }
+                      triggerDemoToast('Regla de Duración', 'Los jugadores solo podrán reservar o crear partidas de 90 min (estándar oficial).', 'info');
+                    }}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
+                      !allowPlayerCustomDurations
+                        ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-xs'
+                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
+                    }`}
+                  >
+                    Solo 90 min
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setAllowPlayerCustomDurations(true);
+                      try {
+                        localStorage.setItem('setmio_allow_player_durations', JSON.stringify(true));
+                      } catch {
+                        // ignore
+                      }
+                      triggerDemoToast('Regla de Duración', 'Habilitadas duraciones de 60, 90 y 120 min para partidas de jugadores.', 'success');
+                    }}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
+                      allowPlayerCustomDurations
+                        ? 'bg-emerald-600 text-white shadow-xs'
+                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
+                    }`}
+                  >
+                    60, 90 y 120 min
                   </button>
                 </div>
               </div>

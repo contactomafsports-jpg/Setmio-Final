@@ -36,6 +36,7 @@ import {
   FileSpreadsheet,
   AlertCircle,
   Map,
+  Lock,
 } from 'lucide-react';
 
 export interface TeamPlayer {
@@ -72,6 +73,7 @@ export interface TeamTraining {
   time: string;
   courtName: string;
   focus: string;
+  positionMode?: 'fixed' | 'recommended';
 }
 
 export interface TeamStanding {
@@ -403,7 +405,7 @@ const INITIAL_TEAMS: ClubTeamFull[] = [
 ];
 
 export const AdminTeams: React.FC = () => {
-  const { currentTenant, triggerDemoToast, navigateToPlayerProfile, customers, coaches, venues, isMultiVenue } = useApp();
+  const { currentTenant, triggerDemoToast, navigateToPlayerProfile, customers, coaches, venues, isMultiVenue, courts } = useApp();
 
   const [teams, setTeams] = useState<ClubTeamFull[]>(() => {
     try {
@@ -467,6 +469,7 @@ export const AdminTeams: React.FC = () => {
     time: '20:00 - 21:30',
     courtName: 'Pista 1 Central Pro',
     focus: 'Estrategia de ataque con remate x3 y salida de pared',
+    positionMode: 'recommended' as 'fixed' | 'recommended',
   });
 
   // Sync to local storage
@@ -552,6 +555,37 @@ export const AdminTeams: React.FC = () => {
     triggerDemoToast(
       'Equipo Creado',
       `"${created.name}" registrado en la competición con éxito.`,
+      'success'
+    );
+  };
+
+  // Handle Create Training Session
+  const handleCreateTraining = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedTeam) return;
+
+    const newTr: TeamTraining = {
+      id: `tr-${Date.now()}`,
+      day: newTrainingForm.day,
+      time: newTrainingForm.time,
+      courtName: newTrainingForm.courtName,
+      focus: newTrainingForm.focus.trim() || 'Sesión técnico-táctica de equipo',
+      positionMode: newTrainingForm.positionMode,
+    };
+
+    const updated = teams.map((team) => {
+      if (team.id !== selectedTeam.id) return team;
+      return {
+        ...team,
+        trainings: [newTr, ...team.trainings],
+      };
+    });
+
+    setTeams(updated);
+    setIsNewTrainingModalOpen(false);
+    triggerDemoToast(
+      'Sesión de Entrenamiento Programada',
+      `Sesión para ${newTrainingForm.day} a las ${newTrainingForm.time} (${newTrainingForm.positionMode === 'fixed' ? 'Posiciones Fijas' : 'Posiciones Recomendadas'}).`,
       'success'
     );
   };
@@ -692,32 +726,6 @@ export const AdminTeams: React.FC = () => {
     setTeams(updatedTeams);
     setIsNewCalloutModalOpen(false);
     triggerDemoToast('Convocatoria Abierta', `Se ha generado la convocatoria para el encuentro vs ${created.rivalTeam}.`, 'success');
-  };
-
-  // Create Training
-  const handleCreateTraining = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!selectedTeam) return;
-
-    const created: TeamTraining = {
-      id: `tr-${Date.now()}`,
-      day: newTrainingForm.day,
-      time: newTrainingForm.time,
-      courtName: newTrainingForm.courtName,
-      focus: newTrainingForm.focus,
-    };
-
-    const updatedTeams = teams.map((t) => {
-      if (t.id !== selectedTeam.id) return t;
-      return {
-        ...t,
-        trainings: [...t.trainings, created],
-      };
-    });
-
-    setTeams(updatedTeams);
-    setIsNewTrainingModalOpen(false);
-    triggerDemoToast('Entrenamiento Registrado', `Sesión de los ${created.day} programada en ${created.courtName}.`, 'success');
   };
 
   // Generate WhatsApp text for callout
@@ -1514,9 +1522,18 @@ ${declined.map((p) => `• ${p.playerName}`).join('\n')}
                         {tr.day} · {tr.time}
                       </span>
                     </div>
-                    <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 font-bold text-xs border border-emerald-500/20">
-                      {tr.courtName}
-                    </span>
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold ${
+                        tr.positionMode === 'fixed'
+                          ? 'bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 border border-purple-500/30'
+                          : 'bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 border border-blue-500/30'
+                      }`}>
+                        {tr.positionMode === 'fixed' ? '🔒 Posiciones Fijas' : '🔄 Modo Recomendado'}
+                      </span>
+                      <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 font-bold text-xs border border-emerald-500/20">
+                        {tr.courtName}
+                      </span>
+                    </div>
                   </div>
 
                   <div className="space-y-1 text-xs">
@@ -2599,6 +2616,165 @@ ${declined.map((p) => `• ${p.playerName}`).join('\n')}
                   className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold transition shadow-xs cursor-pointer"
                 >
                   Crear Equipo
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* =====================================================================
+          MODAL: NUEVA SESIÓN DE ENTRENAMIENTO & TÁCTICA
+          ===================================================================== */}
+      {isNewTrainingModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-sm animate-in fade-in duration-150">
+          <div className="relative w-full max-w-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl text-slate-900 dark:text-slate-100 space-y-4 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+              <div className="flex items-center gap-2">
+                <Dumbbell className="w-5 h-5 text-emerald-500" />
+                <h3 className="text-base font-black text-slate-900 dark:text-white">
+                  Programar Sesión de Entrenamiento Oficial
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsNewTrainingModalOpen(false)}
+                className="p-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateTraining} className="space-y-3.5 text-xs">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                    Día de la Semana *
+                  </label>
+                  <select
+                    value={newTrainingForm.day}
+                    onChange={(e) => setNewTrainingForm({ ...newTrainingForm, day: e.target.value })}
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white font-bold focus:outline-none focus:border-emerald-500"
+                  >
+                    {['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'].map((d) => (
+                      <option key={d} value={d}>
+                        {d}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                    Horario de Sesión *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="20:00 - 21:30"
+                    value={newTrainingForm.time}
+                    onChange={(e) => setNewTrainingForm({ ...newTrainingForm, time: e.target.value })}
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white font-mono font-bold focus:outline-none focus:border-emerald-500"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  Pista Asignada para el Equipo *
+                </label>
+                <select
+                  value={newTrainingForm.courtName}
+                  onChange={(e) => setNewTrainingForm({ ...newTrainingForm, courtName: e.target.value })}
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white font-bold focus:outline-none focus:border-emerald-500"
+                >
+                  {(courts || []).map((c: any) => (
+                    <option key={c.id} value={c.name}>
+                      {c.name} {c.surface ? `(${c.surface})` : ''}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  Enfoque Técnico y Táctico de la Sesión *
+                </label>
+                <textarea
+                  rows={2}
+                  required
+                  placeholder="Ej: Trabajo de transiciones red-fondo, salidas de pared agresivas y puntos simulados bajo presión."
+                  value={newTrainingForm.focus}
+                  onChange={(e) => setNewTrainingForm({ ...newTrainingForm, focus: e.target.value })}
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                />
+              </div>
+
+              {/* Sistema de Posiciones y Parejas: Fijas vs Recomendadas */}
+              <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <label className="block font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider text-[11px] flex items-center gap-1.5">
+                    <Target className="w-3.5 h-3.5 text-emerald-500" />
+                    <span>Sistema de Posiciones y Parejas</span>
+                  </label>
+                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${
+                    newTrainingForm.positionMode === 'fixed'
+                      ? 'bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300'
+                      : 'bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300'
+                  }`}>
+                    {newTrainingForm.positionMode === 'fixed' ? '🔒 Posiciones Fijas' : '🔄 Recomendadas'}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setNewTrainingForm({ ...newTrainingForm, positionMode: 'recommended' })}
+                    className={`p-2.5 rounded-xl border text-left transition cursor-pointer ${
+                      newTrainingForm.positionMode === 'recommended'
+                        ? 'bg-white dark:bg-slate-900 border-blue-500 text-blue-900 dark:text-blue-200 font-bold shadow-2xs'
+                        : 'bg-slate-100 dark:bg-slate-900/60 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400'
+                    }`}
+                  >
+                    <div className="text-xs font-bold">Modo Recomendado</div>
+                    <div className="text-[10px] text-slate-500 dark:text-slate-400 font-normal mt-0.5 leading-snug">
+                      Los jugadores eligen o rotan lado (Drive/Revés) y pareja de entrenamiento.
+                    </div>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setNewTrainingForm({ ...newTrainingForm, positionMode: 'fixed' })}
+                    className={`p-2.5 rounded-xl border text-left transition cursor-pointer ${
+                      newTrainingForm.positionMode === 'fixed'
+                        ? 'bg-white dark:bg-slate-900 border-purple-500 text-purple-900 dark:text-purple-200 font-bold shadow-2xs'
+                        : 'bg-slate-100 dark:bg-slate-900/60 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400'
+                    }`}
+                  >
+                    <div className="text-xs font-bold flex items-center gap-1">
+                      <Lock className="w-3 h-3 text-purple-500" />
+                      <span>Posiciones Fijas</span>
+                    </div>
+                    <div className="text-[10px] text-slate-500 dark:text-slate-400 font-normal mt-0.5 leading-snug">
+                      Posición estricta bloqueada por el entrenador sin cambio permitido.
+                    </div>
+                  </button>
+                </div>
+              </div>
+
+              <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setIsNewTrainingModalOpen(false)}
+                  className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold transition cursor-pointer"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold transition shadow-xs cursor-pointer"
+                >
+                  Guardar Sesión
                 </button>
               </div>
             </form>

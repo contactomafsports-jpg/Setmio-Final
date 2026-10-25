@@ -128,9 +128,10 @@ export const AdminMatches: React.FC = () => {
   // Hub Unificado: Compartir / Notificar
   const [shareNotifyMatch, setShareNotifyMatch] = useState<OpenMatch | null>(null);
   const [shareChannel, setShareChannel] = useState<'email' | 'whatsapp' | 'push'>('whatsapp');
-  const [segmentType, setSegmentType] = useState<'individual' | 'group' | 'level'>('level');
+  const [segmentType, setSegmentType] = useState<'individual' | 'group' | 'teams' | 'level'>('level');
   const [selectedIndividualPlayer, setSelectedIndividualPlayer] = useState<string>('Carlos Méndez');
   const [selectedGroupId, setSelectedGroupId] = useState<string>('');
+  const [selectedTeamName, setSelectedTeamName] = useState<string>('Equipo A Masculino (Federado 1ª)');
   const [hubSubject, setHubSubject] = useState<string>('');
   const [hubMessage, setHubMessage] = useState<string>('');
 
@@ -248,7 +249,9 @@ export const AdminMatches: React.FC = () => {
   const [memberPricePerPlayer, setMemberPricePerPlayer] = useState(6.0);
   const [matchMode, setMatchMode] = useState<'competitive' | 'friendly'>('competitive');
   const [visibility, setVisibility] = useState<'public' | 'private' | 'group'>('public');
-  const [restrictedGroupName, setRestrictedGroupName] = useState('Equipo A Masculino (Federado 1ª)');
+  const [restrictedGroupName, setRestrictedGroupName] = useState('Comunidad Nivel 3.5 - 4.25');
+  const [audienceCategory, setAudienceCategory] = useState<'groups' | 'teams'>('groups');
+  const [convocatoriaAudienceCategory, setConvocatoriaAudienceCategory] = useState<'groups' | 'teams'>('teams');
   const [gender, setGender] = useState<'male' | 'female' | 'mixed'>('male');
   const [paymentMode, setPaymentMode] = useState<'split' | 'single'>('split');
   const [paymentPolicy, setPaymentPolicy] = useState<'online_only' | 'counter_only' | 'both'>('both');
@@ -2512,32 +2515,92 @@ export const AdminMatches: React.FC = () => {
 
                 {/* Si es restringida a grupo / equipo: Segmentación visual obligatoria */}
                 {visibility === 'group' && (
-                  <div className="mt-2 p-3 rounded-2xl bg-indigo-50/60 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800 space-y-2">
-                    <label className="block text-[11px] font-bold text-indigo-900 dark:text-indigo-200">
-                      Seleccionar Audiencia de Notificación / Convocatoria:
-                    </label>
-                    <select
-                      value={restrictedGroupName}
-                      onChange={(e) => setRestrictedGroupName(e.target.value)}
-                      className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-indigo-300 dark:border-indigo-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white"
-                    >
-                      <optgroup label="🏆 EQUIPOS OFICIALES (Competición Federada)">
-                        <option value="Equipo A Masculino (Federado 1ª)">🏆 Equipo A Masculino (Federado 1ª Gallega)</option>
-                        <option value="Equipo B Femenino (Federado 2ª)">🏆 Equipo B Femenino (Federado 2ª Gallega)</option>
-                        <option value="Veteranos +45 (Liga Autonómica)">🏆 Veteranos +45 (Liga Autonómica Social)</option>
-                        <option value="Equipo Menores / Júnior">🏆 Equipo Menores / Promesas (Júnior)</option>
-                      </optgroup>
-                      <optgroup label="👥 GRUPOS DEL CLUB (Comunidad, Niveles & Horarios)">
-                        <option value="Comunidad Nivel 3.5 - 4.25">👥 Comunidad Nivel 3.5 - 4.25 (Intermedio-Avanzado)</option>
-                        <option value="Escuela Adultos Nivel 3.0">👥 Escuela Adultos Nivel 3.0</option>
-                        <option value="Partidas Matinales Entre Semana">👥 Partidas Matinales Entre Semana</option>
-                        <option value="Grupo Ranking Top 10">👥 Grupo Ranking Top 10 Social</option>
-                      </optgroup>
-                    </select>
-                    <div className="flex items-center gap-2 pt-1 text-[10px] text-indigo-600 dark:text-indigo-400">
-                      <span className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
-                      <span>Solo los integrantes del grupo o equipo seleccionado verán y podrán apuntarse a esta convocatoria.</span>
+                  <div className="mt-2 p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <label className="block text-xs font-bold text-slate-800 dark:text-slate-200">
+                        Seleccionar Audiencia de Convocatoria / Notificación *
+                      </label>
+                      <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold bg-emerald-50 dark:bg-emerald-950 px-2 py-0.5 rounded">
+                        Acceso Restringido
+                      </span>
                     </div>
+
+                    {/* Selector de Pestañas Visuales: Grupos vs Equipos */}
+                    <div className="grid grid-cols-2 gap-2 p-1 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setAudienceCategory('groups');
+                          setRestrictedGroupName('Comunidad Nivel 3.5 - 4.25');
+                        }}
+                        className={`py-2 px-3 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${
+                          audienceCategory === 'groups'
+                            ? 'bg-white dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 shadow-xs'
+                            : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                        }`}
+                      >
+                        <Users className="w-4 h-4 text-emerald-500" />
+                        <span>👥 Grupos de Jugadores ({playerGroups.length})</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setAudienceCategory('teams');
+                          setRestrictedGroupName('Equipo A Masculino (Federado 1ª)');
+                        }}
+                        className={`py-2 px-3 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${
+                          audienceCategory === 'teams'
+                            ? 'bg-white dark:bg-slate-800 text-amber-600 dark:text-amber-400 shadow-xs'
+                            : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                        }`}
+                      >
+                        <Trophy className="w-4 h-4 text-amber-500" />
+                        <span>🏆 Equipos de Competición (4)</span>
+                      </button>
+                    </div>
+
+                    {/* Contenido según categoría seleccionada */}
+                    {audienceCategory === 'groups' ? (
+                      <div className="space-y-1.5">
+                        <label className="block text-[11px] font-bold text-emerald-800 dark:text-emerald-300">
+                          Grupos Sociales, de Nivel y Partidas del Club:
+                        </label>
+                        <select
+                          value={restrictedGroupName}
+                          onChange={(e) => setRestrictedGroupName(e.target.value)}
+                          className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-emerald-300 dark:border-emerald-800 rounded-xl text-xs font-bold text-slate-900 dark:text-white"
+                        >
+                          {playerGroups.map((g) => (
+                            <option key={g.id} value={g.name}>
+                              👥 {g.name} ({g.memberCount} socios · {g.category.toUpperCase()})
+                            </option>
+                          ))}
+                        </select>
+                        <p className="text-[10px] text-slate-500 dark:text-slate-400">
+                          Se convocará automáticamente a los miembros del grupo social o nivel para completar la partida.
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="space-y-1.5">
+                        <label className="block text-[11px] font-bold text-amber-800 dark:text-amber-300">
+                          Equipos Federados, Interclubs y Ligas Oficiales:
+                        </label>
+                        <select
+                          value={restrictedGroupName}
+                          onChange={(e) => setRestrictedGroupName(e.target.value)}
+                          className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-amber-300 dark:border-amber-800 rounded-xl text-xs font-bold text-slate-900 dark:text-white"
+                        >
+                          <option value="Equipo A Masculino (Federado 1ª)">🏆 Equipo A Masculino (Federado 1ª Gallega · 12 jug.)</option>
+                          <option value="Equipo B Femenino (Federado 2ª)">🏆 Equipo B Femenino (Federado 2ª Gallega · 10 jug.)</option>
+                          <option value="Veteranos +45 (Liga Autonómica)">🏆 Veteranos +45 (Liga Autonómica Social · 14 jug.)</option>
+                          <option value="Equipo Menores / Júnior">🏆 Equipo Menores / Promesas (Júnior · 8 jug.)</option>
+                        </select>
+                        <p className="text-[10px] text-slate-500 dark:text-slate-400">
+                          Convocatoria restringida exclusivamente a la plantilla oficial y federada del equipo.
+                        </p>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -3844,9 +3907,9 @@ export const AdminMatches: React.FC = () => {
 
             <form onSubmit={handleSendMatchConvocatoria} className="space-y-4 text-xs">
               {/* Selección de Audiencia: Separación Visual entre Grupos y Equipos */}
-              <div className="space-y-2 p-3 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800">
+              <div className="space-y-3 p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800">
                 <div className="flex items-center justify-between">
-                  <label className="block font-bold text-slate-700 dark:text-slate-300 text-xs">
+                  <label className="block font-bold text-slate-800 dark:text-slate-200 text-xs">
                     Audiencia Destinataria de la Convocatoria *
                   </label>
                   <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950 px-2 py-0.5 rounded">
@@ -3854,30 +3917,80 @@ export const AdminMatches: React.FC = () => {
                   </span>
                 </div>
 
-                <select
-                  value={selectedGroupIdForNotification}
-                  onChange={(e) => setSelectedGroupIdForNotification(e.target.value)}
-                  className="w-full px-3 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 font-bold"
-                >
-                  <optgroup label="🏆 EQUIPOS OFICIALES (Competición Federada & Ligas)">
-                    <option value="team-masc-1">🏆 Equipo A Masculino (1ª Categoría Federada · 12 jugadores)</option>
-                    <option value="team-fem-2">🏆 Equipo B Femenino (2ª Categoría Federada · 10 jugadoras)</option>
-                    <option value="team-vet-45">🏆 Equipo Veteranos +45 (Liga Autonómica Social · 14 jugadores)</option>
-                    <option value="team-promesas">🏆 Equipo Menores / Júnior Promesas (8 jugadores)</option>
-                  </optgroup>
-                  <optgroup label="👥 GRUPOS DEL CLUB (Comunidad, Niveles & Horarios)">
-                    {playerGroups.map((g) => (
-                      <option key={g.id} value={g.id}>
-                        👥 {g.name} ({g.memberCount} socios · {g.category.toUpperCase()})
-                      </option>
-                    ))}
-                  </optgroup>
-                </select>
+                {/* Tabs de Selección Visual */}
+                <div className="grid grid-cols-2 gap-2 p-1 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setConvocatoriaAudienceCategory('groups');
+                      setSelectedGroupIdForNotification(playerGroups[0]?.id || 'g-1');
+                    }}
+                    className={`py-2 px-3 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${
+                      convocatoriaAudienceCategory === 'groups'
+                        ? 'bg-white dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 shadow-xs'
+                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                    }`}
+                  >
+                    <Users className="w-4 h-4 text-emerald-500" />
+                    <span>👥 Grupos de Jugadores ({playerGroups.length})</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setConvocatoriaAudienceCategory('teams');
+                      setSelectedGroupIdForNotification('team-masc-1');
+                    }}
+                    className={`py-2 px-3 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${
+                      convocatoriaAudienceCategory === 'teams'
+                        ? 'bg-white dark:bg-slate-800 text-amber-600 dark:text-amber-400 shadow-xs'
+                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                    }`}
+                  >
+                    <Trophy className="w-4 h-4 text-amber-500" />
+                    <span>🏆 Equipos de Competición (4)</span>
+                  </button>
+                </div>
+
+                {convocatoriaAudienceCategory === 'groups' ? (
+                  <div className="space-y-1.5">
+                    <label className="block text-[11px] font-bold text-emerald-800 dark:text-emerald-300">
+                      Grupos Sociales y de Nivel del Club:
+                    </label>
+                    <select
+                      value={selectedGroupIdForNotification}
+                      onChange={(e) => setSelectedGroupIdForNotification(e.target.value)}
+                      className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-emerald-300 dark:border-emerald-800 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 font-bold"
+                    >
+                      {playerGroups.map((g) => (
+                        <option key={g.id} value={g.id}>
+                          👥 {g.name} ({g.memberCount} socios · {g.category.toUpperCase()})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                ) : (
+                  <div className="space-y-1.5">
+                    <label className="block text-[11px] font-bold text-amber-800 dark:text-amber-300">
+                      Equipos Federados e Interclubs:
+                    </label>
+                    <select
+                      value={selectedGroupIdForNotification}
+                      onChange={(e) => setSelectedGroupIdForNotification(e.target.value)}
+                      className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-amber-300 dark:border-amber-800 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 font-bold"
+                    >
+                      <option value="team-masc-1">🏆 Equipo A Masculino (1ª Categoría Federada · 12 jug.)</option>
+                      <option value="team-fem-2">🏆 Equipo B Femenino (2ª Categoría Federada · 10 jug.)</option>
+                      <option value="team-vet-45">🏆 Equipo Veteranos +45 (Liga Autonómica Social · 14 jug.)</option>
+                      <option value="team-promesas">🏆 Equipo Menores / Júnior Promesas (8 jug.)</option>
+                    </select>
+                  </div>
+                )}
 
                 <div className="flex items-center gap-1.5 text-[11px] text-slate-500 dark:text-slate-400 pt-0.5">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
                   <span>
-                    Opciones separadas para distinguir convocatorias de <strong>Equipos de competición</strong> de avisos a <strong>Grupos sociales del club</strong>.
+                    Convocatoria oficial con enlace directo para que los jugadores acepten plaza y paguen su 1/4 parte.
                   </span>
                 </div>
               </div>
@@ -4122,7 +4235,7 @@ export const AdminMatches: React.FC = () => {
                 <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">
                   2. Segmentar Destinatarios por:
                 </label>
-                <div className="grid grid-cols-3 gap-1.5 p-1 rounded-xl bg-slate-100 dark:bg-slate-800/80 mb-2.5">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 p-1 rounded-xl bg-slate-100 dark:bg-slate-800/80 mb-2.5">
                   <button
                     type="button"
                     onClick={() => setSegmentType('level')}
@@ -4132,7 +4245,7 @@ export const AdminMatches: React.FC = () => {
                         : 'text-slate-600 dark:text-slate-400'
                     }`}
                   >
-                    Nivel / Rango ELO
+                    Nivel ELO
                   </button>
                   <button
                     type="button"
@@ -4143,7 +4256,18 @@ export const AdminMatches: React.FC = () => {
                         : 'text-slate-600 dark:text-slate-400'
                     }`}
                   >
-                    Grupo de Jugadores
+                    👥 Grupos
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setSegmentType('teams')}
+                    className={`py-1.5 px-2 rounded-lg text-[11px] font-bold transition cursor-pointer ${
+                      segmentType === 'teams'
+                        ? 'bg-white dark:bg-slate-900 text-amber-600 dark:text-amber-400 shadow-xs'
+                        : 'text-slate-600 dark:text-slate-400'
+                    }`}
+                  >
+                    🏆 Equipos
                   </button>
                   <button
                     type="button"
@@ -4154,7 +4278,7 @@ export const AdminMatches: React.FC = () => {
                         : 'text-slate-600 dark:text-slate-400'
                     }`}
                   >
-                    Jugador Individual
+                    Individual
                   </button>
                 </div>
 
@@ -4175,6 +4299,9 @@ export const AdminMatches: React.FC = () => {
 
                 {segmentType === 'group' && (
                   <div className="space-y-1">
+                    <label className="block text-[11px] font-bold text-emerald-700 dark:text-emerald-300">
+                      Grupo Social / Comunidad del Club:
+                    </label>
                     <select
                       value={selectedGroupId}
                       onChange={(e) => setSelectedGroupId(e.target.value)}
@@ -4182,15 +4309,36 @@ export const AdminMatches: React.FC = () => {
                     >
                       {playerGroups.map((g) => (
                         <option key={g.id} value={g.id}>
-                          {g.name} ({g.memberCount} socios · {g.category.toUpperCase()})
+                          👥 {g.name} ({g.memberCount} socios · {g.category.toUpperCase()})
                         </option>
                       ))}
                     </select>
                   </div>
                 )}
 
+                {segmentType === 'teams' && (
+                  <div className="space-y-1">
+                    <label className="block text-[11px] font-bold text-amber-700 dark:text-amber-300">
+                      Equipo Federado Oficial:
+                    </label>
+                    <select
+                      value={selectedTeamName}
+                      onChange={(e) => setSelectedTeamName(e.target.value)}
+                      className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-amber-300 dark:border-amber-800 rounded-xl text-xs font-bold text-slate-900 dark:text-white focus:outline-none focus:border-amber-500"
+                    >
+                      <option value="Equipo A Masculino (Federado 1ª)">🏆 Equipo A Masculino (Federado 1ª Gallega · 12 jug.)</option>
+                      <option value="Equipo B Femenino (Federado 2ª)">🏆 Equipo B Femenino (Federado 2ª Gallega · 10 jug.)</option>
+                      <option value="Veteranos +45 (Liga Autonómica)">🏆 Veteranos +45 (Liga Autonómica Social · 14 jug.)</option>
+                      <option value="Equipo Menores / Júnior">🏆 Equipo Menores / Promesas (Júnior · 8 jug.)</option>
+                    </select>
+                  </div>
+                )}
+
                 {segmentType === 'individual' && (
                   <div className="space-y-1">
+                    <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300">
+                      Socio / Jugador Individual:
+                    </label>
                     <select
                       value={selectedIndividualPlayer}
                       onChange={(e) => setSelectedIndividualPlayer(e.target.value)}

@@ -2202,6 +2202,7 @@ export const AdminSchool: React.FC = () => {
               {filteredGroups.map((group) => {
                 const isFull = group.currentStudents >= group.maxStudents;
                 const openSpots = group.maxStudents - group.currentStudents;
+                const isSingleClass = group.type === 'single_class';
 
                 return (
                   <div
@@ -2296,85 +2297,93 @@ export const AdminSchool: React.FC = () => {
                       </div>
                     </div>
 
-                    {/* Acciones de la Tarjeta */}
-                    <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-2 text-xs mt-3">
-                      <div className="flex items-center gap-1.5">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setEditingGroup(group);
-                            setGroupFormData({
-                              name: group.name,
-                              periodicity: group.type === 'course_quarterly' ? 'course_quarterly' : 'course_monthly',
-                              levelCategory: group.levelCategory,
-                              coachName: group.coachName,
-                              schedule: group.schedule,
-                              days: group.days,
-                              courtName: group.courtName,
-                              registrationFee: group.registrationFee || 20.0,
-                              memberFee: group.memberFee,
-                              nonMemberFee: group.nonMemberFee,
-                              maxStudents: group.maxStudents,
-                              notes: group.notes || '',
-                              classesPerWeek: group.classesPerWeek || group.days.length || 1,
-                              totalWeeks: group.totalWeeks || (group.type === 'course_quarterly' ? 12 : 4),
-                            });
-                            setIsNewGroupModalOpen(true);
-                          }}
-                          className="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition cursor-pointer"
-                          title="Editar"
-                        >
-                          <Edit2 className="w-3.5 h-3.5" />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setConfirmDeleteGroup(group)}
-                          className="p-1.5 rounded-lg bg-slate-100 hover:bg-rose-100 dark:bg-slate-800 dark:hover:bg-rose-950/50 text-slate-700 dark:text-slate-300 hover:text-rose-600 transition cursor-pointer"
-                          title="Eliminar"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
+                    {/* Acciones de la Tarjeta Reorganizadas y Protegidas contra Desbordamiento */}
+                    <div className="pt-3 border-t border-slate-100 dark:border-slate-800 space-y-2.5 text-xs mt-3">
+                      {/* Fila de gestión de plazas libres (si aplica) con wrap responsivo */}
+                      {openSpots > 0 && (
+                        <div className="flex flex-wrap items-center gap-1.5 p-2 rounded-2xl bg-emerald-50/70 dark:bg-emerald-950/40 border border-emerald-500/20">
+                          <span className="text-[10px] font-bold text-emerald-800 dark:text-emerald-300 uppercase tracking-wider mr-1">
+                            Plazas Libres:
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => handleOpenNotifyGroupForClass(group)}
+                            className="px-2.5 py-1 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[11px] shadow-2xs flex items-center gap-1 transition cursor-pointer active:scale-95"
+                            title="Convocatoria instantánea a grupos de jugadores (WhatsApp)"
+                          >
+                            <Megaphone className="w-3 h-3" />
+                            <span>Notificar Grupo</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setConfirmPublishClass(group)}
+                            className="px-2.5 py-1 rounded-xl bg-white dark:bg-slate-800 hover:bg-emerald-50 dark:hover:bg-slate-700 text-emerald-700 dark:text-emerald-300 font-bold text-[11px] border border-emerald-500/30 flex items-center gap-1 transition cursor-pointer"
+                            title="Ofertar hueco a jugadores externos"
+                          >
+                            <Bell className="w-3 h-3 text-emerald-500" />
+                            <span>{group.publishedAsOpen ? t('school.publishedSpots', 'Plaza Publicada') : t('school.publishSpots', 'Publicar Plazas')}</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setInviteModalGroup(group)}
+                            className="px-2.5 py-1 rounded-xl bg-purple-50 hover:bg-purple-100 dark:bg-purple-950/70 dark:hover:bg-purple-900 text-purple-700 dark:text-purple-300 font-bold text-[11px] border border-purple-500/30 flex items-center gap-1 transition cursor-pointer"
+                            title="Invitar a socios registrados"
+                          >
+                            <UserPlus className="w-3 h-3 text-purple-600 dark:text-purple-400" />
+                            <span>{t('school.inviteToCover', 'Invitar')}</span>
+                          </button>
+                        </div>
+                      )}
 
-                      <div className="flex items-center gap-2">
-                        {openSpots > 0 && (
-                          <>
-                            <button
-                              type="button"
-                              onClick={() => handleOpenNotifyGroupForClass(group)}
-                              className="px-2.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[11px] shadow-2xs flex items-center gap-1 transition cursor-pointer active:scale-95"
-                              title="Convocatoria instantánea a grupos de jugadores (WhatsApp)"
-                            >
-                              <Megaphone className="w-3 h-3" />
-                              <span>Notificar Grupo</span>
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => setConfirmPublishClass(group)}
-                              className="px-2.5 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/70 dark:hover:bg-emerald-900 text-emerald-700 dark:text-emerald-300 font-bold text-[11px] border border-emerald-500/30 flex items-center gap-1 transition cursor-pointer"
-                              title="Ofertar hueco a jugadores externos"
-                            >
-                              <Bell className="w-3 h-3" />
-                              <span>{group.publishedAsOpen ? t('school.publishedSpots', 'Plaza Publicada') : t('school.publishSpots', 'Publicar Plazas')}</span>
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => setInviteModalGroup(group)}
-                              className="px-2.5 py-1.5 rounded-xl bg-purple-50 hover:bg-purple-100 dark:bg-purple-950/70 dark:hover:bg-purple-900 text-purple-700 dark:text-purple-300 font-bold text-[11px] border border-purple-500/30 flex items-center gap-1 transition cursor-pointer"
-                              title="Invitar a socios registrados"
-                            >
-                              <UserPlus className="w-3 h-3" />
-                              <span>{t('school.inviteToCover', 'Invitar')}</span>
-                            </button>
-                          </>
-                        )}
+                      {/* Barra Principal de Acciones: Edición a la izquierda, Botón Dinámico de Detalles a la derecha garantizado dentro de pantalla */}
+                      <div className="flex items-center justify-between gap-2 pt-0.5">
+                        <div className="flex items-center gap-1.5 shrink-0">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setEditingGroup(group);
+                              setGroupFormData({
+                                name: group.name,
+                                periodicity: group.type === 'course_quarterly' ? 'course_quarterly' : 'course_monthly',
+                                levelCategory: group.levelCategory,
+                                coachName: group.coachName,
+                                schedule: group.schedule,
+                                days: group.days,
+                                courtName: group.courtName,
+                                registrationFee: group.registrationFee || 20.0,
+                                memberFee: group.memberFee,
+                                nonMemberFee: group.nonMemberFee,
+                                maxStudents: group.maxStudents,
+                                notes: group.notes || '',
+                                classesPerWeek: group.classesPerWeek || group.days.length || 1,
+                                totalWeeks: group.totalWeeks || (group.type === 'course_quarterly' ? 12 : 4),
+                              });
+                              setIsNewGroupModalOpen(true);
+                            }}
+                            className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition cursor-pointer"
+                            title="Editar"
+                          >
+                            <Edit2 className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setConfirmDeleteGroup(group)}
+                            className="p-2 rounded-xl bg-slate-100 hover:bg-rose-100 dark:bg-slate-800 dark:hover:bg-rose-950/50 text-slate-700 dark:text-slate-300 hover:text-rose-600 transition cursor-pointer"
+                            title="Eliminar"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
 
+                        {/* Botón Dinámico de Detalles: "Ver Clase" si es clase, "Ver Curso" si es curso */}
                         <button
                           type="button"
                           onClick={() => setSelectedGroupDetail(group)}
-                          className="px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-slate-800 dark:hover:bg-slate-700 text-white font-bold text-[11px] transition cursor-pointer"
+                          className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-slate-800 dark:hover:bg-slate-700 text-white font-bold text-xs transition flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-95 shrink-0"
+                          title={`Ver detalles de ${isSingleClass ? 'la clase suelta' : 'este curso'}`}
                         >
-                          {t('school.detailTitle', 'Ver Detalle')}
+                          <span>{isSingleClass ? 'Ver Clase' : 'Ver Curso'}</span>
+                          <ChevronRight className="w-3.5 h-3.5 text-emerald-400" />
                         </button>
                       </div>
                     </div>
