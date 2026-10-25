@@ -164,6 +164,16 @@ export const AdminCafePOS: React.FC = () => {
       venueName: venues?.[0]?.name || 'Sede Principal',
       customerName: 'Elena Permuy',
     },
+    {
+      id: 'tx-105',
+      time: '13:10',
+      concept: '1x Overgrip Wilson + 1x Agua 1.5L',
+      amount: 4.5,
+      paymentMethod: 'Bizum / Online',
+      venueId: venues?.[0]?.id || 'v-1',
+      venueName: venues?.[0]?.name || 'Sede Principal',
+      customerName: 'Javier Fraga',
+    },
   ]);
 
   // Modal: Asignar Reserva / Pago de Jugador
@@ -730,8 +740,9 @@ export const AdminCafePOS: React.FC = () => {
           </div>
         </div>
 
-        {/* Ticket / POS Cart Register */}
-        <div className="lg:col-span-5 bg-white dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 rounded-2xl p-4 sm:p-5 shadow-sm space-y-4">
+        {/* Ticket / POS Cart Register & Últimos 5 Pagos */}
+        <div className="lg:col-span-5 space-y-4">
+          <div className="bg-white dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 rounded-2xl p-4 sm:p-5 shadow-sm space-y-4">
           <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-700/60 pb-3">
             <div className="flex items-center gap-2">
               <ShoppingCart className="w-4 h-4 text-emerald-500" />
@@ -852,7 +863,69 @@ export const AdminCafePOS: React.FC = () => {
             </button>
           </div>
         </div>
+
+        {/* Tarjeta de los Últimos 5 Pagos Registrados (Requisito Bloque 1) */}
+        <div className="bg-white dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 rounded-2xl p-4 sm:p-5 shadow-sm space-y-3">
+          <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-700/60 pb-2.5">
+            <div className="flex items-center gap-2">
+              <History className="w-4 h-4 text-emerald-500" />
+              <h3 className="font-bold text-xs uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                Últimos 5 Pagos Registrados
+              </h3>
+            </div>
+            <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300">
+              {posTransactions.length} en turno
+            </span>
+          </div>
+
+          {posTransactions.length === 0 ? (
+            <div className="p-4 text-center text-xs text-slate-400">
+              No hay pagos registrados todavía en este turno.
+            </div>
+          ) : (
+            <div className="divide-y divide-slate-100 dark:divide-slate-700/60">
+              {posTransactions.slice(0, 5).map((tx) => (
+                <div key={tx.id} className="py-2.5 flex items-center justify-between gap-3 text-xs">
+                  <div className="min-w-0 flex-1 space-y-0.5">
+                    <div className="flex items-center gap-1.5">
+                      <span className="font-mono font-bold text-[10px] text-slate-400 shrink-0">{tx.time}</span>
+                      <span className="font-bold text-slate-900 dark:text-white truncate text-[11px]">{tx.concept}</span>
+                    </div>
+                    <div className="text-[10px] text-slate-500 dark:text-slate-400 flex items-center gap-1.5 truncate">
+                      <span>{tx.customerName || 'Cliente Mostrador'}</span>
+                      <span>·</span>
+                      <span className="text-emerald-600 dark:text-emerald-400 font-medium">{tx.paymentMethod}</span>
+                    </div>
+                  </div>
+                  <div className="text-right shrink-0">
+                    <div className="font-mono font-black text-xs text-emerald-600 dark:text-emerald-400">
+                      +{tx.amount.toFixed(2)} €
+                    </div>
+                    <span className="text-[9px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/80 px-1.5 py-0.2 rounded border border-emerald-500/20">
+                      Cobrado
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Botón Ver todos los pagos */}
+          <div className="pt-2 border-t border-slate-100 dark:border-slate-700/60">
+            <button
+              type="button"
+              onClick={() => setTransactionsModalOpen(true)}
+              className="w-full py-2.5 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-700/80 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold text-xs transition cursor-pointer flex items-center justify-center gap-1.5 shadow-2xs group"
+            >
+              <History className="w-3.5 h-3.5 text-blue-500 shrink-0" />
+              <span>Ver todos los pagos</span>
+              <span className="text-[10px] text-slate-400 font-mono">({posTransactions.length})</span>
+              <ArrowRight className="w-3.5 h-3.5 ml-auto text-slate-400 group-hover:translate-x-0.5 transition-transform" />
+            </button>
+          </div>
+        </div>
       </div>
+    </div>
 
       {/* ======================================================================
           2.5 MODAL: HISTORIAL Y LISTADO DE TRANSACCIONES DEL TURNO

@@ -331,6 +331,7 @@ export interface OpenMatch {
   isClubCreated?: boolean;
   paymentPolicy?: 'online_only' | 'counter_only' | 'both';
   paymentMode?: 'split' | 'single';
+  positionMode?: 'fixed' | 'recommended';
   slotRequests?: OpenMatchSlotRequest[];
   players: {
     id: string;
@@ -339,6 +340,8 @@ export interface OpenMatch {
     position: 'drive' | 'reves' | 'both';
     paid: boolean;
     customPrice?: number;
+    pair?: 1 | 2;
+    isPositionFixed?: boolean;
   }[];
 }
 
@@ -610,6 +613,9 @@ export interface NotificationItem {
   timestamp: string;
   read: boolean;
   actionUrl?: string;
+  originSection?: 'agenda' | 'matches' | 'tournaments' | 'pos_cafe' | 'courts_management' | 'customers' | 'settings';
+  originLabel?: string;
+  metadata?: Record<string, string>;
 }
 
 export interface DiscountCoupon {

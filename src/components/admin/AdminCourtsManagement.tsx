@@ -28,6 +28,7 @@ import {
   Radio,
   Server,
   ArrowRight,
+  Building2,
 } from 'lucide-react';
 
 interface AdminCourtsManagementProps {
@@ -52,6 +53,10 @@ export const AdminCourtsManagement: React.FC<AdminCourtsManagementProps> = ({
     triggerDemoToast,
     setAdminTab,
     t,
+    isMultiVenue,
+    venues,
+    selectedVenueId,
+    setSelectedVenueId,
   } = useApp();
 
   const [activeTab, setActiveTab] = useState<'inventory' | 'iot' | 'logs'>(initialTab);
@@ -62,6 +67,15 @@ export const AdminCourtsManagement: React.FC<AdminCourtsManagementProps> = ({
     }
   }, [initialTab]);
 
+  // Multi-venue segmenting: In multi-venue mode, the entire section is obligatorily segmented by venue
+  const realVenues = (venues || []).filter((v) => v.id !== 'all');
+  const isMultiVenueActive = Boolean(isMultiVenue) && realVenues.length > 1;
+  const effectiveVenueId =
+    selectedVenueId && selectedVenueId !== 'all'
+      ? selectedVenueId
+      : realVenues[0]?.id || 'venue-san-mateo';
+  const activeVenueObj = realVenues.find((v) => v.id === effectiveVenueId) || realVenues[0];
+
   // Inventory Filters & State (Segmented Controls Minimalistas)
   const [formatFilter, setFormatFilter] = useState<'all' | 'double' | 'single'>('all');
   const [locationFilter, setLocationFilter] = useState<'all' | 'indoor' | 'outdoor'>('all');
@@ -69,9 +83,16 @@ export const AdminCourtsManagement: React.FC<AdminCourtsManagementProps> = ({
   const [editingCourt, setEditingCourt] = useState<Court | null>(null);
   const [deletingCourtId, setDeletingCourtId] = useState<string | null>(null);
 
+  // Courts segmented by venue in multi-venue mode
+  const venueCourts = courts.filter((c) => {
+    if (!isMultiVenueActive) return true;
+    return c.venueId ? c.venueId === effectiveVenueId : effectiveVenueId === realVenues[0]?.id;
+  });
+
   // Form state for Create / Edit Court
   const [formData, setFormData] = useState({
     name: '',
+    venueId: effectiveVenueId,
     courtType: 'indoor' as 'indoor' | 'outdoor' | 'covered',
     surface: 'Mondo Supercourt WPT',
     hourlyRate: 24,
@@ -84,22 +105,30 @@ export const AdminCourtsManagement: React.FC<AdminCourtsManagementProps> = ({
 
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 
-  // IoT Devices Form & Filters
+  // IoT Devices Form & Filters (segmented by venue)
   const [deviceFilter, setDeviceFilter] = useState<'all' | 'light_relay' | 'pin_pad_lock'>('all');
   const [showAddDeviceModal, setShowAddDeviceModal] = useState(false);
   const [newDeviceName, setNewDeviceName] = useState('');
   const [newProvider, setNewProvider] = useState<'Shelly Cloud Pro' | 'Salto KS Cloud' | 'Sonoff IoT' | 'Tuya Pro'>('Shelly Cloud Pro');
-  const [newCourtId, setNewCourtId] = useState(courts[0]?.id || 'court-1');
+  const [newCourtId, setNewCourtId] = useState(venueCourts[0]?.id || courts[0]?.id || 'court-1');
+
+  // Keep newCourtId in sync when venue changes
+  useEffect(() => {
+    if (venueCourts.length > 0 && !venueCourts.some((c) => c.id === newCourtId)) {
+      setNewCourtId(venueCourts[0].id);
+    }
+  }, [effectiveVenueId, venueCourts, newCourtId]);
 
   const openCreateModal = () => {
     setFormData({
-      name: `Pista ${courts.length + 1} (Indoor Pro)`,
+      name: `Pista ${venueCourts.length + 1} (${activeVenueObj?.shortName || 'Pro'})`,
+      venueId: effectiveVenueId,
       courtType: 'indoor',
       surface: 'Mondo Supercourt WPT',
       hourlyRate: 24,
       isPanoramic: true,
       hasLights: true,
-      displayOrder: courts.length + 1,
+      displayOrder: venueCourts.length + 1,
       photoUrl: 'https://images.unsplash.com/photo-1554068865-24cecd4e34b8?auto=format&fit=crop&w=800&q=80',
       accessPin: `${Math.floor(1000 + Math.random() * 9000)}#`,
     });
@@ -112,6 +141,7 @@ export const AdminCourtsManagement: React.FC<AdminCourtsManagementProps> = ({
     setEditingCourt(court);
     setFormData({
       name: court.name,
+      venueId: court.venueId || effectiveVenueId,
       courtType: court.courtType || 'indoor',
       surface: court.surface || 'Mondo Supercourt WPT',
       hourlyRate: court.hourlyRate || 24,
@@ -128,6 +158,7 @@ export const AdminCourtsManagement: React.FC<AdminCourtsManagementProps> = ({
   const validateForm = () => {
     const errors: Record<string, string> = {};
     if (!formData.name.trim()) errors.name = 'El nombre de la pista es obligatorio.';
+    if (isMultiVenueActive && !formData.venueId) errors.venueId = 'La sede es obligatoria en entornos multi-sede.';
     if (!formData.surface.trim()) errors.surface = 'La superficie es obligatoria.';
     if (formData.hourlyRate <= 0) errors.hourlyRate = 'La tarifa horaria debe ser mayor a 0 €/h.';
     setFormErrors(errors);
@@ -138,9 +169,14 @@ export const AdminCourtsManagement: React.FC<AdminCourtsManagementProps> = ({
     e.preventDefault();
     if (!validateForm()) return;
 
+    const chosenVenue = realVenues.find((v) => v.id === formData.venueId);
+    const chosenVenueName = chosenVenue?.name || (formData.venueId === 'venue-norte' ? 'Sede Norte - Las Palmas' : 'Sede Principal - San Mateo');
+
     if (editingCourt) {
       updateCourt(editingCourt.id, {
         name: formData.name,
+        venueId: formData.venueId,
+        venueName: chosenVenueName,
         courtType: formData.courtType,
         surface: formData.surface,
         hourlyRate: Number(formData.hourlyRate),
@@ -152,13 +188,15 @@ export const AdminCourtsManagement: React.FC<AdminCourtsManagementProps> = ({
       });
       triggerDemoToast(
         'Pista Actualizada',
-        `Parámetros y tarifas de "${formData.name}" guardados correctamente.`,
+        `Parámetros y tarifas de "${formData.name}" guardados correctamente para ${chosenVenueName}.`,
         'success'
       );
     } else {
       addCourt({
         name: formData.name,
         sport: 'padel',
+        venueId: formData.venueId,
+        venueName: chosenVenueName,
         courtType: formData.courtType,
         surface: formData.surface,
         hourlyRate: Number(formData.hourlyRate),
@@ -174,7 +212,7 @@ export const AdminCourtsManagement: React.FC<AdminCourtsManagementProps> = ({
       });
       triggerDemoToast(
         'Nueva Pista Creada',
-        `Pista "${formData.name}" dada de alta en el cuadrante con tarifa ${formData.hourlyRate}€/h.`,
+        `Pista "${formData.name}" dada de alta en ${chosenVenueName} con tarifa ${formData.hourlyRate}€/h.`,
         'success'
       );
     }
@@ -198,14 +236,14 @@ export const AdminCourtsManagement: React.FC<AdminCourtsManagementProps> = ({
     const assignedCourt = courts.find((c) => c.id === newCourtId);
     triggerDemoToast(
       'Adaptador IoT Vinculado',
-      `Dispositivo "${newDeviceName}" vinculado a "${assignedCourt?.name || 'Pista'}" mediante ${newProvider}.`,
+      `Dispositivo "${newDeviceName}" vinculado a "${assignedCourt?.name || 'Pista'}" (${assignedCourt?.venueName || activeVenueObj?.shortName || 'Sede'}) mediante ${newProvider}.`,
       'success'
     );
     setShowAddDeviceModal(false);
     setNewDeviceName('');
   };
 
-  const filteredCourts = courts.filter((c) => {
+  const filteredCourts = venueCourts.filter((c) => {
     // Formato: Doble vs Individual
     if (formatFilter === 'double' && c.isSingle) return false;
     if (formatFilter === 'single' && !c.isSingle) return false;
@@ -217,14 +255,40 @@ export const AdminCourtsManagement: React.FC<AdminCourtsManagementProps> = ({
     return true;
   });
 
-  const filteredDevices = smartDevices.filter((d) => {
+  const venueSmartDevices = smartDevices.filter((d) => {
+    if (!isMultiVenueActive) return true;
+    const assignedCourt = courts.find((c) => c.id === d.courtId);
+    const courtVenueId = assignedCourt?.venueId || realVenues[0]?.id;
+    return courtVenueId === effectiveVenueId;
+  });
+
+  const filteredDevices = venueSmartDevices.filter((d) => {
     if (deviceFilter === 'light_relay') return d.deviceType === 'light_relay';
     if (deviceFilter === 'pin_pad_lock') return d.deviceType === 'pin_pad_lock';
     return true;
   });
 
-  const activeLightsCount = courts.filter((c) => c.isLightOn).length;
-  const avgRate = courts.length > 0 ? courts.reduce((acc, c) => acc + c.hourlyRate, 0) / courts.length : 0;
+  const activeLightsCount = venueCourts.filter((c) => c.isLightOn).length;
+  const avgRate = venueCourts.length > 0 ? venueCourts.reduce((acc, c) => acc + c.hourlyRate, 0) / venueCourts.length : 0;
+
+  const filteredAuditLogs = auditLogs.filter((log) => {
+    if (!isMultiVenueActive) return true;
+    const targetLower = (log.target || '').toLowerCase();
+    const detailsLower = (log.details || '').toLowerCase();
+    const actionLower = (log.action || '').toLowerCase();
+    const venueNameLower = (activeVenueObj?.name || '').toLowerCase();
+    return (
+      venueCourts.some(
+        (c) =>
+          targetLower.includes(c.name.toLowerCase()) ||
+          detailsLower.includes(c.name.toLowerCase())
+      ) ||
+      detailsLower.includes(venueNameLower) ||
+      actionLower.includes('sede') ||
+      targetLower.includes('san mateo') ||
+      targetLower.includes('norte')
+    );
+  });
 
   return (
     <div className="space-y-6 text-slate-900 dark:text-slate-100 max-w-7xl mx-auto pb-12 font-sans">
@@ -276,6 +340,59 @@ export const AdminCourtsManagement: React.FC<AdminCourtsManagementProps> = ({
         </div>
       </div>
 
+      {/* 1.1 FILTRO OBLIGATORIO DE SEDE EN ENTORNO MULTI-SEDE */}
+      {isMultiVenueActive && (
+        <div className="p-4 rounded-2xl bg-gradient-to-r from-emerald-500/10 via-teal-500/5 to-slate-50 dark:to-slate-900 border border-emerald-500/25 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 rounded-xl bg-emerald-600 text-white shadow-xs shrink-0">
+              <Building2 className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-white">
+                  Sede Activa
+                </span>
+                <span className="px-2 py-0.5 text-[10px] font-black rounded-md bg-emerald-600 text-white uppercase tracking-wider">
+                  Obligatorio (Multi-Sede)
+                </span>
+              </div>
+              <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
+                Segmentación obligatoria: todo el inventario, automatización IoT Shelly y tornos Salto KS pertenecen a la sede activa.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2">
+            {realVenues.map((v) => {
+              const isSelected = effectiveVenueId === v.id;
+              const count = courts.filter((c) => (c.venueId ? c.venueId === v.id : v.id === realVenues[0]?.id)).length;
+              return (
+                <button
+                  key={v.id}
+                  type="button"
+                  onClick={() => setSelectedVenueId(v.id)}
+                  className={`px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 cursor-pointer border ${
+                    isSelected
+                      ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs'
+                      : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-800 hover:border-emerald-500/50'
+                  }`}
+                >
+                  <Building2 className="w-3.5 h-3.5" />
+                  <span>{v.name}</span>
+                  <span
+                    className={`px-1.5 py-0.2 rounded-md text-[10px] font-mono font-bold ${
+                      isSelected ? 'bg-white/25 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
+                    }`}
+                  >
+                    {count} pistas
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       {/* 2. BARRA DE PESTAÑAS (TABS UNIFICADAS) */}
       <div className="flex items-center gap-1 p-1 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs text-xs font-semibold overflow-x-auto">
         <button
@@ -290,7 +407,7 @@ export const AdminCourtsManagement: React.FC<AdminCourtsManagementProps> = ({
           <Layers className="w-4 h-4" />
           <span>{t('courts_iot.tab_inventory', 'Inventario & Pistas')}</span>
           <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-white/20 text-white font-mono">
-            {courts.length}
+            {venueCourts.length}
           </span>
         </button>
 
@@ -306,7 +423,7 @@ export const AdminCourtsManagement: React.FC<AdminCourtsManagementProps> = ({
           <Zap className="w-4 h-4 text-amber-400" />
           <span>{t('courts_iot.tab_hardware', 'Domótica IoT & Hardware')}</span>
           <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-white/20 text-white font-mono">
-            {smartDevices.length}
+            {venueSmartDevices.length}
           </span>
         </button>
 
@@ -321,16 +438,24 @@ export const AdminCourtsManagement: React.FC<AdminCourtsManagementProps> = ({
         >
           <Clock className="w-4 h-4" />
           <span>{t('courts_iot.tab_logs', 'Registros & Logs IoT')}</span>
+          <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-white/20 text-white font-mono">
+            {filteredAuditLogs.length}
+          </span>
         </button>
       </div>
 
       {/* 3. KPIS GENERALES COMPARTIDOS */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-1">
-          <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-            Total Pistas Activas
+          <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center justify-between">
+            <span>Pistas Activas</span>
+            {isMultiVenueActive && (
+              <span className="text-[9px] text-emerald-600 dark:text-emerald-400 font-bold truncate max-w-[100px]">
+                {activeVenueObj?.shortName}
+              </span>
+            )}
           </span>
-          <div className="text-2xl font-black text-slate-900 dark:text-white font-mono">{courts.length}</div>
+          <div className="text-2xl font-black text-slate-900 dark:text-white font-mono">{venueCourts.length}</div>
           <span className="text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1">
             <CheckCircle2 className="w-3.5 h-3.5" /> 100% Operativas
           </span>
@@ -349,7 +474,7 @@ export const AdminCourtsManagement: React.FC<AdminCourtsManagementProps> = ({
             Iluminación IoT Activa
           </span>
           <div className="text-2xl font-black text-amber-500 font-mono flex items-center gap-2">
-            <span>{activeLightsCount} / {courts.length}</span>
+            <span>{activeLightsCount} / {venueCourts.length}</span>
             <Zap className="w-5 h-5 text-amber-500 animate-pulse" />
           </div>
           <span className="text-[11px] text-slate-500 dark:text-slate-400">Relés Shelly Pro Cloud</span>
@@ -447,6 +572,12 @@ export const AdminCourtsManagement: React.FC<AdminCourtsManagementProps> = ({
 
                   {/* Badges superiores */}
                   <div className="absolute top-3 left-3 flex flex-wrap gap-1.5">
+                    {isMultiVenueActive && (
+                      <span className="px-2.5 py-1 rounded-lg bg-emerald-950/90 backdrop-blur-md text-emerald-300 text-[10px] font-black border border-emerald-600/70 uppercase flex items-center gap-1 shadow-xs">
+                        <Building2 className="w-3 h-3 text-emerald-400" />
+                        {court.venueName || activeVenueObj?.shortName || 'Sede'}
+                      </span>
+                    )}
                     <span className="px-2.5 py-1 rounded-lg bg-slate-900/85 backdrop-blur-md text-white text-[11px] font-bold border border-slate-700/80 uppercase">
                       {court.courtType === 'indoor'
                         ? 'Indoor Cristal'
@@ -539,6 +670,28 @@ export const AdminCourtsManagement: React.FC<AdminCourtsManagementProps> = ({
                 </div>
               </div>
             ))}
+
+            {filteredCourts.length === 0 && (
+              <div className="col-span-full p-12 text-center rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-3">
+                <Building2 className="w-10 h-10 text-slate-400 mx-auto" />
+                <h3 className="text-base font-bold text-slate-800 dark:text-slate-200">
+                  No hay pistas registradas para los filtros en esta sede
+                </h3>
+                <p className="text-xs text-slate-500 max-w-md mx-auto">
+                  {isMultiVenueActive
+                    ? `No se encontraron pistas en la sede "${activeVenueObj?.name}". Puedes cambiar los filtros o crear una nueva pista para esta sede.`
+                    : 'Prueba a cambiar los filtros de formato o ubicación para ver más pistas.'}
+                </p>
+                <button
+                  type="button"
+                  onClick={openCreateModal}
+                  className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs inline-flex items-center gap-1.5 transition shadow-sm cursor-pointer"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>Crear Pista en {activeVenueObj?.shortName || 'esta Sede'}</span>
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -553,6 +706,11 @@ export const AdminCourtsManagement: React.FC<AdminCourtsManagementProps> = ({
             <div className="font-bold text-slate-900 dark:text-white flex items-center gap-2">
               <ShieldCheck className="w-4 h-4 text-emerald-500" />
               <span>Seguridad Fail-Safe y Protocolo Automatizado de Iluminación</span>
+              {isMultiVenueActive && (
+                <span className="text-[10px] px-2 py-0.5 rounded-md bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 font-bold border border-emerald-500/20">
+                  {activeVenueObj?.name}
+                </span>
+              )}
             </div>
             <p className="text-slate-600 dark:text-slate-400 leading-relaxed text-[11px]">
               {t(
@@ -578,7 +736,7 @@ export const AdminCourtsManagement: React.FC<AdminCourtsManagementProps> = ({
                     : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                 }`}
               >
-                Todos ({smartDevices.length})
+                Todos ({venueSmartDevices.length})
               </button>
               <button
                 type="button"
@@ -614,7 +772,15 @@ export const AdminCourtsManagement: React.FC<AdminCourtsManagementProps> = ({
               >
                 <div className="space-y-3">
                   <div className="flex items-center justify-between text-xs">
-                    <span className="font-extrabold text-slate-800 dark:text-slate-200">{dev.courtName}</span>
+                    <div className="flex items-center gap-1.5">
+                      <span className="font-extrabold text-slate-800 dark:text-slate-200">{dev.courtName}</span>
+                      {isMultiVenueActive && (
+                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-400 font-bold border border-emerald-500/20 flex items-center gap-1">
+                          <Building2 className="w-2.5 h-2.5" />
+                          {activeVenueObj?.shortName}
+                        </span>
+                      )}
+                    </div>
                     <span className="text-[10px] uppercase font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20">
                       {dev.status === 'connected_demo' ? 'Conectado Demo' : 'Online'}
                     </span>
@@ -675,6 +841,28 @@ export const AdminCourtsManagement: React.FC<AdminCourtsManagementProps> = ({
                 </div>
               </div>
             ))}
+
+            {filteredDevices.length === 0 && (
+              <div className="col-span-full p-10 text-center rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-3">
+                <Zap className="w-8 h-8 text-amber-500 mx-auto" />
+                <h3 className="text-base font-bold text-slate-800 dark:text-slate-200">
+                  No hay adaptadores IoT vinculados en esta sede
+                </h3>
+                <p className="text-xs text-slate-500 max-w-md mx-auto">
+                  {isMultiVenueActive
+                    ? `No se han asignado adaptadores Shelly o Salto KS a las pistas de "${activeVenueObj?.name}".`
+                    : 'No hay adaptadores registrados para este filtro.'}
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setShowAddDeviceModal(true)}
+                  className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs inline-flex items-center gap-1.5 transition shadow-sm cursor-pointer"
+                >
+                  <Zap className="w-4 h-4 text-amber-300" />
+                  <span>Vincular Adaptador en {activeVenueObj?.shortName || 'esta Sede'}</span>
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -689,14 +877,19 @@ export const AdminCourtsManagement: React.FC<AdminCourtsManagementProps> = ({
               <h2 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-2">
                 <Clock className="w-4 h-4 text-emerald-500" />
                 <span>HISTORIAL DE ACTIVIDAD DOMÓTICA & APERTURAS</span>
+                {isMultiVenueActive && (
+                  <span className="text-[10px] px-2 py-0.5 rounded-md bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 font-bold border border-emerald-500/20">
+                    {activeVenueObj?.name}
+                  </span>
+                )}
               </h2>
               <span className="text-[11px] text-slate-400 font-mono">
-                {auditLogs.length} eventos monitorizados
+                {filteredAuditLogs.length} eventos monitorizados
               </span>
             </div>
 
             <div className="space-y-2 text-xs">
-              {auditLogs.map((log) => (
+              {filteredAuditLogs.map((log) => (
                 <div
                   key={log.id}
                   className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-[11px]"
@@ -715,6 +908,12 @@ export const AdminCourtsManagement: React.FC<AdminCourtsManagementProps> = ({
                   </div>
                 </div>
               ))}
+
+              {filteredAuditLogs.length === 0 && (
+                <div className="p-8 text-center text-slate-400 text-xs">
+                  No hay registros de eventos domóticos para la sede seleccionada.
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -741,6 +940,38 @@ export const AdminCourtsManagement: React.FC<AdminCourtsManagementProps> = ({
             </div>
 
             <form onSubmit={handleFormSubmit} className="space-y-4 text-xs">
+              {isMultiVenueActive && (
+                <div className="p-3.5 rounded-2xl bg-emerald-50/70 dark:bg-emerald-950/25 border border-emerald-500/30 space-y-1.5">
+                  <label className="flex items-center justify-between font-bold text-slate-800 dark:text-slate-200">
+                    <span className="flex items-center gap-1.5 text-xs">
+                      <Building2 className="w-4 h-4 text-emerald-500" />
+                      <span>Sede del Club *</span>
+                    </span>
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-600 text-white font-black uppercase tracking-wider">
+                      Obligatorio (Multi-Sede)
+                    </span>
+                  </label>
+                  <select
+                    required
+                    value={formData.venueId}
+                    onChange={(e) => setFormData({ ...formData, venueId: e.target.value })}
+                    className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-semibold text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                  >
+                    {realVenues.map((v) => (
+                      <option key={v.id} value={v.id}>
+                        {v.name}
+                      </option>
+                    ))}
+                  </select>
+                  <p className="text-[10px] text-slate-500 dark:text-slate-400">
+                    En entorno multi-sede, toda pista pertenece obligatoriamente a una sede física asignada.
+                  </p>
+                  {formErrors.venueId && (
+                    <span className="text-rose-500 text-[11px] font-bold block">{formErrors.venueId}</span>
+                  )}
+                </div>
+              )}
+
               <div>
                 <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
                   Nombre de la Pista *
@@ -925,6 +1156,17 @@ export const AdminCourtsManagement: React.FC<AdminCourtsManagementProps> = ({
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                 Integración con gateways Shelly Pro DIN y cerraduras Salto KS
               </p>
+              {isMultiVenueActive && (
+                <div className="mt-2.5 p-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-500/25 flex items-center justify-between text-xs">
+                  <span className="text-slate-600 dark:text-slate-300 font-medium flex items-center gap-1.5">
+                    <Building2 className="w-3.5 h-3.5 text-emerald-500" />
+                    <span>Sede Asignada:</span>
+                  </span>
+                  <span className="font-bold text-emerald-700 dark:text-emerald-400">
+                    {activeVenueObj?.name}
+                  </span>
+                </div>
+              )}
             </div>
 
             <form onSubmit={handleAddDeviceSubmit} className="space-y-3.5 text-xs">
@@ -960,19 +1202,24 @@ export const AdminCourtsManagement: React.FC<AdminCourtsManagementProps> = ({
 
               <div>
                 <label className="block text-slate-700 dark:text-slate-300 mb-1 font-bold">
-                  Pista Asignada
+                  Pista Asignada {isMultiVenueActive ? `(${activeVenueObj?.shortName || 'Sede'}) *` : '*'}
                 </label>
                 <select
                   value={newCourtId}
                   onChange={(e) => setNewCourtId(e.target.value)}
                   className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
                 >
-                  {courts.map((c) => (
+                  {venueCourts.map((c) => (
                     <option key={c.id} value={c.id}>
-                      {c.name}
+                      {c.name} {isMultiVenueActive ? `— ${c.venueName || activeVenueObj?.shortName || ''}` : ''}
                     </option>
                   ))}
                 </select>
+                {venueCourts.length === 0 && (
+                  <p className="text-[11px] text-amber-600 dark:text-amber-400 mt-1">
+                    No hay pistas dadas de alta en esta sede. Da de alta una pista primero.
+                  </p>
+                )}
               </div>
 
               <div className="pt-2 flex items-center justify-end gap-2">

@@ -36,6 +36,7 @@ import {
   Megaphone,
   Send,
   Smartphone,
+  Target,
 } from 'lucide-react';
 
 export const AdminMatches: React.FC = () => {
@@ -226,13 +227,28 @@ export const AdminMatches: React.FC = () => {
   const [selectedCourtId, setSelectedCourtId] = useState(courts[0]?.id || 'court-1');
   const [matchDate, setMatchDate] = useState('2026-10-10');
   const [matchTime, setMatchTime] = useState('19:30');
+  const [matchDuration, setMatchDuration] = useState<60 | 90 | 120>(90);
+  const [allowPlayerCustomDurations, setAllowPlayerCustomDurations] = useState<boolean>(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('setmio_allow_player_durations') === 'true';
+    }
+    return false;
+  });
+  const [adminCreationMode, setAdminCreationMode] = useState<'empty' | 'assign_titular'>('empty');
+  const [titularCustomerId, setTitularCustomerId] = useState<string>('c-1');
+  const [titularPaymentChoice, setTitularPaymentChoice] = useState<'split' | 'full'>('split');
+  const [positionAssignmentMode, setPositionAssignmentMode] = useState<'recommended' | 'fixed'>('recommended');
+  const [slot1Pos, setSlot1Pos] = useState<'drive' | 'reves'>('drive');
+  const [slot2Pos, setSlot2Pos] = useState<'drive' | 'reves'>('reves');
+  const [slot3Pos, setSlot3Pos] = useState<'drive' | 'reves'>('drive');
+  const [slot4Pos, setSlot4Pos] = useState<'drive' | 'reves'>('reves');
   const [minLevel, setMinLevel] = useState(3.0);
   const [maxLevel, setMaxLevel] = useState(4.25);
   const [pricePerPlayer, setPricePerPlayer] = useState(7.5);
   const [memberPricePerPlayer, setMemberPricePerPlayer] = useState(6.0);
   const [matchMode, setMatchMode] = useState<'competitive' | 'friendly'>('competitive');
   const [visibility, setVisibility] = useState<'public' | 'private' | 'group'>('public');
-  const [restrictedGroupName, setRestrictedGroupName] = useState('Equipo A Masculino');
+  const [restrictedGroupName, setRestrictedGroupName] = useState('Equipo A Masculino (Federado 1ª)');
   const [gender, setGender] = useState<'male' | 'female' | 'mixed'>('male');
   const [paymentMode, setPaymentMode] = useState<'split' | 'single'>('split');
   const [paymentPolicy, setPaymentPolicy] = useState<'online_only' | 'counter_only' | 'both'>('both');
@@ -400,24 +416,48 @@ export const AdminMatches: React.FC = () => {
       ? `${currentTenant.name} (Club Oficial)`
       : creatorName.trim() || 'Organizador';
 
-    // Build initial players list based on creator and pre-assigned slots
-    const initialPlayers: OpenMatch['players'] = [
-      {
+    // Build initial players list: Admin NEVER occupies a slot
+    const initialPlayers: OpenMatch['players'] = [];
+
+    if (isClubCreator) {
+      if (adminCreationMode === 'assign_titular') {
+        const titularCust = customers.find((c) => c.id === titularCustomerId) || customers[0];
+        const titularPrice = titularCust?.isMember ? memberPricePerPlayer : pricePerPlayer;
+        initialPlayers.push({
+          id: `p-${Date.now()}-titular`,
+          name: titularCust?.name || 'Jugador Titular',
+          level: titularCust?.level || 4.0,
+          position: slot1Pos,
+          paid: true,
+          customPrice: titularPaymentChoice === 'full' ? titularPrice * 4 : titularPrice,
+          pair: 1,
+          isPositionFixed: positionAssignmentMode === 'fixed',
+        });
+      }
+      // If adminCreationMode === 'empty', initialPlayers starts with 0 players!
+    } else {
+      // Non-club organizer
+      initialPlayers.push({
         id: `p-${Date.now()}-creator`,
-        name: isClubCreator ? `Admin · ${currentTenant.name}` : finalCreatorName,
+        name: finalCreatorName,
         level: Number(creatorLevel) || 4.0,
         position: creatorPosition,
         paid: true,
-      },
-    ];
+        pair: 1,
+        isPositionFixed: positionAssignmentMode === 'fixed',
+      });
+    }
 
-    const invitedSlotIds = [slot2PlayerId, slot3PlayerId, slot4PlayerId].filter(
-      (id) => id && id !== 'none'
-    );
+    const invitedSlotIds = [
+      { id: slot2PlayerId, pair: 1 as const, pos: slot2Pos, slotNum: 2 },
+      { id: slot3PlayerId, pair: 2 as const, pos: slot3Pos, slotNum: 3 },
+      { id: slot4PlayerId, pair: 2 as const, pos: slot4Pos, slotNum: 4 },
+    ].filter((s) => s.id && s.id !== 'none');
+
     const notifiedPlayerNames: string[] = [];
 
-    invitedSlotIds.forEach((cId, idx) => {
-      const cust = customers.find((c) => c.id === cId);
+    invitedSlotIds.forEach((slotInfo, idx) => {
+      const cust = customers.find((c) => c.id === slotInfo.id);
       if (cust) {
         notifiedPlayerNames.push(cust.name);
         const slotPrice = cust.isMember ? memberPricePerPlayer : pricePerPlayer;
@@ -425,15 +465,17 @@ export const AdminMatches: React.FC = () => {
           id: `p-${Date.now()}-${idx + 2}`,
           name: cust.name,
           level: cust.level || 3.5,
-          position: (cust.position?.toLowerCase() === 'reves' ? 'reves' : 'drive') as any,
+          position: slotInfo.pos,
           paid: false,
           customPrice: slotPrice,
+          pair: slotInfo.pair,
+          isPositionFixed: positionAssignmentMode === 'fixed',
         });
 
         // Enviar automáticamente notificación a cada jugador añadido para aceptar y pagar su plaza
         sendNotification({
           title: 'Convocatoria de Partida: Plaza Asignada',
-          message: `${finalCreatorName} te ha asignado una plaza en la partida del ${matchDate} a las ${matchTime} h en ${court.name}. Importe: ${slotPrice.toFixed(2)} €. Entra para aceptar y pagar tu plaza.`,
+          message: `${finalCreatorName} te ha asignado una plaza en la partida del ${matchDate} a las ${matchTime} h (${matchDuration} min) en ${court.name}. Importe: ${slotPrice.toFixed(2)} €. Entra para confirmar y abonar tu plaza.`,
           type: 'match',
           actionUrl: '/admin/partidas',
         });
@@ -453,7 +495,7 @@ export const AdminMatches: React.FC = () => {
       creatorName: finalCreatorName,
       creatorLevel: Number(creatorLevel) || 4.0,
       startTime: startISO,
-      durationMinutes: 90,
+      durationMinutes: matchDuration,
       minLevel: Number(minLevel),
       maxLevel: Number(maxLevel),
       pricePerPlayer: Number(pricePerPlayer),
@@ -464,8 +506,9 @@ export const AdminMatches: React.FC = () => {
       restrictedGroupName: visibility === 'group' ? restrictedGroupName : undefined,
       gender,
       isClubCreated: isClubCreator,
-      paymentMode,
+      paymentMode: isClubCreator && adminCreationMode === 'assign_titular' && titularPaymentChoice === 'full' ? 'single' : paymentMode,
       paymentPolicy,
+      positionMode: positionAssignmentMode,
       players: initialPlayers,
     });
 
@@ -477,8 +520,10 @@ export const AdminMatches: React.FC = () => {
     triggerDemoToast(
       t('matches.toastCreatedTitle', 'Partida Publicada con Éxito'),
       notifiedPlayerNames.length > 0
-        ? `Partida creada en ${court.name}. Se ha enviado notificación automática a ${notifiedPlayerNames.join(', ')} para confirmar y abonar su plaza.`
-        : `Partida en ${court.name} (${gender === 'male' ? 'Masculina' : gender === 'female' ? 'Femenina' : 'Mixta'}) · Cobro: ${paymentMode === 'split' ? 'Split 1/4' : 'Pago Único'}.`,
+        ? `Partida creada en ${court.name} (${matchDuration} min). Notificación automática remitida a ${notifiedPlayerNames.join(', ')} para confirmar su plaza.`
+        : isClubCreator && adminCreationMode === 'empty'
+          ? `Partida 100% abierta creada en ${court.name} (${matchDuration} min, 4 plazas disponibles). El admin no ocupa plaza.`
+          : `Partida en ${court.name} (${matchDuration} min, ${gender === 'male' ? 'Masculina' : gender === 'female' ? 'Femenina' : 'Mixta'}).`,
       'success'
     );
   };
@@ -491,23 +536,45 @@ export const AdminMatches: React.FC = () => {
       ? `${currentTenant.name} (Club Oficial)`
       : creatorName.trim() || 'Organizador';
 
-    const initialPlayers: OpenMatch['players'] = [
-      {
+    const initialPlayers: OpenMatch['players'] = [];
+
+    if (isClubCreator) {
+      if (adminCreationMode === 'assign_titular') {
+        const titularCust = customers.find((c) => c.id === titularCustomerId) || customers[0];
+        const titularPrice = titularCust?.isMember ? memberPricePerPlayer : pricePerPlayer;
+        initialPlayers.push({
+          id: `p-${Date.now()}-titular`,
+          name: titularCust?.name || 'Jugador Titular',
+          level: titularCust?.level || 4.0,
+          position: slot1Pos,
+          paid: true,
+          customPrice: titularPaymentChoice === 'full' ? titularPrice * 4 : titularPrice,
+          pair: 1,
+          isPositionFixed: positionAssignmentMode === 'fixed',
+        });
+      }
+    } else {
+      initialPlayers.push({
         id: `p-${Date.now()}-creator`,
-        name: isClubCreator ? `Admin · ${currentTenant.name}` : finalCreatorName,
+        name: finalCreatorName,
         level: Number(creatorLevel) || 4.0,
         position: creatorPosition,
         paid: true,
-      },
-    ];
+        pair: 1,
+        isPositionFixed: positionAssignmentMode === 'fixed',
+      });
+    }
 
-    const invitedSlotIds = [slot2PlayerId, slot3PlayerId, slot4PlayerId].filter(
-      (id) => id && id !== 'none'
-    );
+    const invitedSlotIds = [
+      { id: slot2PlayerId, pair: 1 as const, pos: slot2Pos, slotNum: 2 },
+      { id: slot3PlayerId, pair: 2 as const, pos: slot3Pos, slotNum: 3 },
+      { id: slot4PlayerId, pair: 2 as const, pos: slot4Pos, slotNum: 4 },
+    ].filter((s) => s.id && s.id !== 'none');
+
     const notifiedPlayerNames: string[] = [];
 
-    invitedSlotIds.forEach((cId, idx) => {
-      const cust = customers.find((c) => c.id === cId);
+    invitedSlotIds.forEach((slotInfo, idx) => {
+      const cust = customers.find((c) => c.id === slotInfo.id);
       if (cust) {
         notifiedPlayerNames.push(cust.name);
         const slotPrice = cust.isMember ? memberPricePerPlayer : pricePerPlayer;
@@ -515,15 +582,16 @@ export const AdminMatches: React.FC = () => {
           id: `p-${Date.now()}-${idx + 2}`,
           name: cust.name,
           level: cust.level || 3.5,
-          position: (cust.position?.toLowerCase() === 'reves' ? 'reves' : 'drive') as any,
+          position: slotInfo.pos,
           paid: false,
           customPrice: slotPrice,
+          pair: slotInfo.pair,
+          isPositionFixed: positionAssignmentMode === 'fixed',
         });
 
-        // Enviar automáticamente notificación a cada jugador añadido para aceptar y pagar su plaza
         sendNotification({
           title: 'Convocatoria de Partida: Plaza Asignada',
-          message: `${finalCreatorName} te ha asignado una plaza en la partida del ${matchDate} a las ${matchTime} h en ${court.name}. Importe: ${slotPrice.toFixed(2)} €. Entra para aceptar y pagar tu plaza.`,
+          message: `${finalCreatorName} te ha asignado una plaza en la partida del ${matchDate} a las ${matchTime} h (${matchDuration} min) en ${court.name}. Importe: ${slotPrice.toFixed(2)} €. Entra para aceptar y pagar tu plaza.`,
           type: 'match',
           actionUrl: '/admin/partidas',
         });
@@ -538,7 +606,7 @@ export const AdminMatches: React.FC = () => {
       creatorName: finalCreatorName,
       creatorLevel: Number(creatorLevel) || 4.0,
       startTime: startISO,
-      durationMinutes: 90,
+      durationMinutes: matchDuration,
       minLevel: Number(minLevel),
       maxLevel: Number(maxLevel),
       pricePerPlayer: Number(pricePerPlayer),
@@ -549,8 +617,9 @@ export const AdminMatches: React.FC = () => {
       restrictedGroupName: visibility === 'group' ? restrictedGroupName : undefined,
       gender,
       isClubCreated: isClubCreator,
-      paymentMode,
+      paymentMode: isClubCreator && adminCreationMode === 'assign_titular' && titularPaymentChoice === 'full' ? 'single' : paymentMode,
       paymentPolicy,
+      positionMode: positionAssignmentMode,
       players: initialPlayers,
     };
 
@@ -563,8 +632,8 @@ export const AdminMatches: React.FC = () => {
     triggerDemoToast(
       t('matches.toastCreatedTitle', 'Partida Publicada con Éxito'),
       notifiedPlayerNames.length > 0
-        ? `Partida creada en ${court.name}. Notificación automática remitida a ${notifiedPlayerNames.join(', ')} para aceptar y abonar su plaza.`
-        : `Partida creada en ${court.name}. Configura la convocatoria para el grupo de jugadores.`,
+        ? `Partida creada en ${court.name} (${matchDuration} min). Notificación automática remitida a ${notifiedPlayerNames.join(', ')}.`
+        : `Partida creada en ${court.name} (${matchDuration} min). Configura la convocatoria para el grupo o equipo.`,
       'success'
     );
     handleOpenNotifyGroup(newMatchData);
@@ -1094,6 +1163,37 @@ export const AdminMatches: React.FC = () => {
                 </select>
               </div>
             )}
+
+            {/* Configuración de Duración para Jugadores (Admin) */}
+            <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200/60 dark:border-slate-700/60 text-xs font-bold text-slate-700 dark:text-slate-300 shadow-2xs">
+              <Clock className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+              <span className="text-[11px] text-slate-500 dark:text-slate-400 hidden md:inline">Duración Jugadores:</span>
+              <button
+                type="button"
+                onClick={() => {
+                  const nextVal = !allowPlayerCustomDurations;
+                  setAllowPlayerCustomDurations(nextVal);
+                  if (typeof window !== 'undefined') {
+                    localStorage.setItem('setmio_allow_player_durations', String(nextVal));
+                  }
+                  triggerDemoToast(
+                    'Regla de Duración Actualizada',
+                    nextVal
+                      ? 'Los jugadores ahora pueden reservar en 60, 90 y 120 minutos.'
+                      : 'Reservas de jugadores restringidas únicamente a 90 minutos (predeterminada).',
+                    'info'
+                  );
+                }}
+                className={`px-2 py-0.5 rounded-md text-[10px] font-bold transition cursor-pointer ${
+                  allowPlayerCustomDurations
+                    ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30'
+                    : 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300'
+                }`}
+                title="Configurar si los jugadores pueden elegir duración (60, 90, 120 min) o solo 90 min"
+              >
+                {allowPlayerCustomDurations ? '60, 90 y 120 min' : 'Solo 90 min'}
+              </button>
+            </div>
 
             {/* Botón de Filtro Responsive: a la misma altura, condensado en icono de filtro sin texto en móvil */}
             <button
@@ -2115,7 +2215,113 @@ export const AdminMatches: React.FC = () => {
                   </label>
                 </div>
 
-                {!isClubCreator && (
+                {/* Si es Creado por el Club (Admin): Admin NO ocupa plaza, permite 0/4 o asignar titular */}
+                {isClubCreator ? (
+                  <div className="p-3.5 rounded-2xl bg-emerald-50/60 dark:bg-emerald-950/40 border border-emerald-500/30 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="font-bold text-emerald-900 dark:text-emerald-200 uppercase tracking-wider text-[11px] flex items-center gap-1.5">
+                        <Shield className="w-3.5 h-3.5 text-emerald-500" />
+                        <span>Modalidad de Apertura por el Administrador</span>
+                      </span>
+                      <span className="text-[10px] font-bold text-emerald-700 dark:text-emerald-300 bg-white dark:bg-slate-900 px-2 py-0.5 rounded-md border border-emerald-500/20">
+                        Admin no ocupa plaza
+                      </span>
+                    </div>
+
+                    <p className="text-[11px] text-slate-600 dark:text-slate-400">
+                      Como administrador, tu perfil no consume ninguna de las 4 plazas de juego. Selecciona cómo se iniciará la partida:
+                    </p>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setAdminCreationMode('empty')}
+                        className={`p-3 rounded-xl border text-left transition cursor-pointer ${
+                          adminCreationMode === 'empty'
+                            ? 'bg-white dark:bg-slate-900 border-emerald-500 text-emerald-900 dark:text-emerald-200 font-bold shadow-xs'
+                            : 'bg-emerald-100/30 dark:bg-emerald-950/20 border-emerald-500/20 text-slate-600 dark:text-slate-400'
+                        }`}
+                      >
+                        <div className="flex items-center gap-1.5 text-xs font-bold">
+                          <Users className="w-4 h-4 text-emerald-500 shrink-0" />
+                          <span>Partida 100% Abierta (0/4)</span>
+                        </div>
+                        <div className="text-[10px] text-slate-500 dark:text-slate-400 font-normal mt-1 leading-relaxed">
+                          Sin ningún jugador inicial. 4 plazas libres abiertas a inscripción de la comunidad.
+                        </div>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setAdminCreationMode('assign_titular')}
+                        className={`p-3 rounded-xl border text-left transition cursor-pointer ${
+                          adminCreationMode === 'assign_titular'
+                            ? 'bg-white dark:bg-slate-900 border-emerald-500 text-emerald-900 dark:text-emerald-200 font-bold shadow-xs'
+                            : 'bg-emerald-100/30 dark:bg-emerald-950/20 border-emerald-500/20 text-slate-600 dark:text-slate-400'
+                        }`}
+                      >
+                        <div className="flex items-center gap-1.5 text-xs font-bold">
+                          <UserCheck className="w-4 h-4 text-emerald-500 shrink-0" />
+                          <span>Asignar Jugador Titular (1/4)</span>
+                        </div>
+                        <div className="text-[10px] text-slate-500 dark:text-slate-400 font-normal mt-1 leading-relaxed">
+                          Asigna a un socio o cliente como capitán/titular de la plaza 1 (pago total o dividido).
+                        </div>
+                      </button>
+                    </div>
+
+                    {adminCreationMode === 'assign_titular' && (
+                      <div className="p-3 rounded-xl bg-white dark:bg-slate-900 border border-emerald-500/20 space-y-2.5">
+                        <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300">
+                          Seleccionar Socio / Jugador Titular (Plaza 1):
+                        </label>
+                        <select
+                          value={titularCustomerId}
+                          onChange={(e) => setTitularCustomerId(e.target.value)}
+                          className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-bold text-slate-900 dark:text-white"
+                        >
+                          {customers.map((c) => (
+                            <option key={`titular-${c.id}`} value={c.id}>
+                              {c.name} (Nivel {c.level?.toFixed(2) || '3.50'}) {c.isMember ? '· Socio Oficial' : '· Cliente'}
+                            </option>
+                          ))}
+                        </select>
+
+                        <div>
+                          <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">
+                            Modalidad de Pago del Titular Asignado:
+                          </label>
+                          <div className="grid grid-cols-2 gap-2">
+                            <button
+                              type="button"
+                              onClick={() => setTitularPaymentChoice('split')}
+                              className={`p-2 rounded-lg border text-xs text-left transition cursor-pointer ${
+                                titularPaymentChoice === 'split'
+                                  ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-500 text-emerald-800 dark:text-emerald-300 font-bold'
+                                  : 'border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400'
+                              }`}
+                            >
+                              <div className="font-bold">Pago Dividido (1/4)</div>
+                              <div className="text-[10px] text-slate-400 font-normal">El titular solo abona su plaza individual</div>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setTitularPaymentChoice('full')}
+                              className={`p-2 rounded-lg border text-xs text-left transition cursor-pointer ${
+                                titularPaymentChoice === 'full'
+                                  ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-500 text-emerald-800 dark:text-emerald-300 font-bold'
+                                  : 'border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400'
+                              }`}
+                            >
+                              <div className="font-bold">Pago Total (100%)</div>
+                              <div className="text-[10px] text-slate-400 font-normal">El titular abona la pista completa (4/4)</div>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ) : (
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
                       <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400">
@@ -2304,23 +2510,34 @@ export const AdminMatches: React.FC = () => {
                   </button>
                 </div>
 
-                {/* Si es restringida a grupo */}
+                {/* Si es restringida a grupo / equipo: Segmentación visual obligatoria */}
                 {visibility === 'group' && (
-                  <div className="mt-2 p-2.5 rounded-xl bg-indigo-50/50 dark:bg-indigo-950/30 border border-indigo-200 dark:border-indigo-800">
-                    <label className="block text-[11px] font-bold text-indigo-900 dark:text-indigo-200 mb-1">
-                      Seleccionar Equipo o Grupo del Club (Visible solo para ellos):
+                  <div className="mt-2 p-3 rounded-2xl bg-indigo-50/60 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800 space-y-2">
+                    <label className="block text-[11px] font-bold text-indigo-900 dark:text-indigo-200">
+                      Seleccionar Audiencia de Notificación / Convocatoria:
                     </label>
                     <select
                       value={restrictedGroupName}
                       onChange={(e) => setRestrictedGroupName(e.target.value)}
                       className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-indigo-300 dark:border-indigo-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white"
                     >
-                      <option value="Equipo A Masculino">Equipo A Masculino (Federado 1ª)</option>
-                      <option value="Equipo B Femenino">Equipo B Femenino (Federado 2ª)</option>
-                      <option value="Veteranos +45">Veteranos +45 (Liga Social)</option>
-                      <option value="Escuela Adultos Nivel 3.5">Escuela Adultos Nivel 3.5</option>
-                      <option value="Grupo Ranking Top 10">Grupo Ranking Top 10</option>
+                      <optgroup label="🏆 EQUIPOS OFICIALES (Competición Federada)">
+                        <option value="Equipo A Masculino (Federado 1ª)">🏆 Equipo A Masculino (Federado 1ª Gallega)</option>
+                        <option value="Equipo B Femenino (Federado 2ª)">🏆 Equipo B Femenino (Federado 2ª Gallega)</option>
+                        <option value="Veteranos +45 (Liga Autonómica)">🏆 Veteranos +45 (Liga Autonómica Social)</option>
+                        <option value="Equipo Menores / Júnior">🏆 Equipo Menores / Promesas (Júnior)</option>
+                      </optgroup>
+                      <optgroup label="👥 GRUPOS DEL CLUB (Comunidad, Niveles & Horarios)">
+                        <option value="Comunidad Nivel 3.5 - 4.25">👥 Comunidad Nivel 3.5 - 4.25 (Intermedio-Avanzado)</option>
+                        <option value="Escuela Adultos Nivel 3.0">👥 Escuela Adultos Nivel 3.0</option>
+                        <option value="Partidas Matinales Entre Semana">👥 Partidas Matinales Entre Semana</option>
+                        <option value="Grupo Ranking Top 10">👥 Grupo Ranking Top 10 Social</option>
+                      </optgroup>
                     </select>
+                    <div className="flex items-center gap-2 pt-1 text-[10px] text-indigo-600 dark:text-indigo-400">
+                      <span className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
+                      <span>Solo los integrantes del grupo o equipo seleccionado verán y podrán apuntarse a esta convocatoria.</span>
+                    </div>
                   </div>
                 )}
               </div>
@@ -2500,7 +2717,7 @@ export const AdminMatches: React.FC = () => {
                 </select>
               </div>
 
-              {/* Fecha y Hora */}
+              {/* Fecha, Hora y Selector de Duración */}
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1 text-[11px]">
@@ -2525,6 +2742,59 @@ export const AdminMatches: React.FC = () => {
                     className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-bold text-slate-900 dark:text-white"
                     required
                   />
+                </div>
+              </div>
+
+              {/* Selector de Duración de Partida: 90 min (default), 60 min y 120 min */}
+              <div>
+                <label className="block font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5 text-[11px] flex items-center justify-between">
+                  <span className="flex items-center gap-1.5">
+                    <Clock className="w-3.5 h-3.5 text-emerald-500" />
+                    <span>Duración de la Partida</span>
+                  </span>
+                  <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold bg-emerald-50 dark:bg-emerald-950 px-2 py-0.5 rounded">
+                    {matchDuration === 90 ? '90 min · Predeterminada' : `${matchDuration} minutos`}
+                  </span>
+                </label>
+                <div className="grid grid-cols-3 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setMatchDuration(60)}
+                    className={`p-2.5 rounded-xl border text-center transition cursor-pointer ${
+                      matchDuration === 60
+                        ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-500 text-emerald-800 dark:text-emerald-300 font-bold shadow-2xs'
+                        : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-slate-300'
+                    }`}
+                  >
+                    <div className="text-xs font-bold">60 min</div>
+                    <div className="text-[10px] text-slate-400 font-normal">1 hora</div>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setMatchDuration(90)}
+                    className={`p-2.5 rounded-xl border text-center transition cursor-pointer ${
+                      matchDuration === 90
+                        ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-500 text-emerald-800 dark:text-emerald-300 font-bold shadow-2xs'
+                        : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-slate-300'
+                    }`}
+                  >
+                    <div className="text-xs font-bold text-emerald-600 dark:text-emerald-400">90 min</div>
+                    <div className="text-[10px] text-slate-400 font-normal">1h 30m (Estándar)</div>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setMatchDuration(120)}
+                    className={`p-2.5 rounded-xl border text-center transition cursor-pointer ${
+                      matchDuration === 120
+                        ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-500 text-emerald-800 dark:text-emerald-300 font-bold shadow-2xs'
+                        : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-slate-300'
+                    }`}
+                  >
+                    <div className="text-xs font-bold">120 min</div>
+                    <div className="text-[10px] text-slate-400 font-normal">2 horas</div>
+                  </button>
                 </div>
               </div>
 
@@ -2616,129 +2886,306 @@ export const AdminMatches: React.FC = () => {
                 </div>
               </div>
 
-              {/* Gestión de Plazas e Invitaciones Directas */}
-              <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800 space-y-3">
+              {/* Gestión de Plazas, Posiciones y Parejas */}
+              <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800 space-y-3.5">
                 <div className="flex items-center justify-between">
                   <span className="font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider text-[11px] flex items-center gap-1.5">
-                    <Users className="w-3.5 h-3.5 text-purple-500" />
-                    <span>Gestión de Plazas e Invitaciones</span>
+                    <Target className="w-3.5 h-3.5 text-emerald-500" />
+                    <span>Asignación de Parejas y Posiciones (Lado de Juego)</span>
                   </span>
-                  <span className="text-[10px] text-slate-400">4 plazas totales</span>
+                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${
+                    positionAssignmentMode === 'fixed'
+                      ? 'bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 border border-purple-500/20'
+                      : 'bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 border border-blue-500/20'
+                  }`}>
+                    {positionAssignmentMode === 'fixed' ? '🔒 Posiciones Fijas' : '🔄 Modo Recomendado'}
+                  </span>
                 </div>
+
+                {/* Selector Modo Recomendado vs Posiciones Fijas */}
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setPositionAssignmentMode('recommended')}
+                    className={`p-2.5 rounded-xl border text-left transition cursor-pointer ${
+                      positionAssignmentMode === 'recommended'
+                        ? 'bg-white dark:bg-slate-900 border-blue-500 text-blue-900 dark:text-blue-200 font-bold shadow-2xs'
+                        : 'bg-slate-100 dark:bg-slate-900/60 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400'
+                    }`}
+                  >
+                    <div className="text-xs font-bold">Modo Recomendado</div>
+                    <div className="text-[10px] text-slate-500 dark:text-slate-400 font-normal mt-0.5 leading-snug">
+                      Los jugadores eligen libremente lado (Drive o Revés) y pareja al apuntarse.
+                    </div>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setPositionAssignmentMode('fixed')}
+                    className={`p-2.5 rounded-xl border text-left transition cursor-pointer ${
+                      positionAssignmentMode === 'fixed'
+                        ? 'bg-white dark:bg-slate-900 border-purple-500 text-purple-900 dark:text-purple-200 font-bold shadow-2xs'
+                        : 'bg-slate-100 dark:bg-slate-900/60 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400'
+                    }`}
+                  >
+                    <div className="text-xs font-bold flex items-center gap-1">
+                      <Lock className="w-3 h-3 text-purple-500" />
+                      <span>Posiciones Fijas</span>
+                    </div>
+                    <div className="text-[10px] text-slate-500 dark:text-slate-400 font-normal mt-0.5 leading-snug">
+                      Asignación estricta de lado y parejas (bloqueadas sin que los jugadores puedan cambiarlas).
+                    </div>
+                  </button>
+                </div>
+
                 <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
-                  Asigna jugadores registrados a las plazas disponibles. Al publicar la partida, el sistema enviará automáticamente una notificación a cada jugador para aceptar y abonar su plaza.
+                  {positionAssignmentMode === 'fixed'
+                    ? 'Configuración de posiciones fijas e inmutables (aplicable también a entrenamientos de competición y partidos oficiales de equipo):'
+                    : 'Puedes sugerir o pre-asignar jugadores a las plazas antes de publicar:'}
                 </p>
 
-                <div className="space-y-2.5">
-                  {/* Plaza 1: Organizador */}
-                  <div className="flex items-center justify-between p-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs">
-                    <div className="flex items-center gap-2">
-                      <span className="w-5 h-5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 font-black text-[10px] flex items-center justify-center">
-                        1
+                {/* Layout de Pista: Pareja 1 vs Pareja 2 */}
+                <div className="space-y-3">
+                  {/* PAREJA 1 */}
+                  <div className="p-3 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-2.5">
+                    <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-1.5">
+                      <span className="text-xs font-black text-slate-900 dark:text-white flex items-center gap-1.5">
+                        <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                        <span>PAREJA 1 (Lado A)</span>
                       </span>
-                      <span className="font-bold text-slate-900 dark:text-white">
-                        {isClubCreator ? `Organizador (Club ${currentTenant.name})` : creatorName}
-                      </span>
-                    </div>
-                    <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950 px-2 py-0.5 rounded-md">
-                      Plaza Titular
-                    </span>
-                  </div>
-
-                  {/* Plaza 2 */}
-                  <div className="p-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-1.5 text-xs">
-                    <div className="flex items-center justify-between">
-                      <span className="font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5 text-[11px]">
-                        <span className="w-4 h-4 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-black text-[10px] flex items-center justify-center">
-                          2
-                        </span>
-                        <span>Plaza 2:</span>
-                      </span>
-                      {slot2PlayerId !== 'none' && (
-                        <span className="text-[10px] font-bold text-purple-600 dark:text-purple-400 flex items-center gap-1">
-                          <Send className="w-3 h-3" />
-                          <span>Se notificará para pagar</span>
+                      {positionAssignmentMode === 'fixed' && (
+                        <span className="text-[10px] font-bold text-purple-600 dark:text-purple-400">
+                          🔒 Posiciones Fijas
                         </span>
                       )}
                     </div>
-                    <select
-                      value={slot2PlayerId}
-                      onChange={(e) => setSlot2PlayerId(e.target.value)}
-                      className="w-full px-2.5 py-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-medium text-slate-900 dark:text-white"
-                    >
-                      <option value="none">-- Plaza libre (Abierta a inscripción pública) --</option>
-                      {customers
-                        .filter((c) => c.name !== creatorName && c.id !== slot3PlayerId && c.id !== slot4PlayerId)
-                        .map((c) => (
-                          <option key={`slot2-${c.id}`} value={c.id}>
-                            {c.name} (Nivel {c.level?.toFixed(2)}) {c.isMember ? '· Socio' : ''}
-                          </option>
-                        ))}
-                    </select>
+
+                    {/* Plaza 1 */}
+                    <div className="p-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800 flex items-center justify-between text-xs gap-2">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <span className="w-5 h-5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 font-black text-[10px] flex items-center justify-center shrink-0">
+                          1
+                        </span>
+                        <div className="min-w-0">
+                          <span className="font-bold text-slate-900 dark:text-white truncate block">
+                            {isClubCreator
+                              ? adminCreationMode === 'empty'
+                                ? 'Plaza Libre (Abierta a inscripción)'
+                                : `Titular: ${customers.find((c) => c.id === titularCustomerId)?.name || 'Jugador'}`
+                              : creatorName}
+                          </span>
+                          <span className="text-[10px] text-slate-400">
+                            {isClubCreator && adminCreationMode === 'empty' ? 'Disponible para primer socio' : 'Capitán Titular'}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Selector de lado (Drive vs Revés) */}
+                      <div className="flex items-center gap-1 shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => setSlot1Pos('drive')}
+                          className={`px-2 py-0.5 rounded text-[10px] font-bold transition ${
+                            slot1Pos === 'drive'
+                              ? 'bg-emerald-600 text-white'
+                              : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700'
+                          }`}
+                        >
+                          Drive
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setSlot1Pos('reves')}
+                          className={`px-2 py-0.5 rounded text-[10px] font-bold transition ${
+                            slot1Pos === 'reves'
+                              ? 'bg-emerald-600 text-white'
+                              : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700'
+                          }`}
+                        >
+                          Revés
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Plaza 2 */}
+                    <div className="p-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800 space-y-1.5 text-xs">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <span className="w-5 h-5 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-black text-[10px] flex items-center justify-center shrink-0">
+                            2
+                          </span>
+                          <span className="font-bold text-slate-700 dark:text-slate-300">
+                            Compañero Pareja 1:
+                          </span>
+                        </div>
+
+                        {/* Selector de lado */}
+                        <div className="flex items-center gap-1 shrink-0">
+                          <button
+                            type="button"
+                            onClick={() => setSlot2Pos('drive')}
+                            className={`px-2 py-0.5 rounded text-[10px] font-bold transition ${
+                              slot2Pos === 'drive'
+                                ? 'bg-emerald-600 text-white'
+                                : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700'
+                            }`}
+                          >
+                            Drive
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setSlot2Pos('reves')}
+                            className={`px-2 py-0.5 rounded text-[10px] font-bold transition ${
+                              slot2Pos === 'reves'
+                                ? 'bg-emerald-600 text-white'
+                                : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700'
+                            }`}
+                          >
+                            Revés
+                          </button>
+                        </div>
+                      </div>
+
+                      <select
+                        value={slot2PlayerId}
+                        onChange={(e) => setSlot2PlayerId(e.target.value)}
+                        className="w-full px-2.5 py-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-medium text-slate-900 dark:text-white"
+                      >
+                        <option value="none">-- Plaza libre (Abierta a inscripción) --</option>
+                        {customers
+                          .filter((c) => c.name !== creatorName && c.id !== slot3PlayerId && c.id !== slot4PlayerId && (!isClubCreator || adminCreationMode !== 'assign_titular' || c.id !== titularCustomerId))
+                          .map((c) => (
+                            <option key={`slot2-${c.id}`} value={c.id}>
+                              {c.name} (Nivel {c.level?.toFixed(2)}) {c.isMember ? '· Socio' : ''}
+                            </option>
+                          ))}
+                      </select>
+                    </div>
                   </div>
 
-                  {/* Plaza 3 */}
-                  <div className="p-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-1.5 text-xs">
-                    <div className="flex items-center justify-between">
-                      <span className="font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5 text-[11px]">
-                        <span className="w-4 h-4 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-black text-[10px] flex items-center justify-center">
-                          3
-                        </span>
-                        <span>Plaza 3:</span>
+                  {/* PAREJA 2 */}
+                  <div className="p-3 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-2.5">
+                    <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-1.5">
+                      <span className="text-xs font-black text-slate-900 dark:text-white flex items-center gap-1.5">
+                        <span className="w-2 h-2 rounded-full bg-indigo-500" />
+                        <span>PAREJA 2 (Lado B)</span>
                       </span>
-                      {slot3PlayerId !== 'none' && (
-                        <span className="text-[10px] font-bold text-purple-600 dark:text-purple-400 flex items-center gap-1">
-                          <Send className="w-3 h-3" />
-                          <span>Se notificará para pagar</span>
+                      {positionAssignmentMode === 'fixed' && (
+                        <span className="text-[10px] font-bold text-purple-600 dark:text-purple-400">
+                          🔒 Posiciones Fijas
                         </span>
                       )}
                     </div>
-                    <select
-                      value={slot3PlayerId}
-                      onChange={(e) => setSlot3PlayerId(e.target.value)}
-                      className="w-full px-2.5 py-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-medium text-slate-900 dark:text-white"
-                    >
-                      <option value="none">-- Plaza libre (Abierta a inscripción pública) --</option>
-                      {customers
-                        .filter((c) => c.name !== creatorName && c.id !== slot2PlayerId && c.id !== slot4PlayerId)
-                        .map((c) => (
-                          <option key={`slot3-${c.id}`} value={c.id}>
-                            {c.name} (Nivel {c.level?.toFixed(2)}) {c.isMember ? '· Socio' : ''}
-                          </option>
-                        ))}
-                    </select>
-                  </div>
 
-                  {/* Plaza 4 */}
-                  <div className="p-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-1.5 text-xs">
-                    <div className="flex items-center justify-between">
-                      <span className="font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5 text-[11px]">
-                        <span className="w-4 h-4 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-black text-[10px] flex items-center justify-center">
-                          4
-                        </span>
-                        <span>Plaza 4:</span>
-                      </span>
-                      {slot4PlayerId !== 'none' && (
-                        <span className="text-[10px] font-bold text-purple-600 dark:text-purple-400 flex items-center gap-1">
-                          <Send className="w-3 h-3" />
-                          <span>Se notificará para pagar</span>
-                        </span>
-                      )}
+                    {/* Plaza 3 */}
+                    <div className="p-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800 space-y-1.5 text-xs">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <span className="w-5 h-5 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-black text-[10px] flex items-center justify-center shrink-0">
+                            3
+                          </span>
+                          <span className="font-bold text-slate-700 dark:text-slate-300">
+                            Jugador Pareja 2:
+                          </span>
+                        </div>
+
+                        {/* Selector de lado */}
+                        <div className="flex items-center gap-1 shrink-0">
+                          <button
+                            type="button"
+                            onClick={() => setSlot3Pos('drive')}
+                            className={`px-2 py-0.5 rounded text-[10px] font-bold transition ${
+                              slot3Pos === 'drive'
+                                ? 'bg-indigo-600 text-white'
+                                : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700'
+                            }`}
+                          >
+                            Drive
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setSlot3Pos('reves')}
+                            className={`px-2 py-0.5 rounded text-[10px] font-bold transition ${
+                              slot3Pos === 'reves'
+                                ? 'bg-indigo-600 text-white'
+                                : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700'
+                            }`}
+                          >
+                            Revés
+                          </button>
+                        </div>
+                      </div>
+
+                      <select
+                        value={slot3PlayerId}
+                        onChange={(e) => setSlot3PlayerId(e.target.value)}
+                        className="w-full px-2.5 py-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-medium text-slate-900 dark:text-white"
+                      >
+                        <option value="none">-- Plaza libre (Abierta a inscripción) --</option>
+                        {customers
+                          .filter((c) => c.name !== creatorName && c.id !== slot2PlayerId && c.id !== slot4PlayerId && (!isClubCreator || adminCreationMode !== 'assign_titular' || c.id !== titularCustomerId))
+                          .map((c) => (
+                            <option key={`slot3-${c.id}`} value={c.id}>
+                              {c.name} (Nivel {c.level?.toFixed(2)}) {c.isMember ? '· Socio' : ''}
+                            </option>
+                          ))}
+                      </select>
                     </div>
-                    <select
-                      value={slot4PlayerId}
-                      onChange={(e) => setSlot4PlayerId(e.target.value)}
-                      className="w-full px-2.5 py-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-medium text-slate-900 dark:text-white"
-                    >
-                      <option value="none">-- Plaza libre (Abierta a inscripción pública) --</option>
-                      {customers
-                        .filter((c) => c.name !== creatorName && c.id !== slot2PlayerId && c.id !== slot3PlayerId)
-                        .map((c) => (
-                          <option key={`slot4-${c.id}`} value={c.id}>
-                            {c.name} (Nivel {c.level?.toFixed(2)}) {c.isMember ? '· Socio' : ''}
-                          </option>
-                        ))}
-                    </select>
+
+                    {/* Plaza 4 */}
+                    <div className="p-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800 space-y-1.5 text-xs">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <span className="w-5 h-5 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-black text-[10px] flex items-center justify-center shrink-0">
+                            4
+                          </span>
+                          <span className="font-bold text-slate-700 dark:text-slate-300">
+                            Compañero Pareja 2:
+                          </span>
+                        </div>
+
+                        {/* Selector de lado */}
+                        <div className="flex items-center gap-1 shrink-0">
+                          <button
+                            type="button"
+                            onClick={() => setSlot4Pos('drive')}
+                            className={`px-2 py-0.5 rounded text-[10px] font-bold transition ${
+                              slot4Pos === 'drive'
+                                ? 'bg-indigo-600 text-white'
+                                : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700'
+                            }`}
+                          >
+                            Drive
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setSlot4Pos('reves')}
+                            className={`px-2 py-0.5 rounded text-[10px] font-bold transition ${
+                              slot4Pos === 'reves'
+                                ? 'bg-indigo-600 text-white'
+                                : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700'
+                            }`}
+                          >
+                            Revés
+                          </button>
+                        </div>
+                      </div>
+
+                      <select
+                        value={slot4PlayerId}
+                        onChange={(e) => setSlot4PlayerId(e.target.value)}
+                        className="w-full px-2.5 py-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-medium text-slate-900 dark:text-white"
+                      >
+                        <option value="none">-- Plaza libre (Abierta a inscripción) --</option>
+                        {customers
+                          .filter((c) => c.name !== creatorName && c.id !== slot2PlayerId && c.id !== slot3PlayerId && (!isClubCreator || adminCreationMode !== 'assign_titular' || c.id !== titularCustomerId))
+                          .map((c) => (
+                            <option key={`slot4-${c.id}`} value={c.id}>
+                              {c.name} (Nivel {c.level?.toFixed(2)}) {c.isMember ? '· Socio' : ''}
+                            </option>
+                          ))}
+                      </select>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -3396,25 +3843,43 @@ export const AdminMatches: React.FC = () => {
             </div>
 
             <form onSubmit={handleSendMatchConvocatoria} className="space-y-4 text-xs">
-              {/* Selección del Grupo Registrado */}
-              <div>
-                <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
-                  Seleccionar Grupo de Jugadores Destinatario *
-                </label>
+              {/* Selección de Audiencia: Separación Visual entre Grupos y Equipos */}
+              <div className="space-y-2 p-3 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800">
+                <div className="flex items-center justify-between">
+                  <label className="block font-bold text-slate-700 dark:text-slate-300 text-xs">
+                    Audiencia Destinataria de la Convocatoria *
+                  </label>
+                  <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950 px-2 py-0.5 rounded">
+                    Sustituto Oficial WhatsApp
+                  </span>
+                </div>
+
                 <select
                   value={selectedGroupIdForNotification}
                   onChange={(e) => setSelectedGroupIdForNotification(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 font-bold"
+                  className="w-full px-3 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 font-bold"
                 >
-                  {playerGroups.map((g) => (
-                    <option key={g.id} value={g.id}>
-                      {g.name} ({g.memberCount} socios · {g.category.toUpperCase()})
-                    </option>
-                  ))}
+                  <optgroup label="🏆 EQUIPOS OFICIALES (Competición Federada & Ligas)">
+                    <option value="team-masc-1">🏆 Equipo A Masculino (1ª Categoría Federada · 12 jugadores)</option>
+                    <option value="team-fem-2">🏆 Equipo B Femenino (2ª Categoría Federada · 10 jugadoras)</option>
+                    <option value="team-vet-45">🏆 Equipo Veteranos +45 (Liga Autonómica Social · 14 jugadores)</option>
+                    <option value="team-promesas">🏆 Equipo Menores / Júnior Promesas (8 jugadores)</option>
+                  </optgroup>
+                  <optgroup label="👥 GRUPOS DEL CLUB (Comunidad, Niveles & Horarios)">
+                    {playerGroups.map((g) => (
+                      <option key={g.id} value={g.id}>
+                        👥 {g.name} ({g.memberCount} socios · {g.category.toUpperCase()})
+                      </option>
+                    ))}
+                  </optgroup>
                 </select>
-                <span className="text-[10px] text-slate-400 mt-1 block">
-                  El sistema pre-selecciona automáticamente la lista que coincide con el nivel de la partida.
-                </span>
+
+                <div className="flex items-center gap-1.5 text-[11px] text-slate-500 dark:text-slate-400 pt-0.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
+                  <span>
+                    Opciones separadas para distinguir convocatorias de <strong>Equipos de competición</strong> de avisos a <strong>Grupos sociales del club</strong>.
+                  </span>
+                </div>
               </div>
 
               <div>

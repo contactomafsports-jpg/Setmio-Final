@@ -13,6 +13,7 @@ import {
   AlertCircle,
   Clock,
   Layers,
+  Building2,
 } from 'lucide-react';
 
 export const AdminSmartCourts: React.FC = () => {
@@ -24,7 +25,24 @@ export const AdminSmartCourts: React.FC = () => {
     generateAccessPin,
     auditLogs,
     triggerDemoToast,
+    isMultiVenue,
+    venues,
+    selectedVenueId,
+    setSelectedVenueId,
   } = useApp();
+
+  const realVenues = (venues || []).filter((v) => v.id !== 'all');
+  const isMultiVenueActive = Boolean(isMultiVenue) && realVenues.length > 1;
+  const effectiveVenueId =
+    selectedVenueId && selectedVenueId !== 'all'
+      ? selectedVenueId
+      : realVenues[0]?.id || 'venue-san-mateo';
+  const activeVenueObj = realVenues.find((v) => v.id === effectiveVenueId) || realVenues[0];
+
+  const venueCourts = courts.filter((c) => {
+    if (!isMultiVenueActive) return true;
+    return c.venueId ? c.venueId === effectiveVenueId : effectiveVenueId === realVenues[0]?.id;
+  });
 
   const [filterType, setFilterType] = useState<'all' | 'light_relay' | 'pin_pad_lock'>('all');
   const [showAddModal, setShowAddModal] = useState(false);
@@ -32,9 +50,16 @@ export const AdminSmartCourts: React.FC = () => {
   // New adapter form
   const [newDeviceName, setNewDeviceName] = useState('');
   const [newProvider, setNewProvider] = useState<'Shelly Cloud Pro' | 'Salto KS Cloud' | 'Sonoff IoT' | 'Tuya Pro'>('Shelly Cloud Pro');
-  const [newCourtId, setNewCourtId] = useState(courts[0]?.id || 'court-1');
+  const [newCourtId, setNewCourtId] = useState(venueCourts[0]?.id || courts[0]?.id || 'court-1');
 
-  const filteredDevices = smartDevices.filter((d) => {
+  const venueSmartDevices = smartDevices.filter((d) => {
+    if (!isMultiVenueActive) return true;
+    const assignedCourt = courts.find((c) => c.id === d.courtId);
+    const courtVenueId = assignedCourt?.venueId || realVenues[0]?.id;
+    return courtVenueId === effectiveVenueId;
+  });
+
+  const filteredDevices = venueSmartDevices.filter((d) => {
     if (filterType === 'light_relay') return d.deviceType === 'light_relay';
     if (filterType === 'pin_pad_lock') return d.deviceType === 'pin_pad_lock';
     return true;
@@ -42,9 +67,10 @@ export const AdminSmartCourts: React.FC = () => {
 
   const handleAddDeviceSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    const assignedCourt = courts.find((c) => c.id === newCourtId);
     triggerDemoToast(
       'Adaptador IoT Registrado',
-      `Dispositivo "${newDeviceName}" vinculado a la pista mediante el gateway de ${newProvider}.`,
+      `Dispositivo "${newDeviceName}" vinculado a "${assignedCourt?.name || 'Pista'}" (${assignedCourt?.venueName || activeVenueObj?.shortName || 'Sede'}) mediante el gateway de ${newProvider}.`,
       'success'
     );
     setShowAddModal(false);
@@ -59,19 +85,75 @@ export const AdminSmartCourts: React.FC = () => {
           <h1 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">
             Domótica IoT & Control de Pistas
           </h1>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 mb-4">
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 mb-2">
             Automatización de iluminación LED, generación de códigos PIN y climatización de pistas
           </p>
         </div>
 
         <button
-          onClick={() => setShowAddModal(true)}
+          onClick={() => {
+            if (venueCourts.length > 0) setNewCourtId(venueCourts[0].id);
+            setShowAddModal(true);
+          }}
           className="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs shadow-sm flex items-center gap-1.5 transition self-start sm:self-auto active:scale-95"
         >
           <Plus className="w-4 h-4" />
           <span>Añadir Adaptador IoT</span>
         </button>
       </div>
+
+      {/* Sede Filter Banner */}
+      {isMultiVenueActive && (
+        <div className="p-4 rounded-2xl bg-gradient-to-r from-emerald-500/10 via-teal-500/5 to-slate-50 dark:to-slate-900 border border-emerald-500/25 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 rounded-xl bg-emerald-600 text-white shadow-xs shrink-0">
+              <Building2 className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-white">
+                  Sede Activa
+                </span>
+                <span className="px-2 py-0.5 text-[10px] font-black rounded-md bg-emerald-600 text-white uppercase tracking-wider">
+                  Obligatorio (Multi-Sede)
+                </span>
+              </div>
+              <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
+                Segmentación por sede: relés de iluminación y cerraduras Salto KS asignadas a las pistas de esta sede.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2">
+            {realVenues.map((v) => {
+              const isSelected = effectiveVenueId === v.id;
+              const count = courts.filter((c) => (c.venueId ? c.venueId === v.id : v.id === realVenues[0]?.id)).length;
+              return (
+                <button
+                  key={v.id}
+                  type="button"
+                  onClick={() => setSelectedVenueId(v.id)}
+                  className={`px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 cursor-pointer border ${
+                    isSelected
+                      ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs'
+                      : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-800 hover:border-emerald-500/50'
+                  }`}
+                >
+                  <Building2 className="w-3.5 h-3.5" />
+                  <span>{v.name}</span>
+                  <span
+                    className={`px-1.5 py-0.2 rounded-md text-[10px] font-mono font-bold ${
+                      isSelected ? 'bg-white/25 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
+                    }`}
+                  >
+                    {count} pistas
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* Integration Info Banner */}
       <div className="p-4 rounded-2xl bg-white dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 text-xs text-slate-700 dark:text-slate-300 space-y-1.5 shadow-sm">
@@ -226,7 +308,18 @@ export const AdminSmartCourts: React.FC = () => {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm animate-in fade-in duration-150">
           <div className="w-full max-w-md rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 p-6 shadow-2xl text-slate-900 dark:text-slate-100">
             <h3 className="text-base font-black text-slate-900 dark:text-white mb-1">Añadir Nuevo Adaptador de Pista</h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mb-4">Configuración de hardware IoT para {currentTenant.shortName}</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mb-2">Configuración de hardware IoT para {currentTenant.shortName}</p>
+            {isMultiVenueActive && (
+              <div className="mb-3 p-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-500/20 flex items-center justify-between text-xs">
+                <span className="text-slate-600 dark:text-slate-400 font-medium flex items-center gap-1.5">
+                  <Building2 className="w-3.5 h-3.5 text-emerald-500" />
+                  <span>Sede Asignada:</span>
+                </span>
+                <span className="font-bold text-emerald-700 dark:text-emerald-400">
+                  {activeVenueObj?.name}
+                </span>
+              </div>
+            )}
 
             <form onSubmit={handleAddDeviceSubmit} className="space-y-3.5 text-xs">
               <div>
@@ -256,16 +349,25 @@ export const AdminSmartCourts: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-slate-700 dark:text-slate-300 mb-1 font-bold">Pista Asignada</label>
+                <label className="block text-slate-700 dark:text-slate-300 mb-1 font-bold">
+                  Pista Asignada {isMultiVenueActive ? `(${activeVenueObj?.shortName || 'Sede'}) *` : '*'}
+                </label>
                 <select
                   value={newCourtId}
                   onChange={(e) => setNewCourtId(e.target.value)}
                   className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-slate-900 dark:text-white focus:outline-none focus:border-amber-500"
                 >
-                  {courts.map((c) => (
-                    <option key={c.id} value={c.id}>{c.name}</option>
+                  {venueCourts.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.name} {isMultiVenueActive ? `— ${c.venueName || activeVenueObj?.shortName || ''}` : ''}
+                    </option>
                   ))}
                 </select>
+                {venueCourts.length === 0 && (
+                  <p className="text-[11px] text-amber-600 dark:text-amber-400 mt-1">
+                    No hay pistas dadas de alta en esta sede.
+                  </p>
+                )}
               </div>
 
               <div className="pt-2 flex items-center justify-end gap-2">

@@ -710,7 +710,8 @@ interface AppContextType {
   notifications: NotificationItem[];
   unreadNotificationsCount: number;
   markNotificationsAsRead: () => void;
-  sendNotification: (notif: { title: string; message: string; type?: NotificationItem['type']; actionUrl?: string }) => void;
+  markSingleNotificationAsRead: (id: string) => void;
+  sendNotification: (notif: { title: string; message: string; type?: NotificationItem['type']; actionUrl?: string; originSection?: NotificationItem['originSection']; originLabel?: string; metadata?: Record<string, string> }) => void;
 
   // CRM Player Profile & Customers Database
   customers: CustomerItem[];
@@ -2395,23 +2396,89 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     );
   };
 
-  // Notifications state with ID deduplication guarantee
+  // Notifications state with ID deduplication guarantee and rich origin metadata
   const [notifications, setNotifications] = useState<NotificationItem[]>([
     {
       id: 'notif-1',
-      title: 'Pistas renovadas en Narón',
-      message: 'Nuevo césped Mondo Supercourt WPT disponible para reserva en pistas 1 y 2.',
-      type: 'system',
-      timestamp: 'Hoy, 09:15',
+      title: 'Reserva Confirmada: Pista Central #1',
+      message: 'Carlos Méndez ha reservado la Pista Central para hoy a las 18:30 (90 min). Iluminación domótica y acceso PIN programados.',
+      type: 'booking',
+      timestamp: 'Hoy, 10:45',
       read: false,
+      originSection: 'agenda',
+      originLabel: 'Cuadrante de Reservas',
+      metadata: {
+        'Pista': 'Pista 1 — Central World Padel Tour',
+        'Horario': 'Hoy, 18:30 - 20:00 (90 min)',
+        'Titular': 'Carlos Méndez (Socio #108)',
+        'Tarifa': '28,00 € (Pago Online Confirmado)',
+        'Sede': 'Sede Central · San Mateo (Narón)',
+      },
     },
     {
       id: 'notif-2',
-      title: 'I Open Primavera Pádel San Mateo',
-      message: 'Abiertas las inscripciones para el torneo con 1.800€ en premios.',
-      type: 'tournament',
-      timestamp: 'Ayer',
+      title: 'Partida Abierta Play! convocada',
+      message: 'Se ha abierto una nueva partida de nivel 3.80 - 4.50 en Pista 2. Quedan 2 plazas libres.',
+      type: 'match',
+      timestamp: 'Hoy, 09:30',
       read: false,
+      originSection: 'matches',
+      originLabel: 'Partidas Abiertas',
+      metadata: {
+        'Partida': 'Play! Dobles Masculina / Mixta',
+        'Nivel ELO': '3.80 — 4.50',
+        'Pista': 'Pista 2 — Cristal Indoor Pro',
+        'Plazas Ocupadas': '2 / 4 plazas',
+        'Precio Plaza': '7,00 € / jugador',
+      },
+    },
+    {
+      id: 'notif-3',
+      title: 'Cobro TPV Registrado en Mostrador',
+      message: 'Cobro de 42,50 € emitido en caja de cafetería y suplemento de pelotas.',
+      type: 'payment',
+      timestamp: 'Hoy, 08:50',
+      read: false,
+      originSection: 'pos_cafe',
+      originLabel: 'TPV / Caja Mostrador',
+      metadata: {
+        'Ticket': 'T-2026-0941',
+        'Importe': '42,50 €',
+        'Método': 'Datáfono Banco (Manual)',
+        'Concepto': '2x Bote Head Pro S + 2x Agua + Alquiler pala',
+        'Operador': 'Recepción Turno Mañana',
+      },
+    },
+    {
+      id: 'notif-4',
+      title: 'Pistas renovadas y Domótica activa',
+      message: 'Nuevo césped Mondo Supercourt WPT disponible y relés Shelly Cloud Pro configurados.',
+      type: 'system',
+      timestamp: 'Ayer',
+      read: true,
+      originSection: 'courts_management',
+      originLabel: 'Pistas & Domótica',
+      metadata: {
+        'Módulo': 'Infraestructura & Pistas',
+        'Instalación': 'Pistas 1 y 2 (Indoor)',
+        'Estado': '100% Operativo',
+      },
+    },
+    {
+      id: 'notif-5',
+      title: 'I Open Primavera Pádel San Mateo',
+      message: 'Abiertas las inscripciones para el torneo con 1.800€ en premios oficiales.',
+      type: 'tournament',
+      timestamp: 'Hace 2 días',
+      read: true,
+      originSection: 'tournaments',
+      originLabel: 'Competiciones & Torneos',
+      metadata: {
+        'Torneo': 'I Open Primavera Pádel San Mateo',
+        'Categorías': '1ª, 2ª, 3ª Masculina / Femenina',
+        'Bolsa Premios': '1.800,00 €',
+        'Inscripción': '20,00 € / jugador',
+      },
     },
   ]);
 
@@ -2421,18 +2488,36 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
   };
 
-  const sendNotification = useCallback((notif: { title: string; message: string; type?: NotificationItem['type']; actionUrl?: string }) => {
-    const newItem: NotificationItem = {
-      id: `notif-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
-      title: notif.title,
-      message: notif.message,
-      type: notif.type || 'system',
-      timestamp: 'Ahora mismo',
-      read: false,
-      actionUrl: notif.actionUrl,
-    };
-    setNotifications((prev) => [newItem, ...prev]);
+  const markSingleNotificationAsRead = useCallback((id: string) => {
+    setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, read: true } : n)));
   }, []);
+
+  const sendNotification = useCallback(
+    (notif: {
+      title: string;
+      message: string;
+      type?: NotificationItem['type'];
+      actionUrl?: string;
+      originSection?: NotificationItem['originSection'];
+      originLabel?: string;
+      metadata?: Record<string, string>;
+    }) => {
+      const newItem: NotificationItem = {
+        id: `notif-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+        title: notif.title,
+        message: notif.message,
+        type: notif.type || 'system',
+        timestamp: 'Ahora mismo',
+        read: false,
+        actionUrl: notif.actionUrl,
+        originSection: notif.originSection,
+        originLabel: notif.originLabel,
+        metadata: notif.metadata,
+      };
+      setNotifications((prev) => [newItem, ...prev]);
+    },
+    []
+  );
 
   // CRM Player Profile & Customers Database
   const [customers, setCustomers] = useState<CustomerItem[]>(() => {
@@ -2936,6 +3021,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         notifications,
         unreadNotificationsCount,
         markNotificationsAsRead,
+        markSingleNotificationAsRead,
         sendNotification,
 
         customers,
