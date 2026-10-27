@@ -30,7 +30,9 @@ import {
   Send,
   CreditCard,
   Landmark,
+  Layers,
 } from 'lucide-react';
+import { SetmioLogo } from '../common/SetmioLogo';
 
 export const SuperadminHQ: React.FC = () => {
   const {
@@ -87,11 +89,19 @@ export const SuperadminHQ: React.FC = () => {
   };
 
   return (
-    <div data-hq-shell className="min-h-screen bg-slate-50 text-[#0B1A2D] dark:bg-[#0B1A2D] dark:text-slate-100 p-4 sm:p-6 lg:p-8 space-y-6 sm:space-y-8 overflow-x-hidden transition-colors duration-200">
+    <div data-hq-shell className="min-h-screen bg-slate-50 text-[#0B1A2D] dark:bg-[#0B1A2D] dark:text-slate-100 p-4 pt-20 sm:p-6 sm:pt-6 lg:p-8 space-y-6 sm:space-y-8 overflow-x-hidden transition-colors duration-200">
+      <header className="fixed inset-x-0 top-0 z-40 flex h-16 items-center justify-between border-b border-slate-200 bg-white/95 px-4 shadow-sm backdrop-blur-md dark:border-[#1A314D] dark:bg-[#0B1A2D]/95 sm:hidden">
+        <SetmioLogo variant="horizontal" size="sm" theme="auto" />
+        <div className="flex items-center gap-2">
+          <span className="rounded-full bg-[#B7F229]/20 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[#0B1A2D] dark:text-[#B7F229]">HQ</span>
+          <button type="button" onClick={logoutOrExitDemo} aria-label="Salir del demo" className="rounded-xl p-2 text-[#64748B] hover:bg-slate-100 dark:hover:bg-[#0E2239]"><LogOut className="h-4 w-4" /></button>
+        </div>
+      </header>
+
       {/* Top Superadmin Banner */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 rounded-3xl bg-gradient-to-r from-purple-950/80 via-slate-900 to-slate-900 border border-purple-800/60 shadow-2xl">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 rounded-3xl bg-[#0B1A2D] border border-[#1A314D] shadow-2xl">
         <div className="space-y-1">
-          <div className="flex items-center gap-2 text-xs font-bold text-purple-400 uppercase tracking-wider">
+          <div className="flex items-center gap-2 text-xs font-bold text-[#64748B] uppercase tracking-wider">
             <ShieldAlert className="w-4 h-4" />
             <span>SETMIO HQ · Panel de Superadministración Global</span>
           </div>
@@ -143,7 +153,7 @@ export const SuperadminHQ: React.FC = () => {
 
           <button
             onClick={() => setShowCreateTenantModal(true)}
-            className="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 font-bold text-white text-xs shadow-lg flex items-center gap-1.5 transition"
+            className="px-4 py-2 rounded-xl bg-[#0B1A2D] hover:bg-purple-500 font-bold text-white text-xs shadow-lg flex items-center gap-1.5 transition"
           >
             <Plus className="w-4 h-4" />
             <span>Nuevo Club</span>
@@ -187,10 +197,10 @@ export const SuperadminHQ: React.FC = () => {
         <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-2 shadow-lg">
           <div className="flex items-center justify-between text-xs text-slate-400">
             <span>Pistas Gestionadas</span>
-            <Users className="w-4 h-4 text-purple-400" />
+            <Users className="w-4 h-4 text-[#64748B]" />
           </div>
           <div className="text-2xl sm:text-3xl font-black text-white font-mono">18 Pistas</div>
-          <div className="text-[11px] text-purple-400">En 3 sedes autonómicas</div>
+          <div className="text-[11px] text-[#64748B]">En 3 sedes autonómicas</div>
         </div>
 
         <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-2 shadow-lg">
@@ -208,7 +218,7 @@ export const SuperadminHQ: React.FC = () => {
         <button
           onClick={() => setActiveHqTab('overview')}
           className={`px-4 py-2 rounded-xl font-bold transition ${
-            activeHqTab === 'overview' ? 'bg-purple-600 text-white shadow' : 'text-slate-400 hover:text-white'
+            activeHqTab === 'overview' ? 'bg-[#0B1A2D] text-white shadow' : 'text-slate-400 hover:text-white'
           }`}
         >
           Resumen & Métricas
@@ -216,7 +226,7 @@ export const SuperadminHQ: React.FC = () => {
         <button
           onClick={() => setActiveHqTab('tenants')}
           className={`px-4 py-2 rounded-xl font-bold transition ${
-            activeHqTab === 'tenants' ? 'bg-purple-600 text-white shadow' : 'text-slate-400 hover:text-white'
+            activeHqTab === 'tenants' ? 'bg-[#0B1A2D] text-white shadow' : 'text-slate-400 hover:text-white'
           }`}
         >
           Empresas / Tenants ({tenants.length})
@@ -224,7 +234,7 @@ export const SuperadminHQ: React.FC = () => {
         <button
           onClick={() => setActiveHqTab('billing')}
           className={`px-4 py-2 rounded-xl font-bold transition flex items-center gap-1.5 ${
-            activeHqTab === 'billing' ? 'bg-purple-600 text-white shadow' : 'text-slate-400 hover:text-white'
+            activeHqTab === 'billing' ? 'bg-[#0B1A2D] text-white shadow' : 'text-slate-400 hover:text-white'
           }`}
         >
           <Receipt className="w-3.5 h-3.5" />
@@ -233,7 +243,7 @@ export const SuperadminHQ: React.FC = () => {
         <button
           onClick={() => setActiveHqTab('plans')}
           className={`px-4 py-2 rounded-xl font-bold transition ${
-            activeHqTab === 'plans' ? 'bg-purple-600 text-white shadow' : 'text-slate-400 hover:text-white'
+            activeHqTab === 'plans' ? 'bg-[#0B1A2D] text-white shadow' : 'text-slate-400 hover:text-white'
           }`}
         >
           Planes y Precios (4 Planes)
@@ -241,7 +251,7 @@ export const SuperadminHQ: React.FC = () => {
         <button
           onClick={() => setActiveHqTab('audit')}
           className={`px-4 py-2 rounded-xl font-bold transition ${
-            activeHqTab === 'audit' ? 'bg-purple-600 text-white shadow' : 'text-slate-400 hover:text-white'
+            activeHqTab === 'audit' ? 'bg-[#0B1A2D] text-white shadow' : 'text-slate-400 hover:text-white'
           }`}
         >
           Auditoría de Acciones
@@ -278,7 +288,7 @@ export const SuperadminHQ: React.FC = () => {
                         switchTenant(t.id);
                         setCurrentView('admin');
                       }}
-                      className="text-xs text-purple-400 font-bold hover:underline"
+                      className="text-xs text-[#64748B] font-bold hover:underline"
                     >
                       Gestionar &rarr;
                     </button>
@@ -324,7 +334,7 @@ export const SuperadminHQ: React.FC = () => {
 
             <button
               onClick={() => setShowCreateTenantModal(true)}
-              className="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs shadow flex items-center gap-1.5 transition"
+              className="px-4 py-2 rounded-xl bg-[#0B1A2D] hover:bg-purple-500 text-white font-bold text-xs shadow flex items-center gap-1.5 transition"
             >
               <Plus className="w-4 h-4" />
               <span>Crear Tenant</span>
@@ -387,7 +397,7 @@ export const SuperadminHQ: React.FC = () => {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-800">
               <div>
                 <div className="flex items-center gap-2">
-                  <Receipt className="w-5 h-5 text-purple-400" />
+                  <Receipt className="w-5 h-5 text-[#64748B]" />
                   <h3 className="text-base font-bold text-white">Facturación SaaS de la Plataforma Setmio</h3>
                 </div>
                 <p className="text-xs text-slate-400 mt-0.5">
@@ -431,7 +441,7 @@ export const SuperadminHQ: React.FC = () => {
                 <div className="text-xl font-black text-white font-mono">
                   {saasInvoices.filter((i) => i.paymentGateway === 'sepa_b2b').length} clientes
                 </div>
-                <div className="text-purple-400 text-[10px]">Normativa SEPA XML</div>
+                <div className="text-[#64748B] text-[10px]">Normativa SEPA XML</div>
               </div>
             </div>
 
@@ -444,7 +454,7 @@ export const SuperadminHQ: React.FC = () => {
                     onClick={() => setBillingStatusFilter(st)}
                     className={`px-3 py-1.5 rounded-xl font-bold transition cursor-pointer ${
                       billingStatusFilter === st
-                        ? 'bg-purple-600 text-white'
+                        ? 'bg-[#0B1A2D] text-white'
                         : 'bg-slate-800 text-slate-400 hover:text-white'
                     }`}
                   >
@@ -519,7 +529,7 @@ export const SuperadminHQ: React.FC = () => {
                               <span>Stripe Card</span>
                             </span>
                           ) : (
-                            <span className="inline-flex items-center gap-1 text-purple-400 text-[11px]">
+                            <span className="inline-flex items-center gap-1 text-[#64748B] text-[11px]">
                               <Landmark className="w-3.5 h-3.5" />
                               <span>SEPA B2B</span>
                             </span>
@@ -684,7 +694,7 @@ export const SuperadminHQ: React.FC = () => {
                 <div>
                   <div className="font-bold text-white flex items-center gap-2">
                     <span>{log.action}</span>
-                    <span className="text-[10px] font-mono text-purple-400">[{log.role}]</span>
+                    <span className="text-[10px] font-mono text-[#64748B]">[{log.role}]</span>
                   </div>
                   <div className="text-slate-400 text-[11px] mt-0.5">{log.details}</div>
                 </div>
@@ -751,7 +761,7 @@ export const SuperadminHQ: React.FC = () => {
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold transition shadow"
+                  className="px-5 py-2 rounded-xl bg-[#0B1A2D] hover:bg-purple-500 text-white font-bold transition shadow"
                 >
                   Aprovisionar Club
                 </button>
@@ -769,7 +779,7 @@ export const SuperadminHQ: React.FC = () => {
         <button
           onClick={() => setActiveHqTab('overview')}
           className={`flex flex-col items-center justify-center py-1.5 rounded-xl transition ${
-            activeHqTab === 'overview' ? 'text-purple-400 font-bold' : 'text-slate-400'
+            activeHqTab === 'overview' ? 'text-[#64748B] font-bold' : 'text-slate-400'
           }`}
         >
           <TrendingUp className="w-5 h-5 mb-0.5" />
@@ -779,7 +789,7 @@ export const SuperadminHQ: React.FC = () => {
         <button
           onClick={() => setActiveHqTab('tenants')}
           className={`flex flex-col items-center justify-center py-1.5 rounded-xl transition ${
-            activeHqTab === 'tenants' ? 'text-purple-400 font-bold' : 'text-slate-400'
+            activeHqTab === 'tenants' ? 'text-[#64748B] font-bold' : 'text-slate-400'
           }`}
         >
           <Building2 className="w-5 h-5 mb-0.5" />
@@ -789,7 +799,7 @@ export const SuperadminHQ: React.FC = () => {
         <button
           onClick={() => setActiveHqTab('billing')}
           className={`flex flex-col items-center justify-center py-1.5 rounded-xl transition ${
-            activeHqTab === 'billing' ? 'text-purple-400 font-bold' : 'text-slate-400'
+            activeHqTab === 'billing' ? 'text-[#64748B] font-bold' : 'text-slate-400'
           }`}
         >
           <Receipt className="w-5 h-5 mb-0.5" />
@@ -799,7 +809,7 @@ export const SuperadminHQ: React.FC = () => {
         <button
           onClick={() => setActiveHqTab('plans')}
           className={`flex flex-col items-center justify-center py-1.5 rounded-xl transition ${
-            activeHqTab === 'plans' ? 'text-purple-400 font-bold' : 'text-slate-400'
+            activeHqTab === 'plans' ? 'text-[#64748B] font-bold' : 'text-slate-400'
           }`}
         >
           <DollarSign className="w-5 h-5 mb-0.5" />
@@ -821,7 +831,7 @@ export const SuperadminHQ: React.FC = () => {
           <div className="bg-slate-900 rounded-t-3xl border-t border-slate-800 p-5 space-y-4 max-h-[85vh] overflow-y-auto">
             <div className="flex items-center justify-between pb-3 border-b border-slate-800">
               <div className="flex items-center gap-2">
-                <ShieldAlert className="w-5 h-5 text-purple-400" />
+                <ShieldAlert className="w-5 h-5 text-[#64748B]" />
                 <span className="font-bold text-sm text-white">Superadmin HQ · Opciones</span>
               </div>
               <button
@@ -847,7 +857,7 @@ export const SuperadminHQ: React.FC = () => {
                     <div className="text-[10px] text-purple-300">Crear nuevo tenant y asignar subdominio</div>
                   </div>
                 </div>
-                <ChevronRight className="w-4 h-4 text-purple-400" />
+                <ChevronRight className="w-4 h-4 text-[#64748B]" />
               </button>
 
               <button

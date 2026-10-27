@@ -41,11 +41,11 @@ export const PrivateMobileNav: React.FC<PrivateMobileNavProps> = ({
             onClick={() => onSelectTab(item.id)}
             className={`flex flex-col items-center justify-center gap-1 py-1 px-2.5 rounded-2xl transition-all duration-150 active:scale-95 cursor-pointer flex-1 max-w-[72px] ${
               isActive
-                ? 'text-[#8B5CF6] dark:text-[#c4b5fd] font-extrabold'
+                ? 'text-[#0B1A2D] dark:text-white font-extrabold'
                 : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
             }`}
           >
-            <div className={`p-1 rounded-xl transition ${isActive ? 'bg-[#8B5CF6]/15 dark:bg-[#8B5CF6]/25' : ''}`}>
+            <div className={`p-1 rounded-xl transition ${isActive ? 'bg-[#B7F229]/20 dark:bg-[#B7F229]/15' : ''}`}>
               <Icon className="w-5 h-5" strokeWidth={isActive ? 2.5 : 1.75} />
             </div>
             <span className="text-[10px] tracking-tight truncate max-w-[64px]">{item.label}</span>
@@ -86,11 +86,11 @@ export const PrivateMobileNav: React.FC<PrivateMobileNavProps> = ({
             onClick={() => onSelectTab(item.id)}
             className={`flex flex-col items-center justify-center gap-1 py-1 px-2.5 rounded-2xl transition-all duration-150 active:scale-95 cursor-pointer flex-1 max-w-[72px] ${
               isActive
-                ? 'text-[#8B5CF6] dark:text-[#c4b5fd] font-extrabold'
+                ? 'text-[#0B1A2D] dark:text-white font-extrabold'
                 : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
             }`}
           >
-            <div className={`p-1 rounded-xl transition ${isActive ? 'bg-[#8B5CF6]/15 dark:bg-[#8B5CF6]/25' : ''}`}>
+            <div className={`p-1 rounded-xl transition ${isActive ? 'bg-[#B7F229]/20 dark:bg-[#B7F229]/15' : ''}`}>
               <Icon className="w-5 h-5" strokeWidth={isActive ? 2.5 : 1.75} />
             </div>
             <span className="text-[10px] tracking-tight truncate max-w-[64px]">{item.label}</span>

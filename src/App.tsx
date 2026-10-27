@@ -9,6 +9,7 @@ import { PWAInstallPrompt } from './components/common/PWAInstallPrompt';
 import { OfflineBanner } from './components/common/OfflineBanner';
 import { CartDrawer } from './components/public/CartDrawer';
 import { AuthModal } from './components/public/AuthModal';
+import { AppErrorBoundary } from './components/common/AppErrorBoundary';
 
 // Public views
 import { PublicEntityLanding } from './components/public/PublicEntityLanding';
@@ -479,7 +480,11 @@ export function App() {
 
   {currentView === 'coach' && <CoachPortal />}
 
-  {currentView === 'hq' && <SuperadminHQ />}
+  {currentView === 'hq' && (
+    <AppErrorBoundary>
+      <SuperadminHQ />
+    </AppErrorBoundary>
+  )}
 
       {/* 3. Floating AI Agent (Draggable, session memory, tenant branded) */}
       {currentView !== 'admin' && <DraggableAIAgent />}

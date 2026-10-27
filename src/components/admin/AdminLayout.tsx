@@ -46,6 +46,19 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 
   useEffect(() => {
+    const root = document.documentElement;
+    const branding = currentTenant.branding;
+    root.style.setProperty('--color-primary', branding?.primaryColor || '#0B1A2D');
+    root.style.setProperty('--color-secondary', branding?.secondaryColor || '#64748B');
+    root.style.setProperty('--color-accent', branding?.accentColor || '#B7F229');
+    return () => {
+      root.style.removeProperty('--color-primary');
+      root.style.removeProperty('--color-secondary');
+      root.style.removeProperty('--color-accent');
+    };
+  }, [currentTenant.branding]);
+
+  useEffect(() => {
     if (!mobileMoreOpen) return;
     const closeOnEscape = (event: KeyboardEvent) => {
       if (event.key === 'Escape') setMobileMoreOpen(false);
@@ -103,7 +116,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
             <div className="flex items-center gap-2.5 min-w-0">
               <div
                 className="w-9 h-9 rounded-xl text-white font-black flex items-center justify-center shrink-0 text-xs shadow-sm select-none"
-                style={{ backgroundColor: currentTenant.branding?.primaryColor || '#10b981' }}
+                style={{ backgroundColor: currentTenant.branding?.primaryColor || '#0B1A2D' }}
               >
                 {currentTenant.shortName.slice(0, 3).toUpperCase()}
               </div>
@@ -152,7 +165,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
                     key={tab.id}
                     type="button"
                     onClick={() => handleSelectTab(tab.id)}
-                    style={isActive ? { backgroundColor: currentTenant.branding?.primaryColor || '#10b981' } : undefined}
+                    style={isActive ? { backgroundColor: currentTenant.branding?.primaryColor || '#0B1A2D' } : undefined}
                     className={`w-full flex items-center justify-between px-3 py-2.5 rounded-2xl font-bold transition cursor-pointer ${
                       isActive
                         ? 'text-white shadow-md'
@@ -187,7 +200,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
                       onClick={() => handleSelectTab(tab.id)}
                       className={`w-full flex items-center justify-between px-3 py-2.5 rounded-2xl font-bold transition cursor-pointer ${
                         isActive
-                          ? 'bg-[#8B5CF6] text-white shadow-md shadow-[#8B5CF6]/30'
+                          ? 'bg-[#0B1A2D] text-white shadow-md shadow-[#0B1A2D]/20'
                           : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white'
                       }`}
                     >
