@@ -10,7 +10,7 @@
   /* PALETA OFICIAL SETMIO PÁDEL (image_16.png) */
   --color-setmio-dark: #0B1A2D;       /* Azul profundo: Fondo principal, base corporativa, modo oscuro */
   --color-setmio-violet: #8B5CF6;     /* Violeta: Acento corporativo, SaaS, elementos activos, tecnología */
-  --color-setmio-lime: #87F229;       /* Verde lima: Acento deportivo, energía, botones de acción principal/CTAs */
+  --color-setmio-lime: #B7F229;       /* Verde lima: Acento deportivo, energía, botones de acción principal/CTAs */
   --color-setmio-white: #FFFFFF;      /* Blanco: Textos principales, fondos de tarjetas claras */
   --color-setmio-gray-light: #E5E7EB; /* Gris claro: Superficies secundarias */
   --color-setmio-gray-text: #64748B;  /* Gris azulado: Texto muted/secundario */
@@ -18,7 +18,7 @@
   /* Aliases para compatibilidad con el ecosistema */
   --color-brand-ink: #0B1A2D;
   --color-brand-moss: #8B5CF6;
-  --color-brand-lime: #87F229;
+  --color-brand-lime: #B7F229;
   --color-brand-paper: #FFFFFF;
 }
 
@@ -28,9 +28,10 @@
   background: #FFFFFF;
   --color-primary: #8B5CF6;
   --color-secondary: #0B1A2D;
-  --color-accent: #87F229;
+  --color-accent: #B7F229;
   --color-background: #FFFFFF;
   --color-foreground: #0B1A2D;
+  color-scheme: light;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
 }
@@ -45,10 +46,11 @@ button, [role="button"], a { transition-property: transform, color, background-c
 button:active, [role="button"]:active, a:active { transform: scale(.98); }
 button:not(:disabled), [role="button"], a { cursor: pointer; }
 button:disabled { cursor: not-allowed; }
-::selection { background: #87F229; color: #0B1A2D; }
+::selection { background: #B7F229; color: #0B1A2D; }
 
 /* MODO OSCURO CORPORATIVO SETMIO PÁDEL (#0B1A2D - Azul Profundo) */
 .dark body, body.dark { background: #0B1A2D; color: #FFFFFF; }
+.dark { color-scheme: dark; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: .01ms !important; }
@@ -60,8 +62,16 @@ button:disabled { cursor: not-allowed; }
 /* Contenedores de Administración en Azul Profundo (#0B1A2D) */
 [data-admin-shell] { background: #F8FAFC; }
 .dark [data-admin-shell] { background: #0B1A2D; }
+[data-hq-shell] .bg-slate-900 { background-color: #FFFFFF; border-color: #E5E7EB; }
+[data-hq-shell] .bg-slate-950 { background-color: #F8FAFC; }
+[data-hq-shell] .border-slate-800 { border-color: #E5E7EB; }
+[data-hq-shell] .text-white { color: #0B1A2D; }
+.dark [data-hq-shell] .bg-slate-900 { background-color: #0E2239; border-color: #1A314D; }
+.dark [data-hq-shell] .bg-slate-950 { background-color: #071220; }
+.dark [data-hq-shell] .border-slate-800 { border-color: #1A314D; }
+.dark [data-hq-shell] .text-white { color: #FFFFFF; }
 
-/* Destellos de Luz Geométricos en Violeta (#8B5CF6) y Verde Lima (#87F229) de image_16.png */
+/* Destellos de Luz Geométricos en Violeta (#8B5CF6) y Verde Lima (#B7F229) de image_16.png */
 .geometric-flare-violet {
   background: radial-gradient(circle at 10% 20%, rgba(139, 92, 246, 0.28) 0%, transparent 45%),
               linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, transparent 60%);

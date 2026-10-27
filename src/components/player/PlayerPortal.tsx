@@ -1838,7 +1838,7 @@ export const PlayerPortal: React.FC = () => {
               onClick={() => navigatePlayerTab(tab.id as typeof activePlayerTab)}
               className={`relative flex flex-col items-center justify-center py-1.5 px-2 rounded-xl transition cursor-pointer ${
                 isActive
-                  ? 'text-emerald-600 dark:text-emerald-400 font-bold'
+                  ? 'text-[#8B5CF6] dark:text-violet-300 font-bold'
                   : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
@@ -1858,13 +1858,23 @@ export const PlayerPortal: React.FC = () => {
           );
         })}
 
+        {/* Acción rápida central: mantiene Reservas y Partidas en un flujo único */}
+        <button
+          type="button"
+          onClick={() => navigatePlayerTab('booking')}
+          className="relative -mt-7 flex size-14 shrink-0 items-center justify-center rounded-full border-4 border-slate-50 bg-[#B7F229] text-[#0B1A2D] shadow-xl shadow-lime-500/20 transition hover:scale-105 dark:border-slate-950"
+          aria-label="Crear una nueva reserva o partida"
+        >
+          <Plus className="size-6 stroke-[2.5]" />
+        </button>
+
         {/* 6. Menú Hamburguesa 'Más' para páginas secundarias */}
         <button
           type="button"
           onClick={() => setMobileDrawerOpen(true)}
           className={`relative flex flex-col items-center justify-center py-1.5 px-2 rounded-xl transition cursor-pointer ${
             mobileDrawerOpen
-              ? 'text-emerald-600 dark:text-emerald-400 font-bold'
+              ? 'text-[#8B5CF6] dark:text-violet-300 font-bold'
               : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
           }`}
           aria-label="Más opciones"

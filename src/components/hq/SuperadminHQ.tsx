@@ -3,6 +3,8 @@ import { useApp } from '../../context/AppContext';
 import { Tenant, Plan, PlanTier } from '../../types/database';
 import {
   ShieldAlert,
+  Sun,
+  Moon,
   Building2,
   DollarSign,
   TrendingUp,
@@ -44,6 +46,8 @@ export const SuperadminHQ: React.FC = () => {
     logoutOrExitDemo,
     saasInvoices,
     syncSaasInvoiceVerifactu,
+    theme,
+    toggleTheme,
   } = useApp();
 
   const [activeHqTab, setActiveHqTab] = useState<'overview' | 'tenants' | 'billing' | 'plans' | 'domains' | 'audit'>('overview');
@@ -83,7 +87,7 @@ export const SuperadminHQ: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 p-4 sm:p-6 lg:p-8 space-y-6 sm:space-y-8 overflow-x-hidden">
+    <div data-hq-shell className="min-h-screen bg-slate-50 text-[#0B1A2D] dark:bg-[#0B1A2D] dark:text-slate-100 p-4 sm:p-6 lg:p-8 space-y-6 sm:space-y-8 overflow-x-hidden transition-colors duration-200">
       {/* Top Superadmin Banner */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 rounded-3xl bg-gradient-to-r from-purple-950/80 via-slate-900 to-slate-900 border border-purple-800/60 shadow-2xl">
         <div className="space-y-1">
@@ -107,6 +111,16 @@ export const SuperadminHQ: React.FC = () => {
 
         <div className="flex flex-wrap items-center gap-2">
           {/* Quick Switch to Modo Jugador */}
+          <button
+            type="button"
+            onClick={toggleTheme}
+            className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-bold text-slate-700 shadow-sm transition hover:border-violet-300 hover:text-violet-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
+            aria-label={theme === 'dark' ? 'Activar modo claro' : 'Activar modo oscuro'}
+          >
+            {theme === 'dark' ? <Sun className="size-4 text-amber-400" /> : <Moon className="size-4 text-[#8B5CF6]" />}
+            <span className="hidden sm:inline">{theme === 'dark' ? 'Claro' : 'Oscuro'}</span>
+          </button>
+
           <button
             onClick={() => {
               switchUserRole('PLAYER');
@@ -237,8 +251,9 @@ export const SuperadminHQ: React.FC = () => {
       {/* TAB 1: OVERVIEW */}
       {activeHqTab === 'overview' && (
         <div className="space-y-6">
-          <div className="p-6 rounded-3xl bg-slate-900 border border-slate-800 space-y-4">
-            <h3 className="text-sm font-bold text-white">Estado de la Red de Tenants</h3>
+          <div className="grid grid-cols-1 xl:grid-cols-[1.35fr_.65fr] gap-6">
+            <div className="p-6 rounded-3xl bg-slate-900 border border-slate-800 space-y-4">
+              <h3 className="text-sm font-bold text-white">Estado de la Red de Tenants</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
               {tenants.map((t) => (
                 <div
@@ -271,6 +286,23 @@ export const SuperadminHQ: React.FC = () => {
                 </div>
               ))}
             </div>
+            </div>
+            <section className="rounded-3xl border border-violet-200 bg-white p-6 shadow-sm dark:border-violet-900/60 dark:bg-slate-900" aria-labelledby="cms-content-title">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-[10px] font-black uppercase tracking-[0.18em] text-violet-500">CMS / Multimedia</p>
+                  <h3 id="cms-content-title" className="mt-1 text-base font-black text-[#0B1A2D] dark:text-white">Contenido público Setmio</h3>
+                </div>
+                <Layers className="size-5 text-violet-500" />
+              </div>
+              <p className="mt-3 text-xs leading-relaxed text-slate-500 dark:text-slate-400">Espacio preparado para gestionar textos, imágenes y vídeos institucionales sin tocar código.</p>
+              <div className="mt-4 grid grid-cols-3 gap-2 text-center text-[10px] font-bold text-slate-500 dark:text-slate-400">
+                <div className="rounded-xl bg-slate-50 p-3 dark:bg-slate-950"><span className="block text-lg text-[#8B5CF6]">12</span>Textos</div>
+                <div className="rounded-xl bg-slate-50 p-3 dark:bg-slate-950"><span className="block text-lg text-[#B7F229]">08</span>Imágenes</div>
+                <div className="rounded-xl bg-slate-50 p-3 dark:bg-slate-950"><span className="block text-lg text-cyan-500">03</span>Vídeos</div>
+              </div>
+              <button type="button" onClick={() => triggerDemoToast('CMS Setmio', 'El editor multimedia estará disponible en la próxima versión.', 'info')} className="mt-4 w-full rounded-xl bg-[#0B1A2D] px-4 py-2.5 text-xs font-bold text-white transition hover:bg-[#162c47] dark:bg-violet-600 dark:hover:bg-violet-500">Abrir gestor de contenidos</button>
+            </section>
           </div>
         </div>
       )}
