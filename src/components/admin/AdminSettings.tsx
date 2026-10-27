@@ -73,6 +73,11 @@ export const AdminSettings: React.FC = () => {
   const [activeSection, setActiveSection] = useState<
     'general' | 'payments' | 'promos' | 'ai' | 'shipping' | 'notifications'
   >('general');
+  const [brandColors, setBrandColors] = useState({
+    primary: currentTenant.branding?.primaryColor || '#0B1A2D',
+    secondary: currentTenant.branding?.secondaryColor || '#64748B',
+    accent: currentTenant.branding?.accentColor || '#B7F229',
+  });
 
   // URL route sync for /gestion/ajustes/notificaciones, /admin/ajustes/notificaciones, /gestion/ajustes/ia, etc.
   useEffect(() => {
@@ -484,6 +489,12 @@ export const AdminSettings: React.FC = () => {
     }
 
     updateCurrentTenant({
+      branding: {
+        ...currentTenant.branding,
+        primaryColor: brandColors.primary,
+        secondaryColor: brandColors.secondary,
+        accentColor: brandColors.accent,
+      },
       contactEmail,
       contactPhone,
       address,
@@ -689,6 +700,29 @@ export const AdminSettings: React.FC = () => {
               </button>
             </div>
           </div>
+
+          {/* White-label brand configuration */}
+          <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-[#1A314D] dark:bg-[#0E2239]" aria-labelledby="white-label-title">
+            <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h3 id="white-label-title" className="flex items-center gap-2 text-sm font-bold text-[#0B1A2D] dark:text-white"><Sliders className="h-4 w-4 text-[#64748B]" /> Marca blanca del club</h3>
+                <p className="mt-1 text-xs text-[#64748B]">Define los tres colores que se inyectan en toda la app del club.</p>
+              </div>
+              <span className="text-[10px] font-bold uppercase tracking-wider text-[#64748B]">3 tokens · tiempo real</span>
+            </div>
+            <div className="mt-5 grid gap-4 sm:grid-cols-3">
+              {([
+                ['primary', 'Color primario'],
+                ['secondary', 'Color secundario'],
+                ['accent', 'Color de acento'],
+              ] as const).map(([key, label]) => (
+                <label key={key} className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-3 dark:border-[#1A314D] dark:bg-[#071220]">
+                  <input type="color" value={brandColors[key]} onChange={(event) => setBrandColors((prev) => ({ ...prev, [key]: event.target.value }))} className="h-10 w-10 cursor-pointer rounded-lg border-0 bg-transparent p-0" aria-label={label} />
+                  <span className="min-w-0"><span className="block text-xs font-bold text-[#0B1A2D] dark:text-white">{label}</span><span className="font-mono text-[11px] text-[#64748B]">{brandColors[key]}</span></span>
+                </label>
+              ))}
+            </div>
+          </section>
 
           {/* Contact Details */}
           <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-4 shadow-sm">
