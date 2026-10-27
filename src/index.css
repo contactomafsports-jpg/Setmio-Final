@@ -26,7 +26,7 @@
   font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
   color: #0B1A2D;
   background: #FFFFFF;
-  --color-primary: #8B5CF6;
+  --color-primary: #0B1A2D;
   --color-secondary: #0B1A2D;
   --color-accent: #B7F229;
   --color-background: #FFFFFF;
@@ -128,7 +128,7 @@ button:disabled { cursor: not-allowed; }
 .dark .text-slate-500 { color: #64748B; }
 
 input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-visible {
-  outline: 3px solid rgba(135, 242, 41, 0.75);
+  outline: 3px solid rgba(183, 242, 41, 0.75);
   outline-offset: 2px;
 }
 

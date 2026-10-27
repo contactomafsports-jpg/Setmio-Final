@@ -63,8 +63,8 @@ export const PrivateMobileNav: React.FC<PrivateMobileNavProps> = ({
         <div
           className={`w-12 h-12 rounded-full flex items-center justify-center shadow-xl transition-all duration-300 border-2 border-white dark:border-[#0B1A2D] ${
             moreOpen
-              ? 'bg-[#8B5CF6] text-white rotate-45 scale-105 shadow-[#8B5CF6]/40 ring-4 ring-[#8B5CF6]/25'
-              : 'bg-gradient-to-tr from-[#8B5CF6] via-[#7c4def] to-[#87F229] hover:from-[#7c4def] hover:to-[#87F229] text-white shadow-[#8B5CF6]/35 hover:scale-105 ring-4 ring-[#8B5CF6]/20'
+              ? 'bg-[#0B1A2D] text-white rotate-45 scale-105 shadow-[#0B1A2D]/30 ring-4 ring-[#B7F229]/25'
+              : 'bg-[#0B1A2D] hover:bg-[#132A45] text-white shadow-[#0B1A2D]/30 hover:scale-105 ring-4 ring-[#B7F229]/20'
           }`}
         >
           <Plus className="w-6 h-6 transition-transform duration-200 text-white" strokeWidth={2.75} />

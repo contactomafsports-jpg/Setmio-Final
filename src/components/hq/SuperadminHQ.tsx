@@ -841,7 +841,7 @@ export const SuperadminHQ: React.FC = () => {
                 className="w-full p-3 rounded-2xl bg-purple-950/60 border border-purple-800 text-left flex items-center justify-between"
               >
                 <div className="flex items-center gap-3">
-                  <Plus className="w-5 h-5 text-purple-400" />
+                  <Plus className="w-5 h-5 text-white" />
                   <div>
                     <div className="text-xs font-bold text-white">Aprovisionar Nuevo Club</div>
                     <div className="text-[10px] text-purple-300">Crear nuevo tenant y asignar subdominio</div>

@@ -37,8 +37,8 @@ export const SetmioSymbol: React.FC<{
       ? '#0B1A2D'
       : 'currentColor';
 
-  const limeColor = '#87F229';
-  const bgColor = iconBg === 'violet' ? '#8B5CF6' : '#0B1A2D';
+  const limeColor = '#B7F229';
+  const bgColor = '#0B1A2D';
 
   const innerSvg = (
     <svg
@@ -142,29 +142,16 @@ export const SetmioWordmark: React.FC<{
     xl: { text: 'text-3xl sm:text-4xl', sub: 'text-xs sm:text-sm', tracking: 'tracking-[0.55em]', gap: 'gap-2' },
   }[size];
 
-  return (
-    <div className={`inline-flex flex-col select-none leading-none ${sizeConfig.gap} ${className}`}>
-      {/* Logotipo personalizado: Tipografía geométrica SETMIO */}
-      <div className={`font-black font-display tracking-tight flex items-center ${sizeConfig.text} ${textColor}`}>
-        <span>S</span>
-        {/* Letra E distintiva: 3 barras horizontales paralelas redondeadas de la guía de marca */}
-        <span className="inline-flex flex-col justify-between mx-[1.5px] h-[0.62em] w-[0.58em] relative top-[-0.04em] shrink-0" aria-label="E">
-          <span className="w-full h-[0.16em] rounded-full bg-current" />
-          <span className="w-[85%] h-[0.16em] rounded-full bg-current" />
-          <span className="w-full h-[0.16em] rounded-full bg-current" />
-        </span>
-        <span>TMIO</span>
-      </div>
+  const logoClass = `block h-auto w-auto object-contain ${className}`;
+  const lightLogo = 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/file_0000000043648210ab56eea231335cd7-87tt8C4C7lgK4g6JQGTnSwM8Jo2NeH.png';
+  const darkLogo = 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/file_000000002f4881f4a7c85b58efed2a73-qKpfsSjD3erXD5N0Mu1PpeqbAGBloG.png';
+  const heightClass = { xs: 'h-5', sm: 'h-6', md: 'h-8', lg: 'h-10', xl: 'h-12' }[size];
 
-      {/* Subtítulo oficial "P Á D E L" con espaciado amplio */}
-      {showSubtitle && (
-        <div
-          className={`font-extrabold uppercase ${sizeConfig.tracking} ${sizeConfig.sub} ${subtitleColor} text-center pl-[0.45em]`}
-        >
-          PÁDEL
-        </div>
-      )}
-    </div>
+  return (
+    <span className={`inline-flex ${heightClass} ${sizeConfig.gap} select-none`} aria-label="Setmio Pádel">
+      <img src={darkLogo} alt="Setmio Pádel" className={`${logoClass} dark:hidden`} />
+      <img src={lightLogo} alt="" aria-hidden="true" className={`${logoClass} hidden dark:block`} />
+    </span>
   );
 };
 
@@ -274,17 +261,11 @@ export const SetmioLogo: React.FC<SetmioLogoProps> = ({
 
   // Variante por defecto: HORIZONTAL (Isotipo a la izquierda, texto a la derecha)
   return (
-    <div className={`inline-flex items-center gap-2.5 sm:gap-3 shrink-0 ${className}`}>
-      <SetmioSymbol
-        size={iconPixelSize}
-        theme={theme}
-        withAppIcon={withAppIcon}
-      />
-      <SetmioWordmark
-        size={size === 'custom' ? 'md' : size}
-        theme={theme}
-        showSubtitle={showSubtitle}
-      />
-    </div>
+    <SetmioWordmark
+      size={size === 'custom' ? 'md' : size}
+      theme={theme}
+      showSubtitle={showSubtitle}
+      className={className}
+    />
   );
 };
