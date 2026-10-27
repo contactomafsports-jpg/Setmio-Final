@@ -449,7 +449,7 @@ export function App() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground dark:bg-slate-950 dark:text-slate-100 font-sans selection:bg-emerald-500 selection:text-foreground antialiased transition-colors duration-200">
+    <div className="min-h-screen bg-background text-foreground dark:bg-slate-950 dark:text-slate-100 font-sans selection:bg-[#B7F229] selection:text-[#0B1A2D] antialiased transition-colors duration-200">
       {/* Main view renderer: Corporate SaaS Landing OR Club View */}
       {currentView === 'public' && (isCorporateLanding ? (
         <CorporateLayout onOpenDemo={() => setRoleSelectorOpen(true)} onOpenAuth={() => setAuthOpen(true)} onOpenRegister={() => { window.history.pushState({}, '', '/registro'); setRegistrationOpen(true); setAuthOpen(true); }}>

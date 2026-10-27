@@ -389,7 +389,7 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
               <button
                 type="button"
                 onClick={handleOpenRegister}
-                className="px-8 py-4 rounded-2xl bg-[#87F229] hover:bg-[#99f846] text-[#0B1A2D] font-black text-sm shadow-xl shadow-[#87F229]/25 hover:shadow-2xl hover:shadow-[#87F229]/40 hover:scale-[1.03] active:scale-[0.98] transition-all flex items-center gap-2 cursor-pointer"
+                className="px-8 py-4 rounded-2xl bg-[#0B1A2D] hover:bg-[#132A45] text-white border border-[#B7F229]/70 font-black text-sm shadow-xl shadow-[#87F229]/25 hover:shadow-2xl hover:shadow-[#87F229]/40 hover:scale-[1.03] active:scale-[0.98] transition-all flex items-center gap-2 cursor-pointer"
               >
                 <span>{t('nav.register', 'Empezar Gratis (30 Días)')}</span>
                 <ArrowRight className="w-4 h-4" />

@@ -191,14 +191,14 @@ export const AdminWebEditor: React.FC = () => {
   const [previewPageId, setPreviewPageId] = useState<string>('home');
 
   // Local branding edit states
-  const [primaryColor, setPrimaryColor] = useState(currentTenant.branding.primaryColor || '#10b981');
-  const [accentColor, setAccentColor] = useState(currentTenant.branding.accentColor || '#06b6d4');
+  const [primaryColor, setPrimaryColor] = useState(currentTenant.branding.primaryColor || '#0B1A2D');
+  const [accentColor, setAccentColor] = useState(currentTenant.branding.accentColor || '#B7F229');
 
   const predefinedPalettes = [
-    { name: 'Esmeralda Pro (Pádel San Mateo)', primary: '#10b981', accent: '#06b6d4' },
-    { name: 'Azul WPT Oficial', primary: '#3b82f6', accent: '#10b981' },
-    { name: 'Ámbar Sport Tech', primary: '#f59e0b', accent: '#ef4444' },
-    { name: 'Violeta Tournament', primary: '#8b5cf6', accent: '#ec4899' },
+    { name: 'Azul Profundo Setmio', primary: '#0B1A2D', accent: '#B7F229' },
+    { name: 'Azul Atlántico', primary: '#1D4ED8', accent: '#93C5FD' },
+    { name: 'Terracota Club', primary: '#9A3412', accent: '#FDBA74' },
+    { name: 'Violeta Club', primary: '#6D28D9', accent: '#C4B5FD' },
   ];
 
   // Save to local storage on changes
@@ -579,7 +579,7 @@ export const AdminWebEditor: React.FC = () => {
                 <label className="block text-slate-700 dark:text-slate-300 font-bold">Personalización Manual de Colores (Códigos HEX)</label>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800 space-y-1.5">
-                    <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300">Color Primario / Marca</span>
+                    <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300">Color del Club (marca blanca)</span>
                     <div className="flex items-center gap-2">
                       <input
                         type="color"
@@ -597,7 +597,7 @@ export const AdminWebEditor: React.FC = () => {
                           setPrimaryColor(e.target.value);
                           setPublishStatus('draft_pending');
                         }}
-                        placeholder="#10b981"
+                        placeholder="#0B1A2D"
                         className="flex-1 px-3 py-1.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white font-mono text-xs focus:outline-none focus:border-emerald-500 uppercase font-bold"
                       />
                     </div>
@@ -622,7 +622,7 @@ export const AdminWebEditor: React.FC = () => {
                           setAccentColor(e.target.value);
                           setPublishStatus('draft_pending');
                         }}
-                        placeholder="#06b6d4"
+                        placeholder="#B7F229"
                         className="flex-1 px-3 py-1.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white font-mono text-xs focus:outline-none focus:border-emerald-500 uppercase font-bold"
                       />
                     </div>
