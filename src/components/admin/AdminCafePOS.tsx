@@ -551,18 +551,28 @@ export const AdminCafePOS: React.FC = () => {
   });
 
   return (
-    <div className="space-y-6 text-slate-900 dark:text-slate-100 max-w-7xl mx-auto pb-12">
+    <div className="space-y-5 text-slate-900 dark:text-slate-100 max-w-7xl mx-auto pb-12">
       {/* 1. Header & POS Shift Status - Mobile Layout Rediseñado Anti-solapamientos */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm">
         <div className="min-w-0">
-          <div className="flex items-center gap-2">
-            <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight truncate">
-              Terminal TPV de Mostrador y Caja
-            </h1>
+          <div className="flex items-center gap-2.5">
+            <div className="w-9 h-9 rounded-xl bg-[#8B5CF6]/10 text-[#8B5CF6] flex items-center justify-center shrink-0">
+              <Receipt className="w-5 h-5 text-[#8B5CF6]" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h1 className="text-xl sm:text-2xl font-black text-[#0B1A2D] dark:text-white tracking-tight truncate">
+                  TPV de Mostrador y Caja
+                </h1>
+                <span className="px-2 py-0.5 rounded-full bg-[#B7F229] text-[#0B1A2D] font-black text-[10px] tracking-wider uppercase shadow-2xs">
+                  Caja Abierta
+                </span>
+              </div>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 truncate">
+                Cobro en mostrador de consumiciones, reservas de pista y recargas de saldo.
+              </p>
+            </div>
           </div>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 truncate">
-            Cobro en mostrador de consumiciones, reservas de pista y recargas de saldo socio.
-          </p>
         </div>
 
         {/* Acciones superiores y Caja: responsive layout anti-solapamiento */}
@@ -570,7 +580,7 @@ export const AdminCafePOS: React.FC = () => {
           {/* Selector de Sede: SOLO visible si el club es Multi-Sede */}
           {hasMultipleVenues && (
             <div className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200/80 dark:border-slate-700/80 shadow-2xs text-xs font-bold col-span-2 sm:col-span-1">
-              <Building2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+              <Building2 className="w-3.5 h-3.5 text-[#8B5CF6] shrink-0" />
               <span className="text-[11px] text-slate-500 dark:text-slate-400 hidden sm:inline">Sede:</span>
               <select
                 value={posVenueFilter}
@@ -593,33 +603,33 @@ export const AdminCafePOS: React.FC = () => {
           <button
             type="button"
             onClick={() => setTransactionsModalOpen(true)}
-            className="px-3 sm:px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold text-xs border border-slate-200/80 dark:border-slate-700/80 shadow-xs flex items-center justify-center gap-1.5 transition active:scale-95 cursor-pointer"
+            className="px-3 sm:px-3.5 py-2 rounded-xl bg-white dark:bg-slate-800/90 hover:bg-slate-50 dark:hover:bg-slate-800 text-[#0B1A2D] dark:text-slate-200 font-bold text-xs border border-slate-200/80 dark:border-slate-700/80 shadow-2xs flex items-center justify-center gap-1.5 transition active:scale-95 cursor-pointer"
             title="Ver y filtrar transacciones por sede"
           >
-            <History className="w-4 h-4 text-blue-500 shrink-0" />
+            <History className="w-4 h-4 text-[#8B5CF6] shrink-0" />
             <span className="truncate">Transacciones</span>
-            <span className="font-mono text-[10px] px-1.5 py-0.2 rounded bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300">
+            <span className="font-mono text-[10px] px-1.5 py-0.2 rounded-md bg-slate-100 dark:bg-slate-700 text-[#0B1A2D] dark:text-slate-200 font-black">
               {filteredTransactions.length}
             </span>
           </button>
 
-          {/* Asignar Reserva / Pago de Jugador */}
+          {/* Asignar Reserva / Pago de Jugador en Verde Lima Setmio */}
           <button
             type="button"
             onClick={() => setAssignModalOpen(true)}
-            className="px-3 sm:px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-xs flex items-center justify-center gap-1.5 transition active:scale-95 cursor-pointer"
+            className="px-3 sm:px-3.5 py-2 rounded-xl bg-[#B7F229] hover:bg-[#a6e61f] text-[#0B1A2D] font-black text-xs shadow-xs flex items-center justify-center gap-1.5 transition active:scale-95 cursor-pointer"
           >
-            <Calendar className="w-4 h-4 shrink-0" />
+            <Calendar className="w-4 h-4 stroke-[2.5] shrink-0" />
             <span className="truncate">Asignar Reserva</span>
           </button>
 
-          {/* Reincorporado: Cierre / Arqueo de Caja */}
+          {/* Cierre / Arqueo de Caja */}
           <button
             type="button"
             onClick={() => setArqueoModalOpen(true)}
-            className="px-3 sm:px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold text-xs border border-slate-200/80 dark:border-slate-700/80 shadow-xs flex items-center justify-center gap-1.5 transition active:scale-95 cursor-pointer"
+            className="px-3 sm:px-3.5 py-2 rounded-xl bg-white dark:bg-slate-800/90 hover:bg-slate-50 dark:hover:bg-slate-800 text-[#0B1A2D] dark:text-slate-200 font-bold text-xs border border-slate-200/80 dark:border-slate-700/80 shadow-2xs flex items-center justify-center gap-1.5 transition active:scale-95 cursor-pointer"
           >
-            <Calculator className="w-4 h-4 text-amber-500 shrink-0" />
+            <Calculator className="w-4 h-4 text-slate-500 shrink-0" />
             <span className="truncate">Arqueo</span>
           </button>
 
@@ -627,19 +637,20 @@ export const AdminCafePOS: React.FC = () => {
           <button
             type="button"
             onClick={() => setCatalogModalOpen(true)}
-            className="px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs border border-slate-200/80 dark:border-slate-700/80 transition active:scale-95 cursor-pointer flex items-center justify-center gap-1.5"
+            className="px-3 py-2 rounded-xl bg-white dark:bg-slate-800/90 hover:bg-slate-50 dark:hover:bg-slate-800 text-[#0B1A2D] dark:text-slate-200 font-bold text-xs border border-slate-200/80 dark:border-slate-700/80 shadow-2xs transition active:scale-95 cursor-pointer flex items-center justify-center gap-1.5"
             title="Gestionar catálogo y existencias"
           >
-            <Package className="w-4 h-4 text-emerald-500 shrink-0" />
+            <Package className="w-4 h-4 text-[#8B5CF6] shrink-0" />
             <span>Catálogo</span>
           </button>
 
           {/* Contenedor dinámico del "Total Turno" */}
-          <div className="p-2 sm:px-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800 text-center sm:text-right shadow-xs flex flex-col justify-center min-w-[95px]">
-            <div className="text-[9px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">
+          <div className="p-2 sm:px-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800 text-center sm:text-right shadow-2xs flex flex-col justify-center min-w-[105px]">
+            <div className="text-[9px] text-slate-400 font-bold uppercase tracking-wider flex items-center justify-center sm:justify-end gap-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#B7F229] shrink-0" />
               Total Turno
             </div>
-            <div className="text-sm sm:text-base font-mono font-black text-emerald-600 dark:text-emerald-400 leading-none mt-0.5">
+            <div className="text-sm sm:text-base font-mono font-black text-[#0B1A2D] dark:text-white leading-none mt-0.5">
               {sessionSalesTotal.toFixed(2)} €
             </div>
           </div>
@@ -647,23 +658,23 @@ export const AdminCafePOS: React.FC = () => {
       </div>
 
       {/* 2. POS Interface: Product Catalog + Fast Ticket Register */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
         {/* Products Grid */}
-        <div className="lg:col-span-7 space-y-4">
+        <div className="lg:col-span-7 space-y-3.5">
           {/* Categories bar */}
-          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1">
+          <div className="flex items-center gap-1.5 overflow-x-auto hide-scrollbar pb-1">
             {categories.map((c) => (
               <button
                 key={c}
                 type="button"
                 onClick={() => setActiveCategory(c)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition cursor-pointer ${
+                className={`px-3 py-1.5 rounded-full text-xs transition cursor-pointer shrink-0 ${
                   activeCategory === c
-                    ? 'bg-emerald-600 text-white shadow-xs'
-                    : 'bg-white dark:bg-slate-800/90 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white border border-slate-200/80 dark:border-slate-700/80'
+                    ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D] font-bold shadow-xs'
+                    : 'bg-white dark:bg-slate-800/90 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white border border-slate-200/80 dark:border-slate-700/80 font-medium'
                 }`}
               >
-                {c === 'all' ? 'Todos' : c}
+                {c === 'all' ? 'Todos los Artículos' : c}
               </button>
             ))}
           </div>
@@ -682,7 +693,7 @@ export const AdminCafePOS: React.FC = () => {
                     addItemToPOS(prod);
                   }
                 }}
-                className="p-2.5 rounded-2xl bg-white dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 hover:border-emerald-500/50 text-left transition flex flex-col group shadow-xs hover:scale-[1.01] active:scale-[0.99] cursor-pointer overflow-hidden select-none"
+                className="p-2.5 rounded-2xl bg-white dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 hover:border-[#8B5CF6]/50 text-left transition flex flex-col group shadow-xs hover:shadow-md hover:scale-[1.01] active:scale-[0.98] cursor-pointer overflow-hidden select-none"
               >
                 {/* 1. Imagen Superior con Badges Superpuestos */}
                 <div className="relative w-full h-28 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-700/50 shrink-0">
@@ -704,35 +715,35 @@ export const AdminCafePOS: React.FC = () => {
                       e.stopPropagation();
                       setSelectedProductDetail(prod);
                     }}
-                    className="absolute bottom-1.5 right-1.5 p-1 rounded-lg bg-slate-900/70 hover:bg-slate-900 text-white transition z-10"
+                    className="absolute bottom-1.5 right-1.5 p-1 rounded-lg bg-[#0B1A2D]/80 hover:bg-[#0B1A2D] text-white transition z-10"
                     title="Ver detalle del producto"
                   >
                     <Info className="w-3 h-3" />
                   </button>
 
                   {/* Badge de Categoría Superpuesto en esquina superior izquierda */}
-                  <span className="absolute top-1.5 left-1.5 px-2 py-0.5 rounded-md bg-slate-900/80 backdrop-blur-xs text-[9px] font-bold text-white uppercase tracking-wider shadow-xs">
+                  <span className="absolute top-1.5 left-1.5 px-2 py-0.5 rounded-md bg-[#0B1A2D]/85 backdrop-blur-xs text-[9px] font-bold text-white uppercase tracking-wider shadow-xs">
                     {prod.category}
                   </span>
 
                   {/* Badge de Stock en esquina superior derecha */}
-                  <span className="absolute top-1.5 right-1.5 px-1.5 py-0.5 rounded-md bg-white/90 dark:bg-slate-900/90 backdrop-blur-xs text-[9px] font-mono font-bold text-slate-800 dark:text-slate-200 shadow-xs">
+                  <span className="absolute top-1.5 right-1.5 px-1.5 py-0.5 rounded-md bg-white/95 dark:bg-slate-900/95 backdrop-blur-xs text-[9px] font-mono font-bold text-slate-800 dark:text-slate-200 shadow-xs">
                     {prod.stock} ud.
                   </span>
                 </div>
 
                 {/* 2. Información Inferior: Título y Precio/Botón en estructura vertical */}
                 <div className="flex flex-col flex-1 justify-between pt-2">
-                  <div className="font-bold text-xs text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition line-clamp-1 leading-snug">
+                  <div className="font-bold text-xs text-slate-900 dark:text-white group-hover:text-[#8B5CF6] dark:group-hover:text-[#B7F229] transition line-clamp-1 leading-snug">
                     {prod.name}
                   </div>
 
                   <div className="flex items-center justify-between pt-1.5 mt-1.5 border-t border-slate-100 dark:border-slate-700/60">
-                    <span className="font-mono font-black text-xs text-emerald-600 dark:text-emerald-400">
+                    <span className="font-mono font-black text-sm text-[#0B1A2D] dark:text-[#B7F229]">
                       {prod.price.toFixed(2)} €
                     </span>
-                    <span className="p-1 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 group-hover:bg-emerald-500 group-hover:text-white transition">
-                      <Plus className="w-3.5 h-3.5" />
+                    <span className="p-1 rounded-lg bg-slate-100 dark:bg-slate-700 text-[#0B1A2D] dark:text-slate-200 group-hover:bg-[#B7F229] group-hover:text-[#0B1A2D] transition-colors">
+                      <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
                     </span>
                   </div>
                 </div>
@@ -743,214 +754,223 @@ export const AdminCafePOS: React.FC = () => {
 
         {/* Ticket / POS Cart Register & Últimos 5 Pagos */}
         <div className="lg:col-span-5 space-y-4">
-          <div className="bg-white dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 rounded-2xl p-4 sm:p-5 shadow-sm space-y-4">
-          <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-700/60 pb-3">
-            <div className="flex items-center gap-2">
-              <ShoppingCart className="w-4 h-4 text-emerald-500" />
-              <h2 className="font-bold text-xs uppercase tracking-wider text-slate-700 dark:text-slate-300">
-                Ticket en Curso ({posCart.reduce((acc, i) => acc + i.qty, 0)})
-              </h2>
+          <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-4 sm:p-5 shadow-sm space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+              <div className="flex items-center gap-2">
+                <div className="p-1.5 rounded-lg bg-[#8B5CF6]/10 text-[#8B5CF6]">
+                  <ShoppingCart className="w-4 h-4 text-[#8B5CF6]" />
+                </div>
+                <h2 className="font-black text-xs uppercase tracking-wider text-[#0B1A2D] dark:text-white">
+                  Ticket en Curso
+                </h2>
+                <span className="font-mono font-bold text-[10px] px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
+                  {posCart.reduce((acc, i) => acc + i.qty, 0)} arts.
+                </span>
+              </div>
+              {posCart.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => setPosCart([])}
+                  className="text-[11px] font-bold text-rose-500 hover:text-rose-600 transition cursor-pointer"
+                >
+                  Vaciar Ticket
+                </button>
+              )}
             </div>
-            {posCart.length > 0 && (
+
+            {/* Cart items list */}
+            <div className="space-y-2 max-h-72 overflow-y-auto pr-1">
+              {posCart.length === 0 ? (
+                <div className="py-12 text-center text-slate-400 dark:text-slate-500 text-xs">
+                  <ShoppingCart className="w-8 h-8 mx-auto mb-2 text-slate-300 dark:text-slate-600" />
+                  Ticket vacío. Selecciona artículos del catálogo o pulsa en "Asignar Reserva".
+                </div>
+              ) : (
+                posCart.map(({ product, qty, meta }, index) => (
+                  <div
+                    key={`${product.id}-${index}`}
+                    className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60 flex items-center justify-between gap-2 text-xs"
+                  >
+                    <div className="min-w-0 flex-1">
+                      <div className="font-bold text-slate-900 dark:text-white truncate">
+                        {product.name}
+                      </div>
+                      <div className="text-[10px] text-slate-500 dark:text-slate-400">
+                        {meta?.bookingId
+                          ? 'Reserva vinculada'
+                          : meta?.isWalletTopup
+                          ? 'Recarga de Monedero'
+                          : product.category}{' '}
+                        · {product.price.toFixed(2)} €/ud.
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2 shrink-0">
+                      <div className="flex items-center border border-slate-200 dark:border-slate-700 rounded-lg overflow-hidden bg-white dark:bg-slate-800">
+                        <button
+                          type="button"
+                          onClick={() => updateQty(product.id, -1)}
+                          className="px-2 py-1 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700 transition"
+                        >
+                          <Minus className="w-3 h-3" />
+                        </button>
+                        <span className="px-2 font-mono font-bold text-xs">{qty}</span>
+                        <button
+                          type="button"
+                          onClick={() => updateQty(product.id, 1)}
+                          className="px-2 py-1 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700 transition"
+                        >
+                          <Plus className="w-3 h-3" />
+                        </button>
+                      </div>
+
+                      <span className="font-mono font-black text-xs w-14 text-right text-[#0B1A2D] dark:text-white">
+                        {(product.price * qty).toFixed(2)} €
+                      </span>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+
+            {/* Payment Method Selector (Filtered by Club Settings) */}
+            <div className="pt-2 border-t border-slate-100 dark:border-slate-800 space-y-2">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
+                Método de Cobro en Mostrador:
+              </span>
+              <div className={`grid ${availablePaymentMethods.length <= 2 ? 'grid-cols-2' : availablePaymentMethods.length <= 3 ? 'grid-cols-3' : 'grid-cols-2 sm:grid-cols-3'} gap-2`}>
+                {availablePaymentMethods.map((m) => {
+                  const IconComponent = m.icon;
+                  const isSelected = paymentMethod === m.id;
+                  return (
+                    <button
+                      key={m.id}
+                      type="button"
+                      onClick={() => setPaymentMethod(m.id)}
+                      className={`p-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 ${
+                        isSelected
+                          ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D] border border-[#0B1A2D] dark:border-white shadow-xs ring-2 ring-[#0B1A2D]/10 dark:ring-white/20'
+                          : 'bg-slate-50 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80'
+                      }`}
+                    >
+                      <IconComponent className="w-3.5 h-3.5" />
+                      <span className="truncate">{m.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Cart Total & Action */}
+            <div className="pt-3 border-t border-slate-100 dark:border-slate-800 space-y-3">
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-slate-500 font-medium">{t('pos.selectedPaymentMethod', 'Método seleccionado:')}</span>
+                <span className="font-bold text-[#0B1A2D] dark:text-slate-200 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#8B5CF6]/10 text-[#8B5CF6] border border-[#8B5CF6]/20">
+                  {activePaymentMethodObj && <activePaymentMethodObj.icon className="w-3.5 h-3.5 text-[#8B5CF6]" />}
+                  <span>{activePaymentMethodObj?.label}</span>
+                </span>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-slate-500">Total a Cobrar:</span>
+                <span className="text-2xl sm:text-3xl font-black font-mono text-[#0B1A2D] dark:text-white tracking-tight">
+                  {cartTotal.toFixed(2)} €
+                </span>
+              </div>
+
+              {/* Botón CTA principal de cobro en Verde Lima Setmio */}
               <button
                 type="button"
-                onClick={() => setPosCart([])}
-                className="text-[11px] font-bold text-rose-500 hover:text-rose-600 transition cursor-pointer"
+                onClick={handleChargeSale}
+                disabled={posCart.length === 0}
+                className="w-full py-3.5 rounded-xl bg-[#B7F229] hover:bg-[#a6e61f] disabled:opacity-40 text-[#0B1A2D] font-black text-sm sm:text-base shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-95"
               >
-                Vaciar Ticket
+                <CheckCircle2 className="w-4 h-4 stroke-[2.5]" />
+                <span>
+                  {t('pos.chargeWithMethod', 'Cobrar con')} {activePaymentMethodObj?.label || 'TPV'} ({cartTotal.toFixed(2)} €)
+                </span>
               </button>
-            )}
+            </div>
           </div>
 
-          {/* Cart items list */}
-          <div className="space-y-2 max-h-72 overflow-y-auto pr-1">
-            {posCart.length === 0 ? (
-              <div className="py-12 text-center text-slate-400 dark:text-slate-500 text-xs">
-                <ShoppingCart className="w-8 h-8 mx-auto mb-2 text-slate-300 dark:text-slate-600" />
-                Ticket vacío. Selecciona artículos del catálogo o pulsa en "Asignar Reserva / Pago".
+          {/* Tarjeta de los Últimos 5 Pagos Registrados (Requisito Bloque 1) */}
+          <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-4 sm:p-5 shadow-sm space-y-3">
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2.5">
+              <div className="flex items-center gap-2">
+                <div className="p-1 rounded-lg bg-[#8B5CF6]/10 text-[#8B5CF6]">
+                  <History className="w-4 h-4 text-[#8B5CF6]" />
+                </div>
+                <h3 className="font-black text-xs uppercase tracking-wider text-[#0B1A2D] dark:text-white">
+                  Últimos 5 Pagos Registrados
+                </h3>
+              </div>
+              <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+                {posTransactions.length} en turno
+              </span>
+            </div>
+
+            {posTransactions.length === 0 ? (
+              <div className="p-4 text-center text-xs text-slate-400">
+                No hay pagos registrados todavía en este turno.
               </div>
             ) : (
-              posCart.map(({ product, qty, meta }, index) => (
-                <div
-                  key={`${product.id}-${index}`}
-                  className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200/60 dark:border-slate-700/60 flex items-center justify-between gap-2 text-xs"
-                >
-                  <div className="min-w-0 flex-1">
-                    <div className="font-bold text-slate-900 dark:text-white truncate">
-                      {product.name}
+              <div className="divide-y divide-slate-100 dark:divide-slate-800">
+                {posTransactions.slice(0, 5).map((tx) => (
+                  <div key={tx.id} className="py-2.5 flex items-center justify-between gap-3 text-xs">
+                    <div className="min-w-0 flex-1 space-y-0.5">
+                      <div className="flex items-center gap-1.5">
+                        <span className="font-mono font-bold text-[10px] text-slate-400 shrink-0">{tx.time}</span>
+                        <span className="font-bold text-slate-900 dark:text-white truncate text-[11px]">{tx.concept}</span>
+                      </div>
+                      <div className="text-[10px] text-slate-500 dark:text-slate-400 flex items-center gap-1.5 truncate">
+                        <span>{tx.customerName || 'Cliente Mostrador'}</span>
+                        <span>·</span>
+                        <span className="text-[#8B5CF6] font-medium">{tx.paymentMethod}</span>
+                      </div>
                     </div>
-                    <div className="text-[10px] text-slate-500 dark:text-slate-400">
-                      {meta?.bookingId
-                        ? 'Reserva vinculada'
-                        : meta?.isWalletTopup
-                        ? 'Recarga de Monedero'
-                        : product.category}{' '}
-                      · {product.price.toFixed(2)} €/ud.
+                    <div className="text-right shrink-0">
+                      <div className="font-mono font-black text-xs text-[#0B1A2D] dark:text-[#B7F229]">
+                        +{tx.amount.toFixed(2)} €
+                      </div>
+                      <span className="text-[9px] font-black text-[#0B1A2D] bg-[#B7F229] px-1.5 py-0.5 rounded shadow-2xs">
+                        Cobrado
+                      </span>
                     </div>
                   </div>
-
-                  <div className="flex items-center gap-2 shrink-0">
-                    <div className="flex items-center border border-slate-200 dark:border-slate-700 rounded-lg overflow-hidden bg-white dark:bg-slate-800">
-                      <button
-                        type="button"
-                        onClick={() => updateQty(product.id, -1)}
-                        className="px-2 py-1 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700 transition"
-                      >
-                        <Minus className="w-3 h-3" />
-                      </button>
-                      <span className="px-2 font-mono font-bold text-xs">{qty}</span>
-                      <button
-                        type="button"
-                        onClick={() => updateQty(product.id, 1)}
-                        className="px-2 py-1 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700 transition"
-                      >
-                        <Plus className="w-3 h-3" />
-                      </button>
-                    </div>
-
-                    <span className="font-mono font-bold text-xs w-14 text-right">
-                      {(product.price * qty).toFixed(2)} €
-                    </span>
-                  </div>
-                </div>
-              ))
+                ))}
+              </div>
             )}
-          </div>
 
-          {/* Payment Method Selector (Filtered by Club Settings) */}
-          <div className="pt-2 border-t border-slate-100 dark:border-slate-700/60 space-y-2">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
-              Método de Cobro (Activos en Club):
-            </span>
-            <div className={`grid ${availablePaymentMethods.length <= 2 ? 'grid-cols-2' : availablePaymentMethods.length <= 3 ? 'grid-cols-3' : 'grid-cols-2 sm:grid-cols-3'} gap-2`}>
-              {availablePaymentMethods.map((m) => {
-                const IconComponent = m.icon;
-                return (
-                  <button
-                    key={m.id}
-                    type="button"
-                    onClick={() => setPaymentMethod(m.id)}
-                    className={`p-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${
-                      paymentMethod === m.id
-                        ? 'bg-emerald-600 text-white shadow-xs'
-                        : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
-                    }`}
-                  >
-                    <IconComponent className="w-3.5 h-3.5" />
-                    <span className="truncate">{m.label}</span>
-                  </button>
-                );
-              })}
+            {/* Botón Ver todos los pagos */}
+            <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
+              <button
+                type="button"
+                onClick={() => setTransactionsModalOpen(true)}
+                className="w-full py-2.5 px-3 rounded-xl bg-slate-50 hover:bg-slate-100 dark:bg-slate-800/80 dark:hover:bg-slate-800 text-[#0B1A2D] dark:text-slate-200 font-bold text-xs transition cursor-pointer flex items-center justify-center gap-1.5 border border-slate-200/80 dark:border-slate-700/80 shadow-2xs group"
+              >
+                <History className="w-3.5 h-3.5 text-[#8B5CF6] shrink-0" />
+                <span>Ver todos los pagos</span>
+                <span className="text-[10px] text-slate-400 font-mono">({posTransactions.length})</span>
+                <ArrowRight className="w-3.5 h-3.5 ml-auto text-slate-400 group-hover:translate-x-0.5 transition-transform" />
+              </button>
             </div>
-          </div>
-
-          {/* Cart Total & Action */}
-          <div className="pt-3 border-t border-slate-100 dark:border-slate-700/60 space-y-3">
-            <div className="flex items-center justify-between text-xs">
-              <span className="text-slate-500 font-medium">{t('pos.selectedPaymentMethod', 'Método seleccionado:')}</span>
-              <span className="font-bold text-slate-800 dark:text-slate-200 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20">
-                {activePaymentMethodObj && <activePaymentMethodObj.icon className="w-3.5 h-3.5 text-emerald-500" />}
-                <span>{activePaymentMethodObj?.label}</span>
-              </span>
-            </div>
-
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-slate-500">Total a Cobrar:</span>
-              <span className="text-2xl font-black font-mono text-slate-900 dark:text-white">
-                {cartTotal.toFixed(2)} €
-              </span>
-            </div>
-
-            <button
-              type="button"
-              onClick={handleChargeSale}
-              disabled={posCart.length === 0}
-              className="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 text-white font-black text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer active:scale-95"
-            >
-              <CheckCircle2 className="w-4 h-4" />
-              <span>
-                {t('pos.chargeWithMethod', 'Cobrar con')} {activePaymentMethodObj?.label || 'TPV'} ({cartTotal.toFixed(2)} €)
-              </span>
-            </button>
-          </div>
-        </div>
-
-        {/* Tarjeta de los Últimos 5 Pagos Registrados (Requisito Bloque 1) */}
-        <div className="bg-white dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 rounded-2xl p-4 sm:p-5 shadow-sm space-y-3">
-          <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-700/60 pb-2.5">
-            <div className="flex items-center gap-2">
-              <History className="w-4 h-4 text-emerald-500" />
-              <h3 className="font-bold text-xs uppercase tracking-wider text-slate-700 dark:text-slate-300">
-                Últimos 5 Pagos Registrados
-              </h3>
-            </div>
-            <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300">
-              {posTransactions.length} en turno
-            </span>
-          </div>
-
-          {posTransactions.length === 0 ? (
-            <div className="p-4 text-center text-xs text-slate-400">
-              No hay pagos registrados todavía en este turno.
-            </div>
-          ) : (
-            <div className="divide-y divide-slate-100 dark:divide-slate-700/60">
-              {posTransactions.slice(0, 5).map((tx) => (
-                <div key={tx.id} className="py-2.5 flex items-center justify-between gap-3 text-xs">
-                  <div className="min-w-0 flex-1 space-y-0.5">
-                    <div className="flex items-center gap-1.5">
-                      <span className="font-mono font-bold text-[10px] text-slate-400 shrink-0">{tx.time}</span>
-                      <span className="font-bold text-slate-900 dark:text-white truncate text-[11px]">{tx.concept}</span>
-                    </div>
-                    <div className="text-[10px] text-slate-500 dark:text-slate-400 flex items-center gap-1.5 truncate">
-                      <span>{tx.customerName || 'Cliente Mostrador'}</span>
-                      <span>·</span>
-                      <span className="text-emerald-600 dark:text-emerald-400 font-medium">{tx.paymentMethod}</span>
-                    </div>
-                  </div>
-                  <div className="text-right shrink-0">
-                    <div className="font-mono font-black text-xs text-emerald-600 dark:text-emerald-400">
-                      +{tx.amount.toFixed(2)} €
-                    </div>
-                    <span className="text-[9px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/80 px-1.5 py-0.2 rounded border border-emerald-500/20">
-                      Cobrado
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {/* Botón Ver todos los pagos */}
-          <div className="pt-2 border-t border-slate-100 dark:border-slate-700/60">
-            <button
-              type="button"
-              onClick={() => setTransactionsModalOpen(true)}
-              className="w-full py-2.5 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-700/80 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold text-xs transition cursor-pointer flex items-center justify-center gap-1.5 shadow-2xs group"
-            >
-              <History className="w-3.5 h-3.5 text-blue-500 shrink-0" />
-              <span>Ver todos los pagos</span>
-              <span className="text-[10px] text-slate-400 font-mono">({posTransactions.length})</span>
-              <ArrowRight className="w-3.5 h-3.5 ml-auto text-slate-400 group-hover:translate-x-0.5 transition-transform" />
-            </button>
           </div>
         </div>
       </div>
-    </div>
 
       {/* ======================================================================
           2.5 MODAL: HISTORIAL Y LISTADO DE TRANSACCIONES DEL TURNO
           ====================================================================== */}
       {transactionsModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 backdrop-blur-sm p-4 animate-in fade-in duration-150">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0B1A2D]/70 backdrop-blur-sm p-4 animate-in fade-in duration-150">
           <div className="relative w-full max-w-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl text-slate-900 dark:text-slate-100 space-y-4 max-h-[90vh] overflow-y-auto">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 dark:border-slate-800 pb-4">
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-blue-100 dark:bg-blue-950 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold">
-                  <History className="w-5 h-5" />
+                <div className="w-9 h-9 rounded-xl bg-[#8B5CF6]/10 text-[#8B5CF6] flex items-center justify-center font-bold">
+                  <History className="w-5 h-5 text-[#8B5CF6]" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-black text-slate-900 dark:text-white">
+                  <h3 className="text-lg font-black text-[#0B1A2D] dark:text-white">
                     Transacciones y Tickets del Turno
                   </h3>
                   <p className="text-xs text-slate-500">
@@ -963,7 +983,7 @@ export const AdminCafePOS: React.FC = () => {
                 {/* Filtro de sede dentro del modal si es multi-sede */}
                 {hasMultipleVenues && (
                   <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-xs font-bold border border-slate-200/80 dark:border-slate-700/80">
-                    <Building2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                    <Building2 className="w-3.5 h-3.5 text-[#8B5CF6] shrink-0" />
                     <select
                       value={posVenueFilter}
                       onChange={(e) => setPosVenueFilter(e.target.value)}
@@ -1000,8 +1020,8 @@ export const AdminCafePOS: React.FC = () => {
                   <div key={tx.id} className="py-3 flex items-center justify-between gap-4 text-xs">
                     <div className="min-w-0 flex-1 space-y-0.5">
                       <div className="flex items-center gap-2">
-                        <span className="font-mono font-bold text-slate-500 text-[11px]">{tx.time}</span>
-                        <span className="font-bold text-slate-900 dark:text-white truncate">{tx.concept}</span>
+                        <span className="font-mono font-bold text-slate-400 text-[11px]">{tx.time}</span>
+                        <span className="font-bold text-[#0B1A2D] dark:text-white truncate">{tx.concept}</span>
                         {hasMultipleVenues && tx.venueName && (
                           <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
                             {tx.venueName}
@@ -1011,12 +1031,12 @@ export const AdminCafePOS: React.FC = () => {
                       <div className="text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-2">
                         <span>{tx.customerName || 'Cliente Mostrador'}</span>
                         <span>·</span>
-                        <span className="text-emerald-600 dark:text-emerald-400 font-medium">{tx.paymentMethod}</span>
+                        <span className="text-[#8B5CF6] font-medium">{tx.paymentMethod}</span>
                       </div>
                     </div>
 
                     <div className="text-right shrink-0">
-                      <div className="font-mono font-black text-sm text-emerald-600 dark:text-emerald-400">
+                      <div className="font-mono font-black text-sm text-[#0B1A2D] dark:text-[#B7F229]">
                         +{tx.amount.toFixed(2)} €
                       </div>
                       <div className="text-[10px] text-slate-400 font-mono">OK / Cobrado</div>
@@ -1030,7 +1050,7 @@ export const AdminCafePOS: React.FC = () => {
               <span className="text-slate-500 font-semibold">
                 Total Transacciones Mostradas ({filteredTransactions.length}):
               </span>
-              <span className="font-mono font-black text-base text-slate-900 dark:text-white">
+              <span className="font-mono font-black text-base text-[#0B1A2D] dark:text-white">
                 {filteredTransactions.reduce((acc, t) => acc + t.amount, 0).toFixed(2)} €
               </span>
             </div>
@@ -1042,15 +1062,15 @@ export const AdminCafePOS: React.FC = () => {
           3. MODAL: CIERRE / ARQUEO DE CAJA DEL TURNO
           ====================================================================== */}
       {arqueoModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 backdrop-blur-sm p-4 animate-in fade-in duration-150">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0B1A2D]/70 backdrop-blur-sm p-4 animate-in fade-in duration-150">
           <div className="relative w-full max-w-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl text-slate-900 dark:text-slate-100 space-y-5 max-h-[92vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-4">
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-amber-100 dark:bg-amber-950 text-amber-600 dark:text-amber-400 flex items-center justify-center font-bold">
-                  <Calculator className="w-5 h-5" />
+                <div className="w-9 h-9 rounded-xl bg-[#8B5CF6]/10 text-[#8B5CF6] flex items-center justify-center font-bold">
+                  <Calculator className="w-5 h-5 text-[#8B5CF6]" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-black text-slate-900 dark:text-white">
+                  <h3 className="text-lg font-black text-[#0B1A2D] dark:text-white">
                     Cierre y Arqueo de Caja
                   </h3>
                   <p className="text-xs text-slate-500">
@@ -1074,13 +1094,13 @@ export const AdminCafePOS: React.FC = () => {
                 <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block">
                   Total Recaudado en Turno
                 </span>
-                <div className="text-3xl font-black font-mono text-emerald-600 dark:text-emerald-400 mt-0.5">
+                <div className="text-3xl font-black font-mono text-[#0B1A2D] dark:text-white mt-0.5">
                   {sessionSalesTotal.toFixed(2)} €
                 </div>
               </div>
               <div className="text-right text-xs space-y-0.5">
                 <div className="text-slate-500">Fecha: {new Date().toLocaleDateString('es-ES')}</div>
-                <div className="font-mono text-emerald-600 font-bold">Turno Abierto: 08:30</div>
+                <div className="font-mono text-[#8B5CF6] font-bold">Turno Abierto: 08:30</div>
               </div>
             </div>
 
@@ -1093,10 +1113,10 @@ export const AdminCafePOS: React.FC = () => {
                 <div className="p-3 rounded-xl bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/80 space-y-1">
                   <div className="flex items-center justify-between text-xs text-slate-500">
                     <span className="flex items-center gap-1 font-bold text-slate-700 dark:text-slate-300">
-                      <CreditCard className="w-3.5 h-3.5 text-blue-500" /> TPV / Tarjeta
+                      <CreditCard className="w-3.5 h-3.5 text-[#8B5CF6]" /> TPV / Tarjeta
                     </span>
                   </div>
-                  <div className="text-lg font-mono font-black text-slate-900 dark:text-white">
+                  <div className="text-lg font-mono font-black text-[#0B1A2D] dark:text-white">
                     {(sessionSalesTotal * 0.58).toFixed(2)} €
                   </div>
                   <div className="text-[10px] text-slate-400">58% de las operaciones</div>
@@ -1108,7 +1128,7 @@ export const AdminCafePOS: React.FC = () => {
                       <Banknote className="w-3.5 h-3.5 text-emerald-500" /> Efectivo
                     </span>
                   </div>
-                  <div className="text-lg font-mono font-black text-slate-900 dark:text-white">
+                  <div className="text-lg font-mono font-black text-[#0B1A2D] dark:text-white">
                     {(sessionSalesTotal * 0.28).toFixed(2)} €
                   </div>
                   <div className="text-[10px] text-slate-400">Cajón portamonedas</div>
@@ -1120,7 +1140,7 @@ export const AdminCafePOS: React.FC = () => {
                       <Wallet className="w-3.5 h-3.5 text-purple-500" /> Monedero
                     </span>
                   </div>
-                  <div className="text-lg font-mono font-black text-slate-900 dark:text-white">
+                  <div className="text-lg font-mono font-black text-[#0B1A2D] dark:text-white">
                     {(sessionSalesTotal * 0.14).toFixed(2)} €
                   </div>
                   <div className="text-[10px] text-slate-400">Saldo de socios</div>
@@ -1144,7 +1164,7 @@ export const AdminCafePOS: React.FC = () => {
                 </div>
                 <div className="flex justify-between items-center pb-1.5 border-b border-slate-200/60 dark:border-slate-800">
                   <span className="text-slate-700 dark:text-slate-300 font-medium">Reservas de Pistas Cobradas</span>
-                  <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400">
+                  <span className="font-mono font-bold text-[#0B1A2D] dark:text-[#B7F229]">
                     {(sessionSalesTotal * 0.38).toFixed(2)} €
                   </span>
                 </div>
@@ -1161,18 +1181,18 @@ export const AdminCafePOS: React.FC = () => {
                 <button
                   type="button"
                   onClick={handleExportArqueoCSV}
-                  className="px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold text-xs flex items-center gap-1.5 transition cursor-pointer"
+                  className="px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-[#0B1A2D] dark:text-slate-200 font-bold text-xs flex items-center gap-1.5 transition cursor-pointer"
                 >
-                  <Download className="w-3.5 h-3.5 text-emerald-500" />
+                  <Download className="w-3.5 h-3.5 text-[#8B5CF6]" />
                   <span>Exportar CSV/PDF</span>
                 </button>
 
                 <button
                   type="button"
                   onClick={handlePrintThermalArqueo}
-                  className="px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold text-xs flex items-center gap-1.5 transition cursor-pointer"
+                  className="px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-[#0B1A2D] dark:text-slate-200 font-bold text-xs flex items-center gap-1.5 transition cursor-pointer"
                 >
-                  <Printer className="w-3.5 h-3.5 text-blue-500" />
+                  <Printer className="w-3.5 h-3.5 text-slate-500" />
                   <span>Imprimir Ticket (80mm)</span>
                 </button>
               </div>
@@ -1184,9 +1204,9 @@ export const AdminCafePOS: React.FC = () => {
                   setArqueoModalOpen(false);
                   triggerDemoToast('Caja Cerrada', 'El turno ha sido cerrado y el contador de caja reiniciado a 0.00 €.', 'success');
                 }}
-                className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-sm flex items-center gap-1.5 transition cursor-pointer"
+                className="px-4 py-2 rounded-xl bg-[#B7F229] hover:bg-[#a6e61f] text-[#0B1A2D] font-black text-xs shadow-xs flex items-center gap-1.5 transition cursor-pointer active:scale-95"
               >
-                <Check className="w-4 h-4" />
+                <Check className="w-4 h-4 stroke-[2.5]" />
                 <span>Cerrar Turno Oficial</span>
               </button>
             </div>
@@ -1198,13 +1218,15 @@ export const AdminCafePOS: React.FC = () => {
           4. MODAL: GESTIÓN DE CATÁLOGO DE PRODUCTOS (CRUD)
           ====================================================================== */}
       {catalogModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 backdrop-blur-sm p-4 animate-in fade-in duration-150">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0B1A2D]/70 backdrop-blur-sm p-4 animate-in fade-in duration-150">
           <div className="relative w-full max-w-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl text-slate-900 dark:text-slate-100 space-y-4 max-h-[92vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
               <div className="flex items-center gap-2">
-                <Package className="w-5 h-5 text-emerald-500" />
+                <div className="p-1.5 rounded-lg bg-[#8B5CF6]/10 text-[#8B5CF6]">
+                  <Package className="w-5 h-5 text-[#8B5CF6]" />
+                </div>
                 <div>
-                  <h3 className="text-base font-black text-slate-900 dark:text-white">
+                  <h3 className="text-base font-black text-[#0B1A2D] dark:text-white">
                     Catálogo de Productos y Existencias TPV
                   </h3>
                   <p className="text-xs text-slate-500">
@@ -1217,9 +1239,9 @@ export const AdminCafePOS: React.FC = () => {
                 <button
                   type="button"
                   onClick={openNewProductModal}
-                  className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-xs flex items-center gap-1 cursor-pointer"
+                  className="px-3 py-1.5 rounded-xl bg-[#B7F229] hover:bg-[#a6e61f] text-[#0B1A2D] font-black text-xs shadow-xs flex items-center gap-1 cursor-pointer active:scale-95"
                 >
-                  <Plus className="w-3.5 h-3.5" />
+                  <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
                   <span>Nuevo Producto</span>
                 </button>
 
@@ -1238,7 +1260,7 @@ export const AdminCafePOS: React.FC = () => {
               {cafeProducts.map((p) => (
                 <div
                   key={p.id}
-                  className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/80 flex items-center justify-between gap-3 text-xs hover:border-emerald-500/50 transition cursor-pointer"
+                  className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/80 flex items-center justify-between gap-3 text-xs hover:border-[#8B5CF6]/50 transition cursor-pointer"
                   onClick={() => setSelectedProductDetail(p)}
                 >
                   <div className="flex items-center gap-3 min-w-0">
@@ -1252,7 +1274,7 @@ export const AdminCafePOS: React.FC = () => {
                       className="w-10 h-10 rounded-lg object-cover bg-slate-200 dark:bg-slate-700 shrink-0"
                     />
                     <div className="min-w-0">
-                      <div className="font-bold text-slate-900 dark:text-white truncate">
+                      <div className="font-bold text-[#0B1A2D] dark:text-white truncate">
                         {p.name}
                       </div>
                       <div className="text-[11px] text-slate-500">
@@ -1262,7 +1284,7 @@ export const AdminCafePOS: React.FC = () => {
                   </div>
 
                   <div className="flex items-center gap-2 shrink-0" onClick={(e) => e.stopPropagation()}>
-                    <span className="font-mono font-bold text-sm text-slate-900 dark:text-white mr-1">
+                    <span className="font-mono font-black text-sm text-[#0B1A2D] dark:text-white mr-1">
                       {p.price.toFixed(2)} €
                     </span>
 
@@ -1278,7 +1300,7 @@ export const AdminCafePOS: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => openEditProductModal(p)}
-                      className="p-1.5 rounded-lg bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-emerald-500 hover:text-white transition cursor-pointer"
+                      className="p-1.5 rounded-lg bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-[#8B5CF6] hover:text-white transition cursor-pointer"
                       title="Editar producto"
                     >
                       <Edit2 className="w-3.5 h-3.5" />
@@ -1302,10 +1324,10 @@ export const AdminCafePOS: React.FC = () => {
 
       {/* MODAL CREAR / EDITAR PRODUCTO */}
       {productFormModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 backdrop-blur-sm p-4 animate-in fade-in duration-150">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0B1A2D]/70 backdrop-blur-sm p-4 animate-in fade-in duration-150">
           <div className="relative w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl text-slate-900 dark:text-slate-100 space-y-4">
             <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
-              <h3 className="text-base font-black text-slate-900 dark:text-white">
+              <h3 className="text-base font-black text-[#0B1A2D] dark:text-white">
                 {editingProduct ? 'Editar Producto TPV' : 'Nuevo Producto TPV'}
               </h3>
               <button
@@ -1326,7 +1348,7 @@ export const AdminCafePOS: React.FC = () => {
                   value={productFormData.name}
                   onChange={(e) => setProductFormData({ ...productFormData, name: e.target.value })}
                   placeholder="Ej: Zumo de Naranja Natural"
-                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-[#8B5CF6]"
                 />
               </div>
 
@@ -1336,7 +1358,7 @@ export const AdminCafePOS: React.FC = () => {
                   <select
                     value={productFormData.category}
                     onChange={(e) => setProductFormData({ ...productFormData, category: e.target.value })}
-                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-[#8B5CF6]"
                   >
                     <option value="Bebidas">Bebidas</option>
                     <option value="Café">Café</option>
@@ -1354,7 +1376,7 @@ export const AdminCafePOS: React.FC = () => {
                     required
                     value={productFormData.price}
                     onChange={(e) => setProductFormData({ ...productFormData, price: parseFloat(e.target.value) || 0 })}
-                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl font-mono text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl font-mono text-slate-900 dark:text-white focus:outline-none focus:border-[#8B5CF6]"
                   />
                 </div>
               </div>
@@ -1365,7 +1387,7 @@ export const AdminCafePOS: React.FC = () => {
                   type="number"
                   value={productFormData.stock}
                   onChange={(e) => setProductFormData({ ...productFormData, stock: parseInt(e.target.value) || 0 })}
-                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl font-mono text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl font-mono text-slate-900 dark:text-white focus:outline-none focus:border-[#8B5CF6]"
                 />
               </div>
 
@@ -1408,7 +1430,7 @@ export const AdminCafePOS: React.FC = () => {
                         onClick={() => setProductFormData({ ...productFormData, imageUrl: imgItem.url })}
                         className={`px-2 py-0.5 rounded-lg text-[10px] font-bold border transition cursor-pointer ${
                           productFormData.imageUrl === imgItem.url
-                            ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-500 text-emerald-700 dark:text-emerald-300'
+                            ? 'bg-[#8B5CF6]/15 border-[#8B5CF6] text-[#8B5CF6]'
                             : 'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-slate-300'
                         }`}
                       >
@@ -1424,10 +1446,10 @@ export const AdminCafePOS: React.FC = () => {
                     value={productFormData.imageUrl}
                     onChange={(e) => setProductFormData({ ...productFormData, imageUrl: e.target.value })}
                     placeholder="URL imagen (https://...)"
-                    className="flex-1 px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                    className="flex-1 px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-[#8B5CF6]"
                   />
-                  <label className="px-3 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold rounded-xl cursor-pointer flex items-center gap-1 shrink-0 transition text-xs border border-slate-200/80 dark:border-slate-700/80">
-                    <Upload className="w-3.5 h-3.5 text-emerald-500" />
+                  <label className="px-3 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-[#0B1A2D] dark:text-slate-300 font-bold rounded-xl cursor-pointer flex items-center gap-1 shrink-0 transition text-xs border border-slate-200/80 dark:border-slate-700/80">
+                    <Upload className="w-3.5 h-3.5 text-[#8B5CF6]" />
                     <span>Subir</span>
                     <input
                       type="file"
@@ -1460,7 +1482,7 @@ export const AdminCafePOS: React.FC = () => {
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold shadow-xs cursor-pointer active:scale-95"
+                  className="px-5 py-2 rounded-xl bg-[#B7F229] hover:bg-[#a6e61f] text-[#0B1A2D] font-black shadow-xs cursor-pointer active:scale-95"
                 >
                   Guardar Producto
                 </button>
@@ -1474,11 +1496,11 @@ export const AdminCafePOS: React.FC = () => {
           MODAL: PÁGINA DE DETALLE COMPLETO DE PRODUCTO (Requisito Bloque 2)
           ====================================================================== */}
       {selectedProductDetail && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 backdrop-blur-sm p-4 animate-in fade-in duration-150">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0B1A2D]/70 backdrop-blur-sm p-4 animate-in fade-in duration-150">
           <div className="relative w-full max-w-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl text-slate-900 dark:text-slate-100 space-y-5 max-h-[92vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
               <div className="flex items-center gap-2">
-                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300">
+                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D]">
                   {selectedProductDetail.category}
                 </span>
                 <span className="text-xs font-mono text-slate-400">
@@ -1505,16 +1527,16 @@ export const AdminCafePOS: React.FC = () => {
                 }}
                 className="w-full h-full object-cover"
               />
-              <span className="absolute bottom-2.5 left-2.5 px-3 py-1 rounded-xl bg-slate-950/80 backdrop-blur-xs text-xs font-mono font-black text-white">
+              <span className="absolute bottom-2.5 left-2.5 px-3 py-1 rounded-xl bg-[#0B1A2D]/85 backdrop-blur-xs text-xs font-mono font-black text-white">
                 {selectedProductDetail.price.toFixed(2)} €
               </span>
-              <span className="absolute bottom-2.5 right-2.5 px-3 py-1 rounded-xl bg-white/90 dark:bg-slate-900/90 backdrop-blur-xs text-xs font-mono font-bold text-slate-800 dark:text-slate-200">
+              <span className="absolute bottom-2.5 right-2.5 px-3 py-1 rounded-xl bg-white/95 dark:bg-slate-900/95 backdrop-blur-xs text-xs font-mono font-bold text-slate-800 dark:text-slate-200">
                 Stock: {selectedProductDetail.stock} unidades
               </span>
             </div>
 
             <div>
-              <h2 className="text-lg font-black text-slate-900 dark:text-white">
+              <h2 className="text-lg font-black text-[#0B1A2D] dark:text-white">
                 {selectedProductDetail.name}
               </h2>
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
@@ -1526,19 +1548,19 @@ export const AdminCafePOS: React.FC = () => {
             <div className="grid grid-cols-3 gap-2.5 text-center text-xs">
               <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800">
                 <span className="text-[10px] text-slate-400 font-bold uppercase block">Precio Venta</span>
-                <span className="text-base font-black font-mono text-emerald-600 dark:text-emerald-400">
+                <span className="text-base font-black font-mono text-[#0B1A2D] dark:text-[#B7F229]">
                   {selectedProductDetail.price.toFixed(2)} €
                 </span>
               </div>
               <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800">
                 <span className="text-[10px] text-slate-400 font-bold uppercase block">Existencias</span>
-                <span className="text-base font-black font-mono text-slate-900 dark:text-white">
+                <span className="text-base font-black font-mono text-[#0B1A2D] dark:text-white">
                   {selectedProductDetail.stock} uds
                 </span>
               </div>
               <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800">
                 <span className="text-[10px] text-slate-400 font-bold uppercase block">Estado</span>
-                <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">
+                <span className="text-xs font-bold text-[#8B5CF6]">
                   {selectedProductDetail.active !== false ? 'Activo en Caja' : 'Inactivo'}
                 </span>
               </div>
@@ -1574,7 +1596,7 @@ export const AdminCafePOS: React.FC = () => {
                     setSelectedProductDetail(null);
                     openEditProductModal(prod);
                   }}
-                  className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md flex items-center gap-1.5 cursor-pointer active:scale-95"
+                  className="px-4 py-2.5 rounded-xl bg-[#B7F229] hover:bg-[#a6e61f] text-[#0B1A2D] font-black text-xs shadow-md flex items-center gap-1.5 cursor-pointer active:scale-95"
                 >
                   <Edit2 className="w-3.5 h-3.5" />
                   <span>Editar Todos los Campos</span>
@@ -1589,7 +1611,7 @@ export const AdminCafePOS: React.FC = () => {
           MODAL: CONFIRMACIÓN PREVIA PARA ELIMINAR PRODUCTO (Requisito Bloque 2)
           ====================================================================== */}
       {productToDelete && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/75 backdrop-blur-xs p-4 animate-in fade-in duration-150">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0B1A2D]/75 backdrop-blur-xs p-4 animate-in fade-in duration-150">
           <div className="w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl space-y-4">
             <div className="w-12 h-12 rounded-2xl bg-rose-100 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center mx-auto">
               <AlertCircle className="w-6 h-6" />
@@ -1642,12 +1664,14 @@ export const AdminCafePOS: React.FC = () => {
           5. MODAL: ASIGNAR RESERVA O RECARGA DE MONEDERO
           ====================================================================== */}
       {assignModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 backdrop-blur-sm p-4 animate-in fade-in duration-150">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0B1A2D]/70 backdrop-blur-sm p-4 animate-in fade-in duration-150">
           <div className="relative w-full max-w-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl text-slate-900 dark:text-slate-100 space-y-4 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
               <div className="flex items-center gap-2">
-                <Layers className="w-5 h-5 text-emerald-500" />
-                <h3 className="text-base font-black text-slate-900 dark:text-white">
+                <div className="p-1.5 rounded-lg bg-[#8B5CF6]/10 text-[#8B5CF6]">
+                  <Layers className="w-5 h-5 text-[#8B5CF6]" />
+                </div>
+                <h3 className="text-base font-black text-[#0B1A2D] dark:text-white">
                   Cobro de Reserva o Recarga de Socio
                 </h3>
               </div>
@@ -1665,10 +1689,10 @@ export const AdminCafePOS: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setAssignTab('bookings')}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition ${
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer ${
                   assignTab === 'bookings'
-                    ? 'bg-emerald-600 text-white shadow-xs'
-                    : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
+                    ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D] shadow-xs'
+                    : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                 }`}
               >
                 1. Reservas de Hoy / Pendientes ({filteredBookings.length})
@@ -1676,10 +1700,10 @@ export const AdminCafePOS: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setAssignTab('wallet')}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition ${
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer ${
                   assignTab === 'wallet'
-                    ? 'bg-emerald-600 text-white shadow-xs'
-                    : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
+                    ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D] shadow-xs'
+                    : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                 }`}
               >
                 2. Recargar Saldo Socio
@@ -1696,7 +1720,7 @@ export const AdminCafePOS: React.FC = () => {
                     value={bookingSearch}
                     onChange={(e) => setBookingSearch(e.target.value)}
                     placeholder="Buscar reserva por jugador o pista..."
-                    className="w-full pl-9 pr-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-emerald-500"
+                    className="w-full pl-9 pr-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-[#8B5CF6]"
                   />
                 </div>
 
@@ -1710,7 +1734,7 @@ export const AdminCafePOS: React.FC = () => {
                       >
                         <div className="flex items-center justify-between">
                           <div>
-                            <span className="font-bold text-slate-900 dark:text-white text-xs">
+                            <span className="font-bold text-[#0B1A2D] dark:text-white text-xs">
                               {b.courtName} ({startH})
                             </span>
                             <div className="text-[11px] text-slate-500">Titular: {b.creatorName}</div>
@@ -1719,7 +1743,7 @@ export const AdminCafePOS: React.FC = () => {
                           <button
                             type="button"
                             onClick={() => handleAssignFullBooking(b)}
-                            className="px-3 py-1 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[11px] shadow-xs cursor-pointer"
+                            className="px-3 py-1.5 rounded-xl bg-[#B7F229] hover:bg-[#a6e61f] text-[#0B1A2D] font-black text-[11px] shadow-xs cursor-pointer active:scale-95"
                           >
                             Pagar Pista Completa ({b.totalPrice.toFixed(2)} €)
                           </button>
@@ -1736,12 +1760,12 @@ export const AdminCafePOS: React.FC = () => {
                                   key={idx}
                                   type="button"
                                   onClick={() => handleAssignParticipant(b, p)}
-                                  className="p-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 hover:border-emerald-500 text-left text-[11px] transition flex items-center justify-between"
+                                  className="p-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 hover:border-[#8B5CF6] text-left text-[11px] transition flex items-center justify-between cursor-pointer active:scale-95"
                                 >
                                   <span className="font-medium text-slate-800 dark:text-slate-200 truncate mr-2">
                                     {p.name}
                                   </span>
-                                  <span className="font-bold text-emerald-600 dark:text-emerald-400 shrink-0 font-mono">
+                                  <span className="font-bold text-[#8B5CF6] dark:text-[#B7F229] shrink-0 font-mono">
                                     +{(p.amount || b.totalPrice / 4).toFixed(2)} €
                                   </span>
                                 </button>
@@ -1770,7 +1794,7 @@ export const AdminCafePOS: React.FC = () => {
                       value={walletSearch}
                       onChange={(e) => setWalletSearch(e.target.value)}
                       placeholder="Buscar por nombre o número de socio..."
-                      className="w-full pl-9 pr-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-emerald-500"
+                      className="w-full pl-9 pr-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-[#8B5CF6]"
                     />
                   </div>
 
@@ -1782,7 +1806,7 @@ export const AdminCafePOS: React.FC = () => {
                         onClick={() => setSelectedWalletMember(m)}
                         className={`p-2.5 rounded-xl border text-left transition cursor-pointer ${
                           selectedWalletMember?.id === m.id
-                            ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-500'
+                            ? 'bg-[#8B5CF6]/10 border-[#8B5CF6] text-[#0B1A2D] dark:text-white font-bold'
                             : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 hover:border-slate-300'
                         }`}
                       >
@@ -1794,8 +1818,8 @@ export const AdminCafePOS: React.FC = () => {
                 </div>
 
                 {selectedWalletMember && (
-                  <div className="p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-500/30 space-y-3">
-                    <div className="font-bold text-emerald-800 dark:text-emerald-300">
+                  <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 space-y-3">
+                    <div className="font-bold text-[#0B1A2D] dark:text-white">
                       2. Importe a Recargar para {selectedWalletMember.name}:
                     </div>
 
@@ -1807,7 +1831,7 @@ export const AdminCafePOS: React.FC = () => {
                           onClick={() => { setWalletAmount(amt); setCustomWalletInput(''); }}
                           className={`px-3 py-1.5 rounded-xl font-mono font-bold text-xs transition cursor-pointer ${
                             walletAmount === amt && !customWalletInput
-                              ? 'bg-emerald-600 text-white shadow-xs'
+                              ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D] shadow-xs'
                               : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700'
                           }`}
                         >
@@ -1820,7 +1844,7 @@ export const AdminCafePOS: React.FC = () => {
                         placeholder="Importe libre..."
                         value={customWalletInput}
                         onChange={(e) => setCustomWalletInput(e.target.value)}
-                        className="px-3 py-1.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 font-mono text-xs w-32 focus:outline-none focus:border-emerald-500"
+                        className="px-3 py-1.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 font-mono text-xs w-32 focus:outline-none focus:border-[#8B5CF6]"
                       />
                     </div>
 
@@ -1828,9 +1852,9 @@ export const AdminCafePOS: React.FC = () => {
                       <button
                         type="button"
                         onClick={handleAddWalletTopup}
-                        className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-sm flex items-center gap-1.5 cursor-pointer"
+                        className="px-4 py-2 rounded-xl bg-[#B7F229] hover:bg-[#a6e61f] text-[#0B1A2D] font-black text-xs shadow-sm flex items-center gap-1.5 cursor-pointer active:scale-95"
                       >
-                        <Check className="w-4 h-4" />
+                        <Check className="w-4 h-4 stroke-[2.5]" />
                         <span>Añadir Recarga al Ticket</span>
                       </button>
                     </div>
