@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+
+<html class="h-full bg-slate-50" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/>
+<title>SETMIO Pro - Partidas Abiertas</title>
+<!-- Tailwind CSS v3 with Plugins -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Google Fonts: Inter & Plus Jakarta Sans -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind Extended Config -->
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              navy: '#0B1A2D',
+              violet: '#8B5CF6',
+              lime: '#B7F229',
+              'lime-hover': '#a3dc1e',
+              slate: '#64748B',
+              border: '#E2E8F0',
+              card: '#FFFFFF',
+              surface: '#F8FAFC'
+            }
+          },
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'Inter', 'sans-serif']
+          },
+          boxShadow: {
+            'subtle': '0 1px 3px 0 rgba(11, 26, 45, 0.04), 0 1px 2px 0 rgba(11, 26, 45, 0.02)',
+            'card': '0 4px 20px -2px rgba(11, 26, 45, 0.05)',
+            'dock': '0 12px 32px -4px rgba(11, 26, 45, 0.12), 0 4px 12px -2px rgba(11, 26, 45, 0.06)'
+          }
+        }
+      }
+    }
+  </script>
+<!-- BEGIN: Custom Utilities -->
+<style data-purpose="custom-enhancements">
+    body {
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+    .hide-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .hide-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    .safe-bottom {
+      padding-bottom: env(safe-area-inset-bottom, 24px);
+    }
+  </style>
+<!-- END: Custom Utilities -->
+</head>
+<body class="h-full bg-[#F8FAFC] text-brand-navy font-sans antialiased overflow-x-hidden selection:bg-brand-lime selection:text-brand-navy">
+<!-- Container optimized for iOS mobile viewport -->
+<div class="max-w-md mx-auto min-h-screen flex flex-col bg-[#F8FAFC] relative pb-28">
+<!-- BEGIN: TopBar -->
+<header class="sticky top-0 z-40 bg-[#F8FAFC]/90 backdrop-blur-md px-5 pt-3 pb-3 border-b border-slate-200/60 flex items-center justify-between">
+<!-- Logo & Pro Badge -->
+<div class="flex items-center gap-2">
+<span class="text-xl font-extrabold tracking-tight text-[#0B1A2D]">SETMIO</span>
+<span class="bg-[#8B5CF6] text-white text-[10px] font-bold px-1.5 py-0.5 rounded tracking-wide uppercase">PRO</span>
+</div>
+<!-- Right Header Actions: Notification, AI button & Profile -->
+<div class="flex items-center gap-2.5">
+<!-- Notification with Badge -->
+<button aria-label="Notificaciones" class="relative p-2 rounded-full text-slate-500 hover:text-brand-navy hover:bg-white transition-colors" type="button">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<path d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+<span class="absolute top-1.5 right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-[#10B981] text-[10px] font-bold text-white ring-2 ring-white">
+            3
+          </span>
+</button>
+<!-- AI Assistant Quick Sparkle -->
+<button aria-label="Asistente de IA" class="p-2 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-100 hover:bg-emerald-100 transition-colors" type="button">
+<svg class="w-4 h-4" fill="currentColor" viewbox="0 0 24 24">
+<path d="M12 2L13.8 7.2L19 9L13.8 10.8L12 16L10.2 10.8L5 9L10.2 7.2L12 2Z"></path>
+<path d="M18 16L19 19L22 20L19 21L18 24L17 21L14 20L17 19L18 16Z" opacity="0.6"></path>
+</svg>
+</button>
+<!-- Director Avatar & Online Badge & Dropdown -->
+<div class="flex items-center pl-1">
+<button aria-label="Menú de cuenta" class="flex items-center gap-1 group focus:outline-none" type="button">
+<div class="relative w-8 h-8 rounded-full overflow-hidden ring-2 ring-slate-100 group-hover:ring-slate-300 transition-all">
+<div class="w-full h-full bg-[#0B1A2D] text-white flex items-center justify-center text-xs font-bold">
+                BP
+              </div>
+<span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-[#B7F229] border-2 border-white rounded-full"></span>
+</div>
+<svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-brand-navy transition-colors" fill="none" stroke="currentColor" stroke-width="2.5" viewbox="0 0 24 24">
+<path d="M19.5 8.25l-7.5 7.5-7.5-7.5" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</button>
+</div>
+</div>
+</header>
+<!-- END: TopBar -->
+<!-- BEGIN: MainContent -->
+<main class="flex-1 px-4 pt-4 space-y-5">
+<!-- Header Intro & Quick CTAs -->
+<section class="space-y-3" data-purpose="header-section"><div class="flex items-center justify-between gap-3 pt-1"><h1 class="text-2xl font-extrabold text-[#0B1A2D] tracking-tight">Partidas Abiertas</h1><span class="text-xs font-semibold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-full">2 activas</span></div><div class="flex items-center gap-2.5 pt-1"><button class="inline-flex items-center justify-center gap-2 px-3.5 py-2.5 bg-white border border-slate-200/80 rounded-xl text-xs font-bold text-[#0B1A2D] shadow-sm hover:bg-slate-50 transition-colors active:scale-95" type="button"><svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>Agenda</button><button class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-[#B7F229] hover:bg-[#a3dc1e] text-[#0B1A2D] rounded-xl text-xs font-extrabold shadow-sm active:scale-95 transition-all" type="button"><svg class="w-4 h-4 text-[#0B1A2D]" fill="none" stroke="currentColor" stroke-width="2.5" viewbox="0 0 24 24"><path d="M12 4.5v15m7.5-7.5h-15" stroke-linecap="round" stroke-linejoin="round"></path></svg>Nueva partida</button></div></section>
+<!-- BEGIN: BentoGridMetrics -->
+<section class="grid grid-cols-2 gap-2.5" data-purpose="bento-metrics"><div class="bg-white rounded-2xl p-3.5 border border-slate-200/80 shadow-subtle flex flex-col justify-between relative overflow-hidden">
+<div class="flex items-center justify-between">
+<p class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Total Partidas</p>
+<span class="w-6 h-6 rounded-lg bg-slate-100 flex items-center justify-center text-slate-600">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 3"></path></svg>
+</span>
+</div>
+<div class="my-1.5">
+<span class="text-3xl font-extrabold text-[#0B1A2D] tracking-tight">2</span>
+</div>
+<p class="text-[11px] font-medium text-slate-500">0 completadas (4/4)</p>
+</div>
+<div class="bg-white rounded-2xl p-3.5 border border-[#B7F229]/60 shadow-subtle flex flex-col justify-between relative overflow-hidden">
+<div class="flex items-center justify-between">
+<p class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Plazas Libres</p>
+<span class="px-1.5 py-0.5 rounded-full bg-[#B7F229] text-[#0B1A2D] text-[9px] font-extrabold uppercase tracking-wide">Activo</span>
+</div>
+<div class="my-1.5 flex items-baseline gap-1.5">
+<span class="text-3xl font-extrabold text-[#0B1A2D] tracking-tight">3</span>
+<span class="w-2 h-2 rounded-full bg-[#B7F229]"></span>
+</div>
+<p class="text-[11px] font-semibold text-[#0B1A2D]">Buscando jugadores</p>
+</div>
+<div class="bg-white rounded-2xl p-3.5 border border-slate-200/80 shadow-subtle flex flex-col justify-between relative overflow-hidden">
+<div class="flex items-center justify-between">
+<p class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Jugadores Activos</p>
+<span class="w-6 h-6 rounded-lg bg-[#8B5CF6]/10 flex items-center justify-center text-[#8B5CF6]">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+</span>
+</div>
+<div class="my-1.5">
+<span class="text-3xl font-extrabold text-[#0B1A2D] tracking-tight">5</span>
+</div>
+<p class="text-[11px] font-medium text-slate-500">En convocatoria</p>
+</div>
+<div class="bg-white rounded-2xl p-3.5 border border-slate-200/80 shadow-subtle flex flex-col justify-between relative overflow-hidden">
+<div class="flex items-center justify-between">
+<p class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Solicitudes Nivel</p>
+<span class="inline-flex items-center px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-600 text-[10px] font-bold border border-emerald-100 whitespace-nowrap">Al día</span>
+</div>
+<div class="my-1.5">
+<span class="text-3xl font-extrabold text-[#0B1A2D] tracking-tight">0</span>
+</div>
+<p class="text-[11px] font-medium text-slate-400">Sin pendientes</p>
+</div></section>
+<!-- END: BentoGridMetrics -->
+<!-- BEGIN: FilterToolbar -->
+<section class="space-y-2.5" data-purpose="filtering-section">
+<!-- Segmented Tab Controls -->
+<div class="p-1 bg-slate-200/60 rounded-xl flex items-center gap-1 text-xs font-semibold">
+<button class="flex-1 py-1.5 bg-white text-[#0B1A2D] rounded-lg shadow-sm text-center font-bold" type="button">
+            Todas (2)
+          </button>
+<button class="flex-1 py-1.5 text-slate-600 hover:text-brand-navy transition-colors text-center" type="button">
+            Buscando (2)
+          </button>
+<button class="flex-1 py-1.5 text-slate-600 hover:text-brand-navy transition-colors text-center" type="button">
+            Completas (0)
+          </button>
+</div>
+<!-- Quick Filters Row -->
+<div class="flex items-center gap-2">
+<!-- Venue Selector -->
+<div class="relative flex-1">
+<select class="w-full appearance-none bg-white border border-slate-200 text-xs font-semibold text-[#0B1A2D] rounded-xl pl-8 pr-7 py-2 shadow-subtle focus:ring-1 focus:ring-brand-navy focus:outline-none">
+<option>Todas las Sedes</option>
+<option>Club Central</option>
+<option>Indoor Classic</option>
+</select>
+<div class="absolute inset-y-0 left-2.5 flex items-center pointer-events-none text-slate-400">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<path d="M3 21h18M3 7v14M21 7v14M6 21V11a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v10M9 7V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3"></path>
+</svg>
+</div>
+<div class="absolute inset-y-0 right-2.5 flex items-center pointer-events-none text-slate-400">
+<svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewbox="0 0 24 24">
+<path d="M19.5 8.25l-7.5 7.5-7.5-7.5" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</div>
+</div>
+<!-- Duration Pill Filter -->
+<button class="inline-flex items-center gap-1.5 px-3 py-2 bg-[#8B5CF6]/10 border border-[#8B5CF6]/30 text-[#8B5CF6] rounded-xl text-xs font-bold shadow-subtle" type="button"><svg class="w-3.5 h-3.5 text-[#8B5CF6]" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round"></path></svg><span>Solo 90 min</span></button>
+<!-- Filter Drawer Trigger Button -->
+<button aria-label="Más filtros" class="p-2 bg-white border border-slate-200 text-slate-600 hover:text-brand-navy rounded-xl shadow-subtle active:scale-95 transition-all" type="button">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+</svg>
+</button>
+</div>
+</section>
+<!-- END: FilterToolbar -->
+<!-- BEGIN: ActiveMatchCards -->
+<section class="space-y-3.5 pt-1" data-purpose="matches-list"><!-- Card 1 -->
+<article class="bg-white rounded-2xl border border-slate-200/80 p-4 shadow-subtle space-y-3.5 hover:border-slate-300 transition-colors">
+<div class="flex items-start justify-between gap-2">
+<div class="flex items-center gap-1.5 text-xs font-semibold text-slate-700">
+<svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+<span class="text-[#0B1A2D] font-bold">Jue, 1 Oct · 19:30</span>
+<span class="text-slate-400 font-normal">· 90 min</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="inline-flex items-center gap-1 bg-[#B7F229]/20 text-[#0B1A2D] text-[10px] font-bold px-2.5 py-0.5 rounded-full border border-[#B7F229]/40">
+<span class="w-1.5 h-1.5 rounded-full bg-[#a3dc1e]"></span>
+        1 libre
+      </span>
+<span class="bg-[#8B5CF6]/10 text-[#8B5CF6] text-[10px] font-semibold px-2 py-0.5 rounded-md">
+        Masculina
+      </span>
+</div>
+</div>
+<div>
+<h2 class="text-sm font-extrabold text-[#0B1A2D] tracking-tight">Pista 1 — Central Panorámica</h2>
+<p class="text-xs text-slate-500 font-medium">Org: Borja Prieto</p>
+</div>
+<div class="flex items-center justify-between px-3 py-2 bg-slate-50 rounded-xl text-xs border border-slate-100">
+<div class="font-medium text-slate-600 flex items-center gap-1.5">
+<span class="text-[11px] uppercase tracking-wider text-slate-400 font-bold">Nivel:</span>
+<span class="text-[#0B1A2D] font-bold bg-white px-2 py-0.5 rounded-md border border-slate-200/60 shadow-xs">3.50 – 4.25</span>
+</div>
+<div class="text-right flex flex-col items-end leading-tight"><div class="flex items-baseline gap-1"><span class="text-[10px] font-semibold text-slate-500 uppercase tracking-wide">Socio:</span><span class="text-sm font-extrabold text-[#0B1A2D]">6.50 €</span></div><div class="flex items-baseline gap-1 text-[11px] text-slate-500"><span class="text-[9px] font-medium text-slate-400">No socio:</span><span class="font-semibold text-slate-600">8.00 €</span></div></div>
+</div>
+<div class="flex items-center justify-between pt-0.5">
+<div class="flex items-center gap-2">
+<div class="relative">
+<div class="w-8 h-8 rounded-full bg-[#0B1A2D] text-white font-bold text-xs flex items-center justify-center shadow-xs">BO</div>
+<span class="absolute -bottom-1 -right-1 bg-slate-700 text-[8px] font-bold text-white w-3.5 h-3.5 rounded-full flex items-center justify-center border border-white">R</span>
+</div>
+<div class="relative">
+<div class="w-8 h-8 rounded-full bg-slate-700 text-white font-bold text-xs flex items-center justify-center shadow-xs">AL</div>
+<span class="absolute -bottom-1 -right-1 bg-slate-700 text-[8px] font-bold text-white w-3.5 h-3.5 rounded-full flex items-center justify-center border border-white">D</span>
+</div>
+<div class="relative">
+<div class="w-8 h-8 rounded-full bg-slate-800 text-white font-bold text-xs flex items-center justify-center shadow-xs">SE</div>
+<span class="absolute -bottom-1 -right-1 bg-slate-700 text-[8px] font-bold text-white w-3.5 h-3.5 rounded-full flex items-center justify-center border border-white">R</span>
+</div>
+<div class="w-8 h-8 rounded-full border-2 border-dashed border-slate-300 flex items-center justify-center text-slate-400 hover:border-slate-400 transition-colors cursor-pointer bg-slate-50/50">
+<svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2.5" viewbox="0 0 24 24"><path d="M12 4.5v15m7.5-7.5h-15" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+</div>
+</div>
+<a class="text-xs font-bold text-[#0B1A2D] hover:text-slate-600 inline-flex items-center gap-1 transition-colors group" href="#">
+<span>ver detalle</span>
+<span aria-hidden="true" class="group-hover:translate-x-0.5 transition-transform">→</span>
+</a>
+</div>
+<div class="flex items-center justify-between pt-3 border-t border-slate-100 gap-2">
+<div class="flex items-center gap-1.5 text-xs text-slate-500 font-medium">
+<svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect height="16" rx="2" width="20" x="2" y="4"></rect><path d="M7 15h0M2 9.5h20"></path></svg>
+<span>Online/Mostrador</span>
+</div>
+<div class="flex items-center gap-1.5">
+<button aria-label="Compartir partida" class="p-2 rounded-xl bg-slate-100 hover:bg-slate-200/60 text-slate-600 hover:text-[#0B1A2D] transition-colors" type="button">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" x2="15.42" y1="13.51" y2="17.49"></line><line x1="15.41" x2="8.59" y1="6.51" y2="10.49"></line></svg>
+</button>
+<button aria-label="Avisar o notificar" class="p-2 rounded-xl bg-slate-100 hover:bg-slate-200/60 text-slate-600 hover:text-[#0B1A2D] transition-colors" type="button">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+</button>
+<button class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#B7F229] hover:bg-[#a3dc1e] text-[#0B1A2D] rounded-xl text-xs font-extrabold shadow-sm active:scale-95 transition-all" type="button">
+<svg class="w-3.5 h-3.5 text-[#0B1A2D] stroke-[2.5]" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 4.5v15m7.5-7.5h-15" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+<span>Inscribir</span>
+</button>
+</div>
+</div>
+</article>
+<!-- Card 2 -->
+<article class="bg-white rounded-2xl border border-slate-200/80 p-4 shadow-subtle space-y-3.5 hover:border-slate-300 transition-colors">
+<div class="flex items-start justify-between gap-2">
+<div class="flex items-center gap-1.5 text-xs font-semibold text-slate-700">
+<svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+<span class="text-[#0B1A2D] font-bold">Vie, 2 Oct · 18:00</span>
+<span class="text-slate-400 font-normal">· 90 min</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="inline-flex items-center gap-1 bg-[#B7F229]/20 text-[#0B1A2D] text-[10px] font-bold px-2.5 py-0.5 rounded-full border border-[#B7F229]/40">
+<span class="w-1.5 h-1.5 rounded-full bg-[#a3dc1e]"></span>
+        2 libres
+      </span>
+<span class="bg-[#8B5CF6]/10 text-[#8B5CF6] text-[10px] font-semibold px-2 py-0.5 rounded-md">
+        Masculina
+      </span>
+</div>
+</div>
+<div>
+<h2 class="text-sm font-extrabold text-[#0B1A2D] tracking-tight">Pista 4 — Indoor Classic</h2>
+<p class="text-xs text-slate-500 font-medium">Org: Elena Permuy</p>
+</div>
+<div class="flex items-center justify-between px-3 py-2 bg-slate-50 rounded-xl text-xs border border-slate-100">
+<div class="font-medium text-slate-600 flex items-center gap-1.5">
+<span class="text-[11px] uppercase tracking-wider text-slate-400 font-bold">Nivel:</span>
+<span class="text-[#0B1A2D] font-bold bg-white px-2 py-0.5 rounded-md border border-slate-200/60 shadow-xs">2.50 – 3.25</span>
+</div>
+<div class="text-right flex flex-col items-end leading-tight"><div class="flex items-baseline gap-1"><span class="text-[10px] font-semibold text-slate-500 uppercase tracking-wide">Socio:</span><span class="text-sm font-extrabold text-[#0B1A2D]">5.00 €</span></div><div class="flex items-baseline gap-1 text-[11px] text-slate-500"><span class="text-[9px] font-medium text-slate-400">No socio:</span><span class="font-semibold text-slate-600">6.50 €</span></div></div>
+</div>
+<div class="flex items-center justify-between pt-0.5">
+<div class="flex items-center gap-2">
+<div class="relative">
+<div class="w-8 h-8 rounded-full bg-[#0B1A2D] text-white font-bold text-xs flex items-center justify-center shadow-xs">EL</div>
+<span class="absolute -bottom-1 -right-1 bg-slate-700 text-[8px] font-bold text-white w-3.5 h-3.5 rounded-full flex items-center justify-center border border-white">D</span>
+</div>
+<div class="relative">
+<div class="w-8 h-8 rounded-full bg-slate-700 text-white font-bold text-xs flex items-center justify-center shadow-xs">CA</div>
+<span class="absolute -bottom-1 -right-1 bg-slate-700 text-[8px] font-bold text-white w-3.5 h-3.5 rounded-full flex items-center justify-center border border-white">R</span>
+</div>
+<div class="w-8 h-8 rounded-full border-2 border-dashed border-slate-300 flex items-center justify-center text-slate-400 hover:border-slate-400 transition-colors cursor-pointer bg-slate-50/50">
+<svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2.5" viewbox="0 0 24 24"><path d="M12 4.5v15m7.5-7.5h-15" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+</div>
+<div class="w-8 h-8 rounded-full border-2 border-dashed border-slate-300 flex items-center justify-center text-slate-400 hover:border-slate-400 transition-colors cursor-pointer bg-slate-50/50">
+<svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2.5" viewbox="0 0 24 24"><path d="M12 4.5v15m7.5-7.5h-15" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+</div>
+</div>
+<a class="text-xs font-bold text-[#0B1A2D] hover:text-slate-600 inline-flex items-center gap-1 transition-colors group" href="#">
+<span>ver detalle</span>
+<span aria-hidden="true" class="group-hover:translate-x-0.5 transition-transform">→</span>
+</a>
+</div>
+<div class="flex items-center justify-between pt-3 border-t border-slate-100 gap-2">
+<div class="flex items-center gap-1.5 text-xs text-slate-500 font-medium">
+<svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect height="16" rx="2" width="20" x="2" y="4"></rect><path d="M7 15h0M2 9.5h20"></path></svg>
+<span>Online/Mostrador</span>
+</div>
+<div class="flex items-center gap-1.5">
+<button aria-label="Compartir partida" class="p-2 rounded-xl bg-slate-100 hover:bg-slate-200/60 text-slate-600 hover:text-[#0B1A2D] transition-colors" type="button">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" x2="15.42" y1="13.51" y2="17.49"></line><line x1="15.41" x2="8.59" y1="6.51" y2="10.49"></line></svg>
+</button>
+<button aria-label="Avisar o notificar" class="p-2 rounded-xl bg-slate-100 hover:bg-slate-200/60 text-slate-600 hover:text-[#0B1A2D] transition-colors" type="button">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+</button>
+<button class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#B7F229] hover:bg-[#a3dc1e] text-[#0B1A2D] rounded-xl text-xs font-extrabold shadow-sm active:scale-95 transition-all" type="button">
+<svg class="w-3.5 h-3.5 text-[#0B1A2D] stroke-[2.5]" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 4.5v15m7.5-7.5h-15" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+<span>Inscribir</span>
+</button>
+</div>
+</div>
+</article></section>
+<!-- END: ActiveMatchCards -->
+</main>
+<!-- END: MainContent -->
+<!-- BEGIN: FloatingBottomNavigation -->
+<nav aria-label="Navegación principal" class="fixed bottom-3 inset-x-0 z-50 max-w-md mx-auto px-4 safe-bottom pointer-events-none">
+<div class="pointer-events-auto bg-white/95 backdrop-blur-md border border-slate-200/90 rounded-3xl px-3 py-2 shadow-dock flex items-center justify-between relative">
+<!-- 1) Inicio -->
+<a class="flex flex-col items-center gap-1 flex-1 py-1 text-slate-400 hover:text-brand-navy transition-colors" href="#">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<rect height="7" rx="1" width="7" x="3" y="3"></rect>
+<rect height="7" rx="1" width="7" x="14" y="3"></rect>
+<rect height="7" rx="1" width="7" x="14" y="14"></rect>
+<rect height="7" rx="1" width="7" x="3" y="14"></rect>
+</svg>
+<span class="text-[10px] font-medium tracking-tight">Inicio</span>
+</a>
+<!-- 2) Reservas -->
+<a class="flex flex-col items-center gap-1 flex-1 py-1 text-slate-400 hover:text-brand-navy transition-colors" href="#">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<path d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+<span class="text-[10px] font-medium tracking-tight">Reservas</span>
+</a>
+<!-- Master Floating Center Button (+) -->
+<div class="relative -top-5 px-1 flex-none">
+<button aria-label="Crear nueva acción rápida" class="w-13 h-13 p-3.5 rounded-full bg-[#0B1A2D] text-white shadow-xl ring-4 ring-white border-2 border-[#B7F229] flex items-center justify-center hover:scale-105 active:scale-95 transition-transform" type="button">
+<svg class="w-6 h-6 text-white stroke-[2.5]" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M12 4.5v15m7.5-7.5h-15" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</button>
+</div>
+<!-- 3) Partidas (Active State) -->
+<a class="flex flex-col items-center gap-1 flex-1 py-1 text-[#0B1A2D] transition-colors relative" href="#">
+<div class="relative">
+<svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2.2" viewbox="0 0 24 24">
+<path d="M16.5 18.75h-9m9 0a3 3 0 013 3h-15a3 3 0 013-3m9 0v-3.375c0-.621-.503-1.125-1.125-1.125h-.871M7.5 18.75v-3.375c0-.621.504-1.125 1.125-1.125h.872m5.004 0V4.875A2.625 2.625 0 0011.625 2.25h-.75a2.625 2.625 0 00-2.625 2.625v9.375m6.75 0H7.5" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</div>
+<span class="text-[10px] font-extrabold text-[#0B1A2D] tracking-tight">Partidas</span>
+</a>
+<!-- 4) TPV / Caja -->
+<a class="flex flex-col items-center gap-1 flex-1 py-1 text-slate-400 hover:text-brand-navy transition-colors" href="#">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<rect height="14" rx="2" width="20" x="2" y="5"></rect>
+<line x1="2" x2="22" y1="10" y2="10"></line>
+</svg>
+<span class="text-[10px] font-medium tracking-tight">TPV / Caja</span>
+</a>
+</div>
+</nav>
+<!-- END: FloatingBottomNavigation -->
+</div>
+</body></html>

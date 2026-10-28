@@ -37,6 +37,7 @@ import {
   Send,
   Smartphone,
   Target,
+  ChevronDown,
 } from 'lucide-react';
 
 export const AdminMatches: React.FC = () => {
@@ -285,6 +286,32 @@ export const AdminMatches: React.FC = () => {
         : `${durH}h`;
 
     return `${timePart} - ${endTimePart} (${durationLabel})`;
+  };
+
+  // Helper simplificado para fechas legibles estilo "Jue, 1 Oct · 19:30"
+  const formatSimplifiedMatchDate = (startTimeStr: string) => {
+    try {
+      let datePart = '2026-10-01';
+      let timePart = '19:30';
+      if (startTimeStr.includes('T')) {
+        const parts = startTimeStr.replace('Z', '').split('T');
+        datePart = parts[0];
+        timePart = parts[1]?.slice(0, 5) || '19:30';
+      } else if (startTimeStr.includes(' ')) {
+        const parts = startTimeStr.split(' ');
+        datePart = parts[0];
+        timePart = parts[1]?.slice(0, 5) || '19:30';
+      }
+      const [y, m, d] = datePart.split('-').map(Number);
+      const dateObj = new Date(y, (m || 10) - 1, d || 1);
+      const weekday = dateObj.toLocaleDateString('es-ES', { weekday: 'short' });
+      const capWeekday = weekday.charAt(0).toUpperCase() + weekday.slice(1).replace('.', '');
+      const month = dateObj.toLocaleDateString('es-ES', { month: 'short' });
+      const capMonth = month.charAt(0).toUpperCase() + month.slice(1).replace('.', '');
+      return `${capWeekday}, ${d} ${capMonth} · ${timePart}`;
+    } catch {
+      return startTimeStr;
+    }
   };
 
   // Pistas filtradas por la sede seleccionada en el formulario de creación
@@ -1013,212 +1040,228 @@ export const AdminMatches: React.FC = () => {
 
   return (
     <div className="space-y-6 text-slate-900 dark:text-slate-100 max-w-7xl mx-auto pb-16">
-      {/* 1. Header Oficial Pro */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <div className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
-            <Trophy className="w-3.5 h-3.5 text-emerald-500" />
-            <span>{t('matches.eyebrow', 'Matchmaking & Comunidad Play!')}</span>
-          </div>
-          <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight mt-0.5">
-            {t('matches.title', 'Gestión de Partidas Abiertas')}
+      {/* 1. Cabecera Limpia Oficial (Sin badge de comunidad play ni subtítulo) */}
+      <section className="space-y-3" data-purpose="header-section">
+        <div className="flex items-center justify-between gap-3 pt-1">
+          <h1 className="text-2xl font-extrabold text-[#0B1A2D] dark:text-white tracking-tight">
+            Partidas Abiertas
           </h1>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-2xl leading-relaxed">
-            {t(
-              'matches.subtitle',
-              `${currentTenant?.name || 'Club'} · Partidas niveladas por rating decimal, división de pago a 1/4 y convocatorias de socios.`
-            )}
-          </p>
+          <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-full">
+            {openMatches.length} activas
+          </span>
         </div>
-
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-2.5 pt-1">
           <button
             type="button"
             onClick={() => setAdminTab('agenda')}
-            className="px-3.5 py-2 rounded-xl bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 font-bold text-xs hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer border border-slate-200 dark:border-slate-800 shadow-xs flex items-center gap-1.5"
+            className="inline-flex items-center justify-center gap-2 px-3.5 py-2.5 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-xl text-xs font-bold text-[#0B1A2D] dark:text-slate-200 shadow-xs hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors active:scale-95 cursor-pointer"
           >
-            <Calendar className="w-3.5 h-3.5 text-slate-500" />
+            <Calendar className="w-4 h-4 text-slate-500" />
             <span>{t('matches.btnAgenda', 'Agenda')}</span>
           </button>
           <button
             type="button"
             onClick={() => setShowCreateModal(true)}
-            className="px-4 py-2 rounded-xl bg-[#87F229] hover:bg-[#97f842] text-[#0B1A2D] font-black text-xs shadow-md shadow-[#87F229]/25 flex items-center gap-1.5 transition active:scale-95 cursor-pointer"
+            className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-[#B7F229] hover:bg-[#a3dc1e] text-[#0B1A2D] rounded-xl text-xs font-extrabold shadow-sm active:scale-95 transition-all cursor-pointer"
           >
-            <Plus className="w-4 h-4 stroke-[3]" />
-            <span>{t('matches.btnNew', 'Crear Partida')}</span>
+            <Plus className="w-4 h-4 stroke-[2.5]" />
+            <span>{t('matches.btnNew', 'Nueva partida')}</span>
           </button>
         </div>
-      </div>
+      </section>
 
-      {/* 2. KPIs Ejecutivos de Partidas */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-1">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-            {t('matches.kpiTotal', 'Total Partidas')}
-          </span>
-          <div className="text-2xl font-black text-slate-900 dark:text-white font-mono">
-            {openMatches.length}
+      {/* 2. KPIs Ejecutivos de Partidas (Bento Grid) */}
+      <section className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4" data-purpose="bento-metrics">
+        {/* Total Partidas */}
+        <div className="bg-white dark:bg-slate-900 rounded-2xl p-3.5 sm:p-4 border border-slate-200/80 dark:border-slate-800 shadow-2xs flex flex-col justify-between relative overflow-hidden">
+          <div className="flex items-center justify-between">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+              {t('matches.kpiTotal', 'Total Partidas')}
+            </p>
+            <span className="w-6 h-6 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-400">
+              <Clock className="w-3.5 h-3.5" />
+            </span>
           </div>
-          <span className="text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1">
-            <CheckCircle2 className="w-3.5 h-3.5" />
-            <span>{fullMatchesCount} {t('matches.kpiComplete', 'Completas (4/4)')}</span>
-          </span>
+          <div className="my-1.5">
+            <span className="text-3xl font-extrabold text-[#0B1A2D] dark:text-white tracking-tight font-mono">
+              {openMatches.length}
+            </span>
+          </div>
+          <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400">
+            {fullMatchesCount} completadas (4/4)
+          </p>
         </div>
 
-        <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-1">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-            {t('matches.kpiSlots', 'Plazas Libres')}
-          </span>
-          <div className="text-2xl font-black text-amber-500 font-mono">
-            {totalOpenSlots}
+        {/* Plazas Libres */}
+        <div className="bg-white dark:bg-slate-900 rounded-2xl p-3.5 sm:p-4 border border-[#B7F229]/60 dark:border-[#B7F229]/40 shadow-2xs flex flex-col justify-between relative overflow-hidden">
+          <div className="flex items-center justify-between">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+              {t('matches.kpiSlots', 'Plazas Libres')}
+            </p>
+            <span className="px-1.5 py-0.5 rounded-full bg-[#B7F229] text-[#0B1A2D] text-[9px] font-extrabold uppercase tracking-wide">
+              Activo
+            </span>
           </div>
-          <span className="text-[11px] text-slate-500 dark:text-slate-400">
+          <div className="my-1.5 flex items-baseline gap-1.5">
+            <span className="text-3xl font-extrabold text-[#0B1A2D] dark:text-white tracking-tight font-mono">
+              {totalOpenSlots}
+            </span>
+            <span className="w-2 h-2 rounded-full bg-[#B7F229]"></span>
+          </div>
+          <p className="text-[11px] font-semibold text-[#0B1A2D] dark:text-[#B7F229]">
             {t('matches.kpiSlotsDesc', 'Buscando jugadores')}
-          </span>
+          </p>
         </div>
 
-        <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-1">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-            {t('matches.kpiPlayers', 'Jugadores Activos')}
-          </span>
-          <div className="text-2xl font-black text-emerald-600 dark:text-emerald-400 font-mono">
-            {activePlayersCount}
+        {/* Jugadores Activos */}
+        <div className="bg-white dark:bg-slate-900 rounded-2xl p-3.5 sm:p-4 border border-slate-200/80 dark:border-slate-800 shadow-2xs flex flex-col justify-between relative overflow-hidden">
+          <div className="flex items-center justify-between">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+              {t('matches.kpiPlayers', 'Jugadores Activos')}
+            </p>
+            <span className="w-6 h-6 rounded-lg bg-[#8B5CF6]/10 dark:bg-[#8B5CF6]/20 flex items-center justify-center text-[#8B5CF6]">
+              <Users className="w-3.5 h-3.5" />
+            </span>
           </div>
-          <span className="text-[11px] text-slate-500 dark:text-slate-400">
-            {t('matches.kpiPlayersDesc', 'En convocatoria Play!')}
-          </span>
+          <div className="my-1.5">
+            <span className="text-3xl font-extrabold text-[#0B1A2D] dark:text-white tracking-tight font-mono">
+              {activePlayersCount}
+            </span>
+          </div>
+          <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400">
+            {t('matches.kpiPlayersDesc', 'En convocatoria')}
+          </p>
         </div>
 
-        <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-1">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-            {t('matches.pendingRequests', 'Solicitudes de Nivel')}
-          </span>
-          <div className={`text-2xl font-black font-mono ${pendingRequestsTotal > 0 ? 'text-amber-500' : 'text-slate-900 dark:text-white'}`}>
-            {pendingRequestsTotal}
-          </div>
-          <span className="text-[11px] text-slate-500 dark:text-slate-400">
-            {pendingRequestsTotal > 0 ? 'Pendientes de aprobar' : 'Al día'}
-          </span>
-        </div>
-      </div>
-
-      {/* 3. Filtros Responsive: Pestañas de estado, Selector de Sede (si multi-sede) y Botón de filtro */}
-      <div className="space-y-3">
-        <div className="p-2 sm:p-2.5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-2xs flex items-center justify-between gap-2 flex-wrap">
-          {/* Segmented Control de Estado (Visible de forma permanente) */}
-          <div className="inline-flex items-center p-1 rounded-xl bg-slate-100 dark:bg-slate-800/80 border border-slate-200/60 dark:border-slate-700/60 text-xs font-bold overflow-x-auto shrink min-w-0">
-            <button
-              type="button"
-              onClick={() => setStatusFilter('all')}
-              className={`px-2.5 sm:px-3 py-1.5 rounded-lg transition cursor-pointer text-xs shrink-0 ${
-                statusFilter === 'all'
-                  ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xs'
-                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-              }`}
-            >
-              {t('matches.filterAll', 'Todas')} ({openMatches.length})
-            </button>
-            <button
-              type="button"
-              onClick={() => setStatusFilter('open')}
-              className={`px-2.5 sm:px-3 py-1.5 rounded-lg transition cursor-pointer text-xs shrink-0 ${
-                statusFilter === 'open'
-                  ? 'bg-white dark:bg-slate-900 text-emerald-600 dark:text-emerald-400 shadow-xs'
-                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-              }`}
-            >
-              {t('matches.filterOpen', 'Buscando')} ({openMatches.filter((m) => m.players.length < 4).length})
-            </button>
-            <button
-              type="button"
-              onClick={() => setStatusFilter('full')}
-              className={`px-2.5 sm:px-3 py-1.5 rounded-lg transition cursor-pointer text-xs shrink-0 ${
-                statusFilter === 'full'
-                  ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-xs'
-                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-              }`}
-            >
-              {t('matches.filterFull', 'Completas')} ({fullMatchesCount})
-            </button>
-          </div>
-
-          <div className="flex items-center gap-2">
-            {/* Selector de Sede (Visible ÚNICAMENTE para Clubes Multi-Sede) */}
-            {Boolean(isMultiVenue) && Array.isArray(venues) && venues.length > 1 && (
-              <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200/60 dark:border-slate-700/60 text-xs font-bold text-slate-700 dark:text-slate-300 shadow-2xs">
-                <Building2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-                <span className="text-[11px] text-slate-500 dark:text-slate-400 hidden sm:inline">Sede:</span>
-                <select
-                  value={venueFilter}
-                  onChange={(e) => setVenueFilter(e.target.value)}
-                  className="bg-transparent text-xs font-bold text-slate-800 dark:text-slate-200 focus:outline-none cursor-pointer pr-1"
-                  aria-label="Filtrar partidas por sede"
-                >
-                  <option value="all">Todas las Sedes</option>
-                  {venues
-                    .filter((v) => v.id !== 'all')
-                    .map((v) => (
-                      <option key={v.id} value={v.id}>
-                        {v.shortName || v.name}
-                      </option>
-                    ))}
-                </select>
-              </div>
+        {/* Solicitudes Nivel: Etiqueta 'Al día' en una sola línea con tono verde suave */}
+        <div className="bg-white dark:bg-slate-900 rounded-2xl p-3.5 sm:p-4 border border-slate-200/80 dark:border-slate-800 shadow-2xs flex flex-col justify-between relative overflow-hidden">
+          <div className="flex items-center justify-between gap-1.5">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 truncate">
+              {t('matches.pendingRequests', 'Solicitudes Nivel')}
+            </p>
+            {pendingRequestsTotal > 0 ? (
+              <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-400 text-[10px] font-bold border border-amber-200 dark:border-amber-800 whitespace-nowrap shrink-0">
+                {pendingRequestsTotal} pend.
+              </span>
+            ) : (
+              <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold border border-emerald-100 dark:border-emerald-800/80 whitespace-nowrap shrink-0">
+                Al día
+              </span>
             )}
-
-            {/* Configuración de Duración para Jugadores (Admin) */}
-            <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200/60 dark:border-slate-700/60 text-xs font-bold text-slate-700 dark:text-slate-300 shadow-2xs">
-              <Clock className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-              <span className="text-[11px] text-slate-500 dark:text-slate-400 hidden md:inline">Duración Jugadores:</span>
-              <button
-                type="button"
-                onClick={() => {
-                  const nextVal = !allowPlayerCustomDurations;
-                  setAllowPlayerCustomDurations(nextVal);
-                  if (typeof window !== 'undefined') {
-                    localStorage.setItem('setmio_allow_player_durations', String(nextVal));
-                  }
-                  triggerDemoToast(
-                    'Regla de Duración Actualizada',
-                    nextVal
-                      ? 'Los jugadores ahora pueden reservar en 60, 90 y 120 minutos.'
-                      : 'Reservas de jugadores restringidas únicamente a 90 minutos (predeterminada).',
-                    'info'
-                  );
-                }}
-                className={`px-2 py-0.5 rounded-md text-[10px] font-bold transition cursor-pointer ${
-                  allowPlayerCustomDurations
-                    ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30'
-                    : 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300'
-                }`}
-                title="Configurar si los jugadores pueden elegir duración (60, 90, 120 min) o solo 90 min"
-              >
-                {allowPlayerCustomDurations ? '60, 90 y 120 min' : 'Solo 90 min'}
-              </button>
-            </div>
-
-            {/* Botón de Filtro Responsive: a la misma altura, condensado en icono de filtro sin texto en móvil */}
-            <button
-              type="button"
-              onClick={openFilterModal}
-              className={`p-2 sm:px-3.5 sm:py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shrink-0 border ${
-                activeFiltersCount > 0
-                  ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-500 text-emerald-700 dark:text-emerald-300 shadow-2xs'
-                  : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700/80'
-              }`}
-              title="Abrir filtros avanzados"
-              aria-label="Filtros avanzados"
-            >
-              <Filter className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-              <span className="hidden sm:inline">Filtros</span>
-              {activeFiltersCount > 0 && (
-                <span className="w-4 h-4 rounded-full bg-emerald-500 text-white font-black text-[9px] flex items-center justify-center leading-none">
-                  {activeFiltersCount}
-                </span>
-              )}
-            </button>
           </div>
+          <div className="my-1.5">
+            <span className={`text-3xl font-extrabold tracking-tight font-mono ${pendingRequestsTotal > 0 ? 'text-amber-500' : 'text-[#0B1A2D] dark:text-white'}`}>
+              {pendingRequestsTotal}
+            </span>
+          </div>
+          <p className="text-[11px] font-medium text-slate-400 dark:text-slate-500">
+            {pendingRequestsTotal > 0 ? 'Pendientes de aprobar' : 'Sin pendientes'}
+          </p>
+        </div>
+      </section>
+
+      {/* 3. Filtros Responsive: Pestañas de estado, Selector de Sede y Botón de filtro */}
+      <section className="space-y-2.5" data-purpose="filtering-section">
+        {/* Segmented Tab Controls */}
+        <div className="p-1 bg-slate-200/60 dark:bg-slate-800/60 rounded-xl flex items-center gap-1 text-xs font-semibold">
+          <button
+            type="button"
+            onClick={() => setStatusFilter('all')}
+            className={`flex-1 py-1.5 rounded-lg text-center transition text-xs cursor-pointer ${
+              statusFilter === 'all'
+                ? 'bg-white dark:bg-slate-900 text-[#0B1A2D] dark:text-white font-bold shadow-xs'
+                : 'text-slate-600 dark:text-slate-400 hover:text-[#0B1A2D] dark:hover:text-white font-semibold'
+            }`}
+          >
+            {t('matches.filterAll', 'Todas')} ({openMatches.length})
+          </button>
+          <button
+            type="button"
+            onClick={() => setStatusFilter('open')}
+            className={`flex-1 py-1.5 rounded-lg text-center transition text-xs cursor-pointer ${
+              statusFilter === 'open'
+                ? 'bg-white dark:bg-slate-900 text-[#0B1A2D] dark:text-white font-bold shadow-xs'
+                : 'text-slate-600 dark:text-slate-400 hover:text-[#0B1A2D] dark:hover:text-white font-semibold'
+            }`}
+          >
+            {t('matches.filterOpen', 'Buscando')} ({openMatches.filter((m) => m.players.length < 4).length})
+          </button>
+          <button
+            type="button"
+            onClick={() => setStatusFilter('full')}
+            className={`flex-1 py-1.5 rounded-lg text-center transition text-xs cursor-pointer ${
+              statusFilter === 'full'
+                ? 'bg-white dark:bg-slate-900 text-[#0B1A2D] dark:text-white font-bold shadow-xs'
+                : 'text-slate-600 dark:text-slate-400 hover:text-[#0B1A2D] dark:hover:text-white font-semibold'
+            }`}
+          >
+            {t('matches.filterFull', 'Completas')} ({fullMatchesCount})
+          </button>
+        </div>
+
+        {/* Quick Filters Row */}
+        <div className="flex items-center gap-2">
+          {/* Venue Selector */}
+          <div className="relative flex-1">
+            <select
+              value={venueFilter}
+              onChange={(e) => setVenueFilter(e.target.value)}
+              className="w-full appearance-none bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs font-semibold text-[#0B1A2D] dark:text-white rounded-xl pl-8 pr-7 py-2 shadow-xs focus:ring-1 focus:ring-[#0B1A2D] focus:outline-none cursor-pointer"
+              aria-label="Filtrar por sede"
+            >
+              <option value="all">Todas las Sedes</option>
+              {venues
+                .filter((v) => v.id !== 'all')
+                .map((v) => (
+                  <option key={v.id} value={v.id}>
+                    {v.shortName || v.name}
+                  </option>
+                ))}
+            </select>
+            <div className="absolute inset-y-0 left-2.5 flex items-center pointer-events-none text-slate-400">
+              <Building2 className="w-3.5 h-3.5 text-slate-400" />
+            </div>
+            <div className="absolute inset-y-0 right-2.5 flex items-center pointer-events-none text-slate-400">
+              <ChevronDown className="w-3 h-3 text-slate-400" />
+            </div>
+          </div>
+
+          {/* Duration Pill Filter in Official Brand Violet (#8B5CF6) */}
+          <button
+            type="button"
+            onClick={() => {
+              const nextVal = !allowPlayerCustomDurations;
+              setAllowPlayerCustomDurations(nextVal);
+              if (typeof window !== 'undefined') {
+                localStorage.setItem('setmio_allow_player_durations', String(nextVal));
+              }
+              triggerDemoToast(
+                'Regla de Duración Actualizada',
+                nextVal
+                  ? 'Los jugadores ahora pueden reservar en 60, 90 y 120 minutos.'
+                  : 'Reservas restringidas únicamente a 90 minutos.',
+                'info'
+              );
+            }}
+            className="inline-flex items-center gap-1.5 px-3 py-2 bg-[#8B5CF6]/10 dark:bg-[#8B5CF6]/20 border border-[#8B5CF6]/30 dark:border-[#8B5CF6]/40 text-[#8B5CF6] dark:text-[#a78bfa] rounded-xl text-xs font-bold shadow-xs hover:bg-[#8B5CF6]/15 transition cursor-pointer shrink-0"
+            title="Configurar duración de partidas"
+          >
+            <Clock className="w-3.5 h-3.5 text-[#8B5CF6] dark:text-[#a78bfa]" />
+            <span>Solo 90 min</span>
+          </button>
+
+          {/* Filter Drawer Trigger Button */}
+          <button
+            type="button"
+            onClick={openFilterModal}
+            className={`p-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:text-[#0B1A2D] dark:hover:text-white rounded-xl shadow-xs active:scale-95 transition-all cursor-pointer shrink-0 ${
+              activeFiltersCount > 0 ? 'border-emerald-500 text-emerald-600' : ''
+            }`}
+            title="Más filtros"
+            aria-label="Más filtros"
+          >
+            <Filter className="w-4 h-4" />
+          </button>
         </div>
 
         {/* Chips de filtros activos para borrado rápido */}
@@ -1266,7 +1309,7 @@ export const AdminMatches: React.FC = () => {
             </button>
           </div>
         )}
-      </div>
+      </section>
 
       {/* ======================================================================
           MODAL DE FILTROS AVANZADOS LIMPIO
@@ -1492,189 +1535,161 @@ export const AdminMatches: React.FC = () => {
               : '2026-10-10';
 
             const pendingReqsCount = (m.slotRequests || []).filter((r) => r.status === 'pending').length;
+            const socioPrice = (m.memberPricePerPlayer !== undefined && m.memberPricePerPlayer > 0)
+              ? m.memberPricePerPlayer
+              : Math.max(0, m.pricePerPlayer - 1.5);
+            const noSocioPrice = m.pricePerPlayer;
+            const organizerDisplay = m.isClubCreated && m.players.length > 0
+              ? `Org: ${m.players[0].name}`
+              : m.isClubCreated
+              ? 'Org: Club Oficial'
+              : `Org: ${m.creatorName}`;
 
             return (
-              <div
+              <article
                 key={m.id}
                 onClick={() => openMatchDetail(m)}
-                className={`p-4 rounded-2xl bg-white dark:bg-slate-900 border transition-all duration-200 shadow-xs hover:shadow-md flex flex-col justify-between cursor-pointer group ${
+                className={`p-4 rounded-2xl bg-white dark:bg-slate-900 border transition-all duration-200 shadow-xs hover:border-slate-300 dark:hover:border-slate-700 flex flex-col justify-between cursor-pointer group space-y-3.5 ${
                   isFull
                     ? 'border-emerald-500/30 dark:border-emerald-500/20'
-                    : 'border-slate-200/90 dark:border-slate-800 hover:border-emerald-500/50'
+                    : 'border-slate-200/80 dark:border-slate-800 hover:shadow-md'
                 }`}
               >
-                <div className="space-y-3">
-                  {/* Fila Superior: Fecha, Pista y Badges Pro */}
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-1.5 text-xs font-mono font-bold text-slate-800 dark:text-slate-200">
-                        <Clock className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-                        <span>{startDateFormatted} · {formatMatchTimeWithDuration(m.startTime, m.durationMinutes)}</span>
-                      </div>
-                      <div className="text-sm font-black text-slate-900 dark:text-white mt-0.5 truncate group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition">
-                        {m.courtName}
-                      </div>
-
-                      {/* Creador: Club o Socio */}
-                      <div className="flex items-center gap-1.5 text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 flex-wrap">
-                        {m.isClubCreated ? (
-                          <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-bold">
-                            <Shield className="w-3 h-3" />
-                            <span>Club Oficial</span>
-                          </span>
-                        ) : (
-                          <span className="truncate">Org: {m.creatorName}</span>
-                        )}
-
-                        {isMultiVenue && (m.venueShortName || m.venueName) && (
-                          <span className="inline-flex items-center gap-1 px-1.5 py-0.2 rounded bg-indigo-50 dark:bg-indigo-950/80 text-indigo-700 dark:text-indigo-300 font-bold text-[9px] border border-indigo-200 dark:border-indigo-800">
-                            <Building2 className="w-2.5 h-2.5 text-indigo-500 shrink-0" />
-                            <span className="truncate max-w-[80px]">{m.venueShortName || m.venueName}</span>
-                          </span>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Badges estilizados */}
-                    <div className="flex flex-col items-end gap-1 shrink-0">
-                      <span
-                        className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider ${
-                          isFull
-                            ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300'
-                            : 'bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300'
-                        }`}
-                      >
-                        {isFull ? t('matches.statusFull', 'Completa') : `${openSlots} ${t('matches.statusNeedPlayers', 'libres')}`}
-                      </span>
-
-                      {/* Género + Visibilidad */}
-                      <div className="flex items-center gap-1">
-                        <span
-                          className={`text-[9px] font-bold px-1.5 py-0.5 rounded-md ${
-                            m.gender === 'female'
-                              ? 'bg-pink-50 dark:bg-pink-950/60 text-pink-700 dark:text-pink-300 border border-pink-200 dark:border-pink-800'
-                              : m.gender === 'mixed'
-                              ? 'bg-teal-50 dark:bg-teal-950/60 text-teal-700 dark:text-teal-300 border border-teal-200 dark:border-teal-800'
-                              : 'bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800'
-                          }`}
-                        >
-                          {m.gender === 'female' ? 'Femenina' : m.gender === 'mixed' ? 'Mixta' : 'Masculina'}
-                        </span>
-
-                        <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 flex items-center gap-0.5">
-                          {m.visibility === 'group' ? (
-                            <>
-                              <Users className="w-2.5 h-2.5" />
-                              <span className="truncate max-w-[70px]">{m.restrictedGroupName || 'Grupo'}</span>
-                            </>
-                          ) : m.visibility === 'private' ? (
-                            <>
-                              <Lock className="w-2.5 h-2.5" />
-                              <span>Privada</span>
-                            </>
-                          ) : (
-                            <>
-                              <Globe className="w-2.5 h-2.5" />
-                              <span>Pública</span>
-                            </>
-                          )}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Nivel ELO & Modalidad de Cobro */}
-                  <div className="flex items-center justify-between text-xs py-1.5 px-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800/80">
-                    <span className="text-slate-500 dark:text-slate-400 text-[11px]">
-                      Nivel: <strong className="text-slate-800 dark:text-slate-200 font-mono">{m.minLevel.toFixed(2)} - {m.maxLevel.toFixed(2)}</strong>
+                {/* 1. Fila Superior: Fecha y Hora Simplificada + Badges de Plazas y Género */}
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300">
+                    <Clock className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                    <span className="text-[#0B1A2D] dark:text-white font-bold">
+                      {formatSimplifiedMatchDate(m.startTime)}
                     </span>
-                    <div className="flex items-center gap-1.5">
-                      <span className="font-mono font-black text-slate-900 dark:text-white">
-                        {m.paymentMode === 'single' ? (m.pricePerPlayer * 4).toFixed(2) : m.pricePerPlayer.toFixed(2)} €
-                      </span>
-                      <span className="text-[9px] text-slate-400 font-semibold">
-                        {m.paymentMode === 'single' ? '(Pista)' : '(1/4)'}
-                      </span>
-                    </div>
+                    <span className="text-slate-400 font-normal">· {m.durationMinutes || 90} min</span>
                   </div>
 
-                  {/* Avatares de Jugadores Pro (compactos con badges de posición) */}
-                  <div>
-                    <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">
-                      <span>Plazas ({m.players.length}/4)</span>
-                      {pendingReqsCount > 0 ? (
-                        <span className="text-amber-500 font-bold flex items-center gap-1">
-                          <AlertCircle className="w-3 h-3" />
-                          <span>{pendingReqsCount} petición{pendingReqsCount > 1 ? 'es' : ''}</span>
-                        </span>
-                      ) : (
-                        <span className="text-emerald-600 dark:text-emerald-400 lowercase font-normal group-hover:underline">
-                          Ver detalle →
-                        </span>
-                      )}
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    {isFull ? (
+                      <span className="inline-flex items-center gap-1 bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 text-[10px] font-bold px-2.5 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                        Completa
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 bg-[#B7F229]/20 text-[#0B1A2D] dark:text-[#B7F229] text-[10px] font-bold px-2.5 py-0.5 rounded-full border border-[#B7F229]/40">
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#a3dc1e]"></span>
+                        {openSlots} {openSlots === 1 ? 'libre' : 'libres'}
+                      </span>
+                    )}
+
+                    <span className="bg-[#8B5CF6]/10 text-[#8B5CF6] dark:text-[#a78bfa] text-[10px] font-semibold px-2 py-0.5 rounded-md">
+                      {m.gender === 'female' ? 'Femenina' : m.gender === 'mixed' ? 'Mixta' : 'Masculina'}
+                    </span>
+                  </div>
+                </div>
+
+                {/* 2. Pista y Organizador */}
+                <div>
+                  <h2 className="text-sm font-extrabold text-[#0B1A2D] dark:text-white tracking-tight truncate group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition">
+                    {m.courtName}
+                  </h2>
+                  <div className="flex items-center gap-2 mt-0.5">
+                    <p className="text-xs text-slate-500 dark:text-slate-400 font-medium truncate">
+                      {organizerDisplay}
+                    </p>
+                    {isMultiVenue && (m.venueShortName || m.venueName) && (
+                      <span className="inline-flex items-center gap-1 px-1.5 py-0.2 rounded bg-indigo-50 dark:bg-indigo-950/80 text-indigo-700 dark:text-indigo-300 font-bold text-[9px] border border-indigo-200 dark:border-indigo-800 shrink-0">
+                        <Building2 className="w-2.5 h-2.5 text-indigo-500 shrink-0" />
+                        <span className="truncate max-w-[80px]">{m.venueShortName || m.venueName}</span>
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* 3. Nivel ELO & Desglose de Precios (Socio / No socio) */}
+                <div className="flex items-center justify-between px-3 py-2 bg-slate-50 dark:bg-slate-950/70 rounded-xl text-xs border border-slate-100 dark:border-slate-800/80">
+                  <div className="font-medium text-slate-600 dark:text-slate-300 flex items-center gap-1.5">
+                    <span className="text-[11px] uppercase tracking-wider text-slate-400 font-bold">Nivel:</span>
+                    <span className="text-[#0B1A2D] dark:text-white font-bold bg-white dark:bg-slate-900 px-2 py-0.5 rounded-md border border-slate-200/60 dark:border-slate-800 shadow-2xs font-mono">
+                      {m.minLevel.toFixed(2)} – {m.maxLevel.toFixed(2)}
+                    </span>
+                  </div>
+
+                  <div className="text-right flex flex-col items-end leading-tight">
+                    <div className="flex items-baseline gap-1">
+                      <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wide">Socio:</span>
+                      <span className="text-sm font-extrabold text-[#0B1A2D] dark:text-white font-mono">
+                        {socioPrice.toFixed(2)} €
+                      </span>
                     </div>
-
-                    <div className="flex items-center gap-2">
-                      {/* Jugadores confirmados con avatar pequeño */}
-                      {m.players.map((p, idx) => (
-                        <div
-                          key={idx}
-                          role="button"
-                          tabIndex={0}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            navigateToPlayerProfile(p.name, 'matches');
-                          }}
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter' || e.key === ' ') {
-                              e.stopPropagation();
-                              navigateToPlayerProfile(p.name, 'matches');
-                            }
-                          }}
-                          className="relative group/avatar cursor-pointer hover:scale-110 transition-transform"
-                          title={`${p.name} · Ver perfil del jugador · Nivel ${p.level.toFixed(2)} (${p.position}) · ${p.paid ? 'Pagado' : 'Pendiente de pago'}`}
-                        >
-                          <div className="w-8 h-8 rounded-full bg-emerald-600 text-white font-black text-xs flex items-center justify-center border-2 border-white dark:border-slate-900 shadow-xs group-hover/avatar:ring-2 group-hover/avatar:ring-emerald-400">
-                            {p.name.slice(0, 2).toUpperCase()}
-                          </div>
-                          {/* Mini badge de posición */}
-                          <span
-                            className={`absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full text-[8px] font-black flex items-center justify-center border border-white dark:border-slate-900 ${
-                              p.position === 'drive'
-                                ? 'bg-amber-400 text-slate-950'
-                                : p.position === 'reves'
-                                ? 'bg-indigo-400 text-white'
-                                : 'bg-emerald-400 text-slate-950'
-                            }`}
-                          >
-                            {p.position === 'drive' ? 'D' : p.position === 'reves' ? 'R' : 'A'}
-                          </span>
-                        </div>
-                      ))}
-
-                      {/* Plazas libres con placeholder circular */}
-                      {Array.from({ length: openSlots }).map((_, emptyIdx) => (
-                        <button
-                          key={`empty-${emptyIdx}`}
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setSelectedMatchForAdd(m);
-                          }}
-                          className="w-8 h-8 rounded-full border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 text-slate-400 hover:text-emerald-600 flex items-center justify-center text-xs font-bold transition cursor-pointer"
-                          title="Inscribir jugador en esta plaza"
-                        >
-                          +
-                        </button>
-                      ))}
+                    <div className="flex items-baseline gap-1 text-[11px] text-slate-500 dark:text-slate-400">
+                      <span className="text-[9px] font-medium text-slate-400">No socio:</span>
+                      <span className="font-semibold text-slate-600 dark:text-slate-300 font-mono">
+                        {noSocioPrice.toFixed(2)} €
+                      </span>
                     </div>
                   </div>
                 </div>
 
-                {/* Footer de Acciones Rápidas */}
-                <div className="pt-3 mt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-xs">
-                  <div className="flex items-center gap-1.5 text-[10px] text-slate-500">
-                    <CreditCard className="w-3 h-3 text-slate-400" />
+                {/* 4. Avatares de Jugadores y Plazas Libres */}
+                <div className="flex items-center justify-between pt-0.5">
+                  <div className="flex items-center gap-2">
+                    {m.players.map((p, idx) => (
+                      <div
+                        key={idx}
+                        role="button"
+                        tabIndex={0}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigateToPlayerProfile(p.name, 'matches');
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.stopPropagation();
+                            navigateToPlayerProfile(p.name, 'matches');
+                          }
+                        }}
+                        className="relative group/avatar cursor-pointer hover:scale-105 transition-transform"
+                        title={`${p.name} · Ver perfil del jugador · Nivel ${p.level.toFixed(2)} (${p.position}) · ${p.paid ? 'Pagado' : 'Pendiente de pago'}`}
+                      >
+                        <div
+                          className={`w-8 h-8 rounded-full ${
+                            idx === 0 ? 'bg-[#0B1A2D]' : 'bg-slate-700 dark:bg-slate-800'
+                          } text-white font-bold text-xs flex items-center justify-center shadow-xs border border-white/20`}
+                        >
+                          {p.name.slice(0, 2).toUpperCase()}
+                        </div>
+                        <span className="absolute -bottom-1 -right-1 bg-slate-700 text-[8px] font-bold text-white w-3.5 h-3.5 rounded-full flex items-center justify-center border border-white dark:border-slate-900">
+                          {p.position === 'drive' ? 'D' : p.position === 'reves' ? 'R' : 'A'}
+                        </span>
+                      </div>
+                    ))}
+
+                    {/* Plazas libres con placeholder circular interactivo */}
+                    {Array.from({ length: openSlots }).map((_, emptyIdx) => (
+                      <button
+                        key={`empty-${emptyIdx}`}
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedMatchForAdd(m);
+                        }}
+                        className="w-8 h-8 rounded-full border-2 border-dashed border-slate-300 dark:border-slate-700 flex items-center justify-center text-slate-400 hover:border-slate-400 dark:hover:border-slate-500 transition-colors cursor-pointer bg-slate-50/50 dark:bg-slate-800/40"
+                        title="Inscribir jugador en esta plaza"
+                      >
+                        <Plus className="w-3.5 h-3.5 text-slate-400 stroke-[2.5]" />
+                      </button>
+                    ))}
+                  </div>
+
+                  <span className="text-xs font-bold text-[#0B1A2D] dark:text-slate-200 hover:text-slate-600 dark:hover:text-slate-400 inline-flex items-center gap-1 transition-colors group/detail">
+                    <span>ver detalle</span>
+                    <span aria-hidden="true" className="group-hover/detail:translate-x-0.5 transition-transform">
+                      →
+                    </span>
+                  </span>
+                </div>
+
+                {/* 5. Footer de Acciones Rápidas */}
+                <div className="flex items-center justify-between pt-3 border-t border-slate-100 dark:border-slate-800/80 gap-2">
+                  <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 font-medium">
+                    <CreditCard className="w-3.5 h-3.5 text-slate-400" />
                     <span>
                       {m.paymentPolicy === 'online_only'
                         ? 'Online'
@@ -1686,60 +1701,47 @@ export const AdminMatches: React.FC = () => {
 
                   <div className="flex items-center gap-1.5">
                     <button
+                      aria-label="Copiar enlace de partida"
                       type="button"
                       onClick={(e) => {
                         e.stopPropagation();
                         handleCopyMatchLink(m.id);
                       }}
-                      className="p-1.5 rounded-lg text-slate-400 hover:text-emerald-600 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+                      className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200/60 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 hover:text-[#0B1A2D] dark:hover:text-white transition-colors cursor-pointer"
                       title="Copiar enlace"
                     >
                       <Copy className="w-3.5 h-3.5" />
                     </button>
 
                     <button
+                      aria-label="Compartir o notificar"
                       type="button"
                       onClick={(e) => {
                         e.stopPropagation();
                         handleOpenShareNotifyHub(m);
                       }}
-                      className="px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 font-bold text-[11px] border border-emerald-300 dark:border-emerald-800 transition cursor-pointer shadow-2xs active:scale-95 flex items-center gap-1"
-                      title="Compartir / Notificar"
+                      className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200/60 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 hover:text-[#0B1A2D] dark:hover:text-white transition-colors cursor-pointer"
+                      title="Compartir o notificar"
                     >
-                      <Share2 className="w-3 h-3 text-emerald-500" />
-                      <span>Compartir / Notificar</span>
+                      <Share2 className="w-3.5 h-3.5" />
                     </button>
 
                     {!isFull && (
-                      <>
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleOpenNotifyGroup(m);
-                          }}
-                          className="px-2 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 font-bold text-[11px] transition cursor-pointer flex items-center gap-1"
-                          title="Notificar a grupo"
-                        >
-                          <Megaphone className="w-3 h-3 text-slate-500" />
-                          <span className="hidden xl:inline">Notificar a grupo</span>
-                        </button>
-
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setSelectedMatchForAdd(m);
-                          }}
-                          className="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[11px] transition cursor-pointer shadow-xs active:scale-95"
-                        >
-                          + Inscribir
-                        </button>
-                      </>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedMatchForAdd(m);
+                        }}
+                        className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#B7F229] hover:bg-[#a3dc1e] text-[#0B1A2D] rounded-xl text-xs font-extrabold shadow-xs active:scale-95 transition-all cursor-pointer"
+                      >
+                        <Plus className="w-3.5 h-3.5 text-[#0B1A2D] stroke-[2.5]" />
+                        <span>Inscribir</span>
+                      </button>
                     )}
                   </div>
                 </div>
-              </div>
+              </article>
             );
           })}
         </div>

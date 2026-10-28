@@ -103,22 +103,22 @@ export const BookingListItem: React.FC<BookingListItemProps> = ({
     if (raw === 'pendiente tpv' || raw === 'pending' || payRaw === 'pending' || payRaw === 'partially_paid') {
       return {
         label: 'PENDIENTE TPV',
-        style: 'bg-amber-50 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300 border-amber-300 dark:border-amber-800',
-        icon: <AlertCircle className="w-3 h-3 text-amber-500" />,
+        style: 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200/90 dark:border-slate-700',
+        icon: <AlertCircle className="w-3 h-3 text-slate-500 dark:text-slate-400 shrink-0" />,
       };
     }
-    // Pagado or Confirmada
+    // Pagado or Confirmada: Verde Lima #B7F229 y Azul Profundo #0B1A2D idéntico a Inicio
     if (raw === 'pagado' || payRaw === 'paid') {
       return {
         label: 'PAGADO',
-        style: 'bg-emerald-50 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 border-emerald-300 dark:border-emerald-800',
-        icon: <CheckCircle2 className="w-3 h-3 text-emerald-500" />,
+        style: 'bg-[#F0FCCF] dark:bg-[#B7F229]/20 text-[#0B1A2D] dark:text-[#B7F229] border-[#B7F229]/50 dark:border-[#B7F229]/40',
+        icon: <CheckCircle2 className="w-3 h-3 text-[#659b02] dark:text-[#B7F229] shrink-0" />,
       };
     }
     return {
       label: 'CONFIRMADA',
-      style: 'bg-emerald-50 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 border-emerald-300 dark:border-emerald-800',
-      icon: <CheckCircle2 className="w-3 h-3 text-emerald-500" />,
+      style: 'bg-[#F0FCCF] dark:bg-[#B7F229]/20 text-[#0B1A2D] dark:text-[#B7F229] border-[#B7F229]/50 dark:border-[#B7F229]/40',
+      icon: <CheckCircle2 className="w-3 h-3 text-[#659b02] dark:text-[#B7F229] shrink-0" />,
     };
   };
 
@@ -132,8 +132,11 @@ export const BookingListItem: React.FC<BookingListItemProps> = ({
       : booking.category === 'tournament'
       ? 'Torneo Oficial'
       : booking.category === 'private'
-      ? 'Pista Privada'
-      : 'Pádel Abierto 4.0');
+      ? 'Reserva Directa'
+      : 'Pádel Abierto');
+
+  const { selectedVenueId } = useApp();
+  const showVenue = selectedVenueId === 'all' && (booking.venueShortName || booking.venueName);
 
   return (
     <div
@@ -146,78 +149,93 @@ export const BookingListItem: React.FC<BookingListItemProps> = ({
           onClick?.();
         }
       }}
-      className={`w-full p-3.5 sm:p-4 rounded-2xl bg-white dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 hover:border-emerald-500/60 hover:shadow-md transition text-left cursor-pointer group flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 shadow-sm ${className}`}
+      className={`w-full bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200/80 dark:border-slate-800 shadow-[0_2px_10px_rgba(11,28,48,0.03)] space-y-3 hover:border-[#8B5CF6]/50 dark:hover:border-[#8B5CF6]/60 transition-colors text-left cursor-pointer group active:scale-[0.99] ${className}`}
     >
-      {/* IZQUIERDA: Badge con hora (en tonalidad menta) + Tag de Pista y Sede */}
-      <div className="flex flex-wrap items-center gap-2 sm:gap-2.5 min-w-0 max-w-full">
-        <div className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/70 border border-emerald-500/20 text-emerald-700 dark:text-emerald-300 font-mono font-bold text-xs shrink-0 group-hover:border-emerald-500/50 transition">
-          <Clock className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+      {/* 1. Top Chips Ribbon: Horario y Pista */}
+      <div className="flex flex-wrap items-center gap-1.5">
+        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-semibold text-xs">
+          <Clock className="w-3.5 h-3.5 text-slate-400 dark:text-slate-400 shrink-0" />
           <span>{timeText}</span>
         </div>
 
-        <span className="px-2 sm:px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-700/80 text-slate-700 dark:text-slate-200 font-bold text-xs border border-slate-200 dark:border-slate-600/70 truncate max-w-[160px] sm:max-w-none min-w-0">
+        <div className="px-2.5 py-1 rounded-lg bg-slate-100/90 dark:bg-slate-800/70 text-slate-700 dark:text-slate-300 font-semibold text-xs truncate max-w-[200px] border border-slate-200/50 dark:border-slate-700/50">
           {booking.courtName}
-        </span>
-
-        {(booking.venueShortName || booking.venueName) && (
-          <span className="px-2 py-0.5 rounded-lg bg-indigo-50 dark:bg-indigo-950/70 text-indigo-700 dark:text-indigo-300 font-bold text-[10px] border border-indigo-200 dark:border-indigo-800 flex items-center gap-1 min-w-0 max-w-[140px] sm:max-w-none shrink-0">
-            <Building2 className="w-3 h-3 text-indigo-500 shrink-0" />
-            <span className="truncate">{booking.venueShortName || booking.venueName}</span>
-          </span>
-        )}
+        </div>
       </div>
 
-      {/* CENTRO: Nombre del Titular + Tipo de reserva */}
-      <div className="min-w-0 flex-1">
-        <div className="font-bold text-sm text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition truncate">
-          {booking.creatorName}
+      {/* 2. Etiqueta de Sede (Visible únicamente en vista consolidada 'Todas las Sedes') */}
+      {showVenue && (
+        <div>
+          <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#8B5CF6]/10 dark:bg-[#8B5CF6]/20 text-[#8B5CF6] dark:text-[#a78bfa] text-xs font-semibold">
+            <Building2 className="w-3.5 h-3.5 shrink-0" />
+            <span className="truncate">{booking.venueShortName || booking.venueName}</span>
+          </div>
         </div>
-        <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 truncate flex flex-wrap items-center gap-1.5 sm:gap-2">
-          <span>{typeText}</span>
+      )}
+
+      {/* 3. Nombre del Titular y Detalles de la Partida */}
+      <div>
+        <h3 className="text-base font-bold text-slate-900 dark:text-white group-hover:text-[#8B5CF6] transition-colors truncate">
+          {booking.creatorName}
+          {booking.creatorMemberNum && (
+            <span className="ml-1.5 text-xs font-normal text-slate-400 dark:text-slate-500">
+              ({booking.creatorMemberNum})
+            </span>
+          )}
+        </h3>
+
+        <div className="flex flex-wrap items-center gap-2 mt-1">
+          <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+            {typeText}
+          </span>
           {booking.mode && (
             <span
-              className={`px-1.5 py-0.5 rounded-md text-[10px] font-bold ${
+              className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
                 booking.mode === 'competitive'
-                  ? 'bg-indigo-50 dark:bg-indigo-950/70 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800'
-                  : 'bg-emerald-50 dark:bg-emerald-950/70 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800'
+                  ? 'bg-[#8B5CF6]/15 dark:bg-[#8B5CF6]/30 text-[#8B5CF6] dark:text-[#c4b5fd]'
+                  : 'bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300'
               }`}
             >
               {booking.mode === 'competitive' ? 'Competitivo' : 'Amistoso'}
             </span>
           )}
           {booking.gender && (
-            <span className="px-1.5 py-0.5 rounded-md text-[10px] font-bold bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-600">
+            <span className="px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-[10px] font-semibold">
               {booking.gender === 'male' ? 'Masc' : booking.gender === 'female' ? 'Fem' : 'Mixto'}
             </span>
           )}
           {booking.sport && (
-            <>
-              <span className="text-slate-300 dark:text-slate-600">·</span>
-              <span className="text-[11px] text-slate-400 dark:text-slate-500">{booking.sport}</span>
-            </>
+            <span className="text-xs text-slate-400 dark:text-slate-500">
+              · {booking.sport}
+            </span>
           )}
         </div>
       </div>
 
-      {/* DERECHA: Columna vertical limpia: Arriba precio en negrita mono, abajo Badge de estado + Código PIN alineados */}
-      <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-center gap-1.5 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-100 dark:border-slate-800">
-        {/* Arriba: Precio en negrita mono destacado bien alineado a la derecha */}
-        <div className="font-black font-mono text-base text-slate-900 dark:text-white sm:text-right tracking-tight">
-          {formatPrice()}
+      {/* 4. Divisor sutil */}
+      <div className="border-t border-slate-100 dark:border-slate-800/80"></div>
+
+      {/* 5. Pie de Tarjeta: Importe + Píldora de Pago + Píldora de PIN */}
+      <div className="flex items-center justify-between pt-0.5 gap-2">
+        <div className="flex items-baseline gap-1">
+          <span className="text-lg sm:text-xl font-black font-mono text-slate-900 dark:text-white tracking-tight">
+            {formatPrice()}
+          </span>
         </div>
 
-        {/* Abajo: Badge de estado + Código PIN alineados horizontalmente */}
         <div className="flex items-center gap-2">
+          {/* Pastilla de Estado de Pago (Estilo idéntico a Inicio) */}
           <span
-            className={`px-2.5 py-0.5 rounded-lg text-[10px] font-black uppercase tracking-wider inline-flex items-center gap-1.5 border shadow-xs whitespace-nowrap ${statusInfo.style}`}
+            className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider border shadow-2xs whitespace-nowrap ${statusInfo.style}`}
           >
             {statusInfo.icon}
             <span>{statusInfo.label}</span>
           </span>
 
-          <span className="inline-flex items-center gap-1.5 text-[11px] font-mono font-bold text-[#0B1A2D] dark:text-slate-200 bg-slate-50 dark:bg-slate-800/80 px-2.5 py-0.5 rounded-lg border border-slate-200/70 dark:border-slate-700/80 whitespace-nowrap">
-            <KeyRound className="w-3 h-3 text-[#0B1A2D] dark:text-slate-300" />
-            <span>PIN: <strong className="text-[#0B1A2D] dark:text-white font-extrabold">{pinCode}</strong></span>
+          {/* Pastilla de Código PIN Domótico (Contenedor neutro y limpio) */}
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-50 dark:bg-slate-800/80 text-[#0B1A2D] dark:text-slate-200 font-mono text-[11px] font-bold border border-slate-200/70 dark:border-slate-700/80 whitespace-nowrap shadow-2xs">
+            <KeyRound className="w-3.5 h-3.5 text-[#0B1A2D] dark:text-slate-300 shrink-0" />
+            <span>PIN: <strong className="text-[#0B1A2D] dark:text-white font-black">{pinCode}</strong></span>
           </span>
         </div>
       </div>

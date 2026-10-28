@@ -402,7 +402,7 @@ export const AllBookingsPage: React.FC<AllBookingsPageProps> = ({
           <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 block mb-0.5">
             Pendiente TPV
           </span>
-          <div className="text-xl sm:text-2xl font-black font-mono text-amber-600 dark:text-amber-400">
+          <div className="text-xl sm:text-2xl font-black font-mono text-slate-800 dark:text-slate-100">
             {pendingCount}
           </div>
         </div>
@@ -558,8 +558,8 @@ export const AllBookingsPage: React.FC<AllBookingsPageProps> = ({
               onClick={() => setStatusFilter('pending')}
               className={`flex-1 py-1 px-1.5 rounded-lg font-bold text-[11px] transition text-center cursor-pointer ${
                 statusFilter === 'pending'
-                  ? 'bg-amber-600 text-white shadow-xs'
-                  : 'text-amber-700 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/40'
+                  ? 'bg-slate-800 dark:bg-slate-700 text-white shadow-xs'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
               Pendientes TPV

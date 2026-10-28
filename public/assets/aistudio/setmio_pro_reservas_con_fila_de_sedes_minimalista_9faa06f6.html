@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>SETMIO PRO - Reservas y Disponibilidad</title>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Google Fonts: Plus Jakarta Sans -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "surface-container-high": "#dce9ff",
+            "background": "#f8f9ff",
+            "inverse-surface": "#213145",
+            "inverse-on-surface": "#eaf1ff",
+            "surface-variant": "#d3e4fe",
+            "tertiary-fixed-dim": "#a0d800",
+            "on-secondary-fixed": "#23005c",
+            "surface-dim": "#cbdbf5",
+            "secondary-fixed": "#e9ddff",
+            "on-primary": "#ffffff",
+            "surface-tint": "#515f75",
+            "on-tertiary-fixed-variant": "#374e00",
+            "on-secondary-container": "#fffbff",
+            "on-secondary-fixed-variant": "#5516be",
+            "surface-container": "#e5eeff",
+            "on-tertiary": "#ffffff",
+            "tertiary": "#000000",
+            "secondary-container": "#8455ef",
+            "outline": "#75777d",
+            "primary": "#000000",
+            "tertiary-fixed": "#baf62d",
+            "on-tertiary-fixed": "#141f00",
+            "primary-container": "#0d1c2f",
+            "primary-fixed-dim": "#b9c7e1",
+            "surface": "#f8f9ff",
+            "on-primary-container": "#76859c",
+            "outline-variant": "#c5c6cd",
+            "on-error-container": "#93000a",
+            "on-primary-fixed-variant": "#3a475d",
+            "surface-container-highest": "#d3e4fe",
+            "secondary-fixed-dim": "#d0bcff",
+            "tertiary-container": "#141f00",
+            "error-container": "#ffdad6",
+            "on-surface-variant": "#44474c",
+            "on-secondary": "#ffffff",
+            "surface-bright": "#f8f9ff",
+            "inverse-primary": "#b9c7e1",
+            "surface-container-lowest": "#ffffff",
+            "secondary": "#6b38d4",
+            "on-tertiary-container": "#6a9000",
+            "surface-container-low": "#eff4ff",
+            "on-primary-fixed": "#0d1c2f",
+            "on-surface": "#0b1c30",
+            "error": "#ba1a1a",
+            "primary-fixed": "#d5e3fe",
+            "on-error": "#ffffff",
+            "on-background": "#0b1c30"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "margin": "2rem",
+            "space-sm": "0.5rem",
+            "space-md": "1rem",
+            "space-xl": "2rem",
+            "margin-mobile": "1rem",
+            "space-lg": "1.5rem",
+            "gutter-mobile": "0.75rem",
+            "gutter": "1.5rem",
+            "space-xs": "0.25rem"
+          },
+          "fontFamily": {
+            "body-lg": ["Plus Jakarta Sans"],
+            "body-sm": ["Plus Jakarta Sans"],
+            "display-lg-mobile": ["Plus Jakarta Sans"],
+            "headline-lg": ["Plus Jakarta Sans"],
+            "label-lg": ["Plus Jakarta Sans"],
+            "headline-md": ["Plus Jakarta Sans"],
+            "display-lg": ["Plus Jakarta Sans"],
+            "label-md": ["Plus Jakarta Sans"],
+            "label-sm": ["Plus Jakarta Sans"],
+            "headline-sm": ["Plus Jakarta Sans"],
+            "body-md": ["Plus Jakarta Sans"]
+          },
+          "fontSize": {
+            "body-lg": ["16px", { lineHeight: "24px", fontWeight: "400" }],
+            "body-sm": ["12px", { lineHeight: "18px", fontWeight: "400" }],
+            "display-lg-mobile": ["30px", { lineHeight: "38px", letterSpacing: "-0.02em", fontWeight: "800" }],
+            "headline-lg": ["28px", { lineHeight: "36px", letterSpacing: "-0.02em", fontWeight: "700" }],
+            "label-lg": ["14px", { lineHeight: "20px", letterSpacing: "0.01em", fontWeight: "600" }],
+            "headline-md": ["22px", { lineHeight: "30px", letterSpacing: "-0.015em", fontWeight: "700" }],
+            "display-lg": ["40px", { lineHeight: "48px", letterSpacing: "-0.03em", fontWeight: "800" }],
+            "label-md": ["12px", { lineHeight: "16px", letterSpacing: "0.02em", fontWeight: "600" }],
+            "label-sm": ["10px", { lineHeight: "14px", letterSpacing: "0.04em", fontWeight: "700" }],
+            "headline-sm": ["18px", { lineHeight: "26px", letterSpacing: "-0.01em", fontWeight: "600" }],
+            "body-md": ["14px", { lineHeight: "20px", fontWeight: "400" }]
+          }
+        },
+      },
+    }
+  </script>
+<style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      -webkit-font-smoothing: antialiased;
+      background-color: #f8f9ff;
+    }
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 500, 'GRAD' 0, 'opsz' 24;
+      display: inline-block;
+      vertical-align: middle;
+      line-height: 1;
+    }
+    /* Hide scrollbar for clean horizontal ribbon */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-surface text-on-surface antialiased pb-28 selection:bg-tertiary-fixed selection:text-on-primary-fixed">
+<!-- ========================================== -->
+<!-- 1. TOP APP BAR (Shared Component Anchor)    -->
+<!-- ========================================== -->
+<header class="sticky top-0 z-40 bg-surface/95 backdrop-blur-md"><div class="flex justify-between items-center w-full px-4 h-16 max-w-md mx-auto"><div class="flex items-center gap-2"><div class="flex items-center text-primary-container"><span class="material-symbols-outlined text-[26px] mr-1 text-on-surface" data-icon="sports_tennis">sports_tennis</span><span class="text-headline-md font-headline-md font-bold tracking-tight text-on-surface uppercase">SETMIO</span></div><span class="bg-secondary text-white text-label-sm font-label-sm px-2 py-0.5 rounded-full shadow-sm tracking-wider uppercase font-bold">PRO</span></div><div class="flex items-center gap-2.5"><button class="relative p-2 rounded-xl text-on-surface-variant hover:bg-surface-container active:scale-95 transition-transform duration-150"><span class="material-symbols-outlined text-[24px]" data-icon="notifications">notifications</span><span class="absolute top-1.5 right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-tertiary-fixed text-on-tertiary-fixed font-bold text-[10px] ring-2 ring-surface">3</span></button><button class="p-2 rounded-xl text-secondary bg-surface-container hover:bg-surface-container-high active:scale-95 transition-transform duration-150"><span class="material-symbols-outlined text-[20px]" data-icon="auto_awesome">auto_awesome</span></button><div class="relative flex items-center pl-1 cursor-pointer"><div class="relative"><img alt="Director profile photo" class="w-9 h-9 rounded-full object-cover ring-2 ring-surface-container-highest" data-alt="Director profile photo" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDLEFbQYX5bt7yaKjZODcm2SS-o2o1CZ5U1-hQt_g0ILLrVS9rmGhO73y1d9lWFATEY0hKLE1XdLnJt_WsFsc3FiRZfKNx-ntVOm9TAvHte1vXzwhylodpdBUqtk3F2ns5IF9ZgH7yMt92ko8xESo8W_A0WxN2BAPEglUTnmAllOzgI-5ot2ELcj60zIxyaVHWl1QgArXZs6M0zvzkTdfyxZ_chntM5m3S01B85o8U"/><span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-tertiary-fixed rounded-full ring-2 ring-surface"></span></div><span class="material-symbols-outlined text-outline text-[18px] ml-1" data-icon="expand_more">expand_more</span></div></div></div></header>
+<!-- ========================================== -->
+<!-- MAIN WORKSPACE CONTENT CONTAINER           -->
+<!-- ========================================== -->
+<main class="max-w-md mx-auto px-4 pt-1 space-y-4">
+<!-- 2. SUB-CABECERA Y CONTROL DE CUADRANTE -->
+<section class="space-y-3">
+<!-- Section Label & Title -->
+<div><div class="flex items-center gap-2.5"><div class="w-9 h-9 rounded-xl bg-surface-container flex items-center justify-center text-[#0B1A2D] shadow-sm flex-shrink-0"><span class="material-symbols-outlined text-[22px]" data-icon="event_available">event_available</span></div><h1 class="text-headline-md font-headline-md font-bold text-on-surface tracking-tight">Reservas y Disponibilidad</h1></div></div>
+<!-- Selector de Sede Desplegable -->
+<div class="relative flex items-center justify-between bg-surface-container-lowest border border-outline-variant/50 rounded-xl px-3.5 py-2.5 shadow-[0_1px_3px_rgba(11,28,48,0.04)] active:scale-[0.99] transition-transform cursor-pointer">
+<div class="flex items-center gap-2.5">
+<div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-primary-container">
+<span class="material-symbols-outlined text-[18px]" data-icon="domain">domain</span>
+</div>
+<div class="flex flex-col">
+<span class="text-label-sm font-label-sm text-outline">Sede:</span>
+<span class="text-label-lg font-label-lg text-on-surface">Todas las sedes</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline" data-icon="keyboard_arrow_down">keyboard_arrow_down</span>
+</div>
+<!-- Temporal Navigation & CTA Button -->
+<div class="grid grid-cols-12 gap-2">
+<!-- Date Selector Ribbon -->
+<div class="col-span-6 flex items-center justify-between bg-surface-container-lowest border border-outline-variant/50 rounded-xl px-2 py-1.5 shadow-[0_1px_3px_rgba(11,28,48,0.04)]">
+<button class="p-1 rounded-lg text-outline hover:text-on-surface hover:bg-surface-container active:scale-90 transition-transform">
+<span class="material-symbols-outlined text-[18px]" data-icon="chevron_left">chevron_left</span>
+</button>
+<div class="flex items-center gap-1.5 text-label-md font-label-md text-on-surface font-semibold">
+<span class="material-symbols-outlined text-[16px] text-outline" data-icon="calendar_today">calendar_today</span>
+<span>Mié, 30 Sept</span>
+</div>
+<button class="p-1 rounded-lg text-outline hover:text-on-surface hover:bg-surface-container active:scale-90 transition-transform">
+<span class="material-symbols-outlined text-[18px]" data-icon="chevron_right">chevron_right</span>
+</button>
+</div>
+<!-- + Nueva Reserva CTA -->
+<button class="col-span-6 flex items-center justify-center gap-1.5 bg-tertiary-fixed text-on-tertiary-fixed font-bold rounded-xl px-3 py-2 text-label-md font-label-md shadow-sm hover:brightness-95 active:scale-95 transition-all">
+<span class="material-symbols-outlined text-[18px]" data-icon="add">add</span>
+<span>Nueva reserva</span>
+</button>
+</div>
+<!-- Quick Action: Historial Reservas -->
+<button class="w-full flex items-center justify-center gap-2 bg-white border border-[#E5E7EB] rounded-xl py-2.5 px-3 text-label-md font-label-md text-[#0B1A2D] hover:bg-surface-container-low transition-colors shadow-sm active:scale-[0.99]"><span class="material-symbols-outlined text-[18px] text-[#64748B]" data-icon="receipt_long">receipt_long</span><span class="font-semibold">Todas las reservas</span></button>
+</section>
+<!-- ========================================== -->
+<!-- 3. LEYENDA DE SEDES EN CUADRANTE           -->
+<!-- ========================================== -->
+<!-- ========================================== -->
+<!-- 4. CUADRANTE DE DISPONIBILIDAD (GRID)      -->
+<!-- ========================================== -->
+<div class="flex items-center gap-2 overflow-x-auto no-scrollbar py-0.5 px-0.5"><div class="flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-[#E5E7EB] shadow-sm text-[12px] font-semibold text-[#0B1A2D]"><span class="w-2 h-2 rounded-full bg-[#B7F229] ring-2 ring-[#B7F229]/40 flex-shrink-0"></span><span>Narón (Central)</span></div><div class="flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-[#E5E7EB] shadow-sm text-[12px] font-medium text-[#64748B]"><span class="w-2 h-2 rounded-full bg-[#0B1A2D] ring-2 ring-[#0B1A2D]/30 flex-shrink-0"></span><span>A Coruña</span></div><div class="flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-[#E5E7EB] shadow-sm text-[12px] font-medium text-[#64748B]"><span class="w-2 h-2 rounded-full bg-[#8B5CF6] ring-2 ring-[#8B5CF6]/40 flex-shrink-0"></span><span>Santiago</span></div><div class="flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-[#E5E7EB] shadow-sm text-[12px] font-medium text-[#64748B]"><span class="w-2 h-2 rounded-full bg-[#64748B] ring-2 ring-outline-variant/30 flex-shrink-0"></span><span>Vigo</span></div></div><section class="bg-surface-container-lowest rounded-2xl border border-outline-variant/40 p-3.5 shadow-[0_2px_8px_rgba(11,28,48,0.03)] space-y-3"><div class="flex items-center justify-between pb-2 border-b border-surface-container"><div class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[#8B5CF6] text-[20px]" data-icon="grid_view">grid_view</span><span class="text-label-md font-label-md font-bold text-[#0B1A2D]">Turnos en Tiempo Real</span></div><div class="flex items-center"><span class="text-body-sm font-body-sm text-[#64748B]">Desliza pistas →</span></div></div><div class="overflow-x-auto no-scrollbar"><div class="min-w-[340px]"><div class="grid grid-cols-12 gap-2 pb-2.5 text-center items-end border-b border-outline-variant/20"><div class="col-span-3 text-left pl-1"><span class="text-label-sm font-label-sm font-bold text-outline uppercase tracking-wider">Hora</span></div><div class="col-span-4 rounded-xl px-2 py-1.5 bg-surface-container-low/60 border border-outline-variant/30 text-left"><div class="flex items-center justify-between"><span class="text-label-md font-label-md font-bold text-on-surface">Pista 1</span><span class="text-label-sm font-label-sm text-outline font-semibold">30€/h</span></div><div class="flex items-center gap-1 text-[10px] text-outline font-medium truncate pt-0.5"><span class="w-1.5 h-1.5 rounded-full bg-tertiary-fixed-dim"></span><span>San Mateo</span></div></div><div class="col-span-5 rounded-xl px-2 py-1.5 bg-surface-container-low/60 border border-outline-variant/30 text-left"><div class="flex items-center justify-between"><span class="text-label-md font-label-md font-bold text-on-surface">Pista 2</span><span class="text-label-sm font-label-sm text-outline font-semibold">28€/h</span></div><div class="flex items-center gap-1 text-[10px] text-outline font-medium truncate pt-0.5"><span class="w-1.5 h-1.5 rounded-full bg-tertiary-fixed-dim"></span><span>San Mateo</span></div></div></div><div class="space-y-2 pt-2"><div class="grid grid-cols-12 gap-2 items-center"><div class="col-span-3 text-label-md font-label-md font-semibold text-[#64748B] pl-1">16:30</div><div class="col-span-4 bg-white border border-[#E5E7EB] rounded-xl px-2.5 py-2 shadow-sm flex flex-col justify-between h-[58px] border-l-4 border-l-[#B7F229]"><div class="flex items-center justify-between"><span class="text-label-sm font-label-sm font-bold text-[#0B1A2D] truncate">Carlos M.</span><span class="w-2 h-2 rounded-full bg-[#B7F229] ring-2 ring-[#B7F229]/40 flex-shrink-0"></span></div><div class="flex items-center justify-between text-[11px] text-[#64748B]"><span class="font-bold text-[#0B1A2D]">45€</span><span class="font-mono text-[10px]">#3506</span></div></div><button class="col-span-5 border border-dashed border-[#E5E7EB] bg-white hover:bg-slate-50 rounded-xl px-2.5 py-2 text-center text-[#64748B] text-label-sm font-label-sm font-semibold transition-colors active:scale-95 flex items-center justify-center gap-1 h-[58px] shadow-sm"><span class="material-symbols-outlined text-[16px] text-[#64748B]" data-icon="add">add</span><span>Disponible</span></button></div><div class="grid grid-cols-12 gap-2 items-center"><div class="col-span-3 text-label-md font-label-md font-semibold text-[#64748B] pl-1">17:00</div><div class="col-span-4 bg-white border border-[#E5E7EB] rounded-xl px-2.5 py-2 shadow-sm flex flex-col justify-between h-[58px] border-l-4 border-l-[#B7F229]"><div class="flex items-center justify-between"><span class="text-label-sm font-label-sm font-bold text-[#0B1A2D] truncate">Carlos M.</span><span class="w-2 h-2 rounded-full bg-[#B7F229] ring-2 ring-[#B7F229]/40 flex-shrink-0"></span></div><div class="flex items-center justify-between text-[11px] text-[#64748B]"><span class="font-bold text-[#0B1A2D]">45€</span><span class="font-mono text-[10px]">#3506</span></div></div><button class="col-span-5 border border-dashed border-[#E5E7EB] bg-white hover:bg-slate-50 rounded-xl px-2.5 py-2 text-center text-[#64748B] text-label-sm font-label-sm font-semibold transition-colors active:scale-95 flex items-center justify-center gap-1 h-[58px] shadow-sm"><span class="material-symbols-outlined text-[16px] text-[#64748B]" data-icon="add">add</span><span>Disponible</span></button></div><div class="grid grid-cols-12 gap-2 items-center"><div class="col-span-3 text-label-md font-label-md font-semibold text-[#64748B] pl-1">18:30</div><button class="col-span-4 border border-dashed border-[#E5E7EB] bg-white hover:bg-slate-50 rounded-xl px-2.5 py-2 text-center text-[#64748B] text-label-sm font-label-sm font-semibold transition-colors active:scale-95 flex items-center justify-center gap-1 h-[58px] shadow-sm"><span class="material-symbols-outlined text-[16px] text-[#64748B]" data-icon="add">add</span><span>Disponible</span></button><div class="col-span-5 bg-white border border-[#E5E7EB] rounded-xl px-2.5 py-2 shadow-sm flex flex-col justify-between h-[58px] border-l-4 border-l-[#8B5CF6]"><div class="flex items-center justify-between"><span class="text-label-sm font-label-sm font-bold text-[#0B1A2D] truncate">Javier Fraga</span><span class="w-2 h-2 rounded-full bg-[#8B5CF6] ring-2 ring-[#8B5CF6]/40 flex-shrink-0"></span></div><div class="flex items-center justify-between text-[11px] text-[#64748B]"><span class="font-bold text-[#0B1A2D]">42€</span><span class="font-mono text-[10px]">PIN: 3374#</span></div></div></div><div class="grid grid-cols-12 gap-2 items-center"><div class="col-span-3 text-label-md font-label-md font-semibold text-[#64748B] pl-1">19:00</div><button class="col-span-4 border border-dashed border-[#E5E7EB] bg-white hover:bg-slate-50 rounded-xl px-2.5 py-2 text-center text-[#64748B] text-label-sm font-label-sm font-semibold transition-colors active:scale-95 flex items-center justify-center gap-1 h-[58px] shadow-sm"><span class="material-symbols-outlined text-[16px] text-[#64748B]" data-icon="add">add</span><span>Disponible</span></button><div class="col-span-5 bg-white border border-[#E5E7EB] rounded-xl px-2.5 py-2 shadow-sm flex flex-col justify-between h-[58px] border-l-4 border-l-[#8B5CF6]"><div class="flex items-center justify-between"><span class="text-label-sm font-label-sm font-bold text-[#0B1A2D] truncate">Javier Fraga</span><span class="w-2 h-2 rounded-full bg-[#8B5CF6] ring-2 ring-[#8B5CF6]/40 flex-shrink-0"></span></div><div class="flex items-center justify-between text-[11px] text-[#64748B]"><span class="font-bold text-[#0B1A2D]">42€</span><span class="font-mono text-[10px]">PIN: 3374#</span></div></div></div><div class="grid grid-cols-12 gap-2 items-center"><div class="col-span-3 text-label-md font-label-md font-semibold text-[#64748B] pl-1">20:00</div><button class="col-span-4 border border-dashed border-[#E5E7EB] bg-white hover:bg-slate-50 rounded-xl px-2.5 py-2 text-center text-[#64748B] text-label-sm font-label-sm font-semibold transition-colors active:scale-95 flex items-center justify-center gap-1 h-[58px] shadow-sm"><span class="material-symbols-outlined text-[16px] text-[#64748B]" data-icon="add">add</span><span>Disponible</span></button><div class="col-span-5 bg-white border border-[#E5E7EB] rounded-xl px-2.5 py-2 shadow-sm flex flex-col justify-between h-[58px] border-l-4 border-l-[#8B5CF6]"><div class="flex items-center justify-between"><span class="text-label-sm font-label-sm font-bold text-[#0B1A2D] truncate">Javier Fraga</span><span class="w-2 h-2 rounded-full bg-[#8B5CF6] ring-2 ring-[#8B5CF6]/40 flex-shrink-0"></span></div><div class="flex items-center justify-between text-[11px] text-[#64748B]"><span class="font-bold text-[#0B1A2D]">42€</span><span class="font-mono text-[10px]">PIN: 3374#</span></div></div></div><div class="grid grid-cols-12 gap-2 items-center"><div class="col-span-3 text-label-md font-label-md font-semibold text-[#64748B] pl-1">21:30</div><div class="col-span-4 bg-white border border-[#E5E7EB] rounded-xl px-2.5 py-2 shadow-sm flex flex-col justify-between h-[58px] border-l-4 border-l-[#0B1A2D]"><div class="flex items-center justify-between"><span class="text-label-sm font-label-sm font-bold text-[#0B1A2D] truncate">M. Dopico</span><span class="w-2 h-2 rounded-full bg-[#0B1A2D] ring-2 ring-[#0B1A2D]/30 flex-shrink-0"></span></div><div class="flex items-center justify-between text-[11px] text-[#64748B]"><span class="font-bold text-[#0B1A2D]">38€</span><span class="font-mono text-[10px]">#4102</span></div></div><button class="col-span-5 border border-dashed border-[#E5E7EB] bg-white hover:bg-slate-50 rounded-xl px-2.5 py-2 text-center text-[#64748B] text-label-sm font-label-sm font-semibold transition-colors active:scale-95 flex items-center justify-center gap-1 h-[58px] shadow-sm"><span class="material-symbols-outlined text-[16px] text-[#64748B]" data-icon="add">add</span><span>Disponible</span></button></div><div class="grid grid-cols-12 gap-2 items-center"><div class="col-span-3 text-label-md font-label-md font-semibold text-[#64748B] pl-1">22:30</div><button class="col-span-4 border border-dashed border-[#E5E7EB] bg-white hover:bg-slate-50 rounded-xl px-2.5 py-2 text-center text-[#64748B] text-label-sm font-label-sm font-semibold transition-colors active:scale-95 flex items-center justify-center gap-1 h-[58px] shadow-sm"><span class="material-symbols-outlined text-[16px] text-[#64748B]" data-icon="add">add</span><span>Disponible</span></button><button class="col-span-5 border border-dashed border-[#E5E7EB] bg-white hover:bg-slate-50 rounded-xl px-2.5 py-2 text-center text-[#64748B] text-label-sm font-label-sm font-semibold transition-colors active:scale-95 flex items-center justify-center gap-1 h-[58px] shadow-sm"><span class="material-symbols-outlined text-[16px] text-[#64748B]" data-icon="add">add</span><span>Disponible</span></button></div><div class="grid grid-cols-12 gap-2 items-center"><div class="col-span-3 text-label-md font-label-md font-semibold text-[#64748B] pl-1">23:00 - 00:00</div><button class="col-span-4 border border-dashed border-[#E5E7EB] bg-slate-50 hover:bg-slate-100 rounded-xl px-2.5 py-2 text-center text-[#64748B] text-label-sm font-label-sm font-semibold transition-colors active:scale-95 flex items-center justify-center gap-1 h-[58px] shadow-sm"><span class="material-symbols-outlined text-[16px] text-[#64748B]" data-icon="lock_clock">lock_clock</span><span>Cierre</span></button><button class="col-span-5 border border-dashed border-[#E5E7EB] bg-slate-50 hover:bg-slate-100 rounded-xl px-2.5 py-2 text-center text-[#64748B] text-label-sm font-label-sm font-semibold transition-colors active:scale-95 flex items-center justify-center gap-1 h-[58px] shadow-sm"><span class="material-symbols-outlined text-[16px] text-[#64748B]" data-icon="lock_clock">lock_clock</span><span>Cierre</span></button></div></div></div></div></section>
+<!-- ========================================== -->
+<!-- 5. RESERVAS DEL DÍA (LISTADO DETALLADO)    -->
+<!-- ========================================== -->
+<section class="space-y-3 pt-1">
+<!-- Section Title & Badge Count -->
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<h2 class="text-headline-sm font-headline-sm font-bold text-on-surface">
+            Reservas del Día (Mié, 30 Sept)
+          </h2>
+<span class="w-6 h-6 rounded-full bg-[#10B981]/15 text-[#047857] text-label-sm font-label-sm font-bold flex items-center justify-center ring-1 ring-[#10B981]/30">
+            5
+          </span>
+</div>
+<button class="text-label-sm font-label-sm text-secondary font-semibold hover:underline">
+          Ver todas
+        </button>
+</div>
+<!-- CARD 1: Carlos Méndez (Pendiente TPV) -->
+<div class="bg-surface-container-lowest rounded-2xl p-4 border border-outline-variant/40 shadow-[0_2px_10px_rgba(11,28,48,0.03)] space-y-3 hover:border-secondary/40 transition-colors">
+<!-- Top Chips Ribbon -->
+<div class="flex flex-wrap items-center gap-1.5">
+<!-- Time Badge -->
+<div class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-surface-container text-on-surface font-semibold text-label-sm font-label-sm">
+<span class="material-symbols-outlined text-[14px] text-outline" data-icon="schedule">schedule</span>
+<span>17:00 - 18:30</span>
+</div>
+<!-- Court Badge -->
+<div class="px-2.5 py-1 rounded-lg bg-surface-container-high/60 text-on-surface font-semibold text-label-sm font-label-sm truncate max-w-[170px]">
+            Pista 1 — Central Panorámica
+          </div>
+</div>
+<!-- Club Branch Badge -->
+<div class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-secondary-fixed/50 text-secondary text-label-sm font-label-sm font-semibold">
+<span class="material-symbols-outlined text-[14px]" data-icon="domain">domain</span>
+<span>Sede Narón (Central)</span>
+</div>
+<!-- Participant & Match Details -->
+<div>
+<h3 class="text-headline-sm font-headline-sm font-bold text-on-surface">
+            Carlos Méndez
+          </h3>
+<div class="flex flex-wrap items-center gap-2 mt-1">
+<span class="text-body-sm font-body-sm text-outline">Pádel Abierto</span>
+<span class="px-2 py-0.5 rounded-full bg-secondary-fixed text-on-secondary-fixed-variant text-label-sm font-label-sm font-bold">
+              Competitivo
+            </span>
+<span class="px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant text-label-sm font-label-sm font-semibold">
+              Mixto
+            </span>
+<span class="text-body-sm font-body-sm text-outline">· Pádel Indoor WPT</span>
+</div>
+</div>
+<!-- Divider line -->
+<div class="border-t border-surface-container"></div>
+<!-- Bottom Payment & Automation Details -->
+<div class="flex items-center justify-between pt-0.5">
+<div class="flex items-baseline gap-1">
+<span class="text-headline-md font-headline-md font-extrabold text-on-surface">45.00</span>
+<span class="text-label-md font-label-md font-bold text-outline">€</span>
+</div>
+<div class="flex items-center gap-2">
+<!-- Payment Pill: Pendiente TPV -->
+<div class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-amber-300 bg-amber-50 text-amber-800 text-label-sm font-label-sm font-bold">
+<span class="material-symbols-outlined text-[14px] text-amber-600" data-icon="warning">warning</span>
+<span>PENDIENTE TPV</span>
+</div>
+<!-- PIN Code -->
+<div class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-surface-container text-on-surface-variant font-mono text-label-sm font-label-sm font-bold">
+<span class="material-symbols-outlined text-[14px] text-outline" data-icon="key">key</span>
+<span>PIN: 3506#</span>
+</div>
+</div>
+</div>
+</div>
+<!-- CARD 2: Lucas Piñeiro (Pagado) -->
+<div class="bg-surface-container-lowest rounded-2xl p-4 border border-outline-variant/40 shadow-[0_2px_10px_rgba(11,28,48,0.03)] space-y-3 hover:border-secondary/40 transition-colors">
+<div class="flex flex-wrap items-center gap-1.5">
+<div class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-surface-container text-on-surface font-semibold text-label-sm font-label-sm">
+<span class="material-symbols-outlined text-[14px] text-outline" data-icon="schedule">schedule</span>
+<span>09:00 - 10:30</span>
+</div>
+<div class="px-2.5 py-1 rounded-lg bg-surface-container-high/60 text-on-surface font-semibold text-label-sm font-label-sm">
+            Pista 6 — Indoor Black Edition
+          </div>
+</div>
+<div class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-secondary-fixed/50 text-secondary text-label-sm font-label-sm font-semibold">
+<span class="material-symbols-outlined text-[14px]" data-icon="domain">domain</span>
+<span>Sede Narón (Central)</span>
+</div>
+<div>
+<h3 class="text-headline-sm font-headline-sm font-bold text-on-surface">
+            Lucas Piñeiro <span class="text-label-md font-label-md font-semibold text-outline font-normal">(Invitado · Nivel 3.85)</span>
+</h3>
+<div class="flex flex-wrap items-center gap-2 mt-1">
+<span class="text-body-sm font-body-sm text-outline">Reserva Directa</span>
+<span class="px-2 py-0.5 rounded-full bg-secondary-fixed text-on-secondary-fixed-variant text-label-sm font-label-sm font-bold">
+              Competitivo
+            </span>
+<span class="px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant text-label-sm font-label-sm font-semibold">
+              Mixto
+            </span>
+<span class="text-body-sm font-body-sm text-outline">· Pádel Indoor WPT</span>
+</div>
+</div>
+<div class="border-t border-surface-container"></div>
+<div class="flex items-center justify-between pt-0.5">
+<div class="flex items-baseline gap-1">
+<span class="text-headline-md font-headline-md font-extrabold text-on-surface">39.00</span>
+<span class="text-label-md font-label-md font-bold text-outline">€</span>
+</div>
+<div class="flex items-center gap-2">
+<!-- Payment Pill: Pagado -->
+<div class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-[#10B981]/50 bg-[#10B981]/10 text-[#047857] text-label-sm font-label-sm font-bold">
+<span class="material-symbols-outlined text-[14px] text-[#047857]" data-icon="check_circle">check_circle</span>
+<span>PAGADO</span>
+</div>
+<!-- PIN Code -->
+<div class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-surface-container text-on-surface-variant font-mono text-label-sm font-label-sm font-bold">
+<span class="material-symbols-outlined text-[14px] text-outline" data-icon="key">key</span>
+<span>PIN: 9777#</span>
+</div>
+</div>
+</div>
+</div>
+<!-- CARD 3: Ana Belén Vázquez (Pendiente TPV) -->
+<div class="bg-surface-container-lowest rounded-2xl p-4 border border-outline-variant/40 shadow-[0_2px_10px_rgba(11,28,48,0.03)] space-y-3 hover:border-secondary/40 transition-colors">
+<div class="flex flex-wrap items-center gap-1.5">
+<div class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-surface-container text-on-surface font-semibold text-label-sm font-label-sm">
+<span class="material-symbols-outlined text-[14px] text-outline" data-icon="schedule">schedule</span>
+<span>18:30 - 20:00</span>
+</div>
+<div class="px-2.5 py-1 rounded-lg bg-surface-container-high/60 text-on-surface font-semibold text-label-sm font-label-sm">
+            Pista 3 — Panorámica Pro
+          </div>
+</div>
+<div class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-secondary-fixed/50 text-secondary text-label-sm font-label-sm font-semibold">
+<span class="material-symbols-outlined text-[14px]" data-icon="domain">domain</span>
+<span>Sede Narón (Central)</span>
+</div>
+<div>
+<h3 class="text-headline-sm font-headline-sm font-bold text-on-surface">
+            Ana Belén Vázquez
+          </h3>
+<div class="flex flex-wrap items-center gap-2 mt-1">
+<span class="text-body-sm font-body-sm text-outline">Pádel Abierto</span>
+<span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-label-sm font-label-sm font-bold">
+              Amistoso
+            </span>
+<span class="px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant text-label-sm font-label-sm font-semibold">
+              Fem
+            </span>
+<span class="text-body-sm font-body-sm text-outline">· Pádel Indoor WPT</span>
+</div>
+</div>
+<div class="border-t border-surface-container"></div>
+<div class="flex items-center justify-between pt-0.5">
+<div class="flex items-baseline gap-1">
+<span class="text-headline-md font-headline-md font-extrabold text-on-surface">42.00</span>
+<span class="text-label-md font-label-md font-bold text-outline">€</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-amber-300 bg-amber-50 text-amber-800 text-label-sm font-label-sm font-bold">
+<span class="material-symbols-outlined text-[14px] text-amber-600" data-icon="warning">warning</span>
+<span>PENDIENTE TPV</span>
+</div>
+<div class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-surface-container text-on-surface-variant font-mono text-label-sm font-label-sm font-bold">
+<span class="material-symbols-outlined text-[14px] text-outline" data-icon="key">key</span>
+<span>PIN: 9012#</span>
+</div>
+</div>
+</div>
+</div>
+<!-- CARD 4: Javier Fraga (Pagado) -->
+<div class="bg-surface-container-lowest rounded-2xl p-4 border border-outline-variant/40 shadow-[0_2px_10px_rgba(11,28,48,0.03)] space-y-3 hover:border-secondary/40 transition-colors">
+<div class="flex flex-wrap items-center gap-1.5">
+<div class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-surface-container text-on-surface font-semibold text-label-sm font-label-sm">
+<span class="material-symbols-outlined text-[14px] text-outline" data-icon="schedule">schedule</span>
+<span>19:00 - 20:30</span>
+</div>
+<div class="px-2.5 py-1 rounded-lg bg-surface-container-high/60 text-on-surface font-semibold text-label-sm font-label-sm">
+            Pista 2 — Panorámica Pro
+          </div>
+</div>
+<div class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-secondary-fixed/50 text-secondary text-label-sm font-label-sm font-semibold">
+<span class="material-symbols-outlined text-[14px]" data-icon="domain">domain</span>
+<span>Sede Narón (Central)</span>
+</div>
+<div>
+<h3 class="text-headline-sm font-headline-sm font-bold text-on-surface">
+            Javier Fraga
+          </h3>
+<div class="flex flex-wrap items-center gap-2 mt-1">
+<span class="text-body-sm font-body-sm text-outline">Reserva Pista 2 — Panorámica Pro</span>
+<span class="px-2 py-0.5 rounded-full bg-secondary-fixed text-on-secondary-fixed-variant text-label-sm font-label-sm font-bold">
+              Competitivo
+            </span>
+<span class="px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant text-label-sm font-label-sm font-semibold">
+              Mixto
+            </span>
+</div>
+</div>
+<div class="border-t border-surface-container"></div>
+<div class="flex items-center justify-between pt-0.5">
+<div class="flex items-baseline gap-1">
+<span class="text-headline-md font-headline-md font-extrabold text-on-surface">42.00</span>
+<span class="text-label-md font-label-md font-bold text-outline">€</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-[#10B981]/50 bg-[#10B981]/10 text-[#047857] text-label-sm font-label-sm font-bold">
+<span class="material-symbols-outlined text-[14px] text-[#047857]" data-icon="check_circle">check_circle</span>
+<span>PAGADO</span>
+</div>
+<div class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-surface-container text-on-surface-variant font-mono text-label-sm font-label-sm font-bold">
+<span class="material-symbols-outlined text-[14px] text-outline" data-icon="key">key</span>
+<span>PIN: 3374#</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- ========================================== -->
+<!-- 6. FLOATING DOCK BOTTOM NAVIGATION BAR      -->
+<!-- ========================================== -->
+<nav class="fixed bottom-3 inset-x-0 z-50 max-w-md mx-auto px-4">
+<div class="bg-surface-container-lowest/95 backdrop-blur-xl border border-outline-variant/50 rounded-full shadow-[0_8px_30px_rgba(11,28,48,0.12)] px-3 py-2 flex items-center justify-between relative">
+<!-- Tab 1: Inicio (Inactive) -->
+<button class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-colors duration-150 active:scale-95 py-1 flex-1">
+<span class="material-symbols-outlined text-[24px]" data-icon="dashboard">dashboard</span>
+<span class="text-label-sm font-label-sm mt-0.5">Inicio</span>
+</button>
+<!-- Tab 2: Reservas (ACTIVE STATE per hierarchy) -->
+<button class="flex flex-col items-center justify-center text-secondary font-bold py-1 flex-1 relative">
+<span class="material-symbols-outlined text-[24px]" data-icon="calendar_month" data-weight="fill" style="font-variation-settings: 'FILL' 1;">calendar_month</span>
+<span class="text-label-sm font-label-sm mt-0.5 font-bold text-secondary">Reservas</span>
+<!-- Subtle active glow pill under text -->
+<span class="w-1.5 h-1.5 rounded-full bg-secondary mt-0.5"></span>
+</button>
+<!-- Center Floating Plus Action Button -->
+<div class="flex-shrink-0 px-1 -mt-4">
+<button class="w-12 h-12 rounded-full bg-primary-container text-on-primary flex items-center justify-center shadow-[0_4px_14px_rgba(11,28,48,0.35)] ring-4 ring-tertiary-fixed/60 active:scale-90 transition-transform">
+<span class="material-symbols-outlined text-[26px] text-white" data-icon="add">add</span>
+</button>
+</div>
+<!-- Tab 3: Partidas (Inactive) -->
+<button class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-colors duration-150 active:scale-95 py-1 flex-1">
+<span class="material-symbols-outlined text-[24px]" data-icon="emoji_events">emoji_events</span>
+<span class="text-label-sm font-label-sm mt-0.5">Partidas</span>
+</button>
+<!-- Tab 4: TPV / Caja (Inactive) -->
+<button class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-colors duration-150 active:scale-95 py-1 flex-1">
+<span class="material-symbols-outlined text-[24px]" data-icon="point_of_sale">point_of_sale</span>
+<span class="text-label-sm font-label-sm mt-0.5">TPV / Caja</span>
+</button>
+</div>
+</nav>
+<!-- Micro-interactions Script -->
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Slot interaction quick-toggle feedback
+      const availableButtons = document.querySelectorAll('button:has(span[data-icon="add"])');
+      availableButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          btn.classList.add('ring-2', 'ring-tertiary-fixed');
+          setTimeout(() => btn.classList.remove('ring-2', 'ring-tertiary-fixed'), 400);
+        });
+      });
+    });
+  </script>
+</body></html>

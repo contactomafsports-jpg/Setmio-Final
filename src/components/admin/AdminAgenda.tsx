@@ -317,7 +317,7 @@ export const AdminAgenda: React.FC = () => {
   ], []);
 
   const timeRows = [
-    '09:00', '10:30', '12:00', '13:30', '15:00', '16:30', '17:00', '18:30', '19:00', '20:00', '21:30'
+    '09:00', '10:30', '12:00', '13:30', '15:00', '16:30', '17:00', '18:30', '19:00', '20:00', '21:30', '22:30', '23:00 - 00:00'
   ];
 
   // Venues disponibles (en caso de existir varias sedes)
@@ -336,6 +336,7 @@ export const AdminAgenda: React.FC = () => {
   }, [courts, selectedVenueId]);
 
   const getBookingForSlot = (courtId: string, time: string) => {
+    const normalizedTime = time.includes(' - ') ? time.split(' - ')[0] : time;
     return bookings.find((b) => {
       if (b.courtId !== courtId || b.status === 'canceled') return false;
 
@@ -352,7 +353,7 @@ export const AdminAgenda: React.FC = () => {
 
       // Match time slot
       const bStart = b.startTime.includes('T') ? b.startTime.split('T')[1].slice(0, 5) : b.startTime.slice(11, 16);
-      if (bStart === time) return true;
+      if (bStart === normalizedTime) return true;
 
       // Overlap or inclusion within slot window
       if (b.startTime && b.endTime) {
@@ -361,7 +362,7 @@ export const AdminAgenda: React.FC = () => {
           const [h, m] = t.split(':').map(Number);
           return (h || 0) * 60 + (m || 0);
         };
-        const [targetH, targetM] = time.split(':').map(Number);
+        const [targetH, targetM] = normalizedTime.split(':').map(Number);
         const slotM = (targetH || 0) * 60 + (targetM || 0);
         const startM = toMin(b.startTime);
         const endM = toMin(b.endTime);
@@ -590,121 +591,373 @@ export const AdminAgenda: React.FC = () => {
     currentUser.role === 'PROFESSIONAL_PLAYER';
 
   return (
-    <div className="space-y-6 text-slate-900 dark:text-slate-100 max-w-7xl mx-auto">
+    <div className="space-y-4 text-slate-900 dark:text-slate-100 max-w-7xl mx-auto">
       {/* ======================================================================
-          1. ENCABEZADO DE PÁGINA (RESPONSIVE: 2 FILAS EN MÓVIL, 1 EN DESKTOP)
+          1. SUB-CABECERA Y CONTROL DE CUADRANTE (ESPECIFICACIÓN STITCH)
           ====================================================================== */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
-        {/* Título y subtítulo */}
-        <div className="w-full sm:w-auto min-w-0">
-          <div className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
-            <Calendar className="w-3.5 h-3.5 text-emerald-500" />
-            <span>{t('agenda.eyebrow', 'Cuadrante Ocupación')}</span>
+      <section className="space-y-3">
+        {/* Título de sección e icono */}
+        <div className="flex items-center gap-2.5">
+          <div className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-[#0B1A2D] dark:text-[#B7F229] shadow-xs shrink-0">
+            <Calendar className="w-5 h-5 text-[#0B1A2D] dark:text-[#B7F229]" />
           </div>
-          <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight mt-0.5">
-            {t('agenda.title', 'Reservas y Disponibilidad')}
-          </h1>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 hidden sm:block">
-            {selectedVenueId !== 'all'
-              ? `Filtrado activo: ${availableVenues.find((v) => v.id === selectedVenueId)?.shortName || 'Sede Seleccionada'}`
-              : t('agenda.subtitle', 'Cuadrante interactivo y gestión diaria de pistas del club')}
-          </p>
+          <div>
+            <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+              {t('agenda.title', 'Reservas y Disponibilidad')}
+            </h1>
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              {selectedVenueId !== 'all'
+                ? `Sede activa: ${availableVenues.find((v) => v.id === selectedVenueId)?.name || 'Sede Seleccionada'}`
+                : t('agenda.subtitle', 'Cuadrante interactivo y turnos en tiempo real')}
+            </p>
+          </div>
         </div>
 
-        {/* Botonera Superior Responsive:
-            - Selector de Sede Dinámico
-            - Selector de Fecha
-            - Botón Nueva Reserva
-            - Historial Reservas */}
-        <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-2.5 w-full sm:w-auto shrink-0 flex-wrap">
-          {/* Selector de Sede Dinámico (en caso de existir varias sedes) */}
-          {availableVenues.length > 1 && (
-            <div className="w-full sm:w-auto relative inline-flex items-center justify-between bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-1 shadow-xs transition hover:border-emerald-500/50 shrink-0">
-              <div className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-slate-700 dark:text-slate-200 w-full sm:w-auto justify-between sm:justify-start">
-                <div className="flex items-center gap-1.5">
-                  <Building2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-                  <span className="text-slate-400 font-medium">Sede:</span>
-                </div>
-                <select
-                  value={selectedVenueId}
-                  onChange={(e) => setSelectedVenueId(e.target.value)}
-                  className="bg-transparent font-bold text-slate-900 dark:text-white cursor-pointer focus:outline-hidden text-xs pr-1"
-                  aria-label="Filtrar por sede"
-                >
-                  <option value="all" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-bold">
-                    Todas las sedes
-                  </option>
-                  {availableVenues
-                    .filter((v) => v.id !== 'all')
-                    .map((v) => (
-                      <option
-                        key={v.id}
-                        value={v.id}
-                        className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
-                      >
-                        {v.shortName || v.name}
-                      </option>
-                    ))}
-                </select>
+        {/* Selector de Sede Desplegable Minimalista */}
+        {availableVenues.length > 1 && (
+          <div className="relative flex items-center justify-between bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-xl px-3.5 py-2.5 shadow-2xs hover:border-[#8B5CF6]/50 transition cursor-pointer">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-[#0B1A2D] dark:text-[#B7F229] shrink-0">
+                <Building2 className="w-4 h-4 text-[#0B1A2D] dark:text-[#B7F229]" />
               </div>
-            </div>
-          )}
-
-          {/* Fila en móvil: Selector de Fecha + Botón Nueva Reserva */}
-          <div className="flex items-center gap-2 w-full sm:w-auto">
-            {/* Selector de Fecha */}
-            <div className="flex-1 sm:flex-none relative inline-flex items-center justify-between bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-1 shadow-xs transition hover:border-emerald-500/50 shrink-0">
-              <button
-                type="button"
-                onClick={() => stepDate(-1)}
-                className="p-1.5 rounded-xl text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
-                title="Día anterior"
-              >
-                <ChevronLeft className="w-4 h-4" />
-              </button>
-
-              <div
-                className="relative flex items-center justify-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-xl bg-slate-50 dark:bg-slate-800/80 hover:bg-emerald-50 dark:hover:bg-emerald-950/60 text-slate-800 dark:text-slate-200 hover:text-emerald-600 dark:hover:text-emerald-400 cursor-pointer transition select-none flex-1 sm:flex-none"
-                title="Seleccionar otra fecha"
-              >
-                <Calendar className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-                <span className="text-xs font-bold whitespace-nowrap">
-                  {formattedDateLabel}
+              <div className="flex flex-col min-w-0">
+                <span className="text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+                  Sede:
                 </span>
-                <input
-                  ref={dateInputRef}
-                  type="date"
-                  value={currentDate}
-                  onChange={(e) => {
-                    if (e.target.value) setCurrentDate(e.target.value);
-                  }}
-                  className="absolute inset-0 opacity-0 cursor-pointer w-full h-full z-10"
-                  aria-label="Seleccionar fecha"
-                />
+                <span className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white truncate">
+                  {selectedVenueId === 'all'
+                    ? 'Todas las sedes'
+                    : availableVenues.find((v) => v.id === selectedVenueId)?.name || 'Sede Seleccionada'}
+                </span>
               </div>
-
-              <button
-                type="button"
-                onClick={() => stepDate(1)}
-                className="p-1.5 rounded-xl text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
-                title="Día siguiente"
-              >
-                <ChevronRight className="w-4 h-4" />
-              </button>
             </div>
+            <ChevronDown className="w-4 h-4 text-slate-400 shrink-0 pointer-events-none" />
+            <select
+              value={selectedVenueId}
+              onChange={(e) => setSelectedVenueId(e.target.value)}
+              className="absolute inset-0 opacity-0 cursor-pointer w-full h-full z-10"
+              aria-label="Filtrar por sede"
+            >
+              <option value="all">Todas las sedes</option>
+              {availableVenues
+                .filter((v) => v.id !== 'all')
+                .map((v) => (
+                  <option key={v.id} value={v.id}>
+                    {v.name || v.shortName}
+                  </option>
+                ))}
+            </select>
+          </div>
+        )}
 
-            {/* Botón Nueva Reserva con acento Verde Lima Setmio */}
+        {/* Fila de Controles: Selector de Fecha + Botón '+ Nueva reserva' */}
+        <div className="grid grid-cols-12 gap-2">
+          {/* Selector de Fecha Tipo Ribbon */}
+          <div className="col-span-12 sm:col-span-6 flex items-center justify-between bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-xl px-2 py-1.5 shadow-2xs">
             <button
               type="button"
-              onClick={() => setShowNewModal(true)}
-              className="px-3.5 sm:px-4 py-2.5 sm:py-2 rounded-2xl bg-[#87F229] hover:bg-[#97f842] active:scale-95 text-[#0B1A2D] font-black text-xs shadow-md shadow-[#87F229]/25 transition shrink-0 whitespace-nowrap cursor-pointer flex items-center justify-center gap-1.5"
+              onClick={() => stepDate(-1)}
+              className="p-1.5 rounded-lg text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 active:scale-90 transition-transform cursor-pointer"
+              title="Día anterior"
             >
-              <Plus className="w-3.5 h-3.5 shrink-0 stroke-[3]" />
-              <span>Nueva reserva</span>
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+            <div className="relative flex items-center justify-center gap-1.5 text-xs sm:text-sm font-bold text-slate-900 dark:text-white cursor-pointer select-none">
+              <Calendar className="w-4 h-4 text-slate-400 shrink-0" />
+              <span>{formattedDateLabel}</span>
+              <input
+                ref={dateInputRef}
+                type="date"
+                value={currentDate}
+                onChange={(e) => {
+                  if (e.target.value) setCurrentDate(e.target.value);
+                }}
+                className="absolute inset-0 opacity-0 cursor-pointer w-full h-full z-10"
+                aria-label="Seleccionar fecha"
+              />
+            </div>
+            <button
+              type="button"
+              onClick={() => stepDate(1)}
+              className="p-1.5 rounded-lg text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 active:scale-90 transition-transform cursor-pointer"
+              title="Día siguiente"
+            >
+              <ChevronRight className="w-4 h-4" />
             </button>
           </div>
 
-          {/* Historial reservas */}
+          {/* Botón CTA '+ Nueva reserva' en Verde Lima Setmio */}
+          <button
+            type="button"
+            onClick={() => setShowNewModal(true)}
+            className="col-span-12 sm:col-span-6 flex items-center justify-center gap-1.5 bg-[#B7F229] hover:bg-[#a6e61f] active:scale-95 text-[#0B1A2D] font-black rounded-xl px-3 py-2 text-xs sm:text-sm shadow-sm transition-all cursor-pointer"
+          >
+            <Plus className="w-4 h-4 stroke-[3]" />
+            <span>Nueva reserva</span>
+          </button>
+        </div>
+
+        {/* Acceso Rápido: Todas las reservas */}
+        <button
+          type="button"
+          onClick={() => {
+            if (typeof window !== 'undefined') {
+              window.history.pushState({}, '', '/admin/reservas/todas');
+            }
+            setShowAllBookingsView(true);
+          }}
+          className="w-full flex items-center justify-center gap-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl py-2.5 px-3 text-xs sm:text-sm font-semibold text-[#0B1A2D] dark:text-white hover:bg-slate-50 dark:hover:bg-slate-800/80 transition-colors shadow-2xs active:scale-[0.99] cursor-pointer"
+        >
+          <FileSpreadsheet className="w-4 h-4 text-[#64748B] dark:text-slate-400" />
+          <span>Todas las reservas</span>
+        </button>
+      </section>
+
+      {/* ======================================================================
+          2. FILA DE SEDES MINIMALISTA CON MICRO-DOTS DE MARCA (RIBBON)
+          ====================================================================== */}
+      <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-0.5 px-0.5">
+        <button
+          type="button"
+          onClick={() => setSelectedVenueId('all')}
+          className={`shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full border shadow-2xs text-xs transition cursor-pointer ${
+            selectedVenueId === 'all'
+              ? 'bg-slate-900 text-white dark:bg-white dark:text-[#0B1A2D] border-slate-900 dark:border-white font-bold ring-2 ring-slate-900/10 dark:ring-white/20'
+              : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white font-medium'
+          }`}
+        >
+          <span className="w-2 h-2 rounded-full bg-slate-400 dark:bg-slate-300 ring-2 ring-slate-400/40 shrink-0" />
+          <span>Todas las Sedes</span>
+        </button>
+
+        {availableVenues
+          .filter((v) => v.id !== 'all')
+          .map((v) => {
+            const isSelected = selectedVenueId === v.id;
+            const dotColor =
+              v.id === 'venue-san-mateo'
+                ? 'bg-[#B7F229] ring-[#B7F229]/40'
+                : v.id === 'venue-coruna'
+                ? 'bg-[#0B1A2D] dark:bg-sky-400 ring-[#0B1A2D]/30 dark:ring-sky-400/30'
+                : v.id === 'venue-santiago'
+                ? 'bg-[#8B5CF6] ring-[#8B5CF6]/40'
+                : 'bg-[#64748B] ring-[#64748B]/30';
+
+            return (
+              <button
+                key={v.id}
+                type="button"
+                onClick={() => setSelectedVenueId(isSelected ? 'all' : v.id)}
+                className={`shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full border shadow-2xs text-xs transition cursor-pointer ${
+                  isSelected
+                    ? 'bg-white dark:bg-slate-900 border-[#0B1A2D] dark:border-[#B7F229] font-bold text-[#0B1A2D] dark:text-white ring-2 ring-[#0B1A2D]/15 dark:ring-[#B7F229]/25 shadow-xs'
+                    : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white font-medium'
+                }`}
+              >
+                <span className={`w-2 h-2 rounded-full ring-2 shrink-0 ${dotColor}`} />
+                <span>{v.shortName || v.name}</span>
+              </button>
+            );
+          })}
+      </div>
+
+      {/* ======================================================================
+          3. CUADRANTE DE DISPONIBILIDAD (GRID UNIFICADO HASTA LAS 00:00)
+          ====================================================================== */}
+      <section className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-3.5 sm:p-4 shadow-sm space-y-3">
+        {/* Cabecera del Cuadrante */}
+        <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
+          <div className="flex items-center gap-2">
+            <span className="p-1 rounded-lg bg-[#8B5CF6]/10 text-[#8B5CF6]">
+              <Calendar className="w-4 h-4 text-[#8B5CF6]" />
+            </span>
+            <span className="text-xs sm:text-sm font-bold text-[#0B1A2D] dark:text-white">
+              Turnos en Tiempo Real
+            </span>
+          </div>
+          <div className="flex items-center">
+            <span className="text-xs text-[#64748B] dark:text-slate-400 font-medium">
+              Desliza pistas →
+            </span>
+          </div>
+        </div>
+
+        {/* Matriz interactiva de turnos */}
+        <div className="overflow-x-auto no-scrollbar">
+          <div className="min-w-[420px]">
+            {/* Header Courts Row con columnas dinámicas */}
+            <div
+              className="pb-2.5 border-b border-slate-100 dark:border-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-300 items-end"
+              style={{
+                display: 'grid',
+                gridTemplateColumns: `80px repeat(${displayedCourts.length}, minmax(135px, 1fr))`,
+                gap: '8px',
+              }}
+            >
+              <div className="text-left pl-1">
+                <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+                  Hora
+                </span>
+              </div>
+              {displayedCourts.map((court) => {
+                const courtVenue = availableVenues.find((v) => v.id === court.venueId) || availableVenues[1] || availableVenues[0];
+                return (
+                  <div
+                    key={court.id}
+                    className="rounded-xl px-2.5 py-1.5 bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60 text-left flex flex-col justify-between"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-slate-900 dark:text-white truncate">
+                        {court.name.split('—')[0]}
+                      </span>
+                      <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">
+                        {court.hourlyRate}€/h
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between text-[10px] text-slate-400 dark:text-slate-500 font-medium truncate pt-0.5">
+                      <span className="truncate">{courtVenue?.shortName || 'San Mateo'}</span>
+                      <button
+                        type="button"
+                        onClick={() => toggleCourtLight(court.id)}
+                        className={`p-0.5 rounded transition cursor-pointer shrink-0 ${
+                          court.isLightOn
+                            ? 'text-amber-500 hover:text-amber-400'
+                            : 'text-slate-400 hover:text-slate-600 dark:text-slate-500'
+                        }`}
+                        title="Conmutar focos"
+                      >
+                        <Zap className="w-3 h-3" />
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Time Rows Unificadas */}
+            <div className="space-y-2 pt-2">
+              {timeRows.map((time) => {
+                const isLateSlot = time === '23:00 - 00:00';
+                return (
+                  <div
+                    key={time}
+                    className="items-center"
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: `80px repeat(${displayedCourts.length}, minmax(135px, 1fr))`,
+                      gap: '8px',
+                    }}
+                  >
+                    <div className="text-xs font-semibold text-[#64748B] dark:text-slate-400 pl-1 font-mono">
+                      {time}
+                    </div>
+
+                    {displayedCourts.map((court) => {
+                      const booking = getBookingForSlot(court.id, time);
+                      const courtVenueId = court.venueId || booking?.venueId || 'venue-san-mateo';
+
+                      const borderAccent =
+                        courtVenueId === 'venue-san-mateo'
+                          ? 'border-l-4 border-l-[#B7F229]'
+                          : courtVenueId === 'venue-santiago'
+                          ? 'border-l-4 border-l-[#8B5CF6]'
+                          : courtVenueId === 'venue-coruna'
+                          ? 'border-l-4 border-l-[#0B1A2D] dark:border-l-sky-400'
+                          : 'border-l-4 border-l-[#64748B]';
+
+                      const dotAccent =
+                        courtVenueId === 'venue-san-mateo'
+                          ? 'bg-[#B7F229] ring-[#B7F229]/40'
+                          : courtVenueId === 'venue-santiago'
+                          ? 'bg-[#8B5CF6] ring-[#8B5CF6]/40'
+                          : courtVenueId === 'venue-coruna'
+                          ? 'bg-[#0B1A2D] dark:bg-sky-400 ring-[#0B1A2D]/30'
+                          : 'bg-[#64748B] ring-[#64748B]/30';
+
+                      if (booking) {
+                        return (
+                          <div
+                            key={court.id}
+                            onClick={() => handleOpenBooking(booking)}
+                            className={`bg-white dark:bg-slate-800/90 border border-[#E5E7EB] dark:border-slate-700 rounded-xl px-2.5 py-2 shadow-2xs flex flex-col justify-between h-[58px] cursor-pointer hover:shadow-xs active:scale-98 transition ${borderAccent}`}
+                          >
+                            <div className="flex items-center justify-between gap-1">
+                              <span className="text-xs font-bold text-[#0B1A2D] dark:text-white truncate">
+                                {booking.creatorName.split(' ')[0]} {booking.creatorName.split(' ')[1]?.[0] ? `${booking.creatorName.split(' ')[1][0]}.` : ''}
+                              </span>
+                              <span className={`w-2 h-2 rounded-full shrink-0 ring-2 ${dotAccent}`} />
+                            </div>
+                            <div className="flex items-center justify-between text-[11px] text-[#64748B] dark:text-slate-400">
+                              <span className="font-bold text-[#0B1A2D] dark:text-white font-mono">
+                                {isPlayerRole
+                                  ? `${(booking.participants?.[0]?.amount || (booking.totalPrice / 4)).toFixed(0)}€`
+                                  : `${booking.totalPrice}€`}
+                              </span>
+                              <span className="font-mono text-[10px]">
+                                {booking.accessPin ? `PIN: ${booking.accessPin}` : `#${booking.id.slice(-4)}`}
+                              </span>
+                            </div>
+                          </div>
+                        );
+                      }
+
+                      if (isLateSlot) {
+                        return (
+                          <button
+                            key={court.id}
+                            type="button"
+                            onClick={() => {
+                              setNewCourtId(court.id);
+                              setNewTime('23:00');
+                              setShowNewModal(true);
+                            }}
+                            className="border border-dashed border-[#E5E7EB] dark:border-slate-700/80 bg-slate-50 dark:bg-slate-800/40 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl px-2.5 py-2 text-center text-[#64748B] dark:text-slate-400 text-xs font-semibold transition active:scale-95 flex items-center justify-center gap-1.5 h-[58px] shadow-2xs cursor-pointer"
+                            title={`Turno tardío / Cierre en ${court.name}`}
+                          >
+                            <Lock className="w-3.5 h-3.5 text-[#64748B] dark:text-slate-500" />
+                            <span>Cierre</span>
+                          </button>
+                        );
+                      }
+
+                      return (
+                        <button
+                          key={court.id}
+                          type="button"
+                          onClick={() => {
+                            setNewCourtId(court.id);
+                            setNewTime(time);
+                            setShowNewModal(true);
+                          }}
+                          className="border border-dashed border-[#E5E7EB] dark:border-slate-700 bg-white dark:bg-slate-800/30 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl px-2.5 py-2 text-center text-[#64748B] dark:text-slate-400 text-xs font-semibold transition active:scale-95 flex items-center justify-center gap-1 h-[58px] shadow-2xs cursor-pointer"
+                          title={`Reservar ${court.name} a las ${time}`}
+                        >
+                          <Plus className="w-3.5 h-3.5 text-[#64748B] dark:text-slate-400" />
+                          <span>Disponible</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ======================================================================
+          4. BLOQUE "RESERVAS DEL DÍA" (REFRESCO DINÁMICO POR FECHA Y SEDE)
+          ====================================================================== */}
+      <section className="space-y-3 pt-1">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <h2 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white">
+              Reservas del Día ({formattedDateLabel})
+            </h2>
+            <span className="w-6 h-6 rounded-full bg-[#10B981]/15 text-[#047857] dark:bg-emerald-950/60 dark:text-emerald-400 text-xs font-bold flex items-center justify-center ring-1 ring-[#10B981]/30">
+              {dayBookings.length}
+            </span>
+          </div>
           <button
             type="button"
             onClick={() => {
@@ -713,233 +966,19 @@ export const AdminAgenda: React.FC = () => {
               }
               setShowAllBookingsView(true);
             }}
-            className="w-full sm:w-auto px-3.5 py-2.5 sm:py-2 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-emerald-500/50 hover:bg-slate-50 dark:hover:bg-slate-800/80 text-slate-800 dark:text-slate-200 hover:text-emerald-600 dark:hover:text-emerald-400 font-bold text-xs transition shadow-2xs flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 shrink-0 whitespace-nowrap"
+            className="text-xs text-[#8B5CF6] dark:text-[#a78bfa] font-semibold hover:underline cursor-pointer"
           >
-            <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-            <span>Historial reservas</span>
+            Ver todas
           </button>
-        </div>
-      </div>
-
-      {/* Indicador de sede activa si se filtra por sede específica */}
-      {selectedVenueId !== 'all' && (
-        <div className="flex items-center justify-between px-4 py-2.5 rounded-2xl bg-indigo-50/70 dark:bg-indigo-950/40 border border-indigo-200/80 dark:border-indigo-800/60 text-xs">
-          <div className="flex items-center gap-2 text-indigo-900 dark:text-indigo-200 font-bold">
-            <span className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse" />
-            <span>
-              Sede Activa: {availableVenues.find((v) => v.id === selectedVenueId)?.name || 'Sede'} ({displayedCourts.length} pistas en cuadrante)
-            </span>
-          </div>
-          <span className="text-[11px] text-indigo-600 dark:text-indigo-400 font-semibold">
-            {dayBookings.length} reservas para este día
-          </span>
-        </div>
-      )}
-
-      {/* ======================================================================
-          LEYENDA DESCRIPTIVA MULTISEDE
-          (Visible únicamente cuando está seleccionada la opción "Todas las sedes")
-          ====================================================================== */}
-      {selectedVenueId === 'all' && (
-        <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 rounded-2xl bg-white dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 shadow-xs">
-          <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-white">
-              Leyenda de Sedes en Cuadrante Consolidado:
-            </span>
-          </div>
-          <div className="flex flex-wrap items-center gap-2">
-            {availableVenues
-              .filter((v) => v.id !== 'all')
-              .map((v) => {
-                const theme = getVenueTheme(v.id);
-                return (
-                  <div
-                    key={v.id}
-                    className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-bold border shadow-2xs ${theme.badgeBg} ${theme.badgeBorder} ${theme.badgeText}`}
-                  >
-                    <span className={`w-2.5 h-2.5 rounded-full ${theme.dotBg} ring-2 ring-white dark:ring-slate-900 shrink-0`} />
-                    <span>{v.shortName || v.name}</span>
-                  </div>
-                );
-              })}
-          </div>
-        </div>
-      )}
-
-      {/* ======================================================================
-          2. TABLA DE DISPONIBILIDAD (CUADRANTE DINÁMICO POR SEDE Y FECHA)
-          ====================================================================== */}
-      <div className="bg-white dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 rounded-2xl p-4 shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
-          <div className="min-w-[700px]">
-            {/* Header Courts Row con columnas dinámicas estrictas según displayedCourts */}
-            <div
-              className="border-b border-slate-200 dark:border-slate-700/80 bg-slate-50 dark:bg-slate-900/90 text-xs font-semibold text-slate-700 dark:text-slate-300 rounded-t-xl"
-              style={{
-                display: 'grid',
-                gridTemplateColumns: `80px repeat(${displayedCourts.length}, minmax(130px, 1fr))`,
-              }}
-            >
-              <div className="p-3 text-center text-slate-500 dark:text-slate-400 font-bold border-r border-slate-200 dark:border-slate-700/80 flex items-center justify-center">
-                Hora
-              </div>
-              {displayedCourts.map((court) => {
-                const courtVenueTheme = getVenueTheme(court.venueId);
-                return (
-                  <div
-                    key={court.id}
-                    className="p-3 border-r border-slate-200 dark:border-slate-700/80 last:border-r-0 flex flex-col justify-between"
-                  >
-                    <div>
-                      {selectedVenueId === 'all' && (
-                        <div className="mb-1">
-                          <span
-                            className={`inline-flex items-center gap-1 text-[9px] font-extrabold px-1.5 py-0.5 rounded-md border truncate max-w-full ${courtVenueTheme.badgeBg} ${courtVenueTheme.badgeBorder} ${courtVenueTheme.badgeText}`}
-                          >
-                            <span className={`w-1.5 h-1.5 rounded-full ${courtVenueTheme.dotBg} shrink-0`} />
-                            <span className="truncate">{courtVenueTheme.shortName}</span>
-                          </span>
-                        </div>
-                      )}
-                      <div className="font-extrabold text-slate-900 dark:text-white truncate text-[11px]">
-                        {court.name.split('—')[0]}
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between text-[10px] text-slate-500 dark:text-slate-400 mt-1">
-                      <span className="font-semibold text-emerald-600 dark:text-emerald-400">{court.hourlyRate}€/h</span>
-                      <button
-                        type="button"
-                        onClick={() => toggleCourtLight(court.id)}
-                        className={`p-1 rounded transition cursor-pointer ${
-                          court.isLightOn
-                            ? 'text-amber-500 hover:text-amber-400'
-                            : 'text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300'
-                        }`}
-                        title="Conmutar focos"
-                      >
-                        <Zap className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* Time Rows dinámicas */}
-            {timeRows.map((time) => (
-              <div
-                key={time}
-                className="border-b border-slate-100 dark:border-slate-700/50 hover:bg-slate-50/50 dark:hover:bg-slate-900/40 text-xs transition-colors"
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: `80px repeat(${displayedCourts.length}, minmax(130px, 1fr))`,
-                }}
-              >
-                <div className="p-3 text-center font-mono text-slate-700 dark:text-slate-200 font-bold border-r border-slate-200 dark:border-slate-700/80 bg-slate-50/60 dark:bg-slate-900/90 flex items-center justify-center">
-                  {time}
-                </div>
-
-                {displayedCourts.map((court) => {
-                  const booking = getBookingForSlot(court.id, time);
-                  const courtVenueId = court.venueId || booking?.venueId || 'venue-san-mateo';
-                  const venueTheme = getVenueTheme(courtVenueId);
-
-                  return (
-                    <div
-                      key={court.id}
-                      className="p-1.5 border-r border-slate-100 dark:border-slate-700/50 last:border-r-0 min-h-[62px] flex items-center"
-                    >
-                      {booking ? (
-                        <button
-                          type="button"
-                          onClick={() => handleOpenBooking(booking)}
-                          className={`w-full h-full p-2 rounded-xl text-left transition shadow-xs group cursor-pointer border ${
-                            selectedVenueId === 'all'
-                              ? `${venueTheme.slotBg} ${venueTheme.slotBorder} ${venueTheme.hoverBorder}`
-                              : 'bg-slate-100 dark:bg-slate-800 border-emerald-500/40 hover:border-emerald-500 dark:hover:border-emerald-400'
-                          }`}
-                        >
-                          <div className="flex items-center justify-between gap-1">
-                            <div
-                              className={`font-bold text-slate-900 dark:text-white truncate text-[11px] transition ${
-                                selectedVenueId === 'all'
-                                  ? venueTheme.accentText
-                                  : 'group-hover:text-emerald-500 dark:group-hover:text-emerald-400'
-                              }`}
-                            >
-                              {booking.creatorName}
-                            </div>
-                            {selectedVenueId === 'all' && (
-                              <span
-                                className={`w-2 h-2 rounded-full shrink-0 ${venueTheme.dotBg} ring-1 ring-white/60 dark:ring-black/40`}
-                                title={venueTheme.name}
-                              />
-                            )}
-                          </div>
-                          <div className="text-[10px] text-slate-500 dark:text-slate-300 flex items-center justify-between font-medium mt-0.5">
-                            <span className="font-bold">
-                              {isPlayerRole
-                                ? `${(booking.participants?.[0]?.amount || (booking.totalPrice / 4)).toFixed(2)}€`
-                                : `${booking.totalPrice}€`}
-                            </span>
-                            <span
-                              className={`font-mono font-bold ${
-                                selectedVenueId === 'all'
-                                  ? venueTheme.pinText
-                                  : 'text-emerald-600 dark:text-emerald-400'
-                              }`}
-                            >
-                              PIN {booking.accessPin || '4821#'}
-                            </span>
-                          </div>
-                        </button>
-                      ) : (
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setNewCourtId(court.id);
-                            setNewTime(time);
-                            setShowNewModal(true);
-                          }}
-                          className="w-full h-full rounded-xl border border-dashed border-[#87F229]/40 hover:border-[#87F229] hover:bg-[#87F229]/15 text-[#529b16] dark:text-[#87F229] text-[11px] font-bold transition flex items-center justify-center gap-1 active:scale-95 cursor-pointer"
-                          title={`Reservar ${court.name} a las ${time}`}
-                        >
-                          <Plus className="w-3 h-3 text-[#87F229]" />
-                          <span>Pista Disponible</span>
-                        </button>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* ======================================================================
-          3. BLOQUE "RESERVAS DEL DÍA" (REFRESCO DINÁMICO POR FECHA Y SEDE)
-          ====================================================================== */}
-      <section className="bg-white dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 rounded-2xl p-4 sm:p-5 shadow-sm space-y-4">
-        <div className="flex items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-700/60 pb-3">
-          <div className="flex items-center gap-2 min-w-0">
-            <h2 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white tracking-tight whitespace-nowrap">
-              Reservas del Día ({formattedDateLabel})
-            </h2>
-            <span className="px-2 py-0.5 rounded-full text-xs font-bold font-mono bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20">
-              {dayBookings.length}
-            </span>
-          </div>
         </div>
 
         {dayBookings.length === 0 ? (
-          <div className="py-8 text-center text-slate-400 dark:text-slate-500 text-xs">
+          <div className="py-8 text-center text-slate-400 dark:text-slate-500 text-xs bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-6">
             <Calendar className="w-8 h-8 mx-auto mb-2 text-slate-300 dark:text-slate-600" />
-            No hay reservas registradas para esta fecha y sede. Puedes hacer clic en "+ Libre" para reservar una pista.
+            No hay reservas registradas para esta fecha y sede. Puedes hacer clic en una pista disponible para reservar.
           </div>
         ) : (
-          <div className="space-y-2.5">
+          <div className="space-y-3">
             {dayBookings.map((b) => {
               const drawerData = convertBookingToDrawer(b);
               return (

@@ -650,7 +650,7 @@ export const ClubDashboard: React.FC = () => {
           </button>
         </div>
 
-        {/* Botón Sólido de Marca: Todas las Reservas */}
+        {/* Botón Sólido de Marca: Todas las Reservas (Limpio y sin flecha) */}
         <button
           type="button"
           onClick={() => {
@@ -661,7 +661,6 @@ export const ClubDashboard: React.FC = () => {
         >
           <Calendar className="w-4 h-4 text-white" />
           <span>Todas las reservas</span>
-          <ArrowRight className="w-4 h-4 text-white" />
         </button>
 
         {/* Listado de Tarjetas de Reservas (Tickets limpios de alto contraste) */}
@@ -710,8 +709,8 @@ export const ClubDashboard: React.FC = () => {
                     <span>PAGADO</span>
                   </span>
                 ) : (
-                  <span className="inline-flex items-center gap-1 text-[11px] font-bold text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/60 px-2.5 py-0.5 rounded-full border border-amber-200/50">
-                    <AlertCircle className="w-3 h-3 text-amber-500" />
+                  <span className="inline-flex items-center gap-1 text-[11px] font-bold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-2.5 py-0.5 rounded-full border border-slate-200/80 dark:border-slate-700">
+                    <AlertCircle className="w-3 h-3 text-slate-500 dark:text-slate-400" />
                     <span>PENDIENTE TPV</span>
                   </span>
                 )}
