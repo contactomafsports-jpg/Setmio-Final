@@ -7,28 +7,30 @@ import {
   ArrowRight,
   TrendingUp,
   Activity,
-  Sparkles,
-  Eye,
-  GraduationCap,
   Trophy,
+  GraduationCap,
   Settings,
-  Shield,
   CheckCircle2,
   Clock,
   KeyRound,
   AlertCircle,
   Zap,
   Building2,
-  FileSpreadsheet,
   ChevronDown,
+  ChevronRight,
+  Sliders,
+  X,
+  LayoutGrid,
+  CreditCard,
+  Shield,
+  Layers,
 } from 'lucide-react';
 import { ReservationDrawer, ReservationDrawerData } from './ReservationDrawer';
-import { BookingListItem } from './BookingListItem';
 
 export const ClubDashboard: React.FC = () => {
   const {
     currentTenant,
-    courts,
+    currentUser,
     setAdminTab,
     setSelectedCustomerId,
     isClubOpen,
@@ -43,6 +45,9 @@ export const ClubDashboard: React.FC = () => {
   } = useApp();
 
   const [selectedReservation, setSelectedReservation] = useState<ReservationDrawerData | null>(null);
+  const [showOperationalNotice, setShowOperationalNotice] = useState(true);
+  const [isVenueSelectorOpen, setIsVenueSelectorOpen] = useState(false);
+  const [showAllQuickActions, setShowAllQuickActions] = useState(false);
 
   // Financial Metrics: Online + TPV Bar (Dynamic based on selected venue or consolidated view)
   const totalRevenueToday = selectedVenue.revenueToday;
@@ -51,11 +56,20 @@ export const ClubDashboard: React.FC = () => {
   const totalRevenueMonth = selectedVenue.revenueMonth;
 
   // Occupancy metrics
-  const totalCourtsCount = selectedVenue.courtsCount;
-  const occupiedCourtsCount = selectedVenue.occupiedCourtsNow;
+  const totalCourtsCount = selectedVenue.courtsCount || 24;
+  const occupiedCourtsCount = selectedVenue.occupiedCourtsNow || 17;
   const occupancyPercentage = Math.round((occupiedCourtsCount / totalCourtsCount) * 100);
 
-  // 3 Ejemplos Reales del Turno Actual según especificación exacta
+  // User Greeting
+  const firstName = currentUser?.name ? currentUser.name.split(' ')[0] : 'Marcos';
+  const userRoleSubtitle =
+    currentUser?.role === 'SUPERADMIN'
+      ? 'Director General · Red Multisede'
+      : currentUser?.role === 'RECEPTION'
+      ? 'Recepción & Atención · Mostrador'
+      : 'Director General · Red Deportiva San Mateo';
+
+  // 3 Ejemplos Reales del Turno Actual según especificación exacta de diseño
   const upcomingTurnBookings: ReservationDrawerData[] = [
     {
       id: 'res-1',
@@ -98,7 +112,7 @@ export const ClubDashboard: React.FC = () => {
       accessPin: '7192#',
       status: 'Confirmada',
       paymentStatus: 'paid',
-      totalPrice: 'Cuota Escuela',
+      totalPrice: '28.00 €',
       lightsStatus: 'auto',
       participants: [
         { name: 'Ana Belén Vázquez', level: 3.2, paid: true, statusText: 'Cuota Mensual' },
@@ -135,469 +149,529 @@ export const ClubDashboard: React.FC = () => {
   ];
 
   return (
-    <div className="space-y-6 sm:space-y-8 text-slate-900 dark:text-slate-100 max-w-7xl mx-auto">
+    <div className="max-w-md lg:max-w-3xl mx-auto px-4 sm:px-5 pt-2 pb-16 space-y-6 font-sans text-[#0B1A2D] dark:text-slate-100 antialiased">
       {/* ======================================================================
-          1. HEADER HERÓICO DEL CLUB ("Centro de Pádel San Mateo")
-          - Mantiene badge "Abierto/Cerrado"
-          - Nombre del club y ubicación
-          - ÚNICAMENTE 2 botones principales: "Pistas & Reservas" y "Vista Jugador"
-          - Se elimina cualquier botón de domótica
+          1. SEDE SELECTOR PILL & OPERATIONAL STATUS (Directo en canvas)
           ====================================================================== */}
-      <section className="relative overflow-hidden rounded-3xl bg-slate-900 border border-slate-700/80 p-5 sm:p-7 shadow-xl text-white">
-        <div className="pointer-events-none absolute -right-16 -top-20 size-60 rounded-full bg-emerald-500/15 blur-3xl" />
-        <div className="pointer-events-none absolute left-1/3 -bottom-16 size-48 rounded-full bg-cyan-500/10 blur-3xl" />
-
-        <div className="relative flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-          <div className="space-y-2">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 text-[11px] font-black tracking-wider">
-                <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
-                Setmio Pro
-              </span>
-
-              {/* Badge destacado Abierto / Cerrado */}
-              <button
-                type="button"
-                onClick={toggleClubOpenState}
-                className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold transition border cursor-pointer ${
-                  isClubOpen
-                    ? 'bg-emerald-950/80 text-emerald-300 border-emerald-600/70 hover:bg-emerald-900'
-                    : 'bg-rose-950/80 text-rose-300 border-rose-600/70 hover:bg-rose-900'
-                }`}
-                title="Conmutar estado del club (Abierto / Cerrado)"
-              >
-                <span className={`w-2 h-2 rounded-full ${isClubOpen ? 'bg-emerald-400 animate-pulse' : 'bg-rose-400'}`} />
-                <span>{isClubOpen ? t('club.status.open', 'Abierto') : t('club.status.closed', 'Cerrado')}</span>
-              </button>
-            </div>
-
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-white tracking-tight">
-              {isConsolidatedView ? 'Todas las Sedes · Red Deportiva San Mateo' : selectedVenue.name}
+      <div className="pt-2 pb-1 space-y-3">
+        <div className="flex items-start justify-between">
+          <div>
+            <h1 className="text-[22px] font-extrabold text-[#0B1A2D] dark:text-white tracking-tight leading-tight">
+              Hola, {firstName}
             </h1>
-            <p className="text-xs sm:text-sm text-slate-300 font-medium max-w-2xl leading-relaxed">
-              {t('dashboard.heroSubtitle', 'Centro de Mandos Operativo en tiempo real')}
+            <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mt-0.5">
+              {userRoleSubtitle}
             </p>
           </div>
 
-          {/* Únicamente 2 botones principales: "Pistas & Reservas" y "Vista Jugador" */}
-          <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+          <div className="flex items-center gap-2">
             <button
               type="button"
-              onClick={() => setAdminTab('agenda')}
-              className="px-4 py-2.5 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs shadow-lg shadow-emerald-500/20 transition hover:scale-[1.02] active:scale-[0.98] flex items-center gap-2"
+              onClick={() => setAdminTab('settings')}
+              className="text-xs font-bold text-[#8B5CF6] dark:text-purple-300 hover:underline inline-flex items-center gap-1 mt-1 bg-[#EDE9FE]/70 dark:bg-[#8B5CF6]/20 px-2.5 py-1 rounded-full transition-colors cursor-pointer"
             >
-              <Calendar className="w-4 h-4" />
-              <span>{t('club.nav.courts', 'Pistas & Reservas')}</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={enterWhiteLabelPlayerPreview}
-              className="px-4 py-2.5 rounded-2xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs border border-white/20 transition flex items-center gap-2 active:scale-95"
-              title="Probar experiencia del socio en Marca Blanca"
-            >
-              <Eye className="w-4 h-4 text-cyan-300" />
-              <span>{t('white_label.player_view', 'Vista Jugador')}</span>
-            </button>
-          </div>
-        </div>
-      </section>
-
-      {/* ======================================================================
-          2. BLOQUE KPIS FINANCIEROS Y OCUPACIÓN EN TIEMPO REAL
-          - Tarjeta "Ingresos de Hoy" (Online + TPV) y "Facturación del Mes"
-          - Tarjeta "% Ocupación en Tiempo Real" (barra de progreso y horas punta)
-          ====================================================================== */}
-      <section className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-        {/* KPI 1: Ingresos de Hoy & Facturación del Mes */}
-        <div className="p-5 sm:p-6 rounded-3xl bg-white dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700/80 shadow-xs space-y-4 hover:border-emerald-500/40 transition">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2.5">
-              <div className="p-2.5 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-                <DollarSign className="w-5 h-5" />
-              </div>
-              <div>
-                <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
-                  {t('dashboard.revenueToday', 'Ingresos de Hoy')}
-                </span>
-                <span className="text-[11px] text-slate-500 dark:text-slate-400">{t('dashboard.revenueSubtitle', 'Online / TPV')}</span>
-              </div>
-            </div>
-
-            <div className="text-right">
-              <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
-                {t('dashboard.revenueMonth', 'Facturación del Mes')}
-              </span>
-              <span className="font-black text-xs text-emerald-600 dark:text-emerald-400 font-mono">
-                {totalRevenueMonth.toLocaleString('es-ES', { minimumFractionDigits: 0 })} €
-              </span>
-            </div>
-          </div>
-
-          <div>
-            <div className="text-3xl sm:text-4xl font-black font-mono text-slate-950 dark:text-white tracking-tight">
-              {totalRevenueToday.toLocaleString('es-ES', { minimumFractionDigits: 2 })} €
-            </div>
-
-            {/* Desglose Online + TPV */}
-            <div className="grid grid-cols-2 gap-2 mt-3 pt-3 border-t border-slate-100 dark:border-slate-700/60 text-xs">
-              <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900/70 border border-slate-100 dark:border-slate-700/60">
-                <span className="text-[11px] text-slate-500 dark:text-slate-400 block font-medium">{t('dashboard.onlineBookings', 'Reservas Online')}</span>
-                <span className="font-black font-mono text-slate-900 dark:text-white text-sm">
-                  {onlineRevenueToday.toFixed(2)} €
-                </span>
-              </div>
-              <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900/70 border border-slate-100 dark:border-slate-700/60">
-                <span className="text-[11px] text-slate-500 dark:text-slate-400 block font-medium">{t('dashboard.tpvSubtitle', 'TPV / Tienda y Mostrador')}</span>
-                <span className="font-black font-mono text-slate-900 dark:text-white text-sm">
-                  {tpvRevenueToday.toFixed(2)} €
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex items-center text-xs text-slate-500 dark:text-slate-400 pt-1">
-            <span className="inline-flex items-center gap-1 font-bold text-emerald-600 dark:text-emerald-400">
-              <TrendingUp className="w-3.5 h-3.5" />
-              +18,4% crecimiento mensual
-            </span>
-          </div>
-        </div>
-
-        {/* KPI 2: % Ocupación en Tiempo Real */}
-        <div className="p-5 sm:p-6 rounded-3xl bg-white dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700/80 shadow-xs space-y-4 hover:border-cyan-500/40 transition">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2.5">
-              <div className="p-2.5 rounded-2xl bg-cyan-50 dark:bg-cyan-950/60 text-cyan-600 dark:text-cyan-400 border border-cyan-500/20">
-                <Activity className="w-5 h-5" />
-              </div>
-              <div>
-                <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
-                  % Ocupación en Tiempo Real
-                </span>
-                <span className="text-[11px] text-slate-500 dark:text-slate-400">Pistas activas en este turno</span>
-              </div>
-            </div>
-
-            <span className="px-2.5 py-1 rounded-full text-xs font-mono font-bold bg-cyan-50 dark:bg-cyan-950 text-cyan-700 dark:text-cyan-300 border border-cyan-200 dark:border-cyan-800">
-              {occupiedCourtsCount} de {totalCourtsCount} Pistas
-            </span>
-          </div>
-
-          <div>
-            <div className="flex items-baseline justify-between">
-              <span className="text-3xl sm:text-4xl font-black font-mono text-cyan-600 dark:text-cyan-400 tracking-tight">
-                {occupancyPercentage}%
-              </span>
-              <span className="text-xs font-semibold text-slate-600 dark:text-slate-300">
-                Turno de Alta Ocupación
-              </span>
-            </div>
-
-            {/* Barra de progreso de ocupación */}
-            <div className="w-full bg-slate-100 dark:bg-slate-900 h-3 rounded-full overflow-hidden mt-3 p-0.5">
-              <div
-                className="bg-gradient-to-r from-cyan-500 via-teal-500 to-emerald-500 h-full rounded-full transition-all duration-700 shadow-xs"
-                style={{ width: `${occupancyPercentage}%` }}
-              />
-            </div>
-          </div>
-
-          <div className="flex items-center justify-between text-xs pt-1 border-t border-slate-100 dark:border-slate-700/60">
-            <span className="text-slate-500 dark:text-slate-400 font-semibold">Horas Punta:</span>
-            <span className="font-extrabold text-slate-800 dark:text-slate-200 font-mono bg-slate-100 dark:bg-slate-900 px-2 py-0.5 rounded-lg">
-              18:30 - 22:30
-            </span>
-          </div>
-        </div>
-      </section>
-
-      {/* ======================================================================
-          3. BLOQUE ACCESOS RÁPIDOS OPERATIVOS (6 MÓDULOS REQUERIDOS)
-          - Icono único superior en cada tarjeta (sin icono repetido a la altura del título)
-          - Enrutamiento correcto a sus respectivas vistas
-          ====================================================================== */}
-      <section className="space-y-3">
-        <h2 className="font-black text-sm uppercase tracking-wider text-slate-700 dark:text-slate-300">
-          {t('dashboard.quick_access_title', 'ACCESOS RÁPIDOS OPERATIVOS')}
-        </h2>
-
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
-          {/* 1. Partidas abiertas -> /admin/partidas */}
-          <button
-            type="button"
-            onClick={() => {
-              if (typeof window !== 'undefined') {
-                window.history.pushState({}, '', '/admin/partidas');
-              }
-              setAdminTab('matches');
-            }}
-            className="p-4 rounded-3xl bg-white dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700/80 hover:border-emerald-500/50 hover:shadow-md transition text-left group flex flex-col justify-between shadow-xs cursor-pointer"
-          >
-            <div className="flex items-center justify-between mb-3">
-              <div className="p-3 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 group-hover:scale-105 transition-transform border border-emerald-500/20">
-                {/* Icono de raqueta y pelota de pádel para partidos */}
-                <svg className="w-5 h-5 fill-none stroke-current stroke-2" viewBox="0 0 24 24">
-                  <circle cx="11" cy="9" r="6" />
-                  <path d="m15.5 13.5 5 5c.8.8.8 2.2 0 3s-2.2.8-3 0l-5-5" strokeLinecap="round" strokeLinejoin="round" />
-                  <circle cx="10" cy="8" r="0.8" fill="currentColor" />
-                  <circle cx="12" cy="8" r="0.8" fill="currentColor" />
-                  <circle cx="11" cy="10" r="0.8" fill="currentColor" />
-                  <circle cx="19.5" cy="4.5" r="2.5" fill="currentColor" stroke="none" />
-                </svg>
-              </div>
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300">
-                Play!
-              </span>
-            </div>
-            <div>
-              <div className="font-black text-sm text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition">
-                {t('dashboard.quick_matches', 'Partidas abiertas')}
-              </div>
-              <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
-                {t('dashboard.quick_matches_desc', 'Matchmaking y niveles')}
-              </div>
-            </div>
-            <div className="mt-3 pt-2 border-t border-slate-100 dark:border-slate-700/60 flex items-center justify-between text-[11px] text-emerald-600 dark:text-emerald-400 font-bold">
-              <span>{t('dashboard.quick_matches_action', 'Gestionar partidas')}</span>
-              <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-            </div>
-          </button>
-
-          {/* 2. Competiciones -> /admin/competiciones (icono de trofeo) */}
-          <button
-            type="button"
-            onClick={() => {
-              if (typeof window !== 'undefined') {
-                window.history.pushState({}, '', '/admin/competiciones');
-              }
-              setAdminTab('tournaments');
-            }}
-            className="p-4 rounded-3xl bg-white dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700/80 hover:border-amber-500/50 hover:shadow-md transition text-left group flex flex-col justify-between shadow-xs cursor-pointer"
-          >
-            <div className="flex items-center justify-between mb-3">
-              <div className="p-3 rounded-2xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 group-hover:scale-105 transition-transform border border-amber-500/20">
-                <Trophy className="w-5 h-5" />
-              </div>
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300">
-                Torneos
-              </span>
-            </div>
-            <div>
-              <div className="font-black text-sm text-slate-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition">
-                {t('dashboard.quick_competitions', 'Competiciones')}
-              </div>
-              <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
-                {t('dashboard.quick_competitions_desc', 'Torneos, cuadros y fases')}
-              </div>
-            </div>
-            <div className="mt-3 pt-2 border-t border-slate-100 dark:border-slate-700/60 flex items-center justify-between text-[11px] text-amber-600 dark:text-amber-400 font-bold">
-              <span>{t('dashboard.quick_competitions_action', 'Ver competiciones')}</span>
-              <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-            </div>
-          </button>
-
-          {/* 3. Socios / CRM -> /admin/socios */}
-          <button
-            type="button"
-            onClick={() => {
-              setSelectedCustomerId(null);
-              if (typeof window !== 'undefined') {
-                window.history.pushState({}, '', '/admin/socios');
-              }
-              setAdminTab('customers');
-            }}
-            className="p-4 rounded-3xl bg-white dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700/80 hover:border-indigo-500/50 hover:shadow-md transition text-left group flex flex-col justify-between shadow-xs cursor-pointer"
-          >
-            <div className="flex items-center justify-between mb-3">
-              <div className="p-3 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 group-hover:scale-105 transition-transform border border-indigo-500/20">
-                <Users className="w-5 h-5" />
-              </div>
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300">
-                CRM
-              </span>
-            </div>
-            <div>
-              <div className="font-black text-sm text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition">
-                {t('dashboard.quick_crm', 'Socios / CRM')}
-              </div>
-              <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
-                {t('dashboard.quick_crm_desc', 'Fichas, monederos y altas')}
-              </div>
-            </div>
-            <div className="mt-3 pt-2 border-t border-slate-100 dark:border-slate-700/60 flex items-center justify-between text-[11px] text-indigo-600 dark:text-indigo-400 font-bold">
-              <span>{t('dashboard.quick_crm_action', 'Listado de socios')}</span>
-              <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-            </div>
-          </button>
-
-          {/* 4. Escuela / Clases -> /admin/escuela */}
-          <button
-            type="button"
-            onClick={() => {
-              if (typeof window !== 'undefined') {
-                window.history.pushState({}, '', '/admin/escuela');
-              }
-              setAdminTab('academy');
-            }}
-            className="p-4 rounded-3xl bg-white dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700/80 hover:border-blue-500/50 hover:shadow-md transition text-left group flex flex-col justify-between shadow-xs cursor-pointer"
-          >
-            <div className="flex items-center justify-between mb-3">
-              <div className="p-3 rounded-2xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 group-hover:scale-105 transition-transform border border-blue-500/20">
-                <GraduationCap className="w-5 h-5" />
-              </div>
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300">
-                Cursos
-              </span>
-            </div>
-            <div>
-              <div className="font-black text-sm text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition">
-                {t('dashboard.quick_academy', 'Escuela / Clases')}
-              </div>
-              <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
-                {t('dashboard.quick_academy_desc', 'Grupos, alumnos y profes')}
-              </div>
-            </div>
-            <div className="mt-3 pt-2 border-t border-slate-100 dark:border-slate-700/60 flex items-center justify-between text-[11px] text-blue-600 dark:text-blue-400 font-bold">
-              <span>{t('dashboard.quick_academy_action', 'Ver cuadrícula')}</span>
-              <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-            </div>
-          </button>
-
-          {/* 5. Equipos -> /admin/equipos */}
-          <button
-            type="button"
-            onClick={() => {
-              if (typeof window !== 'undefined') {
-                window.history.pushState({}, '', '/admin/equipos');
-              }
-              setAdminTab('teams');
-            }}
-            className="p-4 rounded-3xl bg-white dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700/80 hover:border-cyan-500/50 hover:shadow-md transition text-left group flex flex-col justify-between shadow-xs cursor-pointer"
-          >
-            <div className="flex items-center justify-between mb-3">
-              <div className="p-3 rounded-2xl bg-cyan-50 dark:bg-cyan-950/60 text-cyan-600 dark:text-cyan-400 group-hover:scale-105 transition-transform border border-cyan-500/20">
-                <Shield className="w-5 h-5" />
-              </div>
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-cyan-100 dark:bg-cyan-950 text-cyan-700 dark:text-cyan-300">
-                Ligas
-              </span>
-            </div>
-            <div>
-              <div className="font-black text-sm text-slate-900 dark:text-white group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition">
-                {t('dashboard.quick_teams', 'Equipos')}
-              </div>
-              <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
-                {t('dashboard.quick_teams_desc', 'Capitanes, jugadores y actas')}
-              </div>
-            </div>
-            <div className="mt-3 pt-2 border-t border-slate-100 dark:border-slate-700/60 flex items-center justify-between text-[11px] text-cyan-600 dark:text-cyan-400 font-bold">
-              <span>{t('dashboard.quick_teams_action', 'Gestionar equipos')}</span>
-              <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-            </div>
-          </button>
-
-          {/* 6. Ajustes del Club -> /admin/ajustes */}
-          <button
-            type="button"
-            onClick={() => {
-              if (typeof window !== 'undefined') {
-                window.history.pushState({}, '', '/admin/ajustes');
-              }
-              setAdminTab('settings');
-            }}
-            className="p-4 rounded-3xl bg-white dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700/80 hover:border-slate-400 dark:hover:border-slate-600 hover:shadow-md transition text-left group flex flex-col justify-between shadow-xs cursor-pointer"
-          >
-            <div className="flex items-center justify-between mb-3">
-              <div className="p-3 rounded-2xl bg-slate-100 dark:bg-slate-700/60 text-slate-700 dark:text-slate-300 group-hover:scale-105 transition-transform">
-                <Settings className="w-5 h-5" />
-              </div>
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300">
-                Ajustes
-              </span>
-            </div>
-            <div>
-              <div className="font-black text-sm text-slate-900 dark:text-white group-hover:text-slate-700 dark:group-hover:text-slate-200 transition">
-                {t('dashboard.quick_settings', 'Ajustes del Club')}
-              </div>
-              <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
-                {t('dashboard.quick_settings_desc', 'Horarios, tarifas e iluminación')}
-              </div>
-            </div>
-            <div className="mt-3 pt-2 border-t border-slate-100 dark:border-slate-700/60 flex items-center justify-between text-[11px] text-slate-600 dark:text-slate-400 font-bold">
-              <span>{t('dashboard.quick_settings_action', 'Configuración')}</span>
-              <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-            </div>
-          </button>
-        </div>
-      </section>
-
-      {/* ======================================================================
-          4. BLOQUE PRÓXIMAS RESERVAS DE HOY (POSICIÓN FINAL)
-          - Muestra tarjetas de reservas del turno actual con diseño limpio de alto contraste.
-          - Al tocar cualquier tarjeta se abre la ficha detallada en el Drawer operativo.
-          ====================================================================== */}
-      <section className="rounded-3xl bg-white dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700/80 p-5 sm:p-7 shadow-xs space-y-5">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 dark:border-slate-700/80 pb-4">
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
-              <h2 className="font-black text-lg sm:text-xl text-slate-900 dark:text-white">
-                Próximas Reservas de Hoy
-              </h2>
-            </div>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-              Turno actual en pista con códigos PIN de acceso domótico. Toca cualquier reserva para abrir el panel operativo.
-            </p>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto shrink-0">
-            <button
-              type="button"
-              onClick={() => {
-                if (typeof window !== 'undefined') {
-                  window.history.pushState({}, '', '/admin/reservas');
-                }
-                setAdminTab('agenda');
-                window.scrollTo({ top: 0, behavior: 'instant' });
-              }}
-              className="px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-700/80 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 hover:text-emerald-600 dark:hover:text-emerald-400 text-xs font-bold transition flex items-center gap-1.5 border border-slate-200/80 dark:border-slate-700 cursor-pointer shadow-xs active:scale-95"
-            >
-              <Calendar className="w-3.5 h-3.5 text-emerald-500" />
-              <span>{t('dashboard.viewAgenda', 'Ver agenda')}</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => {
-                if (typeof window !== 'undefined') {
-                  window.history.pushState({}, '', '/admin/reservas/todas');
-                }
-                setAdminTab('all_bookings');
-                window.scrollTo({ top: 0, behavior: 'instant' });
-              }}
-              className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-md active:scale-95 cursor-pointer"
-            >
-              <FileSpreadsheet className="w-3.5 h-3.5" />
-              <span>{t('dashboard.allBookings', 'Todas las reservas')}</span>
+              <span>Gestionar</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
         </div>
 
-        {/* Lista visual con las reservas del turno actual usando el componente unificado BookingListItem */}
+        {/* Pill de Sede y Estado Operativo */}
+        <div className="relative">
+          <div className="flex items-center justify-between p-2.5 bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200/80 dark:border-[#1A314D] shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
+            {/* Selector de Sede */}
+            <div
+              onClick={() => setIsVenueSelectorOpen(!isVenueSelectorOpen)}
+              className="flex items-center gap-2 cursor-pointer group select-none min-w-0"
+              title="Cambiar sede activa o ver red consolidada"
+            >
+              <div className="w-8 h-8 rounded-xl bg-slate-50 dark:bg-[#071220] border border-slate-100 dark:border-[#1A314D] flex items-center justify-center text-[#0B1A2D] dark:text-slate-200 shrink-0">
+                <Building2 className="w-4 h-4 text-[#0B1A2D] dark:text-white" />
+              </div>
+              <div className="min-w-0">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-xs font-bold text-[#0B1A2D] dark:text-white truncate">
+                    {isConsolidatedView ? 'Todas las Sedes' : selectedVenue.shortName || selectedVenue.name}
+                  </span>
+                  <ChevronDown
+                    className={`w-3.5 h-3.5 text-slate-400 group-hover:text-[#0B1A2D] dark:group-hover:text-white transition-transform ${
+                      isVenueSelectorOpen ? 'rotate-180 text-[#0B1A2D] dark:text-white' : ''
+                    }`}
+                  />
+                </div>
+                <span className="text-[10px] font-medium text-slate-400 block truncate">
+                  {venues.length > 1 ? `${venues.length} sedes conectadas` : 'Sede oficial'}
+                </span>
+              </div>
+            </div>
+
+            {/* Badge Dinámico de Apertura */}
+            <button
+              type="button"
+              onClick={toggleClubOpenState}
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#F0FCCF] dark:bg-[#B7F229]/20 border border-[#B7F229]/50 transition-all cursor-pointer hover:scale-102 shrink-0 select-none"
+              title="Haz clic para conmutar estado de apertura del club"
+            >
+              <span className={`w-2 h-2 rounded-full ${isClubOpen ? 'bg-[#82b805] animate-pulse' : 'bg-rose-500'}`} />
+              <span className="text-[11px] font-bold text-[#0B1A2D] dark:text-[#B7F229]">
+                {isClubOpen ? 'Abierto · hasta 23:30' : 'Cerrado temporal'}
+              </span>
+            </button>
+          </div>
+
+          {/* Menú Desplegable de Sedes */}
+          {isVenueSelectorOpen && (
+            <div className="absolute top-full left-0 right-0 mt-2 z-30 p-2 bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200 dark:border-[#1A314D] shadow-xl space-y-1 animate-in fade-in slide-in-from-top-2 duration-150">
+              <div className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 px-2 py-1">
+                Red Deportiva · Seleccionar Sede
+              </div>
+
+              {venues.length > 1 && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedVenueId('all');
+                    setIsVenueSelectorOpen(false);
+                  }}
+                  className={`w-full flex items-center justify-between p-2 rounded-xl text-xs font-bold transition text-left cursor-pointer ${
+                    isConsolidatedView
+                      ? 'bg-[#B7F229]/20 text-[#0B1A2D] dark:text-white'
+                      : 'hover:bg-slate-50 dark:hover:bg-[#132A45] text-slate-700 dark:text-slate-300'
+                  }`}
+                >
+                  <span className="flex items-center gap-2">
+                    <Layers className="w-3.5 h-3.5 text-[#8B5CF6]" />
+                    <span>Todas las Sedes (Consolidado)</span>
+                  </span>
+                  {isConsolidatedView && <CheckCircle2 className="w-3.5 h-3.5 text-[#82b805]" />}
+                </button>
+              )}
+
+              {venues
+                .filter((v) => v.id !== 'all')
+                .map((venue) => {
+                  const isSelected = !isConsolidatedView && selectedVenueId === venue.id;
+                  return (
+                    <button
+                      key={venue.id}
+                      type="button"
+                      onClick={() => {
+                        setSelectedVenueId(venue.id);
+                        setIsVenueSelectorOpen(false);
+                      }}
+                      className={`w-full flex items-center justify-between p-2 rounded-xl text-xs font-bold transition text-left cursor-pointer ${
+                        isSelected
+                          ? 'bg-[#B7F229]/20 text-[#0B1A2D] dark:text-white'
+                          : 'hover:bg-slate-50 dark:hover:bg-[#132A45] text-slate-700 dark:text-slate-300'
+                      }`}
+                    >
+                      <span className="flex items-center gap-2 truncate">
+                        <Building2 className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                        <span className="truncate">{venue.name}</span>
+                      </span>
+                      {isSelected && <CheckCircle2 className="w-3.5 h-3.5 text-[#82b805] shrink-0" />}
+                    </button>
+                  );
+                })}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* ======================================================================
+          2. AVISOS OPERATIVOS (Playtomic style reminder card 'No te olvides')
+          ====================================================================== */}
+      {showOperationalNotice && (
+        <section>
+          <p className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2">
+            Avisos Operativos
+          </p>
+          <div className="bg-white dark:bg-[#0E2239] rounded-2xl p-4 border border-slate-100 dark:border-[#1A314D] shadow-[0_2px_10px_rgba(0,0,0,0.03)] flex items-center justify-between">
+            <div
+              className="flex items-center gap-3 cursor-pointer flex-1 mr-2 select-none group"
+              onClick={() => setAdminTab('smart_courts')}
+              title="Abrir configuración de domótica y cuadrante"
+            >
+              <div className="w-10 h-10 rounded-xl bg-[#EDE9FE]/70 dark:bg-[#8B5CF6]/20 flex items-center justify-center text-[#8B5CF6] dark:text-purple-300 flex-shrink-0 group-hover:scale-105 transition-transform">
+                <Sliders className="w-5 h-5 text-[#8B5CF6] dark:text-purple-300" />
+              </div>
+              <div className="pr-2">
+                <h4 className="text-xs font-bold text-[#0B1A2D] dark:text-white group-hover:text-[#8B5CF6] transition-colors">
+                  Editar preferencias de cuadrante
+                </h4>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-snug mt-0.5">
+                  Turno de tarde: {occupiedCourtsCount} pistas con iluminación domótica activada
+                </p>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              aria-label="Cerrar aviso"
+              onClick={() => setShowOperationalNotice(false)}
+              className="p-1 rounded-full text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors flex-shrink-0 cursor-pointer"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        </section>
+      )}
+
+      {/* ======================================================================
+          3. ACCIONES DIRECTAS (4 BOTONES CIRCULARES ESTILO PLAYTOMIC)
+          ====================================================================== */}
+      <section>
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+            Acciones Directas
+          </h2>
+          <button
+            type="button"
+            onClick={() => setShowAllQuickActions(!showAllQuickActions)}
+            className="text-xs font-bold text-[#8B5CF6] dark:text-purple-300 hover:underline cursor-pointer"
+          >
+            {showAllQuickActions ? 'Ver principales' : 'Ver todos'}
+          </button>
+        </div>
+
+        {/* 4 Botones Circulares Principales */}
+        <div className="grid grid-cols-4 gap-2 text-center">
+          {/* 1. Cuadrante */}
+          <div
+            onClick={() => {
+              if (typeof window !== 'undefined') window.history.pushState({}, '', '/admin/reservas');
+              setAdminTab('agenda');
+            }}
+            className="flex flex-col items-center group cursor-pointer select-none"
+          >
+            <div className="w-14 h-14 rounded-full bg-[#0B1A2D] dark:bg-[#132A45] border border-slate-700/30 flex items-center justify-center text-white shadow-[0_4px_14px_rgba(11,26,45,0.25)] group-active:scale-95 group-hover:scale-105 transition-all">
+              <LayoutGrid className="w-6 h-6 text-white" />
+            </div>
+            <span className="text-xs font-bold text-[#0B1A2D] dark:text-slate-200 mt-2 tracking-tight group-hover:text-[#8B5CF6] transition-colors">
+              Cuadrante
+            </span>
+          </div>
+
+          {/* 2. Partidas */}
+          <div
+            onClick={() => {
+              if (typeof window !== 'undefined') window.history.pushState({}, '', '/admin/partidas');
+              setAdminTab('matches');
+            }}
+            className="flex flex-col items-center group cursor-pointer select-none"
+          >
+            <div className="w-14 h-14 rounded-full bg-[#B7F229] flex items-center justify-center text-[#0B1A2D] shadow-[0_4px_14px_rgba(183,242,41,0.45)] group-active:scale-95 group-hover:scale-105 transition-all">
+              {/* Raqueta y pelota de pádel Play! */}
+              <svg className="w-6 h-6 fill-none stroke-[#0B1A2D] stroke-[2.2]" viewBox="0 0 24 24">
+                <circle cx="11" cy="9" r="6" />
+                <path d="m15.5 13.5 5 5c.8.8.8 2.2 0 3s-2.2.8-3 0l-5-5" strokeLinecap="round" strokeLinejoin="round" />
+                <circle cx="10" cy="8" r="0.8" fill="#0B1A2D" />
+                <circle cx="12" cy="8" r="0.8" fill="#0B1A2D" />
+                <circle cx="11" cy="10" r="0.8" fill="#0B1A2D" />
+                <circle cx="19.5" cy="4.5" r="2.5" fill="#0B1A2D" stroke="none" />
+              </svg>
+            </div>
+            <span className="text-xs font-bold text-[#0B1A2D] dark:text-slate-200 mt-2 tracking-tight group-hover:text-[#82b805] transition-colors">
+              Partidas
+            </span>
+          </div>
+
+          {/* 3. Torneos */}
+          <div
+            onClick={() => {
+              if (typeof window !== 'undefined') window.history.pushState({}, '', '/admin/torneos');
+              setAdminTab('tournaments');
+            }}
+            className="flex flex-col items-center group cursor-pointer select-none"
+          >
+            <div className="w-14 h-14 rounded-full bg-[#8B5CF6] flex items-center justify-center text-white shadow-[0_4px_14px_rgba(139,92,246,0.35)] group-active:scale-95 group-hover:scale-105 transition-all">
+              <Trophy className="w-6 h-6 text-white" />
+            </div>
+            <span className="text-xs font-bold text-[#0B1A2D] dark:text-slate-200 mt-2 tracking-tight group-hover:text-[#8B5CF6] transition-colors">
+              Torneos
+            </span>
+          </div>
+
+          {/* 4. Escuela */}
+          <div
+            onClick={() => {
+              if (typeof window !== 'undefined') window.history.pushState({}, '', '/admin/escuela');
+              setAdminTab('academy');
+            }}
+            className="flex flex-col items-center group cursor-pointer select-none"
+          >
+            <div className="w-14 h-14 rounded-full bg-slate-100 dark:bg-[#1E293B] flex items-center justify-center text-slate-700 dark:text-slate-200 border border-slate-200/60 dark:border-slate-700 group-active:scale-95 group-hover:scale-105 transition-all">
+              <GraduationCap className="w-6 h-6 text-slate-700 dark:text-slate-200" />
+            </div>
+            <span className="text-xs font-bold text-[#0B1A2D] dark:text-slate-200 mt-2 tracking-tight group-hover:text-[#8B5CF6] transition-colors">
+              Escuela
+            </span>
+          </div>
+        </div>
+
+        {/* Módulos Adicionales si se pulsa "Ver todos" */}
+        {showAllQuickActions && (
+          <div className="grid grid-cols-4 gap-2 text-center mt-3 pt-3 border-t border-slate-100 dark:border-slate-800 animate-in fade-in slide-in-from-top-1 duration-150">
+            {/* TPV Club */}
+            <div
+              onClick={() => {
+                if (typeof window !== 'undefined') window.history.pushState({}, '', '/admin/tpv');
+                setAdminTab('pos_cafe');
+              }}
+              className="flex flex-col items-center group cursor-pointer select-none"
+            >
+              <div className="w-12 h-12 rounded-full bg-slate-100 dark:bg-[#1E293B] flex items-center justify-center text-slate-700 dark:text-slate-200 border border-slate-200/60 dark:border-slate-700 group-active:scale-95 group-hover:scale-105 transition-all">
+                <CreditCard className="w-5 h-5 text-slate-700 dark:text-slate-200" />
+              </div>
+              <span className="text-[11px] font-bold text-[#0B1A2D] dark:text-slate-300 mt-1.5 tracking-tight">
+                TPV Club
+              </span>
+            </div>
+
+            {/* Socios / CRM */}
+            <div
+              onClick={() => {
+                setSelectedCustomerId(null);
+                if (typeof window !== 'undefined') window.history.pushState({}, '', '/admin/socios');
+                setAdminTab('customers');
+              }}
+              className="flex flex-col items-center group cursor-pointer select-none"
+            >
+              <div className="w-12 h-12 rounded-full bg-slate-100 dark:bg-[#1E293B] flex items-center justify-center text-slate-700 dark:text-slate-200 border border-slate-200/60 dark:border-slate-700 group-active:scale-95 group-hover:scale-105 transition-all">
+                <Users className="w-5 h-5 text-slate-700 dark:text-slate-200" />
+              </div>
+              <span className="text-[11px] font-bold text-[#0B1A2D] dark:text-slate-300 mt-1.5 tracking-tight">
+                Socios CRM
+              </span>
+            </div>
+
+            {/* Equipos */}
+            <div
+              onClick={() => {
+                if (typeof window !== 'undefined') window.history.pushState({}, '', '/admin/equipos');
+                setAdminTab('teams');
+              }}
+              className="flex flex-col items-center group cursor-pointer select-none"
+            >
+              <div className="w-12 h-12 rounded-full bg-slate-100 dark:bg-[#1E293B] flex items-center justify-center text-slate-700 dark:text-slate-200 border border-slate-200/60 dark:border-slate-700 group-active:scale-95 group-hover:scale-105 transition-all">
+                <Shield className="w-5 h-5 text-slate-700 dark:text-slate-200" />
+              </div>
+              <span className="text-[11px] font-bold text-[#0B1A2D] dark:text-slate-300 mt-1.5 tracking-tight">
+                Equipos
+              </span>
+            </div>
+
+            {/* Ajustes Club */}
+            <div
+              onClick={() => {
+                if (typeof window !== 'undefined') window.history.pushState({}, '', '/admin/ajustes');
+                setAdminTab('settings');
+              }}
+              className="flex flex-col items-center group cursor-pointer select-none"
+            >
+              <div className="w-12 h-12 rounded-full bg-slate-100 dark:bg-[#1E293B] flex items-center justify-center text-slate-700 dark:text-slate-200 border border-slate-200/60 dark:border-slate-700 group-active:scale-95 group-hover:scale-105 transition-all">
+                <Settings className="w-5 h-5 text-slate-700 dark:text-slate-200" />
+              </div>
+              <span className="text-[11px] font-bold text-[#0B1A2D] dark:text-slate-300 mt-1.5 tracking-tight">
+                Ajustes
+              </span>
+            </div>
+          </div>
+        )}
+      </section>
+
+      {/* ======================================================================
+          4. RENDIMIENTO EN VIVO (MÉTRICAS MINIMALISTAS Y DIRECTAS)
+          ====================================================================== */}
+      <section className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+            Rendimiento en Vivo
+          </h2>
+          <span className="text-[11px] font-semibold text-slate-400 dark:text-slate-500">
+            Hoy, {new Date().toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })}
+          </span>
+        </div>
+
+        {/* Tarjeta Telemetría: % Ocupación en tiempo real */}
+        <div className="bg-white dark:bg-[#0E2239] rounded-2xl p-4 border border-slate-100 dark:border-[#1A314D] shadow-[0_2px_10px_rgba(0,0,0,0.03)] space-y-3">
+          <div className="flex items-baseline justify-between">
+            <div>
+              <span className="text-xs font-medium text-slate-500 dark:text-slate-400 block">
+                Ocupación en tiempo real
+              </span>
+              <div className="flex items-baseline gap-2 mt-0.5">
+                <span className="text-3xl font-extrabold tracking-tight text-[#0B1A2D] dark:text-white font-mono">
+                  {occupancyPercentage}%
+                </span>
+                <span className="text-xs font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-full">
+                  {occupiedCourtsCount} de {totalCourtsCount} Pistas
+                </span>
+              </div>
+            </div>
+
+            <span className="text-xs font-bold text-[#0B1A2D] dark:text-[#B7F229] flex items-center gap-1 bg-[#F0FCCF] dark:bg-[#B7F229]/20 border border-[#B7F229]/50 px-2.5 py-1 rounded-full">
+              <Zap className="w-3.5 h-3.5 text-[#0B1A2D] dark:text-[#B7F229] fill-current" />
+              Hora Punta
+            </span>
+          </div>
+
+          {/* Barra de Progreso Lima #B7F229 */}
+          <div className="w-full bg-slate-100 dark:bg-slate-800 h-2.5 rounded-full overflow-hidden p-0.5">
+            <div
+              className="bg-[#B7F229] h-full rounded-full transition-all duration-700 shadow-xs"
+              style={{ width: `${Math.min(100, Math.max(5, occupancyPercentage))}%` }}
+            />
+          </div>
+
+          <div className="flex items-center justify-between text-[11px] font-medium text-slate-500 dark:text-slate-400 pt-1">
+            <span>Próxima rotación: 18:30</span>
+            <span>Turno pico: 18:30 – 22:30</span>
+          </div>
+        </div>
+
+        {/* Tarjeta de Facturación e Ingresos */}
+        <div className="bg-white dark:bg-[#0E2239] rounded-2xl p-4 border border-slate-100 dark:border-[#1A314D] shadow-[0_2px_10px_rgba(0,0,0,0.03)]">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium text-slate-500 dark:text-slate-400">Facturación de hoy</span>
+            <span className="inline-flex items-center gap-1 text-xs font-bold text-[#0B1A2D] dark:text-[#B7F229] bg-[#F0FCCF] dark:bg-[#B7F229]/20 border border-[#B7F229]/40 px-2.5 py-0.5 rounded-full">
+              <TrendingUp className="w-3.5 h-3.5 text-[#0B1A2D] dark:text-[#B7F229]" />
+              +18,4% mes
+            </span>
+          </div>
+
+          <div className="flex items-baseline justify-between mt-1">
+            <div className="text-3xl font-extrabold text-[#0B1A2D] dark:text-white tracking-tight font-mono">
+              {totalRevenueToday.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}{' '}
+              <span className="text-lg font-bold text-slate-400">€</span>
+            </div>
+            <div className="text-right">
+              <span className="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500 block tracking-wider">
+                Mes acumulado
+              </span>
+              <span className="text-xs font-bold text-[#0B1A2D] dark:text-white font-mono">
+                {totalRevenueMonth.toLocaleString('es-ES', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} €
+              </span>
+            </div>
+          </div>
+
+          {/* Desglose Limpio de Canales Online y TPV */}
+          <div className="grid grid-cols-2 gap-3 mt-3 pt-3 border-t border-slate-100 dark:border-[#1A314D]">
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] text-slate-500 dark:text-slate-400">App Online:</span>
+              <span className="text-xs font-bold text-[#0B1A2D] dark:text-white font-mono">
+                {onlineRevenueToday.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €
+              </span>
+            </div>
+            <div className="flex items-center justify-between pl-2 border-l border-slate-100 dark:border-[#1A314D]">
+              <span className="text-[11px] text-slate-500 dark:text-slate-400">TPV Club:</span>
+              <span className="text-xs font-bold text-[#0B1A2D] dark:text-white font-mono">
+                {tpvRevenueToday.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €
+              </span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ======================================================================
+          5. PRÓXIMAS RESERVAS DE HOY (TICKETS AISLADOS, LIMPIOS)
+          ====================================================================== */}
+      <section className="space-y-3 pt-1">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-base font-bold text-[#0B1A2D] dark:text-white">
+              Próximas Reservas de Hoy
+            </h2>
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              Turno actual y accesos domóticos
+            </p>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => {
+              if (typeof window !== 'undefined') window.history.pushState({}, '', '/admin/reservas');
+              setAdminTab('agenda');
+            }}
+            className="text-xs font-bold text-[#8B5CF6] dark:text-purple-300 hover:underline flex items-center cursor-pointer"
+          >
+            <span>Ver agenda</span>
+            <ChevronRight className="w-3.5 h-3.5 ml-0.5" />
+          </button>
+        </div>
+
+        {/* Botón Sólido de Marca: Todas las Reservas */}
+        <button
+          type="button"
+          onClick={() => {
+            if (typeof window !== 'undefined') window.history.pushState({}, '', '/admin/reservas/todas');
+            setAdminTab('all_bookings');
+          }}
+          className="w-full py-2.5 px-4 rounded-xl bg-[#0B1A2D] hover:bg-slate-800 dark:bg-[#132A45] dark:hover:bg-[#1a385c] text-white font-bold text-xs flex items-center justify-center gap-2 transition-colors shadow-sm cursor-pointer"
+        >
+          <Calendar className="w-4 h-4 text-white" />
+          <span>Todas las reservas</span>
+          <ArrowRight className="w-4 h-4 text-white" />
+        </button>
+
+        {/* Listado de Tarjetas de Reservas (Tickets limpios de alto contraste) */}
         <div className="space-y-3">
           {upcomingTurnBookings.map((item) => (
-            <BookingListItem
+            <article
               key={item.id}
-              booking={item}
               onClick={() => setSelectedReservation(item)}
-            />
+              className="bg-white dark:bg-[#0E2239] rounded-2xl p-4 border border-slate-100 dark:border-[#1A314D] shadow-[0_2px_12px_rgba(0,0,0,0.04)] space-y-3 cursor-pointer transition hover:border-[#B7F229]/60 hover:shadow-md group"
+            >
+              <div className="flex items-center justify-between">
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-bold">
+                  <Clock className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+                  <span>{item.timeSlot}</span>
+                </span>
+                <span className="text-xs font-bold text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/80 border border-slate-100 dark:border-slate-700 px-2.5 py-1 rounded-full">
+                  {item.courtName}
+                </span>
+              </div>
+
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <h4 className="text-sm font-bold text-[#0B1A2D] dark:text-white truncate group-hover:text-[#8B5CF6] transition-colors">
+                    {item.creatorName}
+                  </h4>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 truncate">
+                    {item.title} • {item.sport}
+                  </p>
+                </div>
+                <span className="text-sm font-extrabold text-[#0B1A2D] dark:text-white font-mono shrink-0">
+                  {item.totalPrice}
+                </span>
+              </div>
+
+              <div className="flex items-center justify-between pt-2.5 border-t border-slate-100 dark:border-slate-800">
+                {item.paymentStatus === 'paid' ? (
+                  <span className="inline-flex items-center gap-1 text-[11px] font-bold text-[#0B1A2D] dark:text-[#B7F229] bg-[#F0FCCF] dark:bg-[#B7F229]/20 px-2.5 py-0.5 rounded-full border border-[#B7F229]/50">
+                    <CheckCircle2 className="w-3 h-3 text-[#659b02] dark:text-[#B7F229]" />
+                    <span>PAGADO</span>
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1 text-[11px] font-bold text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/60 px-2.5 py-0.5 rounded-full border border-amber-200/50">
+                    <AlertCircle className="w-3 h-3 text-amber-500" />
+                    <span>PENDIENTE TPV</span>
+                  </span>
+                )}
+
+                <div className="inline-flex items-center gap-1.5 bg-slate-50 dark:bg-slate-800/80 border border-slate-200/60 dark:border-slate-700 px-2.5 py-1 rounded-full text-xs font-bold text-[#0B1A2D] dark:text-slate-200 font-mono">
+                  <KeyRound className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                  <span>PIN: {item.accessPin}</span>
+                </div>
+              </div>
+            </article>
           ))}
         </div>
       </section>
 
-      {/* DRAWER / MODAL OPERATIVO COMPLETO ESTILO APP MÓVIL NATIVA (Bottom Sheet táctil) */}
+      {/* ======================================================================
+          DRAWER / MODAL OPERATIVO COMPLETO (Bottom Sheet táctil)
+          ====================================================================== */}
       <ReservationDrawer
         isOpen={!!selectedReservation}
         reservation={selectedReservation}
