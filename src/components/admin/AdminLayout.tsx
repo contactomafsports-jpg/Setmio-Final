@@ -105,7 +105,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   };
 
   return (
-    <div data-admin-shell className="min-h-screen bg-slate-50 dark:bg-[#0B1A2D] text-slate-900 dark:text-slate-100 flex flex-col md:flex-row pb-20 md:pb-0 transition-colors duration-200 w-full max-w-full overflow-x-hidden font-sans">
+    <div data-admin-shell className="min-h-screen bg-slate-50 dark:bg-[#0B1A2D] text-slate-900 dark:text-slate-100 flex flex-col md:flex-row pb-24 md:pb-0 transition-colors duration-200 w-full max-w-full overflow-x-hidden font-sans">
       {/* ======================================================================
           SIDEBAR LATERAL UNIFICADO (ESCRITORIO / TABLET)
           - En Marca Blanca (Recepción): Menú único, adaptado y limpio

@@ -24,7 +24,7 @@ export const PrivateMobileNav: React.FC<PrivateMobileNavProps> = ({
   return (
     <nav
       aria-label="Navegación principal de club"
-      className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-[#0B1A2D]/95 backdrop-blur-xl border-t border-slate-200/80 dark:border-[#1A314D] px-2 pt-1 pb-[calc(0.5rem+env(safe-area-inset-bottom))] flex items-center justify-around shadow-[0_-12px_30px_rgba(11,26,45,0.18)]"
+      className="md:hidden fixed bottom-4 inset-x-4 max-w-md mx-auto z-40 bg-white/95 dark:bg-[#0B1A2D]/95 backdrop-blur-xl border border-slate-200/80 dark:border-[#1A314D] px-2.5 py-1.5 rounded-full flex items-center justify-around shadow-[0_8px_30px_rgba(11,26,45,0.12)] dark:shadow-[0_12px_36px_rgba(0,0,0,0.45)]"
     >
       {/* 1º y 2º items principales a la izquierda (Inicio y Reservas) */}
       {primaryNavItems.slice(0, 2).map((item) => {
