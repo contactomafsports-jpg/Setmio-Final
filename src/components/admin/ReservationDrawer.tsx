@@ -666,9 +666,9 @@ export const ReservationDrawer: React.FC<ReservationDrawerProps> = ({
             {/* PIN Card with Copy & WhatsApp Action */}
             <div className="flex items-center justify-between bg-white dark:bg-slate-900 p-2 rounded-xl border border-slate-200 dark:border-slate-700">
               <div className="flex items-center gap-1.5">
-                <KeyRound className="w-4 h-4 text-amber-500" />
+                <KeyRound className="w-4 h-4 text-[#0B1A2D] dark:text-slate-300" />
                 <span className="text-xs font-mono font-black text-slate-900 dark:text-white">
-                  PIN: <strong className="text-emerald-600 dark:text-emerald-400 text-sm tracking-wider">{pinCode}</strong>
+                  PIN: <strong className="text-[#0B1A2D] dark:text-white text-sm tracking-wider">{pinCode}</strong>
                 </span>
               </div>
               <div className="flex items-center gap-1">

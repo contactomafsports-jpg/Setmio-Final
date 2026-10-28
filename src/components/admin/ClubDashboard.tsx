@@ -73,6 +73,9 @@ export const ClubDashboard: React.FC = () => {
   const upcomingTurnBookings: ReservationDrawerData[] = [
     {
       id: 'res-1',
+      venueId: 'venue-san-mateo',
+      venueName: 'Sede Central · San Mateo',
+      venueShortName: 'Sede Central',
       timeSlot: '18:00 - 19:30',
       startTime: '18:00',
       endTime: '19:30',
@@ -98,6 +101,9 @@ export const ClubDashboard: React.FC = () => {
     },
     {
       id: 'res-2',
+      venueId: 'venue-coruna',
+      venueName: 'Sede A Coruña · Matogrande',
+      venueShortName: 'Sede A Coruña',
       timeSlot: '18:30 - 20:00',
       startTime: '18:30',
       endTime: '20:00',
@@ -123,6 +129,9 @@ export const ClubDashboard: React.FC = () => {
     },
     {
       id: 'res-3',
+      venueId: 'venue-santiago',
+      venueName: 'Sede Santiago · Compostela',
+      venueShortName: 'Sede Santiago',
       timeSlot: '19:30 - 21:00',
       startTime: '19:30',
       endTime: '21:00',
@@ -148,8 +157,14 @@ export const ClubDashboard: React.FC = () => {
     },
   ];
 
+  const displayedBookings = isConsolidatedView
+    ? upcomingTurnBookings
+    : upcomingTurnBookings.some((b) => b.venueId === selectedVenueId)
+    ? upcomingTurnBookings.filter((b) => b.venueId === selectedVenueId)
+    : upcomingTurnBookings;
+
   return (
-    <div className="max-w-md lg:max-w-3xl mx-auto px-4 sm:px-5 pt-2 pb-16 space-y-6 font-sans text-[#0B1A2D] dark:text-slate-100 antialiased">
+    <div className="max-w-md lg:max-w-3xl mx-auto pt-2 pb-16 space-y-6 font-sans text-[#0B1A2D] dark:text-slate-100 antialiased">
       {/* ======================================================================
           1. SEDE SELECTOR PILL & OPERATIONAL STATUS (Directo en canvas)
           ====================================================================== */}
@@ -205,16 +220,32 @@ export const ClubDashboard: React.FC = () => {
               </div>
             </div>
 
-            {/* Badge Dinámico de Apertura */}
+            {/* Badge Dinámico de Apertura / Resumen Multisede */}
             <button
               type="button"
-              onClick={toggleClubOpenState}
+              onClick={isConsolidatedView ? () => setIsVenueSelectorOpen((prev) => !prev) : toggleClubOpenState}
               className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#F0FCCF] dark:bg-[#B7F229]/20 border border-[#B7F229]/50 transition-all cursor-pointer hover:scale-102 shrink-0 select-none"
-              title="Haz clic para conmutar estado de apertura del club"
+              title={
+                isConsolidatedView
+                  ? `Red multisede consolidada (${venues.length} sedes operativas)`
+                  : 'Haz clic para conmutar estado de apertura de la sede'
+              }
             >
-              <span className={`w-2 h-2 rounded-full ${isClubOpen ? 'bg-[#82b805] animate-pulse' : 'bg-rose-500'}`} />
+              <span
+                className={`w-2 h-2 rounded-full ${
+                  isConsolidatedView
+                    ? 'bg-[#82b805] dark:bg-[#B7F229]'
+                    : isClubOpen
+                    ? 'bg-[#82b805] animate-pulse'
+                    : 'bg-rose-500'
+                }`}
+              />
               <span className="text-[11px] font-bold text-[#0B1A2D] dark:text-[#B7F229]">
-                {isClubOpen ? 'Abierto · hasta 23:30' : 'Cerrado temporal'}
+                {isConsolidatedView
+                  ? `${venues.length} Sedes Activas`
+                  : isClubOpen
+                  ? 'Abierto · hasta 23:30'
+                  : 'Cerrado temporal'}
               </span>
             </button>
           </div>
@@ -286,7 +317,7 @@ export const ClubDashboard: React.FC = () => {
           <p className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2">
             Avisos Operativos
           </p>
-          <div className="bg-white dark:bg-[#0E2239] rounded-2xl p-4 border border-slate-100 dark:border-[#1A314D] shadow-[0_2px_10px_rgba(0,0,0,0.03)] flex items-center justify-between">
+          <div className="bg-white dark:bg-[#0E2239] rounded-2xl p-3.5 sm:p-4 border border-slate-100 dark:border-[#1A314D] shadow-[0_2px_10px_rgba(0,0,0,0.03)] flex items-center justify-between">
             <div
               className="flex items-center gap-3 cursor-pointer flex-1 mr-2 select-none group"
               onClick={() => setAdminTab('smart_courts')}
@@ -318,10 +349,10 @@ export const ClubDashboard: React.FC = () => {
       )}
 
       {/* ======================================================================
-          3. ACCIONES DIRECTAS (4 BOTONES CIRCULARES ESTILO PLAYTOMIC)
+          3. ACCIONES DIRECTAS (BOTONES CIRCULARES PLANOS Y ACCIONES RÁPIDAS)
           ====================================================================== */}
-      <section>
-        <div className="flex items-center justify-between mb-3">
+      <section className="space-y-3">
+        <div className="flex items-center justify-between">
           <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
             Acciones Directas
           </h2>
@@ -334,9 +365,34 @@ export const ClubDashboard: React.FC = () => {
           </button>
         </div>
 
-        {/* 4 Botones Circulares Principales */}
-        <div className="grid grid-cols-4 gap-2 text-center">
-          {/* 1. Cuadrante */}
+        {/* Accesos directos elegantes con esquinas rounded-2xl: 'Nueva Reserva' y 'Nueva Partida' (Texto centrado, sin iconos) */}
+        <div className="grid grid-cols-2 gap-2.5">
+          <button
+            type="button"
+            onClick={() => {
+              if (typeof window !== 'undefined') window.history.pushState({}, '', '/admin/reservas');
+              setAdminTab('agenda');
+            }}
+            className="w-full text-center py-2.5 px-4 rounded-2xl bg-white dark:bg-[#0E2239] border border-slate-200/90 dark:border-[#1A314D] text-[#0B1A2D] dark:text-white font-bold text-xs hover:border-[#0B1A2D] dark:hover:border-[#B7F229] hover:bg-slate-50 dark:hover:bg-[#132A45] transition-all cursor-pointer shadow-xs active:scale-98 tracking-tight"
+          >
+            Nueva Reserva
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              if (typeof window !== 'undefined') window.history.pushState({}, '', '/admin/partidas');
+              setAdminTab('matches');
+            }}
+            className="w-full text-center py-2.5 px-4 rounded-2xl bg-white dark:bg-[#0E2239] border border-slate-200/90 dark:border-[#1A314D] text-[#0B1A2D] dark:text-white font-bold text-xs hover:border-[#B7F229] hover:bg-slate-50 dark:hover:bg-[#132A45] transition-all cursor-pointer shadow-xs active:scale-98 tracking-tight"
+          >
+            Nueva Partida
+          </button>
+        </div>
+
+        {/* 4 Botones Circulares Principales (Diseño Plano, Limpio, Sin Halos Difusos) */}
+        <div className="grid grid-cols-4 gap-2 text-center pt-0.5">
+          {/* 1. Reservas */}
           <div
             onClick={() => {
               if (typeof window !== 'undefined') window.history.pushState({}, '', '/admin/reservas');
@@ -344,15 +400,15 @@ export const ClubDashboard: React.FC = () => {
             }}
             className="flex flex-col items-center group cursor-pointer select-none"
           >
-            <div className="w-14 h-14 rounded-full bg-[#0B1A2D] dark:bg-[#132A45] border border-slate-700/30 flex items-center justify-center text-white shadow-[0_4px_14px_rgba(11,26,45,0.25)] group-active:scale-95 group-hover:scale-105 transition-all">
-              <LayoutGrid className="w-6 h-6 text-white" />
+            <div className="w-14 h-14 rounded-full bg-[#0B1A2D] dark:bg-[#132A45] border border-[#0B1A2D] dark:border-slate-700 flex items-center justify-center text-white transition-all group-active:scale-95 group-hover:border-slate-500 shadow-xs">
+              <Calendar className="w-6 h-6 text-white" />
             </div>
             <span className="text-xs font-bold text-[#0B1A2D] dark:text-slate-200 mt-2 tracking-tight group-hover:text-[#8B5CF6] transition-colors">
-              Cuadrante
+              Reservas
             </span>
           </div>
 
-          {/* 2. Partidas */}
+          {/* 2. Partidas con icono nítido y probado de Material Symbols (sports_tennis) */}
           <div
             onClick={() => {
               if (typeof window !== 'undefined') window.history.pushState({}, '', '/admin/partidas');
@@ -360,23 +416,17 @@ export const ClubDashboard: React.FC = () => {
             }}
             className="flex flex-col items-center group cursor-pointer select-none"
           >
-            <div className="w-14 h-14 rounded-full bg-[#B7F229] flex items-center justify-center text-[#0B1A2D] shadow-[0_4px_14px_rgba(183,242,41,0.45)] group-active:scale-95 group-hover:scale-105 transition-all">
-              {/* Raqueta y pelota de pádel Play! */}
-              <svg className="w-6 h-6 fill-none stroke-[#0B1A2D] stroke-[2.2]" viewBox="0 0 24 24">
-                <circle cx="11" cy="9" r="6" />
-                <path d="m15.5 13.5 5 5c.8.8.8 2.2 0 3s-2.2.8-3 0l-5-5" strokeLinecap="round" strokeLinejoin="round" />
-                <circle cx="10" cy="8" r="0.8" fill="#0B1A2D" />
-                <circle cx="12" cy="8" r="0.8" fill="#0B1A2D" />
-                <circle cx="11" cy="10" r="0.8" fill="#0B1A2D" />
-                <circle cx="19.5" cy="4.5" r="2.5" fill="#0B1A2D" stroke="none" />
-              </svg>
+            <div className="w-14 h-14 rounded-full bg-[#B7F229] border border-[#B7F229] flex items-center justify-center text-[#0B1A2D] transition-all group-active:scale-95 group-hover:brightness-95 shadow-xs">
+              <span className="material-symbols-outlined text-[26px] text-[#0B1A2D] select-none leading-none">
+                sports_tennis
+              </span>
             </div>
             <span className="text-xs font-bold text-[#0B1A2D] dark:text-slate-200 mt-2 tracking-tight group-hover:text-[#82b805] transition-colors">
               Partidas
             </span>
           </div>
 
-          {/* 3. Torneos */}
+          {/* 3. Torneos: plano sin halo */}
           <div
             onClick={() => {
               if (typeof window !== 'undefined') window.history.pushState({}, '', '/admin/torneos');
@@ -384,7 +434,7 @@ export const ClubDashboard: React.FC = () => {
             }}
             className="flex flex-col items-center group cursor-pointer select-none"
           >
-            <div className="w-14 h-14 rounded-full bg-[#8B5CF6] flex items-center justify-center text-white shadow-[0_4px_14px_rgba(139,92,246,0.35)] group-active:scale-95 group-hover:scale-105 transition-all">
+            <div className="w-14 h-14 rounded-full bg-[#8B5CF6] border border-[#8B5CF6] flex items-center justify-center text-white transition-all group-active:scale-95 group-hover:brightness-95 shadow-xs">
               <Trophy className="w-6 h-6 text-white" />
             </div>
             <span className="text-xs font-bold text-[#0B1A2D] dark:text-slate-200 mt-2 tracking-tight group-hover:text-[#8B5CF6] transition-colors">
@@ -392,7 +442,7 @@ export const ClubDashboard: React.FC = () => {
             </span>
           </div>
 
-          {/* 4. Escuela */}
+          {/* 4. Escuela: plano sin halo */}
           <div
             onClick={() => {
               if (typeof window !== 'undefined') window.history.pushState({}, '', '/admin/escuela');
@@ -400,7 +450,7 @@ export const ClubDashboard: React.FC = () => {
             }}
             className="flex flex-col items-center group cursor-pointer select-none"
           >
-            <div className="w-14 h-14 rounded-full bg-slate-100 dark:bg-[#1E293B] flex items-center justify-center text-slate-700 dark:text-slate-200 border border-slate-200/60 dark:border-slate-700 group-active:scale-95 group-hover:scale-105 transition-all">
+            <div className="w-14 h-14 rounded-full bg-slate-100 dark:bg-[#1E293B] border border-slate-200/80 dark:border-slate-700 flex items-center justify-center text-slate-700 dark:text-slate-200 transition-all group-active:scale-95 group-hover:border-slate-300 dark:group-hover:border-slate-600 shadow-xs">
               <GraduationCap className="w-6 h-6 text-slate-700 dark:text-slate-200" />
             </div>
             <span className="text-xs font-bold text-[#0B1A2D] dark:text-slate-200 mt-2 tracking-tight group-hover:text-[#8B5CF6] transition-colors">
@@ -494,7 +544,7 @@ export const ClubDashboard: React.FC = () => {
         </div>
 
         {/* Tarjeta Telemetría: % Ocupación en tiempo real */}
-        <div className="bg-white dark:bg-[#0E2239] rounded-2xl p-4 border border-slate-100 dark:border-[#1A314D] shadow-[0_2px_10px_rgba(0,0,0,0.03)] space-y-3">
+        <div className="bg-white dark:bg-[#0E2239] rounded-2xl p-3.5 sm:p-4 border border-slate-100 dark:border-[#1A314D] shadow-[0_2px_10px_rgba(0,0,0,0.03)] space-y-3">
           <div className="flex items-baseline justify-between">
             <div>
               <span className="text-xs font-medium text-slate-500 dark:text-slate-400 block">
@@ -531,7 +581,7 @@ export const ClubDashboard: React.FC = () => {
         </div>
 
         {/* Tarjeta de Facturación e Ingresos */}
-        <div className="bg-white dark:bg-[#0E2239] rounded-2xl p-4 border border-slate-100 dark:border-[#1A314D] shadow-[0_2px_10px_rgba(0,0,0,0.03)]">
+        <div className="bg-white dark:bg-[#0E2239] rounded-2xl p-3.5 sm:p-4 border border-slate-100 dark:border-[#1A314D] shadow-[0_2px_10px_rgba(0,0,0,0.03)]">
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-slate-500 dark:text-slate-400">Facturación de hoy</span>
             <span className="inline-flex items-center gap-1 text-xs font-bold text-[#0B1A2D] dark:text-[#B7F229] bg-[#F0FCCF] dark:bg-[#B7F229]/20 border border-[#B7F229]/40 px-2.5 py-0.5 rounded-full">
@@ -616,11 +666,11 @@ export const ClubDashboard: React.FC = () => {
 
         {/* Listado de Tarjetas de Reservas (Tickets limpios de alto contraste) */}
         <div className="space-y-3">
-          {upcomingTurnBookings.map((item) => (
+          {displayedBookings.map((item) => (
             <article
               key={item.id}
               onClick={() => setSelectedReservation(item)}
-              className="bg-white dark:bg-[#0E2239] rounded-2xl p-4 border border-slate-100 dark:border-[#1A314D] shadow-[0_2px_12px_rgba(0,0,0,0.04)] space-y-3 cursor-pointer transition hover:border-[#B7F229]/60 hover:shadow-md group"
+              className="bg-white dark:bg-[#0E2239] rounded-2xl p-3.5 sm:p-4 border border-slate-100 dark:border-[#1A314D] shadow-[0_2px_12px_rgba(0,0,0,0.04)] space-y-3 cursor-pointer transition hover:border-[#B7F229]/60 hover:shadow-md group"
             >
               <div className="flex items-center justify-between">
                 <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-bold">
@@ -634,6 +684,13 @@ export const ClubDashboard: React.FC = () => {
 
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
+                  {/* Micro-texto de Sede en Vista Consolidada ("Todas las Sedes") */}
+                  {isConsolidatedView && (item.venueShortName || item.venueName) && (
+                    <div className="flex items-center gap-1 text-[11px] font-bold text-[#8B5CF6] dark:text-purple-300 mb-0.5 tracking-tight">
+                      <Building2 className="w-3 h-3 text-[#8B5CF6] shrink-0" />
+                      <span>{item.venueShortName || item.venueName}</span>
+                    </div>
+                  )}
                   <h4 className="text-sm font-bold text-[#0B1A2D] dark:text-white truncate group-hover:text-[#8B5CF6] transition-colors">
                     {item.creatorName}
                   </h4>
@@ -659,9 +716,10 @@ export const ClubDashboard: React.FC = () => {
                   </span>
                 )}
 
-                <div className="inline-flex items-center gap-1.5 bg-slate-50 dark:bg-slate-800/80 border border-slate-200/60 dark:border-slate-700 px-2.5 py-1 rounded-full text-xs font-bold text-[#0B1A2D] dark:text-slate-200 font-mono">
-                  <KeyRound className="w-3.5 h-3.5 text-amber-500 shrink-0" />
-                  <span>PIN: {item.accessPin}</span>
+                {/* Tag de Acceso Domótico PIN: Contenedor neutro y limpio (#0B1A2D / Slate) */}
+                <div className="inline-flex items-center gap-1.5 bg-slate-50 dark:bg-slate-800/80 border border-slate-200/70 dark:border-slate-700/80 px-2.5 py-1 rounded-full text-xs font-bold text-[#0B1A2D] dark:text-slate-200 font-mono tracking-wide shadow-2xs">
+                  <KeyRound className="w-3.5 h-3.5 text-[#0B1A2D] dark:text-slate-300 shrink-0" />
+                  <span>PIN: <strong className="text-[#0B1A2D] dark:text-white font-black">{item.accessPin}</strong></span>
                 </div>
               </div>
             </article>

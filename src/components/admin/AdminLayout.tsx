@@ -31,7 +31,10 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
     currentUser,
     logoutOrExitDemo,
     theme,
+    setTheme,
     toggleTheme,
+    adminTheme,
+    setAdminTheme,
     language,
     setLanguage,
     enterWhiteLabelPlayerPreview,
@@ -307,8 +310,8 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
           onSelectTab={handleSelectTab}
         />
 
-        {/* Contenido Dinámico de la Pestaña Activa */}
-        <main className="flex-1 p-3 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto">
+        {/* Contenido Dinámico de la Pestaña Activa con márgenes optimizados px-3.5 */}
+        <main className="flex-1 px-3.5 py-3 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto">
           {children}
         </main>
       </div>
@@ -392,43 +395,79 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
 
             {/* Ajustes Móviles: Tema e Idiomas */}
             <div className="pt-2 border-t border-slate-100 dark:border-slate-800 space-y-3">
-              {/* Conmutador Modo Claro / Oscuro */}
+              {/* Conmutador Modo Claro / Oscuro con pastilla deslizante */}
               <div className="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800">
                 <div className="flex items-center gap-3">
                   <div className="p-2 rounded-xl bg-white dark:bg-slate-900 shadow-xs">
-                    {theme === 'dark' ? (
-                      <Moon className="w-5 h-5 text-indigo-400" />
+                    {(adminTheme === 'dark' || theme === 'dark') ? (
+                      <Moon className="w-5 h-5 text-[#B7F229]" />
                     ) : (
                       <Sun className="w-5 h-5 text-amber-500" />
                     )}
                   </div>
                   <div>
                     <div className="font-bold text-xs text-slate-900 dark:text-white">
-                      Modo {theme === 'dark' ? 'Oscuro' : 'Claro'}
+                      Modo {(adminTheme === 'dark' || theme === 'dark') ? 'Oscuro' : 'Claro'}
                     </div>
                     <div className="text-[10px] text-slate-500 dark:text-slate-400">
                       Aspecto visual de la app
                     </div>
                   </div>
                 </div>
-                <button
-                  type="button"
-                  onClick={toggleTheme}
-                  className="px-3 py-1.5 rounded-xl font-bold text-xs bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 hover:border-emerald-500 transition cursor-pointer flex items-center gap-1.5 shadow-2xs"
-                  aria-label="Cambiar tema"
-                >
-                  {theme === 'dark' ? (
-                    <>
-                      <Sun className="w-3.5 h-3.5 text-amber-400" />
-                      <span>Claro</span>
-                    </>
-                  ) : (
-                    <>
-                      <Moon className="w-3.5 h-3.5 text-indigo-500" />
-                      <span>Oscuro</span>
-                    </>
-                  )}
-                </button>
+
+                {/* Selector interactivo con pastilla deslizante Claro / Oscuro */}
+                <div className="relative flex items-center bg-slate-200/80 dark:bg-slate-900 p-1 rounded-xl text-[11px] font-bold border border-slate-300/60 dark:border-slate-800 w-36 shrink-0">
+                  {/* Pastilla deslizante animada */}
+                  <span
+                    aria-hidden="true"
+                    className={`absolute top-1 bottom-1 w-[calc(50%-4px)] rounded-lg transition-transform duration-200 ease-out shadow-xs pointer-events-none ${
+                      (adminTheme === 'dark' || theme === 'dark')
+                        ? 'left-1 translate-x-[calc(100%+0px)] bg-[#0B1A2D] border border-slate-700/80 shadow-xs'
+                        : 'left-1 translate-x-0 bg-white border border-slate-200/80 shadow-xs'
+                    }`}
+                  />
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (setTheme) setTheme('light');
+                      if (setAdminTheme) setAdminTheme('light');
+                      if (typeof document !== 'undefined') {
+                        document.documentElement.classList.remove('dark');
+                        document.documentElement.classList.add('light');
+                      }
+                    }}
+                    className={`relative z-10 flex-1 py-1 rounded-lg flex items-center justify-center gap-1 transition-colors cursor-pointer select-none text-center ${
+                      !(adminTheme === 'dark' || theme === 'dark')
+                        ? 'text-slate-900 font-extrabold'
+                        : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+                    }`}
+                    title="Cambiar a Modo Claro"
+                  >
+                    <Sun className={`w-3.5 h-3.5 ${!(adminTheme === 'dark' || theme === 'dark') ? 'text-amber-500' : 'text-slate-400'}`} />
+                    <span>Claro</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (setTheme) setTheme('dark');
+                      if (setAdminTheme) setAdminTheme('dark');
+                      if (typeof document !== 'undefined') {
+                        document.documentElement.classList.add('dark');
+                        document.documentElement.classList.remove('light');
+                      }
+                    }}
+                    className={`relative z-10 flex-1 py-1 rounded-lg flex items-center justify-center gap-1 transition-colors cursor-pointer select-none text-center ${
+                      (adminTheme === 'dark' || theme === 'dark')
+                        ? 'text-[#B7F229] font-extrabold'
+                        : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+                    }`}
+                    title="Cambiar a Modo Oscuro"
+                  >
+                    <Moon className={`w-3.5 h-3.5 ${(adminTheme === 'dark' || theme === 'dark') ? 'text-[#B7F229]' : 'text-slate-400'}`} />
+                    <span>Oscuro</span>
+                  </button>
+                </div>
               </div>
 
               {/* Selector de Idiomas */}

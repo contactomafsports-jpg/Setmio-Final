@@ -215,9 +215,9 @@ export const BookingListItem: React.FC<BookingListItemProps> = ({
             <span>{statusInfo.label}</span>
           </span>
 
-          <span className="inline-flex items-center gap-1 text-[11px] font-mono font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-900/80 px-2 py-0.5 rounded-lg border border-slate-200/80 dark:border-slate-700/80 whitespace-nowrap">
-            <KeyRound className="w-3 h-3 text-amber-500" />
-            <span>PIN: <strong className="text-emerald-600 dark:text-emerald-400 font-extrabold">{pinCode}</strong></span>
+          <span className="inline-flex items-center gap-1.5 text-[11px] font-mono font-bold text-[#0B1A2D] dark:text-slate-200 bg-slate-50 dark:bg-slate-800/80 px-2.5 py-0.5 rounded-lg border border-slate-200/70 dark:border-slate-700/80 whitespace-nowrap">
+            <KeyRound className="w-3 h-3 text-[#0B1A2D] dark:text-slate-300" />
+            <span>PIN: <strong className="text-[#0B1A2D] dark:text-white font-extrabold">{pinCode}</strong></span>
           </span>
         </div>
       </div>

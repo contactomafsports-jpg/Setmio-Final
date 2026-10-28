@@ -1862,10 +1862,10 @@ export const PlayerPortal: React.FC = () => {
         <button
           type="button"
           onClick={() => navigatePlayerTab('booking')}
-          className="relative -mt-7 flex size-14 shrink-0 items-center justify-center rounded-full border-4 border-slate-50 bg-[#0B1A2D] text-white shadow-xl shadow-[#0B1A2D]/25 ring-2 ring-[#B7F229]/60 transition hover:scale-105 dark:border-slate-950"
+          className="relative -mt-7 flex size-14 shrink-0 items-center justify-center rounded-full border-4 border-slate-50 dark:border-[#0B1A2D] bg-[#0B1A2D] dark:bg-[#B7F229] text-white dark:text-[#0B1A2D] shadow-xl shadow-[#0B1A2D]/25 dark:shadow-[0_8px_20px_rgba(183,242,41,0.28)] ring-2 ring-[#B7F229]/40 dark:ring-[#B7F229]/40 transition hover:scale-105"
           aria-label="Crear una nueva reserva o partida"
         >
-          <Plus className="size-6 stroke-[2.5]" />
+          <Plus className="size-6 stroke-[2.5] text-white dark:text-[#0B1A2D]" />
         </button>
 
         {/* 6. Menú Hamburguesa 'Más' para páginas secundarias */}

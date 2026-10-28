@@ -53,7 +53,7 @@ export const PrivateMobileNav: React.FC<PrivateMobileNavProps> = ({
         );
       })}
 
-      {/* Botón flotante central "+" con acento de marca Setmio */}
+      {/* Botón flotante central "+" con acento de marca Setmio (Luz y Contraste Óptimo en Modo Claro y Oscuro) */}
       <button
         type="button"
         onClick={onMore}
@@ -61,13 +61,13 @@ export const PrivateMobileNav: React.FC<PrivateMobileNavProps> = ({
         aria-label="Más módulos y herramientas (+)"
       >
         <div
-          className={`w-12 h-12 rounded-full flex items-center justify-center shadow-xl transition-all duration-300 border-2 border-white dark:border-[#0B1A2D] ${
+          className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 border-2 border-white dark:border-[#0B1A2D] ${
             moreOpen
-              ? 'bg-[#0B1A2D] text-white rotate-45 scale-105 shadow-[#0B1A2D]/30 ring-4 ring-[#B7F229]/25'
-              : 'bg-[#0B1A2D] hover:bg-[#132A45] text-white shadow-[#0B1A2D]/30 hover:scale-105 ring-4 ring-[#B7F229]/20'
+              ? 'bg-[#0B1A2D] dark:bg-[#B7F229] text-white dark:text-[#0B1A2D] rotate-45 scale-105 shadow-lg shadow-[#0B1A2D]/20 dark:shadow-[0_8px_24px_rgba(183,242,41,0.35)] ring-4 ring-slate-200/80 dark:ring-[#B7F229]/40'
+              : 'bg-[#0B1A2D] hover:bg-[#132A45] dark:bg-[#B7F229] dark:hover:bg-[#a3dc20] text-white dark:text-[#0B1A2D] shadow-lg shadow-[#0B1A2D]/20 dark:shadow-[0_8px_20px_rgba(183,242,41,0.28)] hover:scale-105 ring-4 ring-[#B7F229]/25 dark:ring-[#B7F229]/30'
           }`}
         >
-          <Plus className="w-6 h-6 transition-transform duration-200 text-white" strokeWidth={2.75} />
+          <Plus className="w-6 h-6 transition-transform duration-200 text-white dark:text-[#0B1A2D]" strokeWidth={2.75} />
         </div>
       </button>
 

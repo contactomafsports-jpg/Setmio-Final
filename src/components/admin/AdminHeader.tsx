@@ -105,7 +105,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
 
   return (
     <>
-      <header className="sticky top-0 z-50 h-14 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-3 sm:px-6 flex items-center justify-between gap-2 shadow-xs transition-colors">
+      <header className="sticky top-0 z-50 h-14 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-3.5 sm:px-6 flex items-center justify-between gap-2 shadow-xs transition-colors">
         {/* Left: BRANDING CONDICIONAL (Recepción = Marca Blanca Club / Admin = Oficial Setmio Pro) */}
         <div className="flex items-center gap-2 sm:gap-3 min-w-0">
           {isReception ? (
@@ -127,9 +127,21 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
               </div>
             </div>
           ) : (
-            /* Vista Admin Club / Escuela / Profesor / Atleta: Branding Oficial Setmio Pro con Isotipo Dual Stripe */
+            /* Vista Admin Club / Escuela / Profesor / Atleta: Branding Oficial Setmio Pro con Tipografía Corporativa */
             <div className="flex items-center gap-2.5 shrink-0">
-              <SetmioLogo variant="horizontal" size="xs" showSubtitle={true} />
+              <button
+                type="button"
+                onClick={() => onSelectTab?.('dashboard')}
+                className="flex items-center gap-2 cursor-pointer select-none group text-left p-0 bg-transparent border-0 focus:outline-none"
+                title="Ir al Inicio de Setmio"
+              >
+                <span className="text-[21px] sm:text-[22px] font-extrabold tracking-tight text-[#0B1A2D] dark:text-white uppercase font-sans leading-none select-none">
+                  SETMIO
+                </span>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#8B5CF6] text-white tracking-wider leading-none shrink-0 shadow-2xs">
+                  PRO
+                </span>
+              </button>
               <div className="flex items-center gap-2">
                 {isProAthleteAdmin ? (
                   <span className="hidden sm:inline-flex items-center gap-1 text-[10px] font-extrabold text-red-400 bg-red-950/70 border border-red-800 px-2 py-0.5 rounded-md">

@@ -37,6 +37,7 @@ export const UserProfileDropdown: React.FC<UserProfileDropdownProps> = ({
     currentTenant,
     logoutOrExitDemo,
     theme,
+    setTheme,
     toggleTheme,
     adminTheme,
     setAdminTheme,
@@ -75,28 +76,27 @@ export const UserProfileDropdown: React.FC<UserProfileDropdownProps> = ({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isOpen]);
 
-  // Determine dark mode state
-  const isDark =
-    theme === 'dark' ||
-    adminTheme === 'dark' ||
-    (typeof document !== 'undefined' && document.documentElement.classList.contains('dark'));
+  // Determine dark mode state reactively based on current active theme
+  const isDark = (variant === 'admin' ? adminTheme === 'dark' : theme === 'dark');
 
   const applyThemeMode = (mode: 'light' | 'dark') => {
-    const root = document.documentElement;
-    if (mode === 'dark') {
-      root.classList.add('dark');
-      root.classList.remove('light');
-    } else {
-      root.classList.remove('dark');
-      root.classList.add('light');
+    if (setTheme) {
+      setTheme(mode);
     }
     if (variant === 'admin' && setAdminTheme) {
       setAdminTheme(mode);
     } else if (setClubTheme) {
       setClubTheme(mode);
     }
-    if (theme !== mode) {
-      toggleTheme();
+    if (typeof document !== 'undefined') {
+      const root = document.documentElement;
+      if (mode === 'dark') {
+        root.classList.add('dark');
+        root.classList.remove('light');
+      } else {
+        root.classList.remove('dark');
+        root.classList.add('light');
+      }
     }
   };
 
@@ -264,32 +264,42 @@ export const UserProfileDropdown: React.FC<UserProfileDropdownProps> = ({
                 </div>
               </div>
 
-              {/* Selector interactivo Claro / Oscuro */}
-              <div className="flex items-center bg-slate-200/80 dark:bg-slate-900 p-0.5 rounded-xl text-[11px] font-bold border border-slate-300/60 dark:border-slate-800">
+              {/* Selector interactivo con pastilla deslizante Claro / Oscuro */}
+              <div className="relative flex items-center bg-slate-200/80 dark:bg-slate-950 p-1 rounded-xl text-[11px] font-bold border border-slate-300/60 dark:border-slate-800 w-36">
+                {/* Pastilla deslizante animada */}
+                <span
+                  aria-hidden="true"
+                  className={`absolute top-1 bottom-1 w-[calc(50%-4px)] rounded-lg transition-transform duration-200 ease-out shadow-xs pointer-events-none ${
+                    isDark
+                      ? 'left-1 translate-x-[calc(100%+0px)] bg-[#0B1A2D] border border-slate-700/80 shadow-xs'
+                      : 'left-1 translate-x-0 bg-white border border-slate-200/80 shadow-xs'
+                  }`}
+                />
+
                 <button
                   type="button"
                   onClick={() => applyThemeMode('light')}
-                  className={`px-2 py-1 rounded-lg flex items-center gap-1 transition cursor-pointer ${
+                  className={`relative z-10 flex-1 py-1 rounded-lg flex items-center justify-center gap-1 transition-colors cursor-pointer select-none text-center ${
                     !isDark
-                      ? 'bg-white text-slate-900 shadow-2xs font-extrabold'
-                      : 'text-slate-500 hover:text-slate-900 dark:hover:text-slate-200'
+                      ? 'text-slate-900 font-extrabold'
+                      : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
                   }`}
                   title="Cambiar a Modo Claro"
                 >
-                  <Sun className="w-3 h-3 text-amber-500" />
+                  <Sun className={`w-3.5 h-3.5 ${!isDark ? 'text-amber-500' : 'text-slate-400'}`} />
                   <span>Claro</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => applyThemeMode('dark')}
-                  className={`px-2 py-1 rounded-lg flex items-center gap-1 transition cursor-pointer ${
+                  className={`relative z-10 flex-1 py-1 rounded-lg flex items-center justify-center gap-1 transition-colors cursor-pointer select-none text-center ${
                     isDark
-                      ? 'bg-slate-800 text-white shadow-2xs font-extrabold'
-                      : 'text-slate-500 hover:text-slate-900 dark:hover:text-slate-200'
+                      ? 'text-[#B7F229] font-extrabold'
+                      : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
                   }`}
                   title="Cambiar a Modo Oscuro"
                 >
-                  <Moon className="w-3 h-3 text-indigo-400" />
+                  <Moon className={`w-3.5 h-3.5 ${isDark ? 'text-[#B7F229]' : 'text-slate-400'}`} />
                   <span>Oscuro</span>
                 </button>
               </div>
