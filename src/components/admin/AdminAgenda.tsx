@@ -107,7 +107,6 @@ export const AdminAgenda: React.FC = () => {
     createBooking,
     updateBooking,
     cancelBooking,
-    toggleCourtLight,
     currentUser,
     currentTenant,
     isMultiVenue,
@@ -650,21 +649,21 @@ export const AdminAgenda: React.FC = () => {
           </div>
         )}
 
-        {/* Fila de Controles: Selector de Fecha + Botón '+ Nueva reserva' */}
-        <div className="grid grid-cols-12 gap-2">
+        {/* Fila de Controles: Selector de Fecha + Botón '+ Nueva reserva' (Lado a lado) */}
+        <div className="flex items-center gap-2">
           {/* Selector de Fecha Tipo Ribbon */}
-          <div className="col-span-12 sm:col-span-6 flex items-center justify-between bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-xl px-2 py-1.5 shadow-2xs">
+          <div className="flex-1 min-w-0 flex items-center justify-between bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-xl px-2 py-2 shadow-2xs h-10">
             <button
               type="button"
               onClick={() => stepDate(-1)}
-              className="p-1.5 rounded-lg text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 active:scale-90 transition-transform cursor-pointer"
+              className="p-1 rounded-lg text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 active:scale-90 transition-transform cursor-pointer shrink-0"
               title="Día anterior"
             >
-              <ChevronLeft className="w-4 h-4" />
+              <ChevronLeft className="w-3.5 h-3.5" />
             </button>
-            <div className="relative flex items-center justify-center gap-1.5 text-xs sm:text-sm font-bold text-slate-900 dark:text-white cursor-pointer select-none">
-              <Calendar className="w-4 h-4 text-slate-400 shrink-0" />
-              <span>{formattedDateLabel}</span>
+            <div className="relative flex items-center justify-center gap-1.5 text-xs sm:text-sm font-bold text-slate-900 dark:text-white cursor-pointer select-none truncate">
+              <Calendar className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+              <span className="truncate">{formattedDateLabel}</span>
               <input
                 ref={dateInputRef}
                 type="date"
@@ -679,10 +678,10 @@ export const AdminAgenda: React.FC = () => {
             <button
               type="button"
               onClick={() => stepDate(1)}
-              className="p-1.5 rounded-lg text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 active:scale-90 transition-transform cursor-pointer"
+              className="p-1 rounded-lg text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 active:scale-90 transition-transform cursor-pointer shrink-0"
               title="Día siguiente"
             >
-              <ChevronRight className="w-4 h-4" />
+              <ChevronRight className="w-3.5 h-3.5" />
             </button>
           </div>
 
@@ -690,10 +689,10 @@ export const AdminAgenda: React.FC = () => {
           <button
             type="button"
             onClick={() => setShowNewModal(true)}
-            className="col-span-12 sm:col-span-6 flex items-center justify-center gap-1.5 bg-[#B7F229] hover:bg-[#a6e61f] active:scale-95 text-[#0B1A2D] font-black rounded-xl px-3 py-2 text-xs sm:text-sm shadow-sm transition-all cursor-pointer"
+            className="flex-1 min-w-0 flex items-center justify-center gap-1.5 bg-[#B7F229] hover:bg-[#a6e61f] active:scale-95 text-[#0B1A2D] font-black rounded-xl px-2.5 py-2 text-xs sm:text-sm shadow-sm transition-all cursor-pointer h-10"
           >
-            <Plus className="w-4 h-4 stroke-[3]" />
-            <span>Nueva reserva</span>
+            <Plus className="w-4 h-4 stroke-[3] shrink-0" />
+            <span className="truncate">Nueva reserva</span>
           </button>
         </div>
 
@@ -716,20 +715,7 @@ export const AdminAgenda: React.FC = () => {
       {/* ======================================================================
           2. FILA DE SEDES MINIMALISTA CON MICRO-DOTS DE MARCA (RIBBON)
           ====================================================================== */}
-      <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-0.5 px-0.5">
-        <button
-          type="button"
-          onClick={() => setSelectedVenueId('all')}
-          className={`shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full border shadow-2xs text-xs transition cursor-pointer ${
-            selectedVenueId === 'all'
-              ? 'bg-slate-900 text-white dark:bg-white dark:text-[#0B1A2D] border-slate-900 dark:border-white font-bold ring-2 ring-slate-900/10 dark:ring-white/20'
-              : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white font-medium'
-          }`}
-        >
-          <span className="w-2 h-2 rounded-full bg-slate-400 dark:bg-slate-300 ring-2 ring-slate-400/40 shrink-0" />
-          <span>Todas las Sedes</span>
-        </button>
-
+      <div className="flex items-center gap-1.5 overflow-x-auto hide-scrollbar [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden py-0.5 px-0.5">
         {availableVenues
           .filter((v) => v.id !== 'all')
           .map((v) => {
@@ -741,21 +727,23 @@ export const AdminAgenda: React.FC = () => {
                 ? 'bg-[#0B1A2D] dark:bg-sky-400 ring-[#0B1A2D]/30 dark:ring-sky-400/30'
                 : v.id === 'venue-santiago'
                 ? 'bg-[#8B5CF6] ring-[#8B5CF6]/40'
-                : 'bg-[#64748B] ring-[#64748B]/30';
+                : 'bg-sky-500 ring-sky-500/30';
+
+            const cleanName = (v.shortName || v.name).replace(/^Sede\s+/i, '');
 
             return (
               <button
                 key={v.id}
                 type="button"
                 onClick={() => setSelectedVenueId(isSelected ? 'all' : v.id)}
-                className={`shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full border shadow-2xs text-xs transition cursor-pointer ${
+                className={`shrink-0 flex items-center gap-1.5 px-2.5 py-1 rounded-full border shadow-2xs text-[11px] sm:text-xs transition cursor-pointer ${
                   isSelected
                     ? 'bg-white dark:bg-slate-900 border-[#0B1A2D] dark:border-[#B7F229] font-bold text-[#0B1A2D] dark:text-white ring-2 ring-[#0B1A2D]/15 dark:ring-[#B7F229]/25 shadow-xs'
-                    : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white font-medium'
+                    : 'bg-white dark:bg-slate-900 border-slate-200/90 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white font-medium hover:border-slate-300 dark:hover:border-slate-700'
                 }`}
               >
                 <span className={`w-2 h-2 rounded-full ring-2 shrink-0 ${dotColor}`} />
-                <span>{v.shortName || v.name}</span>
+                <span className="whitespace-nowrap">{cleanName}</span>
               </button>
             );
           })}
@@ -796,11 +784,31 @@ export const AdminAgenda: React.FC = () => {
             >
               <div className="text-left pl-1">
                 <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
-                  Hora
+                  HORA
                 </span>
               </div>
               {displayedCourts.map((court) => {
                 const courtVenue = availableVenues.find((v) => v.id === court.venueId) || availableVenues[1] || availableVenues[0];
+                const venueInfo = (() => {
+                  if (court.venueId === 'venue-san-mateo' || (!court.venueId && court.name.includes('Pista'))) {
+                    return { name: 'San Mateo', dot: 'bg-[#B7F229]' };
+                  }
+                  if (court.venueId === 'venue-coruna') {
+                    return { name: 'A Coruña', dot: 'bg-[#0B1A2D] dark:bg-sky-400' };
+                  }
+                  if (court.venueId === 'venue-santiago') {
+                    return { name: 'Santiago', dot: 'bg-[#8B5CF6]' };
+                  }
+                  if (court.venueId === 'venue-vigo') {
+                    return { name: 'Vigo', dot: 'bg-sky-500' };
+                  }
+                  const name = (courtVenue?.shortName || courtVenue?.name || 'San Mateo')
+                    .replace(/^Sede\s+/i, '')
+                    .replace(/\s*\(.*\)$/, '')
+                    .trim();
+                  return { name, dot: 'bg-slate-400' };
+                })();
+
                 return (
                   <div
                     key={court.id}
@@ -808,26 +816,15 @@ export const AdminAgenda: React.FC = () => {
                   >
                     <div className="flex items-center justify-between">
                       <span className="text-xs font-bold text-slate-900 dark:text-white truncate">
-                        {court.name.split('—')[0]}
+                        {court.name.split('—')[0].trim()}
                       </span>
-                      <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">
+                      <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 shrink-0">
                         {court.hourlyRate}€/h
                       </span>
                     </div>
-                    <div className="flex items-center justify-between text-[10px] text-slate-400 dark:text-slate-500 font-medium truncate pt-0.5">
-                      <span className="truncate">{courtVenue?.shortName || 'San Mateo'}</span>
-                      <button
-                        type="button"
-                        onClick={() => toggleCourtLight(court.id)}
-                        className={`p-0.5 rounded transition cursor-pointer shrink-0 ${
-                          court.isLightOn
-                            ? 'text-amber-500 hover:text-amber-400'
-                            : 'text-slate-400 hover:text-slate-600 dark:text-slate-500'
-                        }`}
-                        title="Conmutar focos"
-                      >
-                        <Zap className="w-3 h-3" />
-                      </button>
+                    <div className="flex items-center gap-1.5 text-[10px] text-slate-500 dark:text-slate-400 font-medium truncate pt-0.5">
+                      <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${venueInfo.dot}`} />
+                      <span className="truncate">{venueInfo.name}</span>
                     </div>
                   </div>
                 );

@@ -176,6 +176,15 @@ h1, h2, h3, h4 { font-family: 'Inter', 'Manrope', sans-serif; letter-spacing: -.
 
 @layer utilities {
   .text-balance { text-wrap: balance; }
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+  }
 }
 
 @layer base {
