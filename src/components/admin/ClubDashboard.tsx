@@ -24,6 +24,7 @@ import {
   CreditCard,
   Shield,
   Layers,
+  Plus,
 } from 'lucide-react';
 import { ReservationDrawer, ReservationDrawerData } from './ReservationDrawer';
 
@@ -364,7 +365,7 @@ export const ClubDashboard: React.FC = () => {
           </button>
         </div>
 
-        {/* Accesos directos elegantes con esquinas rounded-2xl: 'Nueva Reserva' y 'Nueva Partida' (Texto centrado, sin iconos) */}
+        {/* Accesos directos elegantes en Azul Profundo (#0B1A2D) con signo '+' en Verde Lima (#B7F229) */}
         <div className="grid grid-cols-2 gap-2.5">
           <button
             type="button"
@@ -372,9 +373,10 @@ export const ClubDashboard: React.FC = () => {
               if (typeof window !== 'undefined') window.history.pushState({}, '', '/admin/reservas');
               setAdminTab('agenda');
             }}
-            className="w-full text-center py-2.5 px-4 rounded-2xl bg-white dark:bg-[#0E2239] border border-slate-200/90 dark:border-[#1A314D] text-[#0B1A2D] dark:text-white font-bold text-xs hover:border-[#0B1A2D] dark:hover:border-[#B7F229] hover:bg-slate-50 dark:hover:bg-[#132A45] transition-all cursor-pointer shadow-xs active:scale-98 tracking-tight"
+            className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-2xl bg-[#0B1A2D] hover:bg-[#132A45] active:scale-98 text-white font-bold text-xs shadow-xs border border-[#0B1A2D] dark:border-slate-700 transition-all cursor-pointer tracking-tight group"
           >
-            Nueva Reserva
+            <Plus className="w-4 h-4 stroke-[3] text-[#B7F229] group-hover:rotate-90 transition-transform shrink-0" />
+            <span>Nueva reserva</span>
           </button>
 
           <button
@@ -383,9 +385,10 @@ export const ClubDashboard: React.FC = () => {
               if (typeof window !== 'undefined') window.history.pushState({}, '', '/admin/partidas');
               setAdminTab('matches');
             }}
-            className="w-full text-center py-2.5 px-4 rounded-2xl bg-white dark:bg-[#0E2239] border border-slate-200/90 dark:border-[#1A314D] text-[#0B1A2D] dark:text-white font-bold text-xs hover:border-[#B7F229] hover:bg-slate-50 dark:hover:bg-[#132A45] transition-all cursor-pointer shadow-xs active:scale-98 tracking-tight"
+            className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-2xl bg-[#0B1A2D] hover:bg-[#132A45] active:scale-98 text-white font-bold text-xs shadow-xs border border-[#0B1A2D] dark:border-slate-700 transition-all cursor-pointer tracking-tight group"
           >
-            Nueva Partida
+            <Plus className="w-4 h-4 stroke-[3] text-[#B7F229] group-hover:rotate-90 transition-transform shrink-0" />
+            <span>Nueva partida</span>
           </button>
         </div>
 

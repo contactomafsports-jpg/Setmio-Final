@@ -453,6 +453,13 @@ export const AdminMatches: React.FC = () => {
     0
   );
 
+  const matchWithPendingRequest = useMemo(() => {
+    return (
+      venueFilteredMatches.find((m) => m.slotRequests?.some((r) => r.status === 'pending')) ||
+      openMatches.find((m) => m.slotRequests?.some((r) => r.status === 'pending'))
+    );
+  }, [venueFilteredMatches, openMatches]);
+
   // Handlers
   const handleCreateSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -1060,21 +1067,24 @@ export const AdminMatches: React.FC = () => {
           1. CABECERA LIMPIA Y SIMÉTRICA (ESTILO INICIO & RESERVAS)
           ====================================================================== */}
       <section className="pt-[26px] pb-1 space-y-3" data-purpose="header-section">
-        <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center justify-between">
           <div>
+            <span className="text-xs font-medium text-slate-400 dark:text-slate-500 tracking-wide block mb-0.5">
+              {currentTenant?.name || 'Centro de Pádel San Mateo'}
+            </span>
             <h1 className="text-[22px] font-extrabold text-[#0B1A2D] dark:text-white tracking-tight leading-tight">
               Partidas Abiertas
             </h1>
           </div>
 
-          {/* Botón CTA '+ Nueva partida' en Azul Profundo (#0B1A2D) con acentos en Verde Lima (#B7F229) */}
           <button
             type="button"
             onClick={() => setShowCreateModal(true)}
-            className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 bg-[#0B1A2D] hover:bg-[#132A45] active:scale-95 text-white font-black rounded-xl text-xs sm:text-sm shadow-sm border border-[#0B1A2D] dark:border-slate-700 transition-all cursor-pointer group"
+            className="w-9 h-9 rounded-xl bg-[#0B1A2D] dark:bg-[#0B1A2D] border border-[#0B1A2D] dark:border-slate-700 flex items-center justify-center text-white hover:bg-[#132A45] active:scale-95 transition-all cursor-pointer shadow-xs"
+            title="Nueva partida"
+            aria-label="Nueva partida"
           >
-            <Plus className="w-4 h-4 stroke-[3] text-[#B7F229] group-hover:rotate-90 transition-transform shrink-0" />
-            <span className="truncate">{t('matches.btnNew', 'Nueva partida')}</span>
+            <Plus className="w-4 h-4 stroke-[3] text-[#B7F229]" />
           </button>
         </div>
 
@@ -1259,18 +1269,18 @@ export const AdminMatches: React.FC = () => {
           </p>
         </div>
 
-        {/* Solicitudes Nivel: Etiqueta 'Al día' en una sola línea con tono verde suave */}
+        {/* Solicitudes: Renombrado a 'Solicitudes' con botón interactivo directo a la partida */}
         <div className="bg-white dark:bg-slate-900 rounded-2xl p-3.5 sm:p-4 border border-slate-200/80 dark:border-slate-800 shadow-2xs flex flex-col justify-between relative overflow-hidden">
           <div className="flex items-center justify-between gap-1.5">
             <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 truncate">
-              {t('matches.pendingRequests', 'Solicitudes Nivel')}
+              {t('matches.pendingRequests', 'Solicitudes')}
             </p>
             {pendingRequestsTotal > 0 ? (
               <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-400 text-[10px] font-bold border border-amber-200 dark:border-amber-800 whitespace-nowrap shrink-0">
                 {pendingRequestsTotal} pend.
               </span>
             ) : (
-              <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold border border-emerald-100 dark:border-emerald-800/80 whitespace-nowrap shrink-0">
+              <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-[#F0FCCF] dark:bg-[#B7F229]/20 text-[#0B1A2D] dark:text-[#B7F229] text-[10px] font-bold border border-[#B7F229]/50 whitespace-nowrap shrink-0">
                 Al día
               </span>
             )}
@@ -1280,24 +1290,37 @@ export const AdminMatches: React.FC = () => {
               {pendingRequestsTotal}
             </span>
           </div>
-          <p className="text-[11px] font-medium text-slate-400 dark:text-slate-500">
-            {pendingRequestsTotal > 0 ? 'Pendientes de aprobar' : 'Sin pendientes'}
-          </p>
+          <div className="flex items-center justify-between gap-1">
+            <p className="text-[11px] font-medium text-slate-400 dark:text-slate-500 truncate">
+              {pendingRequestsTotal > 0 ? 'Pendientes de aprobar' : 'Sin pendientes'}
+            </p>
+            {pendingRequestsTotal > 0 && matchWithPendingRequest && (
+              <button
+                type="button"
+                onClick={() => openMatchDetail(matchWithPendingRequest)}
+                className="inline-flex items-center gap-1 text-[11px] font-bold text-[#8B5CF6] hover:text-[#7C3AED] hover:underline cursor-pointer shrink-0"
+                title="Abrir partida con solicitud pendiente"
+              >
+                <span>Ver detalle</span>
+                <ArrowRight className="w-3 h-3" />
+              </button>
+            )}
+          </div>
         </div>
       </section>
 
-      {/* 3. Filtros Horizontales Simplificados (Diseño Plano y Moderno) */}
+      {/* 3. Filtros Horizontales Modernos (Contenedor rounded-2xl minimalista estilo Stripe/Linear) */}
       <section className="space-y-2.5" data-purpose="filtering-section">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+        <div className="p-2 sm:p-2.5 bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200/80 dark:border-[#1A314D] shadow-[0_2px_8px_rgba(0,0,0,0.02)] flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
           {/* Pestañas Planas Modernas */}
           <div className="flex items-center gap-1.5 overflow-x-auto hide-scrollbar">
             <button
               type="button"
               onClick={() => setStatusFilter('all')}
-              className={`px-3 py-1.5 rounded-full text-xs transition cursor-pointer font-bold ${
+              className={`px-3 py-1.5 rounded-xl text-xs transition cursor-pointer font-bold ${
                 statusFilter === 'all'
                   ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D] shadow-xs'
-                  : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white border border-slate-200/80 dark:border-slate-800'
+                  : 'bg-slate-50 dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white border border-slate-200/80 dark:border-slate-800'
               }`}
             >
               {t('matches.filterAll', 'Todas')} ({venueFilteredMatches.length})
@@ -1305,10 +1328,10 @@ export const AdminMatches: React.FC = () => {
             <button
               type="button"
               onClick={() => setStatusFilter('open')}
-              className={`px-3 py-1.5 rounded-full text-xs transition cursor-pointer font-bold ${
+              className={`px-3 py-1.5 rounded-xl text-xs transition cursor-pointer font-bold ${
                 statusFilter === 'open'
                   ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D] shadow-xs'
-                  : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white border border-slate-200/80 dark:border-slate-800'
+                  : 'bg-slate-50 dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white border border-slate-200/80 dark:border-slate-800'
               }`}
             >
               {t('matches.filterOpen', 'Buscando')} ({venueFilteredMatches.filter((m) => m.players.length < 4).length})
@@ -1316,10 +1339,10 @@ export const AdminMatches: React.FC = () => {
             <button
               type="button"
               onClick={() => setStatusFilter('full')}
-              className={`px-3 py-1.5 rounded-full text-xs transition cursor-pointer font-bold ${
+              className={`px-3 py-1.5 rounded-xl text-xs transition cursor-pointer font-bold ${
                 statusFilter === 'full'
                   ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D] shadow-xs'
-                  : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white border border-slate-200/80 dark:border-slate-800'
+                  : 'bg-slate-50 dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white border border-slate-200/80 dark:border-slate-800'
               }`}
             >
               {t('matches.filterFull', 'Completas')} ({fullMatchesCount})
@@ -1335,7 +1358,7 @@ export const AdminMatches: React.FC = () => {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Buscar pista, jugador..."
-                className="w-full pl-8.5 pr-7 py-1.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 text-xs text-[#0B1A2D] dark:text-white placeholder-slate-400 focus:outline-none focus:border-[#8B5CF6]"
+                className="w-full pl-8.5 pr-7 py-1.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 text-xs text-[#0B1A2D] dark:text-white placeholder-slate-400 focus:outline-none focus:border-[#8B5CF6]"
               />
               {search && (
                 <button
@@ -1351,7 +1374,7 @@ export const AdminMatches: React.FC = () => {
             <button
               type="button"
               onClick={openFilterModal}
-              className={`p-2 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:text-[#0B1A2D] dark:hover:text-white rounded-xl shadow-xs active:scale-95 transition-all cursor-pointer shrink-0 ${
+              className={`p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:text-[#0B1A2D] dark:hover:text-white rounded-xl shadow-xs active:scale-95 transition-all cursor-pointer shrink-0 ${
                 activeFiltersCount > 0 ? 'border-[#8B5CF6] text-[#8B5CF6]' : ''
               }`}
               title="Más filtros"
@@ -1649,7 +1672,7 @@ export const AdminMatches: React.FC = () => {
                 onClick={() => openMatchDetail(m)}
                 className={`p-4 rounded-2xl bg-white dark:bg-slate-900 border transition-all duration-200 shadow-xs hover:border-slate-300 dark:hover:border-slate-700 flex flex-col justify-between cursor-pointer group space-y-3.5 ${
                   isFull
-                    ? 'border-emerald-500/30 dark:border-emerald-500/20'
+                    ? 'border-slate-300/80 dark:border-slate-700'
                     : 'border-slate-200/80 dark:border-slate-800 hover:shadow-md'
                 }`}
               >
@@ -1664,8 +1687,8 @@ export const AdminMatches: React.FC = () => {
 
                   <div className="flex items-center gap-1.5 shrink-0">
                     {isFull ? (
-                      <span className="inline-flex items-center gap-1 bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 text-[10px] font-bold px-2.5 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800">
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                      <span className="inline-flex items-center gap-1.5 bg-[#0B1A2D] dark:bg-[#132A45] text-white dark:text-slate-100 text-[10px] font-bold px-2.5 py-0.5 rounded-full border border-[#0B1A2D] dark:border-slate-700 shadow-2xs">
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#B7F229]"></span>
                         Completa
                       </span>
                     ) : (

@@ -193,7 +193,7 @@ export const BookingListItem: React.FC<BookingListItemProps> = ({
               className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
                 booking.mode === 'competitive'
                   ? 'bg-[#8B5CF6]/15 dark:bg-[#8B5CF6]/30 text-[#8B5CF6] dark:text-[#c4b5fd]'
-                  : 'bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300'
+                  : 'bg-[#F0FCCF] dark:bg-[#B7F229]/20 text-[#0B1A2D] dark:text-[#B7F229] border border-[#B7F229]/40'
               }`}
             >
               {booking.mode === 'competitive' ? 'Competitivo' : 'Amistoso'}

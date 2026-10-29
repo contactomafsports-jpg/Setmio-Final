@@ -197,6 +197,20 @@ export const AdminAgenda: React.FC = () => {
     }
   }, [currentDate]);
 
+  const formattedDayTitleLabel = React.useMemo(() => {
+    try {
+      const parts = currentDate.split('-').map(Number);
+      const d = new Date(parts[0], parts[1] - 1, parts[2]);
+      const weekday = d.toLocaleDateString('es-ES', { weekday: 'short' });
+      const month = d.toLocaleDateString('es-ES', { month: 'short' });
+      const capWeekday = weekday.charAt(0).toUpperCase() + weekday.slice(1).replace('.', '');
+      const capMonth = month.charAt(0).toUpperCase() + month.slice(1).replace('.', '');
+      return `${capWeekday}, ${d.getDate()} ${capMonth}`;
+    } catch {
+      return currentDate;
+    }
+  }, [currentDate]);
+
   // New reservation from reception
   const [formVenueId, setFormVenueId] = useState<string>(() => {
     return selectedVenueId !== 'all' ? selectedVenueId : (venues[1]?.id || venues[0]?.id || 'venue-san-mateo');
@@ -601,11 +615,26 @@ export const AdminAgenda: React.FC = () => {
           1. CABECERA LIMPIA Y SIMÉTRICA (ESTILO INICIO)
           ====================================================================== */}
       <section className="pt-[26px] pb-1 space-y-3">
-        {/* Título de sección limpio y simétrico con Inicio (sin icono de calendario ni subtítulos) */}
-        <div>
-          <h1 className="text-[22px] font-extrabold text-[#0B1A2D] dark:text-white tracking-tight leading-tight">
-            {t('agenda.title', 'Reservas y Disponibilidad')}
-          </h1>
+        {/* Título de sección limpio y simétrico con Inicio con botón minimalista '+' en la esquina derecha */}
+        <div className="flex items-center justify-between">
+          <div>
+            <span className="text-xs font-medium text-slate-400 dark:text-slate-500 tracking-wide block mb-0.5">
+              {currentTenant?.name || 'Centro de Pádel San Mateo'}
+            </span>
+            <h1 className="text-[22px] font-extrabold text-[#0B1A2D] dark:text-white tracking-tight leading-tight">
+              {t('agenda.title', 'Reservas y Disponibilidad')}
+            </h1>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setShowNewModal(true)}
+            className="w-9 h-9 rounded-xl bg-[#0B1A2D] dark:bg-[#0B1A2D] border border-[#0B1A2D] dark:border-slate-700 flex items-center justify-center text-white hover:bg-[#132A45] active:scale-95 transition-all cursor-pointer shadow-xs"
+            title="Nueva reserva"
+            aria-label="Nueva reserva"
+          >
+            <Plus className="w-4 h-4 stroke-[3] text-[#B7F229]" />
+          </button>
         </div>
 
         {/* Pill de Sede y Estado Operativo Unificado idéntico a la página de Inicio */}
@@ -725,10 +754,10 @@ export const AdminAgenda: React.FC = () => {
           )}
         </div>
 
-        {/* Fila de Controles: Selector de Fecha + Botón '+ Nueva reserva' (Lado a lado) */}
-        <div className="flex items-center gap-2">
+        {/* Fila de Controles: Selector de Fecha + Acceso Historial Completo */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
           {/* Selector de Fecha Tipo Ribbon */}
-          <div className="flex-1 min-w-0 flex items-center justify-between bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-xl px-2 py-2 shadow-2xs h-10">
+          <div className="flex items-center justify-between bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-xl px-2.5 py-2 shadow-2xs h-10">
             <button
               type="button"
               onClick={() => stepDate(-1)}
@@ -761,69 +790,22 @@ export const AdminAgenda: React.FC = () => {
             </button>
           </div>
 
-          {/* Botón CTA '+ Nueva reserva' invertido en Azul Profundo (#0B1A2D) con acentos en Verde Lima (#B7F229) o blanco */}
+          {/* Acceso Rápido: Todas las reservas */}
           <button
             type="button"
-            onClick={() => setShowNewModal(true)}
-            className="flex-1 min-w-0 flex items-center justify-center gap-1.5 bg-[#0B1A2D] hover:bg-[#132A45] active:scale-95 text-white font-black rounded-xl px-2.5 py-2 text-xs sm:text-sm shadow-sm border border-[#0B1A2D] dark:border-slate-700 transition-all cursor-pointer h-10 group"
+            onClick={() => {
+              if (typeof window !== 'undefined') {
+                window.history.pushState({}, '', '/admin/reservas/todas');
+              }
+              setShowAllBookingsView(true);
+            }}
+            className="w-full flex items-center justify-center gap-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl py-2 px-3 text-xs sm:text-sm font-semibold text-[#0B1A2D] dark:text-white hover:bg-slate-50 dark:hover:bg-slate-800/80 transition-colors shadow-2xs active:scale-[0.99] cursor-pointer h-10"
           >
-            <Plus className="w-4 h-4 stroke-[3] text-[#B7F229] group-hover:rotate-90 transition-transform shrink-0" />
-            <span className="truncate">{t('agenda.new_booking', 'Nueva reserva')}</span>
+            <FileSpreadsheet className="w-4 h-4 text-[#64748B] dark:text-slate-400" />
+            <span>Todas las reservas</span>
           </button>
         </div>
-
-        {/* Acceso Rápido: Todas las reservas */}
-        <button
-          type="button"
-          onClick={() => {
-            if (typeof window !== 'undefined') {
-              window.history.pushState({}, '', '/admin/reservas/todas');
-            }
-            setShowAllBookingsView(true);
-          }}
-          className="w-full flex items-center justify-center gap-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl py-2.5 px-3 text-xs sm:text-sm font-semibold text-[#0B1A2D] dark:text-white hover:bg-slate-50 dark:hover:bg-slate-800/80 transition-colors shadow-2xs active:scale-[0.99] cursor-pointer"
-        >
-          <FileSpreadsheet className="w-4 h-4 text-[#64748B] dark:text-slate-400" />
-          <span>Todas las reservas</span>
-        </button>
       </section>
-
-      {/* ======================================================================
-          2. FILA DE SEDES MINIMALISTA CON MICRO-DOTS DE MARCA (RIBBON)
-          ====================================================================== */}
-      <div className="flex items-center gap-1.5 overflow-x-auto hide-scrollbar [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden py-0.5 px-0.5">
-        {availableVenues
-          .filter((v) => v.id !== 'all')
-          .map((v) => {
-            const isSelected = selectedVenueId === v.id;
-            const dotColor =
-              v.id === 'venue-san-mateo'
-                ? 'bg-[#B7F229] ring-[#B7F229]/40'
-                : v.id === 'venue-coruna'
-                ? 'bg-[#0B1A2D] dark:bg-sky-400 ring-[#0B1A2D]/30 dark:ring-sky-400/30'
-                : v.id === 'venue-santiago'
-                ? 'bg-[#8B5CF6] ring-[#8B5CF6]/40'
-                : 'bg-sky-500 ring-sky-500/30';
-
-            const cleanName = (v.shortName || v.name).replace(/^Sede\s+/i, '');
-
-            return (
-              <button
-                key={v.id}
-                type="button"
-                onClick={() => setSelectedVenueId(isSelected ? 'all' : v.id)}
-                className={`shrink-0 flex items-center gap-1.5 px-2.5 py-1 rounded-full border shadow-2xs text-[11px] sm:text-xs transition cursor-pointer ${
-                  isSelected
-                    ? 'bg-white dark:bg-slate-900 border-[#0B1A2D] dark:border-[#B7F229] font-bold text-[#0B1A2D] dark:text-white ring-2 ring-[#0B1A2D]/15 dark:ring-[#B7F229]/25 shadow-xs'
-                    : 'bg-white dark:bg-slate-900 border-slate-200/90 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white font-medium hover:border-slate-300 dark:hover:border-slate-700'
-                }`}
-              >
-                <span className={`w-2 h-2 rounded-full ring-2 shrink-0 ${dotColor}`} />
-                <span className="whitespace-nowrap">{cleanName}</span>
-              </button>
-            );
-          })}
-      </div>
 
       {/* ======================================================================
           3. CUADRANTE DE DISPONIBILIDAD (GRID UNIFICADO HASTA LAS 00:00)
@@ -1023,9 +1005,14 @@ export const AdminAgenda: React.FC = () => {
           ====================================================================== */}
       <section className="mt-8 pt-1 space-y-3">
         <div className="flex items-center justify-between">
-          <h2 className="text-base font-bold text-[#0B1A2D] dark:text-white">
-            Reservas del Día
-          </h2>
+          <div className="flex items-baseline gap-2">
+            <h2 className="text-base font-bold text-[#0B1A2D] dark:text-white">
+              Reservas del Día
+            </h2>
+            <span className="text-xs font-semibold text-slate-400 dark:text-slate-500">
+              · {formattedDayTitleLabel}
+            </span>
+          </div>
           <button
             type="button"
             onClick={() => {

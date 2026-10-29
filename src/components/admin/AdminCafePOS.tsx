@@ -38,6 +38,7 @@ import {
   Building2,
   History,
   ChevronDown,
+  Sliders,
 } from 'lucide-react';
 
 interface LinkedChargeMeta {
@@ -289,7 +290,52 @@ export const AdminCafePOS: React.FC = () => {
     }
   }, [posPendingCharge, setPosPendingCharge, triggerDemoToast]);
 
-  const categories = ['all', 'Bebidas', 'Café', 'Snacks', 'Bocadillos', 'Grip/Pelotas'];
+  // Product categories management
+  const [customCategories, setCustomCategories] = useState<string[]>([
+    'Bebidas',
+    'Café',
+    'Snacks',
+    'Bocadillos',
+    'Grip/Pelotas',
+  ]);
+  const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
+  const [newCategoryName, setNewCategoryName] = useState('');
+  const [editingCategoryOld, setEditingCategoryOld] = useState<string | null>(null);
+  const [editingCategoryNew, setEditingCategoryNew] = useState('');
+
+  const categories = useMemo(() => ['all', ...customCategories], [customCategories]);
+
+  const handleAddCategory = (e: React.FormEvent) => {
+    e.preventDefault();
+    const clean = newCategoryName.trim();
+    if (!clean) return;
+    if (customCategories.some((c) => c.toLowerCase() === clean.toLowerCase())) {
+      triggerDemoToast('Aviso', 'Esta categoría ya existe.', 'warning');
+      return;
+    }
+    setCustomCategories((prev) => [...prev, clean]);
+    setNewCategoryName('');
+    triggerDemoToast('Categoría Creada', `Categoría "${clean}" añadida con éxito.`, 'success');
+  };
+
+  const handleSaveEditCategory = (oldName: string) => {
+    const clean = editingCategoryNew.trim();
+    if (!clean || clean === oldName) {
+      setEditingCategoryOld(null);
+      return;
+    }
+    setCustomCategories((prev) => prev.map((c) => (c === oldName ? clean : c)));
+    if (activeCategory === oldName) setActiveCategory(clean);
+    setEditingCategoryOld(null);
+    setEditingCategoryNew('');
+    triggerDemoToast('Categoría Actualizada', `Renombrada a "${clean}".`, 'success');
+  };
+
+  const handleDeleteCategory = (catName: string) => {
+    setCustomCategories((prev) => prev.filter((c) => c !== catName));
+    if (activeCategory === catName) setActiveCategory('all');
+    triggerDemoToast('Categoría Eliminada', `Categoría "${catName}" eliminada.`, 'success');
+  };
 
   const filteredProducts = cafeProducts.filter(
     (p) => activeCategory === 'all' || p.category === activeCategory
@@ -564,23 +610,30 @@ export const AdminCafePOS: React.FC = () => {
           1. CABECERA LIMPIA Y SIMÉTRICA (ESTILO INICIO, RESERVAS & PARTIDAS)
           ====================================================================== */}
       <section className="pt-[26px] pb-1 space-y-3" data-purpose="header-section">
-        <div className="flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2.5">
-            <h1 className="text-[22px] font-extrabold text-[#0B1A2D] dark:text-white tracking-tight leading-tight">
-              TPV / Caja
-            </h1>
-            <span className="px-2.5 py-0.5 rounded-full bg-[#F0FCCF] dark:bg-[#B7F229]/20 border border-[#B7F229]/50 text-[#0B1A2D] dark:text-[#B7F229] font-black text-[10px] tracking-wider uppercase shadow-2xs">
-              Caja Abierta
+        <div className="flex items-center justify-between">
+          <div>
+            <span className="text-xs font-medium text-slate-400 dark:text-slate-500 tracking-wide block mb-0.5">
+              {currentTenant?.name || 'Centro de Pádel San Mateo'}
             </span>
+            <div className="flex items-center gap-2.5">
+              <h1 className="text-[22px] font-extrabold text-[#0B1A2D] dark:text-white tracking-tight leading-tight">
+                TPV / Caja
+              </h1>
+              <span className="px-2.5 py-0.5 rounded-full bg-[#F0FCCF] dark:bg-[#B7F229]/20 border border-[#B7F229]/50 text-[#0B1A2D] dark:text-[#B7F229] font-black text-[10px] tracking-wider uppercase shadow-2xs">
+                Caja Abierta
+              </span>
+            </div>
           </div>
 
-          {/* Resumen Total Turno */}
-          <div className="text-right">
-            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Total Turno</span>
-            <span className="text-sm sm:text-base font-mono font-black text-[#0B1A2D] dark:text-white leading-none">
-              {sessionSalesTotal.toFixed(2)} €
-            </span>
-          </div>
+          <button
+            type="button"
+            onClick={() => setArqueoModalOpen(true)}
+            className="w-9 h-9 rounded-xl bg-[#0B1A2D] dark:bg-[#0B1A2D] border border-[#0B1A2D] dark:border-slate-700 flex items-center justify-center text-white hover:bg-[#132A45] active:scale-95 transition-all cursor-pointer shadow-xs"
+            title="Arqueo y Cierre de Turno"
+            aria-label="Arqueo y Cierre de Turno"
+          >
+            <Calculator className="w-4 h-4 text-[#B7F229]" />
+          </button>
         </div>
 
         {/* Pill de Sede y Estado Operativo Unificado */}
@@ -702,34 +755,81 @@ export const AdminCafePOS: React.FC = () => {
           )}
         </div>
 
-        {/* Fila de Acciones Rápidas Reorganizada (Sin botón de Catálogo, con + Producto) */}
-        <div className="flex flex-wrap items-center gap-2 pt-1">
-          {/* 1. Asignar Reserva / Pago de Jugador en Azul Profundo (#0B1A2D) con acento Verde Lima */}
+        {/* Componente Superior de Resumen (Total Turno, Cobros, Ticket Medio, Estado) */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+          <div className="p-3 bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200/80 dark:border-[#1A314D] shadow-2xs flex flex-col justify-between">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Total Turno</span>
+            <div className="my-0.5">
+              <span className="text-xl sm:text-2xl font-extrabold font-mono text-[#0B1A2D] dark:text-white tracking-tight">
+                {sessionSalesTotal.toFixed(2)} €
+              </span>
+            </div>
+            <span className="text-[10px] text-slate-400 font-medium">Facturación acumulada</span>
+          </div>
+
+          <div className="p-3 bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200/80 dark:border-[#1A314D] shadow-2xs flex flex-col justify-between">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Cobros Registrados</span>
+            <div className="my-0.5 flex items-baseline gap-1">
+              <span className="text-xl sm:text-2xl font-extrabold font-mono text-[#0B1A2D] dark:text-white tracking-tight">
+                {filteredTransactions.length}
+              </span>
+              <span className="text-xs text-slate-400 font-medium">tickets</span>
+            </div>
+            <span className="text-[10px] text-slate-400 font-medium">En sesión de caja</span>
+          </div>
+
+          <div className="p-3 bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200/80 dark:border-[#1A314D] shadow-2xs flex flex-col justify-between">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Ticket Medio</span>
+            <div className="my-0.5">
+              <span className="text-xl sm:text-2xl font-extrabold font-mono text-[#0B1A2D] dark:text-white tracking-tight">
+                {filteredTransactions.length > 0 ? (sessionSalesTotal / filteredTransactions.length).toFixed(2) : '0.00'} €
+              </span>
+            </div>
+            <span className="text-[10px] text-slate-400 font-medium">Promedio por venta</span>
+          </div>
+
+          <div className="p-3 bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200/80 dark:border-[#1A314D] shadow-2xs flex flex-col justify-between">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Estado Mostrador</span>
+            <div className="my-0.5 flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-[#82b805] animate-pulse"></span>
+              <span className="text-sm font-bold text-[#0B1A2D] dark:text-white truncate">
+                Caja Operativa
+              </span>
+            </div>
+            <span className="text-[10px] text-slate-400 font-medium truncate">
+              {isConsolidatedView ? 'Todas las Sedes' : selectedVenue.shortName || selectedVenue.name}
+            </span>
+          </div>
+        </div>
+
+        {/* Fila de Acciones Rápidas Simétrica (Ancho Completo de Pantalla) */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 w-full pt-1">
+          {/* 1. Asignar Reserva */}
           <button
             type="button"
             onClick={() => setAssignModalOpen(true)}
-            className="flex-1 sm:flex-none px-3.5 py-2 rounded-xl bg-[#0B1A2D] hover:bg-[#132A45] text-white font-black text-xs shadow-sm border border-[#0B1A2D] dark:border-slate-700 flex items-center justify-center gap-1.5 transition active:scale-95 cursor-pointer group"
+            className="w-full px-3 py-2.5 rounded-xl bg-[#0B1A2D] hover:bg-[#132A45] text-white font-black text-xs shadow-sm border border-[#0B1A2D] dark:border-slate-700 flex items-center justify-center gap-1.5 transition active:scale-95 cursor-pointer group"
           >
             <Calendar className="w-4 h-4 text-[#B7F229] stroke-[2.5] shrink-0" />
             <span className="truncate">Asignar Reserva</span>
           </button>
 
-          {/* 2. Añadir Producto Rápido */}
+          {/* 2. Añadir Producto Rápido (Texto limpio 'Producto' con icono '+') */}
           <button
             type="button"
             onClick={openNewProductModal}
-            className="px-3.5 py-2 rounded-xl bg-white dark:bg-slate-800/90 hover:bg-slate-50 dark:hover:bg-slate-800 text-[#0B1A2D] dark:text-slate-200 font-bold text-xs border border-slate-200/80 dark:border-slate-700/80 shadow-2xs flex items-center justify-center gap-1.5 transition active:scale-95 cursor-pointer"
+            className="w-full px-3 py-2.5 rounded-xl bg-white dark:bg-slate-800/90 hover:bg-slate-50 dark:hover:bg-slate-800 text-[#0B1A2D] dark:text-slate-200 font-bold text-xs border border-slate-200/80 dark:border-slate-700/80 shadow-2xs flex items-center justify-center gap-1.5 transition active:scale-95 cursor-pointer"
             title="Añadir nuevo producto al mostrador"
           >
             <Plus className="w-4 h-4 text-[#8B5CF6] stroke-[2.5] shrink-0" />
-            <span>+ Producto</span>
+            <span className="truncate">Producto</span>
           </button>
 
           {/* 3. Transacciones */}
           <button
             type="button"
             onClick={() => setTransactionsModalOpen(true)}
-            className="px-3.5 py-2 rounded-xl bg-white dark:bg-slate-800/90 hover:bg-slate-50 dark:hover:bg-slate-800 text-[#0B1A2D] dark:text-slate-200 font-bold text-xs border border-slate-200/80 dark:border-slate-700/80 shadow-2xs flex items-center justify-center gap-1.5 transition active:scale-95 cursor-pointer"
+            className="w-full px-3 py-2.5 rounded-xl bg-white dark:bg-slate-800/90 hover:bg-slate-50 dark:hover:bg-slate-800 text-[#0B1A2D] dark:text-slate-200 font-bold text-xs border border-slate-200/80 dark:border-slate-700/80 shadow-2xs flex items-center justify-center gap-1.5 transition active:scale-95 cursor-pointer"
             title="Ver transacciones del turno"
           >
             <History className="w-4 h-4 text-slate-500 shrink-0" />
@@ -743,7 +843,7 @@ export const AdminCafePOS: React.FC = () => {
           <button
             type="button"
             onClick={() => setArqueoModalOpen(true)}
-            className="px-3.5 py-2 rounded-xl bg-white dark:bg-slate-800/90 hover:bg-slate-50 dark:hover:bg-slate-800 text-[#0B1A2D] dark:text-slate-200 font-bold text-xs border border-slate-200/80 dark:border-slate-700/80 shadow-2xs flex items-center justify-center gap-1.5 transition active:scale-95 cursor-pointer"
+            className="w-full px-3 py-2.5 rounded-xl bg-white dark:bg-slate-800/90 hover:bg-slate-50 dark:hover:bg-slate-800 text-[#0B1A2D] dark:text-slate-200 font-bold text-xs border border-slate-200/80 dark:border-slate-700/80 shadow-2xs flex items-center justify-center gap-1.5 transition active:scale-95 cursor-pointer"
             title="Arqueo y cierre de turno"
           >
             <Calculator className="w-4 h-4 text-slate-500 shrink-0" />
@@ -756,22 +856,34 @@ export const AdminCafePOS: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
         {/* Products Grid */}
         <div className="lg:col-span-7 space-y-3.5">
-          {/* Categories bar */}
-          <div className="flex items-center gap-1.5 overflow-x-auto hide-scrollbar pb-1">
-            {categories.map((c) => (
-              <button
-                key={c}
-                type="button"
-                onClick={() => setActiveCategory(c)}
-                className={`px-3 py-1.5 rounded-full text-xs transition cursor-pointer shrink-0 ${
-                  activeCategory === c
-                    ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D] font-bold shadow-xs'
-                    : 'bg-white dark:bg-slate-800/90 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white border border-slate-200/80 dark:border-slate-700/80 font-medium'
-                }`}
-              >
-                {c === 'all' ? 'Todos los Artículos' : c}
-              </button>
-            ))}
+          {/* Categories bar con botón minimalista para gestionar categorías */}
+          <div className="flex items-center justify-between gap-2 pb-1">
+            <div className="flex items-center gap-1.5 overflow-x-auto hide-scrollbar">
+              {categories.map((c) => (
+                <button
+                  key={c}
+                  type="button"
+                  onClick={() => setActiveCategory(c)}
+                  className={`px-3 py-1.5 rounded-xl text-xs transition cursor-pointer shrink-0 font-bold ${
+                    activeCategory === c
+                      ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D] shadow-xs'
+                      : 'bg-white dark:bg-slate-800/90 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white border border-slate-200/80 dark:border-slate-700/80'
+                  }`}
+                >
+                  {c === 'all' ? 'Todos los Artículos' : c}
+                </button>
+              ))}
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setIsCategoryModalOpen(true)}
+              className="px-2.5 py-1.5 rounded-xl bg-white dark:bg-slate-800/90 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 hover:text-[#0B1A2D] dark:hover:text-white border border-slate-200/80 dark:border-slate-700/80 shadow-2xs flex items-center gap-1.5 text-xs font-bold transition cursor-pointer shrink-0"
+              title="Gestionar categorías de artículos"
+            >
+              <Sliders className="w-3.5 h-3.5 text-[#8B5CF6]" />
+              <span className="hidden sm:inline">Categorías</span>
+            </button>
           </div>
 
           {/* Touch item cards con Imagen de Vista Previa Arriba y Badge de Categoría Superpuesto */}
