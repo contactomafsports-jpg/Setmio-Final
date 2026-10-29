@@ -347,23 +347,23 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
           {/* 1. Centro Global de Notificaciones (Campanita con badge numérico dinámico) */}
           <NotificationsPopover variant="admin" />
 
-          {/* Asistente IA Copiloto (Bottom Sheet Drawer) */}
+          {/* Asistente IA Copiloto (Acento Violeta de Marca #8B5CF6) */}
           <button
             type="button"
             onClick={() => setAiDrawerOpen(!aiDrawerOpen)}
             className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-bold transition border cursor-pointer ${
               aiDrawerOpen
-                ? 'bg-emerald-600 text-white border-emerald-500 shadow-sm shadow-emerald-500/30'
-                : 'bg-emerald-50 dark:bg-emerald-950/50 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 border-emerald-300/80 dark:border-emerald-800/80 shadow-xs'
+                ? 'bg-[#8B5CF6] text-white border-[#7C3AED] shadow-sm shadow-[#8B5CF6]/30'
+                : 'bg-[#EDE9FE]/80 dark:bg-[#8B5CF6]/15 hover:bg-[#EDE9FE] dark:hover:bg-[#8B5CF6]/25 text-[#7C3AED] dark:text-[#C4B5FD] border-[#8B5CF6]/30 dark:border-[#8B5CF6]/40 shadow-2xs'
             }`}
             title="Copiloto y Asistente IA Setmio"
             aria-label="Abrir Asistente IA"
           >
-            <div className="relative">
-              <Sparkles className="w-3.5 h-3.5" />
-              <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            <div className="relative flex items-center justify-center">
+              <Sparkles className="w-3.5 h-3.5 text-[#8B5CF6] dark:text-[#C4B5FD]" />
+              <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 rounded-full bg-[#8B5CF6] animate-pulse" />
             </div>
-            <span className="font-extrabold text-[11px] hidden sm:inline">IA</span>
+            <span className="font-extrabold text-[11px] hidden sm:inline text-[#7C3AED] dark:text-[#C4B5FD]">IA</span>
           </button>
 
           {/* 2. Avatar del Usuario con Menú Desplegable Unificado */}

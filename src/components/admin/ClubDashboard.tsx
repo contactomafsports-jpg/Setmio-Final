@@ -67,7 +67,9 @@ export const ClubDashboard: React.FC = () => {
       ? 'Director General · Red Multisede'
       : currentUser?.role === 'RECEPTION'
       ? 'Recepción & Atención · Mostrador'
-      : 'Director General · Red Deportiva San Mateo';
+      : isConsolidatedView
+      ? 'Director General · Red Multisede'
+      : `Director General · ${selectedVenue.shortName || selectedVenue.name || 'Sede Central'}`;
 
   // 3 Ejemplos Reales del Turno Actual según especificación exacta de diseño
   const upcomingTurnBookings: ReservationDrawerData[] = [
@@ -169,26 +171,30 @@ export const ClubDashboard: React.FC = () => {
           1. SEDE SELECTOR PILL & OPERATIONAL STATUS (Directo en canvas)
           ====================================================================== */}
       <div className="pt-2 pb-1 space-y-3">
-        <div className="flex items-start justify-between">
+        <div className="flex items-center justify-between">
           <div>
+            {/* Nombre del Club limpio de texto, sin contenedores, alineado a la izquierda */}
+            <span className="text-xs font-medium text-slate-400 dark:text-slate-500 tracking-wide block mb-0.5">
+              {currentTenant?.name || 'Centro de Pádel San Mateo'}
+            </span>
             <h1 className="text-[22px] font-extrabold text-[#0B1A2D] dark:text-white tracking-tight leading-tight">
               Hola, {firstName}
             </h1>
-            <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mt-0.5">
+            {/* Subtítulo discreto de rol y sede */}
+            <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mt-0.5">
               {userRoleSubtitle}
             </p>
           </div>
 
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => setAdminTab('settings')}
-              className="text-xs font-bold text-[#8B5CF6] dark:text-purple-300 hover:underline inline-flex items-center gap-1 mt-1 bg-[#EDE9FE]/70 dark:bg-[#8B5CF6]/20 px-2.5 py-1 rounded-full transition-colors cursor-pointer"
-            >
-              <span>Gestionar</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </button>
-          </div>
+          <button
+            type="button"
+            onClick={() => setAdminTab('settings')}
+            className="p-2 text-slate-400 hover:text-[#0B1A2D] dark:hover:text-white transition-colors cursor-pointer rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800/60 -mr-1"
+            title="Ajustes del club"
+            aria-label="Ajustes del club"
+          >
+            <Settings className="w-5 h-5" />
+          </button>
         </div>
 
         {/* Pill de Sede y Estado Operativo */}
@@ -310,27 +316,24 @@ export const ClubDashboard: React.FC = () => {
       </div>
 
       {/* ======================================================================
-          2. AVISOS OPERATIVOS (Playtomic style reminder card 'No te olvides')
+          2. AVISO OPERATIVO COMPACTO (Único aviso principal y compacto en Inicio)
           ====================================================================== */}
       {showOperationalNotice && (
         <section>
-          <p className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2">
-            Avisos Operativos
-          </p>
-          <div className="bg-white dark:bg-[#0E2239] rounded-2xl p-3.5 sm:p-4 border border-slate-100 dark:border-[#1A314D] shadow-[0_2px_10px_rgba(0,0,0,0.03)] flex items-center justify-between">
+          <div className="bg-white dark:bg-[#0E2239] rounded-2xl p-3 sm:p-3.5 border border-slate-200/80 dark:border-[#1A314D] shadow-2xs flex items-center justify-between">
             <div
-              className="flex items-center gap-3 cursor-pointer flex-1 mr-2 select-none group"
+              className="flex items-center gap-2.5 cursor-pointer flex-1 mr-2 select-none group min-w-0"
               onClick={() => setAdminTab('smart_courts')}
               title="Abrir configuración de domótica y cuadrante"
             >
-              <div className="w-10 h-10 rounded-xl bg-[#EDE9FE]/70 dark:bg-[#8B5CF6]/20 flex items-center justify-center text-[#8B5CF6] dark:text-purple-300 flex-shrink-0 group-hover:scale-105 transition-transform">
-                <Sliders className="w-5 h-5 text-[#8B5CF6] dark:text-purple-300" />
+              <div className="w-9 h-9 rounded-xl bg-[#EDE9FE] dark:bg-[#8B5CF6]/20 flex items-center justify-center text-[#8B5CF6] dark:text-purple-300 flex-shrink-0 group-hover:scale-105 transition-transform">
+                <Sliders className="w-4 h-4 text-[#8B5CF6] dark:text-purple-300" />
               </div>
-              <div className="pr-2">
-                <h4 className="text-xs font-bold text-[#0B1A2D] dark:text-white group-hover:text-[#8B5CF6] transition-colors">
-                  Editar preferencias de cuadrante
+              <div className="pr-1 min-w-0">
+                <h4 className="text-xs font-bold text-[#0B1A2D] dark:text-white group-hover:text-[#8B5CF6] transition-colors truncate">
+                  Preferencias de cuadrante y domótica
                 </h4>
-                <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-snug mt-0.5">
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-tight mt-0.5 truncate">
                   Turno de tarde: {occupiedCourtsCount} pistas con iluminación domótica activada
                 </p>
               </div>
@@ -349,19 +352,19 @@ export const ClubDashboard: React.FC = () => {
       )}
 
       {/* ======================================================================
-          3. ACCIONES DIRECTAS (BOTONES CIRCULARES PLANOS Y ACCIONES RÁPIDAS)
+          3. ACCIONES RÁPIDAS (BOTONES CIRCULARES PLANOS Y ACCIONES RÁPIDAS)
           ====================================================================== */}
       <section className="space-y-3">
         <div className="flex items-center justify-between">
           <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
-            Acciones Directas
+            Acciones Rápidas
           </h2>
           <button
             type="button"
             onClick={() => setShowAllQuickActions(!showAllQuickActions)}
-            className="text-xs font-bold text-[#8B5CF6] dark:text-purple-300 hover:underline cursor-pointer"
+            className="text-xs font-bold text-[#8B5CF6] dark:text-purple-400 hover:underline cursor-pointer"
           >
-            {showAllQuickActions ? 'Ver principales' : 'Ver todos'}
+            {showAllQuickActions ? 'ver principales' : 'ver todas'}
           </button>
         </div>
 
@@ -628,14 +631,9 @@ export const ClubDashboard: React.FC = () => {
           ====================================================================== */}
       <section className="space-y-3 pt-1">
         <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-base font-bold text-[#0B1A2D] dark:text-white">
-              Próximas Reservas de Hoy
-            </h2>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
-              Turno actual y accesos domóticos
-            </p>
-          </div>
+          <h2 className="text-base font-bold text-[#0B1A2D] dark:text-white">
+            Próximas Reservas de Hoy
+          </h2>
 
           <button
             type="button"
@@ -643,10 +641,9 @@ export const ClubDashboard: React.FC = () => {
               if (typeof window !== 'undefined') window.history.pushState({}, '', '/admin/reservas');
               setAdminTab('agenda');
             }}
-            className="text-xs font-bold text-[#8B5CF6] dark:text-purple-300 hover:underline flex items-center cursor-pointer"
+            className="text-xs font-bold text-[#8B5CF6] dark:text-purple-400 hover:underline cursor-pointer"
           >
-            <span>Ver agenda</span>
-            <ChevronRight className="w-3.5 h-3.5 ml-0.5" />
+            Ver agenda
           </button>
         </div>
 
@@ -669,14 +666,15 @@ export const ClubDashboard: React.FC = () => {
             <article
               key={item.id}
               onClick={() => setSelectedReservation(item)}
-              className="bg-white dark:bg-[#0E2239] rounded-2xl p-3.5 sm:p-4 border border-slate-100 dark:border-[#1A314D] shadow-[0_2px_12px_rgba(0,0,0,0.04)] space-y-3 cursor-pointer transition hover:border-[#B7F229]/60 hover:shadow-md group"
+              className="bg-white dark:bg-[#0E2239] rounded-2xl p-3.5 sm:p-4 border border-slate-200/80 dark:border-[#1A314D] shadow-2xs space-y-3 cursor-pointer transition hover:border-[#8B5CF6]/50 hover:shadow-xs group"
             >
               <div className="flex items-center justify-between">
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-bold">
-                  <Clock className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+                {/* Pastilla de Horario con Acento Violeta Corporativo de Marca (#8B5CF6) */}
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#EDE9FE] dark:bg-[#8B5CF6]/20 border border-[#8B5CF6]/30 text-[#6D28D9] dark:text-[#C4B5FD] text-xs font-bold tracking-tight">
+                  <Clock className="w-3.5 h-3.5 text-[#8B5CF6] shrink-0" />
                   <span>{item.timeSlot}</span>
                 </span>
-                <span className="text-xs font-bold text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/80 border border-slate-100 dark:border-slate-700 px-2.5 py-1 rounded-full">
+                <span className="text-xs font-semibold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800/80 border border-slate-200/70 dark:border-slate-700 px-2.5 py-1 rounded-full">
                   {item.courtName}
                 </span>
               </div>

@@ -163,13 +163,13 @@ export const UserProfileDropdown: React.FC<UserProfileDropdownProps> = ({
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-1.5 p-1 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-emerald-500/50 hover:bg-slate-50 dark:hover:bg-slate-800 transition group focus:outline-none cursor-pointer"
+        className="flex items-center gap-1.5 p-1 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 transition group focus:outline-none cursor-pointer"
         aria-label="Menú de usuario"
         aria-expanded={isOpen}
       >
         <div className="relative shrink-0">
           <div
-            className="w-8 h-8 rounded-full overflow-hidden shrink-0 border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 flex items-center justify-center shadow-xs aspect-square"
+            className="w-8 h-8 rounded-full overflow-hidden shrink-0 border border-slate-200 dark:border-slate-700 bg-[#0B1A2D] flex items-center justify-center shadow-xs aspect-square"
             style={{ borderRadius: '9999px', overflow: 'hidden' }}
           >
             {currentUser.avatarUrl && !avatarImgError ? (
@@ -182,7 +182,7 @@ export const UserProfileDropdown: React.FC<UserProfileDropdownProps> = ({
                 onError={() => setAvatarImgError(true)}
               />
             ) : (
-              <span className="text-white font-black text-xs bg-gradient-to-br from-emerald-500 to-teal-700 w-full h-full flex items-center justify-center select-none">
+              <span className="text-white font-black text-xs bg-[#0B1A2D] w-full h-full flex items-center justify-center select-none">
                 {currentUser.name
                   .split(' ')
                   .map((n) => n[0])
@@ -192,7 +192,8 @@ export const UserProfileDropdown: React.FC<UserProfileDropdownProps> = ({
               </span>
             )}
           </div>
-          <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-white dark:ring-slate-900 pointer-events-none" />
+          {/* Pequeño indicador circular elegante en Verde Lima (#B7F229) */}
+          <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-[#B7F229] ring-2 ring-white dark:ring-slate-900 pointer-events-none" />
         </div>
         <ChevronDown
           className={`w-3.5 h-3.5 text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-200 transition-transform ${

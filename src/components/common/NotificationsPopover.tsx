@@ -194,14 +194,14 @@ export const NotificationsPopover: React.FC<NotificationsPopoverProps> = ({ vari
         <button
           type="button"
           onClick={() => setIsOpen(!isOpen)}
-          className="relative w-9 h-9 flex items-center justify-center shrink-0 rounded-xl text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+          className="relative w-9 h-9 flex items-center justify-center shrink-0 rounded-xl text-[#0B1A2D] dark:text-slate-200 hover:text-slate-950 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
           title="Centro de Notificaciones"
           aria-label="Abrir centro de notificaciones"
           aria-expanded={isOpen}
         >
-          <Bell className="w-4 h-4 shrink-0 text-slate-700 dark:text-slate-300" />
+          <Bell className="w-4 h-4 shrink-0 text-[#0B1A2D] dark:text-slate-200" />
           {unreadNotificationsCount > 0 && (
-            <span className="absolute -top-0.5 -right-0.5 min-w-[17px] h-4 px-1 rounded-full bg-emerald-500 text-white font-black text-[9px] flex items-center justify-center leading-none ring-2 ring-white dark:ring-slate-900 shadow-xs pointer-events-none animate-in zoom-in-75 duration-150">
+            <span className="absolute -top-0.5 -right-0.5 min-w-[17px] h-4 px-1 rounded-full bg-[#B7F229] text-[#0B1A2D] font-black text-[9px] flex items-center justify-center leading-none ring-2 ring-white dark:ring-slate-900 shadow-2xs pointer-events-none animate-in zoom-in-75 duration-150">
               {unreadNotificationsCount > 9 ? '9+' : unreadNotificationsCount}
             </span>
           )}
