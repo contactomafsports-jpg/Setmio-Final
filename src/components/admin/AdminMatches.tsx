@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useApp } from '../../context/AppContext';
 import { OpenMatch, OpenMatchSlotRequest } from '../../types/database';
+import { INITIAL_OPEN_MATCHES } from '../../data/initialData';
 import {
   Trophy,
   Users,
@@ -387,9 +388,40 @@ export const AdminMatches: React.FC = () => {
     { name: 'Carla Noche', level: 3.00, memberNum: '#061', isMember: true, label: 'Carla Noche (Socia #061 · Nivel 3.00)' },
   ], []);
 
-  // Filter logic
+  // Source of matches: if openMatches happens to be empty, always ensure fallback to INITIAL_OPEN_MATCHES
+  const effectiveMatches = useMemo(() => {
+    return Array.isArray(openMatches) && openMatches.length > 0 ? openMatches : INITIAL_OPEN_MATCHES;
+  }, [openMatches]);
+
+  // Venue-filtered matches for KPIs and base list
+  const venueFilteredMatches = useMemo(() => {
+    const list = effectiveMatches.filter((m) => {
+      if (isConsolidatedView || selectedVenueId === 'all' || !isMultiVenue) return true;
+      const court = courts.find((c) => c.id === m.courtId);
+      const matchVenueId = (m as any).venueId || court?.venueId;
+      return !matchVenueId || matchVenueId === selectedVenueId;
+    });
+    return list.length > 0 ? list : effectiveMatches;
+  }, [effectiveMatches, selectedVenueId, isConsolidatedView, isMultiVenue, courts]);
+
+  const totalOpenSlots = venueFilteredMatches.reduce((acc, m) => acc + Math.max(0, 4 - m.players.length), 0);
+  const fullMatchesCount = venueFilteredMatches.filter((m) => m.players.length >= 4).length;
+  const activePlayersCount = venueFilteredMatches.reduce((acc, m) => acc + m.players.length, 0);
+  const pendingRequestsTotal = venueFilteredMatches.reduce(
+    (acc, m) => acc + (m.slotRequests ? m.slotRequests.filter((r) => r.status === 'pending').length : 0),
+    0
+  );
+
+  const matchWithPendingRequest = useMemo(() => {
+    return (
+      venueFilteredMatches.find((m) => m.slotRequests?.some((r) => r.status === 'pending')) ||
+      effectiveMatches.find((m) => m.slotRequests?.some((r) => r.status === 'pending'))
+    );
+  }, [venueFilteredMatches, effectiveMatches]);
+
+  // Filter logic: uses venueFilteredMatches as base so counters and list are 100% in sync
   const filteredMatches = useMemo(() => {
-    return openMatches.filter((m) => {
+    return venueFilteredMatches.filter((m) => {
       const isFull = m.players.length >= 4;
 
       // Search term
@@ -426,39 +458,14 @@ export const AdminMatches: React.FC = () => {
         (visibilityFilter === 'public' && (m.visibility === 'public' || !m.visibility)) ||
         (visibilityFilter === 'private_group' && (m.visibility === 'private' || m.visibility === 'group'));
 
-      // Venue Filter: Integrated with the unified venue selector
+      // Venue Filter
       const court = courts.find((c) => c.id === m.courtId);
-      const matchVenue =
-        (isConsolidatedView || selectedVenueId === 'all' || !isMultiVenue || court?.venueId === selectedVenueId || (m as any).venueId === selectedVenueId) &&
-        (venueFilter === 'all' || court?.venueId === venueFilter || (m as any).venueId === venueFilter);
+      const matchVenueId = (m as any).venueId || court?.venueId;
+      const matchVenue = venueFilter === 'all' || matchVenueId === venueFilter;
 
       return matchSearch && matchStatus && matchLevel && matchGender && matchVis && matchVenue;
     });
-  }, [openMatches, search, statusFilter, levelFilter, genderFilter, visibilityFilter, venueFilter, courts, isMultiVenue, selectedVenueId, isConsolidatedView]);
-
-  // Venue-filtered matches for KPIs
-  const venueFilteredMatches = useMemo(() => {
-    return openMatches.filter((m) => {
-      if (isConsolidatedView || selectedVenueId === 'all' || !isMultiVenue) return true;
-      const court = courts.find((c) => c.id === m.courtId);
-      return court?.venueId === selectedVenueId || (m as any).venueId === selectedVenueId;
-    });
-  }, [openMatches, selectedVenueId, isConsolidatedView, isMultiVenue, courts]);
-
-  const totalOpenSlots = venueFilteredMatches.reduce((acc, m) => acc + Math.max(0, 4 - m.players.length), 0);
-  const fullMatchesCount = venueFilteredMatches.filter((m) => m.players.length >= 4).length;
-  const activePlayersCount = venueFilteredMatches.reduce((acc, m) => acc + m.players.length, 0);
-  const pendingRequestsTotal = venueFilteredMatches.reduce(
-    (acc, m) => acc + (m.slotRequests ? m.slotRequests.filter((r) => r.status === 'pending').length : 0),
-    0
-  );
-
-  const matchWithPendingRequest = useMemo(() => {
-    return (
-      venueFilteredMatches.find((m) => m.slotRequests?.some((r) => r.status === 'pending')) ||
-      openMatches.find((m) => m.slotRequests?.some((r) => r.status === 'pending'))
-    );
-  }, [venueFilteredMatches, openMatches]);
+  }, [venueFilteredMatches, search, statusFilter, levelFilter, genderFilter, visibilityFilter, venueFilter, courts]);
 
   // Handlers
   const handleCreateSubmit = (e: React.FormEvent) => {
@@ -1066,7 +1073,7 @@ export const AdminMatches: React.FC = () => {
       {/* ======================================================================
           1. CABECERA LIMPIA Y SIMÉTRICA (ESTILO INICIO & RESERVAS)
           ====================================================================== */}
-      <section className="pt-[26px] pb-1 space-y-3" data-purpose="header-section">
+      <section className="pt-2 pb-1 space-y-3" data-purpose="header-section">
         <div className="flex items-center justify-between">
           <div>
             <span className="text-xs font-medium text-slate-400 dark:text-slate-500 tracking-wide block mb-0.5">
@@ -1270,7 +1277,16 @@ export const AdminMatches: React.FC = () => {
         </div>
 
         {/* Solicitudes: Renombrado a 'Solicitudes' con botón interactivo directo a la partida */}
-        <div className="bg-white dark:bg-slate-900 rounded-2xl p-3.5 sm:p-4 border border-slate-200/80 dark:border-slate-800 shadow-2xs flex flex-col justify-between relative overflow-hidden">
+        <div
+          onClick={() => {
+            if (matchWithPendingRequest) {
+              openMatchDetail(matchWithPendingRequest);
+            }
+          }}
+          className={`bg-white dark:bg-slate-900 rounded-2xl p-3.5 sm:p-4 border border-slate-200/80 dark:border-slate-800 shadow-2xs flex flex-col justify-between relative overflow-hidden transition-all ${
+            matchWithPendingRequest ? 'cursor-pointer hover:border-[#8B5CF6]/60 hover:shadow-sm' : ''
+          }`}
+        >
           <div className="flex items-center justify-between gap-1.5">
             <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 truncate">
               {t('matches.pendingRequests', 'Solicitudes')}
@@ -1294,95 +1310,105 @@ export const AdminMatches: React.FC = () => {
             <p className="text-[11px] font-medium text-slate-400 dark:text-slate-500 truncate">
               {pendingRequestsTotal > 0 ? 'Pendientes de aprobar' : 'Sin pendientes'}
             </p>
-            {pendingRequestsTotal > 0 && matchWithPendingRequest && (
+            {matchWithPendingRequest ? (
               <button
                 type="button"
-                onClick={() => openMatchDetail(matchWithPendingRequest)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  openMatchDetail(matchWithPendingRequest);
+                }}
                 className="inline-flex items-center gap-1 text-[11px] font-bold text-[#8B5CF6] hover:text-[#7C3AED] hover:underline cursor-pointer shrink-0"
                 title="Abrir partida con solicitud pendiente"
               >
-                <span>Ver detalle</span>
+                <span>Ver partida</span>
                 <ArrowRight className="w-3 h-3" />
               </button>
-            )}
+            ) : null}
           </div>
         </div>
       </section>
 
-      {/* 3. Filtros Horizontales Modernos (Contenedor rounded-2xl minimalista estilo Stripe/Linear) */}
+      {/* 3. Filtros Horizontales Modernos (Dos filas limpias sin contenedores pesados) */}
       <section className="space-y-2.5" data-purpose="filtering-section">
-        <div className="p-2 sm:p-2.5 bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200/80 dark:border-[#1A314D] shadow-[0_2px_8px_rgba(0,0,0,0.02)] flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
-          {/* Pestañas Planas Modernas */}
-          <div className="flex items-center gap-1.5 overflow-x-auto hide-scrollbar">
-            <button
-              type="button"
-              onClick={() => setStatusFilter('all')}
-              className={`px-3 py-1.5 rounded-xl text-xs transition cursor-pointer font-bold ${
-                statusFilter === 'all'
-                  ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D] shadow-xs'
-                  : 'bg-slate-50 dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white border border-slate-200/80 dark:border-slate-800'
-              }`}
-            >
-              {t('matches.filterAll', 'Todas')} ({venueFilteredMatches.length})
-            </button>
-            <button
-              type="button"
-              onClick={() => setStatusFilter('open')}
-              className={`px-3 py-1.5 rounded-xl text-xs transition cursor-pointer font-bold ${
-                statusFilter === 'open'
-                  ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D] shadow-xs'
-                  : 'bg-slate-50 dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white border border-slate-200/80 dark:border-slate-800'
-              }`}
-            >
-              {t('matches.filterOpen', 'Buscando')} ({venueFilteredMatches.filter((m) => m.players.length < 4).length})
-            </button>
-            <button
-              type="button"
-              onClick={() => setStatusFilter('full')}
-              className={`px-3 py-1.5 rounded-xl text-xs transition cursor-pointer font-bold ${
-                statusFilter === 'full'
-                  ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D] shadow-xs'
-                  : 'bg-slate-50 dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white border border-slate-200/80 dark:border-slate-800'
-              }`}
-            >
-              {t('matches.filterFull', 'Completas')} ({fullMatchesCount})
-            </button>
+        {/* Fila 1: Barra de búsqueda superior con icono de filtro perfectamente alineado */}
+        <div className="flex items-center gap-2">
+          <div className="relative flex-1">
+            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Buscar por pista, jugador, nivel o fecha..."
+              className="w-full pl-9 pr-8 py-2 rounded-xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] text-xs font-medium text-[#0B1A2D] dark:text-white placeholder-slate-400 shadow-xs focus:outline-none focus:border-[#8B5CF6] transition-colors"
+            />
+            {search && (
+              <button
+                type="button"
+                onClick={() => setSearch('')}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-0.5"
+                title="Limpiar búsqueda"
+              >
+                ✕
+              </button>
+            )}
           </div>
 
-          {/* Buscador Rápido y Botón de Filtros Avanzados */}
-          <div className="flex items-center gap-2">
-            <div className="relative flex-1 sm:w-60">
-              <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-slate-400" />
-              <input
-                type="text"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Buscar pista, jugador..."
-                className="w-full pl-8.5 pr-7 py-1.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 text-xs text-[#0B1A2D] dark:text-white placeholder-slate-400 focus:outline-none focus:border-[#8B5CF6]"
-              />
-              {search && (
-                <button
-                  type="button"
-                  onClick={() => setSearch('')}
-                  className="absolute right-2 top-2 text-xs text-slate-400 hover:text-slate-600"
-                >
-                  ✕
-                </button>
-              )}
-            </div>
+          <button
+            type="button"
+            onClick={openFilterModal}
+            className={`h-9 px-3 bg-white dark:bg-[#0E2239] border rounded-xl shadow-xs active:scale-95 transition-all cursor-pointer flex items-center gap-1.5 shrink-0 text-xs font-semibold ${
+              activeFiltersCount > 0
+                ? 'border-[#8B5CF6] text-[#8B5CF6]'
+                : 'border-slate-200/80 dark:border-[#1A314D] text-slate-600 dark:text-slate-300 hover:text-[#0B1A2D] dark:hover:text-white hover:border-slate-300'
+            }`}
+            title="Más filtros"
+            aria-label="Más filtros"
+          >
+            <Filter className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Filtros</span>
+            {activeFiltersCount > 0 && (
+              <span className="w-4 h-4 rounded-full bg-[#8B5CF6] text-white text-[10px] flex items-center justify-center font-bold">
+                {activeFiltersCount}
+              </span>
+            )}
+          </button>
+        </div>
 
-            <button
-              type="button"
-              onClick={openFilterModal}
-              className={`p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:text-[#0B1A2D] dark:hover:text-white rounded-xl shadow-xs active:scale-95 transition-all cursor-pointer shrink-0 ${
-                activeFiltersCount > 0 ? 'border-[#8B5CF6] text-[#8B5CF6]' : ''
-              }`}
-              title="Más filtros"
-              aria-label="Más filtros"
-            >
-              <Filter className="w-4 h-4" />
-            </button>
-          </div>
+        {/* Fila 2: Pestañas de estado planas, modernas y limpias */}
+        <div className="flex items-center gap-1.5 overflow-x-auto hide-scrollbar py-0.5">
+          <button
+            type="button"
+            onClick={() => setStatusFilter('all')}
+            className={`px-3.5 py-1.5 rounded-xl text-xs transition cursor-pointer font-bold ${
+              statusFilter === 'all'
+                ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D] shadow-xs'
+                : 'bg-white/80 dark:bg-[#0E2239]/80 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white border border-slate-200/70 dark:border-[#1A314D]'
+            }`}
+          >
+            {t('matches.filterAll', 'Todas')} ({venueFilteredMatches.length})
+          </button>
+          <button
+            type="button"
+            onClick={() => setStatusFilter('open')}
+            className={`px-3.5 py-1.5 rounded-xl text-xs transition cursor-pointer font-bold ${
+              statusFilter === 'open'
+                ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D] shadow-xs'
+                : 'bg-white/80 dark:bg-[#0E2239]/80 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white border border-slate-200/70 dark:border-[#1A314D]'
+            }`}
+          >
+            {t('matches.filterOpen', 'Buscando')} ({venueFilteredMatches.filter((m) => m.players.length < 4).length})
+          </button>
+          <button
+            type="button"
+            onClick={() => setStatusFilter('full')}
+            className={`px-3.5 py-1.5 rounded-xl text-xs transition cursor-pointer font-bold ${
+              statusFilter === 'full'
+                ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D] shadow-xs'
+                : 'bg-white/80 dark:bg-[#0E2239]/80 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white border border-slate-200/70 dark:border-[#1A314D]'
+            }`}
+          >
+            {t('matches.filterFull', 'Completas')} ({fullMatchesCount})
+          </button>
         </div>
 
         {/* Chips de filtros activos para borrado rápido */}
@@ -1687,13 +1713,13 @@ export const AdminMatches: React.FC = () => {
 
                   <div className="flex items-center gap-1.5 shrink-0">
                     {isFull ? (
-                      <span className="inline-flex items-center gap-1.5 bg-[#0B1A2D] dark:bg-[#132A45] text-white dark:text-slate-100 text-[10px] font-bold px-2.5 py-0.5 rounded-full border border-[#0B1A2D] dark:border-slate-700 shadow-2xs">
+                      <span className="inline-flex items-center gap-1.5 bg-[#F0FCCF] dark:bg-[#B7F229]/20 text-[#0B1A2D] dark:text-[#B7F229] text-[10px] font-bold px-2.5 py-0.5 rounded-full border border-[#B7F229]/50 shadow-2xs">
                         <span className="w-1.5 h-1.5 rounded-full bg-[#B7F229]"></span>
                         Completa
                       </span>
                     ) : (
-                      <span className="inline-flex items-center gap-1 bg-[#B7F229]/20 text-[#0B1A2D] dark:text-[#B7F229] text-[10px] font-bold px-2.5 py-0.5 rounded-full border border-[#B7F229]/40">
-                        <span className="w-1.5 h-1.5 rounded-full bg-[#a3dc1e]"></span>
+                      <span className="inline-flex items-center gap-1 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-[10px] font-bold px-2.5 py-0.5 rounded-full border border-slate-200 dark:border-slate-700">
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#B7F229]"></span>
                         {openSlots} {openSlots === 1 ? 'libre' : 'libres'}
                       </span>
                     )}
@@ -1909,7 +1935,7 @@ export const AdminMatches: React.FC = () => {
                   <span
                     className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
                       selectedMatchForDetail.mode === 'friendly'
-                        ? 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700'
+                        ? 'bg-[#F0FCCF] dark:bg-[#B7F229]/20 text-[#0B1A2D] dark:text-[#B7F229] border-[#B7F229]/40'
                         : 'bg-amber-50 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border-amber-200 dark:border-amber-800'
                     }`}
                   >

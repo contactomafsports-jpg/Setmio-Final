@@ -127,7 +127,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
               </div>
             </div>
           ) : (
-            /* Vista Admin Club / Escuela / Profesor / Atleta: Branding Oficial Setmio Pro con Tipografía Corporativa */
+            /* Vista Admin Club / Escuela / Profesor / Atleta: Branding Oficial Setmio Pro con Isotipo Cuadrado PWA */
             <div className="flex items-center gap-2.5 shrink-0">
               <button
                 type="button"
@@ -135,12 +135,22 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
                 className="flex items-center gap-2 cursor-pointer select-none group text-left p-0 bg-transparent border-0 focus:outline-none"
                 title="Ir al Inicio de Setmio"
               >
-                <span className="text-[21px] sm:text-[22px] font-extrabold tracking-tight text-[#0B1A2D] dark:text-white uppercase font-sans leading-none select-none">
-                  SETMIO
-                </span>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#8B5CF6] text-white tracking-wider leading-none shrink-0 shadow-2xs">
-                  PRO
-                </span>
+                {/* Logotipo Cuadrado PWA Optimizado (recorte / object-fit) */}
+                <div className="w-8 h-8 sm:w-8.5 sm:h-8.5 rounded-xl overflow-hidden bg-[#0B1A2D] border border-slate-700/60 flex items-center justify-center shrink-0 shadow-xs group-hover:scale-102 transition-transform">
+                  <img
+                    src="/icon.svg"
+                    alt="Setmio Pro"
+                    className="w-full h-full object-cover select-none"
+                  />
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[19px] sm:text-[21px] font-extrabold tracking-tight text-[#0B1A2D] dark:text-white uppercase font-sans leading-none select-none">
+                    SETMIO
+                  </span>
+                  <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-[#B7F229] text-[#0B1A2D] tracking-wider leading-none shrink-0 shadow-2xs border border-[#B7F229]">
+                    PRO
+                  </span>
+                </div>
               </button>
               <div className="flex items-center gap-2">
                 {isProAthleteAdmin ? (

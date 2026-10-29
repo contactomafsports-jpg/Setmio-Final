@@ -1531,7 +1531,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   // Domain Business State
   const [courts, setCourts] = useState<Court[]>(() => readDemoState('setmio_demo_courts_v1', INITIAL_COURTS));
   const [bookings, setBookings] = useState<Booking[]>(() => readDemoState('setmio_demo_bookings_v1', INITIAL_BOOKINGS));
-  const [openMatches, setOpenMatches] = useState<OpenMatch[]>(() => readDemoState('setmio_demo_matches_v1', INITIAL_OPEN_MATCHES));
+  const [openMatches, setOpenMatches] = useState<OpenMatch[]>(() => {
+    const loaded = readDemoState<OpenMatch[]>('setmio_demo_matches_v1', INITIAL_OPEN_MATCHES);
+    return Array.isArray(loaded) && loaded.length > 0 ? loaded : INITIAL_OPEN_MATCHES;
+  });
   const [coaches] = useState<Coach[]>(INITIAL_COACHES);
   const [academyGroups] = useState<AcademyGroup[]>(INITIAL_ACADEMY_GROUPS);
   const [tournaments, setTournaments] = useState<Tournament[]>(() => readDemoState('setmio_demo_tournaments_v1', INITIAL_TOURNAMENTS));

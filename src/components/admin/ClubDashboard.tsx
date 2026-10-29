@@ -365,7 +365,7 @@ export const ClubDashboard: React.FC = () => {
           </button>
         </div>
 
-        {/* Accesos directos elegantes en Azul Profundo (#0B1A2D) con signo '+' en Verde Lima (#B7F229) */}
+        {/* Accesos directos unificados en Azul Profundo (#0B1A2D) con texto en blanco y signo '+' */}
         <div className="grid grid-cols-2 gap-2.5">
           <button
             type="button"
@@ -373,9 +373,9 @@ export const ClubDashboard: React.FC = () => {
               if (typeof window !== 'undefined') window.history.pushState({}, '', '/admin/reservas');
               setAdminTab('agenda');
             }}
-            className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-2xl bg-[#0B1A2D] hover:bg-[#132A45] active:scale-98 text-white font-bold text-xs shadow-xs border border-[#0B1A2D] dark:border-slate-700 transition-all cursor-pointer tracking-tight group"
+            className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-2xl bg-[#0B1A2D] hover:bg-[#132A45] active:scale-98 text-white font-bold text-xs shadow-xs border border-[#0B1A2D] dark:border-slate-700 transition-all cursor-pointer tracking-tight"
           >
-            <Plus className="w-4 h-4 stroke-[3] text-[#B7F229] group-hover:rotate-90 transition-transform shrink-0" />
+            <Plus className="w-4 h-4 stroke-[3] text-white shrink-0" />
             <span>Nueva reserva</span>
           </button>
 
@@ -385,9 +385,9 @@ export const ClubDashboard: React.FC = () => {
               if (typeof window !== 'undefined') window.history.pushState({}, '', '/admin/partidas');
               setAdminTab('matches');
             }}
-            className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-2xl bg-[#0B1A2D] hover:bg-[#132A45] active:scale-98 text-white font-bold text-xs shadow-xs border border-[#0B1A2D] dark:border-slate-700 transition-all cursor-pointer tracking-tight group"
+            className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-2xl bg-[#0B1A2D] hover:bg-[#132A45] active:scale-98 text-white font-bold text-xs shadow-xs border border-[#0B1A2D] dark:border-slate-700 transition-all cursor-pointer tracking-tight"
           >
-            <Plus className="w-4 h-4 stroke-[3] text-[#B7F229] group-hover:rotate-90 transition-transform shrink-0" />
+            <Plus className="w-4 h-4 stroke-[3] text-white shrink-0" />
             <span>Nueva partida</span>
           </button>
         </div>

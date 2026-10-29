@@ -609,7 +609,7 @@ export const AdminCafePOS: React.FC = () => {
       {/* ======================================================================
           1. CABECERA LIMPIA Y SIMÉTRICA (ESTILO INICIO, RESERVAS & PARTIDAS)
           ====================================================================== */}
-      <section className="pt-[26px] pb-1 space-y-3" data-purpose="header-section">
+      <section className="pt-2 pb-1 space-y-3" data-purpose="header-section">
         <div className="flex items-center justify-between">
           <div>
             <span className="text-xs font-medium text-slate-400 dark:text-slate-500 tracking-wide block mb-0.5">
@@ -627,12 +627,12 @@ export const AdminCafePOS: React.FC = () => {
 
           <button
             type="button"
-            onClick={() => setArqueoModalOpen(true)}
+            onClick={openNewProductModal}
             className="w-9 h-9 rounded-xl bg-[#0B1A2D] dark:bg-[#0B1A2D] border border-[#0B1A2D] dark:border-slate-700 flex items-center justify-center text-white hover:bg-[#132A45] active:scale-95 transition-all cursor-pointer shadow-xs"
-            title="Arqueo y Cierre de Turno"
-            aria-label="Arqueo y Cierre de Turno"
+            title="Nuevo producto"
+            aria-label="Nuevo producto"
           >
-            <Calculator className="w-4 h-4 text-[#B7F229]" />
+            <Plus className="w-4 h-4 stroke-[3] text-[#B7F229]" />
           </button>
         </div>
 
@@ -808,33 +808,33 @@ export const AdminCafePOS: React.FC = () => {
           <button
             type="button"
             onClick={() => setAssignModalOpen(true)}
-            className="w-full px-3 py-2.5 rounded-xl bg-[#0B1A2D] hover:bg-[#132A45] text-white font-black text-xs shadow-sm border border-[#0B1A2D] dark:border-slate-700 flex items-center justify-center gap-1.5 transition active:scale-95 cursor-pointer group"
+            className="w-full px-3 py-2.5 rounded-xl bg-[#0B1A2D] hover:bg-[#132A45] text-white font-black text-xs shadow-sm border border-[#0B1A2D] dark:border-slate-700 flex items-center justify-center gap-1.5 transition active:scale-95 cursor-pointer group whitespace-nowrap"
           >
             <Calendar className="w-4 h-4 text-[#B7F229] stroke-[2.5] shrink-0" />
-            <span className="truncate">Asignar Reserva</span>
+            <span className="whitespace-nowrap">Asignar Reserva</span>
           </button>
 
           {/* 2. Añadir Producto Rápido (Texto limpio 'Producto' con icono '+') */}
           <button
             type="button"
             onClick={openNewProductModal}
-            className="w-full px-3 py-2.5 rounded-xl bg-white dark:bg-slate-800/90 hover:bg-slate-50 dark:hover:bg-slate-800 text-[#0B1A2D] dark:text-slate-200 font-bold text-xs border border-slate-200/80 dark:border-slate-700/80 shadow-2xs flex items-center justify-center gap-1.5 transition active:scale-95 cursor-pointer"
+            className="w-full px-3 py-2.5 rounded-xl bg-white dark:bg-slate-800/90 hover:bg-slate-50 dark:hover:bg-slate-800 text-[#0B1A2D] dark:text-slate-200 font-bold text-xs border border-slate-200/80 dark:border-slate-700/80 shadow-2xs flex items-center justify-center gap-1.5 transition active:scale-95 cursor-pointer whitespace-nowrap"
             title="Añadir nuevo producto al mostrador"
           >
             <Plus className="w-4 h-4 text-[#8B5CF6] stroke-[2.5] shrink-0" />
-            <span className="truncate">Producto</span>
+            <span className="whitespace-nowrap">Producto</span>
           </button>
 
           {/* 3. Transacciones */}
           <button
             type="button"
             onClick={() => setTransactionsModalOpen(true)}
-            className="w-full px-3 py-2.5 rounded-xl bg-white dark:bg-slate-800/90 hover:bg-slate-50 dark:hover:bg-slate-800 text-[#0B1A2D] dark:text-slate-200 font-bold text-xs border border-slate-200/80 dark:border-slate-700/80 shadow-2xs flex items-center justify-center gap-1.5 transition active:scale-95 cursor-pointer"
+            className="w-full px-3 py-2.5 rounded-xl bg-white dark:bg-slate-800/90 hover:bg-slate-50 dark:hover:bg-slate-800 text-[#0B1A2D] dark:text-slate-200 font-bold text-xs border border-slate-200/80 dark:border-slate-700/80 shadow-2xs flex items-center justify-center gap-1.5 transition active:scale-95 cursor-pointer whitespace-nowrap"
             title="Ver transacciones del turno"
           >
             <History className="w-4 h-4 text-slate-500 shrink-0" />
-            <span className="truncate">Transacciones</span>
-            <span className="font-mono text-[10px] px-1.5 py-0.2 rounded-md bg-slate-100 dark:bg-slate-700 text-[#0B1A2D] dark:text-slate-200 font-black">
+            <span className="whitespace-nowrap">Transacciones</span>
+            <span className="font-mono text-[10px] px-1.5 py-0.2 rounded-md bg-slate-100 dark:bg-slate-700 text-[#0B1A2D] dark:text-slate-200 font-black shrink-0">
               {filteredTransactions.length}
             </span>
           </button>
@@ -843,11 +843,11 @@ export const AdminCafePOS: React.FC = () => {
           <button
             type="button"
             onClick={() => setArqueoModalOpen(true)}
-            className="w-full px-3 py-2.5 rounded-xl bg-white dark:bg-slate-800/90 hover:bg-slate-50 dark:hover:bg-slate-800 text-[#0B1A2D] dark:text-slate-200 font-bold text-xs border border-slate-200/80 dark:border-slate-700/80 shadow-2xs flex items-center justify-center gap-1.5 transition active:scale-95 cursor-pointer"
+            className="w-full px-3 py-2.5 rounded-xl bg-white dark:bg-slate-800/90 hover:bg-slate-50 dark:hover:bg-slate-800 text-[#0B1A2D] dark:text-slate-200 font-bold text-xs border border-slate-200/80 dark:border-slate-700/80 shadow-2xs flex items-center justify-center gap-1.5 transition active:scale-95 cursor-pointer whitespace-nowrap"
             title="Arqueo y cierre de turno"
           >
             <Calculator className="w-4 h-4 text-slate-500 shrink-0" />
-            <span className="truncate">Arqueo</span>
+            <span className="whitespace-nowrap">Arqueo</span>
           </button>
         </div>
       </section>
@@ -2063,6 +2063,172 @@ export const AdminCafePOS: React.FC = () => {
                 )}
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* ======================================================================
+          MODAL DE GESTIÓN DE CATEGORÍAS (ALTA, EDICIÓN Y ELIMINACIÓN)
+          ====================================================================== */}
+      {isCategoryModalOpen && (
+        <div className="fixed inset-0 z-50 bg-[#0B1A2D]/70 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-[#0E2239] rounded-2xl max-w-md w-full border border-slate-200 dark:border-[#1A314D] shadow-2xl overflow-hidden flex flex-col max-h-[85vh] animate-in fade-in zoom-in-95 duration-150">
+            {/* Header */}
+            <div className="p-4 border-b border-slate-100 dark:border-[#1A314D] flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-xl bg-[#8B5CF6]/10 text-[#8B5CF6] flex items-center justify-center">
+                  <Sliders className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-[#0B1A2D] dark:text-white">
+                    Gestión de Categorías
+                  </h3>
+                  <p className="text-[11px] text-slate-400">
+                    Organiza las secciones del mostrador y TPV
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setIsCategoryModalOpen(false);
+                  setEditingCategoryOld(null);
+                  setNewCategoryName('');
+                }}
+                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Formulario añadir nueva categoría */}
+            <form onSubmit={handleAddCategory} className="p-4 border-b border-slate-100 dark:border-[#1A314D] bg-slate-50/50 dark:bg-slate-900/40">
+              <label className="text-[11px] font-bold text-slate-600 dark:text-slate-400 block mb-1.5">
+                Nueva Categoría
+              </label>
+              <div className="flex items-center gap-2">
+                <div className="relative flex-1">
+                  <Tag className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <input
+                    type="text"
+                    value={newCategoryName}
+                    onChange={(e) => setNewCategoryName(e.target.value)}
+                    placeholder="Ej. Snacks, Pelotas, Cervezas..."
+                    className="w-full pl-8.5 pr-3 py-2 rounded-xl bg-white dark:bg-[#071220] border border-slate-200 dark:border-[#1A314D] text-xs font-semibold text-[#0B1A2D] dark:text-white placeholder:text-slate-400 focus:outline-none focus:border-[#8B5CF6]"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  disabled={!newCategoryName.trim()}
+                  className="px-3.5 py-2 rounded-xl bg-[#0B1A2D] hover:bg-[#132A45] disabled:opacity-50 text-white font-bold text-xs flex items-center gap-1.5 transition active:scale-95 cursor-pointer shadow-xs shrink-0"
+                >
+                  <Plus className="w-3.5 h-3.5 text-[#B7F229]" />
+                  <span>Añadir</span>
+                </button>
+              </div>
+            </form>
+
+            {/* Lista de categorías existentes con edición y borrado */}
+            <div className="p-4 overflow-y-auto space-y-2 flex-1">
+              <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">
+                Categorías Activas ({customCategories.length})
+              </div>
+
+              {customCategories.length === 0 ? (
+                <div className="text-center py-6 text-xs text-slate-400">
+                  No hay categorías configuradas. Añade una para comenzar.
+                </div>
+              ) : (
+                customCategories.map((cat) => {
+                  const isEditing = editingCategoryOld === cat;
+                  const countInCat = cafeProducts.filter((p) => p.category === cat).length;
+
+                  return (
+                    <div
+                      key={cat}
+                      className="flex items-center justify-between p-2.5 rounded-xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] shadow-2xs gap-2"
+                    >
+                      {isEditing ? (
+                        <div className="flex items-center gap-1.5 flex-1 min-w-0">
+                          <input
+                            type="text"
+                            value={editingCategoryNew}
+                            onChange={(e) => setEditingCategoryNew(e.target.value)}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') handleSaveEditCategory(cat);
+                              if (e.key === 'Escape') setEditingCategoryOld(null);
+                            }}
+                            autoFocus
+                            className="w-full px-2.5 py-1 rounded-lg bg-slate-50 dark:bg-[#071220] border border-[#8B5CF6] text-xs font-bold text-[#0B1A2D] dark:text-white focus:outline-none"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => handleSaveEditCategory(cat)}
+                            className="p-1.5 rounded-lg bg-[#B7F229] text-[#0B1A2D] hover:bg-[#a5e01b] transition cursor-pointer"
+                            title="Guardar nombre"
+                          >
+                            <Check className="w-3.5 h-3.5 stroke-[2.5]" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setEditingCategoryOld(null)}
+                            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition cursor-pointer"
+                            title="Cancelar"
+                          >
+                            <X className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      ) : (
+                        <>
+                          <div className="flex items-center gap-2 min-w-0">
+                            <span className="w-2 h-2 rounded-full bg-[#8B5CF6]"></span>
+                            <span className="text-xs font-bold text-[#0B1A2D] dark:text-white truncate">
+                              {cat}
+                            </span>
+                            <span className="text-[10px] px-1.5 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 font-mono">
+                              {countInCat} {countInCat === 1 ? 'artículo' : 'artículos'}
+                            </span>
+                          </div>
+
+                          <div className="flex items-center gap-1 shrink-0">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setEditingCategoryOld(cat);
+                                setEditingCategoryNew(cat);
+                              }}
+                              className="p-1.5 rounded-lg text-slate-400 hover:text-[#0B1A2D] dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+                              title="Editar nombre"
+                            >
+                              <Edit2 className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteCategory(cat)}
+                              className="p-1.5 rounded-lg text-rose-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition cursor-pointer"
+                              title="Eliminar categoría"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  );
+                })
+              )}
+            </div>
+
+            {/* Footer */}
+            <div className="p-3 border-t border-slate-100 dark:border-[#1A314D] flex justify-end bg-slate-50/50 dark:bg-slate-900/20">
+              <button
+                type="button"
+                onClick={() => setIsCategoryModalOpen(false)}
+                className="px-4 py-1.5 rounded-xl bg-[#0B1A2D] dark:bg-white text-white dark:text-[#0B1A2D] text-xs font-bold hover:bg-[#132A45] transition cursor-pointer"
+              >
+                Cerrar
+              </button>
+            </div>
           </div>
         </div>
       )}

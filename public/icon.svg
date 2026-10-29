@@ -3,7 +3,7 @@
     <!-- Fondo Azul Profundo Setmio (#0B1A2D) -->
     <rect id="appIconBase" width="512" height="512" rx="128" fill="#0B1A2D" />
     <filter id="ballGlow" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="0" dy="0" stdDeviation="8" floodColor="#87F229" floodOpacity="0.75" />
+      <feDropShadow dx="0" dy="0" stdDeviation="8" floodColor="#B7F229" floodOpacity="0.75" />
     </filter>
   </defs>
 
@@ -12,8 +12,8 @@
 
   <!-- Símbolo Isotipo Oficial SETMIO PÁDEL -->
   <g transform="translate(36, 36) scale(4.4)">
-    <!-- Pelota de pádel Verde Lima (#87F229) -->
-    <circle cx="76" cy="17" r="7.5" fill="#87F229" filter="url(#ballGlow)" />
+    <!-- Pelota de pádel Verde Lima (#B7F229) -->
+    <circle cx="76" cy="17" r="7.5" fill="#B7F229" filter="url(#ballGlow)" />
 
     <!-- Franja Superior Dinámica -->
     <path

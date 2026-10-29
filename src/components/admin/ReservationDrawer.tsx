@@ -532,8 +532,8 @@ export const ReservationDrawer: React.FC<ReservationDrawerProps> = ({
                 <span>Afecta Nivel / ELO</span>
               </span>
             ) : (
-              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl text-[10px] font-black bg-emerald-50 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
-                <Smile className="w-3 h-3 text-emerald-500" />
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl text-[10px] font-black bg-[#F0FCCF] dark:bg-[#B7F229]/20 text-[#0B1A2D] dark:text-[#B7F229] border border-[#B7F229]/50">
+                <Smile className="w-3 h-3 text-[#659b02] dark:text-[#B7F229]" />
                 <span>Sin alteración de ELO</span>
               </span>
             )}

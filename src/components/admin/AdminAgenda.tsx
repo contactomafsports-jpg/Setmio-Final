@@ -614,7 +614,7 @@ export const AdminAgenda: React.FC = () => {
       {/* ======================================================================
           1. CABECERA LIMPIA Y SIMÉTRICA (ESTILO INICIO)
           ====================================================================== */}
-      <section className="pt-[26px] pb-1 space-y-3">
+      <section className="pt-2 pb-1 space-y-3" data-purpose="header-section">
         {/* Título de sección limpio y simétrico con Inicio con botón minimalista '+' en la esquina derecha */}
         <div className="flex items-center justify-between">
           <div>
@@ -754,8 +754,31 @@ export const AdminAgenda: React.FC = () => {
           )}
         </div>
 
-        {/* Fila de Controles: Selector de Fecha + Acceso Historial Completo */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+        {/* Reordenación Superior: Botón "Todas las reservas" POR ENCIMA del selector de fechas */}
+        <div className="space-y-2">
+          {/* Acceso Rápido: Todas las reservas */}
+          <button
+            type="button"
+            onClick={() => {
+              if (typeof window !== 'undefined') {
+                window.history.pushState({}, '', '/admin/reservas/todas');
+              }
+              setShowAllBookingsView(true);
+            }}
+            className="w-full flex items-center justify-between bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] rounded-2xl p-2.5 px-3.5 text-xs sm:text-sm font-semibold text-[#0B1A2D] dark:text-white hover:bg-slate-50 dark:hover:bg-[#132A45] transition-colors shadow-[0_2px_8px_rgba(0,0,0,0.02)] active:scale-[0.99] cursor-pointer"
+          >
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-xl bg-slate-50 dark:bg-[#071220] border border-slate-100 dark:border-[#1A314D] flex items-center justify-center text-[#0B1A2D] dark:text-slate-200 shrink-0">
+                <FileSpreadsheet className="w-4 h-4 text-[#8B5CF6]" />
+              </div>
+              <div className="text-left">
+                <div className="font-bold text-xs text-[#0B1A2D] dark:text-white">Todas las reservas</div>
+                <div className="text-[10px] text-slate-400">Historial completo, filtros avanzados y búsqueda</div>
+              </div>
+            </div>
+            <ChevronRight className="w-4 h-4 text-slate-400" />
+          </button>
+
           {/* Selector de Fecha Tipo Ribbon */}
           <div className="flex items-center justify-between bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-xl px-2.5 py-2 shadow-2xs h-10">
             <button
@@ -789,21 +812,6 @@ export const AdminAgenda: React.FC = () => {
               <ChevronRight className="w-3.5 h-3.5" />
             </button>
           </div>
-
-          {/* Acceso Rápido: Todas las reservas */}
-          <button
-            type="button"
-            onClick={() => {
-              if (typeof window !== 'undefined') {
-                window.history.pushState({}, '', '/admin/reservas/todas');
-              }
-              setShowAllBookingsView(true);
-            }}
-            className="w-full flex items-center justify-center gap-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl py-2 px-3 text-xs sm:text-sm font-semibold text-[#0B1A2D] dark:text-white hover:bg-slate-50 dark:hover:bg-slate-800/80 transition-colors shadow-2xs active:scale-[0.99] cursor-pointer h-10"
-          >
-            <FileSpreadsheet className="w-4 h-4 text-[#64748B] dark:text-slate-400" />
-            <span>Todas las reservas</span>
-          </button>
         </div>
       </section>
 
