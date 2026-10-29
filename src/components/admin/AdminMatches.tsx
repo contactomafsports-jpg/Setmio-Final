@@ -52,6 +52,12 @@ export const AdminMatches: React.FC = () => {
     currentTenant,
     isMultiVenue,
     venues,
+    selectedVenueId,
+    selectedVenue,
+    setSelectedVenueId,
+    isConsolidatedView,
+    isClubOpen,
+    toggleClubOpenState,
     triggerDemoToast,
     setAdminTab,
     navigateToPlayerProfile,
@@ -61,6 +67,9 @@ export const AdminMatches: React.FC = () => {
     sendNotification,
     t,
   } = useApp();
+
+  // Unified Venue Selector Dropdown State
+  const [isVenueSelectorOpen, setIsVenueSelectorOpen] = useState(false);
 
   // Filters State
   const [search, setSearch] = useState('');
@@ -417,22 +426,29 @@ export const AdminMatches: React.FC = () => {
         (visibilityFilter === 'public' && (m.visibility === 'public' || !m.visibility)) ||
         (visibilityFilter === 'private_group' && (m.visibility === 'private' || m.visibility === 'group'));
 
-      // Venue Filter
+      // Venue Filter: Integrated with the unified venue selector
       const court = courts.find((c) => c.id === m.courtId);
       const matchVenue =
-        venueFilter === 'all' ||
-        !isMultiVenue ||
-        court?.venueId === venueFilter ||
-        (m as any).venueId === venueFilter;
+        (isConsolidatedView || selectedVenueId === 'all' || !isMultiVenue || court?.venueId === selectedVenueId || (m as any).venueId === selectedVenueId) &&
+        (venueFilter === 'all' || court?.venueId === venueFilter || (m as any).venueId === venueFilter);
 
       return matchSearch && matchStatus && matchLevel && matchGender && matchVis && matchVenue;
     });
-  }, [openMatches, search, statusFilter, levelFilter, genderFilter, visibilityFilter, venueFilter, courts, isMultiVenue]);
+  }, [openMatches, search, statusFilter, levelFilter, genderFilter, visibilityFilter, venueFilter, courts, isMultiVenue, selectedVenueId, isConsolidatedView]);
 
-  const totalOpenSlots = openMatches.reduce((acc, m) => acc + Math.max(0, 4 - m.players.length), 0);
-  const fullMatchesCount = openMatches.filter((m) => m.players.length >= 4).length;
-  const activePlayersCount = openMatches.reduce((acc, m) => acc + m.players.length, 0);
-  const pendingRequestsTotal = openMatches.reduce(
+  // Venue-filtered matches for KPIs
+  const venueFilteredMatches = useMemo(() => {
+    return openMatches.filter((m) => {
+      if (isConsolidatedView || selectedVenueId === 'all' || !isMultiVenue) return true;
+      const court = courts.find((c) => c.id === m.courtId);
+      return court?.venueId === selectedVenueId || (m as any).venueId === selectedVenueId;
+    });
+  }, [openMatches, selectedVenueId, isConsolidatedView, isMultiVenue, courts]);
+
+  const totalOpenSlots = venueFilteredMatches.reduce((acc, m) => acc + Math.max(0, 4 - m.players.length), 0);
+  const fullMatchesCount = venueFilteredMatches.filter((m) => m.players.length >= 4).length;
+  const activePlayersCount = venueFilteredMatches.reduce((acc, m) => acc + m.players.length, 0);
+  const pendingRequestsTotal = venueFilteredMatches.reduce(
     (acc, m) => acc + (m.slotRequests ? m.slotRequests.filter((r) => r.status === 'pending').length : 0),
     0
   );
@@ -1039,34 +1055,144 @@ export const AdminMatches: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6 text-slate-900 dark:text-slate-100 max-w-7xl mx-auto pb-16">
-      {/* 1. Cabecera Limpia Oficial (Sin badge de comunidad play ni subtítulo) */}
-      <section className="space-y-3" data-purpose="header-section">
-        <div className="flex items-center justify-between gap-3 pt-1">
-          <h1 className="text-2xl font-extrabold text-[#0B1A2D] dark:text-white tracking-tight">
-            Partidas Abiertas
-          </h1>
-          <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-full">
-            {openMatches.length} activas
-          </span>
-        </div>
-        <div className="flex items-center gap-2.5 pt-1">
-          <button
-            type="button"
-            onClick={() => setAdminTab('agenda')}
-            className="inline-flex items-center justify-center gap-2 px-3.5 py-2.5 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-xl text-xs font-bold text-[#0B1A2D] dark:text-slate-200 shadow-xs hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors active:scale-95 cursor-pointer"
-          >
-            <Calendar className="w-4 h-4 text-slate-500" />
-            <span>{t('matches.btnAgenda', 'Agenda')}</span>
-          </button>
+    <div className="max-w-7xl mx-auto pt-2 pb-16 space-y-4 font-sans text-[#0B1A2D] dark:text-slate-100 antialiased">
+      {/* ======================================================================
+          1. CABECERA LIMPIA Y SIMÉTRICA (ESTILO INICIO & RESERVAS)
+          ====================================================================== */}
+      <section className="pt-[26px] pb-1 space-y-3" data-purpose="header-section">
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <h1 className="text-[22px] font-extrabold text-[#0B1A2D] dark:text-white tracking-tight leading-tight">
+              Partidas Abiertas
+            </h1>
+          </div>
+
+          {/* Botón CTA '+ Nueva partida' en Azul Profundo (#0B1A2D) con acentos en Verde Lima (#B7F229) */}
           <button
             type="button"
             onClick={() => setShowCreateModal(true)}
-            className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-[#B7F229] hover:bg-[#a3dc1e] text-[#0B1A2D] rounded-xl text-xs font-extrabold shadow-sm active:scale-95 transition-all cursor-pointer"
+            className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 bg-[#0B1A2D] hover:bg-[#132A45] active:scale-95 text-white font-black rounded-xl text-xs sm:text-sm shadow-sm border border-[#0B1A2D] dark:border-slate-700 transition-all cursor-pointer group"
           >
-            <Plus className="w-4 h-4 stroke-[2.5]" />
-            <span>{t('matches.btnNew', 'Nueva partida')}</span>
+            <Plus className="w-4 h-4 stroke-[3] text-[#B7F229] group-hover:rotate-90 transition-transform shrink-0" />
+            <span className="truncate">{t('matches.btnNew', 'Nueva partida')}</span>
           </button>
+        </div>
+
+        {/* Pill de Sede y Estado Operativo Unificado (colocado antes del Dashboard de Métricas) */}
+        <div className="relative">
+          <div className="flex items-center justify-between p-2.5 bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200/80 dark:border-[#1A314D] shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
+            {/* Selector de Sede */}
+            <div
+              onClick={() => setIsVenueSelectorOpen(!isVenueSelectorOpen)}
+              className="flex items-center gap-2 cursor-pointer group select-none min-w-0"
+              title="Cambiar sede activa o ver red consolidada"
+            >
+              <div className="w-8 h-8 rounded-xl bg-slate-50 dark:bg-[#071220] border border-slate-100 dark:border-[#1A314D] flex items-center justify-center text-[#0B1A2D] dark:text-slate-200 shrink-0">
+                <Building2 className="w-4 h-4 text-[#0B1A2D] dark:text-white" />
+              </div>
+              <div className="min-w-0">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-xs font-bold text-[#0B1A2D] dark:text-white truncate">
+                    {isConsolidatedView ? 'Todas las Sedes' : selectedVenue.shortName || selectedVenue.name}
+                  </span>
+                  <ChevronDown
+                    className={`w-3.5 h-3.5 text-slate-400 group-hover:text-[#0B1A2D] dark:group-hover:text-white transition-transform ${
+                      isVenueSelectorOpen ? 'rotate-180 text-[#0B1A2D] dark:text-white' : ''
+                    }`}
+                  />
+                </div>
+                <span className="text-[10px] font-medium text-slate-400 block truncate">
+                  {venues.length > 1 ? `${venues.length} sedes conectadas` : 'Sede oficial'}
+                </span>
+              </div>
+            </div>
+
+            {/* Badge Dinámico de Apertura / Resumen Multisede */}
+            <button
+              type="button"
+              onClick={isConsolidatedView ? () => setIsVenueSelectorOpen((prev) => !prev) : toggleClubOpenState}
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#F0FCCF] dark:bg-[#B7F229]/20 border border-[#B7F229]/50 transition-all cursor-pointer hover:scale-102 shrink-0 select-none"
+              title={
+                isConsolidatedView
+                  ? `Red multisede consolidada (${venues.length} sedes operativas)`
+                  : 'Haz clic para conmutar estado de apertura de la sede'
+              }
+            >
+              <span
+                className={`w-2 h-2 rounded-full ${
+                  isConsolidatedView
+                    ? 'bg-[#82b805] dark:bg-[#B7F229]'
+                    : isClubOpen
+                    ? 'bg-[#82b805] animate-pulse'
+                    : 'bg-rose-500'
+                }`}
+              />
+              <span className="text-[11px] font-bold text-[#0B1A2D] dark:text-[#B7F229]">
+                {isConsolidatedView
+                  ? `${venues.length} Sedes Activas`
+                  : isClubOpen
+                  ? 'Abierto · hasta 23:30'
+                  : 'Cerrado temporal'}
+              </span>
+            </button>
+          </div>
+
+          {/* Menú Desplegable de Sedes */}
+          {isVenueSelectorOpen && (
+            <div className="absolute top-full left-0 right-0 mt-2 z-30 p-2 bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200 dark:border-[#1A314D] shadow-xl space-y-1 animate-in fade-in slide-in-from-top-2 duration-150">
+              <div className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 px-2 py-1">
+                Red Deportiva · Seleccionar Sede
+              </div>
+
+              {venues.length > 1 && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedVenueId('all');
+                    setIsVenueSelectorOpen(false);
+                  }}
+                  className={`w-full flex items-center justify-between p-2 rounded-xl text-xs font-bold transition text-left cursor-pointer ${
+                    isConsolidatedView
+                      ? 'bg-[#B7F229]/20 text-[#0B1A2D] dark:text-white'
+                      : 'hover:bg-slate-50 dark:hover:bg-[#132A45] text-slate-700 dark:text-slate-300'
+                  }`}
+                >
+                  <span className="flex items-center gap-2">
+                    <Layers className="w-3.5 h-3.5 text-[#8B5CF6]" />
+                    <span>Todas las Sedes (Consolidado)</span>
+                  </span>
+                  {isConsolidatedView && <CheckCircle2 className="w-3.5 h-3.5 text-[#82b805]" />}
+                </button>
+              )}
+
+              {venues
+                .filter((v) => v.id !== 'all')
+                .map((venue) => {
+                  const isSelected = !isConsolidatedView && selectedVenueId === venue.id;
+                  return (
+                    <button
+                      key={venue.id}
+                      type="button"
+                      onClick={() => {
+                        setSelectedVenueId(venue.id);
+                        setIsVenueSelectorOpen(false);
+                      }}
+                      className={`w-full flex items-center justify-between p-2 rounded-xl text-xs font-bold transition text-left cursor-pointer ${
+                        isSelected
+                          ? 'bg-[#B7F229]/20 text-[#0B1A2D] dark:text-white'
+                          : 'hover:bg-slate-50 dark:hover:bg-[#132A45] text-slate-700 dark:text-slate-300'
+                      }`}
+                    >
+                      <span className="flex items-center gap-2 truncate">
+                        <Building2 className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                        <span className="truncate">{venue.name}</span>
+                      </span>
+                      {isSelected && <CheckCircle2 className="w-3.5 h-3.5 text-[#82b805] shrink-0" />}
+                    </button>
+                  );
+                })}
+            </div>
+          )}
         </div>
       </section>
 
@@ -1160,108 +1286,80 @@ export const AdminMatches: React.FC = () => {
         </div>
       </section>
 
-      {/* 3. Filtros Responsive: Pestañas de estado, Selector de Sede y Botón de filtro */}
+      {/* 3. Filtros Horizontales Simplificados (Diseño Plano y Moderno) */}
       <section className="space-y-2.5" data-purpose="filtering-section">
-        {/* Segmented Tab Controls */}
-        <div className="p-1 bg-slate-200/60 dark:bg-slate-800/60 rounded-xl flex items-center gap-1 text-xs font-semibold">
-          <button
-            type="button"
-            onClick={() => setStatusFilter('all')}
-            className={`flex-1 py-1.5 rounded-lg text-center transition text-xs cursor-pointer ${
-              statusFilter === 'all'
-                ? 'bg-white dark:bg-slate-900 text-[#0B1A2D] dark:text-white font-bold shadow-xs'
-                : 'text-slate-600 dark:text-slate-400 hover:text-[#0B1A2D] dark:hover:text-white font-semibold'
-            }`}
-          >
-            {t('matches.filterAll', 'Todas')} ({openMatches.length})
-          </button>
-          <button
-            type="button"
-            onClick={() => setStatusFilter('open')}
-            className={`flex-1 py-1.5 rounded-lg text-center transition text-xs cursor-pointer ${
-              statusFilter === 'open'
-                ? 'bg-white dark:bg-slate-900 text-[#0B1A2D] dark:text-white font-bold shadow-xs'
-                : 'text-slate-600 dark:text-slate-400 hover:text-[#0B1A2D] dark:hover:text-white font-semibold'
-            }`}
-          >
-            {t('matches.filterOpen', 'Buscando')} ({openMatches.filter((m) => m.players.length < 4).length})
-          </button>
-          <button
-            type="button"
-            onClick={() => setStatusFilter('full')}
-            className={`flex-1 py-1.5 rounded-lg text-center transition text-xs cursor-pointer ${
-              statusFilter === 'full'
-                ? 'bg-white dark:bg-slate-900 text-[#0B1A2D] dark:text-white font-bold shadow-xs'
-                : 'text-slate-600 dark:text-slate-400 hover:text-[#0B1A2D] dark:hover:text-white font-semibold'
-            }`}
-          >
-            {t('matches.filterFull', 'Completas')} ({fullMatchesCount})
-          </button>
-        </div>
-
-        {/* Quick Filters Row */}
-        <div className="flex items-center gap-2">
-          {/* Venue Selector */}
-          <div className="relative flex-1">
-            <select
-              value={venueFilter}
-              onChange={(e) => setVenueFilter(e.target.value)}
-              className="w-full appearance-none bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs font-semibold text-[#0B1A2D] dark:text-white rounded-xl pl-8 pr-7 py-2 shadow-xs focus:ring-1 focus:ring-[#0B1A2D] focus:outline-none cursor-pointer"
-              aria-label="Filtrar por sede"
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+          {/* Pestañas Planas Modernas */}
+          <div className="flex items-center gap-1.5 overflow-x-auto hide-scrollbar">
+            <button
+              type="button"
+              onClick={() => setStatusFilter('all')}
+              className={`px-3 py-1.5 rounded-full text-xs transition cursor-pointer font-bold ${
+                statusFilter === 'all'
+                  ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D] shadow-xs'
+                  : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white border border-slate-200/80 dark:border-slate-800'
+              }`}
             >
-              <option value="all">Todas las Sedes</option>
-              {venues
-                .filter((v) => v.id !== 'all')
-                .map((v) => (
-                  <option key={v.id} value={v.id}>
-                    {v.shortName || v.name}
-                  </option>
-                ))}
-            </select>
-            <div className="absolute inset-y-0 left-2.5 flex items-center pointer-events-none text-slate-400">
-              <Building2 className="w-3.5 h-3.5 text-slate-400" />
-            </div>
-            <div className="absolute inset-y-0 right-2.5 flex items-center pointer-events-none text-slate-400">
-              <ChevronDown className="w-3 h-3 text-slate-400" />
-            </div>
+              {t('matches.filterAll', 'Todas')} ({venueFilteredMatches.length})
+            </button>
+            <button
+              type="button"
+              onClick={() => setStatusFilter('open')}
+              className={`px-3 py-1.5 rounded-full text-xs transition cursor-pointer font-bold ${
+                statusFilter === 'open'
+                  ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D] shadow-xs'
+                  : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white border border-slate-200/80 dark:border-slate-800'
+              }`}
+            >
+              {t('matches.filterOpen', 'Buscando')} ({venueFilteredMatches.filter((m) => m.players.length < 4).length})
+            </button>
+            <button
+              type="button"
+              onClick={() => setStatusFilter('full')}
+              className={`px-3 py-1.5 rounded-full text-xs transition cursor-pointer font-bold ${
+                statusFilter === 'full'
+                  ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D] shadow-xs'
+                  : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white border border-slate-200/80 dark:border-slate-800'
+              }`}
+            >
+              {t('matches.filterFull', 'Completas')} ({fullMatchesCount})
+            </button>
           </div>
 
-          {/* Duration Pill Filter in Official Brand Violet (#8B5CF6) */}
-          <button
-            type="button"
-            onClick={() => {
-              const nextVal = !allowPlayerCustomDurations;
-              setAllowPlayerCustomDurations(nextVal);
-              if (typeof window !== 'undefined') {
-                localStorage.setItem('setmio_allow_player_durations', String(nextVal));
-              }
-              triggerDemoToast(
-                'Regla de Duración Actualizada',
-                nextVal
-                  ? 'Los jugadores ahora pueden reservar en 60, 90 y 120 minutos.'
-                  : 'Reservas restringidas únicamente a 90 minutos.',
-                'info'
-              );
-            }}
-            className="inline-flex items-center gap-1.5 px-3 py-2 bg-[#8B5CF6]/10 dark:bg-[#8B5CF6]/20 border border-[#8B5CF6]/30 dark:border-[#8B5CF6]/40 text-[#8B5CF6] dark:text-[#a78bfa] rounded-xl text-xs font-bold shadow-xs hover:bg-[#8B5CF6]/15 transition cursor-pointer shrink-0"
-            title="Configurar duración de partidas"
-          >
-            <Clock className="w-3.5 h-3.5 text-[#8B5CF6] dark:text-[#a78bfa]" />
-            <span>Solo 90 min</span>
-          </button>
+          {/* Buscador Rápido y Botón de Filtros Avanzados */}
+          <div className="flex items-center gap-2">
+            <div className="relative flex-1 sm:w-60">
+              <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-slate-400" />
+              <input
+                type="text"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Buscar pista, jugador..."
+                className="w-full pl-8.5 pr-7 py-1.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 text-xs text-[#0B1A2D] dark:text-white placeholder-slate-400 focus:outline-none focus:border-[#8B5CF6]"
+              />
+              {search && (
+                <button
+                  type="button"
+                  onClick={() => setSearch('')}
+                  className="absolute right-2 top-2 text-xs text-slate-400 hover:text-slate-600"
+                >
+                  ✕
+                </button>
+              )}
+            </div>
 
-          {/* Filter Drawer Trigger Button */}
-          <button
-            type="button"
-            onClick={openFilterModal}
-            className={`p-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:text-[#0B1A2D] dark:hover:text-white rounded-xl shadow-xs active:scale-95 transition-all cursor-pointer shrink-0 ${
-              activeFiltersCount > 0 ? 'border-emerald-500 text-emerald-600' : ''
-            }`}
-            title="Más filtros"
-            aria-label="Más filtros"
-          >
-            <Filter className="w-4 h-4" />
-          </button>
+            <button
+              type="button"
+              onClick={openFilterModal}
+              className={`p-2 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:text-[#0B1A2D] dark:hover:text-white rounded-xl shadow-xs active:scale-95 transition-all cursor-pointer shrink-0 ${
+                activeFiltersCount > 0 ? 'border-[#8B5CF6] text-[#8B5CF6]' : ''
+              }`}
+              title="Más filtros"
+              aria-label="Más filtros"
+            >
+              <Filter className="w-4 h-4" />
+            </button>
+          </div>
         </div>
 
         {/* Chips de filtros activos para borrado rápido */}
@@ -1562,7 +1660,6 @@ export const AdminMatches: React.FC = () => {
                     <span className="text-[#0B1A2D] dark:text-white font-bold">
                       {formatSimplifiedMatchDate(m.startTime)}
                     </span>
-                    <span className="text-slate-400 font-normal">· {m.durationMinutes || 90} min</span>
                   </div>
 
                   <div className="flex items-center gap-1.5 shrink-0">

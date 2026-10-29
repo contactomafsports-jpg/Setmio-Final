@@ -37,6 +37,7 @@ import {
   ExternalLink,
   Building2,
   History,
+  ChevronDown,
 } from 'lucide-react';
 
 interface LinkedChargeMeta {
@@ -74,9 +75,16 @@ export const AdminCafePOS: React.FC = () => {
     setAdminTab,
     isMultiVenue,
     venues,
+    selectedVenueId,
+    selectedVenue,
+    setSelectedVenueId,
+    isConsolidatedView,
+    isClubOpen,
+    toggleClubOpenState,
     t,
   } = useApp();
 
+  const [isVenueSelectorOpen, setIsVenueSelectorOpen] = useState(false);
   const [activeCategory, setActiveCategory] = useState<string>('all');
   const [posCart, setPosCart] = useState<{ product: CafeProduct; qty: number; meta?: LinkedChargeMeta }[]>([]);
   const [paymentMethod, setPaymentMethod] = useState<string>('card');
@@ -86,32 +94,32 @@ export const AdminCafePOS: React.FC = () => {
   const availablePaymentMethods = useMemo(() => {
     const list: Array<{ id: string; label: string; icon: any }> = [];
 
-    // 1. Efectivo (Mostrador)
+    // 1. Efectivo
     if (configuredMethods ? configuredMethods.cash !== false : true) {
-      list.push({ id: 'cash', label: t('pos.paymentMethods.cash', 'Efectivo'), icon: Banknote });
+      list.push({ id: 'cash', label: 'Efectivo', icon: Banknote });
     }
-    // 2. Datáfono del Banco (Manual)
+    // 2. Datáfono
     if (configuredMethods ? configuredMethods.manualPos !== false : true) {
-      list.push({ id: 'card', label: t('pos.paymentMethods.manualPos', 'Datáfono Banco (Manual)'), icon: CreditCard });
+      list.push({ id: 'card', label: 'Datáfono', icon: CreditCard });
     }
-    // 3. Datáfono Integrado (Stripe Terminal)
+    // 3. Terminal Stripe
     if (configuredMethods ? configuredMethods.stripeTerminal !== false : true) {
-      list.push({ id: 'stripe_terminal', label: t('pos.paymentMethods.stripeTerminal', 'Stripe Terminal'), icon: CreditCard });
+      list.push({ id: 'stripe_terminal', label: 'Terminal', icon: CreditCard });
     }
-    // 4. Cobro por Notificación Push / App del Socio
+    // 4. Cobro App
     if (configuredMethods ? configuredMethods.pushCharge !== false : true) {
-      list.push({ id: 'push_charge', label: t('pos.paymentMethods.pushCharge', 'Cobro Push / App'), icon: Smartphone });
+      list.push({ id: 'push_charge', label: 'Cobro App', icon: Smartphone });
     }
-    // 5. Monedero / Saldo de Socio y Bonos
+    // 5. Monedero
     if (configuredMethods ? configuredMethods.wallet !== false : true) {
-      list.push({ id: 'member_wallet', label: t('pos.paymentMethods.wallet', 'Monedero Socio'), icon: Wallet });
+      list.push({ id: 'member_wallet', label: 'Monedero', icon: Wallet });
     }
 
     if (list.length === 0) {
-      list.push({ id: 'cash', label: t('pos.paymentMethods.cash', 'Efectivo'), icon: Banknote });
+      list.push({ id: 'cash', label: 'Efectivo', icon: Banknote });
     }
     return list;
-  }, [configuredMethods, t]);
+  }, [configuredMethods]);
 
   useEffect(() => {
     if (availablePaymentMethods.length > 0 && !availablePaymentMethods.some((m) => m.id === paymentMethod)) {
@@ -551,111 +559,198 @@ export const AdminCafePOS: React.FC = () => {
   });
 
   return (
-    <div className="space-y-5 text-slate-900 dark:text-slate-100 max-w-7xl mx-auto pb-12">
-      {/* 1. Header & POS Shift Status - Mobile Layout Rediseñado Anti-solapamientos */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm">
-        <div className="min-w-0">
+    <div className="max-w-7xl mx-auto pt-2 pb-16 space-y-4 font-sans text-[#0B1A2D] dark:text-slate-100 antialiased">
+      {/* ======================================================================
+          1. CABECERA LIMPIA Y SIMÉTRICA (ESTILO INICIO, RESERVAS & PARTIDAS)
+          ====================================================================== */}
+      <section className="pt-[26px] pb-1 space-y-3" data-purpose="header-section">
+        <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-[#8B5CF6]/10 text-[#8B5CF6] flex items-center justify-center shrink-0">
-              <Receipt className="w-5 h-5 text-[#8B5CF6]" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-xl sm:text-2xl font-black text-[#0B1A2D] dark:text-white tracking-tight truncate">
-                  TPV de Mostrador y Caja
-                </h1>
-                <span className="px-2 py-0.5 rounded-full bg-[#B7F229] text-[#0B1A2D] font-black text-[10px] tracking-wider uppercase shadow-2xs">
-                  Caja Abierta
-                </span>
-              </div>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 truncate">
-                Cobro en mostrador de consumiciones, reservas de pista y recargas de saldo.
-              </p>
-            </div>
+            <h1 className="text-[22px] font-extrabold text-[#0B1A2D] dark:text-white tracking-tight leading-tight">
+              TPV / Caja
+            </h1>
+            <span className="px-2.5 py-0.5 rounded-full bg-[#F0FCCF] dark:bg-[#B7F229]/20 border border-[#B7F229]/50 text-[#0B1A2D] dark:text-[#B7F229] font-black text-[10px] tracking-wider uppercase shadow-2xs">
+              Caja Abierta
+            </span>
+          </div>
+
+          {/* Resumen Total Turno */}
+          <div className="text-right">
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Total Turno</span>
+            <span className="text-sm sm:text-base font-mono font-black text-[#0B1A2D] dark:text-white leading-none">
+              {sessionSalesTotal.toFixed(2)} €
+            </span>
           </div>
         </div>
 
-        {/* Acciones superiores y Caja: responsive layout anti-solapamiento */}
-        <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2 sm:gap-2.5 w-full lg:w-auto">
-          {/* Selector de Sede: SOLO visible si el club es Multi-Sede */}
-          {hasMultipleVenues && (
-            <div className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200/80 dark:border-slate-700/80 shadow-2xs text-xs font-bold col-span-2 sm:col-span-1">
-              <Building2 className="w-3.5 h-3.5 text-[#8B5CF6] shrink-0" />
-              <span className="text-[11px] text-slate-500 dark:text-slate-400 hidden sm:inline">Sede:</span>
-              <select
-                value={posVenueFilter}
-                onChange={(e) => setPosVenueFilter(e.target.value)}
-                className="bg-transparent text-slate-900 dark:text-white font-bold outline-hidden cursor-pointer w-full sm:w-auto"
-              >
-                <option value="all" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">
-                  Todas las sedes
-                </option>
-                {venues.map((v) => (
-                  <option key={v.id} value={v.id} className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">
-                    {v.name}
-                  </option>
-                ))}
-              </select>
+        {/* Pill de Sede y Estado Operativo Unificado */}
+        <div className="relative">
+          <div className="flex items-center justify-between p-2.5 bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200/80 dark:border-[#1A314D] shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
+            {/* Selector de Sede */}
+            <div
+              onClick={() => setIsVenueSelectorOpen(!isVenueSelectorOpen)}
+              className="flex items-center gap-2 cursor-pointer group select-none min-w-0"
+              title="Cambiar sede activa o ver red consolidada"
+            >
+              <div className="w-8 h-8 rounded-xl bg-slate-50 dark:bg-[#071220] border border-slate-100 dark:border-[#1A314D] flex items-center justify-center text-[#0B1A2D] dark:text-slate-200 shrink-0">
+                <Building2 className="w-4 h-4 text-[#0B1A2D] dark:text-white" />
+              </div>
+              <div className="min-w-0">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-xs font-bold text-[#0B1A2D] dark:text-white truncate">
+                    {isConsolidatedView ? 'Todas las Sedes' : selectedVenue.shortName || selectedVenue.name}
+                  </span>
+                  <ChevronDown
+                    className={`w-3.5 h-3.5 text-slate-400 group-hover:text-[#0B1A2D] dark:group-hover:text-white transition-transform ${
+                      isVenueSelectorOpen ? 'rotate-180 text-[#0B1A2D] dark:text-white' : ''
+                    }`}
+                  />
+                </div>
+                <span className="text-[10px] font-medium text-slate-400 block truncate">
+                  {venues.length > 1 ? `${venues.length} sedes conectadas` : 'Sede oficial'}
+                </span>
+              </div>
+            </div>
+
+            {/* Badge Dinámico de Apertura / Resumen Multisede */}
+            <button
+              type="button"
+              onClick={isConsolidatedView ? () => setIsVenueSelectorOpen((prev) => !prev) : toggleClubOpenState}
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#F0FCCF] dark:bg-[#B7F229]/20 border border-[#B7F229]/50 transition-all cursor-pointer hover:scale-102 shrink-0 select-none"
+              title={
+                isConsolidatedView
+                  ? `Red multisede consolidada (${venues.length} sedes operativas)`
+                  : 'Haz clic para conmutar estado de apertura de la sede'
+              }
+            >
+              <span
+                className={`w-2 h-2 rounded-full ${
+                  isConsolidatedView
+                    ? 'bg-[#82b805] dark:bg-[#B7F229]'
+                    : isClubOpen
+                    ? 'bg-[#82b805] animate-pulse'
+                    : 'bg-rose-500'
+                }`}
+              />
+              <span className="text-[11px] font-bold text-[#0B1A2D] dark:text-[#B7F229]">
+                {isConsolidatedView
+                  ? `${venues.length} Sedes Activas`
+                  : isClubOpen
+                  ? 'Abierto · hasta 23:30'
+                  : 'Cerrado temporal'}
+              </span>
+            </button>
+          </div>
+
+          {/* Menú Desplegable de Sedes */}
+          {isVenueSelectorOpen && (
+            <div className="absolute top-full left-0 right-0 mt-2 z-30 p-2 bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200 dark:border-[#1A314D] shadow-xl space-y-1 animate-in fade-in slide-in-from-top-2 duration-150">
+              <div className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 px-2 py-1">
+                Red Deportiva · Seleccionar Sede
+              </div>
+
+              {venues.length > 1 && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedVenueId('all');
+                    setPosVenueFilter('all');
+                    setIsVenueSelectorOpen(false);
+                  }}
+                  className={`w-full flex items-center justify-between p-2 rounded-xl text-xs font-bold transition text-left cursor-pointer ${
+                    isConsolidatedView
+                      ? 'bg-[#B7F229]/20 text-[#0B1A2D] dark:text-white'
+                      : 'hover:bg-slate-50 dark:hover:bg-[#132A45] text-slate-700 dark:text-slate-300'
+                  }`}
+                >
+                  <span className="flex items-center gap-2">
+                    <Layers className="w-3.5 h-3.5 text-[#8B5CF6]" />
+                    <span>Todas las Sedes (Consolidado)</span>
+                  </span>
+                  {isConsolidatedView && <CheckCircle2 className="w-3.5 h-3.5 text-[#82b805]" />}
+                </button>
+              )}
+
+              {venues
+                .filter((v) => v.id !== 'all')
+                .map((venue) => {
+                  const isSelected = !isConsolidatedView && selectedVenueId === venue.id;
+                  return (
+                    <button
+                      key={venue.id}
+                      type="button"
+                      onClick={() => {
+                        setSelectedVenueId(venue.id);
+                        setPosVenueFilter(venue.id);
+                        setIsVenueSelectorOpen(false);
+                      }}
+                      className={`w-full flex items-center justify-between p-2 rounded-xl text-xs font-bold transition text-left cursor-pointer ${
+                        isSelected
+                          ? 'bg-[#B7F229]/20 text-[#0B1A2D] dark:text-white'
+                          : 'hover:bg-slate-50 dark:hover:bg-[#132A45] text-slate-700 dark:text-slate-300'
+                      }`}
+                    >
+                      <span className="flex items-center gap-2 truncate">
+                        <Building2 className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                        <span className="truncate">{venue.name}</span>
+                      </span>
+                      {isSelected && <CheckCircle2 className="w-3.5 h-3.5 text-[#82b805] shrink-0" />}
+                    </button>
+                  );
+                })}
             </div>
           )}
+        </div>
 
-          {/* Historial de Transacciones del Turno */}
+        {/* Fila de Acciones Rápidas Reorganizada (Sin botón de Catálogo, con + Producto) */}
+        <div className="flex flex-wrap items-center gap-2 pt-1">
+          {/* 1. Asignar Reserva / Pago de Jugador en Azul Profundo (#0B1A2D) con acento Verde Lima */}
+          <button
+            type="button"
+            onClick={() => setAssignModalOpen(true)}
+            className="flex-1 sm:flex-none px-3.5 py-2 rounded-xl bg-[#0B1A2D] hover:bg-[#132A45] text-white font-black text-xs shadow-sm border border-[#0B1A2D] dark:border-slate-700 flex items-center justify-center gap-1.5 transition active:scale-95 cursor-pointer group"
+          >
+            <Calendar className="w-4 h-4 text-[#B7F229] stroke-[2.5] shrink-0" />
+            <span className="truncate">Asignar Reserva</span>
+          </button>
+
+          {/* 2. Añadir Producto Rápido */}
+          <button
+            type="button"
+            onClick={openNewProductModal}
+            className="px-3.5 py-2 rounded-xl bg-white dark:bg-slate-800/90 hover:bg-slate-50 dark:hover:bg-slate-800 text-[#0B1A2D] dark:text-slate-200 font-bold text-xs border border-slate-200/80 dark:border-slate-700/80 shadow-2xs flex items-center justify-center gap-1.5 transition active:scale-95 cursor-pointer"
+            title="Añadir nuevo producto al mostrador"
+          >
+            <Plus className="w-4 h-4 text-[#8B5CF6] stroke-[2.5] shrink-0" />
+            <span>+ Producto</span>
+          </button>
+
+          {/* 3. Transacciones */}
           <button
             type="button"
             onClick={() => setTransactionsModalOpen(true)}
-            className="px-3 sm:px-3.5 py-2 rounded-xl bg-white dark:bg-slate-800/90 hover:bg-slate-50 dark:hover:bg-slate-800 text-[#0B1A2D] dark:text-slate-200 font-bold text-xs border border-slate-200/80 dark:border-slate-700/80 shadow-2xs flex items-center justify-center gap-1.5 transition active:scale-95 cursor-pointer"
-            title="Ver y filtrar transacciones por sede"
+            className="px-3.5 py-2 rounded-xl bg-white dark:bg-slate-800/90 hover:bg-slate-50 dark:hover:bg-slate-800 text-[#0B1A2D] dark:text-slate-200 font-bold text-xs border border-slate-200/80 dark:border-slate-700/80 shadow-2xs flex items-center justify-center gap-1.5 transition active:scale-95 cursor-pointer"
+            title="Ver transacciones del turno"
           >
-            <History className="w-4 h-4 text-[#8B5CF6] shrink-0" />
+            <History className="w-4 h-4 text-slate-500 shrink-0" />
             <span className="truncate">Transacciones</span>
             <span className="font-mono text-[10px] px-1.5 py-0.2 rounded-md bg-slate-100 dark:bg-slate-700 text-[#0B1A2D] dark:text-slate-200 font-black">
               {filteredTransactions.length}
             </span>
           </button>
 
-          {/* Asignar Reserva / Pago de Jugador en Verde Lima Setmio */}
-          <button
-            type="button"
-            onClick={() => setAssignModalOpen(true)}
-            className="px-3 sm:px-3.5 py-2 rounded-xl bg-[#B7F229] hover:bg-[#a6e61f] text-[#0B1A2D] font-black text-xs shadow-xs flex items-center justify-center gap-1.5 transition active:scale-95 cursor-pointer"
-          >
-            <Calendar className="w-4 h-4 stroke-[2.5] shrink-0" />
-            <span className="truncate">Asignar Reserva</span>
-          </button>
-
-          {/* Cierre / Arqueo de Caja */}
+          {/* 4. Arqueo de Caja */}
           <button
             type="button"
             onClick={() => setArqueoModalOpen(true)}
-            className="px-3 sm:px-3.5 py-2 rounded-xl bg-white dark:bg-slate-800/90 hover:bg-slate-50 dark:hover:bg-slate-800 text-[#0B1A2D] dark:text-slate-200 font-bold text-xs border border-slate-200/80 dark:border-slate-700/80 shadow-2xs flex items-center justify-center gap-1.5 transition active:scale-95 cursor-pointer"
+            className="px-3.5 py-2 rounded-xl bg-white dark:bg-slate-800/90 hover:bg-slate-50 dark:hover:bg-slate-800 text-[#0B1A2D] dark:text-slate-200 font-bold text-xs border border-slate-200/80 dark:border-slate-700/80 shadow-2xs flex items-center justify-center gap-1.5 transition active:scale-95 cursor-pointer"
+            title="Arqueo y cierre de turno"
           >
             <Calculator className="w-4 h-4 text-slate-500 shrink-0" />
             <span className="truncate">Arqueo</span>
           </button>
-
-          {/* Catálogo de Productos */}
-          <button
-            type="button"
-            onClick={() => setCatalogModalOpen(true)}
-            className="px-3 py-2 rounded-xl bg-white dark:bg-slate-800/90 hover:bg-slate-50 dark:hover:bg-slate-800 text-[#0B1A2D] dark:text-slate-200 font-bold text-xs border border-slate-200/80 dark:border-slate-700/80 shadow-2xs transition active:scale-95 cursor-pointer flex items-center justify-center gap-1.5"
-            title="Gestionar catálogo y existencias"
-          >
-            <Package className="w-4 h-4 text-[#8B5CF6] shrink-0" />
-            <span>Catálogo</span>
-          </button>
-
-          {/* Contenedor dinámico del "Total Turno" */}
-          <div className="p-2 sm:px-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800 text-center sm:text-right shadow-2xs flex flex-col justify-center min-w-[105px]">
-            <div className="text-[9px] text-slate-400 font-bold uppercase tracking-wider flex items-center justify-center sm:justify-end gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#B7F229] shrink-0" />
-              Total Turno
-            </div>
-            <div className="text-sm sm:text-base font-mono font-black text-[#0B1A2D] dark:text-white leading-none mt-0.5">
-              {sessionSalesTotal.toFixed(2)} €
-            </div>
-          </div>
         </div>
-      </div>
+      </section>
 
       {/* 2. POS Interface: Product Catalog + Fast Ticket Register */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
@@ -887,40 +982,48 @@ export const AdminCafePOS: React.FC = () => {
               >
                 <CheckCircle2 className="w-4 h-4 stroke-[2.5]" />
                 <span>
-                  {t('pos.chargeWithMethod', 'Cobrar con')} {activePaymentMethodObj?.label || 'TPV'} ({cartTotal.toFixed(2)} €)
+                  Cobrar con {activePaymentMethodObj?.label || 'TPV'}
                 </span>
               </button>
             </div>
           </div>
 
-          {/* Tarjeta de los Últimos 5 Pagos Registrados (Requisito Bloque 1) */}
-          <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-4 sm:p-5 shadow-sm space-y-3">
-            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2.5">
-              <div className="flex items-center gap-2">
-                <div className="p-1 rounded-lg bg-[#8B5CF6]/10 text-[#8B5CF6]">
-                  <History className="w-4 h-4 text-[#8B5CF6]" />
-                </div>
-                <h3 className="font-black text-xs uppercase tracking-wider text-[#0B1A2D] dark:text-white">
-                  Últimos 5 Pagos Registrados
+          {/* Bloque de los Últimos 5 Pagos Registrados (Contenedores individuales limpios estilo Inicio & Reservas) */}
+          <div className="space-y-3 pt-2">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-base font-bold text-[#0B1A2D] dark:text-white">
+                  Últimos Pagos
                 </h3>
+                <p className="text-[11px] text-slate-400 font-medium">
+                  {posTransactions.length} en turno
+                </p>
               </div>
-              <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
-                {posTransactions.length} en turno
-              </span>
+              <button
+                type="button"
+                onClick={() => setTransactionsModalOpen(true)}
+                className="text-xs font-bold text-[#8B5CF6] dark:text-purple-400 hover:underline cursor-pointer"
+              >
+                ver todos
+              </button>
             </div>
 
             {posTransactions.length === 0 ? (
-              <div className="p-4 text-center text-xs text-slate-400">
+              <div className="p-4 text-center text-xs text-slate-400 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800">
                 No hay pagos registrados todavía en este turno.
               </div>
             ) : (
-              <div className="divide-y divide-slate-100 dark:divide-slate-800">
+              <div className="space-y-2">
                 {posTransactions.slice(0, 5).map((tx) => (
-                  <div key={tx.id} className="py-2.5 flex items-center justify-between gap-3 text-xs">
+                  <div
+                    key={tx.id}
+                    onClick={() => setTransactionsModalOpen(true)}
+                    className="p-3.5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-2xs hover:border-[#8B5CF6]/50 dark:hover:border-slate-700 transition flex items-center justify-between gap-3 text-xs cursor-pointer group"
+                  >
                     <div className="min-w-0 flex-1 space-y-0.5">
                       <div className="flex items-center gap-1.5">
                         <span className="font-mono font-bold text-[10px] text-slate-400 shrink-0">{tx.time}</span>
-                        <span className="font-bold text-slate-900 dark:text-white truncate text-[11px]">{tx.concept}</span>
+                        <span className="font-bold text-slate-900 dark:text-white truncate text-[11px] group-hover:text-[#8B5CF6] transition-colors">{tx.concept}</span>
                       </div>
                       <div className="text-[10px] text-slate-500 dark:text-slate-400 flex items-center gap-1.5 truncate">
                         <span>{tx.customerName || 'Cliente Mostrador'}</span>
@@ -940,20 +1043,6 @@ export const AdminCafePOS: React.FC = () => {
                 ))}
               </div>
             )}
-
-            {/* Botón Ver todos los pagos */}
-            <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
-              <button
-                type="button"
-                onClick={() => setTransactionsModalOpen(true)}
-                className="w-full py-2.5 px-3 rounded-xl bg-slate-50 hover:bg-slate-100 dark:bg-slate-800/80 dark:hover:bg-slate-800 text-[#0B1A2D] dark:text-slate-200 font-bold text-xs transition cursor-pointer flex items-center justify-center gap-1.5 border border-slate-200/80 dark:border-slate-700/80 shadow-2xs group"
-              >
-                <History className="w-3.5 h-3.5 text-[#8B5CF6] shrink-0" />
-                <span>Ver todos los pagos</span>
-                <span className="text-[10px] text-slate-400 font-mono">({posTransactions.length})</span>
-                <ArrowRight className="w-3.5 h-3.5 ml-auto text-slate-400 group-hover:translate-x-0.5 transition-transform" />
-              </button>
-            </div>
           </div>
         </div>
       </div>

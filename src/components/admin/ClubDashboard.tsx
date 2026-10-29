@@ -180,10 +180,6 @@ export const ClubDashboard: React.FC = () => {
             <h1 className="text-[22px] font-extrabold text-[#0B1A2D] dark:text-white tracking-tight leading-tight">
               Hola, {firstName}
             </h1>
-            {/* Subtítulo discreto de rol y sede */}
-            <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mt-0.5">
-              {userRoleSubtitle}
-            </p>
           </div>
 
           <button

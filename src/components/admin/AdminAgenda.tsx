@@ -761,14 +761,14 @@ export const AdminAgenda: React.FC = () => {
             </button>
           </div>
 
-          {/* Botón CTA '+ Nueva reserva' en Verde Lima Setmio */}
+          {/* Botón CTA '+ Nueva reserva' invertido en Azul Profundo (#0B1A2D) con acentos en Verde Lima (#B7F229) o blanco */}
           <button
             type="button"
             onClick={() => setShowNewModal(true)}
-            className="flex-1 min-w-0 flex items-center justify-center gap-1.5 bg-[#B7F229] hover:bg-[#a6e61f] active:scale-95 text-[#0B1A2D] font-black rounded-xl px-2.5 py-2 text-xs sm:text-sm shadow-sm transition-all cursor-pointer h-10"
+            className="flex-1 min-w-0 flex items-center justify-center gap-1.5 bg-[#0B1A2D] hover:bg-[#132A45] active:scale-95 text-white font-black rounded-xl px-2.5 py-2 text-xs sm:text-sm shadow-sm border border-[#0B1A2D] dark:border-slate-700 transition-all cursor-pointer h-10 group"
           >
-            <Plus className="w-4 h-4 stroke-[3] shrink-0" />
-            <span className="truncate">Nueva reserva</span>
+            <Plus className="w-4 h-4 stroke-[3] text-[#B7F229] group-hover:rotate-90 transition-transform shrink-0" />
+            <span className="truncate">{t('agenda.new_booking', 'Nueva reserva')}</span>
           </button>
         </div>
 
