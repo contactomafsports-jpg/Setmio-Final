@@ -153,12 +153,12 @@ export const BookingListItem: React.FC<BookingListItemProps> = ({
     >
       {/* 1. Top Chips Ribbon: Horario y Pista */}
       <div className="flex flex-wrap items-center gap-1.5">
-        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-semibold text-xs">
-          <Clock className="w-3.5 h-3.5 text-slate-400 dark:text-slate-400 shrink-0" />
+        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#EDE9FE] dark:bg-[#8B5CF6]/20 border border-[#8B5CF6]/30 text-[#6D28D9] dark:text-[#C4B5FD] font-bold text-xs tracking-tight">
+          <Clock className="w-3.5 h-3.5 text-[#8B5CF6] shrink-0" />
           <span>{timeText}</span>
         </div>
 
-        <div className="px-2.5 py-1 rounded-lg bg-slate-100/90 dark:bg-slate-800/70 text-slate-700 dark:text-slate-300 font-semibold text-xs truncate max-w-[200px] border border-slate-200/50 dark:border-slate-700/50">
+        <div className="px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 font-semibold text-xs truncate max-w-[200px] border border-slate-200/60 dark:border-slate-700/60">
           {booking.courtName}
         </div>
       </div>

@@ -23,6 +23,7 @@ import {
   UserCheck,
   Search,
   ChevronDown,
+  Layers,
 } from 'lucide-react';
 
 const VENUE_THEMES: Record<string, {
@@ -112,7 +113,11 @@ export const AdminAgenda: React.FC = () => {
     isMultiVenue,
     venues,
     selectedVenueId,
+    selectedVenue,
     setSelectedVenueId,
+    isConsolidatedView,
+    isClubOpen,
+    toggleClubOpenState,
     triggerDemoToast,
     navigateToPlayerProfile,
     addCustomer,
@@ -122,6 +127,7 @@ export const AdminAgenda: React.FC = () => {
   } = useApp();
 
   const [currentDate, setCurrentDate] = useState('2026-09-30');
+  const [isVenueSelectorOpen, setIsVenueSelectorOpen] = useState(false);
   const [selectedDrawerData, setSelectedDrawerData] = useState<ReservationDrawerData | null>(null);
   const [showNewModal, setShowNewModal] = useState(false);
   const [showAllBookingsView, setShowAllBookingsView] = useState(() => {
@@ -590,64 +596,134 @@ export const AdminAgenda: React.FC = () => {
     currentUser.role === 'PROFESSIONAL_PLAYER';
 
   return (
-    <div className="space-y-4 text-slate-900 dark:text-slate-100 max-w-7xl mx-auto">
+    <div className="max-w-7xl mx-auto pt-2 pb-16 space-y-4 font-sans text-[#0B1A2D] dark:text-slate-100 antialiased">
       {/* ======================================================================
-          1. SUB-CABECERA Y CONTROL DE CUADRANTE (ESPECIFICACIÓN STITCH)
+          1. CABECERA LIMPIA Y SIMÉTRICA (ESTILO INICIO)
           ====================================================================== */}
-      <section className="space-y-3">
-        {/* Título de sección e icono */}
-        <div className="flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-[#0B1A2D] dark:text-[#B7F229] shadow-xs shrink-0">
-            <Calendar className="w-5 h-5 text-[#0B1A2D] dark:text-[#B7F229]" />
-          </div>
-          <div>
-            <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
-              {t('agenda.title', 'Reservas y Disponibilidad')}
-            </h1>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
-              {selectedVenueId !== 'all'
-                ? `Sede activa: ${availableVenues.find((v) => v.id === selectedVenueId)?.name || 'Sede Seleccionada'}`
-                : t('agenda.subtitle', 'Cuadrante interactivo y turnos en tiempo real')}
-            </p>
-          </div>
+      <section className="pt-[26px] pb-1 space-y-3">
+        {/* Título de sección limpio y simétrico con Inicio (sin icono de calendario ni subtítulos) */}
+        <div>
+          <h1 className="text-[22px] font-extrabold text-[#0B1A2D] dark:text-white tracking-tight leading-tight">
+            {t('agenda.title', 'Reservas y Disponibilidad')}
+          </h1>
         </div>
 
-        {/* Selector de Sede Desplegable Minimalista */}
-        {availableVenues.length > 1 && (
-          <div className="relative flex items-center justify-between bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-xl px-3.5 py-2.5 shadow-2xs hover:border-[#8B5CF6]/50 transition cursor-pointer">
-            <div className="flex items-center gap-2.5 min-w-0">
-              <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-[#0B1A2D] dark:text-[#B7F229] shrink-0">
-                <Building2 className="w-4 h-4 text-[#0B1A2D] dark:text-[#B7F229]" />
+        {/* Pill de Sede y Estado Operativo Unificado idéntico a la página de Inicio */}
+        <div className="relative">
+          <div className="flex items-center justify-between p-2.5 bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200/80 dark:border-[#1A314D] shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
+            {/* Selector de Sede */}
+            <div
+              onClick={() => setIsVenueSelectorOpen(!isVenueSelectorOpen)}
+              className="flex items-center gap-2 cursor-pointer group select-none min-w-0"
+              title="Cambiar sede activa o ver red consolidada"
+            >
+              <div className="w-8 h-8 rounded-xl bg-slate-50 dark:bg-[#071220] border border-slate-100 dark:border-[#1A314D] flex items-center justify-center text-[#0B1A2D] dark:text-slate-200 shrink-0">
+                <Building2 className="w-4 h-4 text-[#0B1A2D] dark:text-white" />
               </div>
-              <div className="flex flex-col min-w-0">
-                <span className="text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
-                  Sede:
-                </span>
-                <span className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white truncate">
-                  {selectedVenueId === 'all'
-                    ? 'Todas las sedes'
-                    : availableVenues.find((v) => v.id === selectedVenueId)?.name || 'Sede Seleccionada'}
+              <div className="min-w-0">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-xs font-bold text-[#0B1A2D] dark:text-white truncate">
+                    {isConsolidatedView ? 'Todas las Sedes' : selectedVenue.shortName || selectedVenue.name}
+                  </span>
+                  <ChevronDown
+                    className={`w-3.5 h-3.5 text-slate-400 group-hover:text-[#0B1A2D] dark:group-hover:text-white transition-transform ${
+                      isVenueSelectorOpen ? 'rotate-180 text-[#0B1A2D] dark:text-white' : ''
+                    }`}
+                  />
+                </div>
+                <span className="text-[10px] font-medium text-slate-400 block truncate">
+                  {venues.length > 1 ? `${venues.length} sedes conectadas` : 'Sede oficial'}
                 </span>
               </div>
             </div>
-            <ChevronDown className="w-4 h-4 text-slate-400 shrink-0 pointer-events-none" />
-            <select
-              value={selectedVenueId}
-              onChange={(e) => setSelectedVenueId(e.target.value)}
-              className="absolute inset-0 opacity-0 cursor-pointer w-full h-full z-10"
-              aria-label="Filtrar por sede"
+
+            {/* Badge Dinámico de Apertura / Resumen Multisede */}
+            <button
+              type="button"
+              onClick={isConsolidatedView ? () => setIsVenueSelectorOpen((prev) => !prev) : toggleClubOpenState}
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#F0FCCF] dark:bg-[#B7F229]/20 border border-[#B7F229]/50 transition-all cursor-pointer hover:scale-102 shrink-0 select-none"
+              title={
+                isConsolidatedView
+                  ? `Red multisede consolidada (${venues.length} sedes operativas)`
+                  : 'Haz clic para conmutar estado de apertura de la sede'
+              }
             >
-              <option value="all">Todas las sedes</option>
-              {availableVenues
-                .filter((v) => v.id !== 'all')
-                .map((v) => (
-                  <option key={v.id} value={v.id}>
-                    {v.name || v.shortName}
-                  </option>
-                ))}
-            </select>
+              <span
+                className={`w-2 h-2 rounded-full ${
+                  isConsolidatedView
+                    ? 'bg-[#82b805] dark:bg-[#B7F229]'
+                    : isClubOpen
+                    ? 'bg-[#82b805] animate-pulse'
+                    : 'bg-rose-500'
+                }`}
+              />
+              <span className="text-[11px] font-bold text-[#0B1A2D] dark:text-[#B7F229]">
+                {isConsolidatedView
+                  ? `${venues.length} Sedes Activas`
+                  : isClubOpen
+                  ? 'Abierto · hasta 23:30'
+                  : 'Cerrado temporal'}
+              </span>
+            </button>
           </div>
-        )}
+
+          {/* Menú Desplegable de Sedes */}
+          {isVenueSelectorOpen && (
+            <div className="absolute top-full left-0 right-0 mt-2 z-30 p-2 bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200 dark:border-[#1A314D] shadow-xl space-y-1 animate-in fade-in slide-in-from-top-2 duration-150">
+              <div className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 px-2 py-1">
+                Red Deportiva · Seleccionar Sede
+              </div>
+
+              {venues.length > 1 && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedVenueId('all');
+                    setIsVenueSelectorOpen(false);
+                  }}
+                  className={`w-full flex items-center justify-between p-2 rounded-xl text-xs font-bold transition text-left cursor-pointer ${
+                    isConsolidatedView
+                      ? 'bg-[#B7F229]/20 text-[#0B1A2D] dark:text-white'
+                      : 'hover:bg-slate-50 dark:hover:bg-[#132A45] text-slate-700 dark:text-slate-300'
+                  }`}
+                >
+                  <span className="flex items-center gap-2">
+                    <Layers className="w-3.5 h-3.5 text-[#8B5CF6]" />
+                    <span>Todas las Sedes (Consolidado)</span>
+                  </span>
+                  {isConsolidatedView && <CheckCircle2 className="w-3.5 h-3.5 text-[#82b805]" />}
+                </button>
+              )}
+
+              {venues
+                .filter((v) => v.id !== 'all')
+                .map((venue) => {
+                  const isSelected = !isConsolidatedView && selectedVenueId === venue.id;
+                  return (
+                    <button
+                      key={venue.id}
+                      type="button"
+                      onClick={() => {
+                        setSelectedVenueId(venue.id);
+                        setIsVenueSelectorOpen(false);
+                      }}
+                      className={`w-full flex items-center justify-between p-2 rounded-xl text-xs font-bold transition text-left cursor-pointer ${
+                        isSelected
+                          ? 'bg-[#B7F229]/20 text-[#0B1A2D] dark:text-white'
+                          : 'hover:bg-slate-50 dark:hover:bg-[#132A45] text-slate-700 dark:text-slate-300'
+                      }`}
+                    >
+                      <span className="flex items-center gap-2 truncate">
+                        <Building2 className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                        <span className="truncate">{venue.name}</span>
+                      </span>
+                      {isSelected && <CheckCircle2 className="w-3.5 h-3.5 text-[#82b805] shrink-0" />}
+                    </button>
+                  );
+                })}
+            </div>
+          )}
+        </div>
 
         {/* Fila de Controles: Selector de Fecha + Botón '+ Nueva reserva' (Lado a lado) */}
         <div className="flex items-center gap-2">
@@ -943,18 +1019,13 @@ export const AdminAgenda: React.FC = () => {
       </section>
 
       {/* ======================================================================
-          4. BLOQUE "RESERVAS DEL DÍA" (REFRESCO DINÁMICO POR FECHA Y SEDE)
+          4. BLOQUE "RESERVAS DEL DÍA" (ESPACIADO GENEROSO Y COHERENCIA CON INICIO)
           ====================================================================== */}
-      <section className="space-y-3 pt-1">
+      <section className="mt-8 pt-1 space-y-3">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <h2 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white">
-              Reservas del Día ({formattedDateLabel})
-            </h2>
-            <span className="w-6 h-6 rounded-full bg-[#10B981]/15 text-[#047857] dark:bg-emerald-950/60 dark:text-emerald-400 text-xs font-bold flex items-center justify-center ring-1 ring-[#10B981]/30">
-              {dayBookings.length}
-            </span>
-          </div>
+          <h2 className="text-base font-bold text-[#0B1A2D] dark:text-white">
+            Reservas del Día
+          </h2>
           <button
             type="button"
             onClick={() => {
@@ -963,9 +1034,9 @@ export const AdminAgenda: React.FC = () => {
               }
               setShowAllBookingsView(true);
             }}
-            className="text-xs text-[#8B5CF6] dark:text-[#a78bfa] font-semibold hover:underline cursor-pointer"
+            className="text-xs font-bold text-[#8B5CF6] dark:text-purple-400 hover:underline cursor-pointer"
           >
-            Ver todas
+            ver todas
           </button>
         </div>
 
