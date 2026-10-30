@@ -1288,8 +1288,8 @@ export const AdminMatches: React.FC = () => {
           }`}
         >
           <div className="flex items-center justify-between gap-1.5">
-            <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 truncate">
-              {t('matches.pendingRequests', 'Solicitudes')}
+            <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 whitespace-nowrap">
+              Solicitudes
             </p>
             {pendingRequestsTotal > 0 ? (
               <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-400 text-[10px] font-bold border border-amber-200 dark:border-amber-800 whitespace-nowrap shrink-0">

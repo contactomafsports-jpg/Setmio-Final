@@ -919,42 +919,52 @@ export const AdminCafePOS: React.FC = () => {
           </div>
         </div>
 
-        {/* Fila de Acciones Rápidas Simétrica (Ancho Completo de Pantalla, Sin Cortes de Texto) */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 w-full pt-1">
+        {/* Retícula Simétrica 2x2 de Acciones Principales (Diseño Unificado, Alineación a la Izquierda) */}
+        <div className="grid grid-cols-2 gap-2.5 w-full pt-1">
           {/* 1. Asignar Reserva */}
           <button
             type="button"
             onClick={() => setAssignModalOpen(true)}
-            className="w-full px-3 py-2.5 rounded-xl bg-[#0B1A2D] hover:bg-[#132A45] text-white font-black text-xs shadow-sm border border-[#0B1A2D] dark:border-slate-700 flex items-center justify-center gap-2 transition active:scale-95 cursor-pointer group"
+            className="w-full h-12 px-3.5 rounded-xl bg-white dark:bg-[#0E2239] hover:bg-slate-50 dark:hover:bg-[#132A45] border border-slate-200/80 dark:border-[#1A314D] shadow-2xs flex items-center justify-start text-left gap-2.5 sm:gap-3 transition active:scale-95 cursor-pointer group"
+            title="Asignar o vincular una reserva de pista"
           >
-            <Calendar className="w-4 h-4 text-[#B7F229] stroke-[2.5] shrink-0" />
-            <span className="font-bold">Asignar Reserva</span>
+            <div className="w-7 h-7 rounded-lg bg-slate-100 dark:bg-[#152e4d] flex items-center justify-center shrink-0 text-slate-600 dark:text-slate-300 group-hover:text-[#0B1A2D] dark:group-hover:text-[#B7F229] transition-colors">
+              <Calendar className="w-4 h-4 stroke-[2.2]" />
+            </div>
+            <span className="text-xs font-bold text-[#0B1A2D] dark:text-white truncate">
+              Asignar Reserva
+            </span>
           </button>
 
-          {/* 2. Nuevo producto */}
+          {/* 2. Nuevo Producto */}
           <button
             type="button"
             onClick={openNewProductModal}
-            className="w-full px-3 py-2 rounded-xl bg-white dark:bg-[#0E2239] hover:bg-slate-50 dark:hover:bg-[#132A45] text-[#0B1A2D] dark:text-slate-200 font-bold border border-slate-200/80 dark:border-[#1A314D] shadow-2xs flex items-center justify-center gap-2.5 transition active:scale-95 cursor-pointer"
+            className="w-full h-12 px-3.5 rounded-xl bg-white dark:bg-[#0E2239] hover:bg-slate-50 dark:hover:bg-[#132A45] border border-slate-200/80 dark:border-[#1A314D] shadow-2xs flex items-center justify-start text-left gap-2.5 sm:gap-3 transition active:scale-95 cursor-pointer group"
             title="Añadir nuevo producto al mostrador"
           >
-            <Package className="w-4 h-4 text-[#8B5CF6] stroke-[2] shrink-0" />
-            <div className="flex flex-col text-left leading-tight">
-              <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">Nuevo</span>
-              <span className="text-xs font-extrabold text-[#0B1A2D] dark:text-white">producto</span>
+            <div className="w-7 h-7 rounded-lg bg-slate-100 dark:bg-[#152e4d] flex items-center justify-center shrink-0 text-slate-600 dark:text-slate-300 group-hover:text-[#0B1A2D] dark:group-hover:text-[#B7F229] transition-colors">
+              <Package className="w-4 h-4 stroke-[2.2]" />
             </div>
+            <span className="text-xs font-bold text-[#0B1A2D] dark:text-white truncate">
+              Nuevo Producto
+            </span>
           </button>
 
           {/* 3. Todos los Pagos */}
           <button
             type="button"
             onClick={() => setTransactionsModalOpen(true)}
-            className="w-full px-3 py-2.5 rounded-xl bg-white dark:bg-[#0E2239] hover:bg-slate-50 dark:hover:bg-[#132A45] text-[#0B1A2D] dark:text-slate-200 font-bold text-xs border border-slate-200/80 dark:border-[#1A314D] shadow-2xs flex items-center justify-center gap-2 transition active:scale-95 cursor-pointer"
+            className="w-full h-12 px-3.5 rounded-xl bg-white dark:bg-[#0E2239] hover:bg-slate-50 dark:hover:bg-[#132A45] border border-slate-200/80 dark:border-[#1A314D] shadow-2xs flex items-center justify-start text-left gap-2.5 sm:gap-3 transition active:scale-95 cursor-pointer group"
             title="Ver todos los pagos del turno"
           >
-            <Receipt className="w-4 h-4 text-slate-500 shrink-0" />
-            <span>Todos los Pagos</span>
-            <span className="font-mono text-[10px] px-1.5 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-[#0B1A2D] dark:text-slate-200 font-black shrink-0">
+            <div className="w-7 h-7 rounded-lg bg-slate-100 dark:bg-[#152e4d] flex items-center justify-center shrink-0 text-slate-600 dark:text-slate-300 group-hover:text-[#0B1A2D] dark:group-hover:text-[#B7F229] transition-colors">
+              <Receipt className="w-4 h-4 stroke-[2.2]" />
+            </div>
+            <span className="text-xs font-bold text-[#0B1A2D] dark:text-white truncate">
+              Todos los Pagos
+            </span>
+            <span className="ml-auto font-mono text-[10px] px-1.5 py-0.5 rounded-md bg-slate-100 dark:bg-[#152e4d] text-slate-600 dark:text-slate-300 font-bold shrink-0">
               {filteredTransactions.length}
             </span>
           </button>
@@ -963,11 +973,15 @@ export const AdminCafePOS: React.FC = () => {
           <button
             type="button"
             onClick={() => setArqueoModalOpen(true)}
-            className="w-full px-3 py-2.5 rounded-xl bg-white dark:bg-[#0E2239] hover:bg-slate-50 dark:hover:bg-[#132A45] text-[#0B1A2D] dark:text-slate-200 font-bold text-xs border border-slate-200/80 dark:border-[#1A314D] shadow-2xs flex items-center justify-center gap-2 transition active:scale-95 cursor-pointer"
+            className="w-full h-12 px-3.5 rounded-xl bg-white dark:bg-[#0E2239] hover:bg-slate-50 dark:hover:bg-[#132A45] border border-slate-200/80 dark:border-[#1A314D] shadow-2xs flex items-center justify-start text-left gap-2.5 sm:gap-3 transition active:scale-95 cursor-pointer group"
             title="Arqueo y cierre de turno"
           >
-            <Calculator className="w-4 h-4 text-slate-500 shrink-0" />
-            <span>Arqueo de Caja</span>
+            <div className="w-7 h-7 rounded-lg bg-slate-100 dark:bg-[#152e4d] flex items-center justify-center shrink-0 text-slate-600 dark:text-slate-300 group-hover:text-[#0B1A2D] dark:group-hover:text-[#B7F229] transition-colors">
+              <Calculator className="w-4 h-4 stroke-[2.2]" />
+            </div>
+            <span className="text-xs font-bold text-[#0B1A2D] dark:text-white truncate">
+              Arqueo de Caja
+            </span>
           </button>
         </div>
       </section>
