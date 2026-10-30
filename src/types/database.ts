@@ -593,6 +593,7 @@ export interface CafeProduct {
   stock: number;
   active?: boolean;
   imageUrl?: string;
+  isFeatured?: boolean;
 }
 
 export interface AuditLogItem {

@@ -55,6 +55,7 @@ export interface POSTransactionItem {
   id: string;
   time: string;
   date?: string;
+  shift?: string;
   concept: string;
   amount: number;
   paymentMethod: string;
@@ -137,16 +138,27 @@ export const AdminCafePOS: React.FC = () => {
   const hasMultipleVenues = Boolean(isMultiVenue) && Array.isArray(venues) && venues.length > 1;
   const [posVenueFilter, setPosVenueFilter] = useState<string>('all');
 
-  // Modal: Todos los Pagos (Historial del Turno)
+  // Navegación Nivel 2: Gestión Integral de Catálogo e Inventario
+  const [isCatalogManagementOpen, setIsCatalogManagementOpen] = useState(false);
+  const [catalogSearch, setCatalogSearch] = useState('');
+  const [catalogCategoryFilter, setCatalogCategoryFilter] = useState('all');
+
+  // Modal Nivel 3: Pagos Consolidados (Historial Global de Todos los Turnos y Recepcionistas)
   const [transactionsModalOpen, setTransactionsModalOpen] = useState(false);
-  // Modal: Detalle Específico de un Pago
   const [selectedPaymentDetail, setSelectedPaymentDetail] = useState<POSTransactionItem | null>(null);
+
+  // Filtros Avanzados para Pagos Globales
+  const [paymentShiftFilter, setPaymentShiftFilter] = useState<string>('all');
+  const [paymentCashierFilter, setPaymentCashierFilter] = useState<string>('all');
+  const [paymentMethodFilter, setPaymentMethodFilter] = useState<string>('all');
+  const [paymentSearch, setPaymentSearch] = useState<string>('');
 
   const [posTransactions, setPosTransactions] = useState<POSTransactionItem[]>([
     {
       id: 'TX-101',
       time: '09:15',
       date: 'Hoy',
+      shift: 'Turno Mañana',
       concept: '2x Agua Mineral + 1x Café Espresso',
       amount: 5.5,
       paymentMethod: 'Tarjeta',
@@ -163,6 +175,7 @@ export const AdminCafePOS: React.FC = () => {
       id: 'TX-102',
       time: '10:00',
       date: 'Hoy',
+      shift: 'Turno Mañana',
       concept: 'Reserva Pista 2 (10:00) — Cuota 1/4',
       amount: 7.0,
       paymentMethod: 'Efectivo',
@@ -178,6 +191,7 @@ export const AdminCafePOS: React.FC = () => {
       id: 'TX-103',
       time: '11:20',
       date: 'Hoy',
+      shift: 'Turno Mañana',
       concept: 'Bote Bolas Head Pro S + 2x Powerade',
       amount: 12.0,
       paymentMethod: 'Monedero Socio',
@@ -194,6 +208,7 @@ export const AdminCafePOS: React.FC = () => {
       id: 'TX-104',
       time: '12:45',
       date: 'Hoy',
+      shift: 'Turno Mañana',
       concept: 'Recarga Monedero Socio (#SM-390)',
       amount: 50.0,
       paymentMethod: 'Tarjeta',
@@ -209,6 +224,7 @@ export const AdminCafePOS: React.FC = () => {
       id: 'TX-105',
       time: '13:10',
       date: 'Hoy',
+      shift: 'Turno Mañana',
       concept: '1x Overgrip Wilson + 1x Agua 1.5L',
       amount: 4.5,
       paymentMethod: 'Bizum / Online',
@@ -219,6 +235,88 @@ export const AdminCafePOS: React.FC = () => {
       items: [
         { name: 'Overgrip Wilson Pro', qty: 1, unitPrice: 2.5, category: 'Grip/Pelotas' },
         { name: 'Agua Mineral 1.5L', qty: 1, unitPrice: 2.0, category: 'Bebidas' },
+      ],
+    },
+    {
+      id: 'TX-098',
+      time: '18:40',
+      date: 'Ayer',
+      shift: 'Turno Tarde',
+      concept: 'Reserva Pista 1 (18:30) — Pago Total (4/4)',
+      amount: 28.0,
+      paymentMethod: 'Tarjeta',
+      venueId: venues?.[0]?.id || 'v-1',
+      venueName: venues?.[0]?.name || 'Sede Principal',
+      customerName: 'Pablo Vello',
+      cashierName: 'Laura Senra (Mostrador)',
+      items: [
+        { name: 'Reserva Pista 1 (18:30) — Completa', qty: 1, unitPrice: 28.0, category: 'Reserva Pista' },
+      ],
+    },
+    {
+      id: 'TX-097',
+      time: '19:15',
+      date: 'Ayer',
+      shift: 'Turno Tarde',
+      concept: '2x Estrella Galicia 0,0 + 1x Patatas Artesanas',
+      amount: 6.5,
+      paymentMethod: 'Efectivo',
+      venueId: venues?.[0]?.id || 'v-1',
+      venueName: venues?.[0]?.name || 'Sede Principal',
+      customerName: 'Marcos Soto',
+      cashierName: 'Carlos M. (Entrenador)',
+      items: [
+        { name: 'Estrella Galicia 0,0', qty: 2, unitPrice: 2.25, category: 'Bebidas' },
+        { name: 'Patatas Fritas Artesanas', qty: 1, unitPrice: 2.0, category: 'Snacks' },
+      ],
+    },
+    {
+      id: 'TX-096',
+      time: '20:30',
+      date: 'Ayer',
+      shift: 'Turno Noche',
+      concept: 'Clase Particular Pádel 60 min (Bono)',
+      amount: 35.0,
+      paymentMethod: 'Monedero Socio',
+      venueId: venues?.[1]?.id || venues?.[0]?.id || 'v-2',
+      venueName: venues?.[1]?.name || 'Sede Indoor Norte',
+      customerName: 'Laura Senra',
+      cashierName: 'Mateo Varela (Admin)',
+      items: [
+        { name: 'Clase Particular 60 min', qty: 1, unitPrice: 35.0, category: 'Clase' },
+      ],
+    },
+    {
+      id: 'TX-095',
+      time: '11:05',
+      date: '28 Sep',
+      shift: 'Turno Mañana',
+      concept: '2x Bote Head Pro S + 1x Grip Perforado',
+      amount: 15.0,
+      paymentMethod: 'Tarjeta',
+      venueId: venues?.[0]?.id || 'v-1',
+      venueName: venues?.[0]?.name || 'Sede Principal',
+      customerName: 'David Castro',
+      cashierName: 'Marcos Soto (Recepción)',
+      items: [
+        { name: 'Bote Bolas Head Pro S', qty: 2, unitPrice: 6.0, category: 'Grip/Pelotas' },
+        { name: 'Grip Perforado', qty: 1, unitPrice: 3.0, category: 'Grip/Pelotas' },
+      ],
+    },
+    {
+      id: 'TX-094',
+      time: '21:15',
+      date: '28 Sep',
+      shift: 'Turno Noche',
+      concept: 'Reserva Pista 4 (21:30) — Cuota 1/4',
+      amount: 7.5,
+      paymentMethod: 'Bizum / Online',
+      venueId: venues?.[0]?.id || 'v-1',
+      venueName: venues?.[0]?.name || 'Sede Principal',
+      customerName: 'Lucas Piñeiro',
+      cashierName: 'Mateo Varela (Admin)',
+      items: [
+        { name: 'Reserva Pista 4 (21:30) — Cuota 1/4', qty: 1, unitPrice: 7.5, category: 'Reserva Pista' },
       ],
     },
   ]);
@@ -714,6 +812,69 @@ export const AdminCafePOS: React.FC = () => {
     setProductFormModalOpen(false);
   };
 
+  // Helper: Conmutar producto destacado en mostrador TPV (destacadoEnTPV / isFeatured)
+  const toggleProductFeatured = (prod: CafeProduct) => {
+    const nextFeatured = prod.isFeatured === false;
+    updateCafeProduct(prod.id, { isFeatured: nextFeatured });
+    triggerDemoToast(
+      nextFeatured ? 'Añadido a Destacados' : 'Retirado de Destacados',
+      `"${prod.name}" ${nextFeatured ? 'ahora se muestra destacado' : 'se ha ocultado'} en el mostrador del TPV.`,
+      'info'
+    );
+  };
+
+  // Helper: Ajuste rápido de existencias de inventario
+  const adjustStock = (prod: CafeProduct, delta: number) => {
+    const newStock = Math.max(0, (prod.stock || 0) + delta);
+    updateCafeProduct(prod.id, { stock: newStock });
+    triggerDemoToast('Stock Actualizado', `Existencias de "${prod.name}": ${newStock} uds.`, 'success');
+  };
+
+  // Productos filtrados para la Vista Nivel 2 de Catálogo Completo e Inventario
+  const filteredCatalogProducts = useMemo(() => {
+    return cafeProducts.filter((p) => {
+      const matchCat = catalogCategoryFilter === 'all' || p.category === catalogCategoryFilter;
+      const term = catalogSearch.toLowerCase().trim();
+      const matchTerm = !term || p.name.toLowerCase().includes(term) || p.category.toLowerCase().includes(term);
+      return matchCat && matchTerm;
+    });
+  }, [cafeProducts, catalogCategoryFilter, catalogSearch]);
+
+  // Pagos Consolidados Multi-Turno y Multi-Recepcionista con Filtros Avanzados
+  const filteredGlobalPayments = useMemo(() => {
+    return posTransactions.filter((tx) => {
+      // 1. Filtro Sede
+      if (posVenueFilter !== 'all') {
+        if (tx.venueId && tx.venueId !== posVenueFilter) return false;
+      }
+      // 2. Filtro Cajero / Recepcionista
+      if (paymentCashierFilter !== 'all') {
+        if (!tx.cashierName?.toLowerCase().includes(paymentCashierFilter.toLowerCase())) return false;
+      }
+      // 3. Filtro Método de Pago
+      if (paymentMethodFilter !== 'all') {
+        if (!tx.paymentMethod?.toLowerCase().includes(paymentMethodFilter.toLowerCase())) return false;
+      }
+      // 4. Filtro Turno / Fecha
+      if (paymentShiftFilter !== 'all') {
+        if (paymentShiftFilter === 'today' && tx.date !== 'Hoy') return false;
+        if (paymentShiftFilter === 'yesterday' && tx.date !== 'Ayer') return false;
+        if (paymentShiftFilter === 'morning' && tx.shift !== 'Turno Mañana') return false;
+        if (paymentShiftFilter === 'afternoon' && tx.shift !== 'Turno Tarde') return false;
+        if (paymentShiftFilter === 'night' && tx.shift !== 'Turno Noche') return false;
+      }
+      // 5. Búsqueda de texto
+      if (paymentSearch.trim()) {
+        const q = paymentSearch.toLowerCase();
+        const matchConcept = tx.concept.toLowerCase().includes(q);
+        const matchCustomer = tx.customerName?.toLowerCase().includes(q);
+        const matchId = tx.id.toLowerCase().includes(q);
+        if (!matchConcept && !matchCustomer && !matchId) return false;
+      }
+      return true;
+    });
+  }, [posTransactions, posVenueFilter, paymentCashierFilter, paymentMethodFilter, paymentShiftFilter, paymentSearch]);
+
   const filteredTransactions = posTransactions.filter((tx) => {
     if (hasMultipleVenues && posVenueFilter !== 'all') {
       return tx.venueId === posVenueFilter;
@@ -919,8 +1080,8 @@ export const AdminCafePOS: React.FC = () => {
           </div>
         </div>
 
-        {/* Retícula Simétrica 2x2 de Acciones Principales (Diseño Unificado, Alineación a la Izquierda) */}
-        <div className="grid grid-cols-2 gap-2.5 w-full pt-1">
+        {/* Retícula de Acciones Principales (Diseño Unificado) */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 w-full pt-1">
           {/* 1. Asignar Reserva */}
           <button
             type="button"
@@ -951,29 +1112,44 @@ export const AdminCafePOS: React.FC = () => {
             </span>
           </button>
 
-          {/* 3. Todos los Pagos */}
+          {/* 3. Pagos (Renombrado de 'Todos los Pagos') */}
           <button
             type="button"
             onClick={() => setTransactionsModalOpen(true)}
             className="w-full h-12 px-3.5 rounded-xl bg-white dark:bg-[#0E2239] hover:bg-slate-50 dark:hover:bg-[#132A45] border border-slate-200/80 dark:border-[#1A314D] shadow-2xs flex items-center justify-start text-left gap-2.5 sm:gap-3 transition active:scale-95 cursor-pointer group"
-            title="Ver todos los pagos del turno"
+            title="Ver pagos consolidados de todos los turnos y recepcionistas"
           >
             <div className="w-7 h-7 rounded-lg bg-slate-100 dark:bg-[#152e4d] flex items-center justify-center shrink-0 text-slate-600 dark:text-slate-300 group-hover:text-[#0B1A2D] dark:group-hover:text-[#B7F229] transition-colors">
               <Receipt className="w-4 h-4 stroke-[2.2]" />
             </div>
             <span className="text-xs font-bold text-[#0B1A2D] dark:text-white truncate">
-              Todos los Pagos
+              Pagos
             </span>
             <span className="ml-auto font-mono text-[10px] px-1.5 py-0.5 rounded-md bg-slate-100 dark:bg-[#152e4d] text-slate-600 dark:text-slate-300 font-bold shrink-0">
-              {filteredTransactions.length}
+              {filteredGlobalPayments.length}
             </span>
           </button>
 
-          {/* 4. Arqueo de Caja */}
+          {/* 4. Todos los productos */}
+          <button
+            type="button"
+            onClick={() => setIsCatalogManagementOpen(true)}
+            className="w-full h-12 px-3.5 rounded-xl bg-white dark:bg-[#0E2239] hover:bg-slate-50 dark:hover:bg-[#132A45] border border-slate-200/80 dark:border-[#1A314D] shadow-2xs flex items-center justify-start text-left gap-2.5 sm:gap-3 transition active:scale-95 cursor-pointer group"
+            title="Gestión de catálogo, existencias y productos destacados en mostrador"
+          >
+            <div className="w-7 h-7 rounded-lg bg-slate-100 dark:bg-[#152e4d] flex items-center justify-center shrink-0 text-slate-600 dark:text-slate-300 group-hover:text-[#0B1A2D] dark:group-hover:text-[#B7F229] transition-colors">
+              <ShoppingBag className="w-4 h-4 stroke-[2.2]" />
+            </div>
+            <span className="text-xs font-bold text-[#0B1A2D] dark:text-white truncate">
+              Todos los productos
+            </span>
+          </button>
+
+          {/* 5. Arqueo de Caja */}
           <button
             type="button"
             onClick={() => setArqueoModalOpen(true)}
-            className="w-full h-12 px-3.5 rounded-xl bg-white dark:bg-[#0E2239] hover:bg-slate-50 dark:hover:bg-[#132A45] border border-slate-200/80 dark:border-[#1A314D] shadow-2xs flex items-center justify-start text-left gap-2.5 sm:gap-3 transition active:scale-95 cursor-pointer group"
+            className="w-full h-12 px-3.5 rounded-xl bg-white dark:bg-[#0E2239] hover:bg-slate-50 dark:hover:bg-[#132A45] border border-slate-200/80 dark:border-[#1A314D] shadow-2xs flex items-center justify-start text-left gap-2.5 sm:gap-3 transition active:scale-95 cursor-pointer group col-span-2 sm:col-span-1"
             title="Arqueo y cierre de turno"
           >
             <div className="w-7 h-7 rounded-lg bg-slate-100 dark:bg-[#152e4d] flex items-center justify-center shrink-0 text-slate-600 dark:text-slate-300 group-hover:text-[#0B1A2D] dark:group-hover:text-[#B7F229] transition-colors">
@@ -986,8 +1162,212 @@ export const AdminCafePOS: React.FC = () => {
         </div>
       </section>
 
-      {/* 2. POS Interface: Product Catalog + Fast Ticket Register */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+      {/* ======================================================================
+          NIVEL 2: PÁGINA DE DETALLE - TODOS LOS PRODUCTOS E INVENTARIO
+          (Cabecera limpia con botón ← de retroceso y título unificado)
+          ====================================================================== */}
+      {isCatalogManagementOpen ? (
+        <section className="space-y-4 animate-in fade-in duration-200" data-level="2">
+          {/* Cabecera Nivel 2 */}
+          <div className="flex items-center justify-between p-4 bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200/80 dark:border-[#1A314D] shadow-2xs">
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => setIsCatalogManagementOpen(false)}
+                className="p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:text-[#0B1A2D] dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#132A45] transition cursor-pointer active:scale-95"
+                title="Volver al mostrador TPV"
+              >
+                <ArrowLeft className="w-5 h-5 stroke-[2.5]" />
+              </button>
+              <div>
+                <h2 className="text-base sm:text-lg font-black text-[#0B1A2D] dark:text-white">
+                  Todos los Productos e Inventario
+                </h2>
+                <p className="text-xs text-slate-400">
+                  Control de existencias, precios y selección de artículos destacados en mostrador
+                </p>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={openNewProductModal}
+              className="px-3.5 py-2 rounded-xl bg-[#0B1A2D] hover:bg-[#132A45] text-white dark:bg-[#B7F229] dark:hover:bg-[#a6e61f] dark:text-[#0B1A2D] font-black text-xs shadow-xs flex items-center gap-1.5 transition cursor-pointer active:scale-95 whitespace-nowrap"
+            >
+              <Plus className="w-4 h-4 stroke-[3]" />
+              <span>Nuevo Producto</span>
+            </button>
+          </div>
+
+          {/* Tarjetas de Métricas de Inventario */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+            <div className="p-3 bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200/80 dark:border-[#1A314D] shadow-2xs">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Total Artículos</span>
+              <div className="text-xl font-black font-mono text-[#0B1A2D] dark:text-white mt-0.5">
+                {cafeProducts.length}
+              </div>
+              <span className="text-[10px] text-slate-400 font-medium">En catálogo oficial</span>
+            </div>
+            <div className="p-3 bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200/80 dark:border-[#1A314D] shadow-2xs">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Destacados TPV</span>
+              <div className="text-xl font-black font-mono text-[#8B5CF6] dark:text-[#C4B5FD] mt-0.5">
+                {cafeProducts.filter((p) => p.isFeatured !== false).length}
+              </div>
+              <span className="text-[10px] text-slate-400 font-medium">Visibles en mostrador</span>
+            </div>
+            <div className="p-3 bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200/80 dark:border-[#1A314D] shadow-2xs">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Existencias Totales</span>
+              <div className="text-xl font-black font-mono text-[#0B1A2D] dark:text-white mt-0.5">
+                {cafeProducts.reduce((sum, p) => sum + (p.stock || 0), 0)} uds
+              </div>
+              <span className="text-[10px] text-slate-400 font-medium">Unidades en stock</span>
+            </div>
+            <div className="p-3 bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200/80 dark:border-[#1A314D] shadow-2xs">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Valor Inventario</span>
+              <div className="text-xl font-black font-mono text-[#82b805] dark:text-[#B7F229] mt-0.5">
+                {cafeProducts.reduce((sum, p) => sum + p.price * (p.stock || 0), 0).toFixed(2)} €
+              </div>
+              <span className="text-[10px] text-slate-400 font-medium">PVP acumulado</span>
+            </div>
+          </div>
+
+          {/* Filtros de Inventario: Búsqueda y Categorías */}
+          <div className="flex flex-col sm:flex-row gap-2.5 items-stretch sm:items-center justify-between">
+            <div className="relative flex-1">
+              <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                value={catalogSearch}
+                onChange={(e) => setCatalogSearch(e.target.value)}
+                placeholder="Buscar artículo por nombre o categoría..."
+                className="w-full pl-9 pr-3 py-2 bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] rounded-xl text-xs font-semibold text-slate-900 dark:text-white focus:outline-none focus:border-[#8B5CF6]"
+              />
+            </div>
+            <div className="flex items-center gap-1.5 overflow-x-auto hide-scrollbar">
+              {categories.map((c) => (
+                <button
+                  key={`cat-inv-${c}`}
+                  type="button"
+                  onClick={() => setCatalogCategoryFilter(c)}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer shrink-0 ${
+                    catalogCategoryFilter === c
+                      ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D] shadow-xs'
+                      : 'bg-white dark:bg-[#0E2239] text-slate-600 dark:text-slate-400 border border-slate-200/80 dark:border-[#1A314D]'
+                  }`}
+                >
+                  {c === 'all' ? 'Todas' : c}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Listado de Artículos con Toggle Destacado en Mostrador */}
+          <div className="bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200/80 dark:border-[#1A314D] shadow-2xs divide-y divide-slate-100 dark:divide-[#1A314D] overflow-hidden">
+            {filteredCatalogProducts.length === 0 ? (
+              <div className="p-12 text-center text-slate-400 text-xs">
+                <Package className="w-10 h-10 mx-auto mb-2 opacity-40 text-slate-400" />
+                No hay productos que coincidan con la búsqueda.
+              </div>
+            ) : (
+              filteredCatalogProducts.map((prod) => {
+                const isFeatured = prod.isFeatured !== false;
+                return (
+                  <div
+                    key={prod.id}
+                    className="p-3.5 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-slate-50/60 dark:hover:bg-[#132A45]/40 transition"
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="relative w-12 h-12 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 shrink-0 border border-slate-200/80 dark:border-slate-700">
+                        <img
+                          src={prod.imageUrl || getFallbackProductImage(prod.category)}
+                          alt={prod.name}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="font-bold text-xs sm:text-sm text-[#0B1A2D] dark:text-white truncate">
+                            {prod.name}
+                          </span>
+                          <span className="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold text-[10px] uppercase">
+                            {prod.category}
+                          </span>
+                        </div>
+                        <div className="text-xs font-mono font-black text-[#8B5CF6] dark:text-[#C4B5FD] mt-0.5">
+                          {prod.price.toFixed(2)} €
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between sm:justify-end gap-3 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-100 dark:border-slate-800">
+                      {/* Control de Stock (+ / -) */}
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-[10px] text-slate-400 font-bold uppercase mr-1">Stock:</span>
+                        <button
+                          type="button"
+                          onClick={() => adjustStock(prod, -1)}
+                          className="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 flex items-center justify-center font-black cursor-pointer text-xs"
+                          title="Reducir stock (-1)"
+                        >
+                          -
+                        </button>
+                        <span className="w-10 text-center font-mono font-bold text-xs text-[#0B1A2D] dark:text-white">
+                          {prod.stock}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => adjustStock(prod, 1)}
+                          className="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 flex items-center justify-center font-black cursor-pointer text-xs"
+                          title="Añadir stock (+1)"
+                        >
+                          +
+                        </button>
+                      </div>
+
+                      {/* Toggle Destacado en Mostrador */}
+                      <button
+                        type="button"
+                        onClick={() => toggleProductFeatured(prod)}
+                        className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-bold transition cursor-pointer select-none ${
+                          isFeatured
+                            ? 'bg-[#F0FCCF] dark:bg-[#B7F229]/20 border-[#B7F229]/60 text-[#0B1A2D] dark:text-[#B7F229]'
+                            : 'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-500'
+                        }`}
+                        title={isFeatured ? 'Artículo visible en el mostrador TPV' : 'Artículo oculto del mostrador rápido'}
+                      >
+                        <span className={`w-2 h-2 rounded-full ${isFeatured ? 'bg-[#82b805] dark:bg-[#B7F229]' : 'bg-slate-400'}`} />
+                        <span>{isFeatured ? 'Destacado en TPV' : 'Oculto en TPV'}</span>
+                      </button>
+
+                      {/* Acciones Editar y Eliminar */}
+                      <div className="flex items-center gap-1">
+                        <button
+                          type="button"
+                          onClick={() => openEditProductModal(prod)}
+                          className="p-2 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+                          title="Editar producto"
+                        >
+                          <Edit2 className="w-4 h-4" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setProductToDelete(prod)}
+                          className="p-2 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition cursor-pointer"
+                          title="Eliminar producto"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })
+            )}
+          </div>
+        </section>
+      ) : (
+        /* 2. POS Interface: Product Catalog + Fast Ticket Register */
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
         {/* Products Grid */}
         <div className="lg:col-span-7 space-y-3.5">
           {/* Categories bar con botón minimalista para gestionar categorías */}
@@ -1009,15 +1389,27 @@ export const AdminCafePOS: React.FC = () => {
               ))}
             </div>
 
-            <button
-              type="button"
-              onClick={() => setIsCategoryModalOpen(true)}
-              className="px-2.5 py-1.5 rounded-xl bg-white dark:bg-slate-800/90 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 hover:text-[#0B1A2D] dark:hover:text-white border border-slate-200/80 dark:border-slate-700/80 shadow-2xs flex items-center gap-1.5 text-xs font-bold transition cursor-pointer shrink-0"
-              title="Gestionar categorías de artículos"
-            >
-              <Sliders className="w-3.5 h-3.5 text-[#8B5CF6]" />
-              <span className="hidden sm:inline">Categorías</span>
-            </button>
+            <div className="flex items-center gap-1.5 shrink-0">
+              <button
+                type="button"
+                onClick={() => setIsCatalogManagementOpen(true)}
+                className="px-2.5 py-1.5 rounded-xl bg-white dark:bg-slate-800/90 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 hover:text-[#0B1A2D] dark:hover:text-white border border-slate-200/80 dark:border-slate-700/80 shadow-2xs flex items-center gap-1.5 text-xs font-bold transition cursor-pointer shrink-0"
+                title="Ver catálogo completo y existencias"
+              >
+                <ShoppingBag className="w-3.5 h-3.5 text-[#8B5CF6]" />
+                <span className="hidden sm:inline">Todos los productos</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setIsCategoryModalOpen(true)}
+                className="px-2.5 py-1.5 rounded-xl bg-white dark:bg-slate-800/90 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 hover:text-[#0B1A2D] dark:hover:text-white border border-slate-200/80 dark:border-slate-700/80 shadow-2xs flex items-center gap-1.5 text-xs font-bold transition cursor-pointer shrink-0"
+                title="Gestionar categorías de artículos"
+              >
+                <Sliders className="w-3.5 h-3.5 text-[#8B5CF6]" />
+                <span className="hidden sm:inline">Categorías</span>
+              </button>
+            </div>
           </div>
 
           {/* Touch item cards con Imagen de Vista Previa Arriba y Badge de Categoría Superpuesto */}
@@ -1295,93 +1687,189 @@ export const AdminCafePOS: React.FC = () => {
           </div>
         </div>
       </div>
+      )}
 
       {/* ======================================================================
-          2.5 MODAL FIJO: "TODOS LOS PAGOS" (HISTORIAL COMPLETO CON SCROLL INTERIOR)
+          2.5 MODAL NIVEL 3: "PAGOS" (HISTORIAL GLOBAL CONSOLIDADO DE TODOS LOS TURNOS Y RECEPCIONISTAS)
           ====================================================================== */}
       {transactionsModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0B1A2D]/75 backdrop-blur-sm p-4 overflow-hidden animate-in fade-in duration-150">
-          <div className="relative w-full max-w-3xl bg-white dark:bg-[#0E2239] border border-slate-200/90 dark:border-[#1A314D] rounded-3xl shadow-2xl text-slate-900 dark:text-slate-100 flex flex-col max-h-[88vh] overflow-hidden">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0B1A2D]/75 backdrop-blur-sm p-3 sm:p-4 md:p-6 overflow-hidden animate-in fade-in duration-150">
+          <div className="relative w-full max-w-4xl bg-white dark:bg-[#0E2239] border border-slate-200/90 dark:border-[#1A314D] rounded-3xl shadow-2xl text-slate-900 dark:text-slate-100 flex flex-col max-h-[92vh] overflow-hidden">
             {/* Header Fijo con X perfectamente alineada a la derecha */}
-            <div className="p-5 sm:p-6 border-b border-slate-100 dark:border-[#1A314D] flex items-center justify-between gap-3 shrink-0">
+            <div className="p-4 sm:p-5 border-b border-slate-100 dark:border-[#1A314D] flex items-center justify-between gap-3 shrink-0 bg-white dark:bg-[#0E2239]">
               <div className="flex items-center gap-3 min-w-0">
-                <div className="w-10 h-10 rounded-2xl bg-[#8B5CF6]/10 text-[#8B5CF6] flex items-center justify-center font-bold shrink-0">
-                  <Receipt className="w-5 h-5 text-[#8B5CF6]" />
+                <div className="w-10 h-10 rounded-2xl bg-[#0B1A2D] text-[#B7F229] flex items-center justify-center font-bold shrink-0">
+                  <Receipt className="w-5 h-5 stroke-[2.2]" />
                 </div>
                 <div className="min-w-0">
                   <div className="flex items-center gap-2">
-                    <h3 className="text-lg font-black text-[#0B1A2D] dark:text-white truncate">
-                      Todos los Pagos
+                    <h3 className="text-base sm:text-lg font-black text-[#0B1A2D] dark:text-white truncate">
+                      Pagos y Cobros Consolidados
                     </h3>
-                    <span className="px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-[#0B1A2D] dark:text-slate-300 font-mono text-[10px] font-black">
-                      {filteredTransactions.length}
+                    <span className="px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-[#0B1A2D] dark:text-[#B7F229] font-mono text-[10px] font-black">
+                      {filteredGlobalPayments.length} pagos
                     </span>
                   </div>
-                  {/* Resumen simplificado de sede y empleado/usuario del turno */}
-                  <div className="flex flex-wrap items-center gap-2 pt-0.5 text-xs text-slate-500 dark:text-slate-400">
-                    <span className="inline-flex items-center gap-1 font-medium">
-                      <Building2 className="w-3.5 h-3.5 text-[#8B5CF6]" />
-                      <span>{hasMultipleVenues && posVenueFilter !== 'all' ? (venues.find(v => v.id === posVenueFilter)?.name || selectedVenue.name) : (isConsolidatedView ? 'Todas las sedes' : selectedVenue.name)}</span>
-                    </span>
-                    <span>·</span>
-                    <span className="inline-flex items-center gap-1 font-medium text-slate-700 dark:text-slate-300">
-                      <User className="w-3.5 h-3.5 text-[#82b805] dark:text-[#B7F229]" />
-                      <span>Atendido por: <strong>{currentUser?.name || 'Recepción Mostrador'}</strong></span>
-                    </span>
-                  </div>
+                  <p className="text-xs text-slate-400 truncate">
+                    Historial consolidado de todos los turnos, recepcionistas y métodos de cobro
+                  </p>
                 </div>
               </div>
 
-              <div className="flex items-center gap-2 shrink-0">
-                {hasMultipleVenues && (
-                  <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-xs font-bold border border-slate-200/80 dark:border-slate-700/80">
-                    <Building2 className="w-3.5 h-3.5 text-[#8B5CF6] shrink-0" />
-                    <select
-                      value={posVenueFilter}
-                      onChange={(e) => setPosVenueFilter(e.target.value)}
-                      className="bg-transparent text-slate-900 dark:text-white font-bold outline-hidden cursor-pointer"
-                    >
-                      <option value="all" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">Todas las sedes</option>
-                      {venues.map((v) => (
-                        <option key={v.id} value={v.id} className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">
-                          {v.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                )}
+              <button
+                type="button"
+                onClick={() => setTransactionsModalOpen(false)}
+                className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer shrink-0"
+                title="Cerrar ventana de pagos"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
 
-                <button
-                  type="button"
-                  onClick={() => setTransactionsModalOpen(false)}
-                  className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
-                  title="Cerrar ventana"
-                >
-                  <X className="w-5 h-5" />
-                </button>
+            {/* KPIs Resumen Superior */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 p-3 sm:p-4 bg-slate-50/70 dark:bg-[#071220]/70 border-b border-slate-100 dark:border-[#1A314D] shrink-0 text-xs">
+              <div className="p-2.5 rounded-xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D]">
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Total Cobrado</span>
+                <span className="text-base sm:text-lg font-black font-mono text-[#0B1A2D] dark:text-[#B7F229]">
+                  {filteredGlobalPayments.reduce((acc, t) => acc + t.amount, 0).toFixed(2)} €
+                </span>
+              </div>
+              <div className="p-2.5 rounded-xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D]">
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Tarjeta / TPV</span>
+                <span className="text-base sm:text-lg font-black font-mono text-[#8B5CF6] dark:text-[#C4B5FD]">
+                  {filteredGlobalPayments.filter((t) => t.paymentMethod.toLowerCase().includes('tarjeta')).reduce((a, b) => a + b.amount, 0).toFixed(2)} €
+                </span>
+              </div>
+              <div className="p-2.5 rounded-xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D]">
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Efectivo</span>
+                <span className="text-base sm:text-lg font-black font-mono text-emerald-600 dark:text-emerald-400">
+                  {filteredGlobalPayments.filter((t) => t.paymentMethod.toLowerCase().includes('efectivo')).reduce((a, b) => a + b.amount, 0).toFixed(2)} €
+                </span>
+              </div>
+              <div className="p-2.5 rounded-xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D]">
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Monedero / App</span>
+                <span className="text-base sm:text-lg font-black font-mono text-[#0B1A2D] dark:text-white">
+                  {filteredGlobalPayments.filter((t) => !t.paymentMethod.toLowerCase().includes('tarjeta') && !t.paymentMethod.toLowerCase().includes('efectivo')).reduce((a, b) => a + b.amount, 0).toFixed(2)} €
+                </span>
+              </div>
+            </div>
+
+            {/* Barra de Filtros Avanzados (Turno/Fecha, Cajero, Método de Pago, Sede, Búsqueda) */}
+            <div className="p-3 sm:p-4 bg-white dark:bg-[#0E2239] border-b border-slate-100 dark:border-[#1A314D] space-y-2 shrink-0 text-xs">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                {/* 1. Filtro Turno / Período */}
+                <div>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">
+                    Turno / Período
+                  </label>
+                  <select
+                    value={paymentShiftFilter}
+                    onChange={(e) => setPaymentShiftFilter(e.target.value)}
+                    className="w-full px-2.5 py-1.5 rounded-xl bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] font-bold text-[#0B1A2D] dark:text-white"
+                  >
+                    <option value="all">Todos los turnos</option>
+                    <option value="today">Hoy (Todos los turnos)</option>
+                    <option value="morning">Turno Mañana</option>
+                    <option value="afternoon">Turno Tarde</option>
+                    <option value="night">Turno Noche</option>
+                    <option value="yesterday">Ayer</option>
+                  </select>
+                </div>
+
+                {/* 2. Filtro Cajero / Recepcionista */}
+                <div>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">
+                    Recepcionista / Cajero
+                  </label>
+                  <select
+                    value={paymentCashierFilter}
+                    onChange={(e) => setPaymentCashierFilter(e.target.value)}
+                    className="w-full px-2.5 py-1.5 rounded-xl bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] font-bold text-[#0B1A2D] dark:text-white"
+                  >
+                    <option value="all">Todos los recepcionistas</option>
+                    <option value="Marcos Soto">Marcos Soto (Recepción)</option>
+                    <option value="Laura Senra">Laura Senra (Mostrador)</option>
+                    <option value="Carlos M.">Carlos M. (Entrenador)</option>
+                    <option value="Mateo Varela">Mateo Varela (Admin)</option>
+                  </select>
+                </div>
+
+                {/* 3. Filtro Método de Pago */}
+                <div>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">
+                    Método de Pago
+                  </label>
+                  <select
+                    value={paymentMethodFilter}
+                    onChange={(e) => setPaymentMethodFilter(e.target.value)}
+                    className="w-full px-2.5 py-1.5 rounded-xl bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] font-bold text-[#0B1A2D] dark:text-white"
+                  >
+                    <option value="all">Todos los métodos</option>
+                    <option value="Tarjeta">Tarjeta / Datáfono</option>
+                    <option value="Efectivo">Efectivo</option>
+                    <option value="Monedero">Monedero Socio</option>
+                    <option value="Bizum">Bizum / Online</option>
+                  </select>
+                </div>
+
+                {/* 4. Filtro Sede Unificada */}
+                <div>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">
+                    Sede Activa
+                  </label>
+                  <select
+                    value={posVenueFilter}
+                    onChange={(e) => setPosVenueFilter(e.target.value)}
+                    className="w-full px-2.5 py-1.5 rounded-xl bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] font-bold text-[#0B1A2D] dark:text-white"
+                  >
+                    <option value="all">Todas las sedes</option>
+                    {venues.map((v) => (
+                      <option key={v.id} value={v.id}>
+                        {v.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* 5. Buscador Rápido por Concepto, Cliente o Nº de Ticket */}
+              <div className="relative">
+                <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  value={paymentSearch}
+                  onChange={(e) => setPaymentSearch(e.target.value)}
+                  placeholder="Filtrar por cliente, concepto o ticket (#TX-101)..."
+                  className="w-full pl-8 pr-3 py-1.5 rounded-xl bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] text-xs font-semibold text-slate-900 dark:text-white focus:outline-none focus:border-[#8B5CF6]"
+                />
               </div>
             </div>
 
             {/* Listado de Pagos con Scroll Interior Controlado */}
-            <div className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-2.5 overscroll-contain">
-              {filteredTransactions.length === 0 ? (
+            <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-2.5 overscroll-contain">
+              {filteredGlobalPayments.length === 0 ? (
                 <div className="p-12 text-center text-slate-400 text-xs">
                   <Receipt className="w-10 h-10 mx-auto mb-2 opacity-40 text-slate-400" />
-                  No hay transacciones registradas en este turno.
+                  No se encontraron pagos con los filtros seleccionados.
                 </div>
               ) : (
-                filteredTransactions.map((tx) => (
+                filteredGlobalPayments.map((tx) => (
                   <div
                     key={tx.id}
-                    onClick={() => {
-                      setSelectedPaymentDetail(tx);
-                    }}
+                    onClick={() => setSelectedPaymentDetail(tx)}
                     className="p-3.5 rounded-2xl bg-slate-50/80 dark:bg-[#071220]/60 hover:bg-white dark:hover:bg-[#132A45] border border-slate-200/80 dark:border-[#1A314D] transition-all flex items-center justify-between gap-4 text-xs cursor-pointer group shadow-2xs hover:shadow-sm"
-                    title="Haz clic para abrir los detalles específicos de este pago"
+                    title="Haz clic para ver el ticket y desglose completo"
                   >
                     <div className="min-w-0 flex-1 space-y-1">
                       <div className="flex items-center gap-2">
-                        <span className="font-mono font-bold text-slate-400 text-[11px] shrink-0">{tx.time}</span>
+                        <span className="font-mono font-bold text-slate-400 text-[11px] shrink-0">
+                          {tx.date || 'Hoy'} · {tx.time}
+                        </span>
+                        {tx.shift && (
+                          <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-[#EDE9FE] dark:bg-[#8B5CF6]/20 text-[#6D28D9] dark:text-[#C4B5FD] shrink-0">
+                            {tx.shift}
+                          </span>
+                        )}
                         <span className="font-mono font-black text-[10px] px-1.5 py-0.5 rounded bg-slate-200/80 dark:bg-slate-800 text-slate-700 dark:text-slate-300 shrink-0">
                           #{tx.id}
                         </span>
@@ -1390,7 +1878,9 @@ export const AdminCafePOS: React.FC = () => {
                         </span>
                       </div>
                       <div className="text-[11px] text-slate-500 dark:text-slate-400 flex flex-wrap items-center gap-2">
-                        <span className="font-semibold text-slate-700 dark:text-slate-300">{tx.customerName || 'Cliente Mostrador'}</span>
+                        <span className="font-semibold text-slate-700 dark:text-slate-300">
+                          {tx.customerName || 'Cliente Mostrador'}
+                        </span>
                         <span>·</span>
                         <span className="text-[#8B5CF6] font-medium">{tx.paymentMethod}</span>
                         <span>·</span>
@@ -1401,7 +1891,10 @@ export const AdminCafePOS: React.FC = () => {
                         {tx.venueName && (
                           <>
                             <span>·</span>
-                            <span className="text-slate-400 text-[10px]">{tx.venueName}</span>
+                            <span className="text-slate-400 text-[10px] inline-flex items-center gap-1">
+                              <Building2 className="w-3 h-3 text-slate-400" />
+                              <span>{tx.venueName}</span>
+                            </span>
                           </>
                         )}
                       </div>
@@ -1426,10 +1919,10 @@ export const AdminCafePOS: React.FC = () => {
             {/* Footer Fijo con Totalizador */}
             <div className="p-4 sm:p-5 border-t border-slate-100 dark:border-[#1A314D] flex items-center justify-between text-xs bg-slate-50/60 dark:bg-[#071220]/50 shrink-0">
               <span className="text-slate-500 font-semibold">
-                Total en turno ({filteredTransactions.length} pagos):
+                Mostrando {filteredGlobalPayments.length} de {posTransactions.length} pagos registrados:
               </span>
               <span className="font-mono font-black text-lg text-[#0B1A2D] dark:text-white">
-                {filteredTransactions.reduce((acc, t) => acc + t.amount, 0).toFixed(2)} €
+                {filteredGlobalPayments.reduce((acc, t) => acc + t.amount, 0).toFixed(2)} €
               </span>
             </div>
           </div>
@@ -1953,7 +2446,7 @@ export const AdminCafePOS: React.FC = () => {
                     className="text-[11px] font-bold text-[#8B5CF6] hover:text-[#7c3aed] flex items-center gap-1 cursor-pointer"
                   >
                     <Plus className="w-3 h-3 stroke-[2.5]" />
-                    <span>{showInlineNewCategory ? 'Cancelar' : '+ Nueva Categoría'}</span>
+                    <span>{showInlineNewCategory ? 'Cancelar' : '+ Añadir categoría'}</span>
                   </button>
                 </div>
 
