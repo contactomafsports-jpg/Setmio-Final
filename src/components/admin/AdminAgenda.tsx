@@ -629,11 +629,11 @@ export const AdminAgenda: React.FC = () => {
           <button
             type="button"
             onClick={() => setShowNewModal(true)}
-            className="w-9 h-9 rounded-xl bg-[#0B1A2D] dark:bg-[#0B1A2D] border border-[#0B1A2D] dark:border-slate-700 flex items-center justify-center text-white hover:bg-[#132A45] active:scale-95 transition-all cursor-pointer shadow-xs"
+            className="p-1 text-slate-700 dark:text-slate-300 hover:text-[#0B1A2D] dark:hover:text-[#B7F229] transition-colors cursor-pointer active:scale-95"
             title="Nueva reserva"
             aria-label="Nueva reserva"
           >
-            <Plus className="w-4 h-4 stroke-[3] text-[#B7F229]" />
+            <Plus className="w-6 h-6 stroke-[2.2]" />
           </button>
         </div>
 

@@ -498,7 +498,7 @@ export const ReservationDrawer: React.FC<ReservationDrawerProps> = ({
 
               {/* SEDE / CLUB DONDE SE DISPUTA */}
               <div className="flex items-center gap-1 text-[11px] font-semibold text-slate-600 dark:text-slate-300">
-                <Building2 className="w-3.5 h-3.5 text-indigo-500 shrink-0" />
+                <Building2 className="w-3.5 h-3.5 text-[#0B1A2D] dark:text-[#B7F229] shrink-0" />
                 <span>Sede: <strong>{venueDisplayName}</strong></span>
               </div>
             </div>

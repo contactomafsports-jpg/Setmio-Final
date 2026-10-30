@@ -185,12 +185,15 @@ export const ClubDashboard: React.FC = () => {
 
           <button
             type="button"
-            onClick={() => setAdminTab('settings')}
-            className="p-2 text-slate-400 hover:text-[#0B1A2D] dark:hover:text-white transition-colors cursor-pointer rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800/60 -mr-1"
-            title="Ajustes del club"
-            aria-label="Ajustes del club"
+            onClick={() => {
+              if (typeof window !== 'undefined') window.history.pushState({}, '', '/admin/reservas');
+              setAdminTab('agenda');
+            }}
+            className="p-1 text-slate-700 dark:text-slate-300 hover:text-[#0B1A2D] dark:hover:text-[#B7F229] transition-colors cursor-pointer active:scale-95"
+            title="Nueva reserva"
+            aria-label="Nueva reserva"
           >
-            <Settings className="w-5 h-5" />
+            <Plus className="w-6 h-6 stroke-[2.2]" />
           </button>
         </div>
 
@@ -642,7 +645,7 @@ export const ClubDashboard: React.FC = () => {
             }}
             className="text-xs font-bold text-[#8B5CF6] dark:text-purple-400 hover:underline cursor-pointer"
           >
-            Ver agenda
+            ver agenda
           </button>
         </div>
 
@@ -682,8 +685,8 @@ export const ClubDashboard: React.FC = () => {
                 <div className="min-w-0">
                   {/* Micro-texto de Sede en Vista Consolidada ("Todas las Sedes") */}
                   {isConsolidatedView && (item.venueShortName || item.venueName) && (
-                    <div className="flex items-center gap-1 text-[11px] font-bold text-[#8B5CF6] dark:text-purple-300 mb-0.5 tracking-tight">
-                      <Building2 className="w-3 h-3 text-[#8B5CF6] shrink-0" />
+                    <div className="flex items-center gap-1 text-[11px] font-bold text-[#0B1A2D] dark:text-[#B7F229] mb-0.5 tracking-tight">
+                      <Building2 className="w-3 h-3 text-[#0B1A2D] dark:text-[#B7F229] shrink-0" />
                       <span>{item.venueShortName || item.venueName}</span>
                     </div>
                   )}

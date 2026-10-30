@@ -1087,11 +1087,11 @@ export const AdminMatches: React.FC = () => {
           <button
             type="button"
             onClick={() => setShowCreateModal(true)}
-            className="w-9 h-9 rounded-xl bg-[#0B1A2D] dark:bg-[#0B1A2D] border border-[#0B1A2D] dark:border-slate-700 flex items-center justify-center text-white hover:bg-[#132A45] active:scale-95 transition-all cursor-pointer shadow-xs"
+            className="p-1 text-slate-700 dark:text-slate-300 hover:text-[#0B1A2D] dark:hover:text-[#B7F229] transition-colors cursor-pointer active:scale-95"
             title="Nueva partida"
             aria-label="Nueva partida"
           >
-            <Plus className="w-4 h-4 stroke-[3] text-[#B7F229]" />
+            <Plus className="w-6 h-6 stroke-[2.2]" />
           </button>
         </div>
 
@@ -1379,35 +1379,39 @@ export const AdminMatches: React.FC = () => {
           <button
             type="button"
             onClick={() => setStatusFilter('all')}
-            className={`px-3.5 py-1.5 rounded-xl text-xs transition cursor-pointer font-bold ${
+            className={`px-3.5 py-1.5 rounded-xl text-xs transition cursor-pointer font-bold flex items-center gap-1.5 ${
               statusFilter === 'all'
                 ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D] shadow-xs'
                 : 'bg-white/80 dark:bg-[#0E2239]/80 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white border border-slate-200/70 dark:border-[#1A314D]'
             }`}
           >
-            {t('matches.filterAll', 'Todas')} ({venueFilteredMatches.length})
+            <span>Todas</span>
+            <span className="font-mono text-[10px] opacity-75">({venueFilteredMatches.length})</span>
           </button>
           <button
             type="button"
             onClick={() => setStatusFilter('open')}
-            className={`px-3.5 py-1.5 rounded-xl text-xs transition cursor-pointer font-bold ${
+            className={`px-3.5 py-1.5 rounded-xl text-xs transition cursor-pointer font-bold flex items-center gap-1.5 ${
               statusFilter === 'open'
                 ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D] shadow-xs'
                 : 'bg-white/80 dark:bg-[#0E2239]/80 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white border border-slate-200/70 dark:border-[#1A314D]'
             }`}
           >
-            {t('matches.filterOpen', 'Buscando')} ({venueFilteredMatches.filter((m) => m.players.length < 4).length})
+            <span>Buscando</span>
+            <span className="font-mono text-[10px] opacity-75">({venueFilteredMatches.filter((m) => m.players.length < 4).length})</span>
           </button>
           <button
             type="button"
             onClick={() => setStatusFilter('full')}
-            className={`px-3.5 py-1.5 rounded-xl text-xs transition cursor-pointer font-bold ${
+            className={`px-3.5 py-1.5 rounded-xl text-xs transition cursor-pointer font-bold flex items-center gap-1.5 ${
               statusFilter === 'full'
                 ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D] shadow-xs'
                 : 'bg-white/80 dark:bg-[#0E2239]/80 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white border border-slate-200/70 dark:border-[#1A314D]'
             }`}
           >
-            {t('matches.filterFull', 'Completas')} ({fullMatchesCount})
+            <span className="w-1.5 h-1.5 rounded-full bg-[#B7F229] shrink-0" />
+            <span>Completa</span>
+            <span className="font-mono text-[10px] opacity-75">({fullMatchesCount})</span>
           </button>
         </div>
 
@@ -1740,8 +1744,8 @@ export const AdminMatches: React.FC = () => {
                       {organizerDisplay}
                     </p>
                     {isMultiVenue && (m.venueShortName || m.venueName) && (
-                      <span className="inline-flex items-center gap-1 px-1.5 py-0.2 rounded bg-indigo-50 dark:bg-indigo-950/80 text-indigo-700 dark:text-indigo-300 font-bold text-[9px] border border-indigo-200 dark:border-indigo-800 shrink-0">
-                        <Building2 className="w-2.5 h-2.5 text-indigo-500 shrink-0" />
+                      <span className="inline-flex items-center gap-1 px-1.5 py-0.2 rounded bg-[#0B1A2D]/5 dark:bg-[#B7F229]/15 text-[#0B1A2D] dark:text-[#B7F229] font-bold text-[9px] border border-slate-200/80 dark:border-[#B7F229]/30 shrink-0">
+                        <Building2 className="w-2.5 h-2.5 text-[#0B1A2D] dark:text-[#B7F229] shrink-0" />
                         <span className="truncate max-w-[80px]">{m.venueShortName || m.venueName}</span>
                       </span>
                     )}
@@ -1946,8 +1950,8 @@ export const AdminMatches: React.FC = () => {
 
                   {/* Badge 4: Sede (en entornos multi-sede) */}
                   {isMultiVenue && (selectedMatchForDetail.venueShortName || selectedMatchForDetail.venueName) && (
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 flex items-center gap-1">
-                      <Building2 className="w-3 h-3 text-indigo-500" />
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#0B1A2D]/5 dark:bg-[#B7F229]/15 text-[#0B1A2D] dark:text-[#B7F229] border border-slate-200/80 dark:border-[#B7F229]/30 flex items-center gap-1">
+                      <Building2 className="w-3 h-3 text-[#0B1A2D] dark:text-[#B7F229]" />
                       <span>{selectedMatchForDetail.venueShortName || selectedMatchForDetail.venueName}</span>
                     </span>
                   )}

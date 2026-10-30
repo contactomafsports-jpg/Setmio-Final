@@ -166,8 +166,8 @@ export const BookingListItem: React.FC<BookingListItemProps> = ({
       {/* 2. Etiqueta de Sede (Visible únicamente en vista consolidada 'Todas las Sedes') */}
       {showVenue && (
         <div>
-          <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#8B5CF6]/10 dark:bg-[#8B5CF6]/20 text-[#8B5CF6] dark:text-[#a78bfa] text-xs font-semibold">
-            <Building2 className="w-3.5 h-3.5 shrink-0" />
+          <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#0B1A2D]/5 dark:bg-[#B7F229]/15 text-[#0B1A2D] dark:text-[#B7F229] border border-slate-200/80 dark:border-[#B7F229]/30 text-xs font-bold">
+            <Building2 className="w-3.5 h-3.5 shrink-0 text-[#0B1A2D] dark:text-[#B7F229]" />
             <span className="truncate">{booking.venueShortName || booking.venueName}</span>
           </div>
         </div>

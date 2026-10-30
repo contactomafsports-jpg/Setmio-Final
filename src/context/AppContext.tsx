@@ -264,6 +264,43 @@ const routeForPlayerTab: Record<PlayerTab, string> = {
   ai_coach: '/app/entrenador',
 };
 
+export const LAST_ACTIVE_ROUTE_KEY = 'setmio_last_active_route_v2';
+
+export interface PersistedRouteState {
+  view: MainView;
+  page: PublicPage;
+  admin: AdminTab;
+  player: PlayerTab;
+  isCorporate: boolean;
+  clubSlug?: string | null;
+  tenantId?: string;
+  pathname?: string;
+  timestamp?: number;
+}
+
+export const saveLastActiveRoute = (data: PersistedRouteState) => {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.setItem(LAST_ACTIVE_ROUTE_KEY, JSON.stringify({
+      ...data,
+      timestamp: Date.now(),
+    }));
+  } catch (e) {
+    // ignore
+  }
+};
+
+export const getLastActiveRoute = (): PersistedRouteState | null => {
+  if (typeof window === 'undefined') return null;
+  try {
+    const raw = localStorage.getItem(LAST_ACTIVE_ROUTE_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw);
+  } catch (e) {
+    return null;
+  }
+};
+
 const readRoute = () => {
   if (typeof window === 'undefined') {
     return {
@@ -278,6 +315,21 @@ const readRoute = () => {
 
   const hostname = window.location.hostname.toLowerCase();
   const path = window.location.pathname.replace(/\/+$/, '') || '/';
+
+  // Si la ruta es la raíz '/', restaurar la última ruta activa del usuario si existe
+  if (path === '/' || path === '') {
+    const saved = getLastActiveRoute();
+    if (saved && saved.view && saved.view !== 'public') {
+      return {
+        view: saved.view,
+        page: saved.page || 'home',
+        admin: saved.admin || 'dashboard',
+        player: saved.player || 'dashboard',
+        clubSlug: saved.clubSlug || null,
+        isCorporate: false,
+      };
+    }
+  }
 
   // 1. Detect Subdomain (e.g. sanmateo.setmiofinal2.vercel.app or sanmateo.localhost)
   let detectedSubdomain: string | null = null;
@@ -1383,6 +1435,45 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     if (window.location.pathname !== path) window.history.pushState({}, '', nextUrl);
   }, [isCorporateLanding, currentTenant.slug, currentView, publicPage, adminTab, playerTab]);
 
+  // Persistencia de última ruta activa para recuperación ante segundo plano
+  useEffect(() => {
+    saveLastActiveRoute({
+      view: currentView,
+      page: publicPage,
+      admin: adminTab,
+      player: playerTab,
+      isCorporate: isCorporateLanding,
+      clubSlug: currentTenant.slug,
+      tenantId: currentTenant.id,
+      pathname: typeof window !== 'undefined' ? window.location.pathname : undefined,
+    });
+  }, [currentView, publicPage, adminTab, playerTab, isCorporateLanding, currentTenant.slug, currentTenant.id]);
+
+  // Restauración garantizada ante reanudación de la app en segundo plano (visibilitychange)
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const handleVisibility = () => {
+      if (!document.hidden) {
+        const saved = getLastActiveRoute();
+        if (saved && saved.view && saved.view !== 'public') {
+          if (currentView !== saved.view) {
+            setCurrentViewState(saved.view);
+          }
+          if (saved.admin && adminTab !== saved.admin) {
+            setAdminTabState(saved.admin);
+          }
+          if (saved.player && playerTab !== saved.player) {
+            setPlayerTabState(saved.player);
+          }
+          if (isCorporateLanding) {
+            setIsCorporateLanding(false);
+          }
+        }
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+    return () => document.removeEventListener('visibilitychange', handleVisibility);
+  }, [currentView, adminTab, playerTab, isCorporateLanding]);
 
   const updateCurrentTenant = (updated: Partial<Tenant>) => {
     // Check if locked demo

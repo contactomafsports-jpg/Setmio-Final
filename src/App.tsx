@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useApp } from './context/AppContext';
+import { useApp, getLastActiveRoute } from './context/AppContext';
 import { RoleSelectorModal } from './components/common/RoleSelectorModal';
 import { Navbar } from './components/common/Navbar';
 import { Footer } from './components/common/Footer';
@@ -127,15 +127,88 @@ export function App() {
     const syncRoute = () => {
       const pathname = typeof window !== 'undefined' ? window.location.pathname : '/';
 
-      // URLs de webs públicas por entidad (/p/[slug] o /club/[slug])
+      // Restauración de ruta activa si se entra a la raíz '/'
+      if (pathname === '/') {
+        const saved = getLastActiveRoute();
+        if (saved && saved.view && saved.view !== 'public') {
+          setIsCorporateLanding(false);
+          setCurrentView(saved.view);
+          if (saved.admin) setAdminTab(saved.admin);
+          if (saved.tenantId) switchTenant(saved.tenantId);
+          return;
+        }
+      }
+
+      // URLs con prefijo de entidad (/p/[slug] o /club/[slug])
       if (pathname.startsWith('/p/') || pathname.startsWith('/club/')) {
         const prefix = pathname.startsWith('/p/') ? '/p/' : '/club/';
-        const slug = pathname.replace(prefix, '').split('/')[0];
+        const parts = pathname.replace(prefix, '').split('/');
+        const slug = parts[0];
+        const remaining = '/' + parts.slice(1).join('/');
         const target = tenants.find((t) => t.slug === slug || t.id === slug);
         if (target) {
           switchTenant(target.id);
         }
         setIsCorporateLanding(false);
+
+        // Si la ruta restante está vacía o es la raíz del club, es la web pública del club
+        if (!remaining || remaining === '/') {
+          setCurrentView('public');
+          setPublicPage('home');
+          return;
+        }
+
+        // Si la ruta restante corresponde a gestión / admin
+        if (remaining === '/gestion' || remaining.startsWith('/gestion/') || remaining === '/admin' || remaining.startsWith('/admin/')) {
+          setCurrentView('admin');
+          if (remaining.includes('/partidas')) setAdminTab('matches');
+          else if (remaining.includes('/reservas/todas') || remaining.includes('/todas-las-reservas')) setAdminTab('all_bookings');
+          else if (remaining.includes('/reservas')) setAdminTab('agenda');
+          else if (remaining.includes('/pistas') || remaining.includes('/domotica')) setAdminTab('courts_management');
+          else if (remaining.includes('/tpv')) setAdminTab('pos_cafe');
+          else if (remaining.includes('/facturacion')) setAdminTab('invoicing');
+          else if (remaining.includes('/escuela')) setAdminTab('academy');
+          else if (remaining.includes('/torneos') || remaining.includes('/competiciones')) setAdminTab('tournaments');
+          else if (remaining.includes('/tienda')) setAdminTab('shop');
+          else if (remaining.includes('/equipos')) setAdminTab('teams');
+          else if (remaining.includes('/socios') || remaining.includes('/crm') || remaining.includes('/clientes') || remaining.includes('/jugadores')) setAdminTab('customers');
+          else if (remaining.includes('/personal') || remaining.includes('/profesores')) setAdminTab('staff');
+          else if (remaining.includes('/ajustes')) setAdminTab('settings');
+          else setAdminTab('dashboard');
+          return;
+        }
+
+        // Si la ruta restante corresponde a portal de jugador
+        if (remaining.startsWith('/app') || remaining.startsWith('/jugador')) {
+          setCurrentView('player');
+          return;
+        }
+
+        // Si la ruta restante corresponde a portal de profesor
+        if (remaining.startsWith('/profesor') || remaining.startsWith('/coach')) {
+          setCurrentView('coach');
+          return;
+        }
+
+        // Si la ruta restante corresponde a la web pública del club
+        const cleanRemaining = remaining.replace(/^\//, '');
+        const clubPublicPages: Record<string, typeof publicPage> = {
+          'pistas': 'courts',
+          'escuela': 'academy',
+          'partidas': 'matches',
+          'torneos': 'tournaments',
+          'tienda': 'shop',
+          'equipos': 'teams',
+          'contacto': 'contact',
+          'reservar': 'booking',
+          'quienes-somos': 'club',
+        };
+        if (clubPublicPages[cleanRemaining]) {
+          setCurrentView('public');
+          setPublicPage(clubPublicPages[cleanRemaining]);
+          return;
+        }
+
         setCurrentView('public');
         setPublicPage('home');
         return;
