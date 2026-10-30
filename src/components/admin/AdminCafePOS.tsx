@@ -39,6 +39,8 @@ import {
   History,
   ChevronDown,
   Sliders,
+  Share2,
+  ArrowLeft,
 } from 'lucide-react';
 
 interface LinkedChargeMeta {
@@ -52,12 +54,15 @@ interface LinkedChargeMeta {
 export interface POSTransactionItem {
   id: string;
   time: string;
+  date?: string;
   concept: string;
   amount: number;
   paymentMethod: string;
   venueId?: string;
   venueName?: string;
   customerName?: string;
+  cashierName?: string;
+  items?: Array<{ name: string; qty: number; unitPrice: number; category?: string }>;
 }
 
 export const AdminCafePOS: React.FC = () => {
@@ -82,6 +87,7 @@ export const AdminCafePOS: React.FC = () => {
     isConsolidatedView,
     isClubOpen,
     toggleClubOpenState,
+    currentUser,
     t,
   } = useApp();
 
@@ -130,58 +136,90 @@ export const AdminCafePOS: React.FC = () => {
 
   const hasMultipleVenues = Boolean(isMultiVenue) && Array.isArray(venues) && venues.length > 1;
   const [posVenueFilter, setPosVenueFilter] = useState<string>('all');
+
+  // Modal: Todos los Pagos (Historial del Turno)
   const [transactionsModalOpen, setTransactionsModalOpen] = useState(false);
+  // Modal: Detalle Específico de un Pago
+  const [selectedPaymentDetail, setSelectedPaymentDetail] = useState<POSTransactionItem | null>(null);
 
   const [posTransactions, setPosTransactions] = useState<POSTransactionItem[]>([
     {
-      id: 'tx-101',
+      id: 'TX-101',
       time: '09:15',
+      date: 'Hoy',
       concept: '2x Agua Mineral + 1x Café Espresso',
       amount: 5.5,
       paymentMethod: 'Tarjeta',
       venueId: venues?.[0]?.id || 'v-1',
       venueName: venues?.[0]?.name || 'Sede Principal',
       customerName: 'Carlos Méndez',
+      cashierName: currentUser?.name || 'Recepción Mostrador',
+      items: [
+        { name: 'Agua Mineral 50cl', qty: 2, unitPrice: 1.5, category: 'Bebidas' },
+        { name: 'Café Espresso', qty: 1, unitPrice: 2.5, category: 'Café' },
+      ],
     },
     {
-      id: 'tx-102',
+      id: 'TX-102',
       time: '10:00',
+      date: 'Hoy',
       concept: 'Reserva Pista 2 (10:00) — Cuota 1/4',
       amount: 7.0,
       paymentMethod: 'Efectivo',
       venueId: venues?.[0]?.id || 'v-1',
       venueName: venues?.[0]?.name || 'Sede Principal',
       customerName: 'Diego Soto',
+      cashierName: currentUser?.name || 'Recepción Mostrador',
+      items: [
+        { name: 'Reserva Pista 2 (10:00) — Cuota 1/4', qty: 1, unitPrice: 7.0, category: 'Reserva Pista' },
+      ],
     },
     {
-      id: 'tx-103',
+      id: 'TX-103',
       time: '11:20',
+      date: 'Hoy',
       concept: 'Bote Bolas Head Pro S + 2x Powerade',
       amount: 12.0,
       paymentMethod: 'Monedero Socio',
       venueId: venues?.[1]?.id || venues?.[0]?.id || 'v-2',
       venueName: venues?.[1]?.name || 'Sede Indoor Norte',
       customerName: 'Ana Belén Vázquez',
+      cashierName: currentUser?.name || 'Recepción Mostrador',
+      items: [
+        { name: 'Bote Bolas Head Pro S', qty: 1, unitPrice: 6.0, category: 'Grip/Pelotas' },
+        { name: 'Isotónico Powerade', qty: 2, unitPrice: 3.0, category: 'Bebidas' },
+      ],
     },
     {
-      id: 'tx-104',
+      id: 'TX-104',
       time: '12:45',
+      date: 'Hoy',
       concept: 'Recarga Monedero Socio (#SM-390)',
       amount: 50.0,
       paymentMethod: 'Tarjeta',
       venueId: venues?.[0]?.id || 'v-1',
       venueName: venues?.[0]?.name || 'Sede Principal',
       customerName: 'Elena Permuy',
+      cashierName: currentUser?.name || 'Recepción Mostrador',
+      items: [
+        { name: 'Recarga Monedero Club (#SM-390)', qty: 1, unitPrice: 50.0, category: 'Monedero' },
+      ],
     },
     {
-      id: 'tx-105',
+      id: 'TX-105',
       time: '13:10',
+      date: 'Hoy',
       concept: '1x Overgrip Wilson + 1x Agua 1.5L',
       amount: 4.5,
       paymentMethod: 'Bizum / Online',
       venueId: venues?.[0]?.id || 'v-1',
       venueName: venues?.[0]?.name || 'Sede Principal',
       customerName: 'Javier Fraga',
+      cashierName: currentUser?.name || 'Recepción Mostrador',
+      items: [
+        { name: 'Overgrip Wilson Pro', qty: 1, unitPrice: 2.5, category: 'Grip/Pelotas' },
+        { name: 'Agua Mineral 1.5L', qty: 1, unitPrice: 2.0, category: 'Bebidas' },
+      ],
     },
   ]);
 
@@ -203,6 +241,9 @@ export const AdminCafePOS: React.FC = () => {
   const [editingProduct, setEditingProduct] = useState<CafeProduct | null>(null);
   const [selectedProductDetail, setSelectedProductDetail] = useState<CafeProduct | null>(null);
   const [productToDelete, setProductToDelete] = useState<CafeProduct | null>(null);
+  const [showInlineNewCategory, setShowInlineNewCategory] = useState(false);
+  const [inlineCategoryName, setInlineCategoryName] = useState('');
+
   const [productFormData, setProductFormData] = useState({
     name: '',
     category: 'Bebidas',
@@ -244,6 +285,36 @@ export const AdminCafePOS: React.FC = () => {
     if (!cat) return CATEGORY_PLACEHOLDERS['Default'];
     return CATEGORY_PLACEHOLDERS[cat] || CATEGORY_PLACEHOLDERS['Default'];
   };
+
+  // Prevenir scroll global cuando cualquier modal está abierto
+  useEffect(() => {
+    const isAnyModalOpen =
+      transactionsModalOpen ||
+      Boolean(selectedPaymentDetail) ||
+      arqueoModalOpen ||
+      catalogModalOpen ||
+      productFormModalOpen ||
+      assignModalOpen ||
+      Boolean(selectedProductDetail) ||
+      Boolean(productToDelete);
+
+    if (isAnyModalOpen) {
+      const originalOverflow = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = originalOverflow;
+      };
+    }
+  }, [
+    transactionsModalOpen,
+    selectedPaymentDetail,
+    arqueoModalOpen,
+    catalogModalOpen,
+    productFormModalOpen,
+    assignModalOpen,
+    selectedProductDetail,
+    productToDelete,
+  ]);
 
   // Sample club members for wallet assignment
   const demoMembers = [
@@ -303,6 +374,15 @@ export const AdminCafePOS: React.FC = () => {
   const [editingCategoryOld, setEditingCategoryOld] = useState<string | null>(null);
   const [editingCategoryNew, setEditingCategoryNew] = useState('');
 
+  // Estado para añadir producto ágil desde una categoría específica
+  const [addingProductToCat, setAddingProductToCat] = useState<string | null>(null);
+  const [catProductForm, setCatProductForm] = useState({
+    name: '',
+    price: 2.5,
+    stock: 50,
+    imageUrl: '',
+  });
+
   const categories = useMemo(() => ['all', ...customCategories], [customCategories]);
 
   const handleAddCategory = (e: React.FormEvent) => {
@@ -316,6 +396,23 @@ export const AdminCafePOS: React.FC = () => {
     setCustomCategories((prev) => [...prev, clean]);
     setNewCategoryName('');
     triggerDemoToast('Categoría Creada', `Categoría "${clean}" añadida con éxito.`, 'success');
+  };
+
+  const handleCreateInlineCategory = () => {
+    const clean = inlineCategoryName.trim();
+    if (!clean) return;
+    if (customCategories.some((c) => c.toLowerCase() === clean.toLowerCase())) {
+      triggerDemoToast('Aviso', 'Esta categoría ya existe.', 'warning');
+      setProductFormData((prev) => ({ ...prev, category: clean }));
+      setShowInlineNewCategory(false);
+      setInlineCategoryName('');
+      return;
+    }
+    setCustomCategories((prev) => [...prev, clean]);
+    setProductFormData((prev) => ({ ...prev, category: clean }));
+    setShowInlineNewCategory(false);
+    setInlineCategoryName('');
+    triggerDemoToast('Categoría Creada', `Categoría "${clean}" añadida y seleccionada.`, 'success');
   };
 
   const handleSaveEditCategory = (oldName: string) => {
@@ -335,6 +432,29 @@ export const AdminCafePOS: React.FC = () => {
     setCustomCategories((prev) => prev.filter((c) => c !== catName));
     if (activeCategory === catName) setActiveCategory('all');
     triggerDemoToast('Categoría Eliminada', `Categoría "${catName}" eliminada.`, 'success');
+  };
+
+  // Añadir producto rápido dentro de una categoría en su modal
+  const handleAddProductToCategorySubmit = (e: React.FormEvent, catName: string) => {
+    e.preventDefault();
+    if (!catProductForm.name.trim()) {
+      triggerDemoToast('Error', 'El nombre del producto es obligatorio.', 'warning');
+      return;
+    }
+
+    addCafeProduct({
+      name: catProductForm.name.trim(),
+      category: catName,
+      price: Number(catProductForm.price) || 2.0,
+      stock: Number(catProductForm.stock) || 30,
+      active: true,
+      imageUrl: catProductForm.imageUrl || 'https://images.unsplash.com/photo-1548839140-29a749e1bc4e?auto=format&fit=crop&w=400&q=80',
+      tenantId: currentTenant.id,
+    });
+
+    triggerDemoToast('Producto Añadido', `"${catProductForm.name}" incorporado a la categoría ${catName}.`, 'success');
+    setAddingProductToCat(null);
+    setCatProductForm({ name: '', price: 2.5, stock: 50, imageUrl: '' });
   };
 
   const filteredProducts = cafeProducts.filter(
@@ -388,14 +508,22 @@ export const AdminCafePOS: React.FC = () => {
       'Cliente Mostrador';
 
     const newTx: POSTransactionItem = {
-      id: `tx-${Date.now()}`,
+      id: `TX-${Date.now().toString().slice(-4)}`,
       time: new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }),
+      date: new Date().toLocaleDateString('es-ES'),
       concept: posCart.map((i) => `${i.qty}x ${i.product.name}`).join(', '),
       amount: cartTotal,
       paymentMethod: methodLabel,
       venueId: activeVenueObj?.id,
       venueName: activeVenueObj?.name,
       customerName: customerMeta,
+      cashierName: currentUser?.name || 'Recepción Mostrador',
+      items: posCart.map((i) => ({
+        name: i.product.name,
+        qty: i.qty,
+        unitPrice: i.product.price,
+        category: i.product.category,
+      })),
     };
 
     setPosTransactions((prev) => [newTx, ...prev]);
@@ -403,7 +531,7 @@ export const AdminCafePOS: React.FC = () => {
 
     triggerDemoToast(
       'Venta Cobrada en TPV',
-      `Ticket emitido por ${cartTotal.toFixed(2)} € pagado con ${methodLabel}. Reservas y monederos actualizados.`,
+      `Ticket #${newTx.id} emitido por ${cartTotal.toFixed(2)} € pagado con ${methodLabel}.`,
       'success'
     );
     setPosCart([]);
@@ -461,28 +589,32 @@ export const AdminCafePOS: React.FC = () => {
     ]);
 
     setAssignModalOpen(false);
-    triggerDemoToast('Cuota de Jugador Asignada', `Cuota de ${p.name} (${(p.amount || 7).toFixed(2)}€) añadida al ticket.`, 'success');
+    triggerDemoToast('Cuota Asignada a TPV', `Cuota de ${p.name} (${itemProd.price.toFixed(2)}€) añadida al ticket.`, 'success');
   };
 
-  // Assign Wallet Top-up to Cart
+  // Assign Wallet Top-up
   const handleAddWalletTopup = () => {
     if (!selectedWalletMember) return;
-    const finalAmount = customWalletInput ? parseFloat(customWalletInput) || walletAmount : walletAmount;
-    if (finalAmount <= 0) return;
+    const finalAmount = customWalletInput ? parseFloat(customWalletInput) : walletAmount;
+    if (isNaN(finalAmount) || finalAmount <= 0) {
+      triggerDemoToast('Importe no válido', 'Introduce un importe válido para la recarga.', 'warning');
+      return;
+    }
 
-    const walletProd: CafeProduct = {
+    const itemProd: CafeProduct = {
       id: `wallet-${selectedWalletMember.id}-${Date.now()}`,
-      name: `Recarga Monedero: ${selectedWalletMember.name} (#${selectedWalletMember.memberNum})`,
+      name: `Recarga Monedero Socio (${selectedWalletMember.name} - #${selectedWalletMember.memberNum})`,
       price: finalAmount,
-      category: 'Recarga Monedero',
+      category: 'Monedero',
       active: true,
       stock: 999,
+      imageUrl: 'https://images.unsplash.com/photo-1554068865-24cecd4e34b8?auto=format&fit=crop&w=400&q=80',
     };
 
     setPosCart((prev) => [
       ...prev,
       {
-        product: walletProd,
+        product: itemProd,
         qty: 1,
         meta: {
           isWalletTopup: true,
@@ -493,12 +625,10 @@ export const AdminCafePOS: React.FC = () => {
     ]);
 
     setAssignModalOpen(false);
-    setSelectedWalletMember(null);
-    setCustomWalletInput('');
-    triggerDemoToast('Recarga de Monedero en Ticket', `Carga de ${finalAmount.toFixed(2)}€ para ${selectedWalletMember.name} preparada para cobrar.`, 'success');
+    triggerDemoToast('Recarga Añadida al Ticket', `+${finalAmount.toFixed(2)} € para ${selectedWalletMember.name}.`, 'success');
   };
 
-  // Print Arqueo Ticket
+  // Print Thermal Arqueo Ticket
   const handlePrintThermalArqueo = () => {
     window.print();
   };
@@ -530,11 +660,12 @@ export const AdminCafePOS: React.FC = () => {
     setEditingProduct(null);
     setProductFormData({
       name: '',
-      category: 'Bebidas',
+      category: customCategories[0] || 'Bebidas',
       price: 2.5,
       stock: 50,
       imageUrl: 'https://images.unsplash.com/photo-1548839140-29a749e1bc4e?auto=format&fit=crop&w=400&q=80',
     });
+    setShowInlineNewCategory(false);
     setProductFormModalOpen(true);
   };
 
@@ -547,6 +678,7 @@ export const AdminCafePOS: React.FC = () => {
       stock: prod.stock,
       imageUrl: prod.imageUrl || '',
     });
+    setShowInlineNewCategory(false);
     setProductFormModalOpen(true);
   };
 
@@ -628,7 +760,7 @@ export const AdminCafePOS: React.FC = () => {
           <button
             type="button"
             onClick={openNewProductModal}
-            className="p-1 text-slate-700 dark:text-slate-300 hover:text-[#0B1A2D] dark:hover:text-[#B7F229] transition-colors cursor-pointer active:scale-95"
+            className="p-1.5 text-slate-700 dark:text-slate-300 hover:text-[#0B1A2D] dark:hover:text-[#B7F229] transition-colors cursor-pointer active:scale-95"
             title="Nuevo producto"
             aria-label="Nuevo producto"
           >
@@ -802,39 +934,39 @@ export const AdminCafePOS: React.FC = () => {
           </div>
         </div>
 
-        {/* Fila de Acciones Rápidas Simétrica (Ancho Completo de Pantalla) */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 w-full pt-1">
+        {/* Fila de Acciones Rápidas Simétrica (Ancho Completo de Pantalla, Sin Cortes de Texto) */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 w-full pt-1">
           {/* 1. Asignar Reserva */}
           <button
             type="button"
             onClick={() => setAssignModalOpen(true)}
-            className="w-full px-3 py-2.5 rounded-xl bg-[#0B1A2D] hover:bg-[#132A45] text-white font-black text-xs shadow-sm border border-[#0B1A2D] dark:border-slate-700 flex items-center justify-center gap-1.5 transition active:scale-95 cursor-pointer group whitespace-nowrap"
+            className="w-full px-3 py-2.5 rounded-xl bg-[#0B1A2D] hover:bg-[#132A45] text-white font-black text-xs shadow-sm border border-[#0B1A2D] dark:border-slate-700 flex items-center justify-center gap-2 transition active:scale-95 cursor-pointer group"
           >
             <Calendar className="w-4 h-4 text-[#B7F229] stroke-[2.5] shrink-0" />
-            <span className="whitespace-nowrap">Asignar Reserva</span>
+            <span className="font-bold">Asignar Reserva</span>
           </button>
 
-          {/* 2. Añadir Producto Rápido (Texto limpio 'Producto' con icono '+') */}
+          {/* 2. + Producto */}
           <button
             type="button"
             onClick={openNewProductModal}
-            className="w-full px-3 py-2.5 rounded-xl bg-white dark:bg-slate-800/90 hover:bg-slate-50 dark:hover:bg-slate-800 text-[#0B1A2D] dark:text-slate-200 font-bold text-xs border border-slate-200/80 dark:border-slate-700/80 shadow-2xs flex items-center justify-center gap-1.5 transition active:scale-95 cursor-pointer whitespace-nowrap"
+            className="w-full px-3 py-2.5 rounded-xl bg-white dark:bg-[#0E2239] hover:bg-slate-50 dark:hover:bg-[#132A45] text-[#0B1A2D] dark:text-slate-200 font-bold text-xs border border-slate-200/80 dark:border-[#1A314D] shadow-2xs flex items-center justify-center gap-2 transition active:scale-95 cursor-pointer"
             title="Añadir nuevo producto al mostrador"
           >
             <Plus className="w-4 h-4 text-[#8B5CF6] stroke-[2.5] shrink-0" />
-            <span className="whitespace-nowrap">Producto</span>
+            <span>+ Producto</span>
           </button>
 
-          {/* 3. Transacciones */}
+          {/* 3. Todos los Pagos */}
           <button
             type="button"
             onClick={() => setTransactionsModalOpen(true)}
-            className="w-full px-3 py-2.5 rounded-xl bg-white dark:bg-slate-800/90 hover:bg-slate-50 dark:hover:bg-slate-800 text-[#0B1A2D] dark:text-slate-200 font-bold text-xs border border-slate-200/80 dark:border-slate-700/80 shadow-2xs flex items-center justify-center gap-1.5 transition active:scale-95 cursor-pointer whitespace-nowrap"
-            title="Ver transacciones del turno"
+            className="w-full px-3 py-2.5 rounded-xl bg-white dark:bg-[#0E2239] hover:bg-slate-50 dark:hover:bg-[#132A45] text-[#0B1A2D] dark:text-slate-200 font-bold text-xs border border-slate-200/80 dark:border-[#1A314D] shadow-2xs flex items-center justify-center gap-2 transition active:scale-95 cursor-pointer"
+            title="Ver todos los pagos del turno"
           >
-            <History className="w-4 h-4 text-slate-500 shrink-0" />
-            <span className="whitespace-nowrap">Transacciones</span>
-            <span className="font-mono text-[10px] px-1.5 py-0.2 rounded-md bg-slate-100 dark:bg-slate-700 text-[#0B1A2D] dark:text-slate-200 font-black shrink-0">
+            <Receipt className="w-4 h-4 text-slate-500 shrink-0" />
+            <span>Todos los Pagos</span>
+            <span className="font-mono text-[10px] px-1.5 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-[#0B1A2D] dark:text-slate-200 font-black shrink-0">
               {filteredTransactions.length}
             </span>
           </button>
@@ -843,11 +975,11 @@ export const AdminCafePOS: React.FC = () => {
           <button
             type="button"
             onClick={() => setArqueoModalOpen(true)}
-            className="w-full px-3 py-2.5 rounded-xl bg-white dark:bg-slate-800/90 hover:bg-slate-50 dark:hover:bg-slate-800 text-[#0B1A2D] dark:text-slate-200 font-bold text-xs border border-slate-200/80 dark:border-slate-700/80 shadow-2xs flex items-center justify-center gap-1.5 transition active:scale-95 cursor-pointer whitespace-nowrap"
+            className="w-full px-3 py-2.5 rounded-xl bg-white dark:bg-[#0E2239] hover:bg-slate-50 dark:hover:bg-[#132A45] text-[#0B1A2D] dark:text-slate-200 font-bold text-xs border border-slate-200/80 dark:border-[#1A314D] shadow-2xs flex items-center justify-center gap-2 transition active:scale-95 cursor-pointer"
             title="Arqueo y cierre de turno"
           >
             <Calculator className="w-4 h-4 text-slate-500 shrink-0" />
-            <span className="whitespace-nowrap">Arqueo</span>
+            <span>Arqueo de Caja</span>
           </button>
         </div>
       </section>
@@ -959,7 +1091,7 @@ export const AdminCafePOS: React.FC = () => {
           </div>
         </div>
 
-        {/* Ticket / POS Cart Register & Últimos 5 Pagos */}
+        {/* Ticket / POS Cart Register & Últimos Pagos */}
         <div className="lg:col-span-5 space-y-4">
           <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-4 sm:p-5 shadow-sm space-y-4">
             <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
@@ -1100,16 +1232,13 @@ export const AdminCafePOS: React.FC = () => {
             </div>
           </div>
 
-          {/* Bloque de los Últimos 5 Pagos Registrados (Contenedores individuales limpios estilo Inicio & Reservas) */}
+          {/* Bloque de los Últimos Pagos Registrados (Limpio, Sin subtítulo '5 en turno', Clic abre Detalle del Pago) */}
           <div className="space-y-3 pt-2">
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-base font-bold text-[#0B1A2D] dark:text-white">
                   Últimos Pagos
                 </h3>
-                <p className="text-[11px] text-slate-400 font-medium">
-                  {posTransactions.length} en turno
-                </p>
               </div>
               <button
                 type="button"
@@ -1129,8 +1258,9 @@ export const AdminCafePOS: React.FC = () => {
                 {posTransactions.slice(0, 5).map((tx) => (
                   <div
                     key={tx.id}
-                    onClick={() => setTransactionsModalOpen(true)}
+                    onClick={() => setSelectedPaymentDetail(tx)}
                     className="p-3.5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-2xs hover:border-[#8B5CF6]/50 dark:hover:border-slate-700 transition flex items-center justify-between gap-3 text-xs cursor-pointer group"
+                    title="Haz clic para ver el detalle de este pago"
                   >
                     <div className="min-w-0 flex-1 space-y-0.5">
                       <div className="flex items-center gap-1.5">
@@ -1160,30 +1290,44 @@ export const AdminCafePOS: React.FC = () => {
       </div>
 
       {/* ======================================================================
-          2.5 MODAL: HISTORIAL Y LISTADO DE TRANSACCIONES DEL TURNO
+          2.5 MODAL FIJO: "TODOS LOS PAGOS" (HISTORIAL COMPLETO CON SCROLL INTERIOR)
           ====================================================================== */}
       {transactionsModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0B1A2D]/70 backdrop-blur-sm p-4 animate-in fade-in duration-150">
-          <div className="relative w-full max-w-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl text-slate-900 dark:text-slate-100 space-y-4 max-h-[90vh] overflow-y-auto">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 dark:border-slate-800 pb-4">
-              <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-[#8B5CF6]/10 text-[#8B5CF6] flex items-center justify-center font-bold">
-                  <History className="w-5 h-5 text-[#8B5CF6]" />
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0B1A2D]/75 backdrop-blur-sm p-4 overflow-hidden animate-in fade-in duration-150">
+          <div className="relative w-full max-w-3xl bg-white dark:bg-[#0E2239] border border-slate-200/90 dark:border-[#1A314D] rounded-3xl shadow-2xl text-slate-900 dark:text-slate-100 flex flex-col max-h-[88vh] overflow-hidden">
+            {/* Header Fijo con X perfectamente alineada a la derecha */}
+            <div className="p-5 sm:p-6 border-b border-slate-100 dark:border-[#1A314D] flex items-center justify-between gap-3 shrink-0">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="w-10 h-10 rounded-2xl bg-[#8B5CF6]/10 text-[#8B5CF6] flex items-center justify-center font-bold shrink-0">
+                  <Receipt className="w-5 h-5 text-[#8B5CF6]" />
                 </div>
-                <div>
-                  <h3 className="text-lg font-black text-[#0B1A2D] dark:text-white">
-                    Transacciones y Tickets del Turno
-                  </h3>
-                  <p className="text-xs text-slate-500">
-                    Registro de cobros emitidos en TPV de cafetería, reservas y recargas
-                  </p>
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-lg font-black text-[#0B1A2D] dark:text-white truncate">
+                      Todos los Pagos
+                    </h3>
+                    <span className="px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-[#0B1A2D] dark:text-slate-300 font-mono text-[10px] font-black">
+                      {filteredTransactions.length}
+                    </span>
+                  </div>
+                  {/* Resumen simplificado de sede y empleado/usuario del turno */}
+                  <div className="flex flex-wrap items-center gap-2 pt-0.5 text-xs text-slate-500 dark:text-slate-400">
+                    <span className="inline-flex items-center gap-1 font-medium">
+                      <Building2 className="w-3.5 h-3.5 text-[#8B5CF6]" />
+                      <span>{hasMultipleVenues && posVenueFilter !== 'all' ? (venues.find(v => v.id === posVenueFilter)?.name || selectedVenue.name) : (isConsolidatedView ? 'Todas las sedes' : selectedVenue.name)}</span>
+                    </span>
+                    <span>·</span>
+                    <span className="inline-flex items-center gap-1 font-medium text-slate-700 dark:text-slate-300">
+                      <User className="w-3.5 h-3.5 text-[#82b805] dark:text-[#B7F229]" />
+                      <span>Atendido por: <strong>{currentUser?.name || 'Recepción Mostrador'}</strong></span>
+                    </span>
+                  </div>
                 </div>
               </div>
 
-              <div className="flex items-center gap-2">
-                {/* Filtro de sede dentro del modal si es multi-sede */}
+              <div className="flex items-center gap-2 shrink-0">
                 {hasMultipleVenues && (
-                  <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-xs font-bold border border-slate-200/80 dark:border-slate-700/80">
+                  <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-xs font-bold border border-slate-200/80 dark:border-slate-700/80">
                     <Building2 className="w-3.5 h-3.5 text-[#8B5CF6] shrink-0" />
                     <select
                       value={posVenueFilter}
@@ -1203,55 +1347,76 @@ export const AdminCafePOS: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setTransactionsModalOpen(false)}
-                  className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+                  className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+                  title="Cerrar ventana"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
             </div>
 
-            {/* Listado de Transacciones */}
-            {filteredTransactions.length === 0 ? (
-              <div className="p-8 text-center text-slate-500 text-xs">
-                No hay transacciones registradas para la sede seleccionada en este turno.
-              </div>
-            ) : (
-              <div className="divide-y divide-slate-100 dark:divide-slate-800/80">
-                {filteredTransactions.map((tx) => (
-                  <div key={tx.id} className="py-3 flex items-center justify-between gap-4 text-xs">
-                    <div className="min-w-0 flex-1 space-y-0.5">
+            {/* Listado de Pagos con Scroll Interior Controlado */}
+            <div className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-2.5 overscroll-contain">
+              {filteredTransactions.length === 0 ? (
+                <div className="p-12 text-center text-slate-400 text-xs">
+                  <Receipt className="w-10 h-10 mx-auto mb-2 opacity-40 text-slate-400" />
+                  No hay transacciones registradas en este turno.
+                </div>
+              ) : (
+                filteredTransactions.map((tx) => (
+                  <div
+                    key={tx.id}
+                    onClick={() => {
+                      setSelectedPaymentDetail(tx);
+                    }}
+                    className="p-3.5 rounded-2xl bg-slate-50/80 dark:bg-[#071220]/60 hover:bg-white dark:hover:bg-[#132A45] border border-slate-200/80 dark:border-[#1A314D] transition-all flex items-center justify-between gap-4 text-xs cursor-pointer group shadow-2xs hover:shadow-sm"
+                    title="Haz clic para abrir los detalles específicos de este pago"
+                  >
+                    <div className="min-w-0 flex-1 space-y-1">
                       <div className="flex items-center gap-2">
-                        <span className="font-mono font-bold text-slate-400 text-[11px]">{tx.time}</span>
-                        <span className="font-bold text-[#0B1A2D] dark:text-white truncate">{tx.concept}</span>
-                        {hasMultipleVenues && tx.venueName && (
-                          <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
-                            {tx.venueName}
-                          </span>
-                        )}
+                        <span className="font-mono font-bold text-slate-400 text-[11px] shrink-0">{tx.time}</span>
+                        <span className="font-mono font-black text-[10px] px-1.5 py-0.5 rounded bg-slate-200/80 dark:bg-slate-800 text-slate-700 dark:text-slate-300 shrink-0">
+                          #{tx.id}
+                        </span>
+                        <span className="font-bold text-[#0B1A2D] dark:text-white truncate group-hover:text-[#8B5CF6] transition-colors">
+                          {tx.concept}
+                        </span>
                       </div>
                       <div className="text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-2">
-                        <span>{tx.customerName || 'Cliente Mostrador'}</span>
+                        <span className="font-semibold text-slate-700 dark:text-slate-300">{tx.customerName || 'Cliente Mostrador'}</span>
                         <span>·</span>
                         <span className="text-[#8B5CF6] font-medium">{tx.paymentMethod}</span>
+                        {tx.venueName && (
+                          <>
+                            <span>·</span>
+                            <span className="text-slate-400 text-[10px]">{tx.venueName}</span>
+                          </>
+                        )}
                       </div>
                     </div>
 
-                    <div className="text-right shrink-0">
-                      <div className="font-mono font-black text-sm text-[#0B1A2D] dark:text-[#B7F229]">
-                        +{tx.amount.toFixed(2)} €
+                    <div className="text-right shrink-0 flex items-center gap-3">
+                      <div>
+                        <div className="font-mono font-black text-sm text-[#0B1A2D] dark:text-[#B7F229]">
+                          +{tx.amount.toFixed(2)} €
+                        </div>
+                        <span className="text-[9px] font-black text-[#0B1A2D] bg-[#B7F229] px-1.5 py-0.5 rounded shadow-2xs">
+                          Cobrado
+                        </span>
                       </div>
-                      <div className="text-[10px] text-slate-400 font-mono">OK / Cobrado</div>
+                      <ArrowRight className="w-4 h-4 text-slate-300 group-hover:text-[#8B5CF6] group-hover:translate-x-0.5 transition-transform" />
                     </div>
                   </div>
-                ))}
-              </div>
-            )}
+                ))
+              )}
+            </div>
 
-            <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs">
+            {/* Footer Fijo con Totalizador */}
+            <div className="p-4 sm:p-5 border-t border-slate-100 dark:border-[#1A314D] flex items-center justify-between text-xs bg-slate-50/60 dark:bg-[#071220]/50 shrink-0">
               <span className="text-slate-500 font-semibold">
-                Total Transacciones Mostradas ({filteredTransactions.length}):
+                Total en turno ({filteredTransactions.length} pagos):
               </span>
-              <span className="font-mono font-black text-base text-[#0B1A2D] dark:text-white">
+              <span className="font-mono font-black text-lg text-[#0B1A2D] dark:text-white">
                 {filteredTransactions.reduce((acc, t) => acc + t.amount, 0).toFixed(2)} €
               </span>
             </div>
@@ -1260,12 +1425,201 @@ export const AdminCafePOS: React.FC = () => {
       )}
 
       {/* ======================================================================
-          3. MODAL: CIERRE / ARQUEO DE CAJA DEL TURNO
+          2.6 MODAL: PÁGINA DE DETALLES ESPECÍFICOS DEL PAGO SELECCIONADO
+          ====================================================================== */}
+      {selectedPaymentDetail && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0B1A2D]/80 backdrop-blur-sm p-4 overflow-hidden animate-in fade-in duration-150">
+          <div className="relative w-full max-w-lg bg-white dark:bg-[#0E2239] border border-slate-200/90 dark:border-[#1A314D] rounded-3xl shadow-2xl text-slate-900 dark:text-slate-100 flex flex-col max-h-[90vh] overflow-hidden">
+            {/* Header */}
+            <div className="p-5 border-b border-slate-100 dark:border-[#1A314D] flex items-center justify-between shrink-0">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-[#8B5CF6]/10 text-[#8B5CF6] flex items-center justify-center font-bold">
+                  <Receipt className="w-5 h-5 text-[#8B5CF6]" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-base font-black text-[#0B1A2D] dark:text-white">
+                      Detalle del Pago #{selectedPaymentDetail.id}
+                    </h3>
+                    <span className="px-2 py-0.5 rounded-full bg-[#F0FCCF] dark:bg-[#B7F229]/20 text-[#0B1A2D] dark:text-[#B7F229] border border-[#B7F229]/50 font-black text-[9px] uppercase tracking-wider">
+                      Completado
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-slate-400">
+                    {selectedPaymentDetail.date || 'Hoy'} · {selectedPaymentDetail.time}
+                  </p>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setSelectedPaymentDetail(null)}
+                className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Contenido con scroll interior */}
+            <div className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-4 overscroll-contain">
+              {/* Tarjeta de Importe Destacado */}
+              <div className="p-4 rounded-2xl bg-[#0B1A2D] text-white border border-[#1A314D] shadow-sm flex items-center justify-between">
+                <div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-300 block">
+                    Importe Cobrado
+                  </span>
+                  <div className="text-2xl sm:text-3xl font-black font-mono text-[#B7F229] mt-0.5">
+                    {selectedPaymentDetail.amount.toFixed(2)} €
+                  </div>
+                </div>
+                <div className="text-right text-xs">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
+                    Método
+                  </span>
+                  <span className="font-bold text-white inline-flex items-center gap-1.5 mt-0.5">
+                    <CreditCard className="w-3.5 h-3.5 text-[#B7F229]" />
+                    {selectedPaymentDetail.paymentMethod}
+                  </span>
+                </div>
+              </div>
+
+              {/* Ficha Resumen de Sede, Atendido por y Cliente */}
+              <div className="grid grid-cols-2 gap-2.5 text-xs">
+                <div className="p-3 rounded-xl bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] space-y-0.5">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
+                    Sede
+                  </span>
+                  <div className="font-bold text-[#0B1A2D] dark:text-white truncate">
+                    {selectedPaymentDetail.venueName || selectedVenue.name}
+                  </div>
+                </div>
+
+                <div className="p-3 rounded-xl bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] space-y-0.5">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
+                    Atendido por
+                  </span>
+                  <div className="font-bold text-[#0B1A2D] dark:text-white truncate">
+                    {selectedPaymentDetail.cashierName || currentUser?.name || 'Recepción Mostrador'}
+                  </div>
+                </div>
+
+                <div className="p-3 rounded-xl bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] space-y-0.5">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
+                    Cliente / Socio
+                  </span>
+                  <div className="font-bold text-[#0B1A2D] dark:text-white truncate">
+                    {selectedPaymentDetail.customerName || 'Cliente Mostrador'}
+                  </div>
+                </div>
+
+                <div className="p-3 rounded-xl bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] space-y-0.5">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
+                    Terminal / TPV
+                  </span>
+                  <div className="font-bold text-[#0B1A2D] dark:text-white truncate">
+                    Caja Mostrador #01
+                  </div>
+                </div>
+              </div>
+
+              {/* Desglose de Conceptos / Artículos */}
+              <div className="space-y-2">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500">
+                  Líneas de Detalle del Ticket
+                </h4>
+                <div className="rounded-2xl bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] p-3 divide-y divide-slate-200/60 dark:divide-slate-800 text-xs">
+                  {selectedPaymentDetail.items && selectedPaymentDetail.items.length > 0 ? (
+                    selectedPaymentDetail.items.map((item, idx) => (
+                      <div key={idx} className="py-2 first:pt-0 last:pb-0 flex items-center justify-between gap-3">
+                        <div className="min-w-0">
+                          <div className="font-bold text-[#0B1A2D] dark:text-white truncate">
+                            {item.name}
+                          </div>
+                          <div className="text-[10px] text-slate-400">
+                            {item.qty} ud. x {item.unitPrice.toFixed(2)} €
+                          </div>
+                        </div>
+                        <div className="font-mono font-bold text-[#0B1A2D] dark:text-white">
+                          {(item.qty * item.unitPrice).toFixed(2)} €
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="py-1 flex items-center justify-between">
+                      <span className="font-bold text-[#0B1A2D] dark:text-white">
+                        {selectedPaymentDetail.concept}
+                      </span>
+                      <span className="font-mono font-bold text-[#0B1A2D] dark:text-white">
+                        {selectedPaymentDetail.amount.toFixed(2)} €
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Totales e Impuestos */}
+              <div className="p-3 rounded-xl bg-slate-100/70 dark:bg-slate-800/40 text-xs space-y-1.5">
+                <div className="flex justify-between text-slate-500">
+                  <span>Base Imponible:</span>
+                  <span className="font-mono">{(selectedPaymentDetail.amount / 1.10).toFixed(2)} €</span>
+                </div>
+                <div className="flex justify-between text-slate-500">
+                  <span>IVA Incluido (10% / 21%):</span>
+                  <span className="font-mono">{(selectedPaymentDetail.amount - (selectedPaymentDetail.amount / 1.10)).toFixed(2)} €</span>
+                </div>
+                <div className="flex justify-between font-black text-[#0B1A2D] dark:text-white pt-1 border-t border-slate-200/80 dark:border-slate-700">
+                  <span>Total Cobrado:</span>
+                  <span className="font-mono text-sm">{selectedPaymentDetail.amount.toFixed(2)} €</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Footer con acciones de impresión y retorno */}
+            <div className="p-4 sm:p-5 border-t border-slate-100 dark:border-[#1A314D] flex flex-wrap items-center justify-between gap-2.5 bg-slate-50/60 dark:bg-[#071220]/50 shrink-0">
+              <button
+                type="button"
+                onClick={() => {
+                  window.print();
+                }}
+                className="px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-[#0B1A2D] dark:text-slate-200 font-bold text-xs flex items-center gap-1.5 transition cursor-pointer"
+              >
+                <Printer className="w-3.5 h-3.5 text-slate-500" />
+                <span>Imprimir Recibo</span>
+              </button>
+
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    triggerDemoToast('Recibo Enviado', `Comprobante digital enviado a ${selectedPaymentDetail.customerName || 'cliente'}.`, 'success');
+                  }}
+                  className="px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-[#0B1A2D] dark:text-slate-200 font-bold text-xs flex items-center gap-1.5 transition cursor-pointer"
+                >
+                  <Share2 className="w-3.5 h-3.5 text-[#8B5CF6]" />
+                  <span>Enviar Recibo</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setSelectedPaymentDetail(null)}
+                  className="px-4 py-2 rounded-xl bg-[#0B1A2D] dark:bg-white text-white dark:text-[#0B1A2D] font-bold text-xs transition cursor-pointer"
+                >
+                  Cerrar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ======================================================================
+          3. MODAL: CIERRE / ARQUEO DE CAJA DEL TURNO (REDISENO MINIMALISTA ELEGANTE)
           ====================================================================== */}
       {arqueoModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0B1A2D]/70 backdrop-blur-sm p-4 animate-in fade-in duration-150">
-          <div className="relative w-full max-w-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl text-slate-900 dark:text-slate-100 space-y-5 max-h-[92vh] overflow-y-auto">
-            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0B1A2D]/75 backdrop-blur-sm p-4 overflow-hidden animate-in fade-in duration-150">
+          <div className="relative w-full max-w-xl bg-white dark:bg-[#0E2239] border border-slate-200/90 dark:border-[#1A314D] rounded-3xl shadow-2xl text-slate-900 dark:text-slate-100 flex flex-col max-h-[90vh] overflow-hidden">
+            {/* Header Fijo con X correctamente alineada */}
+            <div className="p-5 sm:p-6 border-b border-slate-100 dark:border-[#1A314D] flex items-center justify-between shrink-0">
               <div className="flex items-center gap-2.5">
                 <div className="w-9 h-9 rounded-xl bg-[#8B5CF6]/10 text-[#8B5CF6] flex items-center justify-center font-bold">
                   <Calculator className="w-5 h-5 text-[#8B5CF6]" />
@@ -1283,121 +1637,141 @@ export const AdminCafePOS: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setArqueoModalOpen(false)}
-                className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+                className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+                title="Cerrar ventana"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            {/* Total general del turno */}
-            <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800 flex items-center justify-between">
-              <div>
-                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block">
-                  Total Recaudado en Turno
-                </span>
-                <div className="text-3xl font-black font-mono text-[#0B1A2D] dark:text-white mt-0.5">
-                  {sessionSalesTotal.toFixed(2)} €
-                </div>
-              </div>
-              <div className="text-right text-xs space-y-0.5">
-                <div className="text-slate-500">Fecha: {new Date().toLocaleDateString('es-ES')}</div>
-                <div className="font-mono text-[#8B5CF6] font-bold">Turno Abierto: 08:30</div>
-              </div>
-            </div>
-
-            {/* Desglose por Método de Pago */}
-            <div className="space-y-2">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500">
-                Desglose por Método de Pago
-              </h4>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-                <div className="p-3 rounded-xl bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/80 space-y-1">
-                  <div className="flex items-center justify-between text-xs text-slate-500">
-                    <span className="flex items-center gap-1 font-bold text-slate-700 dark:text-slate-300">
-                      <CreditCard className="w-3.5 h-3.5 text-[#8B5CF6]" /> TPV / Tarjeta
-                    </span>
-                  </div>
-                  <div className="text-lg font-mono font-black text-[#0B1A2D] dark:text-white">
-                    {(sessionSalesTotal * 0.58).toFixed(2)} €
-                  </div>
-                  <div className="text-[10px] text-slate-400">58% de las operaciones</div>
-                </div>
-
-                <div className="p-3 rounded-xl bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/80 space-y-1">
-                  <div className="flex items-center justify-between text-xs text-slate-500">
-                    <span className="flex items-center gap-1 font-bold text-slate-700 dark:text-slate-300">
-                      <Banknote className="w-3.5 h-3.5 text-emerald-500" /> Efectivo
-                    </span>
-                  </div>
-                  <div className="text-lg font-mono font-black text-[#0B1A2D] dark:text-white">
-                    {(sessionSalesTotal * 0.28).toFixed(2)} €
-                  </div>
-                  <div className="text-[10px] text-slate-400">Cajón portamonedas</div>
-                </div>
-
-                <div className="p-3 rounded-xl bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/80 space-y-1">
-                  <div className="flex items-center justify-between text-xs text-slate-500">
-                    <span className="flex items-center gap-1 font-bold text-slate-700 dark:text-slate-300">
-                      <Wallet className="w-3.5 h-3.5 text-purple-500" /> Monedero
-                    </span>
-                  </div>
-                  <div className="text-lg font-mono font-black text-[#0B1A2D] dark:text-white">
-                    {(sessionSalesTotal * 0.14).toFixed(2)} €
-                  </div>
-                  <div className="text-[10px] text-slate-400">Saldo de socios</div>
-                </div>
-              </div>
-            </div>
-
-            {/* Métricas por Categoría */}
-            <div className="space-y-2">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500">
-                Ventas por Categoría
-              </h4>
-              <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 space-y-2 text-xs">
-                <div className="flex justify-between items-center pb-1.5 border-b border-slate-200/60 dark:border-slate-800">
-                  <span className="text-slate-700 dark:text-slate-300 font-medium">Bebidas & Snacks</span>
-                  <span className="font-mono font-bold">{(sessionSalesTotal * 0.32).toFixed(2)} €</span>
-                </div>
-                <div className="flex justify-between items-center pb-1.5 border-b border-slate-200/60 dark:border-slate-800">
-                  <span className="text-slate-700 dark:text-slate-300 font-medium">Cafetería & Desayunos</span>
-                  <span className="font-mono font-bold">{(sessionSalesTotal * 0.16).toFixed(2)} €</span>
-                </div>
-                <div className="flex justify-between items-center pb-1.5 border-b border-slate-200/60 dark:border-slate-800">
-                  <span className="text-slate-700 dark:text-slate-300 font-medium">Reservas de Pistas Cobradas</span>
-                  <span className="font-mono font-bold text-[#0B1A2D] dark:text-[#B7F229]">
-                    {(sessionSalesTotal * 0.38).toFixed(2)} €
+            {/* Contenedor Superior de Resumen de Arqueo Rediseñado (Minimalista y Elegante) */}
+            <div className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-4 overscroll-contain">
+              <div className="p-5 rounded-2xl bg-[#0B1A2D] text-white border border-[#1A314D] shadow-md space-y-3">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="font-bold text-slate-300 uppercase tracking-wider text-[10px]">
+                    Total Recaudado en Turno
+                  </span>
+                  <span className="px-2.5 py-0.5 rounded-full bg-[#B7F229] text-[#0B1A2D] font-black text-[10px] tracking-wider uppercase shadow-2xs">
+                    Turno Activo
                   </span>
                 </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-slate-700 dark:text-slate-300 font-medium">Recargas de Saldo y Material</span>
-                  <span className="font-mono font-bold">{(sessionSalesTotal * 0.14).toFixed(2)} €</span>
+                <div className="flex items-baseline justify-between">
+                  <div className="text-3xl sm:text-4xl font-black font-mono text-[#B7F229] tracking-tight">
+                    {sessionSalesTotal.toFixed(2)} €
+                  </div>
+                  <div className="text-right text-[11px] text-slate-300 space-y-0.5">
+                    <div>{new Date().toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short' })}</div>
+                    <div className="font-mono text-slate-300">Apertura: 08:30 h</div>
+                  </div>
+                </div>
+                <div className="pt-2.5 border-t border-white/10 flex flex-wrap items-center justify-between text-[11px] text-slate-300 gap-2">
+                  <div className="flex items-center gap-1.5">
+                    <Building2 className="w-3.5 h-3.5 text-[#B7F229]" />
+                    <span>{isConsolidatedView ? 'Todas las Sedes' : selectedVenue.name}</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <User className="w-3.5 h-3.5 text-[#8B5CF6]" />
+                    <span>Responsable: {currentUser?.name || 'Recepción Mostrador'}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Desglose por Método de Pago */}
+              <div className="space-y-2">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500">
+                  Desglose por Método de Pago
+                </h4>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                  <div className="p-3 rounded-xl bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] space-y-1">
+                    <div className="flex items-center justify-between text-xs text-slate-500">
+                      <span className="flex items-center gap-1 font-bold text-slate-700 dark:text-slate-300">
+                        <CreditCard className="w-3.5 h-3.5 text-[#8B5CF6]" /> TPV / Tarjeta
+                      </span>
+                    </div>
+                    <div className="text-lg font-mono font-black text-[#0B1A2D] dark:text-white">
+                      {(sessionSalesTotal * 0.58).toFixed(2)} €
+                    </div>
+                    <div className="text-[10px] text-slate-400">58% de las operaciones</div>
+                  </div>
+
+                  <div className="p-3 rounded-xl bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] space-y-1">
+                    <div className="flex items-center justify-between text-xs text-slate-500">
+                      <span className="flex items-center gap-1 font-bold text-slate-700 dark:text-slate-300">
+                        <Banknote className="w-3.5 h-3.5 text-emerald-500" /> Efectivo
+                      </span>
+                    </div>
+                    <div className="text-lg font-mono font-black text-[#0B1A2D] dark:text-white">
+                      {(sessionSalesTotal * 0.28).toFixed(2)} €
+                    </div>
+                    <div className="text-[10px] text-slate-400">Cajón portamonedas</div>
+                  </div>
+
+                  <div className="p-3 rounded-xl bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] space-y-1">
+                    <div className="flex items-center justify-between text-xs text-slate-500">
+                      <span className="flex items-center gap-1 font-bold text-slate-700 dark:text-slate-300">
+                        <Wallet className="w-3.5 h-3.5 text-purple-500" /> Monedero
+                      </span>
+                    </div>
+                    <div className="text-lg font-mono font-black text-[#0B1A2D] dark:text-white">
+                      {(sessionSalesTotal * 0.14).toFixed(2)} €
+                    </div>
+                    <div className="text-[10px] text-slate-400">Saldo de socios</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Métricas por Categoría */}
+              <div className="space-y-2">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500">
+                  Ventas por Categoría
+                </h4>
+                <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] space-y-2 text-xs">
+                  <div className="flex justify-between items-center pb-1.5 border-b border-slate-200/60 dark:border-slate-800">
+                    <span className="text-slate-700 dark:text-slate-300 font-medium">Bebidas & Snacks</span>
+                    <span className="font-mono font-bold">{(sessionSalesTotal * 0.32).toFixed(2)} €</span>
+                  </div>
+                  <div className="flex justify-between items-center pb-1.5 border-b border-slate-200/60 dark:border-slate-800">
+                    <span className="text-slate-700 dark:text-slate-300 font-medium">Cafetería & Desayunos</span>
+                    <span className="font-mono font-bold">{(sessionSalesTotal * 0.16).toFixed(2)} €</span>
+                  </div>
+                  <div className="flex justify-between items-center pb-1.5 border-b border-slate-200/60 dark:border-slate-800">
+                    <span className="text-slate-700 dark:text-slate-300 font-medium">Reservas de Pistas Cobradas</span>
+                    <span className="font-mono font-bold text-[#0B1A2D] dark:text-[#B7F229]">
+                      {(sessionSalesTotal * 0.38).toFixed(2)} €
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-700 dark:text-slate-300 font-medium">Recargas de Saldo y Material</span>
+                    <span className="font-mono font-bold">{(sessionSalesTotal * 0.14).toFixed(2)} €</span>
+                  </div>
                 </div>
               </div>
             </div>
 
-            {/* Acciones de Impresión y Exportación */}
-            <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-2.5">
-              <div className="flex items-center gap-2">
+            {/* Footer de Arqueo: Fila superior de 2 botones y botón inferior "Cerrar Turno Oficial" ocupando exactamente el mismo ancho total */}
+            <div className="p-5 border-t border-slate-100 dark:border-[#1A314D] space-y-2.5 bg-slate-50/60 dark:bg-[#071220]/50 shrink-0">
+              {/* Fila Superior: 2 botones en grid de ancho total */}
+              <div className="grid grid-cols-2 gap-3 w-full">
                 <button
                   type="button"
                   onClick={handleExportArqueoCSV}
-                  className="px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-[#0B1A2D] dark:text-slate-200 font-bold text-xs flex items-center gap-1.5 transition cursor-pointer"
+                  className="w-full px-3 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-[#0B1A2D] dark:text-slate-200 font-bold text-xs flex items-center justify-center gap-1.5 transition cursor-pointer"
                 >
-                  <Download className="w-3.5 h-3.5 text-[#8B5CF6]" />
-                  <span>Exportar CSV/PDF</span>
+                  <Download className="w-4 h-4 text-[#8B5CF6] shrink-0" />
+                  <span className="truncate">Exportar CSV/PDF</span>
                 </button>
 
                 <button
                   type="button"
                   onClick={handlePrintThermalArqueo}
-                  className="px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-[#0B1A2D] dark:text-slate-200 font-bold text-xs flex items-center gap-1.5 transition cursor-pointer"
+                  className="w-full px-3 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-[#0B1A2D] dark:text-slate-200 font-bold text-xs flex items-center justify-center gap-1.5 transition cursor-pointer"
                 >
-                  <Printer className="w-3.5 h-3.5 text-slate-500" />
-                  <span>Imprimir Ticket (80mm)</span>
+                  <Printer className="w-4 h-4 text-slate-500 shrink-0" />
+                  <span className="truncate">Imprimir Ticket (80mm)</span>
                 </button>
               </div>
 
+              {/* Botón Inferior: Exactamente el mismo ancho total (w-full) en Azul Profundo #0B1A2D con texto en Verde Lima #B7F229 */}
               <button
                 type="button"
                 onClick={() => {
@@ -1405,7 +1779,7 @@ export const AdminCafePOS: React.FC = () => {
                   setArqueoModalOpen(false);
                   triggerDemoToast('Caja Cerrada', 'El turno ha sido cerrado y el contador de caja reiniciado a 0.00 €.', 'success');
                 }}
-                className="px-4 py-2 rounded-xl bg-[#B7F229] hover:bg-[#a6e61f] text-[#0B1A2D] font-black text-xs shadow-xs flex items-center gap-1.5 transition cursor-pointer active:scale-95"
+                className="w-full py-3 rounded-xl bg-[#0B1A2D] dark:bg-[#071220] hover:bg-[#132A45] dark:hover:bg-[#0E2239] text-[#B7F229] border border-[#0B1A2D] dark:border-[#1A314D] font-black text-xs sm:text-sm shadow-md flex items-center justify-center gap-2 transition cursor-pointer active:scale-[0.99]"
               >
                 <Check className="w-4 h-4 stroke-[2.5]" />
                 <span>Cerrar Turno Oficial</span>
@@ -1419,8 +1793,8 @@ export const AdminCafePOS: React.FC = () => {
           4. MODAL: GESTIÓN DE CATÁLOGO DE PRODUCTOS (CRUD)
           ====================================================================== */}
       {catalogModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0B1A2D]/70 backdrop-blur-sm p-4 animate-in fade-in duration-150">
-          <div className="relative w-full max-w-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl text-slate-900 dark:text-slate-100 space-y-4 max-h-[92vh] overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0B1A2D]/75 backdrop-blur-sm p-4 overflow-hidden animate-in fade-in duration-150">
+          <div className="relative w-full max-w-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl text-slate-900 dark:text-slate-100 space-y-4 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
               <div className="flex items-center gap-2">
                 <div className="p-1.5 rounded-lg bg-[#8B5CF6]/10 text-[#8B5CF6]">
@@ -1443,13 +1817,13 @@ export const AdminCafePOS: React.FC = () => {
                   className="px-3 py-1.5 rounded-xl bg-[#B7F229] hover:bg-[#a6e61f] text-[#0B1A2D] font-black text-xs shadow-xs flex items-center gap-1 cursor-pointer active:scale-95"
                 >
                   <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
-                  <span>Nuevo Producto</span>
+                  <span>+ Producto</span>
                 </button>
 
                 <button
                   type="button"
                   onClick={() => setCatalogModalOpen(false)}
-                  className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-white"
+                  className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-white cursor-pointer"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -1523,52 +1897,89 @@ export const AdminCafePOS: React.FC = () => {
         </div>
       )}
 
-      {/* MODAL CREAR / EDITAR PRODUCTO */}
+      {/* ======================================================================
+          FORMULARIO NUEVO / EDITAR PRODUCTO (CON SELECTOR DE CATEGORÍA OBLIGATORIO Y ACCESO DIRECTO PARA CREAR NUEVA)
+          ====================================================================== */}
       {productFormModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0B1A2D]/70 backdrop-blur-sm p-4 animate-in fade-in duration-150">
-          <div className="relative w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl text-slate-900 dark:text-slate-100 space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0B1A2D]/75 backdrop-blur-sm p-4 overflow-hidden animate-in fade-in duration-150">
+          <div className="relative w-full max-w-md bg-white dark:bg-[#0E2239] border border-slate-200 dark:border-[#1A314D] rounded-3xl p-6 shadow-2xl text-slate-900 dark:text-slate-100 space-y-4 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-[#1A314D] pb-3">
               <h3 className="text-base font-black text-[#0B1A2D] dark:text-white">
                 {editingProduct ? 'Editar Producto TPV' : 'Nuevo Producto TPV'}
               </h3>
               <button
                 type="button"
                 onClick={() => setProductFormModalOpen(false)}
-                className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-white"
+                className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-white cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleSaveProductSubmit} className="space-y-3 text-xs">
+            <form onSubmit={handleSaveProductSubmit} className="space-y-3.5 text-xs">
               <div>
-                <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">Nombre</label>
+                <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">Nombre del Producto</label>
                 <input
                   type="text"
                   required
                   value={productFormData.name}
                   onChange={(e) => setProductFormData({ ...productFormData, name: e.target.value })}
                   placeholder="Ej: Zumo de Naranja Natural"
-                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-[#8B5CF6]"
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-[#071220] border border-slate-200 dark:border-[#1A314D] rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-[#8B5CF6]"
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">Categoría</label>
-                  <select
-                    value={productFormData.category}
-                    onChange={(e) => setProductFormData({ ...productFormData, category: e.target.value })}
-                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-[#8B5CF6]"
+              {/* Selector Obligatorio de Categoría + Acceso Directo Limpio para Crear Nueva Categoría */}
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="block font-bold text-slate-700 dark:text-slate-300">
+                    Categoría <span className="text-rose-500">*</span>
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => setShowInlineNewCategory(!showInlineNewCategory)}
+                    className="text-[11px] font-bold text-[#8B5CF6] hover:text-[#7c3aed] flex items-center gap-1 cursor-pointer"
                   >
-                    <option value="Bebidas">Bebidas</option>
-                    <option value="Café">Café</option>
-                    <option value="Snacks">Snacks</option>
-                    <option value="Bocadillos">Bocadillos</option>
-                    <option value="Grip/Pelotas">Grip/Pelotas</option>
-                  </select>
+                    <Plus className="w-3 h-3 stroke-[2.5]" />
+                    <span>{showInlineNewCategory ? 'Cancelar' : '+ Nueva Categoría'}</span>
+                  </button>
                 </div>
 
+                {showInlineNewCategory ? (
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      placeholder="Nombre de la nueva categoría..."
+                      value={inlineCategoryName}
+                      onChange={(e) => setInlineCategoryName(e.target.value)}
+                      className="flex-1 px-3 py-2 bg-slate-50 dark:bg-[#071220] border border-[#8B5CF6] rounded-xl text-xs font-semibold text-slate-900 dark:text-white focus:outline-none"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleCreateInlineCategory}
+                      className="px-3.5 py-2 bg-[#0B1A2D] hover:bg-[#132A45] text-white rounded-xl font-bold text-xs flex items-center gap-1 cursor-pointer shrink-0"
+                    >
+                      <Check className="w-3.5 h-3.5 text-[#B7F229]" />
+                      <span>Crear</span>
+                    </button>
+                  </div>
+                ) : (
+                  <select
+                    required
+                    value={productFormData.category}
+                    onChange={(e) => setProductFormData({ ...productFormData, category: e.target.value })}
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-[#071220] border border-slate-200 dark:border-[#1A314D] rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-[#8B5CF6] font-semibold"
+                  >
+                    {customCategories.map((c) => (
+                      <option key={c} value={c}>
+                        {c}
+                      </option>
+                    ))}
+                  </select>
+                )}
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">Precio (€)</label>
                   <input
@@ -1577,24 +1988,24 @@ export const AdminCafePOS: React.FC = () => {
                     required
                     value={productFormData.price}
                     onChange={(e) => setProductFormData({ ...productFormData, price: parseFloat(e.target.value) || 0 })}
-                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl font-mono text-slate-900 dark:text-white focus:outline-none focus:border-[#8B5CF6]"
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-[#071220] border border-slate-200 dark:border-[#1A314D] rounded-xl font-mono text-slate-900 dark:text-white focus:outline-none focus:border-[#8B5CF6]"
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">Stock Inicial (uds)</label>
+                  <input
+                    type="number"
+                    value={productFormData.stock}
+                    onChange={(e) => setProductFormData({ ...productFormData, stock: parseInt(e.target.value) || 0 })}
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-[#071220] border border-slate-200 dark:border-[#1A314D] rounded-xl font-mono text-slate-900 dark:text-white focus:outline-none focus:border-[#8B5CF6]"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">Stock Inicial (uds)</label>
-                <input
-                  type="number"
-                  value={productFormData.stock}
-                  onChange={(e) => setProductFormData({ ...productFormData, stock: parseInt(e.target.value) || 0 })}
-                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl font-mono text-slate-900 dark:text-white focus:outline-none focus:border-[#8B5CF6]"
-                />
-              </div>
-
-              <div>
                 <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
-                  Imagen del Producto (URL, Archivo Local o Preset)
+                  Imagen del Producto (URL o Presets)
                 </label>
                 {productFormData.imageUrl && (
                   <div className="relative mb-2 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-950 h-28 flex items-center justify-center">
@@ -1621,7 +2032,7 @@ export const AdminCafePOS: React.FC = () => {
                 {/* Presets de imágenes de catálogo oficiales */}
                 <div className="mb-2">
                   <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">
-                    Presets de imagen oficiales:
+                    Presets de imagen recomendados:
                   </span>
                   <div className="flex flex-wrap gap-1">
                     {PRESET_PRODUCT_IMAGES.map((imgItem) => (
@@ -1647,7 +2058,7 @@ export const AdminCafePOS: React.FC = () => {
                     value={productFormData.imageUrl}
                     onChange={(e) => setProductFormData({ ...productFormData, imageUrl: e.target.value })}
                     placeholder="URL imagen (https://...)"
-                    className="flex-1 px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-[#8B5CF6]"
+                    className="flex-1 px-3 py-2 bg-slate-50 dark:bg-[#071220] border border-slate-200 dark:border-[#1A314D] rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-[#8B5CF6]"
                   />
                   <label className="px-3 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-[#0B1A2D] dark:text-slate-300 font-bold rounded-xl cursor-pointer flex items-center gap-1 shrink-0 transition text-xs border border-slate-200/80 dark:border-slate-700/80">
                     <Upload className="w-3.5 h-3.5 text-[#8B5CF6]" />
@@ -1673,7 +2084,7 @@ export const AdminCafePOS: React.FC = () => {
                 </div>
               </div>
 
-              <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex justify-end gap-2">
+              <div className="pt-3 border-t border-slate-100 dark:border-[#1A314D] flex justify-end gap-2">
                 <button
                   type="button"
                   onClick={() => setProductFormModalOpen(false)}
@@ -1694,11 +2105,11 @@ export const AdminCafePOS: React.FC = () => {
       )}
 
       {/* ======================================================================
-          MODAL: PÁGINA DE DETALLE COMPLETO DE PRODUCTO (Requisito Bloque 2)
+          MODAL: PÁGINA DE DETALLE COMPLETO DE PRODUCTO
           ====================================================================== */}
       {selectedProductDetail && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0B1A2D]/70 backdrop-blur-sm p-4 animate-in fade-in duration-150">
-          <div className="relative w-full max-w-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl text-slate-900 dark:text-slate-100 space-y-5 max-h-[92vh] overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0B1A2D]/75 backdrop-blur-sm p-4 overflow-hidden animate-in fade-in duration-150">
+          <div className="relative w-full max-w-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl text-slate-900 dark:text-slate-100 space-y-5 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
               <div className="flex items-center gap-2">
                 <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D]">
@@ -1711,13 +2122,13 @@ export const AdminCafePOS: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setSelectedProductDetail(null)}
-                className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+                className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-white cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            {/* Foto del Producto con Fallback Robusto */}
+            {/* Foto del Producto */}
             <div className="relative h-48 sm:h-56 rounded-2xl overflow-hidden bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
               <img
                 src={selectedProductDetail.imageUrl || getFallbackProductImage(selectedProductDetail.category)}
@@ -1767,7 +2178,7 @@ export const AdminCafePOS: React.FC = () => {
               </div>
             </div>
 
-            {/* Acciones principales: Editar todos los campos o Eliminar con confirmación */}
+            {/* Acciones principales */}
             <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-3">
               <button
                 type="button"
@@ -1779,7 +2190,7 @@ export const AdminCafePOS: React.FC = () => {
                 className="px-4 py-2.5 rounded-xl border border-rose-200 dark:border-rose-900/60 bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 hover:bg-rose-100 dark:hover:bg-rose-900/40 font-bold text-xs flex items-center gap-1.5 transition cursor-pointer"
               >
                 <Trash2 className="w-4 h-4" />
-                <span>{t('shop.deleteProduct', 'Eliminar Producto')}</span>
+                <span>Eliminar Producto</span>
               </button>
 
               <div className="flex items-center gap-2">
@@ -1800,7 +2211,7 @@ export const AdminCafePOS: React.FC = () => {
                   className="px-4 py-2.5 rounded-xl bg-[#B7F229] hover:bg-[#a6e61f] text-[#0B1A2D] font-black text-xs shadow-md flex items-center gap-1.5 cursor-pointer active:scale-95"
                 >
                   <Edit2 className="w-3.5 h-3.5" />
-                  <span>Editar Todos los Campos</span>
+                  <span>Editar Producto</span>
                 </button>
               </div>
             </div>
@@ -1809,10 +2220,10 @@ export const AdminCafePOS: React.FC = () => {
       )}
 
       {/* ======================================================================
-          MODAL: CONFIRMACIÓN PREVIA PARA ELIMINAR PRODUCTO (Requisito Bloque 2)
+          MODAL: CONFIRMACIÓN PARA ELIMINAR PRODUCTO
           ====================================================================== */}
       {productToDelete && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0B1A2D]/75 backdrop-blur-xs p-4 animate-in fade-in duration-150">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0B1A2D]/75 backdrop-blur-xs p-4 overflow-hidden animate-in fade-in duration-150">
           <div className="w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl space-y-4">
             <div className="w-12 h-12 rounded-2xl bg-rose-100 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center mx-auto">
               <AlertCircle className="w-6 h-6" />
@@ -1820,13 +2231,10 @@ export const AdminCafePOS: React.FC = () => {
 
             <div className="text-center space-y-1">
               <h3 className="text-base font-black text-slate-900 dark:text-white">
-                {t('shop.deleteConfirmTitle', '¿Eliminar este producto?')}
+                ¿Eliminar este producto?
               </h3>
               <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                {t(
-                  'shop.deleteConfirmDesc',
-                  'Esta acción retirará el artículo del catálogo del TPV y de la tienda online de forma permanente.'
-                )}
+                Esta acción retirará el artículo del catálogo del TPV y de la cafetería de forma permanente.
               </p>
               <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 mt-2 font-bold text-xs text-slate-800 dark:text-slate-200">
                 "{productToDelete.name}" · {productToDelete.price.toFixed(2)} €
@@ -1845,16 +2253,12 @@ export const AdminCafePOS: React.FC = () => {
                 type="button"
                 onClick={() => {
                   deleteCafeProduct(productToDelete.id);
-                  triggerDemoToast(
-                    'Producto Eliminado',
-                    `"${productToDelete.name}" ha sido retirado del catálogo.`,
-                    'info'
-                  );
+                  triggerDemoToast('Producto Eliminado', `"${productToDelete.name}" retirado del catálogo.`, 'info');
                   setProductToDelete(null);
                 }}
                 className="px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs shadow-md transition cursor-pointer active:scale-95"
               >
-                {t('shop.btnConfirmDelete', 'Sí, eliminar producto')}
+                Sí, eliminar producto
               </button>
             </div>
           </div>
@@ -1865,7 +2269,7 @@ export const AdminCafePOS: React.FC = () => {
           5. MODAL: ASIGNAR RESERVA O RECARGA DE MONEDERO
           ====================================================================== */}
       {assignModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0B1A2D]/70 backdrop-blur-sm p-4 animate-in fade-in duration-150">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0B1A2D]/75 backdrop-blur-sm p-4 overflow-hidden animate-in fade-in duration-150">
           <div className="relative w-full max-w-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl text-slate-900 dark:text-slate-100 space-y-4 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
               <div className="flex items-center gap-2">
@@ -1879,7 +2283,7 @@ export const AdminCafePOS: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setAssignModalOpen(false)}
-                className="p-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white"
+                className="p-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -1896,7 +2300,7 @@ export const AdminCafePOS: React.FC = () => {
                     : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                 }`}
               >
-                1. Reservas de Hoy / Pendientes ({filteredBookings.length})
+                1. Reservas de Hoy ({filteredBookings.length})
               </button>
               <button
                 type="button"
@@ -2068,43 +2472,40 @@ export const AdminCafePOS: React.FC = () => {
       )}
 
       {/* ======================================================================
-          MODAL DE GESTIÓN DE CATEGORÍAS (ALTA, EDICIÓN Y ELIMINACIÓN)
+          MODAL: GESTIÓN DE CATEGORÍAS (ALTA CON BOTÓN DE MARCA AZUL/LIMA, EDICIÓN Y AÑADIR PRODUCTOS ÁGIL)
           ====================================================================== */}
       {isCategoryModalOpen && (
-        <div className="fixed inset-0 z-50 bg-[#0B1A2D]/70 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-[#0E2239] rounded-2xl max-w-md w-full border border-slate-200 dark:border-[#1A314D] shadow-2xl overflow-hidden flex flex-col max-h-[85vh] animate-in fade-in zoom-in-95 duration-150">
-            {/* Header */}
-            <div className="p-4 border-b border-slate-100 dark:border-[#1A314D] flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl bg-[#8B5CF6]/10 text-[#8B5CF6] flex items-center justify-center">
+        <div className="fixed inset-0 z-50 bg-[#0B1A2D]/75 backdrop-blur-sm flex items-center justify-center p-4 overflow-hidden animate-in fade-in duration-150">
+          <div className="bg-white dark:bg-[#0E2239] rounded-3xl max-w-lg w-full border border-slate-200 dark:border-[#1A314D] shadow-2xl flex flex-col max-h-[88vh] overflow-hidden">
+            {/* Header Limpio sin subtítulos innecesarios, con X alineada a la derecha */}
+            <div className="p-5 border-b border-slate-100 dark:border-[#1A314D] flex items-center justify-between shrink-0">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-[#8B5CF6]/10 text-[#8B5CF6] flex items-center justify-center">
                   <Sliders className="w-4 h-4" />
                 </div>
-                <div>
-                  <h3 className="text-sm font-bold text-[#0B1A2D] dark:text-white">
-                    Gestión de Categorías
-                  </h3>
-                  <p className="text-[11px] text-slate-400">
-                    Organiza las secciones del mostrador y TPV
-                  </p>
-                </div>
+                <h3 className="text-base font-black text-[#0B1A2D] dark:text-white">
+                  Categorías de Hostelería y Tienda
+                </h3>
               </div>
+
               <button
                 type="button"
                 onClick={() => {
                   setIsCategoryModalOpen(false);
                   setEditingCategoryOld(null);
                   setNewCategoryName('');
+                  setAddingProductToCat(null);
                 }}
-                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+                className="p-1.5 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
               >
-                <X className="w-4 h-4" />
+                <X className="w-5 h-5" />
               </button>
             </div>
 
-            {/* Formulario añadir nueva categoría */}
-            <form onSubmit={handleAddCategory} className="p-4 border-b border-slate-100 dark:border-[#1A314D] bg-slate-50/50 dark:bg-slate-900/40">
+            {/* Formulario para Añadir Categoría con Botón Oficial de Marca (Azul Profundo #0B1A2D y Letras Blancas/Limas) */}
+            <form onSubmit={handleAddCategory} className="p-4 border-b border-slate-100 dark:border-[#1A314D] bg-slate-50/60 dark:bg-[#071220]/60 shrink-0">
               <label className="text-[11px] font-bold text-slate-600 dark:text-slate-400 block mb-1.5">
-                Nueva Categoría
+                Crear Nueva Categoría
               </label>
               <div className="flex items-center gap-2">
                 <div className="relative flex-1">
@@ -2113,24 +2514,25 @@ export const AdminCafePOS: React.FC = () => {
                     type="text"
                     value={newCategoryName}
                     onChange={(e) => setNewCategoryName(e.target.value)}
-                    placeholder="Ej. Snacks, Pelotas, Cervezas..."
-                    className="w-full pl-8.5 pr-3 py-2 rounded-xl bg-white dark:bg-[#071220] border border-slate-200 dark:border-[#1A314D] text-xs font-semibold text-[#0B1A2D] dark:text-white placeholder:text-slate-400 focus:outline-none focus:border-[#8B5CF6]"
+                    placeholder="Ej. Batidos, Cervezas, Ropa..."
+                    className="w-full pl-8.5 pr-3 py-2 rounded-xl bg-white dark:bg-[#0E2239] border border-slate-200 dark:border-[#1A314D] text-xs font-semibold text-[#0B1A2D] dark:text-white placeholder:text-slate-400 focus:outline-none focus:border-[#8B5CF6]"
                   />
                 </div>
+                {/* Botón con Fondo Azul #0B1A2D y Letras Blancas / Acento Verde Lima #B7F229 */}
                 <button
                   type="submit"
                   disabled={!newCategoryName.trim()}
-                  className="px-3.5 py-2 rounded-xl bg-[#0B1A2D] hover:bg-[#132A45] disabled:opacity-50 text-white font-bold text-xs flex items-center gap-1.5 transition active:scale-95 cursor-pointer shadow-xs shrink-0"
+                  className="px-4 py-2 rounded-xl bg-[#0B1A2D] hover:bg-[#132A45] disabled:opacity-50 text-white font-bold text-xs flex items-center gap-1.5 transition active:scale-95 cursor-pointer shadow-xs shrink-0 border border-[#0B1A2D]"
                 >
                   <Plus className="w-3.5 h-3.5 text-[#B7F229]" />
-                  <span>Añadir</span>
+                  <span className="text-white">Añadir Categoría</span>
                 </button>
               </div>
             </form>
 
-            {/* Lista de categorías existentes con edición y borrado */}
-            <div className="p-4 overflow-y-auto space-y-2 flex-1">
-              <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">
+            {/* Lista de categorías con edición, borrado y botón ágil para añadir productos a cada una */}
+            <div className="p-4 overflow-y-auto space-y-3 flex-1 overscroll-contain">
+              <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
                 Categorías Activas ({customCategories.length})
               </div>
 
@@ -2141,77 +2543,194 @@ export const AdminCafePOS: React.FC = () => {
               ) : (
                 customCategories.map((cat) => {
                   const isEditing = editingCategoryOld === cat;
-                  const countInCat = cafeProducts.filter((p) => p.category === cat).length;
+                  const catProducts = cafeProducts.filter((p) => p.category === cat);
+                  const isAddingProduct = addingProductToCat === cat;
 
                   return (
                     <div
                       key={cat}
-                      className="flex items-center justify-between p-2.5 rounded-xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] shadow-2xs gap-2"
+                      className="rounded-2xl bg-white dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] shadow-2xs overflow-hidden transition"
                     >
-                      {isEditing ? (
-                        <div className="flex items-center gap-1.5 flex-1 min-w-0">
-                          <input
-                            type="text"
-                            value={editingCategoryNew}
-                            onChange={(e) => setEditingCategoryNew(e.target.value)}
-                            onKeyDown={(e) => {
-                              if (e.key === 'Enter') handleSaveEditCategory(cat);
-                              if (e.key === 'Escape') setEditingCategoryOld(null);
-                            }}
-                            autoFocus
-                            className="w-full px-2.5 py-1 rounded-lg bg-slate-50 dark:bg-[#071220] border border-[#8B5CF6] text-xs font-bold text-[#0B1A2D] dark:text-white focus:outline-none"
-                          />
-                          <button
-                            type="button"
-                            onClick={() => handleSaveEditCategory(cat)}
-                            className="p-1.5 rounded-lg bg-[#B7F229] text-[#0B1A2D] hover:bg-[#a5e01b] transition cursor-pointer"
-                            title="Guardar nombre"
-                          >
-                            <Check className="w-3.5 h-3.5 stroke-[2.5]" />
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => setEditingCategoryOld(null)}
-                            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition cursor-pointer"
-                            title="Cancelar"
-                          >
-                            <X className="w-3.5 h-3.5" />
-                          </button>
-                        </div>
-                      ) : (
-                        <>
-                          <div className="flex items-center gap-2 min-w-0">
-                            <span className="w-2 h-2 rounded-full bg-[#8B5CF6]"></span>
-                            <span className="text-xs font-bold text-[#0B1A2D] dark:text-white truncate">
-                              {cat}
-                            </span>
-                            <span className="text-[10px] px-1.5 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 font-mono">
-                              {countInCat} {countInCat === 1 ? 'artículo' : 'artículos'}
-                            </span>
+                      {/* Cabecera de la categoría */}
+                      <div className="flex items-center justify-between p-3 gap-2">
+                        {isEditing ? (
+                          <div className="flex items-center gap-1.5 flex-1 min-w-0">
+                            <input
+                              type="text"
+                              value={editingCategoryNew}
+                              onChange={(e) => setEditingCategoryNew(e.target.value)}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter') handleSaveEditCategory(cat);
+                                if (e.key === 'Escape') setEditingCategoryOld(null);
+                              }}
+                              autoFocus
+                              className="w-full px-2.5 py-1 rounded-lg bg-slate-50 dark:bg-[#0E2239] border border-[#8B5CF6] text-xs font-bold text-[#0B1A2D] dark:text-white focus:outline-none"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => handleSaveEditCategory(cat)}
+                              className="p-1.5 rounded-lg bg-[#B7F229] text-[#0B1A2D] hover:bg-[#a5e01b] transition cursor-pointer"
+                              title="Guardar nombre"
+                            >
+                              <Check className="w-3.5 h-3.5 stroke-[2.5]" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setEditingCategoryOld(null)}
+                              className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition cursor-pointer"
+                              title="Cancelar"
+                            >
+                              <X className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        ) : (
+                          <>
+                            <div className="flex items-center gap-2 min-w-0">
+                              <span className="w-2 h-2 rounded-full bg-[#8B5CF6] shrink-0"></span>
+                              <span className="text-xs font-bold text-[#0B1A2D] dark:text-white truncate">
+                                {cat}
+                              </span>
+                              <span className="text-[10px] px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-mono font-bold shrink-0">
+                                {catProducts.length} {catProducts.length === 1 ? 'artículo' : 'artículos'}
+                              </span>
+                            </div>
+
+                            <div className="flex items-center gap-1 shrink-0">
+                              {/* Botón ágil añadir producto a esta categoría */}
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  if (isAddingProduct) {
+                                    setAddingProductToCat(null);
+                                  } else {
+                                    setAddingProductToCat(cat);
+                                    setCatProductForm({ name: '', price: 2.5, stock: 50, imageUrl: '' });
+                                  }
+                                }}
+                                className="px-2 py-1 rounded-lg bg-[#F0FCCF] dark:bg-[#B7F229]/20 text-[#0B1A2D] dark:text-[#B7F229] border border-[#B7F229]/50 hover:scale-102 text-[10px] font-black flex items-center gap-1 transition cursor-pointer"
+                                title="Añadir producto directamente a esta categoría"
+                              >
+                                <Plus className="w-3 h-3 stroke-[2.5]" />
+                                <span>Añadir Producto</span>
+                              </button>
+
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setEditingCategoryOld(cat);
+                                  setEditingCategoryNew(cat);
+                                }}
+                                className="p-1.5 rounded-lg text-slate-400 hover:text-[#0B1A2D] dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+                                title="Editar nombre de categoría"
+                              >
+                                <Edit2 className="w-3.5 h-3.5" />
+                              </button>
+
+                              <button
+                                type="button"
+                                onClick={() => handleDeleteCategory(cat)}
+                                className="p-1.5 rounded-lg text-rose-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition cursor-pointer"
+                                title="Eliminar categoría"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          </>
+                        )}
+                      </div>
+
+                      {/* Formulario desplegable ágil para añadir producto directamente a esta categoría */}
+                      {isAddingProduct && (
+                        <form
+                          onSubmit={(e) => handleAddProductToCategorySubmit(e, cat)}
+                          className="p-3 bg-slate-50 dark:bg-[#0E2239] border-t border-slate-100 dark:border-[#1A314D] space-y-2.5 text-xs animate-in fade-in duration-150"
+                        >
+                          <div className="font-bold text-[#0B1A2D] dark:text-white text-[11px] flex items-center justify-between">
+                            <span>Nuevo producto para "{cat}":</span>
+                            <button
+                              type="button"
+                              onClick={() => setAddingProductToCat(null)}
+                              className="text-slate-400 hover:text-slate-600"
+                            >
+                              <X className="w-3.5 h-3.5" />
+                            </button>
                           </div>
 
-                          <div className="flex items-center gap-1 shrink-0">
+                          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                            <input
+                              type="text"
+                              required
+                              placeholder="Nombre (ej. Café Doble)"
+                              value={catProductForm.name}
+                              onChange={(e) => setCatProductForm({ ...catProductForm, name: e.target.value })}
+                              className="sm:col-span-1 px-2.5 py-1.5 rounded-lg bg-white dark:bg-[#071220] border border-slate-200 dark:border-[#1A314D] text-xs font-semibold"
+                            />
+                            <div className="flex gap-2">
+                              <input
+                                type="number"
+                                step="0.10"
+                                required
+                                placeholder="Precio €"
+                                value={catProductForm.price}
+                                onChange={(e) => setCatProductForm({ ...catProductForm, price: parseFloat(e.target.value) || 0 })}
+                                className="w-1/2 px-2.5 py-1.5 rounded-lg bg-white dark:bg-[#071220] border border-slate-200 dark:border-[#1A314D] text-xs font-mono font-bold"
+                              />
+                              <input
+                                type="number"
+                                placeholder="Stock"
+                                value={catProductForm.stock}
+                                onChange={(e) => setCatProductForm({ ...catProductForm, stock: parseInt(e.target.value) || 0 })}
+                                className="w-1/2 px-2.5 py-1.5 rounded-lg bg-white dark:bg-[#071220] border border-slate-200 dark:border-[#1A314D] text-xs font-mono font-bold"
+                              />
+                            </div>
+                            <input
+                              type="url"
+                              placeholder="URL imagen (opcional)"
+                              value={catProductForm.imageUrl}
+                              onChange={(e) => setCatProductForm({ ...catProductForm, imageUrl: e.target.value })}
+                              className="sm:col-span-1 px-2.5 py-1.5 rounded-lg bg-white dark:bg-[#071220] border border-slate-200 dark:border-[#1A314D] text-xs"
+                            />
+                          </div>
+
+                          <div className="flex items-center justify-between pt-1">
+                            {/* Presets rápidos */}
+                            <div className="flex items-center gap-1 overflow-x-auto hide-scrollbar">
+                              {PRESET_PRODUCT_IMAGES.slice(0, 3).map((p) => (
+                                <button
+                                  key={p.label}
+                                  type="button"
+                                  onClick={() => setCatProductForm({ ...catProductForm, imageUrl: p.url })}
+                                  className="text-[9px] px-1.5 py-0.5 rounded bg-slate-200/60 dark:bg-slate-800 text-slate-600 dark:text-slate-300 shrink-0 font-medium hover:bg-slate-300"
+                                >
+                                  {p.label}
+                                </button>
+                              ))}
+                            </div>
+
                             <button
-                              type="button"
-                              onClick={() => {
-                                setEditingCategoryOld(cat);
-                                setEditingCategoryNew(cat);
-                              }}
-                              className="p-1.5 rounded-lg text-slate-400 hover:text-[#0B1A2D] dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
-                              title="Editar nombre"
+                              type="submit"
+                              className="px-3.5 py-1.5 rounded-xl bg-[#0B1A2D] hover:bg-[#132A45] text-white font-black text-xs flex items-center gap-1 transition cursor-pointer shadow-xs shrink-0"
                             >
-                              <Edit2 className="w-3.5 h-3.5" />
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => handleDeleteCategory(cat)}
-                              className="p-1.5 rounded-lg text-rose-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition cursor-pointer"
-                              title="Eliminar categoría"
-                            >
-                              <Trash2 className="w-3.5 h-3.5" />
+                              <Plus className="w-3.5 h-3.5 text-[#B7F229]" />
+                              <span>Crear Producto</span>
                             </button>
                           </div>
-                        </>
+                        </form>
+                      )}
+
+                      {/* Mini listado de productos existentes en esta categoría */}
+                      {catProducts.length > 0 && (
+                        <div className="px-3 pb-2.5 pt-1 border-t border-slate-100/60 dark:border-slate-800 flex flex-wrap gap-1.5">
+                          {catProducts.map((p) => (
+                            <span
+                              key={p.id}
+                              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800/80 text-[10px] text-slate-700 dark:text-slate-300"
+                            >
+                              <span className="font-semibold">{p.name}</span>
+                              <span className="font-mono text-slate-400">({p.price.toFixed(2)}€)</span>
+                            </span>
+                          ))}
+                        </div>
                       )}
                     </div>
                   );
@@ -2220,10 +2739,13 @@ export const AdminCafePOS: React.FC = () => {
             </div>
 
             {/* Footer */}
-            <div className="p-3 border-t border-slate-100 dark:border-[#1A314D] flex justify-end bg-slate-50/50 dark:bg-slate-900/20">
+            <div className="p-3 border-t border-slate-100 dark:border-[#1A314D] flex justify-end bg-slate-50/50 dark:bg-slate-900/20 shrink-0">
               <button
                 type="button"
-                onClick={() => setIsCategoryModalOpen(false)}
+                onClick={() => {
+                  setIsCategoryModalOpen(false);
+                  setAddingProductToCat(null);
+                }}
                 className="px-4 py-1.5 rounded-xl bg-[#0B1A2D] dark:bg-white text-white dark:text-[#0B1A2D] text-xs font-bold hover:bg-[#132A45] transition cursor-pointer"
               >
                 Cerrar
@@ -2239,39 +2761,60 @@ export const AdminCafePOS: React.FC = () => {
           <h2 style={{ fontSize: '14px', fontWeight: 'bold', margin: '0' }}>{currentTenant.name.toUpperCase()}</h2>
           <p style={{ margin: '2px 0' }}>CIF: B-15984210 · TPV MOSTRADOR</p>
           <p style={{ margin: '2px 0' }}>{currentTenant.address || 'Polígono San Mateo, Narón'}</p>
-          <p style={{ margin: '2px 0' }}>CIERRE / ARQUEO DE CAJA</p>
+          <p style={{ margin: '2px 0' }}>
+            {selectedPaymentDetail ? `RECIBO DE VENTA #${selectedPaymentDetail.id}` : 'CIERRE / ARQUEO DE CAJA'}
+          </p>
           <hr style={{ borderTop: '1px dashed #000', margin: '6px 0' }} />
         </div>
 
         <div style={{ fontSize: '11px', marginBottom: '6px' }}>
           <div>FECHA: {new Date().toLocaleDateString('es-ES')} {new Date().toLocaleTimeString('es-ES')}</div>
-          <div>ESTADO: TURNO CERRADO</div>
+          <div>ATENDIDO POR: {currentUser?.name || 'Recepción Mostrador'}</div>
+          <div>ESTADO: {selectedPaymentDetail ? 'COBRADO / PAGADO' : 'TURNO CERRADO'}</div>
           <hr style={{ borderTop: '1px dashed #000', margin: '6px 0' }} />
         </div>
 
-        <div style={{ fontSize: '11px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', margin: '3px 0' }}>
-            <span>Ventas TPV / Tarjeta:</span>
-            <span>{(sessionSalesTotal * 0.58).toFixed(2)} €</span>
+        {selectedPaymentDetail ? (
+          <div style={{ fontSize: '11px' }}>
+            <div style={{ margin: '4px 0', fontWeight: 'bold' }}>DETALLE DE ARTÍCULOS:</div>
+            {selectedPaymentDetail.items?.map((it, idx) => (
+              <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', margin: '2px 0' }}>
+                <span>{it.qty}x {it.name}</span>
+                <span>{(it.qty * it.unitPrice).toFixed(2)} €</span>
+              </div>
+            ))}
+            <hr style={{ borderTop: '1px dashed #000', margin: '6px 0' }} />
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold', fontSize: '13px', margin: '5px 0' }}>
+              <span>TOTAL PAGADO:</span>
+              <span>{selectedPaymentDetail.amount.toFixed(2)} €</span>
+            </div>
+            <div>MÉTODO: {selectedPaymentDetail.paymentMethod}</div>
           </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', margin: '3px 0' }}>
-            <span>Ventas Efectivo:</span>
-            <span>{(sessionSalesTotal * 0.28).toFixed(2)} €</span>
+        ) : (
+          <div style={{ fontSize: '11px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', margin: '3px 0' }}>
+              <span>Ventas TPV / Tarjeta:</span>
+              <span>{(sessionSalesTotal * 0.58).toFixed(2)} €</span>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', margin: '3px 0' }}>
+              <span>Ventas Efectivo:</span>
+              <span>{(sessionSalesTotal * 0.28).toFixed(2)} €</span>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', margin: '3px 0' }}>
+              <span>Cobros Monedero Club:</span>
+              <span>{(sessionSalesTotal * 0.14).toFixed(2)} €</span>
+            </div>
+            <hr style={{ borderTop: '1px dashed #000', margin: '6px 0' }} />
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold', fontSize: '13px', margin: '5px 0' }}>
+              <span>TOTAL TURNO:</span>
+              <span>{sessionSalesTotal.toFixed(2)} €</span>
+            </div>
+            <hr style={{ borderTop: '1px dashed #000', margin: '6px 0' }} />
           </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', margin: '3px 0' }}>
-            <span>Cobros Monedero Club:</span>
-            <span>{(sessionSalesTotal * 0.14).toFixed(2)} €</span>
-          </div>
-          <hr style={{ borderTop: '1px dashed #000', margin: '6px 0' }} />
-          <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold', fontSize: '13px', margin: '5px 0' }}>
-            <span>TOTAL TURNO:</span>
-            <span>{sessionSalesTotal.toFixed(2)} €</span>
-          </div>
-          <hr style={{ borderTop: '1px dashed #000', margin: '6px 0' }} />
-        </div>
+        )}
 
         <div style={{ textAlign: 'center', fontSize: '10px', marginTop: '10px' }}>
-          <p>Documento justificativo de arqueo interno</p>
+          <p>Documento justificativo de compra / TPV</p>
           <p>SETMIO PADEL PRO — Sistema de Gestión Deportiva</p>
         </div>
       </div>
