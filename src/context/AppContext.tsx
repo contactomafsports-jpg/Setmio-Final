@@ -239,18 +239,18 @@ const routeForAdminTab: Record<AdminTab, string> = {
   all_bookings: '/gestion/todas-las-reservas',
   bookings: '/gestion/todas-las-reservas',
   matches: '/gestion/partidas',
-  customers: '/gestion/clientes',
+  customers: '/gestion/socios',
   teams: '/gestion/equipos',
   academy: '/gestion/escuela',
   staff: '/gestion/personal',
   tournaments: '/gestion/torneos',
   shop: '/gestion/tienda',
   smart_courts: '/gestion/pistas-inteligentes',
-  pos_cafe: '/gestion/pos',
+  pos_cafe: '/gestion/tpv',
   web_editor: '/gestion/editor-web',
   domains: '/gestion/dominios',
-  subscription: '/gestion/negocio',
-  settings: '/gestion/configuracion',
+  subscription: '/gestion/suscripcion',
+  settings: '/gestion/ajustes',
   invoicing: '/gestion/facturacion',
 };
 
@@ -265,6 +265,47 @@ const routeForPlayerTab: Record<PlayerTab, string> = {
 };
 
 export const LAST_ACTIVE_ROUTE_KEY = 'setmio_last_active_route_v2';
+export const ADMIN_SESSION_KEY = 'setmio_admin_active_session_v2';
+
+export interface AdminActiveSession {
+  adminTab: AdminTab;
+  tenantId: string;
+  clubSlug: string;
+  pathname?: string;
+  timestamp: number;
+}
+
+export const getSavedAdminSession = (): AdminActiveSession | null => {
+  if (typeof window === 'undefined') return null;
+  try {
+    const raw = localStorage.getItem(ADMIN_SESSION_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
+};
+
+export const saveAdminSession = (data: { adminTab: AdminTab; tenantId: string; clubSlug: string; pathname?: string }) => {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.setItem(ADMIN_SESSION_KEY, JSON.stringify({
+      ...data,
+      timestamp: Date.now(),
+    }));
+  } catch {
+    // ignore
+  }
+};
+
+export const clearAdminSession = () => {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.removeItem(ADMIN_SESSION_KEY);
+  } catch {
+    // ignore
+  }
+};
 
 export interface PersistedRouteState {
   view: MainView;
@@ -285,6 +326,14 @@ export const saveLastActiveRoute = (data: PersistedRouteState) => {
       ...data,
       timestamp: Date.now(),
     }));
+    if (data.view === 'admin') {
+      saveAdminSession({
+        adminTab: data.admin,
+        tenantId: data.tenantId || 'tenant-san-mateo-01',
+        clubSlug: data.clubSlug || 'sanmateo',
+        pathname: data.pathname,
+      });
+    }
   } catch (e) {
     // ignore
   }
@@ -316,16 +365,41 @@ const readRoute = () => {
   const hostname = window.location.hostname.toLowerCase();
   const path = window.location.pathname.replace(/\/+$/, '') || '/';
 
-  // Si la ruta es la raíz '/', restaurar la última ruta activa del usuario si existe
-  if (path === '/' || path === '') {
-    const saved = getLastActiveRoute();
-    if (saved && saved.view && saved.view !== 'public') {
+  const savedAdmin = getSavedAdminSession();
+  const savedRoute = getLastActiveRoute();
+
+  // Comprobar si la ruta actual es una página pública explícita (contacto, precios, blog, etc.)
+  const isExplicitPublicLanding = [
+    '/registro',
+    '/login',
+    '/contacto',
+    '/precios',
+    '/blog',
+    '/soluciones',
+    '/funcionalidades',
+    '/modulos',
+    '/para-jugadores',
+  ].some((p) => path === p || path.startsWith(`${p}/`));
+
+  // Si la ruta es raíz '/' o entrada general, y existe sesión activa de administrador, restaurar inmediatamente
+  if ((path === '/' || path === '' || path === '/demo') && !isExplicitPublicLanding) {
+    if (savedAdmin) {
       return {
-        view: saved.view,
-        page: saved.page || 'home',
-        admin: saved.admin || 'dashboard',
-        player: saved.player || 'dashboard',
-        clubSlug: saved.clubSlug || null,
+        view: 'admin' as MainView,
+        page: 'home' as PublicPage,
+        admin: savedAdmin.adminTab || 'dashboard',
+        player: 'dashboard' as PlayerTab,
+        clubSlug: savedAdmin.clubSlug || null,
+        isCorporate: false,
+      };
+    }
+    if (savedRoute && savedRoute.view && savedRoute.view !== 'public') {
+      return {
+        view: savedRoute.view,
+        page: savedRoute.page || 'home',
+        admin: savedRoute.admin || 'dashboard',
+        player: savedRoute.player || 'dashboard',
+        clubSlug: savedRoute.clubSlug || null,
         isCorporate: false,
       };
     }
@@ -402,7 +476,16 @@ const readRoute = () => {
     };
   }
   if (remainingPath === '/gestion' || remainingPath.startsWith('/gestion/')) {
-    const admin = (Object.entries(routeForAdminTab).find(([, route]) => route === remainingPath || remainingPath.startsWith(route))?.[0] || 'dashboard') as AdminTab;
+    let admin = (Object.entries(routeForAdminTab).find(([, route]) => route === remainingPath || remainingPath.startsWith(route))?.[0] || 'dashboard') as AdminTab;
+    if (
+      remainingPath === '/gestion/tpv' ||
+      remainingPath.startsWith('/gestion/tpv') ||
+      remainingPath === '/gestion/pos' ||
+      remainingPath.startsWith('/gestion/pos') ||
+      remainingPath === '/gestion/caja'
+    ) {
+      admin = 'pos_cafe';
+    }
     return {
       view: 'admin' as MainView,
       page: 'home' as PublicPage,
@@ -513,6 +596,17 @@ const readRoute = () => {
       admin: 'dashboard' as AdminTab,
       player,
       clubSlug: activeClubSlug,
+      isCorporate: false,
+    };
+  }
+
+  if ((remainingPath === '/' || remainingPath === '') && !isExplicitPublicLanding && savedAdmin) {
+    return {
+      view: 'admin' as MainView,
+      page: 'home' as PublicPage,
+      admin: savedAdmin.adminTab || 'dashboard',
+      player: 'dashboard' as PlayerTab,
+      clubSlug: savedAdmin.clubSlug || activeClubSlug,
       isCorporate: false,
     };
   }
@@ -1449,11 +1543,24 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     });
   }, [currentView, publicPage, adminTab, playerTab, isCorporateLanding, currentTenant.slug, currentTenant.id]);
 
-  // Restauración garantizada ante reanudación de la app en segundo plano (visibilitychange)
+  // Restauración garantizada ante reanudación de la app en segundo plano (visibilitychange y pageshow)
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const handleVisibility = () => {
       if (!document.hidden) {
+        const savedAdmin = getSavedAdminSession();
+        if (savedAdmin) {
+          if (currentView !== 'admin') {
+            setCurrentViewState('admin');
+          }
+          if (adminTab !== savedAdmin.adminTab) {
+            setAdminTabState(savedAdmin.adminTab);
+          }
+          if (isCorporateLanding) {
+            setIsCorporateLanding(false);
+          }
+          return;
+        }
         const saved = getLastActiveRoute();
         if (saved && saved.view && saved.view !== 'public') {
           if (currentView !== saved.view) {
@@ -1472,7 +1579,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       }
     };
     document.addEventListener('visibilitychange', handleVisibility);
-    return () => document.removeEventListener('visibilitychange', handleVisibility);
+    window.addEventListener('pageshow', handleVisibility);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibility);
+      window.removeEventListener('pageshow', handleVisibility);
+    };
   }, [currentView, adminTab, playerTab, isCorporateLanding]);
 
   const updateCurrentTenant = (updated: Partial<Tenant>) => {
@@ -1588,6 +1699,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const logoutOrExitDemo = () => {
+    clearAdminSession();
+    try {
+      localStorage.removeItem(LAST_ACTIVE_ROUTE_KEY);
+    } catch {}
     setCurrentUser(ROLE_PROFILES.PLAYER);
     setCurrentViewState('public');
     setPublicPage('home');

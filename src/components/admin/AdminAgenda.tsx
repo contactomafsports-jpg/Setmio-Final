@@ -40,8 +40,8 @@ const VENUE_THEMES: Record<string, {
   accentText: string;
 }> = {
   'venue-san-mateo': {
-    name: 'Sede Central (San Mateo)',
-    shortName: 'San Mateo (Centro)',
+    name: 'Sede Narón',
+    shortName: 'Narón',
     dotBg: 'bg-emerald-500',
     badgeBg: 'bg-emerald-50 dark:bg-emerald-950/70',
     badgeBorder: 'border-emerald-300 dark:border-emerald-800',
@@ -756,7 +756,7 @@ export const AdminAgenda: React.FC = () => {
 
         {/* Reordenación Superior: Botón "Todas las reservas" POR ENCIMA del selector de fechas */}
         <div className="space-y-2">
-          {/* Acceso Rápido: Todas las reservas */}
+          {/* Botón Sólido de Marca: Todas las Reservas (Idéntico a Inicio) */}
           <button
             type="button"
             onClick={() => {
@@ -765,18 +765,10 @@ export const AdminAgenda: React.FC = () => {
               }
               setShowAllBookingsView(true);
             }}
-            className="w-full flex items-center justify-between bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] rounded-2xl p-2.5 px-3.5 text-xs sm:text-sm font-semibold text-[#0B1A2D] dark:text-white hover:bg-slate-50 dark:hover:bg-[#132A45] transition-colors shadow-[0_2px_8px_rgba(0,0,0,0.02)] active:scale-[0.99] cursor-pointer"
+            className="w-full py-2.5 px-4 rounded-xl bg-[#0B1A2D] hover:bg-[#132A45] text-white font-bold text-xs flex items-center justify-center gap-2 transition-colors shadow-sm cursor-pointer"
           >
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-xl bg-slate-50 dark:bg-[#071220] border border-slate-100 dark:border-[#1A314D] flex items-center justify-center text-[#0B1A2D] dark:text-slate-200 shrink-0">
-                <FileSpreadsheet className="w-4 h-4 text-[#8B5CF6]" />
-              </div>
-              <div className="text-left">
-                <div className="font-bold text-xs text-[#0B1A2D] dark:text-white">Todas las reservas</div>
-                <div className="text-[10px] text-slate-400">Historial completo, filtros avanzados y búsqueda</div>
-              </div>
-            </div>
-            <ChevronRight className="w-4 h-4 text-slate-400" />
+            <Calendar className="w-4 h-4 text-white" />
+            <span>Todas las reservas</span>
           </button>
 
           {/* Selector de Fecha Tipo Ribbon */}
@@ -857,7 +849,7 @@ export const AdminAgenda: React.FC = () => {
                 const courtVenue = availableVenues.find((v) => v.id === court.venueId) || availableVenues[1] || availableVenues[0];
                 const venueInfo = (() => {
                   if (court.venueId === 'venue-san-mateo' || (!court.venueId && court.name.includes('Pista'))) {
-                    return { name: 'San Mateo', dot: 'bg-[#B7F229]' };
+                    return { name: 'Narón', dot: 'bg-[#B7F229]' };
                   }
                   if (court.venueId === 'venue-coruna') {
                     return { name: 'A Coruña', dot: 'bg-[#0B1A2D] dark:bg-sky-400' };

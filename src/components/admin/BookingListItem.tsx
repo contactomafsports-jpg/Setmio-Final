@@ -122,6 +122,35 @@ export const BookingListItem: React.FC<BookingListItemProps> = ({
     };
   };
 
+  const calculateDurationMinutes = (startStr?: string, endStr?: string, slotStr?: string): number => {
+    let s = startStr || '';
+    let e = endStr || '';
+    if ((!s || !e) && slotStr && slotStr.includes('-')) {
+      const parts = slotStr.split('-').map((p) => p.trim());
+      s = parts[0];
+      e = parts[1];
+    }
+    if (!s || !e) return 90;
+    const parseToMins = (val: string) => {
+      const timePart = val.includes('T') ? val.split('T')[1].slice(0, 5) : val.slice(0, 5);
+      const [h, m] = timePart.split(':').map(Number);
+      return (h || 0) * 60 + (m || 0);
+    };
+    const startM = parseToMins(s);
+    let endM = parseToMins(e);
+    if (endM < startM) endM += 24 * 60;
+    const diff = endM - startM;
+    return diff > 0 ? diff : 90;
+  };
+
+  const cleanVenue = (name?: string) => {
+    if (!name) return 'Narón';
+    let clean = name.replace(/\s*\((?:Central|Centro)\)/gi, '').replace(/\bCentral\b/gi, '').trim();
+    clean = clean.replace(/^Sede\s+/i, '').replace(/·.*$/, '').trim();
+    if (!clean || clean.toLowerCase() === 'san mateo') return 'Narón';
+    return clean;
+  };
+
   const statusInfo = getStatusInfo();
   const timeText = formatTimeSlot();
   const pinCode = booking.accessPin || '4821#';
@@ -156,6 +185,7 @@ export const BookingListItem: React.FC<BookingListItemProps> = ({
         <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#EDE9FE] dark:bg-[#8B5CF6]/20 border border-[#8B5CF6]/30 text-[#6D28D9] dark:text-[#C4B5FD] font-bold text-xs tracking-tight">
           <Clock className="w-3.5 h-3.5 text-[#8B5CF6] shrink-0" />
           <span>{timeText}</span>
+          <span className="text-[11px] opacity-80 font-semibold">· {calculateDurationMinutes(booking.startTime, booking.endTime, timeText)} min</span>
         </div>
 
         <div className="px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 font-semibold text-xs truncate max-w-[200px] border border-slate-200/60 dark:border-slate-700/60">
@@ -168,7 +198,7 @@ export const BookingListItem: React.FC<BookingListItemProps> = ({
         <div>
           <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#0B1A2D]/5 dark:bg-[#B7F229]/15 text-[#0B1A2D] dark:text-[#B7F229] border border-slate-200/80 dark:border-[#B7F229]/30 text-xs font-bold">
             <Building2 className="w-3.5 h-3.5 shrink-0 text-[#0B1A2D] dark:text-[#B7F229]" />
-            <span className="truncate">{booking.venueShortName || booking.venueName}</span>
+            <span className="truncate">{cleanVenue(booking.venueShortName || booking.venueName)}</span>
           </div>
         </div>
       )}

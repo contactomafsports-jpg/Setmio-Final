@@ -77,8 +77,8 @@ export const ClubDashboard: React.FC = () => {
     {
       id: 'res-1',
       venueId: 'venue-san-mateo',
-      venueName: 'Sede Central · San Mateo',
-      venueShortName: 'Sede Central',
+      venueName: 'Sede Narón · San Mateo',
+      venueShortName: 'Narón',
       timeSlot: '18:00 - 19:30',
       startTime: '18:00',
       endTime: '19:30',
@@ -166,6 +166,35 @@ export const ClubDashboard: React.FC = () => {
     ? upcomingTurnBookings.filter((b) => b.venueId === selectedVenueId)
     : upcomingTurnBookings;
 
+  const calculateDurationMinutes = (startStr?: string, endStr?: string, slotStr?: string): number => {
+    let s = startStr || '';
+    let e = endStr || '';
+    if ((!s || !e) && slotStr && slotStr.includes('-')) {
+      const parts = slotStr.split('-').map((p) => p.trim());
+      s = parts[0];
+      e = parts[1];
+    }
+    if (!s || !e) return 90;
+    const parseToMins = (val: string) => {
+      const timePart = val.includes('T') ? val.split('T')[1].slice(0, 5) : val.slice(0, 5);
+      const [h, m] = timePart.split(':').map(Number);
+      return (h || 0) * 60 + (m || 0);
+    };
+    const startM = parseToMins(s);
+    let endM = parseToMins(e);
+    if (endM < startM) endM += 24 * 60;
+    const diff = endM - startM;
+    return diff > 0 ? diff : 90;
+  };
+
+  const cleanVenueName = (name?: string) => {
+    if (!name) return 'Narón';
+    let clean = name.replace(/\s*\((?:Central|Centro)\)/gi, '').replace(/\bCentral\b/gi, '').trim();
+    clean = clean.replace(/^Sede\s+/i, '').replace(/·.*$/, '').trim();
+    if (!clean || clean.toLowerCase() === 'san mateo') return 'Narón';
+    return clean;
+  };
+
   return (
     <div className="max-w-md lg:max-w-3xl mx-auto pt-2 pb-16 space-y-6 font-sans text-[#0B1A2D] dark:text-slate-100 antialiased">
       {/* ======================================================================
@@ -186,14 +215,14 @@ export const ClubDashboard: React.FC = () => {
           <button
             type="button"
             onClick={() => {
-              if (typeof window !== 'undefined') window.history.pushState({}, '', '/admin/reservas');
-              setAdminTab('agenda');
+              if (typeof window !== 'undefined') window.history.pushState({}, '', '/admin/ajustes');
+              setAdminTab('settings');
             }}
-            className="p-1 text-slate-700 dark:text-slate-300 hover:text-[#0B1A2D] dark:hover:text-[#B7F229] transition-colors cursor-pointer active:scale-95"
-            title="Nueva reserva"
-            aria-label="Nueva reserva"
+            className="p-1.5 text-slate-400 hover:text-slate-600 dark:text-slate-400 dark:hover:text-slate-200 transition-colors cursor-pointer active:scale-95"
+            title="Ajustes del club"
+            aria-label="Ajustes del club"
           >
-            <Plus className="w-6 h-6 stroke-[2.2]" />
+            <Settings className="w-6 h-6 stroke-[2]" />
           </button>
         </div>
 
@@ -656,7 +685,7 @@ export const ClubDashboard: React.FC = () => {
             if (typeof window !== 'undefined') window.history.pushState({}, '', '/admin/reservas/todas');
             setAdminTab('all_bookings');
           }}
-          className="w-full py-2.5 px-4 rounded-xl bg-[#0B1A2D] hover:bg-slate-800 dark:bg-[#132A45] dark:hover:bg-[#1a385c] text-white font-bold text-xs flex items-center justify-center gap-2 transition-colors shadow-sm cursor-pointer"
+          className="w-full py-2.5 px-4 rounded-xl bg-[#0B1A2D] hover:bg-[#132A45] text-white font-bold text-xs flex items-center justify-center gap-2 transition-colors shadow-sm cursor-pointer"
         >
           <Calendar className="w-4 h-4 text-white" />
           <span>Todas las reservas</span>
@@ -675,6 +704,7 @@ export const ClubDashboard: React.FC = () => {
                 <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#EDE9FE] dark:bg-[#8B5CF6]/20 border border-[#8B5CF6]/30 text-[#6D28D9] dark:text-[#C4B5FD] text-xs font-bold tracking-tight">
                   <Clock className="w-3.5 h-3.5 text-[#8B5CF6] shrink-0" />
                   <span>{item.timeSlot}</span>
+                  <span className="text-[11px] opacity-80 font-semibold">· {calculateDurationMinutes(item.startTime, item.endTime, item.timeSlot)} min</span>
                 </span>
                 <span className="text-xs font-semibold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800/80 border border-slate-200/70 dark:border-slate-700 px-2.5 py-1 rounded-full">
                   {item.courtName}
@@ -687,7 +717,7 @@ export const ClubDashboard: React.FC = () => {
                   {isConsolidatedView && (item.venueShortName || item.venueName) && (
                     <div className="flex items-center gap-1 text-[11px] font-bold text-[#0B1A2D] dark:text-[#B7F229] mb-0.5 tracking-tight">
                       <Building2 className="w-3 h-3 text-[#0B1A2D] dark:text-[#B7F229] shrink-0" />
-                      <span>{item.venueShortName || item.venueName}</span>
+                      <span>{cleanVenueName(item.venueShortName || item.venueName)}</span>
                     </div>
                   )}
                   <h4 className="text-sm font-bold text-[#0B1A2D] dark:text-white truncate group-hover:text-[#8B5CF6] transition-colors">

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useApp, getLastActiveRoute } from './context/AppContext';
+import { useApp, getLastActiveRoute, getSavedAdminSession, clearAdminSession } from './context/AppContext';
 import { RoleSelectorModal } from './components/common/RoleSelectorModal';
 import { Navbar } from './components/common/Navbar';
 import { Footer } from './components/common/Footer';
@@ -127,8 +127,16 @@ export function App() {
     const syncRoute = () => {
       const pathname = typeof window !== 'undefined' ? window.location.pathname : '/';
 
-      // Restauración de ruta activa si se entra a la raíz '/'
-      if (pathname === '/') {
+      // Restauración de ruta activa si se entra a la raíz '/', vacío o '/demo'
+      if (pathname === '/' || pathname === '' || pathname === '/demo') {
+        const savedAdmin = getSavedAdminSession();
+        if (savedAdmin) {
+          setIsCorporateLanding(false);
+          setCurrentView('admin');
+          if (savedAdmin.adminTab) setAdminTab(savedAdmin.adminTab);
+          if (savedAdmin.tenantId) switchTenant(savedAdmin.tenantId);
+          return;
+        }
         const saved = getLastActiveRoute();
         if (saved && saved.view && saved.view !== 'public') {
           setIsCorporateLanding(false);
@@ -151,8 +159,15 @@ export function App() {
         }
         setIsCorporateLanding(false);
 
-        // Si la ruta restante está vacía o es la raíz del club, es la web pública del club
+        // Si la ruta restante está vacía o es la raíz del club:
+        // Si hay una sesión activa de administrador guardada, restaurar al administrador
         if (!remaining || remaining === '/') {
+          const savedAdmin = getSavedAdminSession();
+          if (savedAdmin) {
+            setCurrentView('admin');
+            setAdminTab(savedAdmin.adminTab);
+            return;
+          }
           setCurrentView('public');
           setPublicPage('home');
           return;
@@ -165,7 +180,7 @@ export function App() {
           else if (remaining.includes('/reservas/todas') || remaining.includes('/todas-las-reservas')) setAdminTab('all_bookings');
           else if (remaining.includes('/reservas')) setAdminTab('agenda');
           else if (remaining.includes('/pistas') || remaining.includes('/domotica')) setAdminTab('courts_management');
-          else if (remaining.includes('/tpv')) setAdminTab('pos_cafe');
+          else if (remaining.includes('/tpv') || remaining.includes('/pos') || remaining.includes('/caja')) setAdminTab('pos_cafe');
           else if (remaining.includes('/facturacion')) setAdminTab('invoicing');
           else if (remaining.includes('/escuela')) setAdminTab('academy');
           else if (remaining.includes('/torneos') || remaining.includes('/competiciones')) setAdminTab('tournaments');
@@ -173,7 +188,10 @@ export function App() {
           else if (remaining.includes('/equipos')) setAdminTab('teams');
           else if (remaining.includes('/socios') || remaining.includes('/crm') || remaining.includes('/clientes') || remaining.includes('/jugadores')) setAdminTab('customers');
           else if (remaining.includes('/personal') || remaining.includes('/profesores')) setAdminTab('staff');
-          else if (remaining.includes('/ajustes')) setAdminTab('settings');
+          else if (remaining.includes('/editor-web') || remaining.includes('/marca-blanca')) setAdminTab('web_editor');
+          else if (remaining.includes('/dominios')) setAdminTab('domains');
+          else if (remaining.includes('/suscripcion')) setAdminTab('subscription');
+          else if (remaining.includes('/ajustes') || remaining.includes('/configuracion')) setAdminTab('settings');
           else setAdminTab('dashboard');
           return;
         }
@@ -314,7 +332,13 @@ export function App() {
         setAdminTab('academy');
         return;
       }
-      if (pathname === '/gestion/tpv' || pathname === '/admin/tpv') {
+      if (
+        pathname === '/gestion/tpv' ||
+        pathname === '/admin/tpv' ||
+        pathname === '/gestion/pos' ||
+        pathname === '/admin/pos' ||
+        pathname === '/gestion/caja'
+      ) {
         setCurrentView('admin');
         setAdminTab('pos_cafe');
         return;
@@ -378,7 +402,18 @@ export function App() {
     };
     syncRoute();
     window.addEventListener('popstate', syncRoute);
-    return () => window.removeEventListener('popstate', syncRoute);
+    window.addEventListener('pageshow', syncRoute);
+    const handleVisibility = () => {
+      if (!document.hidden) {
+        syncRoute();
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+    return () => {
+      window.removeEventListener('popstate', syncRoute);
+      window.removeEventListener('pageshow', syncRoute);
+      document.removeEventListener('visibilitychange', handleVisibility);
+    };
   }, [setPublicPage, setCurrentView, setAdminTab]);
 
   // Scroll Reset Obligatorio: Al cambiar de página, vista o pestaña, forzar scroll arriba

@@ -153,7 +153,7 @@ export const AdminCafePOS: React.FC = () => {
       venueId: venues?.[0]?.id || 'v-1',
       venueName: venues?.[0]?.name || 'Sede Principal',
       customerName: 'Carlos Méndez',
-      cashierName: currentUser?.name || 'Recepción Mostrador',
+      cashierName: 'Marcos Soto (Recepción)',
       items: [
         { name: 'Agua Mineral 50cl', qty: 2, unitPrice: 1.5, category: 'Bebidas' },
         { name: 'Café Espresso', qty: 1, unitPrice: 2.5, category: 'Café' },
@@ -169,7 +169,7 @@ export const AdminCafePOS: React.FC = () => {
       venueId: venues?.[0]?.id || 'v-1',
       venueName: venues?.[0]?.name || 'Sede Principal',
       customerName: 'Diego Soto',
-      cashierName: currentUser?.name || 'Recepción Mostrador',
+      cashierName: 'Laura Senra (Mostrador)',
       items: [
         { name: 'Reserva Pista 2 (10:00) — Cuota 1/4', qty: 1, unitPrice: 7.0, category: 'Reserva Pista' },
       ],
@@ -184,7 +184,7 @@ export const AdminCafePOS: React.FC = () => {
       venueId: venues?.[1]?.id || venues?.[0]?.id || 'v-2',
       venueName: venues?.[1]?.name || 'Sede Indoor Norte',
       customerName: 'Ana Belén Vázquez',
-      cashierName: currentUser?.name || 'Recepción Mostrador',
+      cashierName: 'Carlos M. (Entrenador)',
       items: [
         { name: 'Bote Bolas Head Pro S', qty: 1, unitPrice: 6.0, category: 'Grip/Pelotas' },
         { name: 'Isotónico Powerade', qty: 2, unitPrice: 3.0, category: 'Bebidas' },
@@ -200,7 +200,7 @@ export const AdminCafePOS: React.FC = () => {
       venueId: venues?.[0]?.id || 'v-1',
       venueName: venues?.[0]?.name || 'Sede Principal',
       customerName: 'Elena Permuy',
-      cashierName: currentUser?.name || 'Recepción Mostrador',
+      cashierName: 'Marcos Soto (Recepción)',
       items: [
         { name: 'Recarga Monedero Club (#SM-390)', qty: 1, unitPrice: 50.0, category: 'Monedero' },
       ],
@@ -215,7 +215,7 @@ export const AdminCafePOS: React.FC = () => {
       venueId: venues?.[0]?.id || 'v-1',
       venueName: venues?.[0]?.name || 'Sede Principal',
       customerName: 'Javier Fraga',
-      cashierName: currentUser?.name || 'Recepción Mostrador',
+      cashierName: 'Laura Senra (Mostrador)',
       items: [
         { name: 'Overgrip Wilson Pro', qty: 1, unitPrice: 2.5, category: 'Grip/Pelotas' },
         { name: 'Agua Mineral 1.5L', qty: 1, unitPrice: 2.0, category: 'Bebidas' },
@@ -747,25 +747,10 @@ export const AdminCafePOS: React.FC = () => {
             <span className="text-xs font-medium text-slate-400 dark:text-slate-500 tracking-wide block mb-0.5">
               {currentTenant?.name || 'Centro de Pádel San Mateo'}
             </span>
-            <div className="flex items-center gap-2.5">
-              <h1 className="text-[22px] font-extrabold text-[#0B1A2D] dark:text-white tracking-tight leading-tight">
-                TPV / Caja
-              </h1>
-              <span className="px-2.5 py-0.5 rounded-full bg-[#F0FCCF] dark:bg-[#B7F229]/20 border border-[#B7F229]/50 text-[#0B1A2D] dark:text-[#B7F229] font-black text-[10px] tracking-wider uppercase shadow-2xs">
-                Caja Abierta
-              </span>
-            </div>
+            <h1 className="text-[22px] font-extrabold text-[#0B1A2D] dark:text-white tracking-tight leading-tight">
+              TPV / Caja
+            </h1>
           </div>
-
-          <button
-            type="button"
-            onClick={openNewProductModal}
-            className="p-1.5 text-slate-700 dark:text-slate-300 hover:text-[#0B1A2D] dark:hover:text-[#B7F229] transition-colors cursor-pointer active:scale-95"
-            title="Nuevo producto"
-            aria-label="Nuevo producto"
-          >
-            <Plus className="w-6 h-6 stroke-[2.2]" />
-          </button>
         </div>
 
         {/* Pill de Sede y Estado Operativo Unificado */}
@@ -946,15 +931,18 @@ export const AdminCafePOS: React.FC = () => {
             <span className="font-bold">Asignar Reserva</span>
           </button>
 
-          {/* 2. + Producto */}
+          {/* 2. Nuevo producto */}
           <button
             type="button"
             onClick={openNewProductModal}
-            className="w-full px-3 py-2.5 rounded-xl bg-white dark:bg-[#0E2239] hover:bg-slate-50 dark:hover:bg-[#132A45] text-[#0B1A2D] dark:text-slate-200 font-bold text-xs border border-slate-200/80 dark:border-[#1A314D] shadow-2xs flex items-center justify-center gap-2 transition active:scale-95 cursor-pointer"
+            className="w-full px-3 py-2 rounded-xl bg-white dark:bg-[#0E2239] hover:bg-slate-50 dark:hover:bg-[#132A45] text-[#0B1A2D] dark:text-slate-200 font-bold border border-slate-200/80 dark:border-[#1A314D] shadow-2xs flex items-center justify-center gap-2.5 transition active:scale-95 cursor-pointer"
             title="Añadir nuevo producto al mostrador"
           >
-            <Plus className="w-4 h-4 text-[#8B5CF6] stroke-[2.5] shrink-0" />
-            <span>+ Producto</span>
+            <Package className="w-4 h-4 text-[#8B5CF6] stroke-[2] shrink-0" />
+            <div className="flex flex-col text-left leading-tight">
+              <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">Nuevo</span>
+              <span className="text-xs font-extrabold text-[#0B1A2D] dark:text-white">producto</span>
+            </div>
           </button>
 
           {/* 3. Todos los Pagos */}
@@ -1267,10 +1255,15 @@ export const AdminCafePOS: React.FC = () => {
                         <span className="font-mono font-bold text-[10px] text-slate-400 shrink-0">{tx.time}</span>
                         <span className="font-bold text-slate-900 dark:text-white truncate text-[11px] group-hover:text-[#8B5CF6] transition-colors">{tx.concept}</span>
                       </div>
-                      <div className="text-[10px] text-slate-500 dark:text-slate-400 flex items-center gap-1.5 truncate">
+                      <div className="text-[10px] text-slate-500 dark:text-slate-400 flex flex-wrap items-center gap-1.5 truncate">
                         <span>{tx.customerName || 'Cliente Mostrador'}</span>
                         <span>·</span>
                         <span className="text-[#8B5CF6] font-medium">{tx.paymentMethod}</span>
+                        <span>·</span>
+                        <span className="text-slate-600 dark:text-slate-300 font-medium inline-flex items-center gap-1">
+                          <User className="w-3 h-3 text-slate-400 shrink-0" />
+                          <span>{tx.cashierName || 'Recepción Mostrador'}</span>
+                        </span>
                       </div>
                     </div>
                     <div className="text-right shrink-0">
@@ -1382,10 +1375,15 @@ export const AdminCafePOS: React.FC = () => {
                           {tx.concept}
                         </span>
                       </div>
-                      <div className="text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-2">
+                      <div className="text-[11px] text-slate-500 dark:text-slate-400 flex flex-wrap items-center gap-2">
                         <span className="font-semibold text-slate-700 dark:text-slate-300">{tx.customerName || 'Cliente Mostrador'}</span>
                         <span>·</span>
                         <span className="text-[#8B5CF6] font-medium">{tx.paymentMethod}</span>
+                        <span>·</span>
+                        <span className="text-slate-600 dark:text-slate-300 font-medium inline-flex items-center gap-1">
+                          <User className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                          <span>Atendido por: <strong>{tx.cashierName || 'Recepción Mostrador'}</strong></span>
+                        </span>
                         {tx.venueName && (
                           <>
                             <span>·</span>

@@ -1374,12 +1374,12 @@ export const AdminMatches: React.FC = () => {
           </button>
         </div>
 
-        {/* Fila 2: Pestañas de estado planas, modernas y limpias */}
-        <div className="flex items-center gap-1.5 overflow-x-auto hide-scrollbar py-0.5">
+        {/* Fila 2: Pestañas de estado planas, modernas y limpias (Fila fija simétrica sin scroll) */}
+        <div className="grid grid-cols-3 gap-1.5 w-full py-0.5">
           <button
             type="button"
             onClick={() => setStatusFilter('all')}
-            className={`px-3.5 py-1.5 rounded-xl text-xs transition cursor-pointer font-bold flex items-center gap-1.5 ${
+            className={`w-full px-2 py-1.5 rounded-xl text-xs transition cursor-pointer font-bold flex items-center justify-center gap-1 text-center whitespace-nowrap ${
               statusFilter === 'all'
                 ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D] shadow-xs'
                 : 'bg-white/80 dark:bg-[#0E2239]/80 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white border border-slate-200/70 dark:border-[#1A314D]'
@@ -1391,7 +1391,7 @@ export const AdminMatches: React.FC = () => {
           <button
             type="button"
             onClick={() => setStatusFilter('open')}
-            className={`px-3.5 py-1.5 rounded-xl text-xs transition cursor-pointer font-bold flex items-center gap-1.5 ${
+            className={`w-full px-2 py-1.5 rounded-xl text-xs transition cursor-pointer font-bold flex items-center justify-center gap-1 text-center whitespace-nowrap ${
               statusFilter === 'open'
                 ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D] shadow-xs'
                 : 'bg-white/80 dark:bg-[#0E2239]/80 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white border border-slate-200/70 dark:border-[#1A314D]'
@@ -1403,7 +1403,7 @@ export const AdminMatches: React.FC = () => {
           <button
             type="button"
             onClick={() => setStatusFilter('full')}
-            className={`px-3.5 py-1.5 rounded-xl text-xs transition cursor-pointer font-bold flex items-center gap-1.5 ${
+            className={`w-full px-2 py-1.5 rounded-xl text-xs transition cursor-pointer font-bold flex items-center justify-center gap-1 text-center whitespace-nowrap ${
               statusFilter === 'full'
                 ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D] shadow-xs'
                 : 'bg-white/80 dark:bg-[#0E2239]/80 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white border border-slate-200/70 dark:border-[#1A314D]'
@@ -1713,6 +1713,9 @@ export const AdminMatches: React.FC = () => {
                     <span className="text-[#0B1A2D] dark:text-white font-bold">
                       {formatSimplifiedMatchDate(m.startTime)}
                     </span>
+                    <span className="inline-flex items-center px-1.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-[10px] font-bold text-slate-600 dark:text-slate-300">
+                      {m.durationMinutes || 90} min
+                    </span>
                   </div>
 
                   <div className="flex items-center gap-1.5 shrink-0">
@@ -1883,9 +1886,9 @@ export const AdminMatches: React.FC = () => {
                           e.stopPropagation();
                           setSelectedMatchForAdd(m);
                         }}
-                        className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#B7F229] hover:bg-[#a3dc1e] text-[#0B1A2D] rounded-xl text-xs font-extrabold shadow-xs active:scale-95 transition-all cursor-pointer"
+                        className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#0B1A2D] hover:bg-[#132A45] text-white rounded-xl text-xs font-extrabold shadow-xs active:scale-95 transition-all cursor-pointer"
                       >
-                        <Plus className="w-3.5 h-3.5 text-[#0B1A2D] stroke-[2.5]" />
+                        <Plus className="w-3.5 h-3.5 text-white stroke-[2.5]" />
                         <span>Inscribir</span>
                       </button>
                     )}
