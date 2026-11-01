@@ -194,7 +194,7 @@ export const NotificationsPopover: React.FC<NotificationsPopoverProps> = ({ vari
         <button
           type="button"
           onClick={() => setIsOpen(!isOpen)}
-          className="relative w-9 h-9 flex items-center justify-center shrink-0 rounded-xl text-[#0B1A2D] dark:text-slate-200 hover:text-slate-950 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+          className="relative w-8 h-8 sm:w-8.5 sm:h-8.5 flex items-center justify-center shrink-0 rounded-full text-[#0B1A2D] dark:text-slate-200 hover:text-slate-950 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
           title="Centro de Notificaciones"
           aria-label="Abrir centro de notificaciones"
           aria-expanded={isOpen}

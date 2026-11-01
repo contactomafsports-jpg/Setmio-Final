@@ -665,17 +665,6 @@ export const ClubDashboard: React.FC = () => {
           <h2 className="text-base font-bold text-[#0B1A2D] dark:text-white">
             Próximas Reservas de Hoy
           </h2>
-
-          <button
-            type="button"
-            onClick={() => {
-              if (typeof window !== 'undefined') window.history.pushState({}, '', '/admin/reservas');
-              setAdminTab('agenda');
-            }}
-            className="text-xs font-bold text-[#8B5CF6] dark:text-purple-400 hover:underline cursor-pointer"
-          >
-            ver agenda
-          </button>
         </div>
 
         {/* Botón Sólido de Marca: Todas las Reservas (Limpio y sin flecha) */}

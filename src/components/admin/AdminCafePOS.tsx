@@ -1130,7 +1130,7 @@ export const AdminCafePOS: React.FC = () => {
             </span>
           </button>
 
-          {/* 4. Todos los productos */}
+          {/* 4. Productos (Renombrado de 'Todos los productos') */}
           <button
             type="button"
             onClick={() => setIsCatalogManagementOpen(true)}
@@ -1141,15 +1141,15 @@ export const AdminCafePOS: React.FC = () => {
               <ShoppingBag className="w-4 h-4 stroke-[2.2]" />
             </div>
             <span className="text-xs font-bold text-[#0B1A2D] dark:text-white truncate">
-              Todos los productos
+              Productos
             </span>
           </button>
 
-          {/* 5. Arqueo de Caja */}
+          {/* 5. Arqueo de Caja (Integrado de forma equilibrada con el mismo ancho) */}
           <button
             type="button"
             onClick={() => setArqueoModalOpen(true)}
-            className="w-full h-12 px-3.5 rounded-xl bg-white dark:bg-[#0E2239] hover:bg-slate-50 dark:hover:bg-[#132A45] border border-slate-200/80 dark:border-[#1A314D] shadow-2xs flex items-center justify-start text-left gap-2.5 sm:gap-3 transition active:scale-95 cursor-pointer group col-span-2 sm:col-span-1"
+            className="w-full h-12 px-3.5 rounded-xl bg-white dark:bg-[#0E2239] hover:bg-slate-50 dark:hover:bg-[#132A45] border border-slate-200/80 dark:border-[#1A314D] shadow-2xs flex items-center justify-start text-left gap-2.5 sm:gap-3 transition active:scale-95 cursor-pointer group"
             title="Arqueo y cierre de turno"
           >
             <div className="w-7 h-7 rounded-lg bg-slate-100 dark:bg-[#152e4d] flex items-center justify-center shrink-0 text-slate-600 dark:text-slate-300 group-hover:text-[#0B1A2D] dark:group-hover:text-[#B7F229] transition-colors">
@@ -1163,31 +1163,32 @@ export const AdminCafePOS: React.FC = () => {
       </section>
 
       {/* ======================================================================
-          NIVEL 2: PÁGINA DE DETALLE - TODOS LOS PRODUCTOS E INVENTARIO
-          (Cabecera limpia con botón ← de retroceso y título unificado)
+          NIVEL 2: PÁGINA DE DETALLE - PRODUCTOS E INVENTARIO
+          (Sin barra superior global, cabecera limpia con botón ← de retroceso y título unificado, sin subtítulos)
           ====================================================================== */}
-      {isCatalogManagementOpen ? (
-        <section className="space-y-4 animate-in fade-in duration-200" data-level="2">
-          {/* Cabecera Nivel 2 */}
-          <div className="flex items-center justify-between p-4 bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200/80 dark:border-[#1A314D] shadow-2xs">
-            <div className="flex items-center gap-3">
-              <button
-                type="button"
-                onClick={() => setIsCatalogManagementOpen(false)}
-                className="p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:text-[#0B1A2D] dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#132A45] transition cursor-pointer active:scale-95"
-                title="Volver al mostrador TPV"
-              >
-                <ArrowLeft className="w-5 h-5 stroke-[2.5]" />
-              </button>
-              <div>
-                <h2 className="text-base sm:text-lg font-black text-[#0B1A2D] dark:text-white">
-                  Todos los Productos e Inventario
-                </h2>
-                <p className="text-xs text-slate-400">
-                  Control de existencias, precios y selección de artículos destacados en mostrador
-                </p>
+      {isCatalogManagementOpen && (
+        <div className="fixed inset-0 z-45 bg-slate-50 dark:bg-[#0B1A2D] overflow-y-auto pb-24 md:pb-8 pt-3 sm:pt-4 px-3.5 sm:px-6 lg:px-8 animate-in fade-in duration-200" data-level="2">
+          <div className="max-w-7xl mx-auto space-y-4">
+            {/* Cabecera Nivel 2 */}
+            <div className="flex items-center justify-between p-3.5 sm:p-4 bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200/80 dark:border-[#1A314D] shadow-2xs">
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => setIsCatalogManagementOpen(false)}
+                  className="p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:text-[#0B1A2D] dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#132A45] transition cursor-pointer active:scale-95"
+                  title="Volver al mostrador TPV"
+                >
+                  <ArrowLeft className="w-5 h-5 stroke-[2.5]" />
+                </button>
+                <div className="flex items-center gap-2.5">
+                  <h1 className="text-lg sm:text-xl font-extrabold text-[#0B1A2D] dark:text-white tracking-tight">
+                    Productos
+                  </h1>
+                  <span className="px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-[#0B1A2D] dark:text-[#B7F229] font-mono text-[10px] font-black">
+                    {cafeProducts.length} artículos
+                  </span>
+                </div>
               </div>
-            </div>
 
             <button
               type="button"
@@ -1274,9 +1275,9 @@ export const AdminCafePOS: React.FC = () => {
                 return (
                   <div
                     key={prod.id}
-                    className="p-3.5 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-slate-50/60 dark:hover:bg-[#132A45]/40 transition"
+                    className="p-3.5 sm:p-4 flex items-center justify-between gap-3 hover:bg-slate-50/60 dark:hover:bg-[#132A45]/40 transition"
                   >
-                    <div className="flex items-center gap-3 min-w-0">
+                    <div className="flex items-center gap-3 min-w-0 flex-1">
                       <div className="relative w-12 h-12 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 shrink-0 border border-slate-200/80 dark:border-slate-700">
                         <img
                           src={prod.imageUrl || getFallbackProductImage(prod.category)}
@@ -1289,7 +1290,7 @@ export const AdminCafePOS: React.FC = () => {
                           <span className="font-bold text-xs sm:text-sm text-[#0B1A2D] dark:text-white truncate">
                             {prod.name}
                           </span>
-                          <span className="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold text-[10px] uppercase">
+                          <span className="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold text-[10px] uppercase shrink-0">
                             {prod.category}
                           </span>
                         </div>
@@ -1299,44 +1300,44 @@ export const AdminCafePOS: React.FC = () => {
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-between sm:justify-end gap-3 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-100 dark:border-slate-800">
+                    <div className="flex items-center justify-end gap-2 sm:gap-3 shrink-0">
                       {/* Control de Stock (+ / -) */}
                       <div className="flex items-center gap-1.5">
-                        <span className="text-[10px] text-slate-400 font-bold uppercase mr-1">Stock:</span>
+                        <span className="text-[10px] text-slate-400 font-bold uppercase mr-1 hidden sm:inline">Stock:</span>
                         <button
                           type="button"
                           onClick={() => adjustStock(prod, -1)}
-                          className="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 flex items-center justify-center font-black cursor-pointer text-xs"
+                          className="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 flex items-center justify-center font-black cursor-pointer text-xs transition"
                           title="Reducir stock (-1)"
                         >
                           -
                         </button>
-                        <span className="w-10 text-center font-mono font-bold text-xs text-[#0B1A2D] dark:text-white">
+                        <span className="w-8 sm:w-10 text-center font-mono font-bold text-xs text-[#0B1A2D] dark:text-white">
                           {prod.stock}
                         </span>
                         <button
                           type="button"
                           onClick={() => adjustStock(prod, 1)}
-                          className="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 flex items-center justify-center font-black cursor-pointer text-xs"
+                          className="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 flex items-center justify-center font-black cursor-pointer text-xs transition"
                           title="Añadir stock (+1)"
                         >
                           +
                         </button>
                       </div>
 
-                      {/* Toggle Destacado en Mostrador */}
+                      {/* Toggle Destacado en Mostrador (Simplificado a 'Destacado') */}
                       <button
                         type="button"
                         onClick={() => toggleProductFeatured(prod)}
                         className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-bold transition cursor-pointer select-none ${
                           isFeatured
                             ? 'bg-[#F0FCCF] dark:bg-[#B7F229]/20 border-[#B7F229]/60 text-[#0B1A2D] dark:text-[#B7F229]'
-                            : 'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-500'
+                            : 'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-400'
                         }`}
-                        title={isFeatured ? 'Artículo visible en el mostrador TPV' : 'Artículo oculto del mostrador rápido'}
+                        title={isFeatured ? 'Artículo visible en mostrador' : 'Hacer clic para destacar en mostrador'}
                       >
                         <span className={`w-2 h-2 rounded-full ${isFeatured ? 'bg-[#82b805] dark:bg-[#B7F229]' : 'bg-slate-400'}`} />
-                        <span>{isFeatured ? 'Destacado en TPV' : 'Oculto en TPV'}</span>
+                        <span>Destacado</span>
                       </button>
 
                       {/* Acciones Editar y Eliminar */}
@@ -1344,7 +1345,7 @@ export const AdminCafePOS: React.FC = () => {
                         <button
                           type="button"
                           onClick={() => openEditProductModal(prod)}
-                          className="p-2 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+                          className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
                           title="Editar producto"
                         >
                           <Edit2 className="w-4 h-4" />
@@ -1352,7 +1353,7 @@ export const AdminCafePOS: React.FC = () => {
                         <button
                           type="button"
                           onClick={() => setProductToDelete(prod)}
-                          className="p-2 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition cursor-pointer"
+                          className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition cursor-pointer"
                           title="Eliminar producto"
                         >
                           <Trash2 className="w-4 h-4" />
@@ -1364,10 +1365,12 @@ export const AdminCafePOS: React.FC = () => {
               })
             )}
           </div>
-        </section>
-      ) : (
-        /* 2. POS Interface: Product Catalog + Fast Ticket Register */
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+        </div>
+      </div>
+      )}
+
+      {/* 2. POS Interface: Product Catalog + Fast Ticket Register */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
         {/* Products Grid */}
         <div className="lg:col-span-7 space-y-3.5">
           {/* Categories bar con botón minimalista para gestionar categorías */}
@@ -1390,16 +1393,6 @@ export const AdminCafePOS: React.FC = () => {
             </div>
 
             <div className="flex items-center gap-1.5 shrink-0">
-              <button
-                type="button"
-                onClick={() => setIsCatalogManagementOpen(true)}
-                className="px-2.5 py-1.5 rounded-xl bg-white dark:bg-slate-800/90 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 hover:text-[#0B1A2D] dark:hover:text-white border border-slate-200/80 dark:border-slate-700/80 shadow-2xs flex items-center gap-1.5 text-xs font-bold transition cursor-pointer shrink-0"
-                title="Ver catálogo completo y existencias"
-              >
-                <ShoppingBag className="w-3.5 h-3.5 text-[#8B5CF6]" />
-                <span className="hidden sm:inline">Todos los productos</span>
-              </button>
-
               <button
                 type="button"
                 onClick={() => setIsCategoryModalOpen(true)}
@@ -1687,77 +1680,156 @@ export const AdminCafePOS: React.FC = () => {
           </div>
         </div>
       </div>
-      )}
 
       {/* ======================================================================
-          2.5 MODAL NIVEL 3: "PAGOS" (HISTORIAL GLOBAL CONSOLIDADO DE TODOS LOS TURNOS Y RECEPCIONISTAS)
+          NIVEL 2: PÁGINA DE DETALLE - PAGOS (CONSOLIDADO MULTI-TURNO Y MULTI-RECEPCIÓN)
+          (Sin barra superior global, cabecera limpia con botón ← de retroceso, sin subtítulos,
+           componente estándar unificado de sedes y filtros globales integrados)
           ====================================================================== */}
       {transactionsModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0B1A2D]/75 backdrop-blur-sm p-3 sm:p-4 md:p-6 overflow-hidden animate-in fade-in duration-150">
-          <div className="relative w-full max-w-4xl bg-white dark:bg-[#0E2239] border border-slate-200/90 dark:border-[#1A314D] rounded-3xl shadow-2xl text-slate-900 dark:text-slate-100 flex flex-col max-h-[92vh] overflow-hidden">
-            {/* Header Fijo con X perfectamente alineada a la derecha */}
-            <div className="p-4 sm:p-5 border-b border-slate-100 dark:border-[#1A314D] flex items-center justify-between gap-3 shrink-0 bg-white dark:bg-[#0E2239]">
+        <div className="fixed inset-0 z-45 bg-slate-50 dark:bg-[#0B1A2D] overflow-y-auto pb-24 md:pb-8 pt-3 sm:pt-4 px-3.5 sm:px-6 lg:px-8 animate-in fade-in duration-200" data-level="2">
+          <div className="max-w-7xl mx-auto space-y-4">
+            {/* Cabecera Limpia Nivel 2 (con botón ← de retroceso y título unificado, SIN subtítulo) */}
+            <div className="flex items-center justify-between p-3.5 sm:p-4 bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200/80 dark:border-[#1A314D] shadow-2xs">
               <div className="flex items-center gap-3 min-w-0">
-                <div className="w-10 h-10 rounded-2xl bg-[#0B1A2D] text-[#B7F229] flex items-center justify-center font-bold shrink-0">
-                  <Receipt className="w-5 h-5 stroke-[2.2]" />
-                </div>
-                <div className="min-w-0">
-                  <div className="flex items-center gap-2">
-                    <h3 className="text-base sm:text-lg font-black text-[#0B1A2D] dark:text-white truncate">
-                      Pagos y Cobros Consolidados
-                    </h3>
-                    <span className="px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-[#0B1A2D] dark:text-[#B7F229] font-mono text-[10px] font-black">
-                      {filteredGlobalPayments.length} pagos
-                    </span>
-                  </div>
-                  <p className="text-xs text-slate-400 truncate">
-                    Historial consolidado de todos los turnos, recepcionistas y métodos de cobro
-                  </p>
+                <button
+                  type="button"
+                  onClick={() => setTransactionsModalOpen(false)}
+                  className="p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:text-[#0B1A2D] dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#132A45] transition cursor-pointer active:scale-95"
+                  title="Volver al mostrador TPV"
+                >
+                  <ArrowLeft className="w-5 h-5 stroke-[2.5]" />
+                </button>
+                <div className="flex items-center gap-2.5">
+                  <h1 className="text-lg sm:text-xl font-extrabold text-[#0B1A2D] dark:text-white tracking-tight">
+                    Pagos
+                  </h1>
+                  <span className="px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-[#0B1A2D] dark:text-[#B7F229] font-mono text-[10px] font-black">
+                    {filteredGlobalPayments.length} registrados
+                  </span>
                 </div>
               </div>
 
+              {/* Botón de Exportación Rápida */}
               <button
                 type="button"
-                onClick={() => setTransactionsModalOpen(false)}
-                className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer shrink-0"
-                title="Cerrar ventana de pagos"
+                onClick={handleExportArqueoCSV}
+                className="px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-[#0B1A2D] dark:text-white font-bold text-xs flex items-center gap-1.5 transition cursor-pointer active:scale-95"
               >
-                <X className="w-5 h-5" />
+                <Download className="w-3.5 h-3.5 text-[#8B5CF6]" />
+                <span className="hidden sm:inline">Exportar CSV</span>
               </button>
             </div>
 
+            {/* Componente Estándar Unificado de Sedes y Estado Operativo */}
+            <div className="relative">
+              <div className="flex items-center justify-between p-2.5 bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200/80 dark:border-[#1A314D] shadow-2xs">
+                <div
+                  onClick={() => setIsVenueSelectorOpen(!isVenueSelectorOpen)}
+                  className="flex items-center gap-2 cursor-pointer group select-none min-w-0"
+                  title="Cambiar sede activa"
+                >
+                  <div className="w-8 h-8 rounded-xl bg-slate-50 dark:bg-[#071220] border border-slate-100 dark:border-[#1A314D] flex items-center justify-center text-[#0B1A2D] dark:text-slate-200 shrink-0">
+                    <Building2 className="w-4 h-4 text-[#0B1A2D] dark:text-white" />
+                  </div>
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-xs font-bold text-[#0B1A2D] dark:text-white truncate">
+                        {posVenueFilter === 'all'
+                          ? 'Todas las Sedes (Consolidado)'
+                          : venues.find((v) => v.id === posVenueFilter)?.name || 'Sede'}
+                      </span>
+                      <ChevronDown className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#0B1A2D] dark:group-hover:text-white transition-transform" />
+                    </div>
+                    <span className="text-[10px] font-medium text-slate-400 block truncate">
+                      {venues.length} sedes conectadas en red deportiva
+                    </span>
+                  </div>
+                </div>
+
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#F0FCCF] dark:bg-[#B7F229]/20 border border-[#B7F229]/50 shrink-0">
+                  <span className="w-2 h-2 rounded-full bg-[#82b805] dark:bg-[#B7F229]" />
+                  <span className="text-[11px] font-bold text-[#0B1A2D] dark:text-[#B7F229]">
+                    {posVenueFilter === 'all' ? `${venues.length} Sedes Activas` : 'Sede Filtrada'}
+                  </span>
+                </div>
+              </div>
+
+              {isVenueSelectorOpen && (
+                <div className="absolute top-full left-0 right-0 mt-2 z-30 p-2 bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200 dark:border-[#1A314D] shadow-xl space-y-1 animate-in fade-in slide-in-from-top-2 duration-150">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setPosVenueFilter('all');
+                      setIsVenueSelectorOpen(false);
+                    }}
+                    className={`w-full flex items-center justify-between p-2 rounded-xl text-xs font-bold transition text-left cursor-pointer ${
+                      posVenueFilter === 'all'
+                        ? 'bg-[#B7F229]/20 text-[#0B1A2D] dark:text-white'
+                        : 'hover:bg-slate-50 dark:hover:bg-[#132A45] text-slate-700 dark:text-slate-300'
+                    }`}
+                  >
+                    <span>Todas las Sedes (Consolidado)</span>
+                    {posVenueFilter === 'all' && <CheckCircle2 className="w-3.5 h-3.5 text-[#82b805]" />}
+                  </button>
+                  {venues.map((v) => (
+                    <button
+                      key={v.id}
+                      type="button"
+                      onClick={() => {
+                        setPosVenueFilter(v.id);
+                        setIsVenueSelectorOpen(false);
+                      }}
+                      className={`w-full flex items-center justify-between p-2 rounded-xl text-xs font-bold transition text-left cursor-pointer ${
+                        posVenueFilter === v.id
+                          ? 'bg-[#B7F229]/20 text-[#0B1A2D] dark:text-white'
+                          : 'hover:bg-slate-50 dark:hover:bg-[#132A45] text-slate-700 dark:text-slate-300'
+                      }`}
+                    >
+                      <span>{v.name}</span>
+                      {posVenueFilter === v.id && <CheckCircle2 className="w-3.5 h-3.5 text-[#82b805]" />}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
             {/* KPIs Resumen Superior */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 p-3 sm:p-4 bg-slate-50/70 dark:bg-[#071220]/70 border-b border-slate-100 dark:border-[#1A314D] shrink-0 text-xs">
-              <div className="p-2.5 rounded-xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D]">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+              <div className="p-3 bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200/80 dark:border-[#1A314D] shadow-2xs">
                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Total Cobrado</span>
-                <span className="text-base sm:text-lg font-black font-mono text-[#0B1A2D] dark:text-[#B7F229]">
+                <span className="text-xl font-black font-mono text-[#0B1A2D] dark:text-[#B7F229] mt-0.5 block">
                   {filteredGlobalPayments.reduce((acc, t) => acc + t.amount, 0).toFixed(2)} €
                 </span>
+                <span className="text-[10px] text-slate-400 font-medium">Todos los turnos</span>
               </div>
-              <div className="p-2.5 rounded-xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D]">
+              <div className="p-3 bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200/80 dark:border-[#1A314D] shadow-2xs">
                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Tarjeta / TPV</span>
-                <span className="text-base sm:text-lg font-black font-mono text-[#8B5CF6] dark:text-[#C4B5FD]">
+                <span className="text-xl font-black font-mono text-[#8B5CF6] dark:text-[#C4B5FD] mt-0.5 block">
                   {filteredGlobalPayments.filter((t) => t.paymentMethod.toLowerCase().includes('tarjeta')).reduce((a, b) => a + b.amount, 0).toFixed(2)} €
                 </span>
+                <span className="text-[10px] text-slate-400 font-medium">Datáfono / Terminal</span>
               </div>
-              <div className="p-2.5 rounded-xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D]">
+              <div className="p-3 bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200/80 dark:border-[#1A314D] shadow-2xs">
                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Efectivo</span>
-                <span className="text-base sm:text-lg font-black font-mono text-emerald-600 dark:text-emerald-400">
+                <span className="text-xl font-black font-mono text-emerald-600 dark:text-emerald-400 mt-0.5 block">
                   {filteredGlobalPayments.filter((t) => t.paymentMethod.toLowerCase().includes('efectivo')).reduce((a, b) => a + b.amount, 0).toFixed(2)} €
                 </span>
+                <span className="text-[10px] text-slate-400 font-medium">Cajón portamonedas</span>
               </div>
-              <div className="p-2.5 rounded-xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D]">
+              <div className="p-3 bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200/80 dark:border-[#1A314D] shadow-2xs">
                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Monedero / App</span>
-                <span className="text-base sm:text-lg font-black font-mono text-[#0B1A2D] dark:text-white">
+                <span className="text-xl font-black font-mono text-[#0B1A2D] dark:text-white mt-0.5 block">
                   {filteredGlobalPayments.filter((t) => !t.paymentMethod.toLowerCase().includes('tarjeta') && !t.paymentMethod.toLowerCase().includes('efectivo')).reduce((a, b) => a + b.amount, 0).toFixed(2)} €
                 </span>
+                <span className="text-[10px] text-slate-400 font-medium">Saldo y Bizum</span>
               </div>
             </div>
 
-            {/* Barra de Filtros Avanzados (Turno/Fecha, Cajero, Método de Pago, Sede, Búsqueda) */}
-            <div className="p-3 sm:p-4 bg-white dark:bg-[#0E2239] border-b border-slate-100 dark:border-[#1A314D] space-y-2 shrink-0 text-xs">
+            {/* Barra de Filtros Globales Integrados */}
+            <div className="p-3.5 sm:p-4 bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200/80 dark:border-[#1A314D] shadow-2xs space-y-2.5 text-xs">
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                {/* 1. Filtro Turno / Período */}
+                {/* 1. Turno / Período */}
                 <div>
                   <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">
                     Turno / Período
@@ -1776,7 +1848,7 @@ export const AdminCafePOS: React.FC = () => {
                   </select>
                 </div>
 
-                {/* 2. Filtro Cajero / Recepcionista */}
+                {/* 2. Recepcionista / Cajero */}
                 <div>
                   <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">
                     Recepcionista / Cajero
@@ -1794,7 +1866,7 @@ export const AdminCafePOS: React.FC = () => {
                   </select>
                 </div>
 
-                {/* 3. Filtro Método de Pago */}
+                {/* 3. Método de Pago */}
                 <div>
                   <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">
                     Método de Pago
@@ -1812,7 +1884,7 @@ export const AdminCafePOS: React.FC = () => {
                   </select>
                 </div>
 
-                {/* 4. Filtro Sede Unificada */}
+                {/* 4. Sede Activa */}
                 <div>
                   <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">
                     Sede Activa
@@ -1832,7 +1904,7 @@ export const AdminCafePOS: React.FC = () => {
                 </div>
               </div>
 
-              {/* 5. Buscador Rápido por Concepto, Cliente o Nº de Ticket */}
+              {/* 5. Buscador Rápido */}
               <div className="relative">
                 <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                 <input
@@ -1845,8 +1917,8 @@ export const AdminCafePOS: React.FC = () => {
               </div>
             </div>
 
-            {/* Listado de Pagos con Scroll Interior Controlado */}
-            <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-2.5 overscroll-contain">
+            {/* Listado de Pagos */}
+            <div className="bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200/80 dark:border-[#1A314D] shadow-2xs divide-y divide-slate-100 dark:divide-[#1A314D] overflow-hidden">
               {filteredGlobalPayments.length === 0 ? (
                 <div className="p-12 text-center text-slate-400 text-xs">
                   <Receipt className="w-10 h-10 mx-auto mb-2 opacity-40 text-slate-400" />
@@ -1857,7 +1929,7 @@ export const AdminCafePOS: React.FC = () => {
                   <div
                     key={tx.id}
                     onClick={() => setSelectedPaymentDetail(tx)}
-                    className="p-3.5 rounded-2xl bg-slate-50/80 dark:bg-[#071220]/60 hover:bg-white dark:hover:bg-[#132A45] border border-slate-200/80 dark:border-[#1A314D] transition-all flex items-center justify-between gap-4 text-xs cursor-pointer group shadow-2xs hover:shadow-sm"
+                    className="p-3.5 sm:p-4 hover:bg-slate-50/60 dark:hover:bg-[#132A45]/40 transition flex items-center justify-between gap-4 text-xs cursor-pointer group"
                     title="Haz clic para ver el ticket y desglose completo"
                   >
                     <div className="min-w-0 flex-1 space-y-1">
@@ -1870,7 +1942,7 @@ export const AdminCafePOS: React.FC = () => {
                             {tx.shift}
                           </span>
                         )}
-                        <span className="font-mono font-black text-[10px] px-1.5 py-0.5 rounded bg-slate-200/80 dark:bg-slate-800 text-slate-700 dark:text-slate-300 shrink-0">
+                        <span className="font-mono font-black text-[10px] px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 shrink-0">
                           #{tx.id}
                         </span>
                         <span className="font-bold text-[#0B1A2D] dark:text-white truncate group-hover:text-[#8B5CF6] transition-colors">
@@ -1902,7 +1974,7 @@ export const AdminCafePOS: React.FC = () => {
 
                     <div className="text-right shrink-0 flex items-center gap-3">
                       <div>
-                        <div className="font-mono font-black text-sm text-[#0B1A2D] dark:text-[#B7F229]">
+                        <div className="font-mono font-black text-sm sm:text-base text-[#0B1A2D] dark:text-[#B7F229]">
                           +{tx.amount.toFixed(2)} €
                         </div>
                         <span className="text-[9px] font-black text-[#0B1A2D] bg-[#B7F229] px-1.5 py-0.5 rounded shadow-2xs">
@@ -1914,16 +1986,16 @@ export const AdminCafePOS: React.FC = () => {
                   </div>
                 ))
               )}
-            </div>
 
-            {/* Footer Fijo con Totalizador */}
-            <div className="p-4 sm:p-5 border-t border-slate-100 dark:border-[#1A314D] flex items-center justify-between text-xs bg-slate-50/60 dark:bg-[#071220]/50 shrink-0">
-              <span className="text-slate-500 font-semibold">
-                Mostrando {filteredGlobalPayments.length} de {posTransactions.length} pagos registrados:
-              </span>
-              <span className="font-mono font-black text-lg text-[#0B1A2D] dark:text-white">
-                {filteredGlobalPayments.reduce((acc, t) => acc + t.amount, 0).toFixed(2)} €
-              </span>
+              {/* Totalizador inferior */}
+              <div className="p-3.5 sm:p-4 bg-slate-50/60 dark:bg-[#071220]/50 flex items-center justify-between text-xs">
+                <span className="text-slate-500 font-semibold">
+                  Mostrando {filteredGlobalPayments.length} de {posTransactions.length} pagos registrados:
+                </span>
+                <span className="font-mono font-black text-base sm:text-lg text-[#0B1A2D] dark:text-white">
+                  {filteredGlobalPayments.reduce((acc, t) => acc + t.amount, 0).toFixed(2)} €
+                </span>
+              </div>
             </div>
           </div>
         </div>

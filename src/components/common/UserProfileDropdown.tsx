@@ -163,7 +163,7 @@ export const UserProfileDropdown: React.FC<UserProfileDropdownProps> = ({
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-1.5 p-1 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 transition group focus:outline-none cursor-pointer"
+        className="flex items-center gap-1 p-0.5 rounded-full border border-transparent hover:border-slate-200 dark:hover:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 transition group focus:outline-none cursor-pointer"
         aria-label="Menú de usuario"
         aria-expanded={isOpen}
       >

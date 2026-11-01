@@ -1013,18 +1013,6 @@ export const AdminAgenda: React.FC = () => {
               · {formattedDayTitleLabel}
             </span>
           </div>
-          <button
-            type="button"
-            onClick={() => {
-              if (typeof window !== 'undefined') {
-                window.history.pushState({}, '', '/admin/reservas/todas');
-              }
-              setShowAllBookingsView(true);
-            }}
-            className="text-xs font-bold text-[#8B5CF6] dark:text-purple-400 hover:underline cursor-pointer"
-          >
-            ver todas
-          </button>
         </div>
 
         {dayBookings.length === 0 ? (

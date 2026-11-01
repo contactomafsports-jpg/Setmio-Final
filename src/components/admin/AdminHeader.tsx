@@ -105,7 +105,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
 
   return (
     <>
-      <header className="sticky top-0 z-50 h-14 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-3.5 sm:px-6 flex items-center justify-between gap-2 shadow-xs transition-colors">
+      <header className="sticky top-0 z-40 w-full px-3.5 sm:px-6 py-2.5 flex items-center justify-between gap-2 bg-slate-50/80 dark:bg-[#0B1A2D]/80 backdrop-blur-md transition-colors">
         {/* Left: BRANDING CONDICIONAL (Recepción = Marca Blanca Club / Admin = Oficial Setmio Pro) */}
         <div className="flex items-center gap-2 sm:gap-3 min-w-0">
           {isReception ? (
@@ -354,34 +354,34 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
             )}
           </button>
 
-          {/* 1. Centro Global de Notificaciones (Campanita con badge numérico dinámico) */}
-          <NotificationsPopover variant="admin" />
+          {/* Pastilla Flotante Unificada Ultracompacta a la Derecha */}
+          <div className="flex items-center gap-1 sm:gap-1.5 p-1 bg-white/90 dark:bg-[#0E2239]/90 backdrop-blur-md rounded-full border border-slate-200/80 dark:border-[#1A314D] shadow-xs">
+            {/* 1. Centro Global de Notificaciones (Campanita con badge dinámico) */}
+            <NotificationsPopover variant="admin" />
 
-          {/* Asistente IA Copiloto (Acento Violeta de Marca #8B5CF6) */}
-          <button
-            type="button"
-            onClick={() => setAiDrawerOpen(!aiDrawerOpen)}
-            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-bold transition border cursor-pointer ${
-              aiDrawerOpen
-                ? 'bg-[#8B5CF6] text-white border-[#7C3AED] shadow-sm shadow-[#8B5CF6]/30'
-                : 'bg-[#EDE9FE]/80 dark:bg-[#8B5CF6]/15 hover:bg-[#EDE9FE] dark:hover:bg-[#8B5CF6]/25 text-[#7C3AED] dark:text-[#C4B5FD] border-[#8B5CF6]/30 dark:border-[#8B5CF6]/40 shadow-2xs'
-            }`}
-            title="Copiloto y Asistente IA Setmio"
-            aria-label="Abrir Asistente IA"
-          >
-            <div className="relative flex items-center justify-center">
-              <Sparkles className="w-3.5 h-3.5 text-[#8B5CF6] dark:text-[#C4B5FD]" />
-              <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 rounded-full bg-[#8B5CF6] animate-pulse" />
-            </div>
-            <span className="font-extrabold text-[11px] hidden sm:inline text-[#7C3AED] dark:text-[#C4B5FD]">IA</span>
-          </button>
+            {/* 2. Asistente IA Copiloto (Acento Violeta de Marca #8B5CF6) */}
+            <button
+              type="button"
+              onClick={() => setAiDrawerOpen(!aiDrawerOpen)}
+              className={`w-8 h-8 rounded-full flex items-center justify-center transition-all cursor-pointer relative ${
+                aiDrawerOpen
+                  ? 'bg-[#8B5CF6] text-white shadow-xs'
+                  : 'text-[#8B5CF6] hover:bg-[#8B5CF6]/15'
+              }`}
+              title="Copiloto y Asistente IA Setmio"
+              aria-label="Abrir Asistente IA"
+            >
+              <Sparkles className="w-4 h-4 text-[#8B5CF6]" />
+              <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-[#8B5CF6] animate-pulse" />
+            </button>
 
-          {/* 2. Avatar del Usuario con Menú Desplegable Unificado */}
-          <UserProfileDropdown
-            variant="admin"
-            onOpenProfileModal={onOpenProfileModal}
-            onSelectTab={onSelectTab}
-          />
+            {/* 3. Avatar del Usuario con Menú Desplegable Unificado */}
+            <UserProfileDropdown
+              variant="admin"
+              onOpenProfileModal={onOpenProfileModal}
+              onSelectTab={onSelectTab}
+            />
+          </div>
         </div>
       </header>
 

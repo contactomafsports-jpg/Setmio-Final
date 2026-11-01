@@ -1713,7 +1713,7 @@ export const AdminMatches: React.FC = () => {
                     <span className="text-[#0B1A2D] dark:text-white font-bold">
                       {formatSimplifiedMatchDate(m.startTime)}
                     </span>
-                    <span className="inline-flex items-center px-1.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-[10px] font-bold text-slate-600 dark:text-slate-300">
+                    <span className="inline-flex items-center px-1.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-[10px] font-bold text-slate-600 dark:text-slate-300 whitespace-nowrap shrink-0">
                       {m.durationMinutes || 90} min
                     </span>
                   </div>
