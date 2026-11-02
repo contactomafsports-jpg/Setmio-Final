@@ -209,47 +209,49 @@ export const AdminInvoices: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6 pb-16 animate-in fade-in duration-150">
+    <div className="space-y-4 pb-16 animate-in fade-in duration-150 font-sans antialiased">
       {/* 1. TOP HEADER & VERI*FACTU BADGE */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex items-center justify-between gap-3 pt-2 pb-1">
         <div>
+          <span className="text-xs font-medium text-slate-400 dark:text-slate-500 tracking-wide block mb-0.5">
+            {currentTenant?.name || 'Centro de Pádel San Mateo'}
+          </span>
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
-              Pagos y Facturación
+            <h1 className="text-[22px] font-extrabold text-[#0B1A2D] dark:text-white tracking-tight leading-tight">
+              Facturación
             </h1>
-            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-800 flex items-center gap-1">
-              <ShieldCheck className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
-              <span>Veri*factu Preparado</span>
+            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-[#F0FCCF] text-[#0B1A2D] dark:bg-[#B7F229]/20 dark:text-[#B7F229] border border-[#B7F229]/50 flex items-center gap-1">
+              <ShieldCheck className="w-3 h-3 text-[#82b805] dark:text-[#B7F229]" />
+              <span>Veri*factu</span>
             </span>
           </div>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-            Gestión contable unificada de {currentTenant.name} · Facturación electrónica, canales de cobro y cumplimiento AEAT (RD 1007/2023).
-          </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex items-center gap-2">
           {pendingVerifactuCount > 0 ? (
             <button
               onClick={syncAllVerifactu}
-              className="px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs shadow transition flex items-center gap-1.5 cursor-pointer active:scale-95"
+              className="px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs shadow-2xs transition flex items-center gap-1.5 cursor-pointer active:scale-95"
               title="Sincronizar facturas pendientes con la Agencia Tributaria"
             >
-              <RefreshCw className="w-4 h-4 animate-spin-reverse" />
-              <span>Sincronizar Lote Veri*factu ({pendingVerifactuCount})</span>
+              <RefreshCw className="w-3.5 h-3.5 animate-spin-reverse" />
+              <span>Sincronizar ({pendingVerifactuCount})</span>
             </button>
           ) : (
-            <div className="px-3 py-1.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 text-xs font-bold flex items-center gap-1.5">
-              <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-              <span>AEAT al día (0 pendientes)</span>
+            <div className="px-2.5 py-1 rounded-xl bg-[#F0FCCF] dark:bg-[#B7F229]/15 border border-[#B7F229]/40 text-[#0B1A2D] dark:text-[#B7F229] text-[11px] font-bold flex items-center gap-1">
+              <CheckCircle2 className="w-3.5 h-3.5 text-[#82b805] dark:text-[#B7F229]" />
+              <span className="hidden sm:inline">AEAT al día</span>
             </div>
           )}
 
           <button
             onClick={() => setShowNewInvoiceModal(true)}
-            className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md transition flex items-center gap-1.5 cursor-pointer active:scale-95"
+            className="p-1.5 text-slate-700 dark:text-slate-300 hover:text-[#0B1A2D] dark:hover:text-[#B7F229] transition-colors cursor-pointer active:scale-95 flex items-center gap-1.5 shrink-0"
+            title="Emitir Factura"
+            aria-label="Emitir Factura"
           >
-            <Plus className="w-4 h-4" />
-            <span>Emitir Factura</span>
+            <Plus className="w-5 h-5 stroke-[2.2]" />
+            <span className="text-xs font-bold sm:inline hidden">Emitir Factura</span>
           </button>
         </div>
       </div>

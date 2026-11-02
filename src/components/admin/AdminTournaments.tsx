@@ -693,43 +693,38 @@ export const AdminTournaments: React.FC = () => {
       {!selectedTournamentId ? (
         <div className="space-y-6 animate-in fade-in duration-150">
           {/* Header Principal Homogéneo */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-center justify-between gap-3 pt-2 pb-1">
             <div>
-              <div className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
-                <Trophy className="w-3.5 h-3.5 text-emerald-500" />
-                <span>{t('tournaments.eyebrow', 'Circuito Oficial & Competiciones')}</span>
-              </div>
-              <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight mt-0.5">
-                {t('tournaments.competitions_title', 'Competiciones')}
+              <span className="text-xs font-medium text-slate-400 dark:text-slate-500 tracking-wide block mb-0.5">
+                {currentTenant?.name || 'Centro de Pádel San Mateo'}
+              </span>
+              <h1 className="text-[22px] font-extrabold text-[#0B1A2D] dark:text-white tracking-tight leading-tight">
+                Torneos & Competiciones
               </h1>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-2xl leading-relaxed">
-                {t(
-                  'tournaments.competitions_subtitle',
-                  'Torneos oficiales, cuadros de cruces, inscripciones y rankings del club'
-                )}
-              </p>
             </div>
 
-            <div className="flex flex-wrap items-center gap-2">
+            <div className="flex items-center gap-2">
               <button
                 type="button"
                 onClick={() => {
                   setSelectedTournamentForInscription(tournaments[0]?.id || '');
                   setIsInscriptionModalOpen(true);
                 }}
-                className="px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold text-xs border border-slate-300 dark:border-slate-700 transition flex items-center gap-1.5 cursor-pointer shadow-xs"
+                className="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-[#0E2239] hover:bg-slate-200 dark:hover:bg-[#132A45] text-slate-700 dark:text-slate-300 font-bold text-xs border border-slate-200/80 dark:border-[#1A314D] transition flex items-center gap-1.5 cursor-pointer shadow-2xs"
               >
-                <Users className="w-4 h-4 text-emerald-500" />
-                <span>{t('tournaments.btn_register_pair', 'Inscribir Pareja')}</span>
+                <Users className="w-3.5 h-3.5 text-[#8B5CF6]" />
+                <span className="hidden sm:inline">Inscribir Pareja</span>
               </button>
 
               <button
                 type="button"
                 onClick={() => setIsCreateModalOpen(true)}
-                className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md transition flex items-center gap-1.5 cursor-pointer active:scale-95"
+                className="p-1.5 text-slate-700 dark:text-slate-300 hover:text-[#0B1A2D] dark:hover:text-[#B7F229] transition-colors cursor-pointer active:scale-95 flex items-center gap-1.5 shrink-0"
+                title="Crear Torneo"
+                aria-label="Crear Torneo"
               >
-                <Plus className="w-4 h-4" />
-                <span>{t('tournaments.btn_create', 'Crear Torneo')}</span>
+                <Plus className="w-5 h-5 stroke-[2.2]" />
+                <span className="text-xs font-bold sm:inline hidden">Crear Torneo</span>
               </button>
             </div>
           </div>

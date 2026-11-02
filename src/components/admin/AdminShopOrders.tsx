@@ -552,9 +552,9 @@ export const AdminShopOrders: React.FC = () => {
   const pendingOrdersCount = orders.filter((o) => o.status === 'pendiente' || o.status === 'preparado').length;
 
   return (
-    <div className="space-y-6 text-slate-900 dark:text-slate-100 max-w-7xl mx-auto pb-16">
+    <div className="space-y-4 text-slate-900 dark:text-slate-100 max-w-7xl mx-auto pb-16 font-sans antialiased">
       {/* 1. Header con botones y navegación breadcrumb */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2 pb-1">
         <div>
           {/* Breadcrumb si estamos en subvista */}
           {activeView !== 'dashboard' && (
@@ -562,46 +562,41 @@ export const AdminShopOrders: React.FC = () => {
               <button
                 type="button"
                 onClick={() => navigateTo('dashboard', '/admin/tienda')}
-                className="hover:text-emerald-600 dark:hover:text-emerald-400 transition cursor-pointer"
+                className="hover:text-[#0B1A2D] dark:hover:text-white transition cursor-pointer flex items-center gap-1"
               >
-                Tienda Oficial
+                <ArrowLeft className="w-3.5 h-3.5" />
+                <span>Tienda</span>
               </button>
               <ChevronRight className="w-3.5 h-3.5" />
-              <span className="text-emerald-600 dark:text-emerald-400 font-bold">
-                {activeView === 'products' && 'Catálogo & Carruseles de Productos'}
-                {activeView === 'orders' && 'Módulo de Pedidos & Ventas'}
-                {activeView === 'new_order' && 'Crear Nuevo Pedido'}
+              <span className="text-[#8B5CF6] dark:text-[#B7F229] font-bold">
+                {activeView === 'products' && 'Catálogo'}
+                {activeView === 'orders' && 'Pedidos'}
+                {activeView === 'new_order' && 'Nuevo Pedido'}
               </span>
             </div>
           )}
 
-          <div className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
-            Control Financiero & Pro Shop
-          </div>
-          <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight mt-0.5">
-            {activeView === 'dashboard' && `Tienda Oficial & Inventario — ${currentTenant.name}`}
-            {activeView === 'products' && 'Catálogo de Productos & Carruseles'}
-            {activeView === 'orders' && 'Gestión de Pedidos & Clientes'}
-            {activeView === 'new_order' && 'Crear Nuevo Pedido — Tienda Oficial'}
+          <span className="text-xs font-medium text-slate-400 dark:text-slate-500 tracking-wide block mb-0.5">
+            {currentTenant?.name || 'Centro de Pádel San Mateo'}
+          </span>
+          <h1 className="text-[22px] font-extrabold text-[#0B1A2D] dark:text-white tracking-tight leading-tight">
+            {activeView === 'dashboard' && 'Tienda & Pro Shop'}
+            {activeView === 'products' && 'Catálogo de Productos'}
+            {activeView === 'orders' && 'Gestión de Pedidos'}
+            {activeView === 'new_order' && 'Nuevo Pedido Mostrador'}
           </h1>
-          <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
-            {activeView === 'dashboard' && 'Métricas de facturación, carruseles de material, inventario multi-sede y arqueo.'}
-            {activeView === 'products' && 'Listas desplazables por categorías, fichas técnicas con márgenes y existencias por instalación.'}
-            {activeView === 'orders' && 'Historial de compras, tickets de caja, preparación de material y seguimiento de socios.'}
-            {activeView === 'new_order' && 'Venta en mostrador con descuento, imputación a socio o cliente de paso y stock en tiempo real.'}
-          </p>
         </div>
 
         {/* Botones de acción principales */}
-        <div className="flex flex-wrap items-center gap-2.5 self-start sm:self-auto">
+        <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto">
           {activeView !== 'dashboard' && (
             <button
               type="button"
               onClick={() => navigateTo('dashboard', '/admin/tienda')}
-              className="px-3.5 py-2.5 rounded-xl bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700/80 text-slate-700 dark:text-slate-300 font-bold text-xs flex items-center gap-1.5 border border-slate-200 dark:border-slate-700 shadow-xs transition active:scale-95 cursor-pointer"
+              className="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-[#0E2239] hover:bg-slate-200 dark:hover:bg-[#132A45] text-slate-700 dark:text-slate-300 font-bold text-xs flex items-center gap-1.5 border border-slate-200/80 dark:border-[#1A314D] shadow-2xs transition active:scale-95 cursor-pointer"
             >
-              <ArrowLeft className="w-4 h-4" />
-              <span>Volver a Resumen</span>
+              <ArrowLeft className="w-3.5 h-3.5" />
+              <span>Volver</span>
             </button>
           )}
 
@@ -609,14 +604,14 @@ export const AdminShopOrders: React.FC = () => {
           <button
             type="button"
             onClick={() => navigateTo('orders', '/admin/tienda/pedidos')}
-            className={`px-4 py-2.5 rounded-xl font-bold text-xs flex items-center gap-2 border shadow-xs transition active:scale-95 cursor-pointer relative ${
+            className={`px-3 py-1.5 rounded-xl font-bold text-xs flex items-center gap-1.5 border shadow-2xs transition active:scale-95 cursor-pointer relative ${
               activeView === 'orders'
-                ? 'bg-emerald-600 text-white border-transparent'
-                : 'bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700/70 text-slate-800 dark:text-slate-200 border-slate-200 dark:border-slate-700'
+                ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D] border-transparent'
+                : 'bg-white dark:bg-[#0E2239] hover:bg-slate-50 dark:hover:bg-[#132A45] text-slate-800 dark:text-slate-200 border-slate-200/80 dark:border-[#1A314D]'
             }`}
           >
-            <Receipt className="w-4 h-4 text-emerald-500" />
-            <span>Lista de Pedidos</span>
+            <Receipt className="w-3.5 h-3.5 text-[#8B5CF6]" />
+            <span>Pedidos</span>
             {pendingOrdersCount > 0 && (
               <span className="px-1.5 py-0.2 rounded-full bg-amber-500 text-slate-950 font-black text-[10px]">
                 {pendingOrdersCount}

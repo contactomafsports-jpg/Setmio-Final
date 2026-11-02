@@ -1126,8 +1126,10 @@ export const AdminCafePOS: React.FC = () => {
     <div className="max-w-7xl mx-auto pt-2 pb-16 space-y-4 font-sans text-[#0B1A2D] dark:text-slate-100 antialiased">
       {/* ======================================================================
           1. CABECERA LIMPIA Y SIMÉTRICA (ESTILO INICIO, RESERVAS & PARTIDAS)
+          (Oculta cuando se abre una subpágina de Nivel 2 para evitar sangrado inferior)
           ====================================================================== */}
-      <section className="pt-2 pb-1 space-y-3" data-purpose="header-section">
+      {!isCatalogManagementOpen && !transactionsModalOpen && (
+        <section className="pt-2 pb-1 space-y-3" data-purpose="header-section">
         <div className="flex items-center justify-between">
           <div>
             <span className="text-xs font-medium text-slate-400 dark:text-slate-500 tracking-wide block mb-0.5">
@@ -1374,13 +1376,14 @@ export const AdminCafePOS: React.FC = () => {
           </button>
         </div>
       </section>
+      )}
 
       {/* ======================================================================
           NIVEL 2: PÁGINA DE DETALLE - PRODUCTOS E INVENTARIO
           (Sin barra superior global, cabecera limpia con botón ← de retroceso y título unificado, sin subtítulos)
           ====================================================================== */}
       {isCatalogManagementOpen && (
-        <div className="fixed inset-0 md:left-64 z-45 bg-slate-50 dark:bg-[#0B1A2D] overflow-y-auto pb-24 md:pb-8 pt-3 sm:pt-4 px-3.5 sm:px-6 lg:px-8 animate-in fade-in duration-200" data-level="2">
+        <div className="fixed inset-0 md:left-64 z-50 bg-slate-50 dark:bg-[#0B1A2D] overflow-y-auto pb-24 md:pb-8 pt-3 sm:pt-4 px-3.5 sm:px-6 lg:px-8 animate-in fade-in duration-150" data-level="2">
           <div className="max-w-6xl mx-auto space-y-4">
             {/* Cabecera Nivel 2 (Limpia, sin colisiones ni desbordamientos) */}
             <div className="flex items-center justify-between py-1.5 sm:py-2 gap-2">
@@ -1633,7 +1636,8 @@ export const AdminCafePOS: React.FC = () => {
       )}
 
       {/* 2. POS Interface: Product Catalog + Fast Ticket Register */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+      {!isCatalogManagementOpen && !transactionsModalOpen && (
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
         {/* Products Grid */}
         <div className="lg:col-span-7 space-y-3.5">
           {/* Categories bar con botón minimalista para gestionar categorías */}
@@ -1948,6 +1952,7 @@ export const AdminCafePOS: React.FC = () => {
           </div>
         </div>
       </div>
+      )}
 
       {/* ======================================================================
           NIVEL 2: PÁGINA DE DETALLE - PAGOS (CONSOLIDADO MULTI-TURNO Y MULTI-RECEPCIÓN)
@@ -1955,7 +1960,7 @@ export const AdminCafePOS: React.FC = () => {
            componente estándar unificado de sedes y filtros globales integrados)
           ====================================================================== */}
       {transactionsModalOpen && (
-        <div className="fixed inset-0 md:left-64 z-45 bg-slate-50 dark:bg-[#0B1A2D] overflow-y-auto pb-24 md:pb-8 pt-3 sm:pt-4 px-3.5 sm:px-6 lg:px-8 animate-in fade-in duration-200" data-level="2">
+        <div className="fixed inset-0 md:left-64 z-50 bg-slate-50 dark:bg-[#0B1A2D] overflow-y-auto pb-24 md:pb-8 pt-3 sm:pt-4 px-3.5 sm:px-6 lg:px-8 animate-in fade-in duration-150" data-level="2">
           <div className="max-w-6xl mx-auto space-y-4">
             {/* Cabecera Limpia Nivel 2 (Sin contenedor pesado que envuelve al título) */}
             <div className="flex items-center justify-between py-1.5 sm:py-2">
@@ -2174,7 +2179,7 @@ export const AdminCafePOS: React.FC = () => {
           2.6 MODAL: PÁGINA DE DETALLES ESPECÍFICOS DEL PAGO SELECCIONADO
           ====================================================================== */}
       {selectedPaymentDetail && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0B1A2D]/80 backdrop-blur-sm p-4 overflow-hidden animate-in fade-in duration-150">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-[#0B1A2D]/80 backdrop-blur-sm p-4 overflow-hidden animate-in fade-in duration-150">
           <div className="relative w-full max-w-lg bg-white dark:bg-[#0E2239] border border-slate-200/90 dark:border-[#1A314D] rounded-3xl shadow-2xl text-slate-900 dark:text-slate-100 flex flex-col max-h-[90vh] overflow-hidden">
             {/* Header */}
             <div className="p-5 border-b border-slate-100 dark:border-[#1A314D] flex items-center justify-between shrink-0">
@@ -2357,7 +2362,7 @@ export const AdminCafePOS: React.FC = () => {
           3. MODAL: CIERRE / ARQUEO DE CAJA DEL TURNO (REDISENO MINIMALISTA ELEGANTE)
           ====================================================================== */}
       {arqueoModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0B1A2D]/75 backdrop-blur-sm p-4 overflow-hidden animate-in fade-in duration-150">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-[#0B1A2D]/75 backdrop-blur-sm p-4 overflow-hidden animate-in fade-in duration-150">
           <div className="relative w-full max-w-xl bg-white dark:bg-[#0E2239] border border-slate-200/90 dark:border-[#1A314D] rounded-3xl shadow-2xl text-slate-900 dark:text-slate-100 flex flex-col max-h-[90vh] overflow-hidden">
             {/* Header Fijo con X correctamente alineada */}
             <div className="p-5 sm:p-6 border-b border-slate-100 dark:border-[#1A314D] flex items-center justify-between shrink-0">
@@ -2550,7 +2555,7 @@ export const AdminCafePOS: React.FC = () => {
           4. MODAL: GESTIÓN DE CATÁLOGO DE PRODUCTOS (CRUD)
           ====================================================================== */}
       {catalogModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0B1A2D]/75 backdrop-blur-sm p-4 overflow-hidden animate-in fade-in duration-150">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-[#0B1A2D]/75 backdrop-blur-sm p-4 overflow-hidden animate-in fade-in duration-150">
           <div className="relative w-full max-w-2xl bg-white dark:bg-[#0E2239] border border-slate-200/90 dark:border-[#1A314D] rounded-3xl p-6 shadow-2xl text-slate-900 dark:text-slate-100 space-y-4 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b border-slate-100 dark:border-[#1A314D] pb-3">
               <div className="flex items-center gap-2">
@@ -2658,7 +2663,7 @@ export const AdminCafePOS: React.FC = () => {
           FORMULARIO NUEVO / EDITAR PRODUCTO (CON SELECTOR DE CATEGORÍA OBLIGATORIO Y ACCESO DIRECTO PARA CREAR NUEVA)
           ====================================================================== */}
       {productFormModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0B1A2D]/75 backdrop-blur-sm p-4 overflow-hidden animate-in fade-in duration-150">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-[#0B1A2D]/75 backdrop-blur-sm p-4 overflow-hidden animate-in fade-in duration-150">
           <div className="relative w-full max-w-md bg-white dark:bg-[#0E2239] border border-slate-200 dark:border-[#1A314D] rounded-3xl p-6 shadow-2xl text-slate-900 dark:text-slate-100 space-y-4 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b border-slate-100 dark:border-[#1A314D] pb-3">
               <h3 className="text-base font-black text-[#0B1A2D] dark:text-white">
@@ -2891,7 +2896,7 @@ export const AdminCafePOS: React.FC = () => {
           MODAL: PÁGINA DE DETALLE COMPLETO DE PRODUCTO
           ====================================================================== */}
       {selectedProductDetail && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0B1A2D]/75 backdrop-blur-sm p-4 overflow-hidden animate-in fade-in duration-150">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-[#0B1A2D]/75 backdrop-blur-sm p-4 overflow-hidden animate-in fade-in duration-150">
           <div className="relative w-full max-w-lg bg-white dark:bg-[#0E2239] border border-slate-200/90 dark:border-[#1A314D] rounded-3xl p-6 shadow-2xl text-slate-900 dark:text-slate-100 space-y-5 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b border-slate-100 dark:border-[#1A314D] pb-3">
               <div className="flex items-center gap-2">
@@ -3006,7 +3011,7 @@ export const AdminCafePOS: React.FC = () => {
           MODAL: CONFIRMACIÓN PARA ELIMINAR PRODUCTO
           ====================================================================== */}
       {productToDelete && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0B1A2D]/75 backdrop-blur-xs p-4 overflow-hidden animate-in fade-in duration-150">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-[#0B1A2D]/75 backdrop-blur-xs p-4 overflow-hidden animate-in fade-in duration-150">
           <div className="w-full max-w-md bg-white dark:bg-[#0E2239] border border-slate-200/90 dark:border-[#1A314D] rounded-3xl p-6 shadow-2xl space-y-4">
             <div className="w-12 h-12 rounded-2xl bg-rose-100 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center mx-auto">
               <AlertCircle className="w-6 h-6" />
@@ -3052,7 +3057,7 @@ export const AdminCafePOS: React.FC = () => {
           5. MODAL: ASIGNAR RESERVA O RECARGA DE MONEDERO
           ====================================================================== */}
       {assignModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0B1A2D]/75 backdrop-blur-sm p-4 overflow-hidden animate-in fade-in duration-150">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-[#0B1A2D]/75 backdrop-blur-sm p-4 overflow-hidden animate-in fade-in duration-150">
           <div className="relative w-full max-w-xl bg-white dark:bg-[#0E2239] border border-slate-200/90 dark:border-[#1A314D] rounded-3xl shadow-2xl text-slate-900 dark:text-slate-100 flex flex-col max-h-[90vh] overflow-hidden">
             {/* Header Limpio sin icono deformado */}
             <div className="p-5 sm:p-6 border-b border-slate-100 dark:border-[#1A314D] flex items-center justify-between shrink-0">
@@ -3264,7 +3269,7 @@ export const AdminCafePOS: React.FC = () => {
           MODAL: GESTIÓN DE CATEGORÍAS (ALTA CON BOTÓN DE MARCA AZUL/LIMA, EDICIÓN Y AÑADIR PRODUCTOS ÁGIL)
           ====================================================================== */}
       {isCategoryModalOpen && (
-        <div className="fixed inset-0 z-50 bg-[#0B1A2D]/75 backdrop-blur-sm flex items-center justify-center p-4 overflow-hidden animate-in fade-in duration-150">
+        <div className="fixed inset-0 z-[60] bg-[#0B1A2D]/75 backdrop-blur-sm flex items-center justify-center p-4 overflow-hidden animate-in fade-in duration-150">
           <div className="bg-white dark:bg-[#0E2239] rounded-3xl max-w-lg w-full border border-slate-200 dark:border-[#1A314D] shadow-2xl flex flex-col max-h-[88vh] overflow-hidden">
             {/* Header Limpio y homogéneo con el Design System global */}
             <div className="p-5 border-b border-slate-100 dark:border-[#1A314D] flex items-center justify-between shrink-0">

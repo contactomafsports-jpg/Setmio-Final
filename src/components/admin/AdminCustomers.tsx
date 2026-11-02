@@ -904,32 +904,17 @@ export const AdminCustomers: React.FC = () => {
   }
 
   return (
-    <div className="space-y-6 text-slate-900 dark:text-slate-100 max-w-7xl mx-auto pb-12">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div className="space-y-4 text-slate-900 dark:text-slate-100 max-w-7xl mx-auto pb-12 font-sans antialiased">
+      <div className="flex items-center justify-between gap-3 pt-2 pb-1">
         <div>
-          <div className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
-            {crmSubTab === 'members' ? (
-              <>
-                <Users className="w-3.5 h-3.5 text-emerald-500" />
-                <span>{t('crm.headerEyebrow', 'Base de Datos & Fidelización')}</span>
-              </>
-            ) : (
-              <>
-                <MessageCircle className="w-3.5 h-3.5 text-emerald-500" />
-                <span>Comunidad & Convocatorias (Sustituto de WhatsApp)</span>
-              </>
-            )}
-          </div>
-          <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight mt-0.5">
+          <span className="text-xs font-medium text-slate-400 dark:text-slate-500 tracking-wide block mb-0.5">
+            {currentTenant?.name || 'Centro de Pádel San Mateo'}
+          </span>
+          <h1 className="text-[22px] font-extrabold text-[#0B1A2D] dark:text-white tracking-tight leading-tight">
             {crmSubTab === 'members'
-              ? t('crm.headerTitle', 'Socios & CRM de Jugadores')
-              : 'Grupos de Jugadores & Listas de Distribución'}
+              ? 'Socios & Clientes'
+              : 'Grupos & Convocatorias'}
           </h1>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-2xl leading-relaxed">
-            {crmSubTab === 'members'
-              ? t('crm.headerSubtitle', 'Gestión integral de socios, cobro de cuotas, monederos y niveles ELO.')
-              : 'Sustituye grupos informales de WhatsApp por listas oficiales segmentadas por nivel ELO, escuela o sede con convocatorias instantáneas y enlaces de pago a 1/4.'}
-          </p>
         </div>
 
         {/* Botón Acción Principal */}
@@ -940,39 +925,43 @@ export const AdminCustomers: React.FC = () => {
               setErrors({});
               setIsNewPlayerModalOpen(true);
             }}
-            className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md transition flex items-center gap-1.5 self-start sm:self-auto active:scale-95 cursor-pointer"
+            className="p-1.5 text-slate-700 dark:text-slate-300 hover:text-[#0B1A2D] dark:hover:text-[#B7F229] transition-colors cursor-pointer active:scale-95 flex items-center gap-1.5 shrink-0"
+            title="Nuevo Jugador"
+            aria-label="Nuevo Jugador"
           >
-            <UserPlus className="w-4 h-4" />
-            <span>+ Nuevo Jugador</span>
+            <Plus className="w-5 h-5 stroke-[2.2]" />
+            <span className="text-xs font-bold sm:inline hidden">Nuevo Jugador</span>
           </button>
         ) : isProOrEnterprise ? (
           <button
             type="button"
             onClick={handleOpenNewGroupModal}
-            className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md transition flex items-center gap-1.5 self-start sm:self-auto active:scale-95 cursor-pointer"
+            className="p-1.5 text-slate-700 dark:text-slate-300 hover:text-[#0B1A2D] dark:hover:text-[#B7F229] transition-colors cursor-pointer active:scale-95 flex items-center gap-1.5 shrink-0"
+            title="Crear Grupo"
+            aria-label="Crear Grupo"
           >
-            <Plus className="w-4 h-4" />
-            <span>+ Crear Grupo de Jugadores</span>
+            <Plus className="w-5 h-5 stroke-[2.2]" />
+            <span className="text-xs font-bold sm:inline hidden">Crear Grupo</span>
           </button>
         ) : null}
       </div>
 
       {/* Subtabs de Navegación: CRM Socios vs Grupos WhatsApp */}
-      <div className="flex items-center gap-2 p-1 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl shadow-xs w-full sm:w-fit overflow-x-auto">
+      <div className="flex items-center gap-1.5 p-1 bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] rounded-2xl shadow-2xs w-full sm:w-fit overflow-x-auto">
         <button
           type="button"
           onClick={() => {
             setCrmSubTab('members');
             if (typeof window !== 'undefined') window.history.pushState({}, '', '/admin/socios');
           }}
-          className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 cursor-pointer shrink-0 ${
+          className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shrink-0 ${
             crmSubTab === 'members'
-              ? 'bg-emerald-600 text-white shadow-xs'
-              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800/60'
+              ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D] shadow-xs'
+              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
           }`}
         >
-          <Users className="w-4 h-4" />
-          <span>Socios & CRM ({customerList.length})</span>
+          <Users className="w-3.5 h-3.5" />
+          <span>Socios ({customerList.length})</span>
         </button>
         <button
           type="button"
@@ -980,15 +969,15 @@ export const AdminCustomers: React.FC = () => {
             setCrmSubTab('groups');
             if (typeof window !== 'undefined') window.history.pushState({}, '', '/admin/socios/grupos');
           }}
-          className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 cursor-pointer shrink-0 ${
+          className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shrink-0 ${
             crmSubTab === 'groups'
-              ? 'bg-emerald-600 text-white shadow-xs'
-              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800/60'
+              ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D] shadow-xs'
+              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
           }`}
         >
-          <MessageCircle className="w-4 h-4 text-emerald-500" />
+          <MessageCircle className="w-3.5 h-3.5" />
           <span>Grupos & Convocatorias ({playerGroups.length})</span>
-          <span className="text-[10px] font-black uppercase px-1.5 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800">
+          <span className="text-[9px] font-black uppercase px-1.5 py-0.5 rounded bg-[#8B5CF6]/15 text-[#8B5CF6] dark:text-[#C4B5FD]">
             Pro
           </span>
         </button>

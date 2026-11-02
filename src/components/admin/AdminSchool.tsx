@@ -2066,18 +2066,15 @@ export const AdminSchool: React.FC = () => {
            VISTA PRINCIPAL: CURSOS, CLASES, ALUMNOS Y PROFESORES
            ===================================================================== */
         <>
-          {/* Header con dos botones separados (sin icono duplicado) */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          {/* Header con botonera alineada */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2 pb-1">
             <div>
-              <div className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
-                Academia & Cursos
-              </div>
-              <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight mt-0.5">
-                Escuela de Pádel — {currentTenant.name}
+              <span className="text-xs font-medium text-slate-400 dark:text-slate-500 tracking-wide block mb-0.5">
+                {currentTenant?.name || 'Centro de Pádel San Mateo'}
+              </span>
+              <h1 className="text-[22px] font-extrabold text-[#0B1A2D] dark:text-white tracking-tight leading-tight">
+                Escuela de Pádel
               </h1>
-              <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
-                Gestión de cursos mensuales, trimestrales, clases sueltas, profesores y alumnos.
-              </p>
             </div>
 
             {/* Botonera Superior Alineada (Icono único por botón) */}
@@ -2089,10 +2086,10 @@ export const AdminSchool: React.FC = () => {
                   setEditingGroup(null);
                   setIsNewGroupModalOpen(true);
                 }}
-                className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1.5 shadow-xs transition active:scale-95 cursor-pointer whitespace-nowrap"
+                className="px-3.5 py-2 rounded-xl bg-[#0B1A2D] hover:bg-[#132A45] text-white font-bold text-xs flex items-center gap-1.5 shadow-xs transition active:scale-95 cursor-pointer whitespace-nowrap"
                 title="Crear grupo periódico con matrícula y cuota"
               >
-                <Plus className="w-3.5 h-3.5" />
+                <Plus className="w-3.5 h-3.5 text-[#B7F229]" />
                 <span>Nuevo Grupo</span>
               </button>
 
