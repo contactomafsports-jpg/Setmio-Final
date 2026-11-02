@@ -7,18 +7,14 @@ import { NewBookingModal } from './NewBookingModal';
 import {
   Calendar,
   Search,
-  Filter,
   ArrowLeft,
   Plus,
   Clock,
   CheckCircle2,
-  AlertCircle,
-  XCircle,
   Building2,
-  X,
-  CreditCard,
-  Shield,
+  ChevronDown,
   Layers,
+  CreditCard,
 } from 'lucide-react';
 
 interface AllBookingsPageProps {
@@ -29,24 +25,23 @@ interface AllBookingsPageProps {
 
 export const AllBookingsPage: React.FC<AllBookingsPageProps> = ({
   onBackToQuadrant,
-  onOpenNewBookingModal,
-  isModal = false,
 }) => {
   const {
     bookings,
     courts,
     venues,
     selectedVenueId,
+    selectedVenue,
     setSelectedVenueId,
-    isMultiVenue,
-    createBooking,
+    isConsolidatedView,
+    isClubOpen,
+    toggleClubOpenState,
     setAdminTab,
-    triggerDemoToast,
     navigateToPlayerProfile,
     t,
   } = useApp();
 
-  // Scroll to top on enter
+  // Scroll to top on mount
   useEffect(() => {
     if (typeof window !== 'undefined') {
       window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
@@ -55,38 +50,39 @@ export const AllBookingsPage: React.FC<AllBookingsPageProps> = ({
     }
   }, []);
 
+  // Today's date in YYYY-MM-DD format as the clear default
+  const todayStr = useMemo(() => new Date().toISOString().split('T')[0], []);
+
+  // Search & Filter state
   const [searchTerm, setSearchTerm] = useState('');
-  const [timeFilter, setTimeFilter] = useState<'all' | 'upcoming' | 'past'>('all');
-  const [statusFilter, setStatusFilter] = useState<'all' | 'confirmed' | 'pending' | 'canceled'>('all');
   const [courtFilter, setCourtFilter] = useState<string>('all');
-  const [venueFilter, setVenueFilter] = useState<string>(selectedVenueId || 'all');
-  const [dateFilter, setDateFilter] = useState<string>('');
+  const [dateFilter, setDateFilter] = useState<string>(todayStr);
+
+  // Venue Selector Dropdown state
+  const [isVenueSelectorOpen, setIsVenueSelectorOpen] = useState(false);
+
+  // Modals & Drawers
   const [selectedDrawerBooking, setSelectedDrawerBooking] = useState<ReservationDrawerData | null>(null);
-
-  // Sincronizar bidireccionalmente con selectedVenueId de AppContext
-  useEffect(() => {
-    if (selectedVenueId) {
-      setVenueFilter(selectedVenueId);
-    }
-  }, [selectedVenueId]);
-
-  const handleVenueFilterChange = (vId: string) => {
-    setVenueFilter(vId);
-    setSelectedVenueId(vId);
-  };
-
-  // Modal Nueva Reserva Integrado (Soluciona Tarea 2)
   const [isNewBookingModalOpen, setIsNewBookingModalOpen] = useState(false);
-  const [newCourtId, setNewCourtId] = useState(courts[0]?.id || 'court-1');
-  const [newVenueId, setNewVenueId] = useState(venues[1]?.id || venues[0]?.id || 'venue-san-mateo');
-  const [newDate, setNewDate] = useState('2026-10-10');
-  const [newTime, setNewTime] = useState('18:00');
-  const [newDuration, setNewDuration] = useState<60 | 90 | 120>(90);
-  const [newClientType, setNewClientType] = useState<'member' | 'activity' | 'tournament' | 'block'>('member');
-  const [newClientName, setNewClientName] = useState('Carlos Méndez');
-  const [newPrice, setNewPrice] = useState('28');
 
-  // Acciones de Navegación Precisas
+  // Dynamic Courts Filter: Filter courts belonging to the selected venue
+  const availableCourts = useMemo(() => {
+    if (isConsolidatedView || selectedVenueId === 'all') {
+      return courts;
+    }
+    return courts.filter(
+      (c) => c.venueId === selectedVenueId || (!c.venueId && selectedVenueId === 'venue-san-mateo')
+    );
+  }, [courts, selectedVenueId, isConsolidatedView]);
+
+  // Reset court filter if selected court doesn't belong to the active venue
+  useEffect(() => {
+    if (courtFilter !== 'all' && !availableCourts.some((c) => c.id === courtFilter)) {
+      setCourtFilter('all');
+    }
+  }, [selectedVenueId, availableCourts, courtFilter]);
+
+  // Navigation handlers
   const handleGoToAgenda = () => {
     setAdminTab('agenda');
     if (typeof window !== 'undefined') {
@@ -100,124 +96,6 @@ export const AllBookingsPage: React.FC<AllBookingsPageProps> = ({
   const handleOpenNewBooking = () => {
     setIsNewBookingModalOpen(true);
   };
-
-  // Recalcular precio automáticamente según tipo de actividad (Regla Tarea 3: 0€ para clases/escuela/torneo)
-  useEffect(() => {
-    const court = courts.find((c) => c.id === newCourtId) || courts[0];
-    const hours = newDuration / 60;
-    const basePrice = (court?.hourlyRate || 20) * hours;
-
-    if (newClientType === 'activity' || newClientType === 'tournament' || newClientType === 'block') {
-      setNewPrice('0');
-    } else {
-      setNewPrice(String(basePrice));
-    }
-  }, [newCourtId, newDuration, newClientType, courts]);
-
-  const handleCreateBookingSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const court = courts.find((c) => c.id === newCourtId) || courts[0];
-    const targetVenue = venues.find((v) => v.id === newVenueId) || venues[1] || venues[0];
-
-    const startH = parseInt(newTime.split(':')[0], 10);
-    const startM = parseInt(newTime.split(':')[1], 10);
-    const totalMinutes = startH * 60 + startM + newDuration;
-    const endH = String(Math.floor(totalMinutes / 60)).padStart(2, '0');
-    const endM = String(totalMinutes % 60).padStart(2, '0');
-
-    const startISO = `${newDate}T${newTime}:00`;
-    const endISO = `${newDate}T${endH}:${endM}:00`;
-
-    const finalPrice = parseFloat(newPrice) || 0;
-
-    let cat: 'private' | 'academy' | 'tournament' = 'private';
-    let title = `Reserva ${court?.name || 'Pista'}`;
-    if (newClientType === 'activity') {
-      cat = 'academy';
-      title = 'Clase Oficial de Escuela / Grupo';
-    } else if (newClientType === 'tournament') {
-      cat = 'tournament';
-      title = 'Cuadro Torneo Oficial Setmio';
-    } else if (newClientType === 'block') {
-      title = `BLOQUEO: ${newClientName || 'Mantenimiento'}`;
-    }
-
-    createBooking({
-      courtId: court?.id || 'court-1',
-      courtName: court?.name || 'Pista 1',
-      venueId: isMultiVenue ? targetVenue?.id : undefined,
-      venueName: isMultiVenue ? targetVenue?.name : undefined,
-      venueShortName: isMultiVenue ? targetVenue?.shortName : undefined,
-      creatorId: 'admin-action',
-      creatorName: newClientName.trim() || 'Titular',
-      startTime: startISO,
-      endTime: endISO,
-      totalPrice: finalPrice,
-      status: 'confirmed',
-      paymentStatus: finalPrice === 0 ? 'paid' : 'pending',
-      isSplitPayment: false,
-      category: cat,
-      title,
-      notes: newClientType === 'activity' ? 'Actividad de escuela (tarifa 0€ en pista)' : newClientType === 'tournament' ? 'Torneo oficial (tarifa 0€)' : undefined,
-      participants: [
-        {
-          name: newClientName.trim() || 'Titular',
-          paid: finalPrice === 0,
-          amount: finalPrice,
-        },
-      ],
-    });
-
-    setIsNewBookingModalOpen(false);
-  };
-
-  // Filter bookings with temporal state, venue, and payment filters
-  const filteredBookings = useMemo(() => {
-    const now = new Date();
-
-    return bookings.filter((b) => {
-      // 1. Search by player name, court, PIN or date string
-      const term = searchTerm.toLowerCase().trim();
-      const matchesSearch =
-        !term ||
-        b.creatorName.toLowerCase().includes(term) ||
-        b.courtName.toLowerCase().includes(term) ||
-        (b.accessPin && b.accessPin.toLowerCase().includes(term)) ||
-        b.startTime.toLowerCase().includes(term);
-
-      // 2. Filter by Temporal Status (Pasadas vs Futuras)
-      const bookingDate = new Date(b.endTime || b.startTime);
-      const isPast = !isNaN(bookingDate.getTime()) && bookingDate < now;
-      let matchesTime = true;
-      if (timeFilter === 'upcoming') {
-        matchesTime = !isPast;
-      } else if (timeFilter === 'past') {
-        matchesTime = isPast;
-      }
-
-      // 3. Filter by payment status
-      let matchesStatus = true;
-      if (statusFilter === 'confirmed') {
-        matchesStatus = b.paymentStatus === 'paid' || (b.status === 'confirmed' && b.paymentStatus !== 'pending' && b.paymentStatus !== 'partially_paid');
-      } else if (statusFilter === 'pending') {
-        matchesStatus = b.paymentStatus === 'pending' || b.paymentStatus === 'partially_paid' || b.status === 'pending';
-      } else if (statusFilter === 'canceled') {
-        matchesStatus = b.status === 'canceled';
-      }
-
-      // 4. Filter by court
-      const matchesCourt = courtFilter === 'all' || b.courtId === courtFilter;
-
-      // 5. Filter by venue (Only if Multi-Sede)
-      const bVenue = b.venueId || courts.find((c) => c.id === b.courtId)?.venueId || 'venue-san-mateo';
-      const matchesVenue = !isMultiVenue || venueFilter === 'all' || bVenue === venueFilter;
-
-      // 6. Filter by date
-      const matchesDate = !dateFilter || b.startTime.startsWith(dateFilter);
-
-      return matchesSearch && matchesTime && matchesStatus && matchesCourt && matchesVenue && matchesDate;
-    });
-  }, [bookings, searchTerm, timeFilter, statusFilter, courtFilter, venueFilter, isMultiVenue, dateFilter]);
 
   // Convert Booking to Drawer & ListItem data
   const mapBookingToItemData = (b: Booking): BookingListItemData => {
@@ -273,14 +151,14 @@ export const AllBookingsPage: React.FC<AllBookingsPageProps> = ({
     });
   };
 
-  // KPIs Dinámicos filtrados por la Sede Activa (venueFilter)
+  // KPIs Dinámicos filtrados por la Sede Activa (selectedVenueId)
   const venueFilteredBookingsForKpis = useMemo(() => {
-    if (venueFilter === 'all') return bookings;
+    if (isConsolidatedView || selectedVenueId === 'all') return bookings;
     return bookings.filter((b) => {
       const bVenue = b.venueId || courts.find((c) => c.id === b.courtId)?.venueId || 'venue-san-mateo';
-      return bVenue === venueFilter;
+      return bVenue === selectedVenueId;
     });
-  }, [bookings, venueFilter, courts]);
+  }, [bookings, selectedVenueId, isConsolidatedView, courts]);
 
   const totalCount = venueFilteredBookingsForKpis.length;
   const confirmedCount = venueFilteredBookingsForKpis.filter(
@@ -293,312 +171,361 @@ export const AllBookingsPage: React.FC<AllBookingsPageProps> = ({
     .filter((b) => b.status !== 'canceled')
     .reduce((acc, curr) => acc + (curr.totalPrice || 0), 0);
 
-  return (
-    <div className="space-y-5 text-slate-900 dark:text-slate-100 max-w-7xl mx-auto pb-12">
-      {/* ======================================================================
-          HEADER DE PÁGINA (Solo para vista de página completa, no modal)
-          ====================================================================== */}
-      {!isModal && (
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div className="min-w-0">
-            <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight truncate">
-              {t('allBookings.title', 'Historial de Reservas')}
-            </h1>
-          </div>
+  // Filter bookings with clean search, dynamic court and date
+  const filteredBookings = useMemo(() => {
+    const term = searchTerm.toLowerCase().trim();
 
-          {/* Botonera Superior */}
-          <div className="flex items-center gap-2 self-start sm:self-auto shrink-0">
+    return bookings.filter((b) => {
+      // 1. Search by player name, court, PIN or title
+      const matchesSearch =
+        !term ||
+        b.creatorName.toLowerCase().includes(term) ||
+        b.courtName.toLowerCase().includes(term) ||
+        (b.accessPin && b.accessPin.toLowerCase().includes(term)) ||
+        (b.title && b.title.toLowerCase().includes(term));
+
+      // 2. Filter by Venue (from top master venue selector)
+      const bVenue = b.venueId || courts.find((c) => c.id === b.courtId)?.venueId || 'venue-san-mateo';
+      const matchesVenue = isConsolidatedView || selectedVenueId === 'all' || bVenue === selectedVenueId;
+
+      // 3. Filter by Court
+      const matchesCourt = courtFilter === 'all' || b.courtId === courtFilter;
+
+      // 4. Filter by Date
+      const matchesDate = !dateFilter || b.startTime.startsWith(dateFilter);
+
+      return matchesSearch && matchesVenue && matchesCourt && matchesDate;
+    });
+  }, [bookings, searchTerm, isConsolidatedView, selectedVenueId, courtFilter, dateFilter, courts]);
+
+  return (
+    <div className="space-y-4 text-slate-900 dark:text-slate-100 max-w-7xl mx-auto pb-16 font-sans antialiased">
+      {/* ======================================================================
+          1. CABECERA LIMPIA Y SIMÉTRICA (ESTILO PARTIDAS / PAGOS)
+          ====================================================================== */}
+      <section className="pt-2 pb-1 space-y-3" data-purpose="header-section">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
             <button
               type="button"
               onClick={handleGoToAgenda}
-              className="px-3.5 py-2 rounded-xl bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 font-bold text-xs transition flex items-center gap-1.5 cursor-pointer shadow-2xs border border-slate-200 dark:border-slate-800"
-              title="Ir al cuadrante diario de pistas"
+              className="p-1 -ml-1 text-slate-700 dark:text-slate-300 hover:text-[#0B1A2D] dark:hover:text-[#B7F229] transition-colors cursor-pointer active:scale-95"
+              title="Volver a Reservas"
+              aria-label="Volver a Reservas"
             >
-              <Calendar className="w-3.5 h-3.5 text-slate-500 shrink-0" />
-              <span>{t('allBookings.agendaBtn', 'Agenda')}</span>
+              <ArrowLeft className="w-5 h-5 stroke-[2.2]" />
             </button>
+            <h1 className="text-[22px] font-extrabold text-[#0B1A2D] dark:text-white tracking-tight leading-tight">
+              {t('allBookings.title', 'Todas las Reservas')}
+            </h1>
+          </div>
 
+          <button
+            type="button"
+            onClick={handleOpenNewBooking}
+            className="p-1 text-slate-700 dark:text-slate-300 hover:text-[#0B1A2D] dark:hover:text-[#B7F229] transition-colors cursor-pointer active:scale-95"
+            title="Nueva reserva"
+            aria-label="Nueva reserva"
+          >
+            <Plus className="w-6 h-6 stroke-[2.2]" />
+          </button>
+        </div>
+
+        {/* ======================================================================
+            2. SELECTOR DE SEDE SUPERIOR (COLOCADO ANTES DEL DASHBOARD DE MÉTRICAS)
+            ====================================================================== */}
+        <div className="relative">
+          <div className="flex items-center justify-between p-2.5 bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200/80 dark:border-[#1A314D] shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
+            {/* Selector de Sede */}
+            <div
+              onClick={() => setIsVenueSelectorOpen(!isVenueSelectorOpen)}
+              className="flex items-center gap-2 cursor-pointer group select-none min-w-0"
+              title="Cambiar sede activa o ver red consolidada"
+            >
+              <div className="w-8 h-8 rounded-xl bg-slate-50 dark:bg-[#071220] border border-slate-100 dark:border-[#1A314D] flex items-center justify-center text-[#0B1A2D] dark:text-slate-200 shrink-0">
+                <Building2 className="w-4 h-4 text-[#0B1A2D] dark:text-white" />
+              </div>
+              <div className="min-w-0">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-xs font-bold text-[#0B1A2D] dark:text-white truncate">
+                    {isConsolidatedView ? 'Todas las Sedes' : selectedVenue.shortName || selectedVenue.name}
+                  </span>
+                  <ChevronDown
+                    className={`w-3.5 h-3.5 text-slate-400 group-hover:text-[#0B1A2D] dark:group-hover:text-white transition-transform ${
+                      isVenueSelectorOpen ? 'rotate-180 text-[#0B1A2D] dark:text-white' : ''
+                    }`}
+                  />
+                </div>
+                <span className="text-[10px] font-medium text-slate-400 block truncate">
+                  {venues.length > 1 ? `${venues.length} sedes conectadas` : 'Sede oficial'}
+                </span>
+              </div>
+            </div>
+
+            {/* Badge Dinámico de Apertura / Resumen Multisede */}
             <button
               type="button"
-              onClick={handleOpenNewBooking}
-              className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md flex items-center gap-1.5 transition active:scale-95 cursor-pointer whitespace-nowrap"
-              title="Crear nueva reserva de pista"
+              onClick={isConsolidatedView ? () => setIsVenueSelectorOpen((prev) => !prev) : toggleClubOpenState}
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#F0FCCF] dark:bg-[#B7F229]/20 border border-[#B7F229]/50 transition-all cursor-pointer hover:scale-102 shrink-0 select-none"
+              title={
+                isConsolidatedView
+                  ? `Red multisede consolidada (${venues.length} sedes operativas)`
+                  : 'Haz clic para conmutar estado de apertura de la sede'
+              }
             >
-              <Plus className="w-4 h-4 shrink-0" />
-              <span>{t('allBookings.newBtn', 'Nueva reserva')}</span>
+              <span
+                className={`w-2 h-2 rounded-full ${
+                  isConsolidatedView
+                    ? 'bg-[#82b805] dark:bg-[#B7F229]'
+                    : isClubOpen
+                    ? 'bg-[#82b805] animate-pulse'
+                    : 'bg-rose-500'
+                }`}
+              />
+              <span className="text-[11px] font-bold text-[#0B1A2D] dark:text-[#B7F229]">
+                {isConsolidatedView
+                  ? `${venues.length} Sedes Activas`
+                  : isClubOpen
+                  ? 'Abierto · hasta 23:30'
+                  : 'Cerrado temporal'}
+              </span>
             </button>
           </div>
+
+          {/* Menú Desplegable de Sedes */}
+          {isVenueSelectorOpen && (
+            <div className="absolute top-full left-0 right-0 mt-2 z-30 p-2 bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200 dark:border-[#1A314D] shadow-xl space-y-1 animate-in fade-in slide-in-from-top-2 duration-150">
+              <div className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 px-2 py-1">
+                Red Deportiva · Seleccionar Sede
+              </div>
+
+              {venues.length > 1 && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedVenueId('all');
+                    setIsVenueSelectorOpen(false);
+                  }}
+                  className={`w-full flex items-center justify-between p-2 rounded-xl text-xs font-bold transition text-left cursor-pointer ${
+                    isConsolidatedView
+                      ? 'bg-[#B7F229]/20 text-[#0B1A2D] dark:text-white'
+                      : 'hover:bg-slate-50 dark:hover:bg-[#132A45] text-slate-700 dark:text-slate-300'
+                  }`}
+                >
+                  <span className="flex items-center gap-2">
+                    <Layers className="w-3.5 h-3.5 text-[#8B5CF6]" />
+                    <span>Todas las Sedes (Consolidado)</span>
+                  </span>
+                  {isConsolidatedView && <CheckCircle2 className="w-3.5 h-3.5 text-[#82b805]" />}
+                </button>
+              )}
+
+              {venues
+                .filter((v) => v.id !== 'all')
+                .map((venue) => {
+                  const isSelected = !isConsolidatedView && selectedVenueId === venue.id;
+                  return (
+                    <button
+                      key={venue.id}
+                      type="button"
+                      onClick={() => {
+                        setSelectedVenueId(venue.id);
+                        setIsVenueSelectorOpen(false);
+                      }}
+                      className={`w-full flex items-center justify-between p-2 rounded-xl text-xs font-bold transition text-left cursor-pointer ${
+                        isSelected
+                          ? 'bg-[#B7F229]/20 text-[#0B1A2D] dark:text-white'
+                          : 'hover:bg-slate-50 dark:hover:bg-[#132A45] text-slate-700 dark:text-slate-300'
+                      }`}
+                    >
+                      <span className="flex items-center gap-2 truncate">
+                        <Building2 className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                        <span className="truncate">{venue.name}</span>
+                      </span>
+                      {isSelected && <CheckCircle2 className="w-3.5 h-3.5 text-[#82b805] shrink-0" />}
+                    </button>
+                  );
+                })}
+            </div>
+          )}
         </div>
-      )}
+      </section>
 
       {/* ======================================================================
-          FILTRO GLOBAL DE SEDE (Afecta tanto a las métricas como a la tabla)
+          3. TARJETAS ANALÍTICAS KPIS (DASHBOARD DE MÉTRICAS)
           ====================================================================== */}
-      {isMultiVenue && (
-        <div className="flex flex-wrap items-center justify-between gap-3 p-3.5 sm:p-4 rounded-2xl bg-white dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 shadow-xs">
-          <div className="flex items-center gap-2">
-            <Building2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-            <span className="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-slate-200">
-              Sede Activa:
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-3.5">
+        {/* KPI 1: Total Registradas */}
+        <div className="bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] rounded-2xl p-4 shadow-sm hover:border-slate-300 dark:hover:border-[#244265] transition-colors">
+          <div className="flex items-center justify-between mb-1.5">
+            <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
+              Total Registradas
             </span>
+            <div className="w-6 h-6 rounded-lg bg-slate-100 dark:bg-[#071220] flex items-center justify-center text-slate-600 dark:text-slate-400">
+              <Calendar className="w-3.5 h-3.5" />
+            </div>
           </div>
-
-          <div className="flex flex-wrap items-center gap-1.5">
-            <button
-              type="button"
-              onClick={() => handleVenueFilterChange('all')}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer border ${
-                venueFilter === 'all'
-                  ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs'
-                  : 'bg-slate-50 dark:bg-slate-900 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-slate-300'
-              }`}
-            >
-              Todas las Sedes
-            </button>
-            {venues
-              .filter((v) => v.id !== 'all')
-              .map((v) => {
-                const isSelected = venueFilter === v.id;
-                return (
-                  <button
-                    key={v.id}
-                    type="button"
-                    onClick={() => handleVenueFilterChange(v.id)}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer border ${
-                      isSelected
-                        ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs'
-                        : 'bg-slate-50 dark:bg-slate-900 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-slate-300'
-                    }`}
-                  >
-                    {v.shortName || v.name}
-                  </button>
-                );
-              })}
-          </div>
-        </div>
-      )}
-
-      {/* TARJETAS RESUMEN KPIS */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-        <div className="bg-white dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 rounded-2xl p-3.5 sm:p-4 shadow-sm">
-          <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 block mb-0.5">
-            Total Registradas
-          </span>
-          <div className="text-xl sm:text-2xl font-black font-mono text-slate-900 dark:text-white">
+          <div className="text-2xl sm:text-3xl font-black font-mono text-[#0B1A2D] dark:text-white tracking-tight">
             {totalCount}
           </div>
+          <div className="text-[10px] text-slate-400 mt-1 font-medium">
+            {isConsolidatedView ? 'Todas las sedes' : selectedVenue.shortName || 'Sede activa'}
+          </div>
         </div>
 
-        <div className="bg-white dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 rounded-2xl p-3.5 sm:p-4 shadow-sm">
-          <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 block mb-0.5">
-            Confirmadas
-          </span>
-          <div className="text-xl sm:text-2xl font-black font-mono text-emerald-600 dark:text-emerald-400">
+        {/* KPI 2: Confirmadas */}
+        <div className="bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] rounded-2xl p-4 shadow-sm hover:border-slate-300 dark:hover:border-[#244265] transition-colors">
+          <div className="flex items-center justify-between mb-1.5">
+            <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
+              Confirmadas
+            </span>
+            <div className="w-6 h-6 rounded-lg bg-[#F0FCCF] dark:bg-[#B7F229]/20 flex items-center justify-center text-[#0B1A2D] dark:text-[#B7F229]">
+              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-[#B7F229]" />
+            </div>
+          </div>
+          <div className="text-2xl sm:text-3xl font-black font-mono text-emerald-600 dark:text-[#B7F229] tracking-tight">
             {confirmedCount}
           </div>
-        </div>
-
-        <div className="bg-white dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 rounded-2xl p-3.5 sm:p-4 shadow-sm">
-          <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 block mb-0.5">
-            Pendiente TPV
-          </span>
-          <div className="text-xl sm:text-2xl font-black font-mono text-slate-800 dark:text-slate-100">
-            {pendingCount}
+          <div className="text-[10px] text-emerald-600 dark:text-emerald-400 mt-1 font-medium">
+            {totalCount > 0 ? `${Math.round((confirmedCount / totalCount) * 100)}% de ocupación` : 'Sin registros'}
           </div>
         </div>
 
-        <div className="bg-white dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 rounded-2xl p-3.5 sm:p-4 shadow-sm">
-          <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 block mb-0.5">
-            Facturación Total
-          </span>
-          <div className="text-xl sm:text-2xl font-black font-mono text-emerald-600 dark:text-emerald-400">
-            {totalAmountSum.toLocaleString('es-ES', { minimumFractionDigits: 2 })} €
+        {/* KPI 3: Pendiente TPV */}
+        <div className="bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] rounded-2xl p-4 shadow-sm hover:border-slate-300 dark:hover:border-[#244265] transition-colors">
+          <div className="flex items-center justify-between mb-1.5">
+            <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
+              Pendiente TPV
+            </span>
+            <div className="w-6 h-6 rounded-lg bg-amber-50 dark:bg-amber-950/60 flex items-center justify-center text-amber-600 dark:text-amber-400">
+              <Clock className="w-3.5 h-3.5" />
+            </div>
+          </div>
+          <div className="text-2xl sm:text-3xl font-black font-mono text-amber-600 dark:text-amber-400 tracking-tight">
+            {pendingCount}
+          </div>
+          <div className="text-[10px] text-slate-400 mt-1 font-medium">
+            Cobro en mostrador / split
+          </div>
+        </div>
+
+        {/* KPI 4: Facturación Total */}
+        <div className="bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] rounded-2xl p-4 shadow-sm hover:border-slate-300 dark:hover:border-[#244265] transition-colors">
+          <div className="flex items-center justify-between mb-1.5">
+            <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
+              Facturación Total
+            </span>
+            <div className="w-6 h-6 rounded-lg bg-slate-100 dark:bg-[#071220] flex items-center justify-center text-[#0B1A2D] dark:text-[#B7F229]">
+              <CreditCard className="w-3.5 h-3.5" />
+            </div>
+          </div>
+          <div className="text-2xl sm:text-3xl font-black font-mono text-[#0B1A2D] dark:text-white tracking-tight">
+            {totalAmountSum.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €
+          </div>
+          <div className="text-[10px] text-slate-400 mt-1 font-medium">
+            Tarifas de pista sumadas
           </div>
         </div>
       </div>
 
       {/* ======================================================================
-          BARRA DE BÚSQUEDA Y FILTROS ULTRA-COMPACTOS (Directamente sobre el fondo)
+          4. BARRA DE BÚSQUEDA Y FILTROS MINIMALISTAS (SIN CONTENEDORES PESADOS)
           ====================================================================== */}
-      <div className="space-y-2.5">
-        {/* Fila 1: Buscador y Selectores Ultra-Compactos */}
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2">
-          {/* Buscador ultra-compacto */}
-          <div className="relative flex-1 min-w-0">
-            <Search className="absolute left-3 top-2.5 w-3.5 h-3.5 text-slate-400" />
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 pt-1">
+        {/* Buscador minimalista */}
+        <div className="relative flex-1 min-w-0">
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Buscar por titular, pista o PIN..."
+            className="w-full pl-9 pr-8 py-2.5 bg-white dark:bg-[#0E2239] border border-slate-200/90 dark:border-[#1A314D] rounded-xl text-xs text-[#0B1A2D] dark:text-white placeholder-slate-400 focus:outline-none focus:border-[#B7F229] transition shadow-2xs"
+          />
+          {searchTerm && (
+            <button
+              type="button"
+              onClick={() => setSearchTerm('')}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
+            >
+              ✕
+            </button>
+          )}
+        </div>
+
+        {/* Selectores Dinámicos: Pista y Fecha sin envolventes pesadas */}
+        <div className="flex items-center gap-2 shrink-0">
+          {/* Selector de Pista Dinámico (Filtrado por sede activa) */}
+          <select
+            value={courtFilter}
+            onChange={(e) => setCourtFilter(e.target.value)}
+            className="px-3 py-2.5 bg-white dark:bg-[#0E2239] border border-slate-200/90 dark:border-[#1A314D] rounded-xl text-xs text-[#0B1A2D] dark:text-slate-200 focus:outline-none focus:border-[#B7F229] transition font-bold min-w-[130px] shadow-2xs cursor-pointer"
+            title="Filtrar por pista de la sede activa"
+          >
+            <option value="all">Todas las Pistas</option>
+            {availableCourts.map((court) => (
+              <option key={court.id} value={court.id}>
+                {court.name}
+              </option>
+            ))}
+          </select>
+
+          {/* Selector de Fecha (con fecha de hoy por defecto) */}
+          <div className="flex items-center gap-1">
             <input
-              type="text"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Buscar por titular, pista o PIN..."
-              className="w-full pl-8.5 pr-8 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-emerald-500 transition shadow-2xs"
+              type="date"
+              value={dateFilter}
+              onChange={(e) => setDateFilter(e.target.value)}
+              className="px-2.5 py-2.5 bg-white dark:bg-[#0E2239] border border-slate-200/90 dark:border-[#1A314D] rounded-xl text-xs text-[#0B1A2D] dark:text-slate-200 focus:outline-none focus:border-[#B7F229] transition font-semibold min-w-[135px] shadow-2xs cursor-pointer"
+              title="Filtrar por fecha específica"
             />
-            {searchTerm && (
+            {dateFilter && (
               <button
                 type="button"
-                onClick={() => setSearchTerm('')}
-                className="absolute right-2.5 top-2.5 text-xs text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
+                onClick={() => setDateFilter('')}
+                className="text-xs text-slate-400 hover:text-rose-500 font-bold px-1.5 py-1 rounded cursor-pointer shrink-0 transition"
+                title="Limpiar filtro de fecha (ver histórico completo)"
               >
                 ✕
               </button>
             )}
           </div>
-
-          {/* Selectores de Pista y Fecha */}
-          <div className="flex flex-wrap items-center gap-1.5 shrink-0">
-
-            {/* Selector de Pista */}
-            <select
-              value={courtFilter}
-              onChange={(e) => setCourtFilter(e.target.value)}
-              className="px-2.5 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-emerald-500 transition font-medium min-w-[120px] shadow-2xs cursor-pointer"
-            >
-              <option value="all">Todas las Pistas</option>
-              {courts.map((court) => (
-                <option key={court.id} value={court.id}>
-                  {court.name}
-                </option>
-              ))}
-            </select>
-
-            {/* Selector de Fecha */}
-            <div className="flex items-center gap-1">
-              <input
-                type="date"
-                value={dateFilter}
-                onChange={(e) => setDateFilter(e.target.value)}
-                className="px-2 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-emerald-500 transition font-medium max-w-[130px] shadow-2xs cursor-pointer"
-                title="Filtrar por fecha específica"
-              />
-              {dateFilter && (
-                <button
-                  type="button"
-                  onClick={() => setDateFilter('')}
-                  className="text-[11px] text-slate-500 hover:text-emerald-500 font-bold px-1.5 py-1 rounded cursor-pointer shrink-0"
-                >
-                  ✕
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Fila 2: Segmented Controls Minimalistas Ultra-Compactos (Temporal + Pago) */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-          {/* 1. Filtro Temporal: Todas vs Futuras vs Pasadas */}
-          <div className="inline-flex w-full p-1 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 text-xs gap-1 shadow-2xs">
-            <button
-              type="button"
-              onClick={() => setTimeFilter('all')}
-              className={`flex-1 py-1 px-2 rounded-lg font-bold text-[11px] transition text-center cursor-pointer flex items-center justify-center gap-1 ${
-                timeFilter === 'all'
-                  ? 'bg-emerald-600 text-white shadow-xs'
-                  : 'text-slate-600 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400'
-              }`}
-            >
-              <Calendar className="w-3 h-3" />
-              <span>Todas</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setTimeFilter('upcoming')}
-              className={`flex-1 py-1 px-2 rounded-lg font-bold text-[11px] transition text-center cursor-pointer flex items-center justify-center gap-1 ${
-                timeFilter === 'upcoming'
-                  ? 'bg-emerald-600 text-white shadow-xs'
-                  : 'text-slate-600 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400'
-              }`}
-            >
-              <Clock className="w-3 h-3" />
-              <span>Futuras</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setTimeFilter('past')}
-              className={`flex-1 py-1 px-2 rounded-lg font-bold text-[11px] transition text-center cursor-pointer flex items-center justify-center gap-1 ${
-                timeFilter === 'past'
-                  ? 'bg-slate-800 dark:bg-slate-700 text-white shadow-xs'
-                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-              }`}
-            >
-              <CheckCircle2 className="w-3 h-3" />
-              <span>Pasadas</span>
-            </button>
-          </div>
-
-          {/* 2. Filtro de Estado de Pago */}
-          <div className="inline-flex w-full p-1 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 text-xs gap-1 shadow-2xs">
-            <button
-              type="button"
-              onClick={() => setStatusFilter('all')}
-              className={`flex-1 py-1 px-1.5 rounded-lg font-bold text-[11px] transition text-center cursor-pointer ${
-                statusFilter === 'all'
-                  ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white shadow-xs'
-                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-              }`}
-            >
-              {t('allBookings.paymentFilter.all', 'Todos')}
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setStatusFilter('confirmed')}
-              className={`flex-1 py-1 px-1.5 rounded-lg font-bold text-[11px] transition text-center cursor-pointer ${
-                statusFilter === 'confirmed'
-                  ? 'bg-emerald-600 text-white shadow-xs'
-                  : 'text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/40'
-              }`}
-            >
-              Pagadas
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setStatusFilter('pending')}
-              className={`flex-1 py-1 px-1.5 rounded-lg font-bold text-[11px] transition text-center cursor-pointer ${
-                statusFilter === 'pending'
-                  ? 'bg-slate-800 dark:bg-slate-700 text-white shadow-xs'
-                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-              }`}
-            >
-              Pendientes TPV
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setStatusFilter('canceled')}
-              className={`flex-1 py-1 px-1.5 rounded-lg font-bold text-[11px] transition text-center cursor-pointer ${
-                statusFilter === 'canceled'
-                  ? 'bg-rose-600 text-white shadow-xs'
-                  : 'text-rose-700 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40'
-              }`}
-            >
-              Canceladas
-            </button>
-          </div>
         </div>
       </div>
 
       {/* ======================================================================
-          LISTADO DE RESERVAS (Renderizado directamente sobre el fondo sin tarjeta general)
+          5. LISTADO DE RESERVAS (Renderizado directamente sobre el fondo limpio)
           ====================================================================== */}
-      <div className="space-y-2.5">
+      <div className="space-y-2.5 pt-1">
         <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 px-1">
           <span className="font-bold uppercase tracking-wider text-[11px]">
             {filteredBookings.length} {filteredBookings.length === 1 ? 'Reserva' : 'Reservas'} encontradas
           </span>
+          {dateFilter && (
+            <span className="text-[11px] font-medium text-slate-400">
+              Fecha: {dateFilter}
+            </span>
+          )}
         </div>
 
         {filteredBookings.length === 0 ? (
-          <div className="p-10 text-center text-slate-400 dark:text-slate-500 text-xs rounded-2xl bg-white/60 dark:bg-slate-900/60 border border-dashed border-slate-200 dark:border-slate-800">
+          <div className="p-10 text-center text-slate-400 dark:text-slate-500 text-xs rounded-2xl bg-white/60 dark:bg-[#0E2239]/60 border border-dashed border-slate-200 dark:border-[#1A314D]">
             <Calendar className="w-8 h-8 text-slate-300 dark:text-slate-600 mx-auto mb-2" />
-            <h3 className="font-bold text-sm text-slate-900 dark:text-white">
+            <h3 className="font-bold text-sm text-[#0B1A2D] dark:text-white">
               No se encontraron reservas
             </h3>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-sm mx-auto">
-              No hay registros que coincidan con los filtros seleccionados.
+              No hay registros que coincidan con los filtros seleccionados. Prueba a cambiar la fecha o limpiar los filtros.
             </p>
+            {dateFilter && (
+              <button
+                type="button"
+                onClick={() => setDateFilter('')}
+                className="mt-3 px-3 py-1.5 bg-[#0B1A2D] dark:bg-[#B7F229] text-white dark:text-[#0B1A2D] rounded-xl text-xs font-bold transition hover:opacity-90 active:scale-95 cursor-pointer"
+              >
+                Ver todo el histórico
+              </button>
+            )}
           </div>
         ) : (
           <div className="space-y-2">
@@ -616,7 +543,7 @@ export const AllBookingsPage: React.FC<AllBookingsPageProps> = ({
         )}
       </div>
 
-      {/* Bottom Sheet Drawer de Detalle Operativo (con permisos de editar, cancelar y eliminar) */}
+      {/* Bottom Sheet Drawer de Detalle Operativo */}
       <ReservationDrawer
         isOpen={!!selectedDrawerBooking}
         reservation={selectedDrawerBooking}
@@ -627,13 +554,11 @@ export const AllBookingsPage: React.FC<AllBookingsPageProps> = ({
         }}
       />
 
-      {/* ======================================================================
-          MODAL DE NUEVA RESERVA DIRECTO (Componente Unificado con todos los requerimientos)
-          ====================================================================== */}
+      {/* Modal de Nueva Reserva */}
       <NewBookingModal
         isOpen={isNewBookingModalOpen}
         onClose={() => setIsNewBookingModalOpen(false)}
-        defaultVenueId={venueFilter !== 'all' ? venueFilter : undefined}
+        defaultVenueId={selectedVenueId !== 'all' ? selectedVenueId : undefined}
       />
     </div>
   );

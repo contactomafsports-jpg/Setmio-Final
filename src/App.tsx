@@ -497,9 +497,10 @@ export function App() {
       case 'dashboard':
         return <ContextualDashboard />;
       case 'agenda':
-      case 'all_bookings':
       case 'bookings':
         return <AdminAgenda />;
+      case 'all_bookings':
+        return <AllBookingsPage onBackToQuadrant={() => setAdminTab('agenda')} />;
       case 'courts_management': {
         const hasNoCourtsInfrastructure =
           currentTenant.type === 'COACH' ||

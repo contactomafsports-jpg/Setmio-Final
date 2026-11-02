@@ -1101,13 +1101,13 @@ export const AdminTournaments: React.FC = () => {
             ====================================================================== */
         <div className="space-y-6 animate-in fade-in duration-150">
           {/* Barra Superior con Botón Volver Integrado y Estado */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200/80 dark:border-slate-800">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200/80 dark:border-[#1A314D]">
             <button
               type="button"
               onClick={handleBackToList}
-              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800 shadow-2xs font-bold text-xs transition cursor-pointer active:scale-95 group self-start"
+              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white dark:bg-[#0E2239] hover:bg-slate-50 dark:hover:bg-[#132A45] text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-[#1A314D] shadow-2xs font-bold text-xs transition cursor-pointer active:scale-95 group self-start"
             >
-              <ArrowLeft className="w-4 h-4 text-emerald-500 group-hover:-translate-x-0.5 transition-transform" />
+              <ArrowLeft className="w-4 h-4 text-slate-600 dark:text-slate-300 group-hover:-translate-x-0.5 transition-transform stroke-[2.5]" />
               <span>{t('tournaments.btn_back', 'Volver a competiciones')}</span>
             </button>
 
@@ -1115,28 +1115,28 @@ export const AdminTournaments: React.FC = () => {
               <span className="text-xs text-slate-500 dark:text-slate-400 font-mono">
                 {selectedTournament.dates}
               </span>
-              <span className="px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 font-black text-[10px] uppercase border border-emerald-500/20">
+              <span className="px-2.5 py-1 rounded-full bg-[#F0FCCF] dark:bg-[#B7F229]/20 text-[#0B1A2D] dark:text-[#B7F229] font-black text-[10px] uppercase border border-[#B7F229]/40">
                 {selectedTournament.status === 'registration_open' ? 'Inscripción Abierta' : 'En Curso'}
               </span>
             </div>
           </div>
 
           {/* Cabecera / Primer Contenedor del Torneo: Máximo Contraste y Legibilidad */}
-          <div className="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-sm overflow-hidden flex flex-col md:flex-row">
+          <div className="rounded-3xl bg-white dark:bg-[#0E2239] border border-slate-200/90 dark:border-[#1A314D] shadow-sm overflow-hidden flex flex-col md:flex-row">
             {/* Imagen del Cartel / Banner Limpia y Delimitada */}
-            <div className="relative w-full md:w-80 lg:w-96 h-52 md:h-auto shrink-0 bg-slate-950 overflow-hidden">
+            <div className="relative w-full md:w-80 lg:w-96 h-52 md:h-auto shrink-0 bg-[#0B1A2D] overflow-hidden">
               <img
                 src={selectedTournament.bannerUrl}
                 alt={selectedTournament.title}
                 className="w-full h-full object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-slate-950/60 via-transparent to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-[#0B1A2D]/70 via-transparent to-transparent" />
               
               <div className="absolute top-3 left-3 flex flex-wrap gap-1.5">
-                <span className="px-2.5 py-1 rounded-lg bg-emerald-500 text-slate-950 text-[10px] font-black uppercase tracking-wider shadow-sm">
+                <span className="px-2.5 py-1 rounded-lg bg-[#B7F229] text-[#0B1A2D] text-[10px] font-black uppercase tracking-wider shadow-sm">
                   {selectedTournament.status === 'registration_open' ? 'Inscripción Abierta' : 'En Curso'}
                 </span>
-                <span className="px-2.5 py-1 rounded-lg bg-slate-950/80 backdrop-blur-xs text-white text-[10px] font-bold border border-white/20">
+                <span className="px-2.5 py-1 rounded-lg bg-[#0B1A2D]/85 backdrop-blur-xs text-white text-[10px] font-bold border border-white/20">
                   {selectedTournament.rankingCategory || 'Circuito Setmio Oro'}
                 </span>
               </div>
@@ -1145,7 +1145,7 @@ export const AdminTournaments: React.FC = () => {
             {/* Contenido Informativo con Fondo Sólido de Alto Contraste */}
             <div className="p-6 flex-1 flex flex-col justify-between space-y-4">
               <div className="space-y-2">
-                <div className="flex items-center gap-2 text-xs font-mono font-bold text-emerald-600 dark:text-emerald-400">
+                <div className="flex items-center gap-2 text-xs font-mono font-bold text-[#8B5CF6] dark:text-[#C4B5FD]">
                   <Calendar className="w-4 h-4 shrink-0" />
                   <span>{selectedTournament.dates}</span>
                   <span>·</span>

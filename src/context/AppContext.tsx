@@ -1724,7 +1724,21 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   // Domain Business State
   const [courts, setCourts] = useState<Court[]>(() => readDemoState('setmio_demo_courts_v1', INITIAL_COURTS));
-  const [bookings, setBookings] = useState<Booking[]>(() => readDemoState('setmio_demo_bookings_v1', INITIAL_BOOKINGS));
+  const [bookings, setBookings] = useState<Booking[]>(() => {
+    const loaded = readDemoState<Booking[]>('setmio_demo_bookings_v1', INITIAL_BOOKINGS);
+    const todayStr = new Date().toISOString().split('T')[0];
+    const hasTodayBookings = loaded && loaded.some((b: Booking) => b.startTime.startsWith(todayStr));
+    if (!hasTodayBookings && Array.isArray(loaded) && loaded.length > 0) {
+      const todayClones: Booking[] = loaded.slice(0, 8).map((b: Booking, idx: number) => ({
+        ...b,
+        id: `b-today-${idx + 1}-${Date.now()}`,
+        startTime: b.startTime.replace(/^[0-9]{4}-[0-9]{2}-[0-9]{2}/, todayStr),
+        endTime: b.endTime ? b.endTime.replace(/^[0-9]{4}-[0-9]{2}-[0-9]{2}/, todayStr) : `${todayStr}T20:00:00`,
+      }));
+      return [...todayClones, ...loaded];
+    }
+    return loaded || INITIAL_BOOKINGS;
+  });
   const [openMatches, setOpenMatches] = useState<OpenMatch[]>(() => {
     const loaded = readDemoState<OpenMatch[]>('setmio_demo_matches_v1', INITIAL_OPEN_MATCHES);
     return Array.isArray(loaded) && loaded.length > 0 ? loaded : INITIAL_OPEN_MATCHES;

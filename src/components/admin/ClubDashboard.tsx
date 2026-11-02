@@ -54,7 +54,6 @@ export const ClubDashboard: React.FC = () => {
   const [showAllQuickActions, setShowAllQuickActions] = useState(false);
   const [showNewBookingModal, setShowNewBookingModal] = useState(false);
   const [showNewMatchModal, setShowNewMatchModal] = useState(false);
-  const [showAllBookingsModal, setShowAllBookingsModal] = useState(false);
 
   // Financial Metrics: Online + TPV Bar (Dynamic based on selected venue or consolidated view)
   const totalRevenueToday = selectedVenue.revenueToday;
@@ -670,7 +669,10 @@ export const ClubDashboard: React.FC = () => {
         {/* Botón Sólido de Marca: Todas las Reservas (Limpio y sin flecha) */}
         <button
           type="button"
-          onClick={() => setShowAllBookingsModal(true)}
+          onClick={() => {
+            if (typeof window !== 'undefined') window.history.pushState({}, '', '/admin/reservas/todas');
+            setAdminTab('all_bookings');
+          }}
           className="w-full py-2.5 px-4 rounded-xl bg-[#0B1A2D] hover:bg-[#132A45] text-white font-bold text-xs flex items-center justify-center gap-2 transition-colors shadow-sm cursor-pointer"
         >
           <Calendar className="w-4 h-4 text-white" />
@@ -768,58 +770,6 @@ export const ClubDashboard: React.FC = () => {
         onClose={() => setShowNewMatchModal(false)}
         defaultVenueId={selectedVenueId !== 'all' ? selectedVenueId : undefined}
       />
-
-      {/* ======================================================================
-          MODAL NIVEL 3: HISTORIAL DE RESERVAS (RETORNO GARANTIZADO A INICIO)
-          ====================================================================== */}
-      {showAllBookingsModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/75 p-2 sm:p-4 md:p-6 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="relative w-full max-w-7xl h-[92vh] max-h-[92vh] bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-2xl overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
-            {/* Header del Modal Expansivo con X alineada arriba a la derecha */}
-            <div className="flex items-center justify-between px-5 py-3.5 bg-white dark:bg-slate-900/95 border-b border-slate-200 dark:border-slate-800 shrink-0">
-              <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-[#0B1A2D] text-[#B7F229] flex items-center justify-center">
-                  <Calendar className="w-5 h-5 stroke-[2.2]" />
-                </div>
-                <div>
-                  <h2 className="text-base sm:text-lg font-black text-slate-900 dark:text-white">
-                    Historial de Reservas
-                  </h2>
-                  <p className="text-xs text-slate-400">Listado consolidado de turnos y disponibilidad</p>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2.5">
-                <button
-                  type="button"
-                  onClick={() => setShowNewBookingModal(true)}
-                  className="px-3.5 py-2 rounded-xl bg-[#0B1A2D] hover:bg-[#132A45] text-white dark:bg-[#B7F229] dark:hover:bg-[#a6e61f] dark:text-[#0B1A2D] font-black text-xs shadow-xs flex items-center gap-1.5 transition active:scale-95 cursor-pointer whitespace-nowrap"
-                  title="Crear nueva reserva de pista"
-                >
-                  <Plus className="w-4 h-4 shrink-0 stroke-[3]" />
-                  <span>Nueva reserva</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setShowAllBookingsModal(false)}
-                  className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
-                  title="Cerrar modal y volver a Inicio"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-            </div>
-
-            {/* Contenido scrolleable del historial */}
-            <div className="flex-1 overflow-y-auto p-4 sm:p-6">
-              <AllBookingsPage
-                isModal={true}
-                onBackToQuadrant={() => setShowAllBookingsModal(false)}
-              />
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
