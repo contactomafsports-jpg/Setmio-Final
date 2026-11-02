@@ -127,11 +127,19 @@ export function App() {
     const syncRoute = () => {
       const pathname = typeof window !== 'undefined' ? window.location.pathname : '/';
 
-      // Inicio predeterminado: La aplicación debe iniciar SIEMPRE en la página de INICIO (Level 1)
-      if (pathname === '/' || pathname === '' || pathname === '/demo') {
-        setIsCorporateLanding(false);
-        setCurrentView('admin');
-        setAdminTab('dashboard');
+      // Arranque predeterminado: La aplicación debe cargar por defecto en la página de inicio de la web pública de Setmio
+      if (pathname === '/' || pathname === '') {
+        setIsCorporateLanding(true);
+        setCurrentView('public');
+        setPublicPage('home');
+        return;
+      }
+
+      if (pathname === '/demo') {
+        setIsCorporateLanding(true);
+        setCurrentView('public');
+        setPublicPage('home');
+        setRoleSelectorOpen(true);
         return;
       }
 

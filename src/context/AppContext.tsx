@@ -381,15 +381,15 @@ const readRoute = () => {
     '/para-jugadores',
   ].some((p) => path === p || path.startsWith(`${p}/`));
 
-  // La aplicación debe iniciar SIEMPRE en la página de INICIO (Level 1) de forma predeterminada
-  if ((path === '/' || path === '' || path === '/demo') && !isExplicitPublicLanding) {
+  // Arranque predeterminado: La aplicación debe cargar por defecto en la página de inicio de la web pública de Setmio
+  if (path === '/' || path === '') {
     return {
-      view: 'admin' as MainView,
+      view: 'public' as MainView,
       page: 'home' as PublicPage,
       admin: 'dashboard' as AdminTab,
       player: 'dashboard' as PlayerTab,
-      clubSlug: savedAdmin?.clubSlug || null,
-      isCorporate: false,
+      clubSlug: null,
+      isCorporate: true,
     };
   }
 
@@ -588,14 +588,14 @@ const readRoute = () => {
     };
   }
 
-  if ((remainingPath === '/' || remainingPath === '') && !isExplicitPublicLanding) {
+  if (remainingPath === '/' || remainingPath === '') {
     return {
-      view: 'admin' as MainView,
+      view: 'public' as MainView,
       page: 'home' as PublicPage,
       admin: 'dashboard' as AdminTab,
       player: 'dashboard' as PlayerTab,
-      clubSlug: savedAdmin?.clubSlug || activeClubSlug,
-      isCorporate: false,
+      clubSlug: activeClubSlug,
+      isCorporate: !activeClubSlug,
     };
   }
 
