@@ -381,28 +381,16 @@ const readRoute = () => {
     '/para-jugadores',
   ].some((p) => path === p || path.startsWith(`${p}/`));
 
-  // Si la ruta es raíz '/' o entrada general, y existe sesión activa de administrador, restaurar inmediatamente
+  // La aplicación debe iniciar SIEMPRE en la página de INICIO (Level 1) de forma predeterminada
   if ((path === '/' || path === '' || path === '/demo') && !isExplicitPublicLanding) {
-    if (savedAdmin) {
-      return {
-        view: 'admin' as MainView,
-        page: 'home' as PublicPage,
-        admin: savedAdmin.adminTab || 'dashboard',
-        player: 'dashboard' as PlayerTab,
-        clubSlug: savedAdmin.clubSlug || null,
-        isCorporate: false,
-      };
-    }
-    if (savedRoute && savedRoute.view && savedRoute.view !== 'public') {
-      return {
-        view: savedRoute.view,
-        page: savedRoute.page || 'home',
-        admin: savedRoute.admin || 'dashboard',
-        player: savedRoute.player || 'dashboard',
-        clubSlug: savedRoute.clubSlug || null,
-        isCorporate: false,
-      };
-    }
+    return {
+      view: 'admin' as MainView,
+      page: 'home' as PublicPage,
+      admin: 'dashboard' as AdminTab,
+      player: 'dashboard' as PlayerTab,
+      clubSlug: savedAdmin?.clubSlug || null,
+      isCorporate: false,
+    };
   }
 
   // 1. Detect Subdomain (e.g. sanmateo.setmiofinal2.vercel.app or sanmateo.localhost)
@@ -600,13 +588,13 @@ const readRoute = () => {
     };
   }
 
-  if ((remainingPath === '/' || remainingPath === '') && !isExplicitPublicLanding && savedAdmin) {
+  if ((remainingPath === '/' || remainingPath === '') && !isExplicitPublicLanding) {
     return {
       view: 'admin' as MainView,
       page: 'home' as PublicPage,
-      admin: savedAdmin.adminTab || 'dashboard',
+      admin: 'dashboard' as AdminTab,
       player: 'dashboard' as PlayerTab,
-      clubSlug: savedAdmin.clubSlug || activeClubSlug,
+      clubSlug: savedAdmin?.clubSlug || activeClubSlug,
       isCorporate: false,
     };
   }

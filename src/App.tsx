@@ -127,24 +127,12 @@ export function App() {
     const syncRoute = () => {
       const pathname = typeof window !== 'undefined' ? window.location.pathname : '/';
 
-      // Restauración de ruta activa si se entra a la raíz '/', vacío o '/demo'
+      // Inicio predeterminado: La aplicación debe iniciar SIEMPRE en la página de INICIO (Level 1)
       if (pathname === '/' || pathname === '' || pathname === '/demo') {
-        const savedAdmin = getSavedAdminSession();
-        if (savedAdmin) {
-          setIsCorporateLanding(false);
-          setCurrentView('admin');
-          if (savedAdmin.adminTab) setAdminTab(savedAdmin.adminTab);
-          if (savedAdmin.tenantId) switchTenant(savedAdmin.tenantId);
-          return;
-        }
-        const saved = getLastActiveRoute();
-        if (saved && saved.view && saved.view !== 'public') {
-          setIsCorporateLanding(false);
-          setCurrentView(saved.view);
-          if (saved.admin) setAdminTab(saved.admin);
-          if (saved.tenantId) switchTenant(saved.tenantId);
-          return;
-        }
+        setIsCorporateLanding(false);
+        setCurrentView('admin');
+        setAdminTab('dashboard');
+        return;
       }
 
       // URLs con prefijo de entidad (/p/[slug] o /club/[slug])
