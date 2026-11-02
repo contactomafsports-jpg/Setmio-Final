@@ -135,8 +135,8 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
                 className="flex items-center gap-2 cursor-pointer select-none group text-left p-0 bg-transparent border-0 focus:outline-none"
                 title="Ir al Inicio de Setmio"
               >
-                {/* Logotipo Cuadrado PWA Optimizado (recorte / object-fit) */}
-                <div className="w-8 h-8 sm:w-8.5 sm:h-8.5 rounded-xl overflow-hidden bg-[#0B1A2D] border border-slate-700/60 flex items-center justify-center shrink-0 shadow-xs group-hover:scale-102 transition-transform">
+                {/* Logotipo Cuadrado PWA con Isotipo Oficial en Verde Lima #B7F229 */}
+                <div className="w-8 h-8 sm:w-8.5 sm:h-8.5 rounded-xl overflow-hidden bg-[#0B1A2D] border border-[#B7F229]/40 dark:border-[#B7F229]/50 flex items-center justify-center shrink-0 shadow-xs group-hover:scale-102 transition-transform">
                   <img
                     src="/icon.svg"
                     alt="Setmio Pro"
@@ -354,8 +354,8 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
             )}
           </button>
 
-          {/* Pastilla Flotante Unificada Ultracompacta a la Derecha */}
-          <div className="flex items-center gap-1 sm:gap-1.5 p-1 bg-white/90 dark:bg-[#0E2239]/90 backdrop-blur-md rounded-full border border-slate-200/80 dark:border-[#1A314D] shadow-xs">
+          {/* Elementos de la derecha flotantes y limpios sin cajas */}
+          <div className="flex items-center gap-1.5 sm:gap-2">
             {/* 1. Centro Global de Notificaciones (Campanita con badge dinámico) */}
             <NotificationsPopover variant="admin" />
 

@@ -587,6 +587,8 @@ export interface SmartCourtDevice {
 export interface CafeProduct {
   id: string;
   tenantId?: string;
+  venueId?: string;
+  venueName?: string;
   name: string;
   category: 'Bebidas' | 'Café' | 'Snacks' | 'Bocadillos' | 'Grip/Pelotas' | 'Reserva Pista' | 'Recarga Monedero' | string;
   price: number;

@@ -142,6 +142,7 @@ export const AdminCafePOS: React.FC = () => {
   const [isCatalogManagementOpen, setIsCatalogManagementOpen] = useState(false);
   const [catalogSearch, setCatalogSearch] = useState('');
   const [catalogCategoryFilter, setCatalogCategoryFilter] = useState('all');
+  const [catalogVenueFilter, setCatalogVenueFilter] = useState('all');
 
   // Modal Nivel 3: Pagos Consolidados (Historial Global de Todos los Turnos y Recepcionistas)
   const [transactionsModalOpen, setTransactionsModalOpen] = useState(false);
@@ -348,6 +349,7 @@ export const AdminCafePOS: React.FC = () => {
     price: 2.0,
     stock: 50,
     imageUrl: '',
+    venueId: '',
   });
 
   const PRESET_PRODUCT_IMAGES = [
@@ -756,12 +758,14 @@ export const AdminCafePOS: React.FC = () => {
   // Open Create/Edit Product Form Modal
   const openNewProductModal = () => {
     setEditingProduct(null);
+    const defaultVenueId = selectedVenueId !== 'all' ? selectedVenueId : (venues?.[0]?.id || 'v-1');
     setProductFormData({
       name: '',
       category: customCategories[0] || 'Bebidas',
       price: 2.5,
       stock: 50,
       imageUrl: 'https://images.unsplash.com/photo-1548839140-29a749e1bc4e?auto=format&fit=crop&w=400&q=80',
+      venueId: defaultVenueId,
     });
     setShowInlineNewCategory(false);
     setProductFormModalOpen(true);
@@ -775,6 +779,7 @@ export const AdminCafePOS: React.FC = () => {
       price: prod.price,
       stock: prod.stock,
       imageUrl: prod.imageUrl || '',
+      venueId: prod.venueId || (selectedVenueId !== 'all' ? selectedVenueId : (venues?.[0]?.id || 'v-1')),
     });
     setShowInlineNewCategory(false);
     setProductFormModalOpen(true);
@@ -787,6 +792,9 @@ export const AdminCafePOS: React.FC = () => {
       return;
     }
 
+    const assignedVenue = venues.find((v) => v.id === productFormData.venueId);
+    const venueName = assignedVenue?.name || selectedVenue?.name || 'Sede Central';
+
     if (editingProduct) {
       updateCafeProduct(editingProduct.id, {
         name: productFormData.name,
@@ -794,6 +802,8 @@ export const AdminCafePOS: React.FC = () => {
         price: Number(productFormData.price),
         stock: Number(productFormData.stock),
         imageUrl: productFormData.imageUrl,
+        venueId: productFormData.venueId,
+        venueName,
       });
       triggerDemoToast('Producto Actualizado', `"${productFormData.name}" actualizado en el catálogo.`, 'success');
     } else {
@@ -805,6 +815,8 @@ export const AdminCafePOS: React.FC = () => {
         active: true,
         imageUrl: productFormData.imageUrl || 'https://images.unsplash.com/photo-1548839140-29a749e1bc4e?auto=format&fit=crop&w=400&q=80',
         tenantId: currentTenant.id,
+        venueId: productFormData.venueId,
+        venueName,
       });
       triggerDemoToast('Producto Añadido', `"${productFormData.name}" disponible en TPV.`, 'success');
     }
@@ -833,12 +845,16 @@ export const AdminCafePOS: React.FC = () => {
   // Productos filtrados para la Vista Nivel 2 de Catálogo Completo e Inventario
   const filteredCatalogProducts = useMemo(() => {
     return cafeProducts.filter((p) => {
+      const matchVenue =
+        catalogVenueFilter === 'all' ||
+        !p.venueId ||
+        p.venueId === catalogVenueFilter;
       const matchCat = catalogCategoryFilter === 'all' || p.category === catalogCategoryFilter;
       const term = catalogSearch.toLowerCase().trim();
       const matchTerm = !term || p.name.toLowerCase().includes(term) || p.category.toLowerCase().includes(term);
-      return matchCat && matchTerm;
+      return matchVenue && matchCat && matchTerm;
     });
-  }, [cafeProducts, catalogCategoryFilter, catalogSearch]);
+  }, [cafeProducts, catalogCategoryFilter, catalogSearch, catalogVenueFilter]);
 
   // Pagos Consolidados Multi-Turno y Multi-Recepcionista con Filtros Avanzados
   const filteredGlobalPayments = useMemo(() => {
@@ -1080,8 +1096,8 @@ export const AdminCafePOS: React.FC = () => {
           </div>
         </div>
 
-        {/* Retícula de Acciones Principales (Diseño Unificado) */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 w-full pt-1">
+        {/* Retícula Simétrica 2x2 de Acciones Principales */}
+        <div className="grid grid-cols-2 gap-2.5 w-full pt-1">
           {/* 1. Asignar Reserva */}
           <button
             type="button"
@@ -1097,22 +1113,7 @@ export const AdminCafePOS: React.FC = () => {
             </span>
           </button>
 
-          {/* 2. Nuevo Producto */}
-          <button
-            type="button"
-            onClick={openNewProductModal}
-            className="w-full h-12 px-3.5 rounded-xl bg-white dark:bg-[#0E2239] hover:bg-slate-50 dark:hover:bg-[#132A45] border border-slate-200/80 dark:border-[#1A314D] shadow-2xs flex items-center justify-start text-left gap-2.5 sm:gap-3 transition active:scale-95 cursor-pointer group"
-            title="Añadir nuevo producto al mostrador"
-          >
-            <div className="w-7 h-7 rounded-lg bg-slate-100 dark:bg-[#152e4d] flex items-center justify-center shrink-0 text-slate-600 dark:text-slate-300 group-hover:text-[#0B1A2D] dark:group-hover:text-[#B7F229] transition-colors">
-              <Package className="w-4 h-4 stroke-[2.2]" />
-            </div>
-            <span className="text-xs font-bold text-[#0B1A2D] dark:text-white truncate">
-              Nuevo Producto
-            </span>
-          </button>
-
-          {/* 3. Pagos (Renombrado de 'Todos los Pagos') */}
+          {/* 2. Pagos */}
           <button
             type="button"
             onClick={() => setTransactionsModalOpen(true)}
@@ -1130,7 +1131,7 @@ export const AdminCafePOS: React.FC = () => {
             </span>
           </button>
 
-          {/* 4. Productos (Renombrado de 'Todos los productos') */}
+          {/* 3. Productos */}
           <button
             type="button"
             onClick={() => setIsCatalogManagementOpen(true)}
@@ -1145,7 +1146,7 @@ export const AdminCafePOS: React.FC = () => {
             </span>
           </button>
 
-          {/* 5. Arqueo de Caja (Integrado de forma equilibrada con el mismo ancho) */}
+          {/* 4. Arqueo de Caja */}
           <button
             type="button"
             onClick={() => setArqueoModalOpen(true)}
@@ -1167,206 +1168,254 @@ export const AdminCafePOS: React.FC = () => {
           (Sin barra superior global, cabecera limpia con botón ← de retroceso y título unificado, sin subtítulos)
           ====================================================================== */}
       {isCatalogManagementOpen && (
-        <div className="fixed inset-0 z-45 bg-slate-50 dark:bg-[#0B1A2D] overflow-y-auto pb-24 md:pb-8 pt-3 sm:pt-4 px-3.5 sm:px-6 lg:px-8 animate-in fade-in duration-200" data-level="2">
-          <div className="max-w-7xl mx-auto space-y-4">
-            {/* Cabecera Nivel 2 */}
-            <div className="flex items-center justify-between p-3.5 sm:p-4 bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200/80 dark:border-[#1A314D] shadow-2xs">
-              <div className="flex items-center gap-3">
+        <div className="fixed inset-0 md:left-64 z-45 bg-slate-50 dark:bg-[#0B1A2D] overflow-y-auto pb-24 md:pb-8 pt-3 sm:pt-4 px-3.5 sm:px-6 lg:px-8 animate-in fade-in duration-200" data-level="2">
+          <div className="max-w-6xl mx-auto space-y-4">
+            {/* Cabecera Nivel 2 (Limpia, sin colisiones ni desbordamientos) */}
+            <div className="flex items-center justify-between py-1.5 sm:py-2 gap-2">
+              <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
                 <button
                   type="button"
                   onClick={() => setIsCatalogManagementOpen(false)}
-                  className="p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:text-[#0B1A2D] dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#132A45] transition cursor-pointer active:scale-95"
+                  className="p-2 -ml-2 rounded-xl text-slate-600 dark:text-slate-300 hover:text-[#0B1A2D] dark:hover:text-white hover:bg-slate-200/60 dark:hover:bg-slate-800/60 transition cursor-pointer active:scale-95 shrink-0"
                   title="Volver al mostrador TPV"
                 >
                   <ArrowLeft className="w-5 h-5 stroke-[2.5]" />
                 </button>
-                <div className="flex items-center gap-2.5">
-                  <h1 className="text-lg sm:text-xl font-extrabold text-[#0B1A2D] dark:text-white tracking-tight">
+                <div className="flex items-center gap-2 min-w-0">
+                  <h1 className="text-xl sm:text-2xl font-black text-[#0B1A2D] dark:text-white tracking-tight truncate">
                     Productos
                   </h1>
-                  <span className="px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-[#0B1A2D] dark:text-[#B7F229] font-mono text-[10px] font-black">
-                    {cafeProducts.length} artículos
+                  <span className="px-2.5 py-0.5 rounded-full bg-slate-200/70 dark:bg-[#152e4d] text-slate-700 dark:text-[#B7F229] font-mono text-xs font-bold shrink-0">
+                    {filteredCatalogProducts.length}
                   </span>
                 </div>
               </div>
 
-            <button
-              type="button"
-              onClick={openNewProductModal}
-              className="px-3.5 py-2 rounded-xl bg-[#0B1A2D] hover:bg-[#132A45] text-white dark:bg-[#B7F229] dark:hover:bg-[#a6e61f] dark:text-[#0B1A2D] font-black text-xs shadow-xs flex items-center gap-1.5 transition cursor-pointer active:scale-95 whitespace-nowrap"
-            >
-              <Plus className="w-4 h-4 stroke-[3]" />
-              <span>Nuevo Producto</span>
-            </button>
-          </div>
+              <button
+                type="button"
+                onClick={openNewProductModal}
+                className="px-3.5 sm:px-4 py-2 rounded-xl bg-[#0B1A2D] hover:bg-[#132A45] text-white dark:bg-[#B7F229] dark:hover:bg-[#a6e61f] dark:text-[#0B1A2D] font-bold text-xs shadow-xs flex items-center gap-1.5 transition cursor-pointer active:scale-95 shrink-0 whitespace-nowrap"
+              >
+                <Plus className="w-4 h-4 stroke-[2.5]" />
+                <span>Nuevo Producto</span>
+              </button>
+            </div>
 
-          {/* Tarjetas de Métricas de Inventario */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-            <div className="p-3 bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200/80 dark:border-[#1A314D] shadow-2xs">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Total Artículos</span>
-              <div className="text-xl font-black font-mono text-[#0B1A2D] dark:text-white mt-0.5">
-                {cafeProducts.length}
+            {/* Tarjetas de Métricas de Inventario */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+              <div className="p-3 bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200/80 dark:border-[#1A314D] shadow-2xs">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Total Artículos</span>
+                <div className="text-xl font-black font-mono text-[#0B1A2D] dark:text-white mt-0.5">
+                  {cafeProducts.length}
+                </div>
+                <span className="text-[10px] text-slate-400 font-medium">En catálogo oficial</span>
               </div>
-              <span className="text-[10px] text-slate-400 font-medium">En catálogo oficial</span>
-            </div>
-            <div className="p-3 bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200/80 dark:border-[#1A314D] shadow-2xs">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Destacados TPV</span>
-              <div className="text-xl font-black font-mono text-[#8B5CF6] dark:text-[#C4B5FD] mt-0.5">
-                {cafeProducts.filter((p) => p.isFeatured !== false).length}
+              <div className="p-3 bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200/80 dark:border-[#1A314D] shadow-2xs">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Destacados TPV</span>
+                <div className="text-xl font-black font-mono text-[#8B5CF6] dark:text-[#C4B5FD] mt-0.5">
+                  {cafeProducts.filter((p) => p.isFeatured !== false).length}
+                </div>
+                <span className="text-[10px] text-slate-400 font-medium">Visibles en mostrador</span>
               </div>
-              <span className="text-[10px] text-slate-400 font-medium">Visibles en mostrador</span>
-            </div>
-            <div className="p-3 bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200/80 dark:border-[#1A314D] shadow-2xs">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Existencias Totales</span>
-              <div className="text-xl font-black font-mono text-[#0B1A2D] dark:text-white mt-0.5">
-                {cafeProducts.reduce((sum, p) => sum + (p.stock || 0), 0)} uds
+              <div className="p-3 bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200/80 dark:border-[#1A314D] shadow-2xs">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Existencias Totales</span>
+                <div className="text-xl font-black font-mono text-[#0B1A2D] dark:text-white mt-0.5">
+                  {cafeProducts.reduce((sum, p) => sum + (p.stock || 0), 0)} uds
+                </div>
+                <span className="text-[10px] text-slate-400 font-medium">Unidades en stock</span>
               </div>
-              <span className="text-[10px] text-slate-400 font-medium">Unidades en stock</span>
-            </div>
-            <div className="p-3 bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200/80 dark:border-[#1A314D] shadow-2xs">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Valor Inventario</span>
-              <div className="text-xl font-black font-mono text-[#82b805] dark:text-[#B7F229] mt-0.5">
-                {cafeProducts.reduce((sum, p) => sum + p.price * (p.stock || 0), 0).toFixed(2)} €
+              <div className="p-3 bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200/80 dark:border-[#1A314D] shadow-2xs">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Valor Inventario</span>
+                <div className="text-xl font-black font-mono text-[#82b805] dark:text-[#B7F229] mt-0.5">
+                  {cafeProducts.reduce((sum, p) => sum + p.price * (p.stock || 0), 0).toFixed(2)} €
+                </div>
+                <span className="text-[10px] text-slate-400 font-medium">PVP acumulado</span>
               </div>
-              <span className="text-[10px] text-slate-400 font-medium">PVP acumulado</span>
             </div>
-          </div>
 
-          {/* Filtros de Inventario: Búsqueda y Categorías */}
-          <div className="flex flex-col sm:flex-row gap-2.5 items-stretch sm:items-center justify-between">
-            <div className="relative flex-1">
-              <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-              <input
-                type="text"
-                value={catalogSearch}
-                onChange={(e) => setCatalogSearch(e.target.value)}
-                placeholder="Buscar artículo por nombre o categoría..."
-                className="w-full pl-9 pr-3 py-2 bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] rounded-xl text-xs font-semibold text-slate-900 dark:text-white focus:outline-none focus:border-[#8B5CF6]"
-              />
-            </div>
-            <div className="flex items-center gap-1.5 overflow-x-auto hide-scrollbar">
-              {categories.map((c) => (
-                <button
-                  key={`cat-inv-${c}`}
-                  type="button"
-                  onClick={() => setCatalogCategoryFilter(c)}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer shrink-0 ${
-                    catalogCategoryFilter === c
-                      ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D] shadow-xs'
-                      : 'bg-white dark:bg-[#0E2239] text-slate-600 dark:text-slate-400 border border-slate-200/80 dark:border-[#1A314D]'
-                  }`}
+            {/* Filtros Limpios de Catálogo: Búsqueda, Sede y Categoría (Sin caja exterior pesada) */}
+            <div className="grid grid-cols-1 sm:grid-cols-12 gap-2 text-xs">
+              {/* Buscador */}
+              <div className="sm:col-span-6 relative">
+                <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  value={catalogSearch}
+                  onChange={(e) => setCatalogSearch(e.target.value)}
+                  placeholder="Buscar artículo por nombre..."
+                  className="w-full pl-9 pr-3 py-2 bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] rounded-xl text-xs font-semibold text-slate-900 dark:text-white shadow-2xs focus:outline-none focus:border-[#8B5CF6]"
+                />
+              </div>
+
+              {/* Filtro por Sede */}
+              <div className="sm:col-span-3">
+                <select
+                  value={catalogVenueFilter}
+                  onChange={(e) => setCatalogVenueFilter(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] font-bold text-xs text-[#0B1A2D] dark:text-white shadow-2xs focus:outline-none focus:border-[#8B5CF6]"
                 >
-                  {c === 'all' ? 'Todas' : c}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Listado de Artículos con Toggle Destacado en Mostrador */}
-          <div className="bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200/80 dark:border-[#1A314D] shadow-2xs divide-y divide-slate-100 dark:divide-[#1A314D] overflow-hidden">
-            {filteredCatalogProducts.length === 0 ? (
-              <div className="p-12 text-center text-slate-400 text-xs">
-                <Package className="w-10 h-10 mx-auto mb-2 opacity-40 text-slate-400" />
-                No hay productos que coincidan con la búsqueda.
+                  <option value="all">Todas las Sedes</option>
+                  {venues.map((v) => (
+                    <option key={`venue-filter-${v.id}`} value={v.id}>
+                      {v.shortName || v.name}
+                    </option>
+                  ))}
+                </select>
               </div>
-            ) : (
-              filteredCatalogProducts.map((prod) => {
-                const isFeatured = prod.isFeatured !== false;
-                return (
-                  <div
-                    key={prod.id}
-                    className="p-3.5 sm:p-4 flex items-center justify-between gap-3 hover:bg-slate-50/60 dark:hover:bg-[#132A45]/40 transition"
-                  >
-                    <div className="flex items-center gap-3 min-w-0 flex-1">
-                      <div className="relative w-12 h-12 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 shrink-0 border border-slate-200/80 dark:border-slate-700">
-                        <img
-                          src={prod.imageUrl || getFallbackProductImage(prod.category)}
-                          alt={prod.name}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                      <div className="min-w-0">
-                        <div className="flex items-center gap-2">
-                          <span className="font-bold text-xs sm:text-sm text-[#0B1A2D] dark:text-white truncate">
-                            {prod.name}
-                          </span>
-                          <span className="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold text-[10px] uppercase shrink-0">
-                            {prod.category}
-                          </span>
+
+              {/* Filtro por Categoría */}
+              <div className="sm:col-span-3">
+                <select
+                  value={catalogCategoryFilter}
+                  onChange={(e) => setCatalogCategoryFilter(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] font-bold text-xs text-[#0B1A2D] dark:text-white shadow-2xs focus:outline-none focus:border-[#8B5CF6]"
+                >
+                  <option value="all">Todas las Categorías</option>
+                  {categories.filter((c) => c !== 'all').map((c) => (
+                    <option key={`cat-filter-${c}`} value={c}>
+                      {c}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {/* Listado de Artículos con Diseño Minimalista */}
+            <div className="space-y-2">
+              {filteredCatalogProducts.length === 0 ? (
+                <div className="p-12 text-center text-slate-400 text-xs bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200/80 dark:border-[#1A314D]">
+                  <Package className="w-10 h-10 mx-auto mb-2 opacity-40 text-slate-400" />
+                  No hay productos que coincidan con la búsqueda o filtros.
+                </div>
+              ) : (
+                filteredCatalogProducts.map((prod) => {
+                  const isFeatured = prod.isFeatured !== false;
+                  const itemVenueName =
+                    prod.venueName ||
+                    venues.find((v) => v.id === prod.venueId)?.name ||
+                    selectedVenue?.shortName ||
+                    selectedVenue?.name ||
+                    'Sede Central';
+
+                  return (
+                    <div
+                      key={prod.id}
+                      className="p-3 sm:p-3.5 bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200/80 dark:border-[#1A314D] shadow-2xs hover:border-slate-300 dark:hover:border-slate-700 transition flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs"
+                    >
+                      {/* Imagen + Datos del Producto (Nombre, Categoría, Sede, Precio sin solapamiento) */}
+                      <div className="flex items-center gap-3 min-w-0 flex-1">
+                        <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 shrink-0 border border-slate-200/80 dark:border-[#1A314D] relative">
+                          <img
+                            src={prod.imageUrl || getFallbackProductImage(prod.category)}
+                            alt={prod.name}
+                            onError={(e) => {
+                              e.currentTarget.onerror = null;
+                              e.currentTarget.src = getFallbackProductImage(prod.category);
+                            }}
+                            className="w-full h-full object-cover"
+                          />
                         </div>
-                        <div className="text-xs font-mono font-black text-[#8B5CF6] dark:text-[#C4B5FD] mt-0.5">
-                          {prod.price.toFixed(2)} €
+
+                        <div className="min-w-0 space-y-1">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="font-bold text-xs sm:text-sm text-[#0B1A2D] dark:text-white truncate">
+                              {prod.name}
+                            </span>
+                            <span className="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold text-[10px] uppercase shrink-0">
+                              {prod.category}
+                            </span>
+                            <span className="px-2 py-0.5 rounded-md bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] text-slate-500 dark:text-slate-400 font-medium text-[10px] inline-flex items-center gap-1 shrink-0">
+                              <Building2 className="w-3 h-3 text-slate-400 shrink-0" />
+                              <span>{itemVenueName}</span>
+                            </span>
+                          </div>
+
+                          <div className="flex items-center gap-2">
+                            <span className="font-mono font-black text-sm sm:text-base text-[#0B1A2D] dark:text-[#B7F229]">
+                              {prod.price.toFixed(2)} €
+                            </span>
+                            <span className="text-[11px] text-slate-400 font-medium">
+                              · Stock actual: <strong className="font-mono text-slate-700 dark:text-slate-200">{prod.stock} uds</strong>
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Control de Stock, Botón Destacado y Acciones */}
+                      <div className="flex items-center justify-between sm:justify-end gap-2 sm:gap-3 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-100 dark:border-slate-800">
+                        {/* Control de Stock (+ / -) */}
+                        <div className="flex items-center gap-1 bg-slate-50 dark:bg-[#071220] p-1 rounded-xl border border-slate-200/80 dark:border-[#1A314D]">
+                          <button
+                            type="button"
+                            onClick={() => adjustStock(prod, -1)}
+                            className="w-6 h-6 rounded-lg bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 flex items-center justify-center font-black cursor-pointer text-xs transition shadow-2xs"
+                            title="Reducir stock (-1)"
+                          >
+                            -
+                          </button>
+                          <span className="w-8 text-center font-mono font-bold text-xs text-[#0B1A2D] dark:text-white">
+                            {prod.stock}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => adjustStock(prod, 1)}
+                            className="w-6 h-6 rounded-lg bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 flex items-center justify-center font-black cursor-pointer text-xs transition shadow-2xs"
+                            title="Añadir stock (+1)"
+                          >
+                            +
+                          </button>
+                        </div>
+
+                        {/* Toggle Destacado en Mostrador (Simplificado a 'Destacado') */}
+                        <button
+                          type="button"
+                          onClick={() => toggleProductFeatured(prod)}
+                          className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-bold transition cursor-pointer select-none ${
+                            isFeatured
+                              ? 'bg-[#F0FCCF] dark:bg-[#B7F229]/20 border-[#B7F229]/60 text-[#0B1A2D] dark:text-[#B7F229]'
+                              : 'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-400'
+                          }`}
+                          title={isFeatured ? 'Artículo visible en mostrador' : 'Hacer clic para destacar en mostrador'}
+                        >
+                          <span className={`w-2 h-2 rounded-full ${isFeatured ? 'bg-[#82b805] dark:bg-[#B7F229]' : 'bg-slate-400'}`} />
+                          <span>Destacado</span>
+                        </button>
+
+                        {/* Acciones Detalle, Editar y Eliminar */}
+                        <div className="flex items-center gap-1">
+                          <button
+                            type="button"
+                            onClick={() => openEditProductModal(prod)}
+                            className="p-1.5 rounded-lg text-slate-400 hover:text-[#8B5CF6] dark:hover:text-[#A78BFA] hover:bg-violet-50 dark:hover:bg-[#8B5CF6]/15 transition cursor-pointer"
+                            title="Ver detalles / Ficha técnica"
+                          >
+                            <Info className="w-4 h-4" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => openEditProductModal(prod)}
+                            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+                            title="Editar producto"
+                          >
+                            <Edit2 className="w-4 h-4" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setProductToDelete(prod)}
+                            className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition cursor-pointer"
+                            title="Eliminar producto"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
                         </div>
                       </div>
                     </div>
-
-                    <div className="flex items-center justify-end gap-2 sm:gap-3 shrink-0">
-                      {/* Control de Stock (+ / -) */}
-                      <div className="flex items-center gap-1.5">
-                        <span className="text-[10px] text-slate-400 font-bold uppercase mr-1 hidden sm:inline">Stock:</span>
-                        <button
-                          type="button"
-                          onClick={() => adjustStock(prod, -1)}
-                          className="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 flex items-center justify-center font-black cursor-pointer text-xs transition"
-                          title="Reducir stock (-1)"
-                        >
-                          -
-                        </button>
-                        <span className="w-8 sm:w-10 text-center font-mono font-bold text-xs text-[#0B1A2D] dark:text-white">
-                          {prod.stock}
-                        </span>
-                        <button
-                          type="button"
-                          onClick={() => adjustStock(prod, 1)}
-                          className="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 flex items-center justify-center font-black cursor-pointer text-xs transition"
-                          title="Añadir stock (+1)"
-                        >
-                          +
-                        </button>
-                      </div>
-
-                      {/* Toggle Destacado en Mostrador (Simplificado a 'Destacado') */}
-                      <button
-                        type="button"
-                        onClick={() => toggleProductFeatured(prod)}
-                        className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-bold transition cursor-pointer select-none ${
-                          isFeatured
-                            ? 'bg-[#F0FCCF] dark:bg-[#B7F229]/20 border-[#B7F229]/60 text-[#0B1A2D] dark:text-[#B7F229]'
-                            : 'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-400'
-                        }`}
-                        title={isFeatured ? 'Artículo visible en mostrador' : 'Hacer clic para destacar en mostrador'}
-                      >
-                        <span className={`w-2 h-2 rounded-full ${isFeatured ? 'bg-[#82b805] dark:bg-[#B7F229]' : 'bg-slate-400'}`} />
-                        <span>Destacado</span>
-                      </button>
-
-                      {/* Acciones Editar y Eliminar */}
-                      <div className="flex items-center gap-1">
-                        <button
-                          type="button"
-                          onClick={() => openEditProductModal(prod)}
-                          className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
-                          title="Editar producto"
-                        >
-                          <Edit2 className="w-4 h-4" />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setProductToDelete(prod)}
-                          className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition cursor-pointer"
-                          title="Eliminar producto"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })
-            )}
+                  );
+                })
+              )}
+            </div>
           </div>
         </div>
-      </div>
       )}
 
       {/* 2. POS Interface: Product Catalog + Fast Ticket Register */}
@@ -1687,25 +1736,25 @@ export const AdminCafePOS: React.FC = () => {
            componente estándar unificado de sedes y filtros globales integrados)
           ====================================================================== */}
       {transactionsModalOpen && (
-        <div className="fixed inset-0 z-45 bg-slate-50 dark:bg-[#0B1A2D] overflow-y-auto pb-24 md:pb-8 pt-3 sm:pt-4 px-3.5 sm:px-6 lg:px-8 animate-in fade-in duration-200" data-level="2">
-          <div className="max-w-7xl mx-auto space-y-4">
-            {/* Cabecera Limpia Nivel 2 (con botón ← de retroceso y título unificado, SIN subtítulo) */}
-            <div className="flex items-center justify-between p-3.5 sm:p-4 bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200/80 dark:border-[#1A314D] shadow-2xs">
-              <div className="flex items-center gap-3 min-w-0">
+        <div className="fixed inset-0 md:left-64 z-45 bg-slate-50 dark:bg-[#0B1A2D] overflow-y-auto pb-24 md:pb-8 pt-3 sm:pt-4 px-3.5 sm:px-6 lg:px-8 animate-in fade-in duration-200" data-level="2">
+          <div className="max-w-6xl mx-auto space-y-4">
+            {/* Cabecera Limpia Nivel 2 (Sin contenedor pesado que envuelve al título) */}
+            <div className="flex items-center justify-between py-1.5 sm:py-2">
+              <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
                 <button
                   type="button"
                   onClick={() => setTransactionsModalOpen(false)}
-                  className="p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:text-[#0B1A2D] dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#132A45] transition cursor-pointer active:scale-95"
+                  className="p-2 -ml-2 rounded-xl text-slate-600 dark:text-slate-300 hover:text-[#0B1A2D] dark:hover:text-white hover:bg-slate-200/60 dark:hover:bg-slate-800/60 transition cursor-pointer active:scale-95 shrink-0"
                   title="Volver al mostrador TPV"
                 >
                   <ArrowLeft className="w-5 h-5 stroke-[2.5]" />
                 </button>
-                <div className="flex items-center gap-2.5">
-                  <h1 className="text-lg sm:text-xl font-extrabold text-[#0B1A2D] dark:text-white tracking-tight">
+                <div className="flex items-center gap-2 min-w-0">
+                  <h1 className="text-xl sm:text-2xl font-black text-[#0B1A2D] dark:text-white tracking-tight truncate">
                     Pagos
                   </h1>
-                  <span className="px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-[#0B1A2D] dark:text-[#B7F229] font-mono text-[10px] font-black">
-                    {filteredGlobalPayments.length} registrados
+                  <span className="px-2.5 py-0.5 rounded-full bg-slate-200/70 dark:bg-[#152e4d] text-slate-700 dark:text-[#B7F229] font-mono text-xs font-bold shrink-0">
+                    {filteredGlobalPayments.length}
                   </span>
                 </div>
               </div>
@@ -1714,87 +1763,14 @@ export const AdminCafePOS: React.FC = () => {
               <button
                 type="button"
                 onClick={handleExportArqueoCSV}
-                className="px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-[#0B1A2D] dark:text-white font-bold text-xs flex items-center gap-1.5 transition cursor-pointer active:scale-95"
+                className="px-3 sm:px-3.5 py-2 rounded-xl bg-white dark:bg-[#0E2239] hover:bg-slate-50 dark:hover:bg-[#132A45] text-[#0B1A2D] dark:text-white border border-slate-200/80 dark:border-[#1A314D] font-bold text-xs flex items-center gap-1.5 transition cursor-pointer active:scale-95 shadow-2xs shrink-0"
               >
                 <Download className="w-3.5 h-3.5 text-[#8B5CF6]" />
                 <span className="hidden sm:inline">Exportar CSV</span>
               </button>
             </div>
 
-            {/* Componente Estándar Unificado de Sedes y Estado Operativo */}
-            <div className="relative">
-              <div className="flex items-center justify-between p-2.5 bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200/80 dark:border-[#1A314D] shadow-2xs">
-                <div
-                  onClick={() => setIsVenueSelectorOpen(!isVenueSelectorOpen)}
-                  className="flex items-center gap-2 cursor-pointer group select-none min-w-0"
-                  title="Cambiar sede activa"
-                >
-                  <div className="w-8 h-8 rounded-xl bg-slate-50 dark:bg-[#071220] border border-slate-100 dark:border-[#1A314D] flex items-center justify-center text-[#0B1A2D] dark:text-slate-200 shrink-0">
-                    <Building2 className="w-4 h-4 text-[#0B1A2D] dark:text-white" />
-                  </div>
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-xs font-bold text-[#0B1A2D] dark:text-white truncate">
-                        {posVenueFilter === 'all'
-                          ? 'Todas las Sedes (Consolidado)'
-                          : venues.find((v) => v.id === posVenueFilter)?.name || 'Sede'}
-                      </span>
-                      <ChevronDown className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#0B1A2D] dark:group-hover:text-white transition-transform" />
-                    </div>
-                    <span className="text-[10px] font-medium text-slate-400 block truncate">
-                      {venues.length} sedes conectadas en red deportiva
-                    </span>
-                  </div>
-                </div>
-
-                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#F0FCCF] dark:bg-[#B7F229]/20 border border-[#B7F229]/50 shrink-0">
-                  <span className="w-2 h-2 rounded-full bg-[#82b805] dark:bg-[#B7F229]" />
-                  <span className="text-[11px] font-bold text-[#0B1A2D] dark:text-[#B7F229]">
-                    {posVenueFilter === 'all' ? `${venues.length} Sedes Activas` : 'Sede Filtrada'}
-                  </span>
-                </div>
-              </div>
-
-              {isVenueSelectorOpen && (
-                <div className="absolute top-full left-0 right-0 mt-2 z-30 p-2 bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200 dark:border-[#1A314D] shadow-xl space-y-1 animate-in fade-in slide-in-from-top-2 duration-150">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setPosVenueFilter('all');
-                      setIsVenueSelectorOpen(false);
-                    }}
-                    className={`w-full flex items-center justify-between p-2 rounded-xl text-xs font-bold transition text-left cursor-pointer ${
-                      posVenueFilter === 'all'
-                        ? 'bg-[#B7F229]/20 text-[#0B1A2D] dark:text-white'
-                        : 'hover:bg-slate-50 dark:hover:bg-[#132A45] text-slate-700 dark:text-slate-300'
-                    }`}
-                  >
-                    <span>Todas las Sedes (Consolidado)</span>
-                    {posVenueFilter === 'all' && <CheckCircle2 className="w-3.5 h-3.5 text-[#82b805]" />}
-                  </button>
-                  {venues.map((v) => (
-                    <button
-                      key={v.id}
-                      type="button"
-                      onClick={() => {
-                        setPosVenueFilter(v.id);
-                        setIsVenueSelectorOpen(false);
-                      }}
-                      className={`w-full flex items-center justify-between p-2 rounded-xl text-xs font-bold transition text-left cursor-pointer ${
-                        posVenueFilter === v.id
-                          ? 'bg-[#B7F229]/20 text-[#0B1A2D] dark:text-white'
-                          : 'hover:bg-slate-50 dark:hover:bg-[#132A45] text-slate-700 dark:text-slate-300'
-                      }`}
-                    >
-                      <span>{v.name}</span>
-                      {posVenueFilter === v.id && <CheckCircle2 className="w-3.5 h-3.5 text-[#82b805]" />}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* KPIs Resumen Superior */}
+            {/* KPIs Resumen Superior Compacto */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
               <div className="p-3 bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200/80 dark:border-[#1A314D] shadow-2xs">
                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Total Cobrado</span>
@@ -1826,101 +1802,72 @@ export const AdminCafePOS: React.FC = () => {
               </div>
             </div>
 
-            {/* Barra de Filtros Globales Integrados */}
-            <div className="p-3.5 sm:p-4 bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200/80 dark:border-[#1A314D] shadow-2xs space-y-2.5 text-xs">
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                {/* 1. Turno / Período */}
-                <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">
-                    Turno / Período
-                  </label>
-                  <select
-                    value={paymentShiftFilter}
-                    onChange={(e) => setPaymentShiftFilter(e.target.value)}
-                    className="w-full px-2.5 py-1.5 rounded-xl bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] font-bold text-[#0B1A2D] dark:text-white"
-                  >
-                    <option value="all">Todos los turnos</option>
-                    <option value="today">Hoy (Todos los turnos)</option>
-                    <option value="morning">Turno Mañana</option>
-                    <option value="afternoon">Turno Tarde</option>
-                    <option value="night">Turno Noche</option>
-                    <option value="yesterday">Ayer</option>
-                  </select>
-                </div>
-
-                {/* 2. Recepcionista / Cajero */}
-                <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">
-                    Recepcionista / Cajero
-                  </label>
-                  <select
-                    value={paymentCashierFilter}
-                    onChange={(e) => setPaymentCashierFilter(e.target.value)}
-                    className="w-full px-2.5 py-1.5 rounded-xl bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] font-bold text-[#0B1A2D] dark:text-white"
-                  >
-                    <option value="all">Todos los recepcionistas</option>
-                    <option value="Marcos Soto">Marcos Soto (Recepción)</option>
-                    <option value="Laura Senra">Laura Senra (Mostrador)</option>
-                    <option value="Carlos M.">Carlos M. (Entrenador)</option>
-                    <option value="Mateo Varela">Mateo Varela (Admin)</option>
-                  </select>
-                </div>
-
-                {/* 3. Método de Pago */}
-                <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">
-                    Método de Pago
-                  </label>
-                  <select
-                    value={paymentMethodFilter}
-                    onChange={(e) => setPaymentMethodFilter(e.target.value)}
-                    className="w-full px-2.5 py-1.5 rounded-xl bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] font-bold text-[#0B1A2D] dark:text-white"
-                  >
-                    <option value="all">Todos los métodos</option>
-                    <option value="Tarjeta">Tarjeta / Datáfono</option>
-                    <option value="Efectivo">Efectivo</option>
-                    <option value="Monedero">Monedero Socio</option>
-                    <option value="Bizum">Bizum / Online</option>
-                  </select>
-                </div>
-
-                {/* 4. Sede Activa */}
-                <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">
-                    Sede Activa
-                  </label>
-                  <select
-                    value={posVenueFilter}
-                    onChange={(e) => setPosVenueFilter(e.target.value)}
-                    className="w-full px-2.5 py-1.5 rounded-xl bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] font-bold text-[#0B1A2D] dark:text-white"
-                  >
-                    <option value="all">Todas las sedes</option>
-                    {venues.map((v) => (
-                      <option key={v.id} value={v.id}>
-                        {v.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              {/* 5. Buscador Rápido */}
-              <div className="relative">
+            {/* Barra de Filtros Compactos Integrados (Sin caja exterior pesada) */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-2 text-xs">
+              {/* 1. Buscador Rápido */}
+              <div className="lg:col-span-4 relative">
                 <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                 <input
                   type="text"
                   value={paymentSearch}
                   onChange={(e) => setPaymentSearch(e.target.value)}
-                  placeholder="Filtrar por cliente, concepto o ticket (#TX-101)..."
-                  className="w-full pl-8 pr-3 py-1.5 rounded-xl bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] text-xs font-semibold text-slate-900 dark:text-white focus:outline-none focus:border-[#8B5CF6]"
+                  placeholder="Buscar por cliente, concepto o #TX..."
+                  className="w-full pl-8 pr-3 py-2 rounded-xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] text-xs font-semibold text-slate-900 dark:text-white shadow-2xs focus:outline-none focus:border-[#8B5CF6]"
                 />
+              </div>
+
+              {/* 2. Sede Activa */}
+              <div className="lg:col-span-3">
+                <select
+                  value={posVenueFilter}
+                  onChange={(e) => setPosVenueFilter(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] font-bold text-xs text-[#0B1A2D] dark:text-white shadow-2xs focus:outline-none focus:border-[#8B5CF6]"
+                >
+                  <option value="all">Todas las Sedes (Consolidado)</option>
+                  {venues.map((v) => (
+                    <option key={v.id} value={v.id}>
+                      {v.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* 3. Turno / Período */}
+              <div className="lg:col-span-2">
+                <select
+                  value={paymentShiftFilter}
+                  onChange={(e) => setPaymentShiftFilter(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] font-bold text-xs text-[#0B1A2D] dark:text-white shadow-2xs focus:outline-none focus:border-[#8B5CF6]"
+                >
+                  <option value="all">Todos los turnos</option>
+                  <option value="today">Hoy</option>
+                  <option value="morning">Turno Mañana</option>
+                  <option value="afternoon">Turno Tarde</option>
+                  <option value="night">Turno Noche</option>
+                  <option value="yesterday">Ayer</option>
+                </select>
+              </div>
+
+              {/* 4. Método de Pago */}
+              <div className="lg:col-span-3">
+                <select
+                  value={paymentMethodFilter}
+                  onChange={(e) => setPaymentMethodFilter(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] font-bold text-xs text-[#0B1A2D] dark:text-white shadow-2xs focus:outline-none focus:border-[#8B5CF6]"
+                >
+                  <option value="all">Todos los métodos</option>
+                  <option value="Tarjeta">Tarjeta / Datáfono</option>
+                  <option value="Efectivo">Efectivo</option>
+                  <option value="Monedero">Monedero Socio</option>
+                  <option value="Bizum">Bizum / Online</option>
+                </select>
               </div>
             </div>
 
-            {/* Listado de Pagos */}
-            <div className="bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200/80 dark:border-[#1A314D] shadow-2xs divide-y divide-slate-100 dark:divide-[#1A314D] overflow-hidden">
+            {/* Listado Vertical de Pagos en Tarjetas Minimalistas (Design System Global) */}
+            <div className="space-y-2">
               {filteredGlobalPayments.length === 0 ? (
-                <div className="p-12 text-center text-slate-400 text-xs">
+                <div className="p-12 text-center text-slate-400 text-xs bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200/80 dark:border-[#1A314D]">
                   <Receipt className="w-10 h-10 mx-auto mb-2 opacity-40 text-slate-400" />
                   No se encontraron pagos con los filtros seleccionados.
                 </div>
@@ -1929,42 +1876,43 @@ export const AdminCafePOS: React.FC = () => {
                   <div
                     key={tx.id}
                     onClick={() => setSelectedPaymentDetail(tx)}
-                    className="p-3.5 sm:p-4 hover:bg-slate-50/60 dark:hover:bg-[#132A45]/40 transition flex items-center justify-between gap-4 text-xs cursor-pointer group"
+                    className="p-3.5 bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200/80 dark:border-[#1A314D] shadow-2xs hover:border-slate-300 dark:hover:border-slate-700 transition flex items-center justify-between gap-3 text-xs cursor-pointer group"
                     title="Haz clic para ver el ticket y desglose completo"
                   >
                     <div className="min-w-0 flex-1 space-y-1">
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 flex-wrap">
                         <span className="font-mono font-bold text-slate-400 text-[11px] shrink-0">
                           {tx.date || 'Hoy'} · {tx.time}
                         </span>
+                        <span className="font-mono text-[10px] px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold shrink-0">
+                          #{tx.id}
+                        </span>
                         {tx.shift && (
-                          <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-[#EDE9FE] dark:bg-[#8B5CF6]/20 text-[#6D28D9] dark:text-[#C4B5FD] shrink-0">
+                          <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-violet-50 dark:bg-[#8B5CF6]/15 text-[#6D28D9] dark:text-[#C4B5FD] shrink-0">
                             {tx.shift}
                           </span>
                         )}
-                        <span className="font-mono font-black text-[10px] px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 shrink-0">
-                          #{tx.id}
-                        </span>
                         <span className="font-bold text-[#0B1A2D] dark:text-white truncate group-hover:text-[#8B5CF6] transition-colors">
                           {tx.concept}
                         </span>
                       </div>
-                      <div className="text-[11px] text-slate-500 dark:text-slate-400 flex flex-wrap items-center gap-2">
+
+                      <div className="text-[11px] text-slate-500 dark:text-slate-400 flex flex-wrap items-center gap-1.5 sm:gap-2">
                         <span className="font-semibold text-slate-700 dark:text-slate-300">
                           {tx.customerName || 'Cliente Mostrador'}
                         </span>
                         <span>·</span>
                         <span className="text-[#8B5CF6] font-medium">{tx.paymentMethod}</span>
                         <span>·</span>
-                        <span className="text-slate-600 dark:text-slate-300 font-medium inline-flex items-center gap-1">
-                          <User className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                          <span>Atendido por: <strong>{tx.cashierName || 'Recepción Mostrador'}</strong></span>
+                        <span className="text-slate-500 dark:text-slate-400 inline-flex items-center gap-1">
+                          <User className="w-3 h-3 text-slate-400 shrink-0" />
+                          <span>{tx.cashierName || 'Recepción'}</span>
                         </span>
                         {tx.venueName && (
                           <>
                             <span>·</span>
                             <span className="text-slate-400 text-[10px] inline-flex items-center gap-1">
-                              <Building2 className="w-3 h-3 text-slate-400" />
+                              <Building2 className="w-3 h-3 text-slate-400 shrink-0" />
                               <span>{tx.venueName}</span>
                             </span>
                           </>
@@ -1987,15 +1935,17 @@ export const AdminCafePOS: React.FC = () => {
                 ))
               )}
 
-              {/* Totalizador inferior */}
-              <div className="p-3.5 sm:p-4 bg-slate-50/60 dark:bg-[#071220]/50 flex items-center justify-between text-xs">
-                <span className="text-slate-500 font-semibold">
-                  Mostrando {filteredGlobalPayments.length} de {posTransactions.length} pagos registrados:
-                </span>
-                <span className="font-mono font-black text-base sm:text-lg text-[#0B1A2D] dark:text-white">
-                  {filteredGlobalPayments.reduce((acc, t) => acc + t.amount, 0).toFixed(2)} €
-                </span>
-              </div>
+              {/* Totalizador inferior minimalista */}
+              {filteredGlobalPayments.length > 0 && (
+                <div className="p-3 bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200/80 dark:border-[#1A314D] shadow-2xs flex items-center justify-between text-xs">
+                  <span className="text-slate-500 font-semibold">
+                    Mostrando {filteredGlobalPayments.length} de {posTransactions.length} pagos registrados:
+                  </span>
+                  <span className="font-mono font-black text-base sm:text-lg text-[#0B1A2D] dark:text-white">
+                    {filteredGlobalPayments.reduce((acc, t) => acc + t.amount, 0).toFixed(2)} €
+                  </span>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -2013,16 +1963,16 @@ export const AdminCafePOS: React.FC = () => {
                 <div className="w-9 h-9 rounded-xl bg-[#8B5CF6]/10 text-[#8B5CF6] flex items-center justify-center font-bold">
                   <Receipt className="w-5 h-5 text-[#8B5CF6]" />
                 </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <h3 className="text-base font-black text-[#0B1A2D] dark:text-white">
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <h3 className="text-sm sm:text-base font-black text-[#0B1A2D] dark:text-white truncate whitespace-nowrap">
                       Detalle del Pago #{selectedPaymentDetail.id}
                     </h3>
-                    <span className="px-2 py-0.5 rounded-full bg-[#F0FCCF] dark:bg-[#B7F229]/20 text-[#0B1A2D] dark:text-[#B7F229] border border-[#B7F229]/50 font-black text-[9px] uppercase tracking-wider">
+                    <span className="px-2 py-0.5 rounded-full bg-[#F0FCCF] dark:bg-[#B7F229]/20 text-[#0B1A2D] dark:text-[#B7F229] border border-[#B7F229]/50 font-black text-[9px] uppercase tracking-wider shrink-0">
                       Completado
                     </span>
                   </div>
-                  <p className="text-[11px] text-slate-400">
+                  <p className="text-[11px] text-slate-400 truncate">
                     {selectedPaymentDetail.date || 'Hoy'} · {selectedPaymentDetail.time}
                   </p>
                 </div>
@@ -2152,38 +2102,38 @@ export const AdminCafePOS: React.FC = () => {
             </div>
 
             {/* Footer con acciones de impresión y retorno */}
-            <div className="p-4 sm:p-5 border-t border-slate-100 dark:border-[#1A314D] flex flex-wrap items-center justify-between gap-2.5 bg-slate-50/60 dark:bg-[#071220]/50 shrink-0">
-              <button
-                type="button"
-                onClick={() => {
-                  window.print();
-                }}
-                className="px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-[#0B1A2D] dark:text-slate-200 font-bold text-xs flex items-center gap-1.5 transition cursor-pointer"
-              >
-                <Printer className="w-3.5 h-3.5 text-slate-500" />
-                <span>Imprimir Recibo</span>
-              </button>
-
+            <div className="p-4 sm:p-5 border-t border-slate-100 dark:border-[#1A314D] flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 bg-slate-50/60 dark:bg-[#071220]/50 shrink-0">
               <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    window.print();
+                  }}
+                  className="flex-1 sm:flex-initial px-3.5 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-[#0B1A2D] dark:text-slate-200 font-bold text-xs flex items-center justify-center gap-1.5 transition cursor-pointer"
+                >
+                  <Printer className="w-3.5 h-3.5 text-slate-500" />
+                  <span>Imprimir Recibo</span>
+                </button>
+
                 <button
                   type="button"
                   onClick={() => {
                     triggerDemoToast('Recibo Enviado', `Comprobante digital enviado a ${selectedPaymentDetail.customerName || 'cliente'}.`, 'success');
                   }}
-                  className="px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-[#0B1A2D] dark:text-slate-200 font-bold text-xs flex items-center gap-1.5 transition cursor-pointer"
+                  className="flex-1 sm:flex-initial px-3.5 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-[#0B1A2D] dark:text-slate-200 font-bold text-xs flex items-center justify-center gap-1.5 transition cursor-pointer"
                 >
                   <Share2 className="w-3.5 h-3.5 text-[#8B5CF6]" />
                   <span>Enviar Recibo</span>
                 </button>
-
-                <button
-                  type="button"
-                  onClick={() => setSelectedPaymentDetail(null)}
-                  className="px-4 py-2 rounded-xl bg-[#0B1A2D] dark:bg-white text-white dark:text-[#0B1A2D] font-bold text-xs transition cursor-pointer"
-                >
-                  Cerrar
-                </button>
               </div>
+
+              <button
+                type="button"
+                onClick={() => setSelectedPaymentDetail(null)}
+                className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-[#0B1A2D] dark:bg-white text-white dark:text-[#0B1A2D] font-bold text-xs transition cursor-pointer text-center"
+              >
+                Cerrar
+              </button>
             </div>
           </div>
         </div>
@@ -2394,7 +2344,7 @@ export const AdminCafePOS: React.FC = () => {
                   className="px-3 py-1.5 rounded-xl bg-[#B7F229] hover:bg-[#a6e61f] text-[#0B1A2D] font-black text-xs shadow-xs flex items-center gap-1 cursor-pointer active:scale-95"
                 >
                   <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
-                  <span>+ Producto</span>
+                  <span>Nuevo Producto</span>
                 </button>
 
                 <button
@@ -2517,8 +2467,14 @@ export const AdminCafePOS: React.FC = () => {
                     onClick={() => setShowInlineNewCategory(!showInlineNewCategory)}
                     className="text-[11px] font-bold text-[#8B5CF6] hover:text-[#7c3aed] flex items-center gap-1 cursor-pointer"
                   >
-                    <Plus className="w-3 h-3 stroke-[2.5]" />
-                    <span>{showInlineNewCategory ? 'Cancelar' : '+ Añadir categoría'}</span>
+                    {showInlineNewCategory ? (
+                      <span>Cancelar</span>
+                    ) : (
+                      <>
+                        <Plus className="w-3 h-3 stroke-[2.5]" />
+                        <span>Añadir categoría</span>
+                      </>
+                    )}
                   </button>
                 </div>
 
@@ -2579,6 +2535,26 @@ export const AdminCafePOS: React.FC = () => {
                   />
                 </div>
               </div>
+
+              {/* Selector de Sede Asignada al Producto */}
+              {venues && venues.length > 0 && (
+                <div>
+                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                    Sede Asignada
+                  </label>
+                  <select
+                    value={productFormData.venueId}
+                    onChange={(e) => setProductFormData({ ...productFormData, venueId: e.target.value })}
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-[#071220] border border-slate-200 dark:border-[#1A314D] rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-[#8B5CF6] font-semibold"
+                  >
+                    {venues.map((v) => (
+                      <option key={`prod-form-venue-${v.id}`} value={v.id}>
+                        {v.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
 
               <div>
                 <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
