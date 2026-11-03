@@ -46,6 +46,7 @@ import { AdminTeams } from './components/admin/AdminTeams';
 import { AdminSchool } from './components/admin/AdminSchool';
 import { AdminTournaments } from './components/admin/AdminTournaments';
 import { AdminMatches } from './components/admin/AdminMatches';
+import { NewMatchPage } from './components/admin/NewMatchPage';
 import { AdminShopOrders } from './components/admin/AdminShopOrders';
 import { AdminSmartCourts } from './components/admin/AdminSmartCourts';
 import { AdminCafePOS } from './components/admin/AdminCafePOS';
@@ -172,7 +173,8 @@ export function App() {
         // Si la ruta restante corresponde a gestión / admin
         if (remaining === '/gestion' || remaining.startsWith('/gestion/') || remaining === '/admin' || remaining.startsWith('/admin/')) {
           setCurrentView('admin');
-          if (remaining.includes('/partidas')) setAdminTab('matches');
+          if (remaining.includes('/partidas/nueva') || remaining.includes('/nueva-partida')) setAdminTab('new_match');
+          else if (remaining.includes('/partidas')) setAdminTab('matches');
           else if (remaining.includes('/reservas/todas') || remaining.includes('/todas-las-reservas')) setAdminTab('all_bookings');
           else if (remaining.includes('/reservas')) setAdminTab('agenda');
           else if (remaining.includes('/pistas') || remaining.includes('/domotica')) setAdminTab('courts_management');
@@ -237,6 +239,15 @@ export function App() {
       if (pathname === '/admin' || pathname === '/gestion') {
         setCurrentView('admin');
         setAdminTab('dashboard');
+        return;
+      }
+      if (
+        pathname === '/admin/partidas/nueva' ||
+        pathname === '/gestion/partidas/nueva' ||
+        pathname === '/gestion/nueva-partida'
+      ) {
+        setCurrentView('admin');
+        setAdminTab('new_match');
         return;
       }
       if (
@@ -514,6 +525,17 @@ export function App() {
       }
       case 'matches':
         return <AdminMatches />;
+      case 'new_match':
+        return (
+          <NewMatchPage
+            onBack={() => {
+              setAdminTab('matches');
+              if (typeof window !== 'undefined') {
+                window.history.pushState({}, '', '/gestion/partidas');
+              }
+            }}
+          />
+        );
       case 'customers':
         return <AdminCustomers />;
       case 'teams':

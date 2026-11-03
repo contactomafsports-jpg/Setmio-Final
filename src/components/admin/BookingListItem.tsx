@@ -1,7 +1,6 @@
 import React from 'react';
 import { Clock, KeyRound, CheckCircle2, AlertCircle, XCircle, Building2 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
-import { ReservationDrawerData } from './ReservationDrawer';
 
 export interface BookingListItemData {
   id: string;
@@ -45,7 +44,7 @@ export const BookingListItem: React.FC<BookingListItemProps> = ({
   className = '',
   isPlayerView = false,
 }) => {
-  const { isMultiVenue, currentUser, currentView } = useApp();
+  const { isMultiVenue, currentUser, currentView, isConsolidatedView } = useApp();
 
   const isPlayer =
     isPlayerView ||
@@ -88,40 +87,6 @@ export const BookingListItem: React.FC<BookingListItemProps> = ({
     return `${numeric.toFixed(2)} €`;
   };
 
-  // Format Status Badge
-  const getStatusInfo = () => {
-    const raw = String(booking.status || '').toLowerCase();
-    const payRaw = String(booking.paymentStatus || '').toLowerCase();
-
-    if (raw === 'canceled' || raw === 'cancelada') {
-      return {
-        label: 'CANCELADA',
-        style: 'bg-rose-50 dark:bg-rose-950/80 text-rose-700 dark:text-rose-300 border-rose-200 dark:border-rose-800',
-        icon: <XCircle className="w-3 h-3 text-rose-500" />,
-      };
-    }
-    if (raw === 'pendiente tpv' || raw === 'pending' || payRaw === 'pending' || payRaw === 'partially_paid') {
-      return {
-        label: 'PENDIENTE TPV',
-        style: 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200/90 dark:border-slate-700',
-        icon: <AlertCircle className="w-3 h-3 text-slate-500 dark:text-slate-400 shrink-0" />,
-      };
-    }
-    // Pagado or Confirmada: Verde Lima #B7F229 y Azul Profundo #0B1A2D idéntico a Inicio
-    if (raw === 'pagado' || payRaw === 'paid') {
-      return {
-        label: 'PAGADO',
-        style: 'bg-[#F0FCCF] dark:bg-[#B7F229]/20 text-[#0B1A2D] dark:text-[#B7F229] border-[#B7F229]/50 dark:border-[#B7F229]/40',
-        icon: <CheckCircle2 className="w-3 h-3 text-[#659b02] dark:text-[#B7F229] shrink-0" />,
-      };
-    }
-    return {
-      label: 'CONFIRMADA',
-      style: 'bg-[#F0FCCF] dark:bg-[#B7F229]/20 text-[#0B1A2D] dark:text-[#B7F229] border-[#B7F229]/50 dark:border-[#B7F229]/40',
-      icon: <CheckCircle2 className="w-3 h-3 text-[#659b02] dark:text-[#B7F229] shrink-0" />,
-    };
-  };
-
   const calculateDurationMinutes = (startStr?: string, endStr?: string, slotStr?: string): number => {
     let s = startStr || '';
     let e = endStr || '';
@@ -151,7 +116,6 @@ export const BookingListItem: React.FC<BookingListItemProps> = ({
     return clean;
   };
 
-  const statusInfo = getStatusInfo();
   const timeText = formatTimeSlot();
   const pinCode = booking.accessPin || '4821#';
   const typeText =
@@ -164,11 +128,13 @@ export const BookingListItem: React.FC<BookingListItemProps> = ({
       ? 'Reserva Directa'
       : 'Pádel Abierto');
 
-  const { selectedVenueId } = useApp();
-  const showVenue = selectedVenueId === 'all' && (booking.venueShortName || booking.venueName);
+  const rawStatus = String(booking.status || '').toLowerCase();
+  const rawPayment = String(booking.paymentStatus || '').toLowerCase();
+  const isCanceled = rawStatus === 'canceled' || rawStatus === 'cancelada';
+  const isPaid = rawStatus === 'pagado' || rawPayment === 'paid';
 
   return (
-    <div
+    <article
       role="button"
       tabIndex={0}
       onClick={onClick}
@@ -178,97 +144,75 @@ export const BookingListItem: React.FC<BookingListItemProps> = ({
           onClick?.();
         }
       }}
-      className={`w-full bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200/80 dark:border-slate-800 shadow-[0_2px_10px_rgba(11,28,48,0.03)] space-y-3 hover:border-[#8B5CF6]/50 dark:hover:border-[#8B5CF6]/60 transition-colors text-left cursor-pointer group active:scale-[0.99] ${className}`}
+      className={`w-full bg-white dark:bg-[#0E2239] rounded-2xl p-3.5 sm:p-4 border border-slate-200/80 dark:border-[#1A314D] shadow-2xs space-y-3 cursor-pointer transition hover:border-[#8B5CF6]/50 hover:shadow-xs group text-left active:scale-[0.99] ${className}`}
     >
-      {/* 1. Top Chips Ribbon: Horario y Pista */}
-      <div className="flex flex-wrap items-center gap-1.5">
-        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#EDE9FE] dark:bg-[#8B5CF6]/20 border border-[#8B5CF6]/30 text-[#6D28D9] dark:text-[#C4B5FD] font-bold text-xs tracking-tight">
+      {/* 1. Header: Franja horaria a la izquierda, Pista a la derecha en la misma línea superior */}
+      <div className="flex items-center justify-between gap-2">
+        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#EDE9FE] dark:bg-[#8B5CF6]/20 border border-[#8B5CF6]/30 text-[#6D28D9] dark:text-[#C4B5FD] text-xs font-bold tracking-tight shrink-0">
           <Clock className="w-3.5 h-3.5 text-[#8B5CF6] shrink-0" />
           <span>{timeText}</span>
           <span className="text-[11px] opacity-80 font-semibold">· {calculateDurationMinutes(booking.startTime, booking.endTime, timeText)} min</span>
-        </div>
+        </span>
 
-        <div className="px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 font-semibold text-xs truncate max-w-[200px] border border-slate-200/60 dark:border-slate-700/60">
+        <span className="text-xs font-semibold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800/80 border border-slate-200/70 dark:border-slate-700 px-2.5 py-1 rounded-full truncate max-w-[180px] sm:max-w-none shrink-0">
           {booking.courtName}
-        </div>
+        </span>
       </div>
 
-      {/* 2. Etiqueta de Sede (Visible únicamente en vista consolidada 'Todas las Sedes') */}
-      {showVenue && (
-        <div>
-          <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#0B1A2D]/5 dark:bg-[#B7F229]/15 text-[#0B1A2D] dark:text-[#B7F229] border border-slate-200/80 dark:border-[#B7F229]/30 text-xs font-bold">
-            <Building2 className="w-3.5 h-3.5 shrink-0 text-[#0B1A2D] dark:text-[#B7F229]" />
-            <span className="truncate">{cleanVenue(booking.venueShortName || booking.venueName)}</span>
-          </div>
+      {/* 2. Protagonismo del Cliente y Precio en la misma fila sin amontonamiento */}
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          {/* Micro-texto de Sede en Vista Consolidada ("Todas las Sedes") */}
+          {isConsolidatedView && (booking.venueShortName || booking.venueName) && (
+            <div className="flex items-center gap-1 text-[11px] font-bold text-[#0B1A2D] dark:text-[#B7F229] mb-0.5 tracking-tight">
+              <Building2 className="w-3 h-3 text-[#0B1A2D] dark:text-[#B7F229] shrink-0" />
+              <span>{cleanVenue(booking.venueShortName || booking.venueName)}</span>
+            </div>
+          )}
+          <h4 className="text-sm font-bold text-[#0B1A2D] dark:text-white truncate group-hover:text-[#8B5CF6] transition-colors">
+            {booking.creatorName}
+            {booking.creatorMemberNum && (
+              <span className="ml-1.5 text-xs font-normal text-slate-400 dark:text-slate-500">
+                ({booking.creatorMemberNum})
+              </span>
+            )}
+          </h4>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 truncate">
+            {typeText} • {booking.sport || 'Pádel'}
+          </p>
         </div>
-      )}
-
-      {/* 3. Nombre del Titular y Detalles de la Partida */}
-      <div>
-        <h3 className="text-base font-bold text-slate-900 dark:text-white group-hover:text-[#8B5CF6] transition-colors truncate">
-          {booking.creatorName}
-          {booking.creatorMemberNum && (
-            <span className="ml-1.5 text-xs font-normal text-slate-400 dark:text-slate-500">
-              ({booking.creatorMemberNum})
-            </span>
-          )}
-        </h3>
-
-        <div className="flex flex-wrap items-center gap-2 mt-1">
-          <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">
-            {typeText}
-          </span>
-          {booking.mode && (
-            <span
-              className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                booking.mode === 'competitive'
-                  ? 'bg-[#8B5CF6]/15 dark:bg-[#8B5CF6]/30 text-[#8B5CF6] dark:text-[#c4b5fd]'
-                  : 'bg-[#F0FCCF] dark:bg-[#B7F229]/20 text-[#0B1A2D] dark:text-[#B7F229] border border-[#B7F229]/40'
-              }`}
-            >
-              {booking.mode === 'competitive' ? 'Competitivo' : 'Amistoso'}
-            </span>
-          )}
-          {booking.gender && (
-            <span className="px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-[10px] font-semibold">
-              {booking.gender === 'male' ? 'Masc' : booking.gender === 'female' ? 'Fem' : 'Mixto'}
-            </span>
-          )}
-          {booking.sport && (
-            <span className="text-xs text-slate-400 dark:text-slate-500">
-              · {booking.sport}
-            </span>
-          )}
-        </div>
+        <span className="text-sm font-extrabold text-[#0B1A2D] dark:text-white font-mono shrink-0">
+          {formatPrice()}
+        </span>
       </div>
 
-      {/* 4. Divisor sutil */}
-      <div className="border-t border-slate-100 dark:border-slate-800/80"></div>
-
-      {/* 5. Pie de Tarjeta: Importe + Píldora de Pago + Píldora de PIN */}
-      <div className="flex items-center justify-between pt-0.5 gap-2">
-        <div className="flex items-baseline gap-1">
-          <span className="text-lg sm:text-xl font-black font-mono text-slate-900 dark:text-white tracking-tight">
-            {formatPrice()}
+      {/* 3. Distribución Inferior Limpia: Estado de Pago a la izquierda, PIN de Acceso a la derecha */}
+      <div className="flex items-center justify-between pt-2.5 border-t border-slate-100 dark:border-slate-800">
+        {isCanceled ? (
+          <span className="inline-flex items-center gap-1 text-[11px] font-bold text-rose-700 dark:text-rose-300 bg-rose-50 dark:bg-rose-950/80 px-2.5 py-0.5 rounded-full border border-rose-200 dark:border-rose-800">
+            <XCircle className="w-3 h-3 text-rose-500" />
+            <span>CANCELADA</span>
           </span>
-        </div>
-
-        <div className="flex items-center gap-2">
-          {/* Pastilla de Estado de Pago (Estilo idéntico a Inicio) */}
-          <span
-            className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider border shadow-2xs whitespace-nowrap ${statusInfo.style}`}
-          >
-            {statusInfo.icon}
-            <span>{statusInfo.label}</span>
+        ) : isPaid ? (
+          <span className="inline-flex items-center gap-1 text-[11px] font-bold text-[#0B1A2D] dark:text-[#B7F229] bg-[#F0FCCF] dark:bg-[#B7F229]/20 px-2.5 py-0.5 rounded-full border border-[#B7F229]/50">
+            <CheckCircle2 className="w-3 h-3 text-[#659b02] dark:text-[#B7F229]" />
+            <span>PAGADO</span>
           </span>
-
-          {/* Pastilla de Código PIN Domótico (Contenedor neutro y limpio) */}
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-50 dark:bg-slate-800/80 text-[#0B1A2D] dark:text-slate-200 font-mono text-[11px] font-bold border border-slate-200/70 dark:border-slate-700/80 whitespace-nowrap shadow-2xs">
-            <KeyRound className="w-3.5 h-3.5 text-[#0B1A2D] dark:text-slate-300 shrink-0" />
-            <span>PIN: <strong className="text-[#0B1A2D] dark:text-white font-black">{pinCode}</strong></span>
+        ) : (
+          <span className="inline-flex items-center gap-1 text-[11px] font-bold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-2.5 py-0.5 rounded-full border border-slate-200/80 dark:border-slate-700">
+            <AlertCircle className="w-3 h-3 text-slate-500 dark:text-slate-400" />
+            <span>PENDIENTE TPV</span>
           </span>
+        )}
+
+        {/* Tag de Acceso Domótico PIN: Contenedor neutro y limpio (#0B1A2D / Slate) */}
+        <div className="inline-flex items-center gap-1.5 bg-slate-50 dark:bg-slate-800/80 border border-slate-200/70 dark:border-slate-700/80 px-2.5 py-1 rounded-full text-xs font-bold text-[#0B1A2D] dark:text-slate-200 font-mono tracking-wide shadow-2xs">
+          <KeyRound className="w-3.5 h-3.5 text-[#0B1A2D] dark:text-slate-300 shrink-0" />
+          <span>PIN: <strong className="text-[#0B1A2D] dark:text-white font-black">{pinCode}</strong></span>
         </div>
       </div>
-    </div>
+    </article>
   );
 };
+
+export default BookingListItem;

@@ -252,6 +252,7 @@ const routeForAdminTab: Record<AdminTab, string> = {
   subscription: '/gestion/suscripcion',
   settings: '/gestion/ajustes',
   invoicing: '/gestion/facturacion',
+  new_match: '/gestion/partidas/nueva',
 };
 
 const routeForPlayerTab: Record<PlayerTab, string> = {
@@ -505,6 +506,8 @@ const readRoute = () => {
       admin = 'tournaments';
     } else if (remainingPath === '/admin/clientes' || remainingPath.startsWith('/admin/clientes/') || remainingPath === '/admin/socios' || remainingPath.startsWith('/admin/socios/')) {
       admin = 'customers';
+    } else if (remainingPath === '/admin/partidas/nueva' || remainingPath === '/gestion/partidas/nueva' || remainingPath === '/gestion/nueva-partida') {
+      admin = 'new_match';
     } else if (remainingPath === '/admin/partidas' || remainingPath.startsWith('/admin/partidas/')) {
       admin = 'matches';
     } else if (remainingPath === '/admin/tienda' || remainingPath.startsWith('/admin/tienda/')) {
@@ -629,7 +632,8 @@ export type AdminTab =
   | 'web_editor'
   | 'domains'
   | 'subscription'
-  | 'settings';
+  | 'settings'
+  | 'new_match';
 
 export type PlayerTab =
   | 'dashboard'
