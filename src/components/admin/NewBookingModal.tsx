@@ -309,13 +309,13 @@ export const NewBookingModal: React.FC<NewBookingModalProps> = ({
         <form onSubmit={handleSubmit} className="p-5 sm:p-6 overflow-y-auto space-y-4 text-xs flex-1">
           {/* 1. SELECTOR DE SEDE (SOLO SI ES ENTORNO MULTI-SEDE) */}
           {hasMultipleVenues && (
-            <div className="space-y-1">
-              <label className="block text-slate-700 dark:text-slate-300 font-bold text-[11px] uppercase tracking-wider flex items-center justify-between">
+            <div className="space-y-1.5">
+              <label className="block text-slate-700 dark:text-slate-300 font-bold text-xs uppercase tracking-wider flex items-center justify-between">
                 <span className="flex items-center gap-1.5">
                   <Building2 className="w-3.5 h-3.5 text-[#0B1A2D] dark:text-[#B7F229]" />
                   <span>Sede de la Instalación <strong className="text-rose-500">*</strong></span>
                 </span>
-                <span className="text-[10px] text-emerald-700 dark:text-[#B7F229] font-bold bg-[#F0FCCF] dark:bg-[#B7F229]/20 px-2 py-0.5 rounded-md">
+                <span className="text-[10px] text-[#0B1A2D] dark:text-[#B7F229] font-bold bg-[#B7F229]/20 px-2 py-0.5 rounded-md">
                   Obligatorio
                 </span>
               </label>
@@ -330,7 +330,7 @@ export const NewBookingModal: React.FC<NewBookingModalProps> = ({
                     setFormCourtId(matchingCourts[0].id);
                   }
                 }}
-                className="w-full bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-xl px-3 py-2.5 text-xs font-bold text-[#0B1A2D] dark:text-white focus:outline-none focus:border-[#B7F229] transition shadow-2xs"
+                className="w-full bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-xl px-3 py-2.5 text-xs font-bold text-[#0B1A2D] dark:text-white focus:outline-none focus:ring-1 focus:ring-[#B7F229] focus:border-[#B7F229] transition shadow-2xs"
               >
                 {activeVenues.map((v) => (
                   <option key={v.id} value={v.id}>
@@ -385,7 +385,7 @@ export const NewBookingModal: React.FC<NewBookingModalProps> = ({
                 onClick={() => setClientType('block')}
                 className={`py-2 px-2 rounded-xl font-bold text-xs transition cursor-pointer text-center ${
                   clientType === 'block'
-                    ? 'bg-rose-600 text-white shadow-xs'
+                    ? 'bg-[#0B1A2D] dark:bg-[#B7F229] text-white dark:text-[#0B1A2D] shadow-xs'
                     : 'text-slate-600 dark:text-slate-400 hover:text-[#0B1A2D] dark:hover:text-white'
                 }`}
               >
@@ -394,16 +394,16 @@ export const NewBookingModal: React.FC<NewBookingModalProps> = ({
             </div>
           </div>
 
-          {/* 3. CAMPOS ESPECÍFICOS SEGÚN TIPO (PLANOS Y SIN CAJAS BLANCAS ANIDADAS) */}
+          {/* 3. CAMPOS ESPECÍFICOS SEGÚN TIPO (LIMPIOS Y SIN CAJAS ANIDADAS) */}
           {clientType === 'existing' && (
-            <div className="space-y-1.5 p-3.5 rounded-2xl bg-slate-50/60 dark:bg-[#071220]/60 border border-slate-200/80 dark:border-[#1A314D]">
-              <label className="block text-slate-700 dark:text-slate-300 font-bold text-[11px]">
+            <div className="space-y-1.5">
+              <label className="block text-slate-700 dark:text-slate-300 font-bold text-xs">
                 Seleccionar Socio Titular:
               </label>
               <select
                 value={selectedMember}
                 onChange={(e) => setSelectedMember(e.target.value)}
-                className="w-full bg-white dark:bg-[#0E2239] border border-slate-200/90 dark:border-[#1A314D] rounded-xl px-3 py-2.5 text-xs font-semibold text-[#0B1A2D] dark:text-white focus:outline-none focus:border-[#B7F229] shadow-2xs"
+                className="w-full bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-xl px-3 py-2.5 text-xs font-semibold text-[#0B1A2D] dark:text-white focus:outline-none focus:ring-1 focus:ring-[#B7F229] focus:border-[#B7F229] transition shadow-2xs"
               >
                 {clubRegisteredPlayers.map((player) => (
                   <option key={player.id} value={player.label}>
@@ -415,16 +415,16 @@ export const NewBookingModal: React.FC<NewBookingModalProps> = ({
           )}
 
           {clientType === 'new' && (
-            <div className="p-3.5 rounded-2xl bg-slate-50/60 dark:bg-[#071220]/60 border border-slate-200/80 dark:border-[#1A314D] space-y-2.5">
+            <div className="p-3.5 rounded-2xl bg-slate-50/70 dark:bg-[#071220]/70 border border-slate-200/80 dark:border-[#1A314D] space-y-3">
               <div className="text-[11px] font-extrabold uppercase tracking-wider text-slate-700 dark:text-slate-300 flex items-center justify-between">
                 <span>Datos del Nuevo Usuario</span>
-                <span className="text-[10px] text-emerald-700 dark:text-[#B7F229] font-bold bg-[#F0FCCF] dark:bg-[#B7F229]/20 px-2 py-0.5 rounded-md">
+                <span className="text-[10px] text-[#0B1A2D] dark:text-[#B7F229] font-bold bg-[#B7F229]/20 px-2 py-0.5 rounded-md">
                   Crea Ficha CRM
                 </span>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-slate-700 dark:text-slate-300 mb-1 font-bold text-[11px]">
+                  <label className="block text-slate-700 dark:text-slate-300 mb-1 font-bold text-xs">
                     Nombre Completo <strong className="text-rose-500">*</strong>
                   </label>
                   <div className="relative">
@@ -435,12 +435,12 @@ export const NewBookingModal: React.FC<NewBookingModalProps> = ({
                       placeholder="Ej. Rodrigo Silva"
                       value={newClientName}
                       onChange={(e) => setNewClientName(e.target.value)}
-                      className="w-full bg-white dark:bg-[#0E2239] border border-slate-200/90 dark:border-[#1A314D] rounded-xl pl-9 pr-3 py-2 text-xs text-[#0B1A2D] dark:text-white focus:outline-none focus:border-[#B7F229] shadow-2xs"
+                      className="w-full bg-white dark:bg-[#0E2239] border border-slate-200/90 dark:border-[#1A314D] rounded-xl pl-9 pr-3 py-2.5 text-xs text-[#0B1A2D] dark:text-white font-medium focus:outline-none focus:ring-1 focus:ring-[#B7F229] focus:border-[#B7F229] transition shadow-2xs"
                     />
                   </div>
                 </div>
                 <div>
-                  <label className="block text-slate-700 dark:text-slate-300 mb-1 font-bold text-[11px]">
+                  <label className="block text-slate-700 dark:text-slate-300 mb-1 font-bold text-xs">
                     Teléfono <strong className="text-rose-500">*</strong>
                   </label>
                   <div className="relative">
@@ -451,13 +451,13 @@ export const NewBookingModal: React.FC<NewBookingModalProps> = ({
                       placeholder="+34 600 00 00 00"
                       value={newClientPhone}
                       onChange={(e) => setNewClientPhone(e.target.value)}
-                      className="w-full bg-white dark:bg-[#0E2239] border border-slate-200/90 dark:border-[#1A314D] rounded-xl pl-9 pr-3 py-2 text-xs text-[#0B1A2D] dark:text-white focus:outline-none focus:border-[#B7F229] shadow-2xs"
+                      className="w-full bg-white dark:bg-[#0E2239] border border-slate-200/90 dark:border-[#1A314D] rounded-xl pl-9 pr-3 py-2.5 text-xs text-[#0B1A2D] dark:text-white font-medium focus:outline-none focus:ring-1 focus:ring-[#B7F229] focus:border-[#B7F229] transition shadow-2xs"
                     />
                   </div>
                 </div>
               </div>
               <div>
-                <label className="block text-slate-700 dark:text-slate-300 mb-1 font-bold text-[11px]">
+                <label className="block text-slate-700 dark:text-slate-300 mb-1 font-bold text-xs">
                   Correo Electrónico <span className="text-slate-400 font-normal">(Opcional)</span>
                 </label>
                 <div className="relative">
@@ -467,7 +467,7 @@ export const NewBookingModal: React.FC<NewBookingModalProps> = ({
                     placeholder="ejemplo@correo.com (opcional)"
                     value={newClientEmail}
                     onChange={(e) => setNewClientEmail(e.target.value)}
-                    className="w-full bg-white dark:bg-[#0E2239] border border-slate-200/90 dark:border-[#1A314D] rounded-xl pl-9 pr-3 py-2 text-xs text-[#0B1A2D] dark:text-white focus:outline-none focus:border-[#B7F229] shadow-2xs"
+                    className="w-full bg-white dark:bg-[#0E2239] border border-slate-200/90 dark:border-[#1A314D] rounded-xl pl-9 pr-3 py-2.5 text-xs text-[#0B1A2D] dark:text-white font-medium focus:outline-none focus:ring-1 focus:ring-[#B7F229] focus:border-[#B7F229] transition shadow-2xs"
                   />
                 </div>
               </div>
@@ -475,29 +475,43 @@ export const NewBookingModal: React.FC<NewBookingModalProps> = ({
           )}
 
           {clientType === 'club' && (
-            <div className="p-3.5 rounded-2xl bg-indigo-50/50 dark:bg-indigo-950/20 border border-indigo-200/80 dark:border-indigo-800/60 space-y-2.5">
+            <div className="p-3.5 rounded-2xl bg-slate-50/70 dark:bg-[#071220]/70 border border-slate-200/80 dark:border-[#1A314D] space-y-3">
               <div className="flex items-center gap-2">
-                <Building2 className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-                <span className="font-extrabold text-indigo-950 dark:text-indigo-200 text-xs">
-                  Reserva Oficial del Propio Club
+                <Building2 className="w-4 h-4 text-[#8B5CF6]" />
+                <span className="font-extrabold text-[#0B1A2D] dark:text-white text-xs">
+                  Reserva Oficial del Club
                 </span>
               </div>
-              <div>
-                <label className="block text-indigo-900 dark:text-indigo-200 mb-1 font-bold text-[11px]">
-                  Motivo / Actividad:
-                </label>
-                <select
-                  value={clubReasonPreset}
-                  onChange={(e) => setClubReasonPreset(e.target.value)}
-                  className="w-full bg-white dark:bg-[#0E2239] border border-indigo-200 dark:border-indigo-800 rounded-xl px-3 py-2 text-xs font-bold text-[#0B1A2D] dark:text-white"
-                >
-                  <option value="Entrenamiento de Equipo Federado">Entrenamiento de Equipo Federado</option>
-                  <option value="Clase Magistral / Clinic Oficial">Clase Magistral / Clinic Oficial</option>
-                  <option value="Reserva Institucional / Patrocinadores">Reserva Institucional / Patrocinadores</option>
-                  <option value="Evento Interno / Actividad Social">Evento Interno / Actividad Social</option>
-                  <option value="Calibración y Pruebas Domóticas">Calibración y Pruebas Domóticas</option>
-                  <option value="Otro motivo oficial">Otro motivo oficial (especificar)</option>
-                </select>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-slate-700 dark:text-slate-300 mb-1 font-bold text-xs">
+                    Motivo / Actividad:
+                  </label>
+                  <select
+                    value={clubReasonPreset}
+                    onChange={(e) => setClubReasonPreset(e.target.value)}
+                    className="w-full bg-white dark:bg-[#0E2239] border border-slate-200/90 dark:border-[#1A314D] rounded-xl px-3 py-2.5 text-xs font-semibold text-[#0B1A2D] dark:text-white focus:outline-none focus:ring-1 focus:ring-[#B7F229] focus:border-[#B7F229] transition shadow-2xs"
+                  >
+                    <option value="Entrenamiento de Equipo Federado">Entrenamiento de Equipo Federado</option>
+                    <option value="Clase Magistral / Clinic Oficial">Clase Magistral / Clinic Oficial</option>
+                    <option value="Reserva Institucional / Patrocinadores">Reserva Institucional / Patrocinadores</option>
+                    <option value="Evento Interno / Actividad Social">Evento Interno / Actividad Social</option>
+                    <option value="Calibración y Pruebas Domóticas">Calibración y Pruebas Domóticas</option>
+                    <option value="Otro motivo oficial">Otro motivo oficial (especificar)</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-slate-700 dark:text-slate-300 mb-1 font-bold text-xs">
+                    Responsable / Departamento:
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Dirección Deportiva / Staff"
+                    value={clubResponsible}
+                    onChange={(e) => setClubResponsible(e.target.value)}
+                    className="w-full bg-white dark:bg-[#0E2239] border border-slate-200/90 dark:border-[#1A314D] rounded-xl px-3 py-2.5 text-xs text-[#0B1A2D] dark:text-white font-medium focus:outline-none focus:ring-1 focus:ring-[#B7F229] focus:border-[#B7F229] transition shadow-2xs"
+                  />
+                </div>
               </div>
               {clubReasonPreset === 'Otro motivo oficial' && (
                 <div>
@@ -506,54 +520,57 @@ export const NewBookingModal: React.FC<NewBookingModalProps> = ({
                     placeholder="Escribe el motivo oficial de la reserva..."
                     value={customClubReason}
                     onChange={(e) => setCustomClubReason(e.target.value)}
-                    className="w-full bg-white dark:bg-[#0E2239] border border-indigo-200 dark:border-indigo-800 rounded-xl px-3 py-2 text-xs text-[#0B1A2D] dark:text-white"
+                    className="w-full bg-white dark:bg-[#0E2239] border border-slate-200/90 dark:border-[#1A314D] rounded-xl px-3 py-2.5 text-xs text-[#0B1A2D] dark:text-white font-medium focus:outline-none focus:ring-1 focus:ring-[#B7F229] focus:border-[#B7F229] transition shadow-2xs"
                     required
                   />
                 </div>
               )}
-              <div>
-                <label className="block text-indigo-900 dark:text-indigo-200 mb-1 font-bold text-[11px]">
-                  Responsable / Departamento:
-                </label>
-                <input
-                  type="text"
-                  placeholder="Dirección Deportiva / Staff"
-                  value={clubResponsible}
-                  onChange={(e) => setClubResponsible(e.target.value)}
-                  className="w-full bg-white dark:bg-[#0E2239] border border-indigo-200 dark:border-indigo-800 rounded-xl px-3 py-2 text-xs text-[#0B1A2D] dark:text-white"
-                />
-              </div>
-              <p className="text-[10px] text-indigo-700 dark:text-indigo-300 bg-indigo-100/60 dark:bg-indigo-900/30 p-2 rounded-xl">
-                Se registrará a tarifa 0,00 € garantizando control de pista, activación de luces y PIN de acceso.
+              <p className="text-[11px] text-slate-600 dark:text-slate-300 bg-slate-100/80 dark:bg-[#132A45]/50 border border-slate-200/60 dark:border-[#1A314D] p-2.5 rounded-xl flex items-center gap-2">
+                <Info className="w-3.5 h-3.5 text-[#8B5CF6] dark:text-[#B7F229] shrink-0" />
+                <span>Se registrará a tarifa 0,00 € garantizando control de pista, activación de luces y PIN de acceso.</span>
               </p>
             </div>
           )}
 
           {clientType === 'block' && (
-            <div className="p-3.5 rounded-2xl bg-rose-50/50 dark:bg-rose-950/20 border border-rose-200/80 dark:border-rose-800/60 space-y-2.5">
+            <div className="p-3.5 rounded-2xl bg-slate-50/70 dark:bg-[#071220]/70 border border-slate-200/80 dark:border-[#1A314D] space-y-3">
               <div className="flex items-center gap-2">
-                <Lock className="w-4 h-4 text-rose-600 dark:text-rose-400" />
-                <span className="font-extrabold text-rose-950 dark:text-rose-200 text-xs">
+                <Lock className="w-4 h-4 text-[#0B1A2D] dark:text-[#B7F229]" />
+                <span className="font-extrabold text-[#0B1A2D] dark:text-white text-xs">
                   Bloqueo Administrativo de Pista
                 </span>
               </div>
-              <div>
-                <label className="block text-rose-900 dark:text-rose-200 mb-1 font-bold text-[11px]">
-                  Motivo de Bloqueo:
-                </label>
-                <select
-                  value={blockReasonPreset}
-                  onChange={(e) => setBlockReasonPreset(e.target.value)}
-                  className="w-full bg-white dark:bg-[#0E2239] border border-rose-200 dark:border-rose-800 rounded-xl px-3 py-2 text-xs font-bold text-[#0B1A2D] dark:text-white"
-                >
-                  <option value="Mantenimiento y limpieza de césped">Mantenimiento y limpieza de césped</option>
-                  <option value="Reparación de red y postes">Reparación de red y postes</option>
-                  <option value="Revisión técnica de iluminación LED">Revisión técnica de iluminación LED</option>
-                  <option value="Sustitución / Reparación de cristal">Sustitución / Reparación de cristal</option>
-                  <option value="Condiciones meteorológicas adversas">Condiciones meteorológicas adversas</option>
-                  <option value="Entrenamiento oficial del club">Entrenamiento oficial del club</option>
-                  <option value="Otro motivo personalizado">Otro motivo personalizado (redactar)</option>
-                </select>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-slate-700 dark:text-slate-300 mb-1 font-bold text-xs">
+                    Motivo de Bloqueo:
+                  </label>
+                  <select
+                    value={blockReasonPreset}
+                    onChange={(e) => setBlockReasonPreset(e.target.value)}
+                    className="w-full bg-white dark:bg-[#0E2239] border border-slate-200/90 dark:border-[#1A314D] rounded-xl px-3 py-2.5 text-xs font-semibold text-[#0B1A2D] dark:text-white focus:outline-none focus:ring-1 focus:ring-[#B7F229] focus:border-[#B7F229] transition shadow-2xs"
+                  >
+                    <option value="Mantenimiento y limpieza de césped">Mantenimiento y limpieza de césped</option>
+                    <option value="Reparación de red y postes">Reparación de red y postes</option>
+                    <option value="Revisión técnica de iluminación LED">Revisión técnica de iluminación LED</option>
+                    <option value="Sustitución / Reparación de cristal">Sustitución / Reparación de cristal</option>
+                    <option value="Condiciones meteorológicas adversas">Condiciones meteorológicas adversas</option>
+                    <option value="Entrenamiento oficial del club">Entrenamiento oficial del club</option>
+                    <option value="Otro motivo personalizado">Otro motivo personalizado (redactar)</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-slate-700 dark:text-slate-300 mb-1 font-bold text-xs">
+                    Responsable del Bloqueo:
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Personal de Mantenimiento / Recepción"
+                    value={blockResponsible}
+                    onChange={(e) => setBlockResponsible(e.target.value)}
+                    className="w-full bg-white dark:bg-[#0E2239] border border-slate-200/90 dark:border-[#1A314D] rounded-xl px-3 py-2.5 text-xs text-[#0B1A2D] dark:text-white font-medium focus:outline-none focus:ring-1 focus:ring-[#B7F229] focus:border-[#B7F229] transition shadow-2xs"
+                  />
+                </div>
               </div>
               {blockReasonPreset === 'Otro motivo personalizado' && (
                 <div>
@@ -563,22 +580,10 @@ export const NewBookingModal: React.FC<NewBookingModalProps> = ({
                     placeholder="Ej. Torneo express o arreglo urgente"
                     value={customBlockReason}
                     onChange={(e) => setCustomBlockReason(e.target.value)}
-                    className="w-full bg-white dark:bg-[#0E2239] border border-rose-200 dark:border-rose-800 rounded-xl px-3 py-2 text-xs text-[#0B1A2D] dark:text-white"
+                    className="w-full bg-white dark:bg-[#0E2239] border border-slate-200/90 dark:border-[#1A314D] rounded-xl px-3 py-2.5 text-xs text-[#0B1A2D] dark:text-white font-medium focus:outline-none focus:ring-1 focus:ring-[#B7F229] focus:border-[#B7F229] transition shadow-2xs"
                   />
                 </div>
               )}
-              <div>
-                <label className="block text-rose-900 dark:text-rose-200 mb-1 font-bold text-[11px]">
-                  Responsable del Bloqueo:
-                </label>
-                <input
-                  type="text"
-                  placeholder="Personal de Mantenimiento / Recepción"
-                  value={blockResponsible}
-                  onChange={(e) => setBlockResponsible(e.target.value)}
-                  className="w-full bg-white dark:bg-[#0E2239] border border-rose-200 dark:border-rose-800 rounded-xl px-3 py-2 text-xs text-[#0B1A2D] dark:text-white"
-                />
-              </div>
             </div>
           )}
 
@@ -649,13 +654,13 @@ export const NewBookingModal: React.FC<NewBookingModalProps> = ({
 
           {/* 5. PAGO DIVIDIDO E INVITACIÓN A OTROS SOCIOS */}
           {clientType !== 'block' && clientType !== 'club' && (
-            <div className="p-3.5 rounded-2xl bg-slate-50/60 dark:bg-[#071220]/60 border border-slate-200/80 dark:border-[#1A314D] space-y-3">
+            <div className="p-3.5 rounded-2xl bg-slate-50/70 dark:bg-[#071220]/70 border border-slate-200/80 dark:border-[#1A314D] space-y-3">
               <label className="flex items-center gap-2.5 cursor-pointer select-none">
                 <input
                   type="checkbox"
                   checked={isSplitPayment}
                   onChange={(e) => setIsSplitPayment(e.target.checked)}
-                  className="w-4 h-4 rounded text-emerald-600 focus:ring-[#B7F229]"
+                  className="w-4 h-4 rounded text-[#0B1A2D] accent-[#0B1A2D] dark:accent-[#B7F229] focus:ring-[#B7F229] cursor-pointer"
                 />
                 <div>
                   <span className="font-extrabold text-[#0B1A2D] dark:text-white text-xs block">
@@ -668,24 +673,26 @@ export const NewBookingModal: React.FC<NewBookingModalProps> = ({
               </label>
 
               {clientType === 'existing' && isSplitPayment && (
-                <div className="pt-2 border-t border-slate-200/80 dark:border-[#1A314D] space-y-2.5 animate-in fade-in duration-150">
+                <div className="pt-3 border-t border-slate-200/80 dark:border-[#1A314D] space-y-2.5 animate-in fade-in duration-150">
                   <div className="flex items-center justify-between">
-                    <span className="text-[11px] font-black uppercase tracking-wider text-emerald-700 dark:text-[#B7F229] flex items-center gap-1.5">
-                      <Users className="w-3.5 h-3.5" />
+                    <span className="text-xs font-bold text-[#0B1A2D] dark:text-[#B7F229] flex items-center gap-1.5">
+                      <Users className="w-3.5 h-3.5 text-[#8B5CF6] dark:text-[#B7F229]" />
                       <span>Invitar a otros socios del club</span>
                     </span>
-                    <span className="text-[10px] text-slate-400 font-mono">3 plazas convocadas</span>
+                    <span className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 font-mono">
+                      3 plazas convocadas
+                    </span>
                   </div>
 
                   <div className="space-y-2">
                     <div>
-                      <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-0.5">
+                      <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1">
                         Plaza 2 (Socio Convocado):
                       </label>
                       <select
                         value={invitedMember2}
                         onChange={(e) => setInvitedMember2(e.target.value)}
-                        className="w-full bg-white dark:bg-[#0E2239] border border-slate-200/90 dark:border-[#1A314D] rounded-xl px-2.5 py-1.5 text-xs text-[#0B1A2D] dark:text-white font-medium"
+                        className="w-full bg-white dark:bg-[#0E2239] border border-slate-200/90 dark:border-[#1A314D] rounded-xl px-3 py-2 text-xs text-[#0B1A2D] dark:text-white font-medium focus:outline-none focus:ring-1 focus:ring-[#B7F229] focus:border-[#B7F229] transition shadow-2xs"
                       >
                         {clubRegisteredPlayers.map((p) => (
                           <option key={`p2-${p.id}`} value={p.label}>
@@ -696,13 +703,13 @@ export const NewBookingModal: React.FC<NewBookingModalProps> = ({
                     </div>
 
                     <div>
-                      <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-0.5">
+                      <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1">
                         Plaza 3 (Socio Convocado):
                       </label>
                       <select
                         value={invitedMember3}
                         onChange={(e) => setInvitedMember3(e.target.value)}
-                        className="w-full bg-white dark:bg-[#0E2239] border border-slate-200/90 dark:border-[#1A314D] rounded-xl px-2.5 py-1.5 text-xs text-[#0B1A2D] dark:text-white font-medium"
+                        className="w-full bg-white dark:bg-[#0E2239] border border-slate-200/90 dark:border-[#1A314D] rounded-xl px-3 py-2 text-xs text-[#0B1A2D] dark:text-white font-medium focus:outline-none focus:ring-1 focus:ring-[#B7F229] focus:border-[#B7F229] transition shadow-2xs"
                       >
                         {clubRegisteredPlayers.map((p) => (
                           <option key={`p3-${p.id}`} value={p.label}>
@@ -713,13 +720,13 @@ export const NewBookingModal: React.FC<NewBookingModalProps> = ({
                     </div>
 
                     <div>
-                      <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-0.5">
+                      <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1">
                         Plaza 4 (Socio Convocado):
                       </label>
                       <select
                         value={invitedMember4}
                         onChange={(e) => setInvitedMember4(e.target.value)}
-                        className="w-full bg-white dark:bg-[#0E2239] border border-slate-200/90 dark:border-[#1A314D] rounded-xl px-2.5 py-1.5 text-xs text-[#0B1A2D] dark:text-white font-medium"
+                        className="w-full bg-white dark:bg-[#0E2239] border border-slate-200/90 dark:border-[#1A314D] rounded-xl px-3 py-2 text-xs text-[#0B1A2D] dark:text-white font-medium focus:outline-none focus:ring-1 focus:ring-[#B7F229] focus:border-[#B7F229] transition shadow-2xs"
                       >
                         {clubRegisteredPlayers.map((p) => (
                           <option key={`p4-${p.id}`} value={p.label}>
@@ -729,8 +736,10 @@ export const NewBookingModal: React.FC<NewBookingModalProps> = ({
                       </select>
                     </div>
                   </div>
-                  <p className="text-[10px] text-emerald-700 dark:text-[#B7F229] bg-[#F0FCCF]/60 dark:bg-[#B7F229]/10 p-2 rounded-xl">
-                    Se enviará notificación automática a los socios convocados con su enlace de pago correspondiente.
+
+                  <p className="text-[11px] text-slate-600 dark:text-slate-300 bg-slate-100/80 dark:bg-[#132A45]/50 border border-slate-200/60 dark:border-[#1A314D] p-2.5 rounded-xl flex items-center gap-2">
+                    <Info className="w-3.5 h-3.5 text-[#8B5CF6] dark:text-[#B7F229] shrink-0" />
+                    <span>Se enviará notificación automática a los socios convocados con su enlace de pago correspondiente.</span>
                   </p>
                 </div>
               )}
@@ -739,8 +748,8 @@ export const NewBookingModal: React.FC<NewBookingModalProps> = ({
 
           {/* 6. CONFIGURACIÓN DE PAGO (ONLINE EXCLUSIVO, PAGO EN CLUB, O AMBAS) */}
           {clientType !== 'block' && clientType !== 'club' && (
-            <div className="p-3.5 rounded-2xl bg-slate-50/60 dark:bg-[#071220]/60 border border-slate-200/80 dark:border-[#1A314D] space-y-2.5">
-              <label className="block text-slate-700 dark:text-slate-300 font-bold uppercase tracking-wider text-[11px] flex items-center justify-between">
+            <div className="space-y-2">
+              <label className="block text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider text-[11px] flex items-center justify-between">
                 <span>Configuración de Pago</span>
                 <span className="text-[10px] text-slate-400 normal-case font-normal">
                   Reglas para socios y no socios
@@ -753,12 +762,12 @@ export const NewBookingModal: React.FC<NewBookingModalProps> = ({
                   onClick={() => setPaymentConfig('both')}
                   className={`p-2.5 rounded-xl border text-left transition cursor-pointer ${
                     paymentConfig === 'both'
-                      ? 'bg-white dark:bg-[#0E2239] border-[#0B1A2D] dark:border-[#B7F229] text-[#0B1A2D] dark:text-[#B7F229] font-bold shadow-2xs'
-                      : 'bg-white/80 dark:bg-[#0E2239]/80 border-slate-200/80 dark:border-[#1A314D] text-slate-600 dark:text-slate-400 hover:border-slate-300'
+                      ? 'bg-[#0B1A2D] dark:bg-[#B7F229] border-[#0B1A2D] dark:border-[#B7F229] text-white dark:text-[#0B1A2D] font-bold shadow-xs'
+                      : 'bg-slate-50/70 dark:bg-[#071220]/70 border-slate-200/80 dark:border-[#1A314D] text-slate-600 dark:text-slate-400 hover:border-slate-300'
                   }`}
                 >
                   <div className="text-xs">Ambas Vías</div>
-                  <div className="text-[10px] text-slate-400 font-normal">
+                  <div className={`text-[10px] font-normal ${paymentConfig === 'both' ? 'text-slate-300 dark:text-[#0B1A2D]/80' : 'text-slate-400'}`}>
                     Online o mostrador
                   </div>
                 </button>
@@ -768,12 +777,12 @@ export const NewBookingModal: React.FC<NewBookingModalProps> = ({
                   onClick={() => setPaymentConfig('online')}
                   className={`p-2.5 rounded-xl border text-left transition cursor-pointer ${
                     paymentConfig === 'online'
-                      ? 'bg-white dark:bg-[#0E2239] border-[#0B1A2D] dark:border-[#B7F229] text-[#0B1A2D] dark:text-[#B7F229] font-bold shadow-2xs'
-                      : 'bg-white/80 dark:bg-[#0E2239]/80 border-slate-200/80 dark:border-[#1A314D] text-slate-600 dark:text-slate-400 hover:border-slate-300'
+                      ? 'bg-[#0B1A2D] dark:bg-[#B7F229] border-[#0B1A2D] dark:border-[#B7F229] text-white dark:text-[#0B1A2D] font-bold shadow-xs'
+                      : 'bg-slate-50/70 dark:bg-[#071220]/70 border-slate-200/80 dark:border-[#1A314D] text-slate-600 dark:text-slate-400 hover:border-slate-300'
                   }`}
                 >
                   <div className="text-xs">Pago Online</div>
-                  <div className="text-[10px] text-slate-400 font-normal">
+                  <div className={`text-[10px] font-normal ${paymentConfig === 'online' ? 'text-slate-300 dark:text-[#0B1A2D]/80' : 'text-slate-400'}`}>
                     Enlace previo
                   </div>
                 </button>
@@ -783,12 +792,12 @@ export const NewBookingModal: React.FC<NewBookingModalProps> = ({
                   onClick={() => setPaymentConfig('club')}
                   className={`p-2.5 rounded-xl border text-left transition cursor-pointer ${
                     paymentConfig === 'club'
-                      ? 'bg-white dark:bg-[#0E2239] border-[#0B1A2D] dark:border-[#B7F229] text-[#0B1A2D] dark:text-[#B7F229] font-bold shadow-2xs'
-                      : 'bg-white/80 dark:bg-[#0E2239]/80 border-slate-200/80 dark:border-[#1A314D] text-slate-600 dark:text-slate-400 hover:border-slate-300'
+                      ? 'bg-[#0B1A2D] dark:bg-[#B7F229] border-[#0B1A2D] dark:border-[#B7F229] text-white dark:text-[#0B1A2D] font-bold shadow-xs'
+                      : 'bg-slate-50/70 dark:bg-[#071220]/70 border-slate-200/80 dark:border-[#1A314D] text-slate-600 dark:text-slate-400 hover:border-slate-300'
                   }`}
                 >
                   <div className="text-xs">Pago en Club</div>
-                  <div className="text-[10px] text-slate-400 font-normal">
+                  <div className={`text-[10px] font-normal ${paymentConfig === 'club' ? 'text-slate-300 dark:text-[#0B1A2D]/80' : 'text-slate-400'}`}>
                     Mostrador / TPV
                   </div>
                 </button>
@@ -797,7 +806,7 @@ export const NewBookingModal: React.FC<NewBookingModalProps> = ({
           )}
 
           {/* Tarifa Final en Pista */}
-          <div className="p-3.5 rounded-2xl bg-slate-50/60 dark:bg-[#071220]/60 border border-slate-200/80 dark:border-[#1A314D] flex items-center justify-between">
+          <div className="p-3.5 rounded-2xl bg-slate-50/70 dark:bg-[#071220]/70 border border-slate-200/80 dark:border-[#1A314D] flex items-center justify-between">
             <div>
               <span className="font-bold text-xs text-[#0B1A2D] dark:text-white block">
                 {isZeroPrice ? 'Tarifa Administrativa' : 'Importe Total de la Reserva'}
@@ -808,28 +817,30 @@ export const NewBookingModal: React.FC<NewBookingModalProps> = ({
                   : `${formDuration} min en ${currentCourt.name.split('—')[0]} (${currentCourt.hourlyRate} €/h)`}
               </span>
             </div>
-            <div className="font-mono font-black text-xl sm:text-2xl text-emerald-600 dark:text-[#B7F229]">
+            <div className="font-mono font-black text-xl sm:text-2xl text-[#82b805] dark:text-[#B7F229]">
               {calculatedPrice.toFixed(2)} €
             </div>
           </div>
         </form>
 
-        {/* Modal Footer Sólido y Simétrico */}
-        <div className="px-5 sm:px-6 py-3.5 border-t border-slate-100 dark:border-[#1A314D] bg-slate-50/50 dark:bg-[#071220]/50 flex items-center justify-end gap-2.5 shrink-0">
-          <button
-            type="button"
-            onClick={onClose}
-            className="px-4 py-2.5 rounded-xl bg-white dark:bg-[#0E2239] hover:bg-slate-100 dark:hover:bg-[#132A45] text-slate-700 dark:text-slate-300 font-bold text-xs border border-slate-200/80 dark:border-[#1A314D] transition cursor-pointer"
-          >
-            Cancelar
-          </button>
-          <button
-            type="button"
-            onClick={handleSubmit}
-            className="px-5 py-2.5 rounded-xl bg-[#B7F229] hover:bg-[#a3e514] text-[#0B1A2D] font-black text-xs shadow-md shadow-[#B7F229]/20 transition active:scale-95 cursor-pointer"
-          >
-            {clientType === 'block' ? 'Confirmar Bloqueo' : 'Confirmar Reserva'}
-          </button>
+        {/* Modal Footer Sólido y Simétrico (Distribución Equitativa 50/50) */}
+        <div className="px-5 sm:px-6 py-3.5 border-t border-slate-100 dark:border-[#1A314D] bg-slate-50/50 dark:bg-[#071220]/50 shrink-0">
+          <div className="grid grid-cols-2 gap-3 w-full">
+            <button
+              type="button"
+              onClick={onClose}
+              className="w-full py-2.5 sm:py-3 px-2.5 sm:px-4 rounded-xl bg-white dark:bg-[#0E2239] hover:bg-slate-100 dark:hover:bg-[#132A45] text-slate-700 dark:text-slate-300 font-bold text-xs sm:text-sm border border-slate-200/80 dark:border-[#1A314D] transition cursor-pointer active:scale-[0.99] flex items-center justify-center text-center whitespace-nowrap"
+            >
+              <span>Cancelar</span>
+            </button>
+            <button
+              type="button"
+              onClick={handleSubmit}
+              className="w-full py-2.5 sm:py-3 px-2.5 sm:px-4 rounded-xl bg-[#0B1A2D] hover:bg-[#132A45] text-white font-bold text-xs sm:text-sm border border-[#1A314D] shadow-md transition active:scale-[0.99] cursor-pointer flex items-center justify-center text-center whitespace-nowrap"
+            >
+              <span>{clientType === 'block' ? 'Confirmar Bloqueo' : 'Confirmar Reserva'}</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>
