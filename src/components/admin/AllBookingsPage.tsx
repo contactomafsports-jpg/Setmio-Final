@@ -478,7 +478,7 @@ export const AllBookingsPage: React.FC<AllBookingsPageProps> = ({
         {/* Selectores Dinámicos: Pista y Fecha con padding holgado en flechas */}
         <div className="grid grid-cols-2 sm:flex sm:items-center gap-3 shrink-0">
           {/* Selector de Pista Dinámico con ChevronDown y padding pr-8 */}
-          <div className="relative min-w-[140px]">
+          <div className="relative min-w-[140px] flex items-center justify-between">
             <select
               value={courtFilter}
               onChange={(e) => setCourtFilter(e.target.value)}
@@ -495,15 +495,16 @@ export const AllBookingsPage: React.FC<AllBookingsPageProps> = ({
             <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 pointer-events-none" />
           </div>
 
-          {/* Selector de Fecha Simétrico con exactamente el mismo padding derecho pr-8 que el de pistas */}
-          <div className="relative min-w-[140px]">
+          {/* Selector de Fecha Simétrico con ChevronDown personalizado idéntico al de pistas */}
+          <div className="relative min-w-[140px] flex items-center justify-between">
             <input
               type="date"
               value={dateFilter}
               onChange={(e) => setDateFilter(e.target.value || todayStr)}
-              className="w-full h-10 pl-3.5 pr-8 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-xl text-xs font-semibold text-[#0B1A2D] dark:text-slate-200 focus:outline-none focus:border-[#B7F229] transition shadow-2xs cursor-pointer [&::-webkit-calendar-picker-indicator]:cursor-pointer [&::-webkit-calendar-picker-indicator]:opacity-70 hover:[&::-webkit-calendar-picker-indicator]:opacity-100"
+              className="w-full h-10 pl-3.5 pr-8 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-xl text-xs font-semibold text-[#0B1A2D] dark:text-slate-200 focus:outline-none focus:border-[#B7F229] transition shadow-2xs cursor-pointer appearance-none [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:inset-0 [&::-webkit-calendar-picker-indicator]:w-full [&::-webkit-calendar-picker-indicator]:h-full [&::-webkit-calendar-picker-indicator]:cursor-pointer"
               title="Filtrar por fecha específica"
             />
+            <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 pointer-events-none" />
           </div>
         </div>
       </div>
