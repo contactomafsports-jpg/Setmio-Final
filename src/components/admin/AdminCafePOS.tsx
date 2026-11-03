@@ -498,6 +498,7 @@ export const AdminCafePOS: React.FC = () => {
   // Modal: Arqueo / Cierre de Caja
   const [arqueoModalOpen, setArqueoModalOpen] = useState(false);
   const [arqueoVenueFilter, setArqueoVenueFilter] = useState<string>(selectedVenueId || 'all');
+  const [isArqueoVenueSelectorOpen, setIsArqueoVenueSelectorOpen] = useState(false);
 
   useEffect(() => {
     if (selectedVenueId) {
@@ -1223,7 +1224,7 @@ export const AdminCafePOS: React.FC = () => {
                 >
                   <span className="flex items-center gap-2">
                     <Layers className="w-3.5 h-3.5 text-[#8B5CF6]" />
-                    <span>Todas las Sedes (Consolidado)</span>
+                    <span>Todas las Sedes</span>
                   </span>
                   {isConsolidatedView && <CheckCircle2 className="w-3.5 h-3.5 text-[#82b805]" />}
                 </button>
@@ -2047,7 +2048,7 @@ export const AdminCafePOS: React.FC = () => {
                   onChange={(e) => setPosVenueFilter(e.target.value)}
                   className="w-full px-3 py-2 rounded-xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] font-bold text-xs text-[#0B1A2D] dark:text-white shadow-2xs focus:outline-none focus:border-[#8B5CF6]"
                 >
-                  <option value="all">Todas las Sedes (Consolidado)</option>
+                  <option value="all">Todas las Sedes</option>
                   {venues.map((v) => (
                     <option key={v.id} value={v.id}>
                       {v.name}
@@ -2382,24 +2383,108 @@ export const AdminCafePOS: React.FC = () => {
 
             {/* Contenedor Superior de Resumen de Arqueo Rediseñado (Minimalista y Elegante) */}
             <div className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-4 overscroll-contain">
-              {/* Selector de Sede Unificado */}
-              <div className="flex items-center justify-between gap-3 p-3 rounded-2xl bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D]">
-                <div className="flex items-center gap-2 text-xs font-bold text-slate-700 dark:text-slate-300">
-                  <Building2 className="w-4 h-4 text-[#8B5CF6]" />
-                  <span>Sede Arqueo:</span>
+              {/* Selector de Sede Superior Idéntico al de las Páginas Principales */}
+              <div className="relative">
+                <div className="flex items-center justify-between p-2.5 bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200/80 dark:border-[#1A314D] shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
+                  {/* Selector de Sede */}
+                  <div
+                    onClick={() => setIsArqueoVenueSelectorOpen(!isArqueoVenueSelectorOpen)}
+                    className="flex items-center gap-2 cursor-pointer group select-none min-w-0"
+                    title="Cambiar sede de arqueo o ver consolidado"
+                  >
+                    <div className="w-8 h-8 rounded-xl bg-slate-50 dark:bg-[#071220] border border-slate-100 dark:border-[#1A314D] flex items-center justify-center text-[#0B1A2D] dark:text-slate-200 shrink-0">
+                      <Building2 className="w-4 h-4 text-[#0B1A2D] dark:text-white" />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-xs font-bold text-[#0B1A2D] dark:text-white truncate">
+                          {arqueoVenueFilter === 'all'
+                            ? 'Todas las Sedes'
+                            : venues.find((v) => v.id === arqueoVenueFilter)?.shortName ||
+                              venues.find((v) => v.id === arqueoVenueFilter)?.name ||
+                              'Sede Central'}
+                        </span>
+                        <ChevronDown
+                          className={`w-3.5 h-3.5 text-slate-400 group-hover:text-[#0B1A2D] dark:group-hover:text-white transition-transform ${
+                            isArqueoVenueSelectorOpen ? 'rotate-180 text-[#0B1A2D] dark:text-white' : ''
+                          }`}
+                        />
+                      </div>
+                      <span className="text-[10px] font-medium text-slate-400 block truncate">
+                        {venues.filter((v) => v.id !== 'all').length > 1
+                          ? `${venues.filter((v) => v.id !== 'all').length} sedes conectadas`
+                          : 'Sede oficial'}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Badge Dinámico de Apertura / Resumen Multisede */}
+                  <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#F0FCCF] dark:bg-[#B7F229]/20 border border-[#B7F229]/50 transition-all select-none shrink-0">
+                    <span className="w-2 h-2 rounded-full bg-[#82b805] dark:bg-[#B7F229]" />
+                    <span className="text-[11px] font-bold text-[#0B1A2D] dark:text-[#B7F229]">
+                      {arqueoVenueFilter === 'all'
+                        ? `${venues.filter((v) => v.id !== 'all').length} Sedes Activas`
+                        : 'Turno Activo'}
+                    </span>
+                  </div>
                 </div>
-                <select
-                  value={arqueoVenueFilter}
-                  onChange={(e) => setArqueoVenueFilter(e.target.value)}
-                  className="px-3 py-1.5 rounded-xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] font-bold text-xs text-[#0B1A2D] dark:text-white shadow-2xs focus:outline-none focus:border-[#8B5CF6] cursor-pointer"
-                >
-                  <option value="all">Todas las Sedes (Consolidado)</option>
-                  {venues.filter((v) => v.id !== 'all').map((v) => (
-                    <option key={v.id} value={v.id}>
-                      {formatVenueDisplayName(v.name, v.id)}
-                    </option>
-                  ))}
-                </select>
+
+                {/* Menú Desplegable de Sedes */}
+                {isArqueoVenueSelectorOpen && (
+                  <div className="absolute top-full left-0 right-0 mt-2 z-30 p-2 bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200 dark:border-[#1A314D] shadow-xl space-y-1 animate-in fade-in slide-in-from-top-2 duration-150">
+                    <div className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 px-2 py-1">
+                      Red Deportiva · Seleccionar Sede
+                    </div>
+
+                    {venues.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setArqueoVenueFilter('all');
+                          setIsArqueoVenueSelectorOpen(false);
+                        }}
+                        className={`w-full flex items-center justify-between p-2 rounded-xl text-xs font-bold transition text-left cursor-pointer ${
+                          arqueoVenueFilter === 'all'
+                            ? 'bg-[#B7F229]/20 text-[#0B1A2D] dark:text-white'
+                            : 'hover:bg-slate-50 dark:hover:bg-[#132A45] text-slate-700 dark:text-slate-300'
+                        }`}
+                      >
+                        <span className="flex items-center gap-2">
+                          <Layers className="w-3.5 h-3.5 text-[#8B5CF6]" />
+                          <span>Todas las Sedes</span>
+                        </span>
+                        {arqueoVenueFilter === 'all' && <CheckCircle2 className="w-3.5 h-3.5 text-[#82b805]" />}
+                      </button>
+                    )}
+
+                    {venues
+                      .filter((v) => v.id !== 'all')
+                      .map((venue) => {
+                        const isSelected = arqueoVenueFilter === venue.id;
+                        return (
+                          <button
+                            key={venue.id}
+                            type="button"
+                            onClick={() => {
+                              setArqueoVenueFilter(venue.id);
+                              setIsArqueoVenueSelectorOpen(false);
+                            }}
+                            className={`w-full flex items-center justify-between p-2 rounded-xl text-xs font-bold transition text-left cursor-pointer ${
+                              isSelected
+                                ? 'bg-[#B7F229]/20 text-[#0B1A2D] dark:text-white'
+                                : 'hover:bg-slate-50 dark:hover:bg-[#132A45] text-slate-700 dark:text-slate-300'
+                            }`}
+                          >
+                            <div className="flex items-center gap-2 truncate">
+                              <Building2 className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                              <span className="truncate">{venue.name}</span>
+                            </div>
+                            {isSelected && <CheckCircle2 className="w-3.5 h-3.5 text-[#82b805] shrink-0" />}
+                          </button>
+                        );
+                      })}
+                  </div>
+                )}
               </div>
 
               <div className="p-5 rounded-2xl bg-[#0B1A2D] text-white border border-[#1A314D] shadow-md space-y-3">
@@ -2425,7 +2510,7 @@ export const AdminCafePOS: React.FC = () => {
                     <Building2 className="w-3.5 h-3.5 text-[#B7F229]" />
                     <span>
                       {arqueoVenueFilter === 'all'
-                        ? 'Todas las Sedes (Consolidado)'
+                        ? 'Todas las Sedes'
                         : formatVenueDisplayName(venues.find((v) => v.id === arqueoVenueFilter)?.name, arqueoVenueFilter)}
                     </span>
                   </div>

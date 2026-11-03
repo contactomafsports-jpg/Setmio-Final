@@ -76,7 +76,7 @@ export interface ClubVenue {
 export const INITIAL_VENUES: ClubVenue[] = [
   {
     id: 'all',
-    name: 'Todas las Sedes (Vista Consolidada)',
+    name: 'Todas las Sedes',
     shortName: 'Todas las Sedes',
     city: 'Red Multi-Sede Galicia',
     address: '4 Instalaciones Deportivas Vinculadas',

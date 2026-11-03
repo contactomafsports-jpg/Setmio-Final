@@ -216,14 +216,9 @@ export const AllBookingsPage: React.FC<AllBookingsPageProps> = ({
             >
               <ArrowLeft className="w-5 h-5 stroke-[2.2]" />
             </button>
-            <div>
-              <span className="text-xs font-medium text-slate-400 dark:text-slate-500 tracking-wide block mb-0.5">
-                {currentTenant?.name || 'Centro de Pádel San Mateo'}
-              </span>
-              <h1 className="text-[22px] font-extrabold text-[#0B1A2D] dark:text-white tracking-tight leading-tight">
-                {t('allBookings.title', 'Todas las Reservas')}
-              </h1>
-            </div>
+            <h1 className="text-[22px] font-extrabold text-[#0B1A2D] dark:text-white tracking-tight leading-tight">
+              {t('allBookings.title', 'Todas las Reservas')}
+            </h1>
           </div>
 
           <button

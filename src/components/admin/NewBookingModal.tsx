@@ -289,22 +289,12 @@ export const NewBookingModal: React.FC<NewBookingModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center bg-[#0B1A2D]/80 backdrop-blur-sm p-3 sm:p-4 animate-in fade-in duration-150">
-      <div className="w-full max-w-lg bg-white dark:bg-[#0E2239] border border-slate-200/90 dark:border-[#1A314D] rounded-3xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden text-slate-900 dark:text-slate-100">
+      <div className="w-full max-w-xl bg-white dark:bg-[#0E2239] border border-slate-200/90 dark:border-[#1A314D] rounded-3xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden text-slate-900 dark:text-slate-100">
         {/* Modal Header */}
         <div className="px-5 sm:px-6 py-4 border-b border-slate-100 dark:border-[#1A314D] flex items-center justify-between bg-white dark:bg-[#0E2239] shrink-0">
-          <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-9 h-9 rounded-xl bg-[#F0FCCF] dark:bg-[#B7F229]/20 border border-[#B7F229]/40 text-[#0B1A2D] dark:text-[#B7F229] flex items-center justify-center shrink-0">
-              <Calendar className="w-4 h-4" />
-            </div>
-            <div className="min-w-0">
-              <h3 className="text-base font-black text-[#0B1A2D] dark:text-white truncate">
-                Nueva Reserva en Mostrador
-              </h3>
-              <p className="text-[11px] text-slate-400 font-medium truncate">
-                Gestión de Cuadrante y Pistas · {currentTenant.name}
-              </p>
-            </div>
-          </div>
+          <h3 className="text-lg font-black text-[#0B1A2D] dark:text-white tracking-tight">
+            Nueva Reserva
+          </h3>
           <button
             type="button"
             onClick={onClose}
@@ -592,10 +582,10 @@ export const NewBookingModal: React.FC<NewBookingModalProps> = ({
             </div>
           )}
 
-          {/* 4. FECHA, PISTA, HORA Y DURACIÓN (DISEÑO PLANO MINIMALISTA) */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+          {/* 4. FECHA, PISTA, HORA Y DURACIÓN (RETÍCULA SIMÉTRICA 2X2) */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label className="block text-slate-700 dark:text-slate-300 mb-1 font-bold text-[11px]">
+              <label className="block text-slate-700 dark:text-slate-300 mb-1 font-bold text-xs">
                 Fecha de Reserva <strong className="text-rose-500">*</strong>
               </label>
               <input
@@ -603,18 +593,18 @@ export const NewBookingModal: React.FC<NewBookingModalProps> = ({
                 required
                 value={formDate}
                 onChange={(e) => setFormDate(e.target.value)}
-                className="w-full bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-xl px-3 py-2.5 text-xs font-semibold text-[#0B1A2D] dark:text-white focus:outline-none focus:border-[#B7F229]"
+                className="w-full bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-xl px-3 py-2.5 text-xs font-semibold text-[#0B1A2D] dark:text-white focus:outline-none focus:ring-1 focus:ring-[#B7F229] focus:border-[#B7F229] transition shadow-2xs"
               />
             </div>
 
             <div>
-              <label className="block text-slate-700 dark:text-slate-300 mb-1 font-bold text-[11px]">
+              <label className="block text-slate-700 dark:text-slate-300 mb-1 font-bold text-xs">
                 Pista Asignada <strong className="text-rose-500">*</strong>
               </label>
               <select
                 value={formCourtId}
                 onChange={(e) => setFormCourtId(e.target.value)}
-                className="w-full bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-xl px-3 py-2.5 text-xs font-semibold text-[#0B1A2D] dark:text-white focus:outline-none focus:border-[#B7F229]"
+                className="w-full bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-xl px-3 py-2.5 text-xs font-semibold text-[#0B1A2D] dark:text-white focus:outline-none focus:ring-1 focus:ring-[#B7F229] focus:border-[#B7F229] transition shadow-2xs"
               >
                 {availableCourts.map((court) => (
                   <option key={court.id} value={court.id}>
@@ -623,17 +613,15 @@ export const NewBookingModal: React.FC<NewBookingModalProps> = ({
                 ))}
               </select>
             </div>
-          </div>
 
-          <div className="grid grid-cols-2 gap-2.5">
             <div>
-              <label className="block text-slate-700 dark:text-slate-300 mb-1 font-bold text-[11px]">
+              <label className="block text-slate-700 dark:text-slate-300 mb-1 font-bold text-xs">
                 Hora de Inicio <strong className="text-rose-500">*</strong>
               </label>
               <select
                 value={formTime}
                 onChange={(e) => setFormTime(e.target.value)}
-                className="w-full bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-xl px-3 py-2.5 text-xs font-mono font-bold text-[#0B1A2D] dark:text-white focus:outline-none focus:border-[#B7F229]"
+                className="w-full bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-xl px-3 py-2.5 text-xs font-mono font-bold text-[#0B1A2D] dark:text-white focus:outline-none focus:ring-1 focus:ring-[#B7F229] focus:border-[#B7F229] transition shadow-2xs"
               >
                 {timeOptions.map((t) => (
                   <option key={t} value={t}>
@@ -644,13 +632,13 @@ export const NewBookingModal: React.FC<NewBookingModalProps> = ({
             </div>
 
             <div>
-              <label className="block text-slate-700 dark:text-slate-300 mb-1 font-bold text-[11px]">
+              <label className="block text-slate-700 dark:text-slate-300 mb-1 font-bold text-xs">
                 Duración
               </label>
               <select
                 value={formDuration}
                 onChange={(e) => setFormDuration(Number(e.target.value) as 60 | 90 | 120)}
-                className="w-full bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-xl px-3 py-2.5 text-xs font-semibold text-[#0B1A2D] dark:text-white focus:outline-none focus:border-[#B7F229]"
+                className="w-full bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-xl px-3 py-2.5 text-xs font-semibold text-[#0B1A2D] dark:text-white focus:outline-none focus:ring-1 focus:ring-[#B7F229] focus:border-[#B7F229] transition shadow-2xs"
               >
                 <option value={60}>60 min (1 hora)</option>
                 <option value={90}>90 min (1.5h - Predeterminada)</option>
