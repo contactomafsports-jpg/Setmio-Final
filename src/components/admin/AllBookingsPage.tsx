@@ -38,6 +38,7 @@ export const AllBookingsPage: React.FC<AllBookingsPageProps> = ({
     toggleClubOpenState,
     setAdminTab,
     navigateToPlayerProfile,
+    currentTenant,
     t,
   } = useApp();
 
@@ -199,13 +200,13 @@ export const AllBookingsPage: React.FC<AllBookingsPageProps> = ({
   }, [bookings, searchTerm, isConsolidatedView, selectedVenueId, courtFilter, dateFilter, courts]);
 
   return (
-    <div className="space-y-4 text-slate-900 dark:text-slate-100 max-w-7xl mx-auto pb-16 font-sans antialiased">
+    <div className="space-y-4 sm:space-y-5 text-slate-900 dark:text-slate-100 max-w-7xl mx-auto pb-16 font-sans antialiased">
       {/* ======================================================================
-          1. CABECERA LIMPIA Y SIMÉTRICA (ESTILO PARTIDAS / PAGOS)
+          1. CABECERA LIMPIA Y SIMÉTRICA (ESTILO PARTIDAS / PAGOS / RESERVAS)
           ====================================================================== */}
       <section className="pt-2 pb-1 space-y-3" data-purpose="header-section">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-3">
             <button
               type="button"
               onClick={handleGoToAgenda}
@@ -215,9 +216,14 @@ export const AllBookingsPage: React.FC<AllBookingsPageProps> = ({
             >
               <ArrowLeft className="w-5 h-5 stroke-[2.2]" />
             </button>
-            <h1 className="text-[22px] font-extrabold text-[#0B1A2D] dark:text-white tracking-tight leading-tight">
-              {t('allBookings.title', 'Todas las Reservas')}
-            </h1>
+            <div>
+              <span className="text-xs font-medium text-slate-400 dark:text-slate-500 tracking-wide block mb-0.5">
+                {currentTenant?.name || 'Centro de Pádel San Mateo'}
+              </span>
+              <h1 className="text-[22px] font-extrabold text-[#0B1A2D] dark:text-white tracking-tight leading-tight">
+                {t('allBookings.title', 'Todas las Reservas')}
+              </h1>
+            </div>
           </div>
 
           <button
@@ -352,86 +358,102 @@ export const AllBookingsPage: React.FC<AllBookingsPageProps> = ({
       </section>
 
       {/* ======================================================================
-          3. TARJETAS ANALÍTICAS KPIS (DASHBOARD DE MÉTRICAS)
+          3. TARJETAS ANALÍTICAS KPIS (DASHBOARD DE MÉTRICAS BENTO - ESTÁNDAR PARTIDAS)
           ====================================================================== */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-3.5">
+      <section className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4" data-purpose="bento-metrics">
         {/* KPI 1: Total Registradas */}
-        <div className="bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] rounded-2xl p-4 shadow-sm hover:border-slate-300 dark:hover:border-[#244265] transition-colors">
-          <div className="flex items-center justify-between mb-1.5">
-            <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl p-3.5 sm:p-4 border border-slate-200/80 dark:border-slate-800 shadow-2xs flex flex-col justify-between relative overflow-hidden">
+          <div className="flex items-center justify-between">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
               Total Registradas
-            </span>
-            <div className="w-6 h-6 rounded-lg bg-slate-100 dark:bg-[#071220] flex items-center justify-center text-slate-600 dark:text-slate-400">
+            </p>
+            <span className="w-6 h-6 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-400">
               <Calendar className="w-3.5 h-3.5" />
-            </div>
+            </span>
           </div>
-          <div className="text-2xl sm:text-3xl font-black font-mono text-[#0B1A2D] dark:text-white tracking-tight">
-            {totalCount}
+          <div className="my-1.5">
+            <span className="text-3xl font-extrabold text-[#0B1A2D] dark:text-white tracking-tight font-mono">
+              {totalCount}
+            </span>
           </div>
-          <div className="text-[10px] text-slate-400 mt-1 font-medium">
+          <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400 truncate">
             {isConsolidatedView ? 'Todas las sedes' : selectedVenue.shortName || 'Sede activa'}
-          </div>
+          </p>
         </div>
 
-        {/* KPI 2: Confirmadas */}
-        <div className="bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] rounded-2xl p-4 shadow-sm hover:border-slate-300 dark:hover:border-[#244265] transition-colors">
-          <div className="flex items-center justify-between mb-1.5">
-            <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
+        {/* KPI 2: Confirmadas (Con acento corporativo Verde Lima #B7F229) */}
+        <div className="bg-white dark:bg-slate-900 rounded-2xl p-3.5 sm:p-4 border border-[#B7F229]/60 dark:border-[#B7F229]/40 shadow-2xs flex flex-col justify-between relative overflow-hidden">
+          <div className="flex items-center justify-between">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
               Confirmadas
+            </p>
+            <span className="px-1.5 py-0.5 rounded-full bg-[#B7F229] text-[#0B1A2D] text-[9px] font-extrabold uppercase tracking-wide">
+              Activo
             </span>
-            <div className="w-6 h-6 rounded-lg bg-[#F0FCCF] dark:bg-[#B7F229]/20 flex items-center justify-center text-[#0B1A2D] dark:text-[#B7F229]">
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-[#B7F229]" />
-            </div>
           </div>
-          <div className="text-2xl sm:text-3xl font-black font-mono text-emerald-600 dark:text-[#B7F229] tracking-tight">
-            {confirmedCount}
+          <div className="my-1.5 flex items-baseline gap-1.5">
+            <span className="text-3xl font-extrabold text-[#0B1A2D] dark:text-[#B7F229] tracking-tight font-mono">
+              {confirmedCount}
+            </span>
+            <span className="w-2 h-2 rounded-full bg-[#B7F229]"></span>
           </div>
-          <div className="text-[10px] text-emerald-600 dark:text-emerald-400 mt-1 font-medium">
+          <p className="text-[11px] font-semibold text-[#0B1A2D] dark:text-[#B7F229] truncate">
             {totalCount > 0 ? `${Math.round((confirmedCount / totalCount) * 100)}% de ocupación` : 'Sin registros'}
-          </div>
+          </p>
         </div>
 
-        {/* KPI 3: Pendiente TPV */}
-        <div className="bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] rounded-2xl p-4 shadow-sm hover:border-slate-300 dark:hover:border-[#244265] transition-colors">
-          <div className="flex items-center justify-between mb-1.5">
-            <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
+        {/* KPI 3: Pendiente TPV (Con acento cromático violeta corporativo #8B5CF6) */}
+        <div className="bg-white dark:bg-slate-900 rounded-2xl p-3.5 sm:p-4 border border-slate-200/80 dark:border-slate-800 shadow-2xs flex flex-col justify-between relative overflow-hidden transition-colors hover:border-[#8B5CF6]/50 dark:hover:border-[#8B5CF6]/60">
+          <div className="flex items-center justify-between gap-1.5">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
               Pendiente TPV
+            </p>
+            {pendingCount > 0 ? (
+              <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-[#EDE9FE] dark:bg-[#8B5CF6]/20 text-[#6D28D9] dark:text-[#C4B5FD] text-[10px] font-bold border border-[#8B5CF6]/30 whitespace-nowrap shrink-0">
+                {pendingCount} pend.
+              </span>
+            ) : (
+              <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-[#F0FCCF] dark:bg-[#B7F229]/20 text-[#0B1A2D] dark:text-[#B7F229] text-[10px] font-bold border border-[#B7F229]/50 whitespace-nowrap shrink-0">
+                Al día
+              </span>
+            )}
+          </div>
+          <div className="my-1.5 flex items-baseline gap-1.5">
+            <span className="text-3xl font-extrabold text-[#7C3AED] dark:text-[#C4B5FD] tracking-tight font-mono">
+              {pendingCount}
             </span>
-            <div className="w-6 h-6 rounded-lg bg-amber-50 dark:bg-amber-950/60 flex items-center justify-center text-amber-600 dark:text-amber-400">
-              <Clock className="w-3.5 h-3.5" />
-            </div>
+            {pendingCount > 0 && <span className="w-2 h-2 rounded-full bg-[#8B5CF6] animate-pulse"></span>}
           </div>
-          <div className="text-2xl sm:text-3xl font-black font-mono text-amber-600 dark:text-amber-400 tracking-tight">
-            {pendingCount}
-          </div>
-          <div className="text-[10px] text-slate-400 mt-1 font-medium">
+          <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400 truncate">
             Cobro en mostrador / split
-          </div>
+          </p>
         </div>
 
         {/* KPI 4: Facturación Total */}
-        <div className="bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] rounded-2xl p-4 shadow-sm hover:border-slate-300 dark:hover:border-[#244265] transition-colors">
-          <div className="flex items-center justify-between mb-1.5">
-            <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl p-3.5 sm:p-4 border border-slate-200/80 dark:border-slate-800 shadow-2xs flex flex-col justify-between relative overflow-hidden">
+          <div className="flex items-center justify-between">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
               Facturación Total
-            </span>
-            <div className="w-6 h-6 rounded-lg bg-slate-100 dark:bg-[#071220] flex items-center justify-center text-[#0B1A2D] dark:text-[#B7F229]">
+            </p>
+            <span className="w-6 h-6 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-[#0B1A2D] dark:text-[#B7F229]">
               <CreditCard className="w-3.5 h-3.5" />
-            </div>
+            </span>
           </div>
-          <div className="text-2xl sm:text-3xl font-black font-mono text-[#0B1A2D] dark:text-white tracking-tight">
-            {totalAmountSum.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €
+          <div className="my-1.5">
+            <span className="text-3xl font-extrabold text-[#0B1A2D] dark:text-white tracking-tight font-mono">
+              {totalAmountSum.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €
+            </span>
           </div>
-          <div className="text-[10px] text-slate-400 mt-1 font-medium">
+          <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400 truncate">
             Tarifas de pista sumadas
-          </div>
+          </p>
         </div>
-      </div>
+      </section>
 
       {/* ======================================================================
           4. BARRA DE BÚSQUEDA Y FILTROS MINIMALISTAS (SIN CONTENEDORES PESADOS)
           ====================================================================== */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 pt-1">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-1">
         {/* Buscador minimalista */}
         <div className="relative flex-1 min-w-0">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
@@ -440,7 +462,7 @@ export const AllBookingsPage: React.FC<AllBookingsPageProps> = ({
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Buscar por titular, pista o PIN..."
-            className="w-full pl-9 pr-8 py-2.5 bg-white dark:bg-[#0E2239] border border-slate-200/90 dark:border-[#1A314D] rounded-xl text-xs text-[#0B1A2D] dark:text-white placeholder-slate-400 focus:outline-none focus:border-[#B7F229] transition shadow-2xs"
+            className="w-full h-10 pl-9.5 pr-8 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-xl text-xs text-[#0B1A2D] dark:text-white placeholder-slate-400 focus:outline-none focus:border-[#B7F229] transition shadow-2xs"
           />
           {searchTerm && (
             <button
@@ -453,42 +475,35 @@ export const AllBookingsPage: React.FC<AllBookingsPageProps> = ({
           )}
         </div>
 
-        {/* Selectores Dinámicos: Pista y Fecha sin envolventes pesadas */}
-        <div className="flex items-center gap-2 shrink-0">
-          {/* Selector de Pista Dinámico (Filtrado por sede activa) */}
-          <select
-            value={courtFilter}
-            onChange={(e) => setCourtFilter(e.target.value)}
-            className="px-3 py-2.5 bg-white dark:bg-[#0E2239] border border-slate-200/90 dark:border-[#1A314D] rounded-xl text-xs text-[#0B1A2D] dark:text-slate-200 focus:outline-none focus:border-[#B7F229] transition font-bold min-w-[130px] shadow-2xs cursor-pointer"
-            title="Filtrar por pista de la sede activa"
-          >
-            <option value="all">Todas las Pistas</option>
-            {availableCourts.map((court) => (
-              <option key={court.id} value={court.id}>
-                {court.name}
-              </option>
-            ))}
-          </select>
+        {/* Selectores Dinámicos: Pista y Fecha con padding holgado en flechas */}
+        <div className="grid grid-cols-2 sm:flex sm:items-center gap-3 shrink-0">
+          {/* Selector de Pista Dinámico con ChevronDown y padding pr-8 */}
+          <div className="relative min-w-[140px]">
+            <select
+              value={courtFilter}
+              onChange={(e) => setCourtFilter(e.target.value)}
+              className="w-full h-10 pl-3.5 pr-8 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-xl text-xs font-semibold text-[#0B1A2D] dark:text-slate-200 focus:outline-none focus:border-[#B7F229] transition shadow-2xs cursor-pointer appearance-none"
+              title="Filtrar por pista de la sede activa"
+            >
+              <option value="all">Todas las Pistas</option>
+              {availableCourts.map((court) => (
+                <option key={court.id} value={court.id}>
+                  {court.name}
+                </option>
+              ))}
+            </select>
+            <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 pointer-events-none" />
+          </div>
 
-          {/* Selector de Fecha (con fecha de hoy por defecto) */}
-          <div className="flex items-center gap-1">
+          {/* Selector de Fecha Simétrico con exactamente el mismo padding derecho pr-8 que el de pistas */}
+          <div className="relative min-w-[140px]">
             <input
               type="date"
               value={dateFilter}
-              onChange={(e) => setDateFilter(e.target.value)}
-              className="px-2.5 py-2.5 bg-white dark:bg-[#0E2239] border border-slate-200/90 dark:border-[#1A314D] rounded-xl text-xs text-[#0B1A2D] dark:text-slate-200 focus:outline-none focus:border-[#B7F229] transition font-semibold min-w-[135px] shadow-2xs cursor-pointer"
+              onChange={(e) => setDateFilter(e.target.value || todayStr)}
+              className="w-full h-10 pl-3.5 pr-8 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-xl text-xs font-semibold text-[#0B1A2D] dark:text-slate-200 focus:outline-none focus:border-[#B7F229] transition shadow-2xs cursor-pointer [&::-webkit-calendar-picker-indicator]:cursor-pointer [&::-webkit-calendar-picker-indicator]:opacity-70 hover:[&::-webkit-calendar-picker-indicator]:opacity-100"
               title="Filtrar por fecha específica"
             />
-            {dateFilter && (
-              <button
-                type="button"
-                onClick={() => setDateFilter('')}
-                className="text-xs text-slate-400 hover:text-rose-500 font-bold px-1.5 py-1 rounded cursor-pointer shrink-0 transition"
-                title="Limpiar filtro de fecha (ver histórico completo)"
-              >
-                ✕
-              </button>
-            )}
           </div>
         </div>
       </div>
@@ -515,15 +530,15 @@ export const AllBookingsPage: React.FC<AllBookingsPageProps> = ({
               No se encontraron reservas
             </h3>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-sm mx-auto">
-              No hay registros que coincidan con los filtros seleccionados. Prueba a cambiar la fecha o limpiar los filtros.
+              No hay registros que coincidan con los filtros seleccionados. Prueba a cambiar la fecha o seleccionar otra pista.
             </p>
-            {dateFilter && (
+            {dateFilter && dateFilter !== todayStr && (
               <button
                 type="button"
-                onClick={() => setDateFilter('')}
-                className="mt-3 px-3 py-1.5 bg-[#0B1A2D] dark:bg-[#B7F229] text-white dark:text-[#0B1A2D] rounded-xl text-xs font-bold transition hover:opacity-90 active:scale-95 cursor-pointer"
+                onClick={() => setDateFilter(todayStr)}
+                className="mt-3 px-3.5 py-1.5 bg-[#0B1A2D] dark:bg-[#B7F229] text-white dark:text-[#0B1A2D] rounded-xl text-xs font-bold transition hover:opacity-90 active:scale-95 cursor-pointer"
               >
-                Ver todo el histórico
+                Volver a la fecha actual
               </button>
             )}
           </div>

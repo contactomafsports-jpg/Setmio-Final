@@ -304,14 +304,16 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
           CONTENEDOR PRINCIPAL
           ====================================================================== */}
       <div className="flex-1 flex flex-col min-w-0">
-        {/* Header Superior Nativo Modular */}
-        <AdminHeader
-          onOpenProfileModal={() => setIsProfileModalOpen(true)}
-          onSelectTab={handleSelectTab}
-        />
+        {/* Header Superior Nativo Modular (Oculto en páginas secundarias de Nivel 2 como 'all_bookings') */}
+        {adminTab !== 'all_bookings' && (
+          <AdminHeader
+            onOpenProfileModal={() => setIsProfileModalOpen(true)}
+            onSelectTab={handleSelectTab}
+          />
+        )}
 
         {/* Contenido Dinámico de la Pestaña Activa con márgenes optimizados px-3.5 */}
-        <main className="flex-1 px-3.5 py-3 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto">
+        <main className={`flex-1 px-3.5 py-3 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto ${adminTab === 'all_bookings' ? 'pt-4 sm:pt-6' : ''}`}>
           {children}
         </main>
       </div>

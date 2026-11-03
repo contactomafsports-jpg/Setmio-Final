@@ -3,7 +3,6 @@ import { useApp, INITIAL_VENUES } from '../../context/AppContext';
 import { Booking, Court } from '../../types/database';
 import { ReservationDrawer, ReservationDrawerData } from './ReservationDrawer';
 import { BookingListItem, BookingListItemData } from './BookingListItem';
-import { AllBookingsPage } from './AllBookingsPage';
 import { NewBookingModal } from './NewBookingModal';
 import {
   Calendar,
@@ -131,15 +130,6 @@ export const AdminAgenda: React.FC = () => {
   const [isVenueSelectorOpen, setIsVenueSelectorOpen] = useState(false);
   const [selectedDrawerData, setSelectedDrawerData] = useState<ReservationDrawerData | null>(null);
   const [showNewModal, setShowNewModal] = useState(false);
-  const [showAllBookingsView, setShowAllBookingsView] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return (
-        window.location.pathname.includes('/reservas/todas') ||
-        window.location.pathname.includes('/todas-las-reservas')
-      );
-    }
-    return false;
-  });
   const dateInputRef = React.useRef<HTMLInputElement>(null);
 
   // Sync with browser URL changes and deep links for /admin/reservas/:id
@@ -148,7 +138,10 @@ export const AdminAgenda: React.FC = () => {
       if (typeof window !== 'undefined') {
         const path = window.location.pathname;
         const isAll = path.includes('/reservas/todas') || path.includes('/todas-las-reservas');
-        setShowAllBookingsView(isAll);
+        if (isAll) {
+          setAdminTab('all_bookings');
+          return;
+        }
 
         const match = path.match(/\/(?:admin|gestion)\/reservas\/([^/]+)$/);
         if (match && match[1] && match[1] !== 'todas') {
@@ -1052,25 +1045,7 @@ export const AdminAgenda: React.FC = () => {
         }}
       />
 
-      {/* ======================================================================
-          4. MODAL EXPANSIVO / OVERLAY PROFESIONAL: HISTORIAL RESERVAS
-          (Conserva exactamente el contexto de navegación para regresar al cuadrante)
-          ====================================================================== */}
-      {showAllBookingsView && (
-        <div className="fixed inset-0 md:left-64 z-50 bg-slate-50 dark:bg-[#0B1A2D] overflow-y-auto pb-24 md:pb-8 pt-3 sm:pt-4 px-3.5 sm:px-6 lg:px-8 animate-in fade-in duration-150" data-level="2">
-          <div className="max-w-7xl mx-auto">
-            <AllBookingsPage
-              onBackToQuadrant={() => {
-                setShowAllBookingsView(false);
-                if (typeof window !== 'undefined') {
-                  window.history.pushState({}, '', '/admin/reservas');
-                }
-                setAdminTab('agenda');
-              }}
-            />
-          </div>
-        </div>
-      )}
+
 
       {/* MODAL NUEVA RESERVA EN MOSTRADOR */}
       <NewBookingModal
