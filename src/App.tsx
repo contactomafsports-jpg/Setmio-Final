@@ -47,6 +47,7 @@ import { AdminSchool } from './components/admin/AdminSchool';
 import { AdminTournaments } from './components/admin/AdminTournaments';
 import { AdminMatches } from './components/admin/AdminMatches';
 import { NewMatchPage } from './components/admin/NewMatchPage';
+import { NewBookingPage } from './components/admin/NewBookingPage';
 import { AdminShopOrders } from './components/admin/AdminShopOrders';
 import { AdminSmartCourts } from './components/admin/AdminSmartCourts';
 import { AdminCafePOS } from './components/admin/AdminCafePOS';
@@ -175,6 +176,7 @@ export function App() {
           setCurrentView('admin');
           if (remaining.includes('/partidas/nueva') || remaining.includes('/nueva-partida')) setAdminTab('new_match');
           else if (remaining.includes('/partidas')) setAdminTab('matches');
+          else if (remaining.includes('/reservas/nueva') || remaining.includes('/nueva-reserva')) setAdminTab('new_booking');
           else if (remaining.includes('/reservas/todas') || remaining.includes('/todas-las-reservas')) setAdminTab('all_bookings');
           else if (remaining.includes('/reservas')) setAdminTab('agenda');
           else if (remaining.includes('/pistas') || remaining.includes('/domotica')) setAdminTab('courts_management');
@@ -258,6 +260,15 @@ export function App() {
       ) {
         setCurrentView('admin');
         setAdminTab('matches');
+        return;
+      }
+      if (
+        pathname === '/admin/reservas/nueva' ||
+        pathname === '/gestion/reservas/nueva' ||
+        pathname === '/gestion/nueva-reserva'
+      ) {
+        setCurrentView('admin');
+        setAdminTab('new_booking');
         return;
       }
       if (
@@ -512,6 +523,17 @@ export function App() {
         return <AdminAgenda />;
       case 'all_bookings':
         return <AllBookingsPage onBackToQuadrant={() => setAdminTab('agenda')} />;
+      case 'new_booking':
+        return (
+          <NewBookingPage
+            onBack={() => {
+              setAdminTab('agenda');
+              if (typeof window !== 'undefined') {
+                window.history.pushState({}, '', '/gestion/reservas');
+              }
+            }}
+          />
+        );
       case 'courts_management': {
         const hasNoCourtsInfrastructure =
           currentTenant.type === 'COACH' ||

@@ -2755,44 +2755,51 @@ export const AdminCafePOS: React.FC = () => {
           FORMULARIO NUEVO / EDITAR PRODUCTO (CON SELECTOR DE CATEGORÍA OBLIGATORIO Y ACCESO DIRECTO PARA CREAR NUEVA)
           ====================================================================== */}
       {productFormModalOpen && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-[#0B1A2D]/75 backdrop-blur-sm p-4 overflow-hidden animate-in fade-in duration-150">
-          <div className="relative w-full max-w-md bg-white dark:bg-[#0E2239] border border-slate-200 dark:border-[#1A314D] rounded-3xl p-6 shadow-2xl text-slate-900 dark:text-slate-100 space-y-4 max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between border-b border-slate-100 dark:border-[#1A314D] pb-3">
-              <h3 className="text-base font-black text-[#0B1A2D] dark:text-white">
+        <div className="fixed inset-0 z-50 flex flex-col bg-slate-950/60 dark:bg-black/75 backdrop-blur-xs overflow-y-auto sm:p-4 lg:p-6 sm:items-center sm:justify-center animate-in fade-in duration-150">
+          <div className="w-full min-h-screen sm:min-h-0 sm:max-w-lg bg-white dark:bg-[#071220] sm:rounded-3xl shadow-2xl flex flex-col border-0 sm:border sm:border-slate-200/90 dark:sm:border-[#1A314D] overflow-hidden my-auto">
+            {/* Cabecera Limpia y Exclusiva con botón X */}
+            <div className="sticky top-0 z-20 px-5 sm:px-6 py-4 border-b border-slate-100 dark:border-[#1A314D] flex items-center justify-between bg-white/95 dark:bg-[#071220]/95 backdrop-blur-md shrink-0">
+              <h2 className="text-lg sm:text-xl font-black text-[#0B1A2D] dark:text-white tracking-tight">
                 {editingProduct ? 'Editar Producto TPV' : 'Nuevo Producto TPV'}
-              </h3>
+              </h2>
               <button
                 type="button"
                 onClick={() => setProductFormModalOpen(false)}
-                className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-white cursor-pointer"
+                className="p-2 -mr-1.5 text-slate-400 hover:text-slate-700 dark:hover:text-white rounded-xl hover:bg-slate-100 dark:hover:bg-[#0E2239] transition-colors cursor-pointer shrink-0"
+                title="Cerrar formulario"
+                aria-label="Cerrar"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleSaveProductSubmit} className="space-y-3.5 text-xs">
+            {/* Contenido sin scrollbars anidadas - Estilo Linear/Stripe */}
+            <form onSubmit={handleSaveProductSubmit} className="p-5 sm:p-6 space-y-4 sm:space-y-5 text-xs text-slate-900 dark:text-slate-100 flex-1">
+              {/* Nombre del Producto */}
               <div>
-                <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">Nombre del Producto</label>
+                <label className="block text-slate-700 dark:text-slate-300 font-bold mb-1.5 text-xs">
+                  Nombre del Producto <span className="text-rose-500">*</span>
+                </label>
                 <input
                   type="text"
                   required
                   value={productFormData.name}
                   onChange={(e) => setProductFormData({ ...productFormData, name: e.target.value })}
                   placeholder="Ej: Zumo de Naranja Natural"
-                  className="w-full px-3 py-2 bg-slate-50 dark:bg-[#071220] border border-slate-200 dark:border-[#1A314D] rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-[#8B5CF6]"
+                  className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-xl text-xs font-semibold text-[#0B1A2D] dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-[#B7F229] focus:border-[#B7F229] transition shadow-2xs"
                 />
               </div>
 
-              {/* Selector Obligatorio de Categoría + Acceso Directo Limpio para Crear Nueva Categoría */}
+              {/* Selector Obligatorio de Categoría + Acceso Directo para Crear Nueva */}
               <div>
-                <div className="flex items-center justify-between mb-1">
-                  <label className="block font-bold text-slate-700 dark:text-slate-300">
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="block text-slate-700 dark:text-slate-300 font-bold text-xs">
                     Categoría <span className="text-rose-500">*</span>
                   </label>
                   <button
                     type="button"
                     onClick={() => setShowInlineNewCategory(!showInlineNewCategory)}
-                    className="text-[11px] font-bold text-[#8B5CF6] hover:text-[#7c3aed] flex items-center gap-1 cursor-pointer"
+                    className="text-[11px] font-bold text-[#8B5CF6] hover:text-[#7c3aed] flex items-center gap-1 cursor-pointer transition"
                   >
                     {showInlineNewCategory ? (
                       <span>Cancelar</span>
@@ -2812,12 +2819,12 @@ export const AdminCafePOS: React.FC = () => {
                       placeholder="Nombre de la nueva categoría..."
                       value={inlineCategoryName}
                       onChange={(e) => setInlineCategoryName(e.target.value)}
-                      className="flex-1 px-3 py-2 bg-slate-50 dark:bg-[#071220] border border-[#8B5CF6] rounded-xl text-xs font-semibold text-slate-900 dark:text-white focus:outline-none"
+                      className="flex-1 px-3.5 py-2.5 bg-slate-50 dark:bg-[#071220] border border-[#8B5CF6] rounded-xl text-xs font-semibold text-[#0B1A2D] dark:text-white focus:outline-none focus:ring-1 focus:ring-[#8B5CF6]"
                     />
                     <button
                       type="button"
                       onClick={handleCreateInlineCategory}
-                      className="px-3.5 py-2 bg-[#0B1A2D] hover:bg-[#132A45] text-white rounded-xl font-bold text-xs flex items-center gap-1 cursor-pointer shrink-0"
+                      className="px-4 py-2.5 bg-[#0B1A2D] hover:bg-[#132A45] text-white rounded-xl font-bold text-xs flex items-center gap-1.5 cursor-pointer shrink-0 transition"
                     >
                       <Check className="w-3.5 h-3.5 text-[#B7F229]" />
                       <span>Crear</span>
@@ -2828,7 +2835,7 @@ export const AdminCafePOS: React.FC = () => {
                     required
                     value={productFormData.category}
                     onChange={(e) => setProductFormData({ ...productFormData, category: e.target.value })}
-                    className="w-full px-3 py-2 bg-slate-50 dark:bg-[#071220] border border-slate-200 dark:border-[#1A314D] rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-[#8B5CF6] font-semibold"
+                    className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-xl text-xs font-semibold text-[#0B1A2D] dark:text-white focus:outline-none focus:ring-1 focus:ring-[#B7F229] focus:border-[#B7F229] transition shadow-2xs"
                   >
                     {customCategories.map((c) => (
                       <option key={c} value={c}>
@@ -2839,26 +2846,31 @@ export const AdminCafePOS: React.FC = () => {
                 )}
               </div>
 
+              {/* Precio y Stock Inicial - Retícula limpia 2 columnas */}
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">Precio (€)</label>
+                  <label className="block text-slate-700 dark:text-slate-300 font-bold mb-1.5 text-xs">
+                    Precio (€) <span className="text-rose-500">*</span>
+                  </label>
                   <input
                     type="number"
                     step="0.10"
                     required
                     value={productFormData.price}
                     onChange={(e) => setProductFormData({ ...productFormData, price: parseFloat(e.target.value) || 0 })}
-                    className="w-full px-3 py-2 bg-slate-50 dark:bg-[#071220] border border-slate-200 dark:border-[#1A314D] rounded-xl font-mono text-slate-900 dark:text-white focus:outline-none focus:border-[#8B5CF6]"
+                    className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-xl text-xs font-mono font-bold text-[#0B1A2D] dark:text-white focus:outline-none focus:ring-1 focus:ring-[#B7F229] focus:border-[#B7F229] transition shadow-2xs"
                   />
                 </div>
 
                 <div>
-                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">Stock Inicial (uds)</label>
+                  <label className="block text-slate-700 dark:text-slate-300 font-bold mb-1.5 text-xs">
+                    Stock Inicial (uds)
+                  </label>
                   <input
                     type="number"
                     value={productFormData.stock}
                     onChange={(e) => setProductFormData({ ...productFormData, stock: parseInt(e.target.value) || 0 })}
-                    className="w-full px-3 py-2 bg-slate-50 dark:bg-[#071220] border border-slate-200 dark:border-[#1A314D] rounded-xl font-mono text-slate-900 dark:text-white focus:outline-none focus:border-[#8B5CF6]"
+                    className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-xl text-xs font-mono font-bold text-[#0B1A2D] dark:text-white focus:outline-none focus:ring-1 focus:ring-[#B7F229] focus:border-[#B7F229] transition shadow-2xs"
                   />
                 </div>
               </div>
@@ -2866,13 +2878,13 @@ export const AdminCafePOS: React.FC = () => {
               {/* Selector de Sede Asignada al Producto */}
               {venues && venues.length > 0 && (
                 <div>
-                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  <label className="block text-slate-700 dark:text-slate-300 font-bold mb-1.5 text-xs">
                     Sede Asignada
                   </label>
                   <select
                     value={productFormData.venueId}
                     onChange={(e) => setProductFormData({ ...productFormData, venueId: e.target.value })}
-                    className="w-full px-3 py-2 bg-slate-50 dark:bg-[#071220] border border-slate-200 dark:border-[#1A314D] rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-[#8B5CF6] font-semibold"
+                    className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-xl text-xs font-semibold text-[#0B1A2D] dark:text-white focus:outline-none focus:ring-1 focus:ring-[#B7F229] focus:border-[#B7F229] transition shadow-2xs"
                   >
                     {venues.map((v) => (
                       <option key={`prod-form-venue-${v.id}`} value={v.id}>
@@ -2883,12 +2895,14 @@ export const AdminCafePOS: React.FC = () => {
                 </div>
               )}
 
-              <div>
-                <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
-                  Imagen del Producto (URL o Presets)
+              {/* Imagen del Producto (URL o Presets) */}
+              <div className="space-y-2">
+                <label className="block text-slate-700 dark:text-slate-300 font-bold text-xs">
+                  Imagen del Producto
                 </label>
+
                 {productFormData.imageUrl && (
-                  <div className="relative mb-2 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-950 h-28 flex items-center justify-center">
+                  <div className="relative rounded-2xl overflow-hidden border border-slate-200/80 dark:border-[#1A314D] bg-slate-50 dark:bg-[#071220] h-32 flex items-center justify-center">
                     <img
                       src={productFormData.imageUrl}
                       alt="Vista previa"
@@ -2901,7 +2915,7 @@ export const AdminCafePOS: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => setProductFormData({ ...productFormData, imageUrl: '' })}
-                      className="absolute top-1.5 right-1.5 p-1 rounded-lg bg-black/60 text-white hover:bg-black transition text-xs cursor-pointer"
+                      className="absolute top-2 right-2 p-1.5 rounded-xl bg-slate-900/70 hover:bg-slate-900 text-white transition cursor-pointer"
                       title="Eliminar imagen"
                     >
                       <X className="w-3.5 h-3.5" />
@@ -2910,20 +2924,20 @@ export const AdminCafePOS: React.FC = () => {
                 )}
 
                 {/* Presets de imágenes de catálogo oficiales */}
-                <div className="mb-2">
-                  <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">
-                    Presets de imagen recomendados:
+                <div>
+                  <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1.5">
+                    Presets de imagen recomendados
                   </span>
-                  <div className="flex flex-wrap gap-1">
+                  <div className="flex flex-wrap gap-1.5">
                     {PRESET_PRODUCT_IMAGES.map((imgItem) => (
                       <button
                         key={imgItem.label}
                         type="button"
                         onClick={() => setProductFormData({ ...productFormData, imageUrl: imgItem.url })}
-                        className={`px-2 py-0.5 rounded-lg text-[10px] font-bold border transition cursor-pointer ${
+                        className={`px-2.5 py-1 rounded-lg text-[11px] font-bold border transition cursor-pointer ${
                           productFormData.imageUrl === imgItem.url
-                            ? 'bg-[#8B5CF6]/15 border-[#8B5CF6] text-[#8B5CF6]'
-                            : 'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-slate-300'
+                            ? 'bg-[#0B1A2D] text-white dark:bg-[#B7F229] dark:text-[#0B1A2D] border-transparent shadow-xs'
+                            : 'bg-slate-100 dark:bg-[#071220] border-slate-200/80 dark:border-[#1A314D] text-slate-600 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-700'
                         }`}
                       >
                         {imgItem.label}
@@ -2932,15 +2946,16 @@ export const AdminCafePOS: React.FC = () => {
                   </div>
                 </div>
 
+                {/* Input URL + Botón Subir Archivo */}
                 <div className="flex gap-2">
                   <input
                     type="url"
                     value={productFormData.imageUrl}
                     onChange={(e) => setProductFormData({ ...productFormData, imageUrl: e.target.value })}
-                    placeholder="URL imagen (https://...)"
-                    className="flex-1 px-3 py-2 bg-slate-50 dark:bg-[#071220] border border-slate-200 dark:border-[#1A314D] rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-[#8B5CF6]"
+                    placeholder="URL de imagen (https://...)"
+                    className="flex-1 px-3.5 py-2.5 bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-xl text-xs font-medium text-[#0B1A2D] dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-[#B7F229] focus:border-[#B7F229] transition shadow-2xs"
                   />
-                  <label className="px-3 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-[#0B1A2D] dark:text-slate-300 font-bold rounded-xl cursor-pointer flex items-center gap-1 shrink-0 transition text-xs border border-slate-200/80 dark:border-slate-700/80">
+                  <label className="px-3.5 py-2.5 bg-slate-100 hover:bg-slate-200 dark:bg-[#0E2239] dark:hover:bg-[#132A45] text-slate-700 dark:text-slate-300 font-bold rounded-xl cursor-pointer flex items-center gap-1.5 shrink-0 transition text-xs border border-slate-200/80 dark:border-[#1A314D]">
                     <Upload className="w-3.5 h-3.5 text-[#8B5CF6]" />
                     <span>Subir</span>
                     <input
@@ -2963,23 +2978,27 @@ export const AdminCafePOS: React.FC = () => {
                   </label>
                 </div>
               </div>
+            </form>
 
-              <div className="pt-3 border-t border-slate-100 dark:border-[#1A314D] flex justify-end gap-2">
+            {/* Modal Footer Sólido y Simétrico a Ancho Completo (Distribución Equitativa 50/50) */}
+            <div className="sticky bottom-0 z-20 px-5 sm:px-6 py-3.5 sm:py-4 border-t border-slate-100 dark:border-[#1A314D] bg-white/95 dark:bg-[#071220]/95 backdrop-blur-md shrink-0">
+              <div className="grid grid-cols-2 gap-3 w-full">
                 <button
                   type="button"
                   onClick={() => setProductFormModalOpen(false)}
-                  className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold"
+                  className="w-full py-3 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-[#0E2239] dark:hover:bg-[#132A45] text-slate-700 dark:text-slate-300 font-bold text-xs sm:text-sm border border-slate-200/80 dark:border-[#1A314D] transition cursor-pointer active:scale-[0.99] flex items-center justify-center text-center whitespace-nowrap"
                 >
-                  Cancelar
+                  <span>Cancelar</span>
                 </button>
                 <button
-                  type="submit"
-                  className="px-5 py-2 rounded-xl bg-[#B7F229] hover:bg-[#a6e61f] text-[#0B1A2D] font-black shadow-xs cursor-pointer active:scale-95"
+                  type="button"
+                  onClick={handleSaveProductSubmit}
+                  className="w-full py-3 px-3 rounded-xl bg-[#0B1A2D] hover:bg-[#132A45] text-white dark:bg-[#B7F229] dark:hover:bg-[#a6e61f] dark:text-[#0B1A2D] font-bold text-xs sm:text-sm border border-transparent shadow-md transition active:scale-[0.99] cursor-pointer flex items-center justify-center text-center whitespace-nowrap"
                 >
-                  Guardar Producto
+                  <span>Guardar Producto</span>
                 </button>
               </div>
-            </form>
+            </div>
           </div>
         </div>
       )}

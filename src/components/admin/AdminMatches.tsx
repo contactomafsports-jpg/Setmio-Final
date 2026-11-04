@@ -40,7 +40,7 @@ import {
   Target,
   ChevronDown,
 } from 'lucide-react';
-import { NewMatchPage } from './NewMatchPage';
+import { NewMatchModal } from './NewMatchModal';
 
 export const AdminMatches: React.FC = () => {
   const {
@@ -2340,13 +2340,13 @@ export const AdminMatches: React.FC = () => {
       )}
 
       {/* ======================================================================
-          VISTA DE NIVEL 2 / MODAL 2: NUEVA PARTIDA A PANTALLA COMPLETA
+          MODAL A PANTALLA COMPLETA (FULL-SCREEN SHEET): NUEVA PARTIDA
           ====================================================================== */}
-      {showCreateModal && (
-        <div className="fixed inset-0 z-50 bg-slate-50 dark:bg-[#0B1A2D] overflow-y-auto p-3.5 sm:p-6 lg:p-8 animate-in fade-in duration-150">
-          <NewMatchPage onBack={() => setShowCreateModal(false)} />
-        </div>
-      )}
+      <NewMatchModal
+        isOpen={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+        defaultVenueId={selectedVenueId !== 'all' ? selectedVenueId : undefined}
+      />
 
       {/* ======================================================================
           MODAL 3: INSCRIBIR O INVITAR JUGADOR (Socio Registrado / WhatsApp / Email)

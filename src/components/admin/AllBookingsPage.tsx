@@ -95,7 +95,10 @@ export const AllBookingsPage: React.FC<AllBookingsPageProps> = ({
   };
 
   const handleOpenNewBooking = () => {
-    setIsNewBookingModalOpen(true);
+    setAdminTab('new_booking');
+    if (typeof window !== 'undefined') {
+      window.history.pushState({}, '', '/gestion/reservas/nueva');
+    }
   };
 
   // Convert Booking to Drawer & ListItem data

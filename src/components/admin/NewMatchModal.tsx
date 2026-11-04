@@ -3,18 +3,12 @@ import { useApp } from '../../context/AppContext';
 import { OpenMatch } from '../../types/database';
 import {
   X,
-  Trophy,
   Users,
-  Calendar,
-  Clock,
-  Building2,
   Shield,
   UserCheck,
-  CheckCircle2,
-  Search,
-  Sparkles,
-  DollarSign,
-  Tag,
+  Building2,
+  Calendar,
+  Clock,
 } from 'lucide-react';
 
 export interface NewMatchModalProps {
@@ -41,8 +35,6 @@ export const NewMatchModal: React.FC<NewMatchModalProps> = ({
     customers,
     currentTenant,
     triggerDemoToast,
-    sendNotification,
-    t,
   } = useApp();
 
   const todayStr = useMemo(() => {
@@ -70,8 +62,6 @@ export const NewMatchModal: React.FC<NewMatchModalProps> = ({
   const [creatorName, setCreatorName] = useState('Club ' + (currentTenant?.name || 'Pádel'));
   const [creatorLevel, setCreatorLevel] = useState(4.0);
   const [creatorPosition, setCreatorPosition] = useState<'drive' | 'reves' | 'both'>('drive');
-  const [creatorSearchQuery, setCreatorSearchQuery] = useState('');
-  const [isCreatorDropdownOpen, setIsCreatorDropdownOpen] = useState(false);
 
   const [minLevel, setMinLevel] = useState(3.0);
   const [maxLevel, setMaxLevel] = useState(4.5);
@@ -96,6 +86,15 @@ export const NewMatchModal: React.FC<NewMatchModalProps> = ({
       setSelectedCourtId(availableCourts[0].id);
     }
   }, [availableCourts, selectedCourtId]);
+
+  // Sync default props when modal opens
+  React.useEffect(() => {
+    if (isOpen) {
+      if (defaultDate) setMatchDate(defaultDate);
+      if (defaultCourtId) setSelectedCourtId(defaultCourtId);
+      if (defaultVenueId && defaultVenueId !== 'all') setModalVenueId(defaultVenueId);
+    }
+  }, [isOpen, defaultDate, defaultCourtId, defaultVenueId]);
 
   if (!isOpen) return null;
 
@@ -172,41 +171,31 @@ export const NewMatchModal: React.FC<NewMatchModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/75 backdrop-blur-sm animate-in fade-in duration-150">
-      <div className="relative w-full max-w-lg bg-white dark:bg-[#0E2239] border border-slate-200/90 dark:border-[#1A314D] rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[92vh]">
-        {/* Cabecera Nivel 4 (Formulario) con Cruz alineada estrictamente arriba a la derecha */}
-        <div className="p-4 sm:p-5 border-b border-slate-100 dark:border-[#1A314D] flex items-center justify-between shrink-0 bg-white dark:bg-[#0E2239]">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-[#0B1A2D] text-[#B7F229] flex items-center justify-center font-bold shrink-0">
-              <Trophy className="w-5 h-5 stroke-[2.2]" />
-            </div>
-            <div>
-              <h3 className="text-base sm:text-lg font-black text-[#0B1A2D] dark:text-white">
-                Nueva Partida Abierta
-              </h3>
-              <p className="text-xs text-slate-400">
-                Convocatoria de juego, cuota por plaza y asignación de pista
-              </p>
-            </div>
-          </div>
-
+    <div className="fixed inset-0 z-50 flex flex-col bg-slate-950/60 dark:bg-black/75 backdrop-blur-xs overflow-y-auto sm:p-4 lg:p-6 sm:items-center sm:justify-center animate-in fade-in duration-150">
+      <div className="w-full min-h-screen sm:min-h-0 sm:max-w-2xl lg:max-w-3xl bg-white dark:bg-[#071220] sm:rounded-3xl shadow-2xl flex flex-col border-0 sm:border sm:border-slate-200/90 dark:sm:border-[#1A314D] overflow-hidden my-auto">
+        {/* Cabecera Limpia y Exclusiva: solo Título y botón "X" */}
+        <div className="sticky top-0 z-20 px-5 sm:px-6 py-4 border-b border-slate-100 dark:border-[#1A314D] flex items-center justify-between bg-white/95 dark:bg-[#071220]/95 backdrop-blur-md shrink-0">
+          <h2 className="text-lg sm:text-xl font-black text-[#0B1A2D] dark:text-white tracking-tight">
+            Nueva Partida
+          </h2>
           <button
             type="button"
             onClick={onClose}
-            className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+            className="p-2 -mr-1.5 text-slate-400 hover:text-slate-700 dark:hover:text-white rounded-xl hover:bg-slate-100 dark:hover:bg-[#0E2239] transition-colors cursor-pointer shrink-0"
             title="Cerrar formulario"
+            aria-label="Cerrar"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        {/* Contenido scrolleable del formulario */}
-        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 text-xs overscroll-contain">
+        {/* Contenido sin scrollbars anidadas */}
+        <form onSubmit={handleSubmit} className="p-5 sm:p-7 space-y-5 sm:space-y-6 text-xs text-slate-900 dark:text-slate-100 flex-1">
           {/* Modalidad de Apertura: Creado por Club vs Socio */}
-          <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-[#071220]/70 border border-slate-200/80 dark:border-[#1A314D] space-y-2.5">
+          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-[#071220]/70 border border-slate-200/80 dark:border-[#1A314D] space-y-3">
             <div className="flex items-center justify-between">
-              <span className="font-bold text-[#0B1A2D] dark:text-slate-200 uppercase tracking-wider text-[11px] flex items-center gap-1.5">
-                <Shield className="w-3.5 h-3.5 text-[#8B5CF6]" />
+              <span className="font-extrabold text-[#0B1A2D] dark:text-slate-200 uppercase tracking-wider text-[11px] flex items-center gap-1.5">
+                <Shield className="w-4 h-4 text-[#8B5CF6]" />
                 <span>Organizador Oficial</span>
               </span>
               <label className="flex items-center gap-2 cursor-pointer select-none">
@@ -214,7 +203,7 @@ export const NewMatchModal: React.FC<NewMatchModalProps> = ({
                   type="checkbox"
                   checked={isClubCreator}
                   onChange={(e) => setIsClubCreator(e.target.checked)}
-                  className="w-4 h-4 rounded text-[#0B1A2D] focus:ring-[#8B5CF6] cursor-pointer"
+                  className="w-4 h-4 rounded text-[#0B1A2D] focus:ring-[#8B5CF6] cursor-pointer accent-[#0B1A2D] dark:accent-[#B7F229]"
                 />
                 <span className="text-xs font-bold text-[#0B1A2D] dark:text-[#B7F229]">
                   Creado por el Club
@@ -223,37 +212,37 @@ export const NewMatchModal: React.FC<NewMatchModalProps> = ({
             </div>
 
             {isClubCreator ? (
-              <div className="grid grid-cols-2 gap-2 pt-1">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
                 <button
                   type="button"
                   onClick={() => setAdminCreationMode('empty')}
-                  className={`p-2.5 rounded-xl border text-left transition cursor-pointer ${
+                  className={`p-3 rounded-xl border text-left transition cursor-pointer ${
                     adminCreationMode === 'empty'
-                      ? 'bg-white dark:bg-[#0B1A2D] border-[#8B5CF6] text-[#0B1A2D] dark:text-white font-bold shadow-xs'
-                      : 'border-slate-200 dark:border-[#1A314D] text-slate-600 dark:text-slate-400'
+                      ? 'bg-white dark:bg-[#0E2239] border-[#8B5CF6] text-[#0B1A2D] dark:text-white font-bold shadow-xs'
+                      : 'border-slate-200/80 dark:border-[#1A314D] text-slate-600 dark:text-slate-400'
                   }`}
                 >
                   <div className="flex items-center gap-1.5 text-xs font-bold">
                     <Users className="w-3.5 h-3.5 text-[#8B5CF6]" />
-                    <span>Abierta (0/4)</span>
+                    <span>Partida Abierta (0/4)</span>
                   </div>
-                  <div className="text-[10px] text-slate-400 mt-0.5">4 plazas libres para la comunidad</div>
+                  <div className="text-[10px] text-slate-400 mt-1">4 plazas libres para la comunidad</div>
                 </button>
 
                 <button
                   type="button"
                   onClick={() => setAdminCreationMode('assign_titular')}
-                  className={`p-2.5 rounded-xl border text-left transition cursor-pointer ${
+                  className={`p-3 rounded-xl border text-left transition cursor-pointer ${
                     adminCreationMode === 'assign_titular'
-                      ? 'bg-white dark:bg-[#0B1A2D] border-[#8B5CF6] text-[#0B1A2D] dark:text-white font-bold shadow-xs'
-                      : 'border-slate-200 dark:border-[#1A314D] text-slate-600 dark:text-slate-400'
+                      ? 'bg-white dark:bg-[#0E2239] border-[#8B5CF6] text-[#0B1A2D] dark:text-white font-bold shadow-xs'
+                      : 'border-slate-200/80 dark:border-[#1A314D] text-slate-600 dark:text-slate-400'
                   }`}
                 >
                   <div className="flex items-center gap-1.5 text-xs font-bold">
                     <UserCheck className="w-3.5 h-3.5 text-[#8B5CF6]" />
-                    <span>Con Titular (1/4)</span>
+                    <span>Con Titular Asignado (1/4)</span>
                   </div>
-                  <div className="text-[10px] text-slate-400 mt-0.5">Asigna capitán inicial</div>
+                  <div className="text-[10px] text-slate-400 mt-1">Asigna capitán inicial con reserva</div>
                 </button>
               </div>
             ) : (
@@ -265,9 +254,28 @@ export const NewMatchModal: React.FC<NewMatchModalProps> = ({
                   type="text"
                   value={creatorName}
                   onChange={(e) => setCreatorName(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl bg-white dark:bg-[#0E2239] border border-slate-200 dark:border-[#1A314D] text-xs font-bold text-[#0B1A2D] dark:text-white"
+                  className="w-full px-3 py-2.5 rounded-xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] text-xs font-bold text-[#0B1A2D] dark:text-white focus:outline-none focus:ring-1 focus:ring-[#B7F229]"
                   placeholder="Ej. Carlos Méndez"
                 />
+              </div>
+            )}
+
+            {isClubCreator && adminCreationMode === 'assign_titular' && (
+              <div className="pt-2 border-t border-slate-200/70 dark:border-[#1A314D] space-y-2">
+                <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300">
+                  Seleccionar Socio Titular:
+                </label>
+                <select
+                  value={titularCustomerId}
+                  onChange={(e) => setTitularCustomerId(e.target.value)}
+                  className="w-full px-3 py-2.5 bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] rounded-xl text-xs font-bold text-[#0B1A2D] dark:text-white"
+                >
+                  {customers.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.name} {c.isMember ? '(Socio)' : '(Cliente)'} · Nivel {c.level?.toFixed(1) || '4.0'}
+                    </option>
+                  ))}
+                </select>
               </div>
             )}
           </div>
@@ -282,7 +290,7 @@ export const NewMatchModal: React.FC<NewMatchModalProps> = ({
                 <select
                   value={modalVenueId}
                   onChange={(e) => setModalVenueId(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-50 dark:bg-[#071220] border border-slate-200 dark:border-[#1A314D] rounded-xl text-xs font-bold text-[#0B1A2D] dark:text-white"
+                  className="w-full px-3 py-2.5 bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-xl text-xs font-bold text-[#0B1A2D] dark:text-white"
                 >
                   {venues
                     .filter((v) => v.id !== 'all')
@@ -295,14 +303,14 @@ export const NewMatchModal: React.FC<NewMatchModalProps> = ({
               </div>
             )}
 
-            <div>
+            <div className={isMultiVenue ? '' : 'sm:col-span-2'}>
               <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">
                 Pista
               </label>
               <select
                 value={selectedCourtId}
                 onChange={(e) => setSelectedCourtId(e.target.value)}
-                className="w-full px-3 py-2 bg-slate-50 dark:bg-[#071220] border border-slate-200 dark:border-[#1A314D] rounded-xl text-xs font-bold text-[#0B1A2D] dark:text-white"
+                className="w-full px-3 py-2.5 bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-xl text-xs font-bold text-[#0B1A2D] dark:text-white"
               >
                 {availableCourts.map((c) => (
                   <option key={c.id} value={c.id}>
@@ -323,7 +331,7 @@ export const NewMatchModal: React.FC<NewMatchModalProps> = ({
                 type="date"
                 value={matchDate}
                 onChange={(e) => setMatchDate(e.target.value)}
-                className="w-full px-3 py-2 bg-slate-50 dark:bg-[#071220] border border-slate-200 dark:border-[#1A314D] rounded-xl text-xs font-bold text-[#0B1A2D] dark:text-white"
+                className="w-full px-3 py-2.5 bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-xl text-xs font-bold text-[#0B1A2D] dark:text-white"
               />
             </div>
 
@@ -335,7 +343,7 @@ export const NewMatchModal: React.FC<NewMatchModalProps> = ({
                 type="time"
                 value={matchTime}
                 onChange={(e) => setMatchTime(e.target.value)}
-                className="w-full px-3 py-2 bg-slate-50 dark:bg-[#071220] border border-slate-200 dark:border-[#1A314D] rounded-xl text-xs font-bold text-[#0B1A2D] dark:text-white"
+                className="w-full px-3 py-2.5 bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-xl text-xs font-bold text-[#0B1A2D] dark:text-white"
               />
             </div>
 
@@ -351,13 +359,76 @@ export const NewMatchModal: React.FC<NewMatchModalProps> = ({
                     onClick={() => setMatchDuration(dur)}
                     className={`py-2 rounded-xl text-xs font-bold transition cursor-pointer ${
                       matchDuration === dur
-                        ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D]'
+                        ? 'bg-[#0B1A2D] text-white dark:bg-[#B7F229] dark:text-[#0B1A2D] shadow-xs'
                         : 'bg-slate-100 dark:bg-[#071220] text-slate-600 dark:text-slate-400'
                     }`}
                   >
                     {dur}'
                   </button>
                 ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Modo de Juego & Visibilidad */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">
+                Modo de Juego
+              </label>
+              <div className="grid grid-cols-2 gap-1.5 p-1 bg-slate-100 dark:bg-[#071220] rounded-xl border border-slate-200/80 dark:border-[#1A314D]">
+                <button
+                  type="button"
+                  onClick={() => setMatchMode('competitive')}
+                  className={`py-2 rounded-lg text-xs font-bold transition cursor-pointer text-center ${
+                    matchMode === 'competitive'
+                      ? 'bg-[#0B1A2D] text-white dark:bg-[#B7F229] dark:text-[#0B1A2D] shadow-xs'
+                      : 'text-slate-600 dark:text-slate-400'
+                  }`}
+                >
+                  Competitiva
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setMatchMode('friendly')}
+                  className={`py-2 rounded-lg text-xs font-bold transition cursor-pointer text-center ${
+                    matchMode === 'friendly'
+                      ? 'bg-[#0B1A2D] text-white dark:bg-[#B7F229] dark:text-[#0B1A2D] shadow-xs'
+                      : 'text-slate-600 dark:text-slate-400'
+                  }`}
+                >
+                  Amistosa
+                </button>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">
+                Visibilidad
+              </label>
+              <div className="grid grid-cols-2 gap-1.5 p-1 bg-slate-100 dark:bg-[#071220] rounded-xl border border-slate-200/80 dark:border-[#1A314D]">
+                <button
+                  type="button"
+                  onClick={() => setVisibility('public')}
+                  className={`py-2 rounded-lg text-xs font-bold transition cursor-pointer text-center ${
+                    visibility === 'public'
+                      ? 'bg-[#0B1A2D] text-white dark:bg-[#B7F229] dark:text-[#0B1A2D] shadow-xs'
+                      : 'text-slate-600 dark:text-slate-400'
+                  }`}
+                >
+                  Pública
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setVisibility('group')}
+                  className={`py-2 rounded-lg text-xs font-bold transition cursor-pointer text-center ${
+                    visibility === 'group'
+                      ? 'bg-[#8B5CF6] text-white shadow-xs'
+                      : 'text-slate-600 dark:text-slate-400'
+                  }`}
+                >
+                  Privada / Grupo
+                </button>
               </div>
             </div>
           </div>
@@ -376,7 +447,7 @@ export const NewMatchModal: React.FC<NewMatchModalProps> = ({
                   max="7"
                   value={minLevel}
                   onChange={(e) => setMinLevel(parseFloat(e.target.value) || 1)}
-                  className="w-full px-3 py-2 bg-slate-50 dark:bg-[#071220] border border-slate-200 dark:border-[#1A314D] rounded-xl text-xs font-bold font-mono text-[#0B1A2D] dark:text-white"
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-xl text-xs font-bold font-mono text-[#0B1A2D] dark:text-white"
                 />
                 <span className="text-slate-400 font-bold">-</span>
                 <input
@@ -386,7 +457,7 @@ export const NewMatchModal: React.FC<NewMatchModalProps> = ({
                   max="7"
                   value={maxLevel}
                   onChange={(e) => setMaxLevel(parseFloat(e.target.value) || 7)}
-                  className="w-full px-3 py-2 bg-slate-50 dark:bg-[#071220] border border-slate-200 dark:border-[#1A314D] rounded-xl text-xs font-bold font-mono text-[#0B1A2D] dark:text-white"
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-xl text-xs font-bold font-mono text-[#0B1A2D] dark:text-white"
                 />
               </div>
             </div>
@@ -403,7 +474,7 @@ export const NewMatchModal: React.FC<NewMatchModalProps> = ({
                     onClick={() => setGender(g)}
                     className={`py-2 rounded-xl text-xs font-bold capitalize transition cursor-pointer ${
                       gender === g
-                        ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D]'
+                        ? 'bg-[#0B1A2D] text-white dark:bg-[#B7F229] dark:text-[#0B1A2D] shadow-xs'
                         : 'bg-slate-100 dark:bg-[#071220] text-slate-600 dark:text-slate-400'
                     }`}
                   >
@@ -415,7 +486,7 @@ export const NewMatchModal: React.FC<NewMatchModalProps> = ({
           </div>
 
           {/* Precio por jugador */}
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">
                 Precio / Plaza (€)
@@ -425,7 +496,7 @@ export const NewMatchModal: React.FC<NewMatchModalProps> = ({
                 step="0.50"
                 value={pricePerPlayer}
                 onChange={(e) => setPricePerPlayer(parseFloat(e.target.value) || 0)}
-                className="w-full px-3 py-2 bg-slate-50 dark:bg-[#071220] border border-slate-200 dark:border-[#1A314D] rounded-xl text-xs font-mono font-bold text-[#0B1A2D] dark:text-white"
+                className="w-full px-3 py-2.5 bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-xl text-xs font-mono font-bold text-[#0B1A2D] dark:text-white"
               />
             </div>
             <div>
@@ -437,29 +508,34 @@ export const NewMatchModal: React.FC<NewMatchModalProps> = ({
                 step="0.50"
                 value={memberPricePerPlayer}
                 onChange={(e) => setMemberPricePerPlayer(parseFloat(e.target.value) || 0)}
-                className="w-full px-3 py-2 bg-slate-50 dark:bg-[#071220] border border-slate-200 dark:border-[#1A314D] rounded-xl text-xs font-mono font-bold text-[#0B1A2D] dark:text-white"
+                className="w-full px-3 py-2.5 bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-xl text-xs font-mono font-bold text-[#0B1A2D] dark:text-white"
               />
             </div>
           </div>
+        </form>
 
-          {/* Botones Estándar Nivel 4 */}
-          <div className="pt-3 border-t border-slate-100 dark:border-[#1A314D] flex items-center justify-end gap-2.5">
+        {/* Modal Footer Sólido y Simétrico (Distribución Equitativa 50/50) */}
+        <div className="sticky bottom-0 z-20 px-5 sm:px-6 py-3.5 sm:py-4 border-t border-slate-100 dark:border-[#1A314D] bg-white/95 dark:bg-[#071220]/95 backdrop-blur-md shrink-0">
+          <div className="grid grid-cols-2 gap-3 w-full">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs transition cursor-pointer hover:bg-slate-200"
+              className="w-full py-3 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-[#0E2239] dark:hover:bg-[#132A45] text-slate-700 dark:text-slate-300 font-bold text-xs sm:text-sm border border-slate-200/80 dark:border-[#1A314D] transition cursor-pointer active:scale-[0.99] flex items-center justify-center text-center whitespace-nowrap"
             >
-              Cancelar
+              <span>Cancelar</span>
             </button>
             <button
-              type="submit"
-              className="px-5 py-2.5 rounded-xl bg-[#0B1A2D] hover:bg-[#132A45] text-white dark:bg-[#B7F229] dark:hover:bg-[#a6e61f] dark:text-[#0B1A2D] font-bold text-xs transition shadow-xs cursor-pointer active:scale-95"
+              type="button"
+              onClick={handleSubmit}
+              className="w-full py-3 px-3 rounded-xl bg-[#0B1A2D] hover:bg-[#132A45] text-white dark:bg-[#B7F229] dark:hover:bg-[#a6e61f] dark:text-[#0B1A2D] font-bold text-xs sm:text-sm border border-transparent shadow-md transition active:scale-[0.99] cursor-pointer flex items-center justify-center text-center whitespace-nowrap"
             >
-              Publicar Partida
+              <span>Publicar Partida</span>
             </button>
           </div>
-        </form>
+        </div>
       </div>
     </div>
   );
 };
+
+export default NewMatchModal;

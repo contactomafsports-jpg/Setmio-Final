@@ -253,6 +253,7 @@ const routeForAdminTab: Record<AdminTab, string> = {
   settings: '/gestion/ajustes',
   invoicing: '/gestion/facturacion',
   new_match: '/gestion/partidas/nueva',
+  new_booking: '/gestion/reservas/nueva',
 };
 
 const routeForPlayerTab: Record<PlayerTab, string> = {
@@ -465,6 +466,20 @@ const readRoute = () => {
     };
   }
   if (remainingPath === '/gestion' || remainingPath.startsWith('/gestion/')) {
+    if (
+      remainingPath === '/gestion/reservas/nueva' ||
+      remainingPath === '/gestion/nueva-reserva' ||
+      remainingPath === '/admin/reservas/nueva'
+    ) {
+      return {
+        view: 'admin' as MainView,
+        page: 'home' as PublicPage,
+        admin: 'new_booking' as AdminTab,
+        player: 'dashboard' as PlayerTab,
+        clubSlug: activeClubSlug,
+        isCorporate: false,
+      };
+    }
     let admin = (Object.entries(routeForAdminTab).find(([, route]) => route === remainingPath || remainingPath.startsWith(route))?.[0] || 'dashboard') as AdminTab;
     if (
       remainingPath === '/gestion/tpv' ||
@@ -486,7 +501,9 @@ const readRoute = () => {
   }
   if (remainingPath === '/admin' || remainingPath.startsWith('/admin/')) {
     let admin: AdminTab = 'dashboard';
-    if (remainingPath === '/admin/pistas' || remainingPath.startsWith('/admin/pistas/')) {
+    if (remainingPath === '/admin/reservas/nueva' || remainingPath === '/gestion/reservas/nueva' || remainingPath === '/gestion/nueva-reserva') {
+      admin = 'new_booking';
+    } else if (remainingPath === '/admin/pistas' || remainingPath.startsWith('/admin/pistas/')) {
       admin = 'courts_management';
     } else if (remainingPath === '/admin/domotica' || remainingPath.startsWith('/admin/domotica/')) {
       admin = 'smart_courts';
@@ -633,7 +650,15 @@ export type AdminTab =
   | 'domains'
   | 'subscription'
   | 'settings'
-  | 'new_match';
+  | 'new_match'
+  | 'new_booking';
+
+export interface BookingDraft {
+  date?: string;
+  time?: string;
+  courtId?: string;
+  venueId?: string;
+}
 
 export type PlayerTab =
   | 'dashboard'
@@ -880,6 +905,10 @@ interface AppContextType {
   demoToast: DemoNotificationToast | null;
   triggerDemoToast: (title: string, description: string, type?: 'info' | 'success' | 'warning') => void;
   clearDemoToast: () => void;
+
+  // Level 2 New Booking Draft State
+  newBookingDraft: BookingDraft | null;
+  setNewBookingDraft: (draft: BookingDraft | null) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -1226,6 +1255,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [selectedCourtsForBooking, setSelectedCourtsForBooking] = useState<string[]>([]);
   const [adminTab, setAdminTabState] = useState<AdminTab>(initialRoute.admin);
   const [playerTab, setPlayerTabState] = useState<PlayerTab>(initialRoute.player);
+  const [newBookingDraft, setNewBookingDraft] = useState<BookingDraft | null>(null);
 
   const setCurrentView = useCallback((view: MainView) => {
     if (view !== 'public') {
@@ -3290,6 +3320,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         demoToast,
         triggerDemoToast,
         clearDemoToast,
+
+        newBookingDraft,
+        setNewBookingDraft,
       }}
     >
       {children}

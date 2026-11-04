@@ -304,8 +304,8 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
           CONTENEDOR PRINCIPAL
           ====================================================================== */}
       <div className="flex-1 flex flex-col min-w-0">
-        {/* Header Superior Nativo Modular (Oculto en páginas secundarias de Nivel 2 como 'all_bookings' y 'new_match') */}
-        {adminTab !== 'all_bookings' && adminTab !== 'new_match' && (
+        {/* Header Superior Nativo Modular (Oculto en páginas secundarias de Nivel 2 como 'all_bookings', 'new_match' y 'new_booking') */}
+        {adminTab !== 'all_bookings' && adminTab !== 'new_match' && adminTab !== 'new_booking' && (
           <AdminHeader
             onOpenProfileModal={() => setIsProfileModalOpen(true)}
             onSelectTab={handleSelectTab}
@@ -313,7 +313,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
         )}
 
         {/* Contenido Dinámico de la Pestaña Activa con márgenes optimizados px-3.5 */}
-        <main className={`flex-1 px-3.5 py-3 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto ${(adminTab === 'all_bookings' || adminTab === 'new_match') ? 'pt-4 sm:pt-6' : ''}`}>
+        <main className={`flex-1 px-3.5 py-3 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto ${(adminTab === 'all_bookings' || adminTab === 'new_match' || adminTab === 'new_booking') ? 'pt-4 sm:pt-6' : ''}`}>
           {children}
         </main>
       </div>

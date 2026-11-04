@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useApp } from '../../context/AppContext';
-import { Court, SmartCourtDevice } from '../../types/database';
+import { Court } from '../../types/database';
 import {
   Zap,
   Plus,
@@ -12,22 +12,10 @@ import {
   AlertTriangle,
   Sparkles,
   KeyRound,
-  Lock,
-  Key,
   Clock,
-  Layers,
-  Search,
-  Filter,
   X,
-  Sliders,
-  Check,
   Upload,
-  Image as ImageIcon,
-  Calendar,
   Activity,
-  Radio,
-  Server,
-  ArrowRight,
   Building2,
   ChevronDown,
 } from 'lucide-react';
@@ -40,7 +28,6 @@ export const AdminCourtsManagement: React.FC<AdminCourtsManagementProps> = ({
   initialTab = 'courts',
 }) => {
   const {
-    currentTenant,
     courts,
     addCourt,
     updateCourt,
@@ -48,12 +35,8 @@ export const AdminCourtsManagement: React.FC<AdminCourtsManagementProps> = ({
     toggleCourtLight,
     openCourtDoor,
     smartDevices,
-    toggleSmartRelay,
-    generateAccessPin,
     auditLogs,
     triggerDemoToast,
-    setAdminTab,
-    t,
     isMultiVenue,
     venues,
     selectedVenueId,
@@ -107,7 +90,7 @@ export const AdminCourtsManagement: React.FC<AdminCourtsManagementProps> = ({
       : realVenues[0]?.id || 'venue-san-mateo';
   const activeVenueObj = realVenues.find((v) => v.id === effectiveVenueId) || realVenues[0];
 
-  // Inventory Filters & State (Segmented Controls Minimalistas)
+  // Inventory Filters (Segmented Controls Minimalistas sin iconos)
   const [formatFilter, setFormatFilter] = useState<'all' | 'double' | 'single'>('all');
   const [locationFilter, setLocationFilter] = useState<'all' | 'indoor' | 'outdoor'>('all');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -137,8 +120,7 @@ export const AdminCourtsManagement: React.FC<AdminCourtsManagementProps> = ({
 
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 
-  // IoT Devices Form & Filters (segmented by venue)
-  const [deviceFilter, setDeviceFilter] = useState<'all' | 'light_relay' | 'pin_pad_lock'>('all');
+  // IoT Devices Form state
   const [showAddDeviceModal, setShowAddDeviceModal] = useState(false);
   const [newDeviceName, setNewDeviceName] = useState('');
   const [newProvider, setNewProvider] = useState<'Shelly Cloud Pro' | 'Salto KS Cloud' | 'Sonoff IoT' | 'Tuya Pro'>('Shelly Cloud Pro');
@@ -280,24 +262,10 @@ export const AdminCourtsManagement: React.FC<AdminCourtsManagementProps> = ({
     if (formatFilter === 'double' && c.isSingle) return false;
     if (formatFilter === 'single' && !c.isSingle) return false;
 
-    // Ubicación: Indoor vs Outdoor (sin opciones obsoletas)
+    // Ubicación: Indoor vs Outdoor
     if (locationFilter === 'indoor' && c.courtType !== 'indoor' && c.courtType !== 'covered') return false;
     if (locationFilter === 'outdoor' && c.courtType !== 'outdoor') return false;
 
-    return true;
-  });
-
-  const venueSmartDevices = smartDevices.filter((d) => {
-    if (!isMultiVenueActive) return true;
-    if (isAllVenuesSelected) return true;
-    const assignedCourt = courts.find((c) => c.id === d.courtId);
-    const courtVenueId = assignedCourt?.venueId || realVenues[0]?.id;
-    return courtVenueId === effectiveVenueId;
-  });
-
-  const filteredDevices = venueSmartDevices.filter((d) => {
-    if (deviceFilter === 'light_relay') return d.deviceType === 'light_relay';
-    if (deviceFilter === 'pin_pad_lock') return d.deviceType === 'pin_pad_lock';
     return true;
   });
 
@@ -317,6 +285,7 @@ export const AdminCourtsManagement: React.FC<AdminCourtsManagementProps> = ({
           detailsLower.includes(c.name.toLowerCase())
       ) ||
       detailsLower.includes(venueNameLower) ||
+      actionLower.includes('sede') ||
       actionLower.includes('sede') ||
       targetLower.includes('san mateo') ||
       targetLower.includes('norte')
@@ -351,9 +320,8 @@ export const AdminCourtsManagement: React.FC<AdminCourtsManagementProps> = ({
                   setIsActionMenuOpen(false);
                   openCreateModal();
                 }}
-                className="w-full px-3.5 py-2 text-left text-xs font-bold text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-[#132A45] hover:text-[#0B1A2D] dark:hover:text-[#B7F229] flex items-center gap-2.5 transition cursor-pointer"
+                className="w-full px-3.5 py-2.5 text-left text-xs font-bold text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-[#132A45] hover:text-[#0B1A2D] dark:hover:text-[#B7F229] flex items-center gap-2.5 transition cursor-pointer"
               >
-                <Plus className="w-4 h-4 stroke-[2.2] text-[#8B5CF6]" />
                 <span>Nueva Pista</span>
               </button>
               <button
@@ -362,17 +330,16 @@ export const AdminCourtsManagement: React.FC<AdminCourtsManagementProps> = ({
                   setIsActionMenuOpen(false);
                   setShowAddDeviceModal(true);
                 }}
-                className="w-full px-3.5 py-2 text-left text-xs font-bold text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-[#132A45] hover:text-[#0B1A2D] dark:hover:text-[#B7F229] flex items-center gap-2.5 transition cursor-pointer"
+                className="w-full px-3.5 py-2.5 text-left text-xs font-bold text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-[#132A45] hover:text-[#0B1A2D] dark:hover:text-[#B7F229] flex items-center gap-2.5 transition cursor-pointer"
               >
-                <Zap className="w-4 h-4 text-amber-500" />
-                <span>Adaptador IoT</span>
+                <span>Nuevo Adaptador IoT</span>
               </button>
             </div>
           )}
         </div>
       </div>
 
-      {/* 1.1 SELECTOR DE SEDE Y ESTADO OPERATIVO UNIFICADO (IDÉNTICO A RESERVAS) */}
+      {/* 1.1 SELECTOR DE SEDE Y ESTADO OPERATIVO UNIFICADO */}
       <div className="relative" ref={venueSelectorRef}>
         <div className="flex items-center justify-between p-2.5 bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200/80 dark:border-[#1A314D] shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
           {/* Selector de Sede */}
@@ -451,10 +418,7 @@ export const AdminCourtsManagement: React.FC<AdminCourtsManagementProps> = ({
                     : 'hover:bg-slate-50 dark:hover:bg-[#132A45] text-slate-700 dark:text-slate-300'
                 }`}
               >
-                <span className="flex items-center gap-2">
-                  <Layers className="w-3.5 h-3.5 text-[#8B5CF6]" />
-                  <span>Todas las Sedes (Consolidado)</span>
-                </span>
+                <span>Todas las Sedes (Consolidado)</span>
                 {isConsolidatedView && <CheckCircle2 className="w-3.5 h-3.5 text-[#82b805]" />}
               </button>
             )}
@@ -477,10 +441,7 @@ export const AdminCourtsManagement: React.FC<AdminCourtsManagementProps> = ({
                         : 'hover:bg-slate-50 dark:hover:bg-[#132A45] text-slate-700 dark:text-slate-300'
                     }`}
                   >
-                    <span className="flex items-center gap-2 truncate">
-                      <Building2 className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                      <span className="truncate">{venue.name}</span>
-                    </span>
+                    <span className="truncate">{venue.name}</span>
                     {isSelected && <CheckCircle2 className="w-3.5 h-3.5 text-[#82b805] shrink-0" />}
                   </button>
                 );
@@ -536,47 +497,39 @@ export const AdminCourtsManagement: React.FC<AdminCourtsManagementProps> = ({
         </div>
       </div>
 
-      {/* 3. REESTRUCTURACIÓN DE PESTAÑAS (MINIMALISTA PLANO: "Pistas" y "Registros") */}
+      {/* 3. REESTRUCTURACIÓN DE PESTAÑAS (MINIMALISTA PLANO SIN ICONOS) */}
       <div className="flex items-center gap-2 border-b border-slate-200/80 dark:border-[#1A314D] pb-3 text-xs font-semibold">
         <button
           type="button"
           onClick={() => setActiveTab('courts')}
-          className={`px-4 py-2 rounded-xl transition flex items-center gap-2 cursor-pointer ${
+          className={`px-4 py-2 rounded-xl transition cursor-pointer ${
             activeTab === 'courts'
               ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D] font-bold shadow-xs'
               : 'bg-white dark:bg-[#0E2239] text-slate-600 dark:text-slate-400 hover:text-[#0B1A2D] dark:hover:text-white border border-slate-200/80 dark:border-[#1A314D]'
           }`}
         >
-          <Layers className="w-4 h-4 text-[#8B5CF6]" />
-          <span>Pistas</span>
-          <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-mono font-bold">
-            {venueCourts.length}
-          </span>
+          <span>Pistas ({venueCourts.length})</span>
         </button>
 
         <button
           type="button"
           onClick={() => setActiveTab('logs')}
-          className={`px-4 py-2 rounded-xl transition flex items-center gap-2 cursor-pointer ${
+          className={`px-4 py-2 rounded-xl transition cursor-pointer ${
             activeTab === 'logs'
               ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D] font-bold shadow-xs'
               : 'bg-white dark:bg-[#0E2239] text-slate-600 dark:text-slate-400 hover:text-[#0B1A2D] dark:hover:text-white border border-slate-200/80 dark:border-[#1A314D]'
           }`}
         >
-          <Clock className="w-4 h-4 text-[#82b805] dark:text-[#B7F229]" />
-          <span>Registros</span>
-          <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-mono font-bold">
-            {filteredAuditLogs.length}
-          </span>
+          <span>Registros ({filteredAuditLogs.length})</span>
         </button>
       </div>
 
       {/* ======================================================================
-          PESTAÑA 1: PISTAS
+          PESTAÑA 1: PISTAS (CON DOMÓTICA INTEGRADA EN CADA TARJETA)
           ====================================================================== */}
       {activeTab === 'courts' && (
         <div className="space-y-4 animate-in fade-in duration-150">
-          {/* Filtros Planos y Minimalistas (Sin contenedores pesados ni etiquetas de texto estáticas) */}
+          {/* Filtros Planos y Minimalistas Sin Iconos */}
           <div className="flex flex-wrap items-center justify-between gap-2.5 text-xs">
             {/* 1. Botones de Formato */}
             <div className="flex items-center gap-1.5">
@@ -623,123 +576,167 @@ export const AdminCourtsManagement: React.FC<AdminCourtsManagementProps> = ({
             </div>
           </div>
 
-          {/* Grid de Pistas Homologadas con Control IoT y CRUD */}
+          {/* Grid de Pistas Homologadas con Domótica Integrada */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-4">
-            {filteredCourts.map((court) => (
-              <div
-                key={court.id}
-                className="rounded-2xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] hover:border-slate-300 dark:hover:border-slate-700 transition overflow-hidden shadow-2xs flex flex-col justify-between group"
-              >
-                {/* Foto & Badges Superiores */}
-                <div className="relative h-44 w-full bg-slate-950 overflow-hidden">
-                  <img
-                    src={court.photoUrl}
-                    alt={court.name}
-                    className="w-full h-full object-cover group-hover:scale-103 transition duration-300 opacity-90"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent" />
+            {filteredCourts.map((court) => {
+              const courtDevices = smartDevices.filter((d) => d.courtId === court.id);
+              const hasShelly = courtDevices.some((d) => d.deviceType === 'light_relay') || court.hasLights;
+              const hasSalto = courtDevices.some((d) => d.deviceType === 'pin_pad_lock') || Boolean(court.accessPin);
 
-                  {/* Badges superiores */}
-                  <div className="absolute top-3 left-3 flex flex-wrap gap-1.5">
-                    {isMultiVenueActive && (
-                      <span className="px-2 py-0.5 rounded-md bg-[#0B1A2D]/85 backdrop-blur-md text-white text-[10px] font-bold border border-white/10 uppercase flex items-center gap-1 shadow-xs">
-                        <Building2 className="w-3 h-3 text-[#B7F229]" />
-                        {court.venueName || activeVenueObj?.shortName || 'Sede'}
-                      </span>
-                    )}
-                    <span className="px-2 py-0.5 rounded-md bg-[#0B1A2D]/85 backdrop-blur-md text-white text-[10px] font-bold border border-white/10 uppercase">
-                      {court.courtType === 'indoor'
-                        ? 'Indoor Cristal'
-                        : court.courtType === 'outdoor'
-                        ? 'Outdoor Exterior'
-                        : 'Cubierta'}
-                    </span>
-                    {court.isPanoramic && (
-                      <span className="px-2 py-0.5 rounded-md bg-[#F0FCCF] dark:bg-[#B7F229]/20 text-[#0B1A2D] dark:text-[#B7F229] border border-[#B7F229]/50 text-[10px] font-black uppercase tracking-wider flex items-center gap-1 shadow-xs">
-                        <Sparkles className="w-3 h-3 text-[#82b805] dark:text-[#B7F229]" /> Panorámica WPT
-                      </span>
-                    )}
-                  </div>
+              return (
+                <div
+                  key={court.id}
+                  className="rounded-3xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] hover:border-slate-300 dark:hover:border-slate-700 transition overflow-hidden shadow-2xs flex flex-col justify-between group"
+                >
+                  {/* Foto & Badges Superiores */}
+                  <div className="relative h-44 w-full bg-slate-950 overflow-hidden">
+                    <img
+                      src={court.photoUrl}
+                      alt={court.name}
+                      className="w-full h-full object-cover group-hover:scale-103 transition duration-300 opacity-90"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent" />
 
-                  {/* Tarifa destacada abajo a la derecha de la foto */}
-                  <div className="absolute bottom-3 right-3 px-2.5 py-1 rounded-xl bg-[#0B1A2D]/85 backdrop-blur-md border border-white/10 text-right">
-                    <div className="text-[9px] text-slate-400 font-bold uppercase">Tarifa</div>
-                    <div className="text-base font-black font-mono text-[#B7F229]">
-                      {court.hourlyRate.toFixed(2)} €<span className="text-[10px] font-normal text-slate-300">/h</span>
+                    {/* Badges superiores */}
+                    <div className="absolute top-3 left-3 flex flex-wrap gap-1.5">
+                      {isMultiVenueActive && (
+                        <span className="px-2 py-0.5 rounded-md bg-[#0B1A2D]/85 backdrop-blur-md text-white text-[10px] font-bold border border-white/10 uppercase shadow-xs">
+                          {court.venueName || activeVenueObj?.shortName || 'Sede'}
+                        </span>
+                      )}
+                      <span className="px-2 py-0.5 rounded-md bg-[#0B1A2D]/85 backdrop-blur-md text-white text-[10px] font-bold border border-white/10 uppercase">
+                        {court.courtType === 'indoor'
+                          ? 'Indoor Cristal'
+                          : court.courtType === 'outdoor'
+                          ? 'Outdoor Exterior'
+                          : 'Cubierta'}
+                      </span>
+                      {court.isPanoramic && (
+                        <span className="px-2 py-0.5 rounded-md bg-[#F0FCCF] dark:bg-[#B7F229]/20 text-[#0B1A2D] dark:text-[#B7F229] border border-[#B7F229]/50 text-[10px] font-black uppercase tracking-wider flex items-center gap-1 shadow-xs">
+                          <Sparkles className="w-3 h-3 text-[#82b805] dark:text-[#B7F229]" /> Panorámica WPT
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Indicador IoT Conectado */}
+                    <div className="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-[#0B1A2D]/85 backdrop-blur-md text-[#82b805] dark:text-[#B7F229] border border-white/10 text-[10px] font-bold flex items-center gap-1.5 shadow-xs">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#82b805] dark:bg-[#B7F229] animate-pulse" />
+                      <span>IoT Online</span>
+                    </div>
+
+                    {/* Tarifa destacada abajo a la derecha de la foto */}
+                    <div className="absolute bottom-3 right-3 px-2.5 py-1 rounded-xl bg-[#0B1A2D]/85 backdrop-blur-md border border-white/10 text-right">
+                      <div className="text-[9px] text-slate-400 font-bold uppercase">Tarifa</div>
+                      <div className="text-base font-black font-mono text-[#B7F229]">
+                        {court.hourlyRate.toFixed(2)} €<span className="text-[10px] font-normal text-slate-300">/h</span>
+                      </div>
+                    </div>
+
+                    {/* Nombre de la pista */}
+                    <div className="absolute bottom-3 left-3 text-white">
+                      <h3 className="text-base font-black tracking-tight">{court.name}</h3>
+                      <div className="text-[11px] text-slate-300">{court.surface}</div>
                     </div>
                   </div>
 
-                  {/* Nombre de la pista */}
-                  <div className="absolute bottom-3 left-3 text-white">
-                    <h3 className="text-base font-black tracking-tight">{court.name}</h3>
-                    <div className="text-[11px] text-slate-300">{court.surface}</div>
-                  </div>
-                </div>
-
-                {/* Controles IoT y Parámetros (Sin cajas internas innecesarias) */}
-                <div className="p-4 space-y-3.5 flex-1 flex flex-col justify-between">
-                  {/* Fila Focos LED Shelly */}
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="font-bold text-[#0B1A2D] dark:text-white flex items-center gap-1.5">
-                      <Zap className={`w-3.5 h-3.5 ${court.isLightOn ? 'text-[#82b805] dark:text-[#B7F229]' : 'text-slate-400'}`} />
-                      <span>Iluminación LED</span>
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => toggleCourtLight(court.id)}
-                      className={`px-2.5 py-1 rounded-lg font-bold text-[11px] transition flex items-center gap-1 cursor-pointer active:scale-95 ${
-                        court.isLightOn
-                          ? 'bg-[#F0FCCF] text-[#0B1A2D] dark:bg-[#B7F229]/20 dark:text-[#B7F229] border border-[#B7F229]/50'
-                          : 'bg-slate-100 dark:bg-[#071220] text-slate-600 dark:text-slate-400 border border-slate-200/60 dark:border-[#1A314D]'
-                      }`}
-                    >
-                      <Power className="w-3 h-3" />
-                      <span>{court.isLightOn ? 'ENCENDIDA' : 'APAGADA'}</span>
-                    </button>
-                  </div>
-
-                  {/* Fila PIN y Acceso Salto KS */}
-                  <div className="flex items-center justify-between text-xs pt-2.5 border-t border-slate-100 dark:border-[#1A314D]">
-                    <div className="flex items-center gap-1.5 text-slate-500 dark:text-slate-400 text-[11px]">
-                      <KeyRound className="w-3.5 h-3.5 text-[#8B5CF6]" />
-                      <span>PIN:</span>
-                      <span className="font-mono font-bold text-[#0B1A2D] dark:text-[#B7F229]">{court.accessPin || '4821#'}</span>
+                  {/* FUSIÓN TOTAL DE DOMÓTICA EN LA PROPIA TARJETA (Sin tarjetas anidadas redundantes) */}
+                  <div className="p-4 space-y-3 flex-1 flex flex-col justify-between text-xs">
+                    {/* Dispositivo Asociado & Estado de Conexión */}
+                    <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 dark:bg-[#071220] border border-slate-200/60 dark:border-[#1A314D] text-xs">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <span className="w-2 h-2 rounded-full bg-[#82b805] dark:bg-[#B7F229] shrink-0 animate-pulse" />
+                        <span className="font-bold text-[#0B1A2D] dark:text-white truncate">
+                          {hasShelly && hasSalto
+                            ? 'Shelly Pro DIN + Salto KS'
+                            : hasShelly
+                            ? 'Shelly Pro DIN (Iluminación)'
+                            : hasSalto
+                            ? 'Salto KS Cloud (Cerradura)'
+                            : 'Pasarela IoT Conectada'}
+                        </span>
+                      </div>
+                      <span className="text-[10px] font-mono text-[#82b805] dark:text-[#B7F229] font-bold shrink-0">
+                        Conectado
+                      </span>
                     </div>
-                    <button
-                      type="button"
-                      onClick={() => openCourtDoor(court.id)}
-                      className="text-xs font-bold text-[#8B5CF6] hover:text-[#7C3AED] dark:text-[#C4B5FD] transition cursor-pointer"
-                    >
-                      Abrir Torno
-                    </button>
-                  </div>
 
-                  {/* Acciones CRUD */}
-                  <div className="pt-2.5 flex items-center gap-2 border-t border-slate-100 dark:border-[#1A314D]">
-                    <button
-                      type="button"
-                      onClick={() => openEditModal(court)}
-                      className="flex-1 py-2 px-3 rounded-xl bg-[#0B1A2D] hover:bg-[#132A45] dark:bg-white dark:hover:bg-slate-100 text-white dark:text-[#0B1A2D] font-bold text-xs transition flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs"
-                    >
-                      <Edit2 className="w-3.5 h-3.5" />
-                      <span>Editar Parámetros</span>
-                    </button>
+                    {/* Control Rápido: Focos LED (Shelly) */}
+                    <div className="flex items-center justify-between pt-1">
+                      <div className="flex items-center gap-2">
+                        <Zap className={`w-4 h-4 ${court.isLightOn ? 'text-amber-500' : 'text-slate-400'}`} />
+                        <div>
+                          <span className="font-bold text-[#0B1A2D] dark:text-white block">Iluminación LED</span>
+                          <span className="text-[10px] text-slate-400">
+                            {court.isLightOn ? 'Focos activos (4.2 kW)' : 'Relé en espera'}
+                          </span>
+                        </div>
+                      </div>
 
-                    <button
-                      type="button"
-                      onClick={() => setDeletingCourtId(court.id)}
-                      className="p-2 rounded-xl text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/50 transition cursor-pointer border border-transparent hover:border-rose-200 dark:hover:border-rose-900"
-                      title="Desactivar o Eliminar Pista"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
+                      <button
+                        type="button"
+                        onClick={() => toggleCourtLight(court.id)}
+                        className={`px-3 py-1.5 rounded-xl font-bold text-xs transition cursor-pointer active:scale-95 flex items-center gap-1.5 ${
+                          court.isLightOn
+                            ? 'bg-[#0B1A2D] text-white dark:bg-[#B7F229] dark:text-[#0B1A2D] shadow-xs'
+                            : 'bg-slate-100 hover:bg-slate-200 dark:bg-[#071220] dark:hover:bg-[#132A45] text-slate-700 dark:text-slate-300 border border-slate-200/80 dark:border-[#1A314D]'
+                        }`}
+                      >
+                        <Power className="w-3.5 h-3.5" />
+                        <span>{court.isLightOn ? 'ENCENDIDA' : 'APAGADA'}</span>
+                      </button>
+                    </div>
+
+                    {/* Control Rápido: Acceso / Salto KS */}
+                    <div className="flex items-center justify-between pt-2.5 border-t border-slate-100 dark:border-[#1A314D]">
+                      <div className="flex items-center gap-2">
+                        <KeyRound className="w-4 h-4 text-[#8B5CF6]" />
+                        <div>
+                          <span className="font-bold text-[#0B1A2D] dark:text-white block">Acceso Autónomo</span>
+                          <div className="flex items-center gap-1 text-[11px] text-slate-500 dark:text-slate-400">
+                            <span>PIN Activo:</span>
+                            <span className="font-mono font-bold text-[#0B1A2D] dark:text-[#B7F229]">
+                              {court.accessPin || '4821#'}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => openCourtDoor(court.id)}
+                        className="px-3 py-1.5 rounded-xl font-bold text-xs bg-slate-100 hover:bg-slate-200 dark:bg-[#071220] dark:hover:bg-[#132A45] text-slate-700 dark:text-slate-300 border border-slate-200/80 dark:border-[#1A314D] transition cursor-pointer flex items-center gap-1.5 active:scale-95"
+                      >
+                        <span>Abrir Torno</span>
+                      </button>
+                    </div>
+
+                    {/* Acciones de Pista */}
+                    <div className="pt-2.5 flex items-center gap-2 border-t border-slate-100 dark:border-[#1A314D]">
+                      <button
+                        type="button"
+                        onClick={() => openEditModal(court)}
+                        className="flex-1 py-2.5 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-[#071220] dark:hover:bg-[#132A45] text-slate-700 dark:text-slate-200 font-bold text-xs border border-slate-200/80 dark:border-[#1A314D] transition flex items-center justify-center gap-1.5 cursor-pointer"
+                      >
+                        <Edit2 className="w-3.5 h-3.5" />
+                        <span>Editar Parámetros</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setDeletingCourtId(court.id)}
+                        className="p-2.5 rounded-xl text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/50 border border-slate-200/80 dark:border-[#1A314D] hover:border-rose-200 transition cursor-pointer"
+                        title="Desactivar o Eliminar Pista"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
 
             {filteredCourts.length === 0 && (
-              <div className="col-span-full p-12 text-center rounded-2xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] shadow-2xs space-y-3">
+              <div className="col-span-full p-12 text-center rounded-3xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] shadow-2xs space-y-3">
                 <Building2 className="w-10 h-10 text-slate-400 mx-auto" />
                 <h3 className="text-base font-bold text-slate-800 dark:text-slate-200">
                   No hay pistas registradas para los filtros en esta sede
@@ -752,7 +749,7 @@ export const AdminCourtsManagement: React.FC<AdminCourtsManagementProps> = ({
                 <button
                   type="button"
                   onClick={openCreateModal}
-                  className="px-4 py-2 rounded-xl bg-[#0B1A2D] hover:bg-[#132A45] text-white font-bold text-xs inline-flex items-center gap-1.5 transition shadow-sm cursor-pointer"
+                  className="px-4 py-2.5 rounded-xl bg-[#0B1A2D] hover:bg-[#132A45] text-white font-bold text-xs inline-flex items-center gap-1.5 transition shadow-sm cursor-pointer"
                 >
                   <Plus className="w-4 h-4 text-[#B7F229]" />
                   <span>Crear Pista en {activeVenueObj?.shortName || 'esta Sede'}</span>
@@ -760,158 +757,11 @@ export const AdminCourtsManagement: React.FC<AdminCourtsManagementProps> = ({
               </div>
             )}
           </div>
-
-          {/* Subsección: Hardware IoT y Pasarelas de Control */}
-          <div className="pt-4 space-y-3">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200/80 dark:border-[#1A314D] shadow-2xs">
-              <div>
-                <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400">
-                  Dispositivos IoT & Pasarelas ({filteredDevices.length})
-                </h2>
-                <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                  Relés Shelly Pro DIN y cerraduras autónomas Salto KS vinculadas
-                </p>
-              </div>
-
-              <div className="flex items-center gap-1 p-1 bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-xl text-xs">
-                <button
-                  type="button"
-                  onClick={() => setDeviceFilter('all')}
-                  className={`px-3 py-1.5 rounded-lg font-bold transition cursor-pointer ${
-                    deviceFilter === 'all'
-                      ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D] shadow-xs'
-                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-                  }`}
-                >
-                  Todos ({venueSmartDevices.length})
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setDeviceFilter('light_relay')}
-                  className={`px-3 py-1.5 rounded-lg font-bold transition cursor-pointer ${
-                    deviceFilter === 'light_relay'
-                      ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D] shadow-xs'
-                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-                  }`}
-                >
-                  Relés Shelly Pro
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setDeviceFilter('pin_pad_lock')}
-                  className={`px-3 py-1.5 rounded-lg font-bold transition cursor-pointer ${
-                    deviceFilter === 'pin_pad_lock'
-                      ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D] shadow-xs'
-                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-                  }`}
-                >
-                  Cerraduras Salto KS
-                </button>
-              </div>
-            </div>
-
-            {/* Grid de Dispositivos IoT */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
-              {filteredDevices.map((dev) => (
-                <div
-                  key={dev.id}
-                  className="p-4 rounded-2xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] hover:border-slate-300 dark:hover:border-slate-700 flex flex-col justify-between space-y-3.5 shadow-2xs transition"
-                >
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between text-xs">
-                      <div className="flex items-center gap-1.5">
-                        <span className="font-extrabold text-[#0B1A2D] dark:text-white">{dev.courtName}</span>
-                        {isMultiVenueActive && (
-                          <span className="text-[10px] px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold border border-slate-200 dark:border-[#1A314D] flex items-center gap-1">
-                            <Building2 className="w-2.5 h-2.5" />
-                            {activeVenueObj?.shortName}
-                          </span>
-                        )}
-                      </div>
-                      <span className="text-[10px] uppercase font-mono font-bold px-2 py-0.5 rounded-full bg-[#F0FCCF] dark:bg-[#B7F229]/20 text-[#0B1A2D] dark:text-[#B7F229] border border-[#B7F229]/50">
-                        {dev.status === 'connected_demo' ? 'Conectado' : 'Online'}
-                      </span>
-                    </div>
-
-                    <div className="space-y-1">
-                      <h4 className="text-xs sm:text-sm font-bold text-[#0B1A2D] dark:text-white flex items-center gap-2">
-                        {dev.deviceType === 'light_relay' ? (
-                          <Zap className="w-4 h-4 text-amber-500" />
-                        ) : (
-                          <Lock className="w-4 h-4 text-[#8B5CF6]" />
-                        )}
-                        <span className="truncate">{dev.name}</span>
-                      </h4>
-                      <div className="text-[11px] text-slate-500 dark:text-slate-400">
-                        Gateway: <span className="text-slate-800 dark:text-slate-200 font-semibold">{dev.provider}</span>
-                      </div>
-                      <div className="text-[10px] text-slate-400 font-mono">ID / MAC: {dev.ipOrCloudId}</div>
-                    </div>
-
-                    {dev.deviceType === 'pin_pad_lock' && dev.currentAccessPin && (
-                      <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] flex items-center justify-between text-xs">
-                        <span className="text-slate-600 dark:text-slate-400 font-medium">PIN Activo:</span>
-                        <span className="font-mono text-base font-black text-[#0B1A2D] dark:text-[#B7F229]">
-                          {dev.currentAccessPin}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Botones de Acción IoT */}
-                  <div className="pt-2 border-t border-slate-100 dark:border-[#1A314D] flex items-center justify-between">
-                    <span className="text-[10px] text-slate-400 font-mono">{dev.lastSync}</span>
-
-                    {dev.deviceType === 'light_relay' ? (
-                      <button
-                        type="button"
-                        onClick={() => toggleSmartRelay(dev.id)}
-                        className={`px-3 py-1.5 rounded-xl font-bold text-xs flex items-center gap-1.5 transition active:scale-95 cursor-pointer ${
-                          dev.relayState
-                            ? 'bg-amber-500 hover:bg-amber-400 text-slate-950 shadow-xs'
-                            : 'bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300'
-                        }`}
-                      >
-                        <Power className="w-3.5 h-3.5" />
-                        <span>{dev.relayState ? 'Encendido (ON)' : 'Apagado (OFF)'}</span>
-                      </button>
-                    ) : (
-                      <button
-                        type="button"
-                        onClick={() => generateAccessPin(dev.id)}
-                        className="px-3 py-1.5 rounded-xl bg-[#0B1A2D] hover:bg-[#132A45] text-white font-bold text-xs flex items-center gap-1.5 transition active:scale-95 shadow-xs cursor-pointer"
-                      >
-                        <Key className="w-3.5 h-3.5 text-[#B7F229]" />
-                        <span>Regenerar PIN</span>
-                      </button>
-                    )}
-                  </div>
-                </div>
-              ))}
-
-              {filteredDevices.length === 0 && (
-                <div className="col-span-full p-8 text-center rounded-2xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] shadow-2xs space-y-2">
-                  <Zap className="w-7 h-7 text-amber-500 mx-auto" />
-                  <h3 className="text-xs font-bold text-slate-800 dark:text-slate-200">
-                    No hay adaptadores IoT vinculados en esta sede
-                  </h3>
-                  <button
-                    type="button"
-                    onClick={() => setShowAddDeviceModal(true)}
-                    className="px-3 py-1.5 rounded-xl bg-[#0B1A2D] hover:bg-[#132A45] text-white font-bold text-xs inline-flex items-center gap-1.5 transition shadow-sm cursor-pointer"
-                  >
-                    <Plus className="w-3.5 h-3.5 text-[#B7F229]" />
-                    <span>Vincular Adaptador</span>
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
         </div>
       )}
 
       {/* ======================================================================
-          PESTAÑA 2: REGISTROS Y LOGS DE AUTOMATIZACIÓN (REDISEÑO ANTISOLAPAMIENTO)
+          PESTAÑA 2: REGISTROS
           ====================================================================== */}
       {activeTab === 'logs' && (
         <div className="space-y-4 animate-in fade-in duration-150">
@@ -946,14 +796,12 @@ export const AdminCourtsManagement: React.FC<AdminCourtsManagementProps> = ({
                 const actionLower = log.action.toLowerCase();
                 const isLight = actionLower.includes('ilumin') || actionLower.includes('foco') || actionLower.includes('shelly');
                 const isAccess = actionLower.includes('torno') || actionLower.includes('puerta') || actionLower.includes('pin') || actionLower.includes('cerrad');
-                const isBooking = actionLower.includes('reserva');
 
                 return (
                   <div
                     key={log.id}
                     className="p-3.5 rounded-2xl bg-slate-50 dark:bg-[#071220] border border-slate-200/70 dark:border-[#1A314D] hover:border-slate-300 dark:hover:border-slate-700 transition flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs"
                   >
-                    {/* Icono + Contenido */}
                     <div className="flex items-start gap-3 min-w-0 flex-1">
                       <div
                         className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 mt-0.5 ${
@@ -961,8 +809,6 @@ export const AdminCourtsManagement: React.FC<AdminCourtsManagementProps> = ({
                             ? 'bg-amber-100 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400'
                             : isAccess
                             ? 'bg-[#F0FCCF] dark:bg-[#B7F229]/20 text-[#0B1A2D] dark:text-[#B7F229]'
-                            : isBooking
-                            ? 'bg-[#8B5CF6]/15 text-[#8B5CF6]'
                             : 'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300'
                         }`}
                       >
@@ -970,8 +816,6 @@ export const AdminCourtsManagement: React.FC<AdminCourtsManagementProps> = ({
                           <Zap className="w-4 h-4 animate-pulse" />
                         ) : isAccess ? (
                           <ShieldCheck className="w-4 h-4" />
-                        ) : isBooking ? (
-                          <Calendar className="w-4 h-4" />
                         ) : (
                           <Activity className="w-4 h-4" />
                         )}
@@ -1006,7 +850,6 @@ export const AdminCourtsManagement: React.FC<AdminCourtsManagementProps> = ({
                       </div>
                     </div>
 
-                    {/* Fecha y Marca de Tiempo (Alineada a la derecha, sin colisión) */}
                     <div className="shrink-0 flex items-center md:flex-col md:items-end justify-between md:justify-center border-t md:border-t-0 pt-2 md:pt-0 border-slate-200/60 dark:border-[#1A314D]">
                       <span className="text-[11px] font-mono font-bold text-slate-500 dark:text-slate-400 bg-white dark:bg-[#0E2239] px-2.5 py-1 rounded-lg border border-slate-200/80 dark:border-[#1A314D] whitespace-nowrap shadow-2xs">
                         {log.timestamp}
@@ -1032,37 +875,40 @@ export const AdminCourtsManagement: React.FC<AdminCourtsManagementProps> = ({
         </div>
       )}
 
-      {/* MODAL: ALTA / EDICIÓN DE PISTA (HOMOLOGADO A NIVEL 3) */}
+      {/* ======================================================================
+          MODAL A PANTALLA COMPLETA (FULL-SCREEN SHEET): NUEVA / EDITAR PISTA
+          ====================================================================== */}
       {isCreateModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0B1A2D]/75 backdrop-blur-sm p-4 overflow-hidden animate-in fade-in duration-150">
-          <div className="relative w-full max-w-lg bg-white dark:bg-[#0E2239] border border-slate-200/90 dark:border-[#1A314D] rounded-3xl shadow-2xl text-slate-900 dark:text-slate-100 flex flex-col max-h-[90vh] overflow-hidden">
-            {/* Header Fijo con X correctamente alineada */}
-            <div className="p-5 sm:p-6 border-b border-slate-100 dark:border-[#1A314D] flex items-center justify-between shrink-0">
-              <h3 className="text-lg font-black text-[#0B1A2D] dark:text-white">
-                {editingCourt ? `Editar ${editingCourt.name}` : 'Crear Nueva Pista'}
-              </h3>
+        <div className="fixed inset-0 z-50 flex flex-col bg-slate-950/60 dark:bg-black/75 backdrop-blur-xs overflow-y-auto sm:p-4 lg:p-6 sm:items-center sm:justify-center animate-in fade-in duration-150">
+          <div className="w-full min-h-screen sm:min-h-0 sm:max-w-2xl lg:max-w-3xl bg-white dark:bg-[#071220] sm:rounded-3xl shadow-2xl flex flex-col border-0 sm:border sm:border-slate-200/90 dark:sm:border-[#1A314D] overflow-hidden my-auto">
+            {/* Header Limpio y Exclusivo con botón X */}
+            <div className="sticky top-0 z-20 px-5 sm:px-6 py-4 border-b border-slate-100 dark:border-[#1A314D] flex items-center justify-between bg-white/95 dark:bg-[#071220]/95 backdrop-blur-md shrink-0">
+              <h2 className="text-lg sm:text-xl font-black text-[#0B1A2D] dark:text-white tracking-tight">
+                {editingCourt ? `Editar ${editingCourt.name}` : 'Nueva Pista'}
+              </h2>
               <button
                 type="button"
                 onClick={() => setIsCreateModalOpen(false)}
-                className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
-                title="Cerrar ventana"
+                className="p-2 -mr-1.5 text-slate-400 hover:text-slate-700 dark:hover:text-white rounded-xl hover:bg-slate-100 dark:hover:bg-[#0E2239] transition-colors cursor-pointer shrink-0"
+                title="Cerrar formulario"
+                aria-label="Cerrar"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            {/* Formulario Organizado sin Cajas Pesadas Innecesarias */}
-            <form onSubmit={handleFormSubmit} className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-4 overscroll-contain text-xs">
+            {/* Contenido sin scrollbars anidadas */}
+            <form onSubmit={handleFormSubmit} className="p-5 sm:p-7 space-y-5 sm:space-y-6 text-xs text-slate-900 dark:text-slate-100 flex-1">
               {isMultiVenueActive && (
                 <div>
-                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
-                    Sede Asignada *
+                  <label className="block text-slate-700 dark:text-slate-300 font-bold mb-1.5 text-xs">
+                    Sede Asignada <span className="text-rose-500">*</span>
                   </label>
                   <select
                     required
                     value={formData.venueId}
                     onChange={(e) => setFormData({ ...formData, venueId: e.target.value })}
-                    className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-xl text-xs font-semibold text-slate-900 dark:text-white focus:outline-none focus:border-[#8B5CF6]"
+                    className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-xl text-xs font-semibold text-[#0B1A2D] dark:text-white focus:outline-none focus:ring-1 focus:ring-[#B7F229] focus:border-[#B7F229] transition shadow-2xs"
                   >
                     {realVenues.map((v) => (
                       <option key={v.id} value={v.id}>
@@ -1077,28 +923,28 @@ export const AdminCourtsManagement: React.FC<AdminCourtsManagementProps> = ({
               )}
 
               <div>
-                <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
-                  Nombre de la Pista *
+                <label className="block text-slate-700 dark:text-slate-300 font-bold mb-1.5 text-xs">
+                  Nombre de la Pista <span className="text-rose-500">*</span>
                 </label>
                 <input
                   type="text"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   placeholder="Ej: Pista 9 (Central Panorámica)"
-                  className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-xl text-xs font-semibold text-slate-900 dark:text-white focus:outline-none focus:border-[#8B5CF6]"
+                  className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-xl text-xs font-semibold text-[#0B1A2D] dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-[#B7F229] focus:border-[#B7F229] transition shadow-2xs"
                 />
-                {formErrors.name && <span className="text-rose-500 text-[11px] mt-1 block">{formErrors.name}</span>}
+                {formErrors.name && <span className="text-rose-500 text-[11px] mt-1 block font-bold">{formErrors.name}</span>}
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  <label className="block text-slate-700 dark:text-slate-300 font-bold mb-1.5 text-xs">
                     Tipo de Pista
                   </label>
                   <select
                     value={formData.courtType}
                     onChange={(e) => setFormData({ ...formData, courtType: e.target.value as any })}
-                    className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-xl text-xs font-semibold text-slate-900 dark:text-white focus:outline-none focus:border-[#8B5CF6]"
+                    className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-xl text-xs font-semibold text-[#0B1A2D] dark:text-white focus:outline-none focus:ring-1 focus:ring-[#B7F229] focus:border-[#B7F229] transition shadow-2xs"
                   >
                     <option value="indoor">Indoor (Cubierta)</option>
                     <option value="outdoor">Outdoor (Exterior)</option>
@@ -1107,8 +953,8 @@ export const AdminCourtsManagement: React.FC<AdminCourtsManagementProps> = ({
                 </div>
 
                 <div>
-                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
-                    Tarifa Horaria (€/h) *
+                  <label className="block text-slate-700 dark:text-slate-300 font-bold mb-1.5 text-xs">
+                    Tarifa Horaria (€/h) <span className="text-rose-500">*</span>
                   </label>
                   <input
                     type="number"
@@ -1116,47 +962,47 @@ export const AdminCourtsManagement: React.FC<AdminCourtsManagementProps> = ({
                     min="1"
                     value={formData.hourlyRate}
                     onChange={(e) => setFormData({ ...formData, hourlyRate: parseFloat(e.target.value) || 0 })}
-                    className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-xl text-xs font-mono font-bold text-slate-900 dark:text-white focus:outline-none focus:border-[#8B5CF6]"
+                    className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-xl text-xs font-mono font-bold text-[#0B1A2D] dark:text-white focus:outline-none focus:ring-1 focus:ring-[#B7F229] focus:border-[#B7F229] transition shadow-2xs"
                   />
-                  {formErrors.hourlyRate && <span className="text-rose-500 text-[11px] mt-1 block">{formErrors.hourlyRate}</span>}
+                  {formErrors.hourlyRate && <span className="text-rose-500 text-[11px] mt-1 block font-bold">{formErrors.hourlyRate}</span>}
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
-                    Superficie de Juego *
+                  <label className="block text-slate-700 dark:text-slate-300 font-bold mb-1.5 text-xs">
+                    Superficie de Juego <span className="text-rose-500">*</span>
                   </label>
                   <input
                     type="text"
                     value={formData.surface}
                     onChange={(e) => setFormData({ ...formData, surface: e.target.value })}
                     placeholder="Mondo Supercourt WPT"
-                    className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-xl text-xs font-semibold text-slate-900 dark:text-white focus:outline-none focus:border-[#8B5CF6]"
+                    className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-xl text-xs font-semibold text-[#0B1A2D] dark:text-white focus:outline-none focus:ring-1 focus:ring-[#B7F229] focus:border-[#B7F229] transition shadow-2xs"
                   />
-                  {formErrors.surface && <span className="text-rose-500 text-[11px] mt-1 block">{formErrors.surface}</span>}
+                  {formErrors.surface && <span className="text-rose-500 text-[11px] mt-1 block font-bold">{formErrors.surface}</span>}
                 </div>
 
                 <div>
-                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  <label className="block text-slate-700 dark:text-slate-300 font-bold mb-1.5 text-xs">
                     Código PIN Torno / Acceso
                   </label>
                   <input
                     type="text"
                     value={formData.accessPin}
                     onChange={(e) => setFormData({ ...formData, accessPin: e.target.value })}
-                    placeholder="5821#"
-                    className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-xl text-xs font-mono font-bold text-slate-900 dark:text-white focus:outline-none focus:border-[#8B5CF6]"
+                    placeholder="4821#"
+                    className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-xl text-xs font-mono font-bold text-[#0B1A2D] dark:text-white focus:outline-none focus:ring-1 focus:ring-[#B7F229] focus:border-[#B7F229] transition shadow-2xs"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">
-                  Fotografía de la Pista (URL o Archivo)
+                <label className="block text-slate-700 dark:text-slate-300 font-bold mb-1.5 text-xs">
+                  Fotografía de la Pista
                 </label>
                 {formData.photoUrl ? (
-                  <div className="relative rounded-2xl overflow-hidden border border-slate-200/80 dark:border-[#1A314D] bg-slate-100 dark:bg-slate-950 mb-2">
+                  <div className="relative rounded-2xl overflow-hidden border border-slate-200/80 dark:border-[#1A314D] bg-slate-100 dark:bg-slate-950">
                     <img
                       src={formData.photoUrl}
                       alt="Vista previa de pista"
@@ -1176,7 +1022,7 @@ export const AdminCourtsManagement: React.FC<AdminCourtsManagementProps> = ({
                     </div>
                   </div>
                 ) : (
-                  <label className="flex flex-col items-center justify-center p-5 border-2 border-dashed border-slate-300 dark:border-[#1A314D] hover:border-[#8B5CF6] rounded-2xl cursor-pointer bg-slate-50 dark:bg-[#071220] transition text-center">
+                  <label className="flex flex-col items-center justify-center p-5 border border-dashed border-slate-300 dark:border-[#1A314D] hover:border-[#8B5CF6] rounded-2xl cursor-pointer bg-slate-50 dark:bg-[#071220] transition text-center">
                     <Upload className="w-5 h-5 text-slate-400 mb-1" />
                     <span className="text-xs font-bold text-slate-700 dark:text-slate-300">
                       Seleccionar imagen para la pista
@@ -1203,91 +1049,96 @@ export const AdminCourtsManagement: React.FC<AdminCourtsManagementProps> = ({
               </div>
 
               <div className="pt-2 border-t border-slate-100 dark:border-[#1A314D] space-y-2.5">
-                <label className="flex items-center gap-2.5 cursor-pointer">
+                <label className="flex items-center gap-2.5 cursor-pointer select-none">
                   <input
                     type="checkbox"
                     checked={formData.isPanoramic}
                     onChange={(e) => setFormData({ ...formData, isPanoramic: e.target.checked })}
-                    className="w-4 h-4 rounded text-[#8B5CF6] focus:ring-[#8B5CF6]"
+                    className="w-4 h-4 rounded text-[#0B1A2D] accent-[#0B1A2D] dark:accent-[#B7F229] focus:ring-[#B7F229]"
                   />
                   <span className="font-semibold text-slate-800 dark:text-slate-200">
                     Estructura Panorámica WPT Pro (Sin marcos intermedios)
                   </span>
                 </label>
 
-                <label className="flex items-center gap-2.5 cursor-pointer">
+                <label className="flex items-center gap-2.5 cursor-pointer select-none">
                   <input
                     type="checkbox"
                     checked={formData.hasLights}
                     onChange={(e) => setFormData({ ...formData, hasLights: e.target.checked })}
-                    className="w-4 h-4 rounded text-[#8B5CF6] focus:ring-[#8B5CF6]"
+                    className="w-4 h-4 rounded text-[#0B1A2D] accent-[#0B1A2D] dark:accent-[#B7F229] focus:ring-[#B7F229]"
                   />
                   <span className="font-semibold text-slate-800 dark:text-slate-200">
                     Focos LED y Relé Shelly IoT conectado
                   </span>
                 </label>
               </div>
+            </form>
 
-              {/* Footer de Acciones del Modal */}
-              <div className="pt-4 border-t border-slate-100 dark:border-[#1A314D] flex justify-end gap-2.5">
+            {/* Footer Sólido y Simétrico a Ancho Completo (Distribución Equitativa 50/50) */}
+            <div className="sticky bottom-0 z-20 px-5 sm:px-6 py-3.5 sm:py-4 border-t border-slate-100 dark:border-[#1A314D] bg-white/95 dark:bg-[#071220]/95 backdrop-blur-md shrink-0">
+              <div className="grid grid-cols-2 gap-3 w-full">
                 <button
                   type="button"
                   onClick={() => setIsCreateModalOpen(false)}
-                  className="px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition"
+                  className="w-full py-3 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-[#0E2239] dark:hover:bg-[#132A45] text-slate-700 dark:text-slate-300 font-bold text-xs sm:text-sm border border-slate-200/80 dark:border-[#1A314D] transition cursor-pointer active:scale-[0.99] flex items-center justify-center text-center whitespace-nowrap"
                 >
-                  Cancelar
+                  <span>Cancelar</span>
                 </button>
                 <button
-                  type="submit"
-                  className="px-5 py-2.5 rounded-xl bg-[#B7F229] hover:bg-[#a6e61f] text-[#0B1A2D] font-black text-xs shadow-md flex items-center gap-1.5 cursor-pointer active:scale-95 transition"
+                  type="button"
+                  onClick={handleFormSubmit}
+                  className="w-full py-3 px-3 rounded-xl bg-[#0B1A2D] hover:bg-[#132A45] text-white dark:bg-[#B7F229] dark:hover:bg-[#a6e61f] dark:text-[#0B1A2D] font-bold text-xs sm:text-sm border border-transparent shadow-md transition active:scale-[0.99] cursor-pointer flex items-center justify-center text-center whitespace-nowrap"
                 >
-                  <Check className="w-4 h-4 stroke-[2.5]" />
                   <span>{editingCourt ? 'Guardar Cambios' : 'Crear Pista'}</span>
                 </button>
               </div>
-            </form>
+            </div>
           </div>
         </div>
       )}
 
-      {/* MODAL: AÑADIR ADAPTADOR HARDWARE IOT */}
+      {/* ======================================================================
+          MODAL A PANTALLA COMPLETA (FULL-SCREEN SHEET): NUEVO ADAPTADOR IOT
+          ====================================================================== */}
       {showAddDeviceModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0B1A2D]/75 p-4 backdrop-blur-sm animate-in fade-in duration-150">
-          <div className="w-full max-w-md rounded-3xl bg-white dark:bg-[#0E2239] border border-slate-200/90 dark:border-[#1A314D] p-5 sm:p-6 shadow-2xl text-slate-900 dark:text-slate-100 space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-100 dark:border-[#1A314D] pb-3">
-              <div>
-                <h3 className="text-base font-black text-[#0B1A2D] dark:text-white">
-                  Vincular Adaptador Hardware IoT
-                </h3>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                  Integración con gateways Shelly Pro DIN y cerraduras Salto KS
-                </p>
-              </div>
+        <div className="fixed inset-0 z-50 flex flex-col bg-slate-950/60 dark:bg-black/75 backdrop-blur-xs overflow-y-auto sm:p-4 lg:p-6 sm:items-center sm:justify-center animate-in fade-in duration-150">
+          <div className="w-full min-h-screen sm:min-h-0 sm:max-w-lg bg-white dark:bg-[#071220] sm:rounded-3xl shadow-2xl flex flex-col border-0 sm:border sm:border-slate-200/90 dark:sm:border-[#1A314D] overflow-hidden my-auto">
+            {/* Header Limpio y Exclusivo con botón X */}
+            <div className="sticky top-0 z-20 px-5 sm:px-6 py-4 border-b border-slate-100 dark:border-[#1A314D] flex items-center justify-between bg-white/95 dark:bg-[#071220]/95 backdrop-blur-md shrink-0">
+              <h2 className="text-lg sm:text-xl font-black text-[#0B1A2D] dark:text-white tracking-tight">
+                Nuevo Adaptador IoT
+              </h2>
               <button
                 type="button"
                 onClick={() => setShowAddDeviceModal(false)}
-                className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+                className="p-2 -mr-1.5 text-slate-400 hover:text-slate-700 dark:hover:text-white rounded-xl hover:bg-slate-100 dark:hover:bg-[#0E2239] transition-colors cursor-pointer shrink-0"
+                title="Cerrar formulario"
+                aria-label="Cerrar"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            {isMultiVenueActive && (
-              <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] flex items-center justify-between text-xs">
-                <span className="text-slate-600 dark:text-slate-300 font-medium flex items-center gap-1.5">
-                  <Building2 className="w-3.5 h-3.5 text-[#8B5CF6]" />
-                  <span>Sede Asignada:</span>
-                </span>
-                <span className="font-bold text-[#0B1A2D] dark:text-[#B7F229]">
-                  {activeVenueObj?.name}
-                </span>
-              </div>
-            )}
+            {/* Formulario sin scrollbars anidadas */}
+            <form onSubmit={handleAddDeviceSubmit} className="p-5 sm:p-6 space-y-4 sm:space-y-5 text-xs text-slate-900 dark:text-slate-100 flex-1">
+              {isMultiVenueActive && (
+                <div>
+                  <label className="block text-slate-700 dark:text-slate-300 mb-1.5 font-bold text-xs">
+                    Sede Asignada
+                  </label>
+                  <div className="p-3 rounded-xl bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] flex items-center justify-between text-xs">
+                    <span className="text-slate-600 dark:text-slate-300 font-medium">Sede Activa:</span>
+                    <span className="font-bold text-[#0B1A2D] dark:text-[#B7F229]">
+                      {activeVenueObj?.name}
+                    </span>
+                  </div>
+                </div>
+              )}
 
-            <form onSubmit={handleAddDeviceSubmit} className="space-y-3.5 text-xs">
               <div>
-                <label className="block text-slate-700 dark:text-slate-300 mb-1 font-bold">
-                  Nombre del Dispositivo / Canal
+                <label className="block text-slate-700 dark:text-slate-300 mb-1.5 font-bold text-xs">
+                  Nombre del Dispositivo / Canal <span className="text-rose-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -1295,18 +1146,18 @@ export const AdminCourtsManagement: React.FC<AdminCourtsManagementProps> = ({
                   value={newDeviceName}
                   onChange={(e) => setNewDeviceName(e.target.value)}
                   placeholder="Ej: Relé Focos Pista 6 (Canal A)"
-                  className="w-full bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-xl px-3 py-2 text-slate-900 dark:text-white focus:outline-none focus:border-[#8B5CF6]"
+                  className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-xl text-xs font-semibold text-[#0B1A2D] dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-[#B7F229] focus:border-[#B7F229] transition shadow-2xs"
                 />
               </div>
 
               <div>
-                <label className="block text-slate-700 dark:text-slate-300 mb-1 font-bold">
+                <label className="block text-slate-700 dark:text-slate-300 mb-1.5 font-bold text-xs">
                   Proveedor / Protocolo
                 </label>
                 <select
                   value={newProvider}
                   onChange={(e) => setNewProvider(e.target.value as any)}
-                  className="w-full bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-xl px-3 py-2 text-slate-900 dark:text-white focus:outline-none focus:border-[#8B5CF6]"
+                  className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-xl text-xs font-semibold text-[#0B1A2D] dark:text-white focus:outline-none focus:ring-1 focus:ring-[#B7F229] focus:border-[#B7F229] transition shadow-2xs"
                 >
                   <option value="Shelly Cloud Pro">Shelly Cloud Pro (Relé DIN)</option>
                   <option value="Salto KS Cloud">Salto KS Cloud (Cerradura PIN)</option>
@@ -1316,13 +1167,13 @@ export const AdminCourtsManagement: React.FC<AdminCourtsManagementProps> = ({
               </div>
 
               <div>
-                <label className="block text-slate-700 dark:text-slate-300 mb-1 font-bold">
+                <label className="block text-slate-700 dark:text-slate-300 mb-1.5 font-bold text-xs">
                   Pista Asignada {isMultiVenueActive ? `(${activeVenueObj?.shortName || 'Sede'}) *` : '*'}
                 </label>
                 <select
                   value={newCourtId}
                   onChange={(e) => setNewCourtId(e.target.value)}
-                  className="w-full bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-xl px-3 py-2 text-slate-900 dark:text-white focus:outline-none focus:border-[#8B5CF6]"
+                  className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-xl text-xs font-semibold text-[#0B1A2D] dark:text-white focus:outline-none focus:ring-1 focus:ring-[#B7F229] focus:border-[#B7F229] transition shadow-2xs"
                 >
                   {venueCourts.map((c) => (
                     <option key={c.id} value={c.id}>
@@ -1331,28 +1182,32 @@ export const AdminCourtsManagement: React.FC<AdminCourtsManagementProps> = ({
                   ))}
                 </select>
                 {venueCourts.length === 0 && (
-                  <p className="text-[11px] text-amber-600 dark:text-amber-400 mt-1">
+                  <p className="text-[11px] text-amber-600 dark:text-amber-400 mt-1 font-semibold">
                     No hay pistas dadas de alta en esta sede. Da de alta una pista primero.
                   </p>
                 )}
               </div>
+            </form>
 
-              <div className="pt-2 flex items-center justify-end gap-2 border-t border-slate-100 dark:border-[#1A314D]">
+            {/* Footer Sólido y Simétrico a Ancho Completo (Distribución Equitativa 50/50) */}
+            <div className="sticky bottom-0 z-20 px-5 sm:px-6 py-3.5 sm:py-4 border-t border-slate-100 dark:border-[#1A314D] bg-white/95 dark:bg-[#071220]/95 backdrop-blur-md shrink-0">
+              <div className="grid grid-cols-2 gap-3 w-full">
                 <button
                   type="button"
                   onClick={() => setShowAddDeviceModal(false)}
-                  className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold transition cursor-pointer"
+                  className="w-full py-3 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-[#0E2239] dark:hover:bg-[#132A45] text-slate-700 dark:text-slate-300 font-bold text-xs sm:text-sm border border-slate-200/80 dark:border-[#1A314D] transition cursor-pointer active:scale-[0.99] flex items-center justify-center text-center whitespace-nowrap"
                 >
-                  Cancelar
+                  <span>Cancelar</span>
                 </button>
                 <button
-                  type="submit"
-                  className="px-5 py-2 rounded-xl bg-[#B7F229] hover:bg-[#a6e61f] text-[#0B1A2D] font-black transition shadow-sm active:scale-95 cursor-pointer"
+                  type="button"
+                  onClick={handleAddDeviceSubmit}
+                  className="w-full py-3 px-3 rounded-xl bg-[#0B1A2D] hover:bg-[#132A45] text-white dark:bg-[#B7F229] dark:hover:bg-[#a6e61f] dark:text-[#0B1A2D] font-bold text-xs sm:text-sm border border-transparent shadow-md transition active:scale-[0.99] cursor-pointer flex items-center justify-center text-center whitespace-nowrap"
                 >
-                  Vincular Dispositivo
+                  <span>Vincular Adaptador</span>
                 </button>
               </div>
-            </form>
+            </div>
           </div>
         </div>
       )}
@@ -1375,18 +1230,18 @@ export const AdminCourtsManagement: React.FC<AdminCourtsManagementProps> = ({
               La pista dejará de aparecer en la cuadrícula de reservas para socios y recepción. Las reservas pasadas se conservarán para el histórico contable.
             </p>
 
-            <div className="flex justify-end gap-2 pt-2 border-t border-slate-100 dark:border-[#1A314D]">
+            <div className="grid grid-cols-2 gap-3 pt-2 border-t border-slate-100 dark:border-[#1A314D]">
               <button
                 type="button"
                 onClick={() => setDeletingCourtId(null)}
-                className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs cursor-pointer"
+                className="w-full py-2.5 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-[#071220] dark:hover:bg-[#132A45] text-slate-700 dark:text-slate-300 font-bold text-xs transition cursor-pointer text-center"
               >
                 Cancelar
               </button>
               <button
                 type="button"
                 onClick={() => confirmDeleteCourt(deletingCourtId)}
-                className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs shadow-sm cursor-pointer"
+                className="w-full py-2.5 px-3 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs shadow-sm transition cursor-pointer text-center"
               >
                 Confirmar Baja
               </button>

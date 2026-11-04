@@ -406,7 +406,12 @@ export const ClubDashboard: React.FC = () => {
         <div className="grid grid-cols-2 gap-2.5">
           <button
             type="button"
-            onClick={() => setShowNewBookingModal(true)}
+            onClick={() => {
+              setAdminTab('new_booking');
+              if (typeof window !== 'undefined') {
+                window.history.pushState({}, '', '/gestion/reservas/nueva');
+              }
+            }}
             className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-2xl bg-[#0B1A2D] hover:bg-[#132A45] active:scale-98 text-white font-bold text-xs shadow-xs border border-[#0B1A2D] dark:border-slate-700 transition-all cursor-pointer tracking-tight"
           >
             <Plus className="w-4 h-4 stroke-[3] text-white shrink-0" />
@@ -415,7 +420,12 @@ export const ClubDashboard: React.FC = () => {
 
           <button
             type="button"
-            onClick={() => setShowNewMatchModal(true)}
+            onClick={() => {
+              setAdminTab('new_match');
+              if (typeof window !== 'undefined') {
+                window.history.pushState({}, '', '/gestion/partidas/nueva');
+              }
+            }}
             className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-2xl bg-[#0B1A2D] hover:bg-[#132A45] active:scale-98 text-white font-bold text-xs shadow-xs border border-[#0B1A2D] dark:border-slate-700 transition-all cursor-pointer tracking-tight"
           >
             <Plus className="w-4 h-4 stroke-[3] text-white shrink-0" />

@@ -46,8 +46,11 @@ export const NewBookingModal: React.FC<NewBookingModalProps> = ({
     customers,
     triggerDemoToast,
     currentTenant,
+    setAdminTab,
+    setNewBookingDraft,
     t,
   } = useApp();
+
 
   // Helper date
   const todayStr = useMemo(() => {
@@ -288,25 +291,26 @@ export const NewBookingModal: React.FC<NewBookingModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-[#0B1A2D]/80 backdrop-blur-sm p-3 sm:p-4 animate-in fade-in duration-150">
-      <div className="w-full max-w-xl bg-white dark:bg-[#0E2239] border border-slate-200/90 dark:border-[#1A314D] rounded-3xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden text-slate-900 dark:text-slate-100">
-        {/* Modal Header */}
-        <div className="px-5 sm:px-6 py-4 border-b border-slate-100 dark:border-[#1A314D] flex items-center justify-between bg-white dark:bg-[#0E2239] shrink-0">
-          <h3 className="text-lg font-black text-[#0B1A2D] dark:text-white tracking-tight">
+    <div className="fixed inset-0 z-50 flex flex-col bg-slate-950/60 dark:bg-black/75 backdrop-blur-xs overflow-y-auto sm:p-4 lg:p-6 sm:items-center sm:justify-center animate-in fade-in duration-150">
+      <div className="w-full min-h-screen sm:min-h-0 sm:max-w-2xl lg:max-w-3xl bg-white dark:bg-[#071220] sm:rounded-3xl shadow-2xl flex flex-col border-0 sm:border sm:border-slate-200/90 dark:sm:border-[#1A314D] overflow-hidden my-auto">
+        {/* Modal Header Limpio y Exclusivo */}
+        <div className="sticky top-0 z-20 px-5 sm:px-6 py-4 border-b border-slate-100 dark:border-[#1A314D] flex items-center justify-between bg-white/95 dark:bg-[#071220]/95 backdrop-blur-md shrink-0">
+          <h2 className="text-lg sm:text-xl font-black text-[#0B1A2D] dark:text-white tracking-tight">
             Nueva Reserva
-          </h3>
+          </h2>
           <button
             type="button"
             onClick={onClose}
-            className="p-1.5 text-slate-400 hover:text-slate-700 dark:hover:text-white rounded-xl hover:bg-slate-100 dark:hover:bg-[#132A45] transition cursor-pointer shrink-0"
-            title="Cerrar ventana"
+            className="p-2 -mr-1.5 text-slate-400 hover:text-slate-700 dark:hover:text-white rounded-xl hover:bg-slate-100 dark:hover:bg-[#0E2239] transition-colors cursor-pointer shrink-0"
+            title="Cerrar formulario"
+            aria-label="Cerrar"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        {/* Form Body */}
-        <form onSubmit={handleSubmit} className="p-5 sm:p-6 overflow-y-auto space-y-4 text-xs flex-1">
+        {/* Form Body - Flujo continuo sin scrollbars anidadas */}
+        <form onSubmit={handleSubmit} className="p-5 sm:p-7 space-y-5 sm:space-y-6 text-xs text-slate-900 dark:text-slate-100 flex-1">
           {/* 1. SELECTOR DE SEDE (SOLO SI ES ENTORNO MULTI-SEDE) */}
           {hasMultipleVenues && (
             <div className="space-y-1.5">
@@ -824,19 +828,19 @@ export const NewBookingModal: React.FC<NewBookingModalProps> = ({
         </form>
 
         {/* Modal Footer Sólido y Simétrico (Distribución Equitativa 50/50) */}
-        <div className="px-5 sm:px-6 py-3.5 border-t border-slate-100 dark:border-[#1A314D] bg-slate-50/50 dark:bg-[#071220]/50 shrink-0">
+        <div className="sticky bottom-0 z-20 px-5 sm:px-6 py-3.5 sm:py-4 border-t border-slate-100 dark:border-[#1A314D] bg-white/95 dark:bg-[#071220]/95 backdrop-blur-md shrink-0">
           <div className="grid grid-cols-2 gap-3 w-full">
             <button
               type="button"
               onClick={onClose}
-              className="w-full py-2.5 sm:py-3 px-2.5 sm:px-4 rounded-xl bg-white dark:bg-[#0E2239] hover:bg-slate-100 dark:hover:bg-[#132A45] text-slate-700 dark:text-slate-300 font-bold text-xs sm:text-sm border border-slate-200/80 dark:border-[#1A314D] transition cursor-pointer active:scale-[0.99] flex items-center justify-center text-center whitespace-nowrap"
+              className="w-full py-3 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-[#0E2239] dark:hover:bg-[#132A45] text-slate-700 dark:text-slate-300 font-bold text-xs sm:text-sm border border-slate-200/80 dark:border-[#1A314D] transition cursor-pointer active:scale-[0.99] flex items-center justify-center text-center whitespace-nowrap"
             >
               <span>Cancelar</span>
             </button>
             <button
-              type="button"
+              type="submit"
               onClick={handleSubmit}
-              className="w-full py-2.5 sm:py-3 px-2.5 sm:px-4 rounded-xl bg-[#0B1A2D] hover:bg-[#132A45] text-white font-bold text-xs sm:text-sm border border-[#1A314D] shadow-md transition active:scale-[0.99] cursor-pointer flex items-center justify-center text-center whitespace-nowrap"
+              className="w-full py-3 px-3 rounded-xl bg-[#0B1A2D] hover:bg-[#132A45] text-white dark:bg-[#B7F229] dark:hover:bg-[#a6e61f] dark:text-[#0B1A2D] font-bold text-xs sm:text-sm border border-transparent shadow-md transition active:scale-[0.99] cursor-pointer flex items-center justify-center text-center whitespace-nowrap"
             >
               <span>{clientType === 'block' ? 'Confirmar Bloqueo' : 'Confirmar Reserva'}</span>
             </button>
