@@ -332,31 +332,40 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
           DRAWER TÁCTIL "MÁS" EN MÓVIL (Módulos Secundarios en Idéntico Orden)
           ====================================================================== */}
       {mobileMoreOpen && (
-        <div className="md:hidden fixed inset-0 z-50 flex flex-col justify-end bg-slate-950/70 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-white dark:bg-slate-900 rounded-t-3xl border-t border-slate-200 dark:border-slate-800 p-5 space-y-4 max-h-[85vh] overflow-y-auto shadow-2xl">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
-              <div className="flex items-center gap-2.5">
-                <SetmioLogo variant="symbol" size="sm" />
+        <div className="md:hidden fixed inset-0 z-50 flex flex-col justify-end bg-slate-950/70 dark:bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
+          <div className="w-full bg-white dark:bg-[#071220] rounded-t-[32px] border-t border-slate-200/90 dark:border-[#1A314D] shadow-[0_-12px_40px_rgba(0,0,0,0.35)] flex flex-col max-h-[88vh] overflow-hidden animate-in slide-in-from-bottom-6 duration-200">
+            {/* Barra táctil indicadora superior */}
+            <div className="w-12 h-1 bg-slate-300 dark:bg-slate-700 rounded-full mx-auto mt-3 mb-1 shrink-0" />
+
+            {/* Cabecera del Panel */}
+            <div className="px-5 pb-3 pt-1 border-b border-slate-100 dark:border-[#1A314D] flex items-center justify-between shrink-0">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-2xl bg-[#0B1A2D] dark:bg-white text-white dark:text-[#0B1A2D] flex items-center justify-center shadow-xs shrink-0">
+                  <SetmioLogo variant="symbol" size="sm" />
+                </div>
                 <div>
-                  <div className="font-extrabold text-sm text-slate-900 dark:text-white">
-                    Más Módulos & Herramientas
+                  <div className="font-black text-sm tracking-tight text-[#0B1A2D] dark:text-white">
+                    Módulos & Herramientas
                   </div>
-                  <div className="text-[10px] text-[#8B5CF6] font-bold">
-                    {roleTitle} · {currentTenant.name}
+                  <div className="text-[11px] text-slate-500 dark:text-slate-400 font-medium flex items-center gap-1.5">
+                    <span className="font-bold text-[#8B5CF6] dark:text-[#B7F229]">{roleTitle}</span>
+                    <span>·</span>
+                    <span className="truncate max-w-[170px]">{currentTenant.name}</span>
                   </div>
                 </div>
               </div>
               <button
                 type="button"
                 onClick={() => setMobileMoreOpen(false)}
-                className="p-1.5 rounded-xl text-slate-500 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+                className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#0E2239] transition cursor-pointer"
+                aria-label="Cerrar panel"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            {/* Módulos en Drawer Secundario (Línea Ejecutiva Limpia) */}
-            <div className="space-y-1">
+            {/* Módulos en Drawer Secundario (Estilo Linear / Stripe con espaciado amplio y tipografía cuidada) */}
+            <div className="flex-1 overflow-y-auto overscroll-contain px-4 py-3 space-y-1.5">
               {secondaryItems.map((tab) => {
                 const Icon = tab.icon;
                 const isActive = adminTab === tab.id;
@@ -364,112 +373,161 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
                   <button
                     key={tab.id}
                     type="button"
-                    onClick={() => handleSelectTab(tab.id)}
-                    className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl transition text-left cursor-pointer group active:scale-98 ${
+                    onClick={() => {
+                      setMobileMoreOpen(false);
+                      handleSelectTab(tab.id);
+                    }}
+                    className={`w-full flex items-center justify-between p-2.5 rounded-2xl transition text-left cursor-pointer group active:scale-[0.99] border ${
                       isActive
-                        ? 'bg-[#8B5CF6]/15 dark:bg-[#8B5CF6]/25 text-[#6D28D9] dark:text-[#C4B5FD] font-extrabold'
-                        : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-[#132A45]/60'
+                        ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D] border-transparent shadow-xs'
+                        : 'bg-slate-50/70 dark:bg-[#0E2239]/60 hover:bg-slate-100 dark:hover:bg-[#132A45] border-slate-200/60 dark:border-[#1A314D]/60 text-slate-800 dark:text-slate-100'
                     }`}
                   >
                     <div className="flex items-center gap-3 min-w-0">
-                      <Icon className={`w-4 h-4 shrink-0 transition-colors stroke-[2.2] ${isActive ? 'text-[#8B5CF6] dark:text-[#B7F229]' : 'text-slate-400 dark:text-slate-400 group-hover:text-slate-700 dark:group-hover:text-white'}`} />
-                      <span className="text-xs font-bold tracking-tight truncate">{tab.label}</span>
+                      <div
+                        className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 border transition ${
+                          isActive
+                            ? 'bg-white/10 dark:bg-[#0B1A2D]/10 border-white/20 dark:border-[#0B1A2D]/20 text-[#B7F229] dark:text-[#0B1A2D]'
+                            : 'bg-white dark:bg-[#071220] border-slate-200/80 dark:border-[#1A314D] text-[#0B1A2D] dark:text-[#B7F229]'
+                        }`}
+                      >
+                        <Icon className="w-4 h-4 stroke-[2.2]" />
+                      </div>
+                      <div className="min-w-0">
+                        <span className="text-xs font-bold tracking-tight block truncate">
+                          {tab.label}
+                        </span>
+                        {tab.desc && (
+                          <span
+                            className={`text-[10px] truncate block ${
+                              isActive ? 'text-white/70 dark:text-[#0B1A2D]/70' : 'text-slate-400 dark:text-slate-400'
+                            }`}
+                          >
+                            {tab.desc}
+                          </span>
+                        )}
+                      </div>
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
                       {tab.badge && (
-                        <span className="text-[9px] uppercase px-1.5 py-0.5 rounded-md font-mono font-bold bg-slate-200/80 dark:bg-slate-800 text-[#8B5CF6] dark:text-[#B7F229]">
+                        <span
+                          className={`text-[9px] uppercase px-2 py-0.5 rounded-lg font-mono font-bold tracking-wide ${
+                            isActive
+                              ? 'bg-[#B7F229] text-[#0B1A2D]'
+                              : 'bg-slate-200/80 dark:bg-[#1A314D] text-[#8B5CF6] dark:text-[#B7F229]'
+                          }`}
+                        >
                           {tab.badge}
                         </span>
                       )}
-                      <ChevronRight className="w-3.5 h-3.5 text-slate-300 dark:text-slate-600 group-hover:text-slate-500 dark:group-hover:text-slate-300 transition-colors" />
+                      <ChevronRight
+                        className={`w-4 h-4 transition-transform ${
+                          isActive
+                            ? 'text-white dark:text-[#0B1A2D]'
+                            : 'text-slate-300 dark:text-slate-600 group-hover:text-slate-500 dark:group-hover:text-slate-300'
+                        }`}
+                      />
                     </div>
                   </button>
                 );
               })}
             </div>
 
-            {/* Ajustes Rápidos: Idioma Compacto + Tema Claro/Oscuro */}
-            <div className="pt-2.5 border-t border-slate-100 dark:border-slate-800 grid grid-cols-2 gap-2 text-xs">
-              {/* Idioma Compacto Dropdown */}
-              <div className="flex items-center justify-between p-2 rounded-xl bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800">
-                <div className="flex items-center gap-1.5 min-w-0">
-                  <Globe className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                  <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300">Idioma</span>
-                </div>
-                <select
-                  value={language}
-                  aria-label="Seleccionar idioma de la plataforma"
-                  onChange={(e) => {
-                    i18n.changeLanguage(e.target.value);
-                    setLanguage(e.target.value as SupportedLanguage);
-                  }}
-                  className="bg-transparent text-[11px] font-mono font-bold text-slate-800 dark:text-white focus:outline-none cursor-pointer pr-1"
-                >
-                  {SUPPORTED_LANGUAGES.map((l) => (
-                    <option key={l.code} value={l.code} className="dark:bg-[#0B1A2D] text-slate-900 dark:text-white">
-                      {l.code.toUpperCase()} · {l.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Conmutador Modo Claro / Oscuro con pastilla minimalista */}
-              <button
-                type="button"
-                onClick={() => {
-                  const newTheme = (adminTheme === 'dark' || theme === 'dark') ? 'light' : 'dark';
-                  if (setTheme) setTheme(newTheme);
-                  if (setAdminTheme) setAdminTheme(newTheme);
-                  if (typeof document !== 'undefined') {
-                    if (newTheme === 'dark') {
-                      document.documentElement.classList.add('dark');
-                      document.documentElement.classList.remove('light');
-                    } else {
+            {/* Barra Inferior Simétrica: Selectores de Tema & Idioma + Acciones */}
+            <div className="p-4 border-t border-slate-100 dark:border-[#1A314D] bg-slate-50/80 dark:bg-[#071220]/90 backdrop-blur-md space-y-3 shrink-0">
+              {/* Selectores Simétricos 50/50 en Botones de Segmento */}
+              <div className="grid grid-cols-2 gap-2.5">
+                {/* Selector de Tema Segmentado */}
+                <div className="p-1 bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200/80 dark:border-[#1A314D] grid grid-cols-2 gap-1 text-[11px] font-bold shadow-2xs">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (setTheme) setTheme('light');
+                      if (setAdminTheme) setAdminTheme('light');
                       document.documentElement.classList.remove('dark');
                       document.documentElement.classList.add('light');
-                    }
-                  }
-                }}
-                className="flex items-center justify-between p-2 rounded-xl bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800 cursor-pointer active:scale-98 transition"
-              >
-                <div className="flex items-center gap-1.5 min-w-0">
-                  {(adminTheme === 'dark' || theme === 'dark') ? (
-                    <Moon className="w-3.5 h-3.5 text-[#B7F229] shrink-0" />
-                  ) : (
-                    <Sun className="w-3.5 h-3.5 text-amber-500 shrink-0" />
-                  )}
-                  <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300">Tema</span>
-                </div>
-                <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 shadow-2xs">
-                  {(adminTheme === 'dark' || theme === 'dark') ? 'Oscuro' : 'Claro'}
-                </span>
-              </button>
-            </div>
+                    }}
+                    className={`flex items-center justify-center gap-1.5 py-2 px-2 rounded-xl transition cursor-pointer ${
+                      adminTheme === 'dark' || theme === 'dark'
+                        ? 'text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'
+                        : 'bg-[#0B1A2D] text-white shadow-2xs font-extrabold'
+                    }`}
+                  >
+                    <Sun className={`w-3.5 h-3.5 ${adminTheme === 'dark' || theme === 'dark' ? 'text-slate-400' : 'text-amber-400'}`} />
+                    <span>Claro</span>
+                  </button>
 
-            {/* Acciones Rápidas Inferiores Agrupadas */}
-            <div className="pt-2 border-t border-slate-100 dark:border-slate-800 grid grid-cols-1 sm:grid-cols-2 gap-2">
-              {!isReception && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (setTheme) setTheme('dark');
+                      if (setAdminTheme) setAdminTheme('dark');
+                      document.documentElement.classList.remove('light');
+                      document.documentElement.classList.add('dark');
+                    }}
+                    className={`flex items-center justify-center gap-1.5 py-2 px-2 rounded-xl transition cursor-pointer ${
+                      adminTheme === 'dark' || theme === 'dark'
+                        ? 'bg-white text-[#0B1A2D] dark:bg-white dark:text-[#0B1A2D] shadow-2xs font-extrabold'
+                        : 'text-slate-500 hover:text-slate-900'
+                    }`}
+                  >
+                    <Moon className={`w-3.5 h-3.5 ${adminTheme === 'dark' || theme === 'dark' ? 'text-[#8B5CF6] dark:text-[#0B1A2D]' : 'text-slate-400'}`} />
+                    <span>Oscuro</span>
+                  </button>
+                </div>
+
+                {/* Selector de Idioma Segmentado (ES / EN / GL) */}
+                <div className="p-1 bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200/80 dark:border-[#1A314D] grid grid-cols-3 gap-1 text-[11px] font-mono font-bold shadow-2xs">
+                  {(['es', 'en', 'gl'] as const).map((code) => {
+                    const isLangActive = language === code;
+                    return (
+                      <button
+                        key={code}
+                        type="button"
+                        onClick={() => {
+                          i18n.changeLanguage(code);
+                          setLanguage(code as SupportedLanguage);
+                        }}
+                        className={`py-2 px-1 rounded-xl transition text-center cursor-pointer uppercase ${
+                          isLangActive
+                            ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D] shadow-2xs font-black'
+                            : 'text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'
+                        }`}
+                      >
+                        {code}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Acciones Rápidas Inferiores (Vista Jugador & Cerrar Sesión) */}
+              <div className="grid grid-cols-2 gap-2.5">
+                {!isReception ? (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMobileMoreOpen(false);
+                      enterWhiteLabelPlayerPreview();
+                    }}
+                    className="w-full py-2.5 px-3 rounded-2xl bg-white dark:bg-[#0E2239] hover:bg-slate-100 dark:hover:bg-[#132A45] text-slate-800 dark:text-white font-bold text-xs border border-slate-200/80 dark:border-[#1A314D] transition flex items-center justify-center gap-2 active:scale-98 cursor-pointer shadow-2xs"
+                  >
+                    <Eye className="w-3.5 h-3.5 text-[#8B5CF6]" />
+                    <span>Vista Jugador</span>
+                  </button>
+                ) : (
+                  <div />
+                )}
+
                 <button
                   type="button"
-                  onClick={() => {
-                    setMobileMoreOpen(false);
-                    enterWhiteLabelPlayerPreview();
-                  }}
-                  className="w-full py-2.5 px-3.5 rounded-xl bg-[#0B1A2D] dark:bg-white text-white dark:text-[#0B1A2D] font-extrabold text-xs shadow-xs transition flex items-center justify-center gap-2 active:scale-98 cursor-pointer"
+                  onClick={logoutOrExitDemo}
+                  className="w-full py-2.5 px-3 rounded-2xl bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-300 font-bold text-xs border border-rose-200/60 dark:border-rose-900/40 transition flex items-center justify-center gap-2 active:scale-98 cursor-pointer hover:bg-rose-100 dark:hover:bg-rose-950/60 shadow-2xs"
                 >
-                  <Eye className="w-3.5 h-3.5 text-[#B7F229] dark:text-[#8B5CF6]" />
-                  <span>{t('white_label.player_view', 'Vista Jugador')}</span>
+                  <LogOut className="w-3.5 h-3.5 text-rose-500" />
+                  <span>Cerrar Sesión</span>
                 </button>
-              )}
-
-              <button
-                type="button"
-                onClick={logoutOrExitDemo}
-                className="w-full py-2.5 px-3.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-300 font-bold text-xs border border-rose-200/60 dark:border-rose-900/40 transition flex items-center justify-center gap-2 active:scale-98 cursor-pointer hover:bg-rose-100"
-              >
-                <LogOut className="w-3.5 h-3.5 text-rose-500" />
-                <span>{t('club.nav.logout', 'Cerrar Sesión / Salir')}</span>
-              </button>
+              </div>
             </div>
           </div>
         </div>

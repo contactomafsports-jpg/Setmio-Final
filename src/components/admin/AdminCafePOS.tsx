@@ -2363,10 +2363,13 @@ export const AdminCafePOS: React.FC = () => {
           3. MODAL: CIERRE / ARQUEO DE CAJA DEL TURNO (REDISENO MINIMALISTA ELEGANTE)
           ====================================================================== */}
       {arqueoModalOpen && (
-        <div className="fixed inset-0 z-[60] flex flex-col h-full overflow-y-auto bg-white dark:bg-[#071220] sm:bg-slate-950/70 sm:dark:bg-black/80 sm:backdrop-blur-xs sm:p-4 lg:p-6 sm:items-center sm:justify-center animate-in fade-in duration-150">
-          <div className="relative w-full flex-1 sm:flex-initial flex flex-col bg-white dark:bg-[#0E2239] border-0 sm:border sm:border-slate-200/90 dark:sm:border-[#1A314D] sm:rounded-3xl sm:shadow-2xl text-slate-900 dark:text-slate-100 sm:max-w-xl my-0 sm:my-auto max-h-none sm:max-h-[92vh] overflow-hidden">
+        <div className="fixed inset-0 z-[60] flex flex-col justify-end sm:justify-center sm:items-center bg-slate-950/60 dark:bg-black/75 backdrop-blur-xs p-0 sm:p-4 lg:p-6 animate-in fade-in duration-200 overflow-y-auto">
+          <div className="relative w-full flex flex-col bg-white dark:bg-[#0E2239] border-t border-slate-200/90 dark:border-[#1A314D] sm:border sm:rounded-3xl rounded-t-[28px] sm:shadow-2xl text-slate-900 dark:text-slate-100 sm:max-w-xl max-h-[90vh] sm:max-h-[92vh] overflow-hidden mt-auto sm:my-auto animate-in slide-in-from-bottom-4 duration-200">
+            {/* Drag handle táctil en móvil */}
+            <div className="w-12 h-1 bg-slate-300 dark:bg-slate-700 rounded-full mx-auto my-2.5 sm:hidden shrink-0" />
+
             {/* Header Fijo con X correctamente alineada */}
-            <div className="p-5 sm:p-6 border-b border-slate-100 dark:border-[#1A314D] flex items-center justify-between shrink-0">
+            <div className="p-4 sm:p-6 border-b border-slate-100 dark:border-[#1A314D] flex items-center justify-between shrink-0">
               <h3 className="text-lg font-black text-[#0B1A2D] dark:text-white">
                 Cierre y Arqueo de Caja
               </h3>
@@ -2755,10 +2758,13 @@ export const AdminCafePOS: React.FC = () => {
           FORMULARIO NUEVO / EDITAR PRODUCTO (CON SELECTOR DE CATEGORÍA OBLIGATORIO Y ACCESO DIRECTO PARA CREAR NUEVA)
           ====================================================================== */}
       {productFormModalOpen && (
-        <div className="fixed inset-0 z-50 flex flex-col h-full overflow-y-auto bg-white dark:bg-[#071220] sm:bg-slate-950/70 sm:dark:bg-black/80 sm:backdrop-blur-xs sm:p-4 lg:p-6 sm:items-center sm:justify-center animate-in fade-in duration-150">
-          <div className="w-full flex-1 sm:flex-initial flex flex-col bg-white dark:bg-[#071220] sm:max-w-lg sm:rounded-3xl sm:shadow-2xl border-0 sm:border sm:border-slate-200/90 dark:sm:border-[#1A314D] my-0 sm:my-auto max-h-none sm:max-h-[92vh] overflow-hidden">
+        <div className="fixed inset-0 z-50 flex flex-col justify-end sm:justify-center sm:items-center bg-slate-950/60 dark:bg-black/75 backdrop-blur-xs p-0 sm:p-4 lg:p-6 animate-in fade-in duration-200 overflow-y-auto">
+          <div className="w-full flex flex-col bg-white dark:bg-[#071220] rounded-t-[28px] sm:rounded-3xl sm:shadow-2xl border-t border-slate-200/90 dark:border-[#1A314D] sm:border sm:max-w-lg max-h-[90vh] sm:max-h-[92vh] overflow-hidden mt-auto sm:my-auto animate-in slide-in-from-bottom-4 duration-200">
+            {/* Drag handle táctil en móvil */}
+            <div className="w-12 h-1 bg-slate-300 dark:bg-slate-700 rounded-full mx-auto my-2.5 sm:hidden shrink-0" />
+
             {/* Cabecera Limpia y Exclusiva con botón X */}
-            <div className="sticky top-0 z-20 px-5 sm:px-6 py-4 border-b border-slate-100 dark:border-[#1A314D] flex items-center justify-between bg-white/95 dark:bg-[#071220]/95 backdrop-blur-md shrink-0">
+            <div className="sticky top-0 z-20 px-5 sm:px-6 py-3.5 sm:py-4 border-b border-slate-100 dark:border-[#1A314D] flex items-center justify-between bg-white/95 dark:bg-[#071220]/95 backdrop-blur-md shrink-0">
               <h2 className="text-lg sm:text-xl font-black text-[#0B1A2D] dark:text-white tracking-tight">
                 {editingProduct ? 'Editar Producto TPV' : 'Nuevo Producto TPV'}
               </h2>

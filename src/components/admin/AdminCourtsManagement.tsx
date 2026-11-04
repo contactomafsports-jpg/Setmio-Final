@@ -316,37 +316,16 @@ export const AdminCourtsManagement: React.FC<AdminCourtsManagementProps> = ({
           Pistas y domótica
         </h1>
 
-        <div className="flex items-center gap-1.5">
-          {/* Botón de Filtros Avanzados */}
+        <div className="relative" ref={actionMenuRef}>
           <button
             type="button"
-            onClick={() => setIsFilterModalOpen(true)}
-            className={`relative p-2 rounded-xl border transition-colors cursor-pointer active:scale-95 flex items-center justify-center ${
-              hasActiveFilters
-                ? 'bg-[#B7F229]/20 border-[#B7F229] text-[#0B1A2D] dark:text-white'
-                : 'bg-white dark:bg-[#0E2239] border-slate-200/80 dark:border-[#1A314D] text-slate-700 dark:text-slate-300 hover:text-[#0B1A2D] dark:hover:text-[#B7F229]'
-            }`}
-            title="Filtros avanzados de pistas"
-            aria-label="Filtros avanzados"
+            onClick={() => setIsActionMenuOpen((prev) => !prev)}
+            className="p-1 text-slate-700 dark:text-slate-300 hover:text-[#0B1A2D] dark:hover:text-[#B7F229] transition-colors cursor-pointer active:scale-95"
+            title="Añadir Pista o Adaptador IoT"
+            aria-label="Añadir Pista o Adaptador IoT"
           >
-            <SlidersHorizontal className="w-4 h-4 stroke-[2]" />
-            {hasActiveFilters && (
-              <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#0B1A2D] dark:bg-[#B7F229] text-white dark:text-[#0B1A2D] rounded-full text-[9px] font-black flex items-center justify-center">
-                {activeFiltersCount}
-              </span>
-            )}
+            <Plus className="w-6 h-6 stroke-[2.2]" />
           </button>
-
-          <div className="relative" ref={actionMenuRef}>
-            <button
-              type="button"
-              onClick={() => setIsActionMenuOpen((prev) => !prev)}
-              className="p-2 text-white bg-[#0B1A2D] dark:bg-[#B7F229] dark:text-[#0B1A2D] hover:bg-[#132A45] dark:hover:bg-[#a6e61f] rounded-xl transition-colors cursor-pointer active:scale-95 flex items-center justify-center shadow-xs"
-              title="Añadir Pista o Adaptador IoT"
-              aria-label="Añadir Pista o Adaptador IoT"
-            >
-              <Plus className="w-4 h-4 stroke-[2.5]" />
-            </button>
 
           {/* Menú Contextual Desplegable */}
           {isActionMenuOpen && (
@@ -375,7 +354,6 @@ export const AdminCourtsManagement: React.FC<AdminCourtsManagementProps> = ({
           )}
         </div>
       </div>
-    </div>
 
       {/* 1.1 SELECTOR DE SEDE Y ESTADO OPERATIVO UNIFICADO */}
       <div className="relative" ref={venueSelectorRef}>
@@ -535,30 +513,52 @@ export const AdminCourtsManagement: React.FC<AdminCourtsManagementProps> = ({
         </div>
       </div>
 
-      {/* 3. CONTROL DE SEGMENTOS ("PISTAS" Y "REGISTROS") - 100% ANCHO 50/50 SIMÉTRICO */}
-      <div className="w-full p-1 bg-slate-100 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-2xl grid grid-cols-2 gap-1 text-xs select-none shadow-2xs">
-        <button
-          type="button"
-          onClick={() => setActiveTab('courts')}
-          className={`w-full py-2.5 px-3 rounded-xl font-bold transition text-center cursor-pointer ${
-            activeTab === 'courts'
-              ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D] shadow-xs'
-              : 'text-slate-600 dark:text-slate-400 hover:text-[#0B1A2D] dark:hover:text-white'
-          }`}
-        >
-          Pistas ({filteredCourts.length})
-        </button>
+      {/* 3. CONTROL DE SEGMENTOS ("PISTAS" Y "REGISTROS") CON BOTÓN DE FILTRO INTEGRADO EN LA MISMA FRANJA */}
+      <div className="flex items-center gap-2 w-full">
+        <div className="flex-1 p-1 bg-slate-100 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-2xl grid grid-cols-2 gap-1 text-xs select-none shadow-2xs">
+          <button
+            type="button"
+            onClick={() => setActiveTab('courts')}
+            className={`w-full py-2.5 px-3 rounded-xl font-bold transition text-center cursor-pointer ${
+              activeTab === 'courts'
+                ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D] shadow-xs'
+                : 'text-slate-600 dark:text-slate-400 hover:text-[#0B1A2D] dark:hover:text-white'
+            }`}
+          >
+            Pistas ({filteredCourts.length})
+          </button>
 
+          <button
+            type="button"
+            onClick={() => setActiveTab('logs')}
+            className={`w-full py-2.5 px-3 rounded-xl font-bold transition text-center cursor-pointer ${
+              activeTab === 'logs'
+                ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D] shadow-xs'
+                : 'text-slate-600 dark:text-slate-400 hover:text-[#0B1A2D] dark:hover:text-white'
+            }`}
+          >
+            Registros ({filteredAuditLogs.length})
+          </button>
+        </div>
+
+        {/* Botón de Filtros alineado en la misma franja del selector de pestañas */}
         <button
           type="button"
-          onClick={() => setActiveTab('logs')}
-          className={`w-full py-2.5 px-3 rounded-xl font-bold transition text-center cursor-pointer ${
-            activeTab === 'logs'
-              ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D] shadow-xs'
-              : 'text-slate-600 dark:text-slate-400 hover:text-[#0B1A2D] dark:hover:text-white'
+          onClick={() => setIsFilterModalOpen(true)}
+          className={`relative p-2.5 rounded-2xl border transition-all cursor-pointer active:scale-95 flex items-center justify-center shrink-0 shadow-2xs ${
+            hasActiveFilters
+              ? 'bg-[#B7F229]/20 border-[#B7F229] text-[#0B1A2D] dark:text-[#B7F229]'
+              : 'bg-white dark:bg-[#071220] border-slate-200/80 dark:border-[#1A314D] text-slate-600 dark:text-slate-400 hover:text-[#0B1A2D] dark:hover:text-white'
           }`}
+          title="Filtros avanzados de pistas"
+          aria-label="Filtros avanzados"
         >
-          Registros ({filteredAuditLogs.length})
+          <SlidersHorizontal className="w-4 h-4 stroke-[2.2]" />
+          {hasActiveFilters && (
+            <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#0B1A2D] dark:bg-[#B7F229] text-white dark:text-[#0B1A2D] rounded-full text-[9px] font-black flex items-center justify-center shadow-xs">
+              {activeFiltersCount}
+            </span>
+          )}
         </button>
       </div>
 
@@ -891,10 +891,13 @@ export const AdminCourtsManagement: React.FC<AdminCourtsManagementProps> = ({
           MODAL: FILTROS AVANZADOS DE PISTAS Y DOMÓTICA
           ====================================================================== */}
       {isFilterModalOpen && (
-        <div className="fixed inset-0 z-50 flex flex-col h-full overflow-y-auto bg-white dark:bg-[#071220] sm:bg-slate-950/70 sm:dark:bg-black/80 sm:backdrop-blur-xs sm:p-4 lg:p-6 sm:items-center sm:justify-center animate-in fade-in duration-150">
-          <div className="w-full flex-1 sm:flex-initial flex flex-col bg-white dark:bg-[#071220] sm:max-w-md sm:rounded-3xl shadow-2xl border-0 sm:border sm:border-slate-200/90 dark:sm:border-[#1A314D] my-0 sm:my-auto max-h-none sm:max-h-[92vh] overflow-hidden">
+        <div className="fixed inset-0 z-50 flex flex-col justify-end sm:justify-center sm:items-center bg-slate-950/60 dark:bg-black/75 backdrop-blur-xs p-0 sm:p-4 lg:p-6 animate-in fade-in duration-200 overflow-y-auto">
+          <div className="w-full flex flex-col bg-white dark:bg-[#071220] rounded-t-[28px] sm:rounded-3xl shadow-2xl border-t border-slate-200/90 dark:border-[#1A314D] sm:border max-h-[90vh] sm:max-h-[92vh] sm:max-w-md overflow-hidden mt-auto sm:my-auto animate-in slide-in-from-bottom-4 duration-200">
+            {/* Drag handle táctil en móvil */}
+            <div className="w-12 h-1 bg-slate-300 dark:bg-slate-700 rounded-full mx-auto my-2.5 sm:hidden shrink-0" />
+
             {/* Header */}
-            <div className="sticky top-0 z-20 px-5 sm:px-6 py-4 border-b border-slate-100 dark:border-[#1A314D] flex items-center justify-between bg-white/95 dark:bg-[#071220]/95 backdrop-blur-md shrink-0">
+            <div className="sticky top-0 z-20 px-5 sm:px-6 py-3.5 sm:py-4 border-b border-slate-100 dark:border-[#1A314D] flex items-center justify-between bg-white/95 dark:bg-[#071220]/95 backdrop-blur-md shrink-0">
               <div className="flex items-center gap-2">
                 <SlidersHorizontal className="w-4 h-4 text-[#0B1A2D] dark:text-[#B7F229]" />
                 <h2 className="text-base sm:text-lg font-black text-[#0B1A2D] dark:text-white tracking-tight">
@@ -1039,10 +1042,13 @@ export const AdminCourtsManagement: React.FC<AdminCourtsManagementProps> = ({
           MODAL A PANTALLA COMPLETA (FULL-SCREEN SHEET): NUEVA / EDITAR PISTA
           ====================================================================== */}
       {isCreateModalOpen && (
-        <div className="fixed inset-0 z-50 flex flex-col h-full overflow-y-auto bg-white dark:bg-[#071220] sm:bg-slate-950/70 sm:dark:bg-black/80 sm:backdrop-blur-xs sm:p-4 lg:p-6 sm:items-center sm:justify-center animate-in fade-in duration-150">
-          <div className="w-full flex-1 sm:flex-initial flex flex-col bg-white dark:bg-[#071220] sm:max-w-2xl lg:max-w-3xl sm:rounded-3xl shadow-2xl border-0 sm:border sm:border-slate-200/90 dark:sm:border-[#1A314D] my-0 sm:my-auto max-h-none sm:max-h-[92vh] overflow-hidden">
+        <div className="fixed inset-0 z-50 flex flex-col justify-end sm:justify-center sm:items-center bg-slate-950/60 dark:bg-black/75 backdrop-blur-xs p-0 sm:p-4 lg:p-6 animate-in fade-in duration-200 overflow-y-auto">
+          <div className="w-full flex flex-col bg-white dark:bg-[#071220] rounded-t-[28px] sm:rounded-3xl shadow-2xl border-t border-slate-200/90 dark:border-[#1A314D] sm:border max-h-[90vh] sm:max-h-[92vh] sm:max-w-2xl lg:max-w-3xl overflow-hidden mt-auto sm:my-auto animate-in slide-in-from-bottom-4 duration-200">
+            {/* Drag handle táctil en móvil */}
+            <div className="w-12 h-1 bg-slate-300 dark:bg-slate-700 rounded-full mx-auto my-2.5 sm:hidden shrink-0" />
+
             {/* Header Limpio y Exclusivo con botón X */}
-            <div className="sticky top-0 z-20 px-5 sm:px-6 py-4 border-b border-slate-100 dark:border-[#1A314D] flex items-center justify-between bg-white/95 dark:bg-[#071220]/95 backdrop-blur-md shrink-0">
+            <div className="sticky top-0 z-20 px-5 sm:px-6 py-3.5 sm:py-4 border-b border-slate-100 dark:border-[#1A314D] flex items-center justify-between bg-white/95 dark:bg-[#071220]/95 backdrop-blur-md shrink-0">
               <h2 className="text-lg sm:text-xl font-black text-[#0B1A2D] dark:text-white tracking-tight">
                 {editingCourt ? `Editar ${editingCourt.name}` : 'Nueva Pista'}
               </h2>
@@ -1262,10 +1268,13 @@ export const AdminCourtsManagement: React.FC<AdminCourtsManagementProps> = ({
           MODAL A PANTALLA COMPLETA (FULL-SCREEN SHEET): NUEVO ADAPTADOR IOT
           ====================================================================== */}
       {showAddDeviceModal && (
-        <div className="fixed inset-0 z-50 flex flex-col h-full overflow-y-auto bg-white dark:bg-[#071220] sm:bg-slate-950/70 sm:dark:bg-black/80 sm:backdrop-blur-xs sm:p-4 lg:p-6 sm:items-center sm:justify-center animate-in fade-in duration-150">
-          <div className="w-full flex-1 sm:flex-initial flex flex-col bg-white dark:bg-[#071220] sm:max-w-lg sm:rounded-3xl shadow-2xl border-0 sm:border sm:border-slate-200/90 dark:sm:border-[#1A314D] my-0 sm:my-auto max-h-none sm:max-h-[92vh] overflow-hidden">
+        <div className="fixed inset-0 z-50 flex flex-col justify-end sm:justify-center sm:items-center bg-slate-950/60 dark:bg-black/75 backdrop-blur-xs p-0 sm:p-4 lg:p-6 animate-in fade-in duration-200 overflow-y-auto">
+          <div className="w-full flex flex-col bg-white dark:bg-[#071220] rounded-t-[28px] sm:rounded-3xl shadow-2xl border-t border-slate-200/90 dark:border-[#1A314D] sm:border max-h-[90vh] sm:max-h-[92vh] sm:max-w-lg overflow-hidden mt-auto sm:my-auto animate-in slide-in-from-bottom-4 duration-200">
+            {/* Drag handle táctil en móvil */}
+            <div className="w-12 h-1 bg-slate-300 dark:bg-slate-700 rounded-full mx-auto my-2.5 sm:hidden shrink-0" />
+
             {/* Header Limpio y Exclusivo con botón X */}
-            <div className="sticky top-0 z-20 px-5 sm:px-6 py-4 border-b border-slate-100 dark:border-[#1A314D] flex items-center justify-between bg-white/95 dark:bg-[#071220]/95 backdrop-blur-md shrink-0">
+            <div className="sticky top-0 z-20 px-5 sm:px-6 py-3.5 sm:py-4 border-b border-slate-100 dark:border-[#1A314D] flex items-center justify-between bg-white/95 dark:bg-[#071220]/95 backdrop-blur-md shrink-0">
               <h2 className="text-lg sm:text-xl font-black text-[#0B1A2D] dark:text-white tracking-tight">
                 Nuevo Adaptador IoT
               </h2>
