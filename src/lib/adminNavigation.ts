@@ -128,7 +128,7 @@ export function getAdminNavConfig(
     secondaryItems = [
       {
         id: 'courts_management',
-        label: 'Pistas & Domótica',
+        label: 'Pistas y domótica',
         icon: Layers,
         desc: 'Estado de pistas y luces en tiempo real',
         isPrimary: false,
@@ -521,7 +521,7 @@ export function getAdminNavConfig(
     secondaryItems = [
       {
         id: 'courts_management',
-        label: 'Pistas & Domótica',
+        label: 'Pistas y domótica',
         icon: Layers,
         desc: 'Pistas, domótica IoT y control de accesos',
         isPrimary: false,

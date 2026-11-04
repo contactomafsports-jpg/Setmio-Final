@@ -82,6 +82,17 @@ export const NewBookingModal: React.FC<NewBookingModalProps> = ({
   // Operation Type: 'existing' (Socio Club) | 'new' (Nuevo) | 'club' (Reserva del Propio Club) | 'block' (Bloqueo Pista)
   const [clientType, setClientType] = useState<'existing' | 'new' | 'club' | 'block'>('existing');
 
+  // Prevenir scroll de fondo mientras el modal está activo
+  useEffect(() => {
+    if (isOpen) {
+      const originalOverflow = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = originalOverflow;
+      };
+    }
+  }, [isOpen]);
+
   // Socio Club selection
   const clubRegisteredPlayers = useMemo(() => {
     if (customers && customers.length > 0) {
@@ -290,9 +301,11 @@ export const NewBookingModal: React.FC<NewBookingModalProps> = ({
     onClose();
   };
 
+  if (!isOpen) return null;
+
   return (
-    <div className="fixed inset-0 z-50 flex flex-col bg-slate-950/60 dark:bg-black/75 backdrop-blur-xs overflow-y-auto sm:p-4 lg:p-6 sm:items-center sm:justify-center animate-in fade-in duration-150">
-      <div className="w-full min-h-screen sm:min-h-0 sm:max-w-2xl lg:max-w-3xl bg-white dark:bg-[#071220] sm:rounded-3xl shadow-2xl flex flex-col border-0 sm:border sm:border-slate-200/90 dark:sm:border-[#1A314D] overflow-hidden my-auto">
+    <div className="fixed inset-0 z-50 flex flex-col h-full overflow-y-auto bg-white dark:bg-[#071220] sm:bg-slate-950/70 sm:dark:bg-black/80 sm:backdrop-blur-xs sm:p-4 lg:p-6 sm:items-center sm:justify-center animate-in fade-in duration-150">
+      <div className="w-full flex-1 sm:flex-initial flex flex-col bg-white dark:bg-[#071220] sm:max-w-2xl lg:max-w-3xl sm:rounded-3xl sm:shadow-2xl border-0 sm:border sm:border-slate-200/90 dark:sm:border-[#1A314D] my-0 sm:my-auto">
         {/* Modal Header Limpio y Exclusivo */}
         <div className="sticky top-0 z-20 px-5 sm:px-6 py-4 border-b border-slate-100 dark:border-[#1A314D] flex items-center justify-between bg-white/95 dark:bg-[#071220]/95 backdrop-blur-md shrink-0">
           <h2 className="text-lg sm:text-xl font-black text-[#0B1A2D] dark:text-white tracking-tight">
@@ -828,7 +841,7 @@ export const NewBookingModal: React.FC<NewBookingModalProps> = ({
         </form>
 
         {/* Modal Footer Sólido y Simétrico (Distribución Equitativa 50/50) */}
-        <div className="sticky bottom-0 z-20 px-5 sm:px-6 py-3.5 sm:py-4 border-t border-slate-100 dark:border-[#1A314D] bg-white/95 dark:bg-[#071220]/95 backdrop-blur-md shrink-0">
+        <div className="sticky bottom-0 z-20 px-5 sm:px-6 py-3.5 sm:py-4 border-t border-slate-100 dark:border-[#1A314D] bg-white/95 dark:bg-[#071220]/95 backdrop-blur-md shrink-0 mt-auto">
           <div className="grid grid-cols-2 gap-3 w-full">
             <button
               type="button"
