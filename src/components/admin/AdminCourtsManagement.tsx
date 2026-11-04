@@ -18,6 +18,8 @@ import {
   Activity,
   Building2,
   ChevronDown,
+  SlidersHorizontal,
+  Check,
 } from 'lucide-react';
 
 interface AdminCourtsManagementProps {
@@ -90,9 +92,12 @@ export const AdminCourtsManagement: React.FC<AdminCourtsManagementProps> = ({
       : realVenues[0]?.id || 'venue-san-mateo';
   const activeVenueObj = realVenues.find((v) => v.id === effectiveVenueId) || realVenues[0];
 
-  // Inventory Filters (Segmented Controls Minimalistas sin iconos)
+  // Inventory Filters
   const [formatFilter, setFormatFilter] = useState<'all' | 'double' | 'single'>('all');
   const [locationFilter, setLocationFilter] = useState<'all' | 'indoor' | 'outdoor'>('all');
+  const [lightsFilter, setLightsFilter] = useState<'all' | 'with_lights' | 'without_lights'>('all');
+  const [panoramicFilter, setPanoramicFilter] = useState<'all' | 'panoramic' | 'standard'>('all');
+  const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [editingCourt, setEditingCourt] = useState<Court | null>(null);
   const [deletingCourtId, setDeletingCourtId] = useState<string | null>(null);
@@ -266,8 +271,19 @@ export const AdminCourtsManagement: React.FC<AdminCourtsManagementProps> = ({
     if (locationFilter === 'indoor' && c.courtType !== 'indoor' && c.courtType !== 'covered') return false;
     if (locationFilter === 'outdoor' && c.courtType !== 'outdoor') return false;
 
+    // Iluminación
+    if (lightsFilter === 'with_lights' && !c.hasLights) return false;
+    if (lightsFilter === 'without_lights' && c.hasLights) return false;
+
+    // Panorámica
+    if (panoramicFilter === 'panoramic' && !c.isPanoramic) return false;
+    if (panoramicFilter === 'standard' && c.isPanoramic) return false;
+
     return true;
   });
+
+  const hasActiveFilters = formatFilter !== 'all' || locationFilter !== 'all' || lightsFilter !== 'all' || panoramicFilter !== 'all';
+  const activeFiltersCount = (formatFilter !== 'all' ? 1 : 0) + (locationFilter !== 'all' ? 1 : 0) + (lightsFilter !== 'all' ? 1 : 0) + (panoramicFilter !== 'all' ? 1 : 0);
 
   const activeLightsCount = venueCourts.filter((c) => c.isLightOn).length;
   const avgRate = venueCourts.length > 0 ? venueCourts.reduce((acc, c) => acc + c.hourlyRate, 0) / venueCourts.length : 0;
@@ -297,19 +313,40 @@ export const AdminCourtsManagement: React.FC<AdminCourtsManagementProps> = ({
       {/* 1. CABECERA LIMPIA Y SIMÉTRICA CON MENÚ RÁPIDO DE ACCIÓN "+" */}
       <div className="flex items-center justify-between pt-2 pb-1" data-purpose="header-section">
         <h1 className="text-[22px] font-extrabold text-[#0B1A2D] dark:text-white tracking-tight leading-tight">
-          Pistas y Domótica
+          Pistas y domótica
         </h1>
 
-        <div className="relative" ref={actionMenuRef}>
+        <div className="flex items-center gap-1.5">
+          {/* Botón de Filtros Avanzados */}
           <button
             type="button"
-            onClick={() => setIsActionMenuOpen((prev) => !prev)}
-            className="p-1.5 text-slate-700 dark:text-slate-300 hover:text-[#0B1A2D] dark:hover:text-[#B7F229] transition-colors cursor-pointer active:scale-95 flex items-center justify-center rounded-lg"
-            title="Añadir Pista o Adaptador IoT"
-            aria-label="Añadir Pista o Adaptador IoT"
+            onClick={() => setIsFilterModalOpen(true)}
+            className={`relative p-2 rounded-xl border transition-colors cursor-pointer active:scale-95 flex items-center justify-center ${
+              hasActiveFilters
+                ? 'bg-[#B7F229]/20 border-[#B7F229] text-[#0B1A2D] dark:text-white'
+                : 'bg-white dark:bg-[#0E2239] border-slate-200/80 dark:border-[#1A314D] text-slate-700 dark:text-slate-300 hover:text-[#0B1A2D] dark:hover:text-[#B7F229]'
+            }`}
+            title="Filtros avanzados de pistas"
+            aria-label="Filtros avanzados"
           >
-            <Plus className="w-5 h-5 stroke-[2.2]" />
+            <SlidersHorizontal className="w-4 h-4 stroke-[2]" />
+            {hasActiveFilters && (
+              <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#0B1A2D] dark:bg-[#B7F229] text-white dark:text-[#0B1A2D] rounded-full text-[9px] font-black flex items-center justify-center">
+                {activeFiltersCount}
+              </span>
+            )}
           </button>
+
+          <div className="relative" ref={actionMenuRef}>
+            <button
+              type="button"
+              onClick={() => setIsActionMenuOpen((prev) => !prev)}
+              className="p-2 text-white bg-[#0B1A2D] dark:bg-[#B7F229] dark:text-[#0B1A2D] hover:bg-[#132A45] dark:hover:bg-[#a6e61f] rounded-xl transition-colors cursor-pointer active:scale-95 flex items-center justify-center shadow-xs"
+              title="Añadir Pista o Adaptador IoT"
+              aria-label="Añadir Pista o Adaptador IoT"
+            >
+              <Plus className="w-4 h-4 stroke-[2.5]" />
+            </button>
 
           {/* Menú Contextual Desplegable */}
           {isActionMenuOpen && (
@@ -338,6 +375,7 @@ export const AdminCourtsManagement: React.FC<AdminCourtsManagementProps> = ({
           )}
         </div>
       </div>
+    </div>
 
       {/* 1.1 SELECTOR DE SEDE Y ESTADO OPERATIVO UNIFICADO */}
       <div className="relative" ref={venueSelectorRef}>
@@ -497,30 +535,30 @@ export const AdminCourtsManagement: React.FC<AdminCourtsManagementProps> = ({
         </div>
       </div>
 
-      {/* 3. REESTRUCTURACIÓN DE PESTAÑAS (MINIMALISTA PLANO SIN ICONOS) */}
-      <div className="flex items-center gap-2 border-b border-slate-200/80 dark:border-[#1A314D] pb-3 text-xs font-semibold">
+      {/* 3. CONTROL DE SEGMENTOS ("PISTAS" Y "REGISTROS") - 100% ANCHO 50/50 SIMÉTRICO */}
+      <div className="w-full p-1 bg-slate-100 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-2xl grid grid-cols-2 gap-1 text-xs select-none shadow-2xs">
         <button
           type="button"
           onClick={() => setActiveTab('courts')}
-          className={`px-4 py-2 rounded-xl transition cursor-pointer ${
+          className={`w-full py-2.5 px-3 rounded-xl font-bold transition text-center cursor-pointer ${
             activeTab === 'courts'
-              ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D] font-bold shadow-xs'
-              : 'bg-white dark:bg-[#0E2239] text-slate-600 dark:text-slate-400 hover:text-[#0B1A2D] dark:hover:text-white border border-slate-200/80 dark:border-[#1A314D]'
+              ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D] shadow-xs'
+              : 'text-slate-600 dark:text-slate-400 hover:text-[#0B1A2D] dark:hover:text-white'
           }`}
         >
-          <span>Pistas ({venueCourts.length})</span>
+          Pistas ({filteredCourts.length})
         </button>
 
         <button
           type="button"
           onClick={() => setActiveTab('logs')}
-          className={`px-4 py-2 rounded-xl transition cursor-pointer ${
+          className={`w-full py-2.5 px-3 rounded-xl font-bold transition text-center cursor-pointer ${
             activeTab === 'logs'
-              ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D] font-bold shadow-xs'
-              : 'bg-white dark:bg-[#0E2239] text-slate-600 dark:text-slate-400 hover:text-[#0B1A2D] dark:hover:text-white border border-slate-200/80 dark:border-[#1A314D]'
+              ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D] shadow-xs'
+              : 'text-slate-600 dark:text-slate-400 hover:text-[#0B1A2D] dark:hover:text-white'
           }`}
         >
-          <span>Registros ({filteredAuditLogs.length})</span>
+          Registros ({filteredAuditLogs.length})
         </button>
       </div>
 
@@ -529,52 +567,26 @@ export const AdminCourtsManagement: React.FC<AdminCourtsManagementProps> = ({
           ====================================================================== */}
       {activeTab === 'courts' && (
         <div className="space-y-4 animate-in fade-in duration-150">
-          {/* Filtros Planos y Minimalistas Sin Iconos */}
-          <div className="flex flex-wrap items-center justify-between gap-2.5 text-xs">
-            {/* 1. Botones de Formato */}
-            <div className="flex items-center gap-1.5">
-              {(['all', 'double', 'single'] as const).map((fmt) => (
-                <button
-                  key={fmt}
-                  type="button"
-                  onClick={() => setFormatFilter(fmt)}
-                  className={`py-1.5 px-3 rounded-xl font-bold text-xs transition cursor-pointer ${
-                    formatFilter === fmt
-                      ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D] shadow-xs'
-                      : 'bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-                  }`}
-                >
-                  {fmt === 'all'
-                    ? 'Todos los formatos'
-                    : fmt === 'double'
-                    ? 'Doble'
-                    : 'Individual'}
-                </button>
-              ))}
+          {/* Indicador sutil de filtros activos si los hay */}
+          {hasActiveFilters && (
+            <div className="flex items-center justify-between text-xs py-2 px-3.5 bg-[#B7F229]/15 border border-[#B7F229]/40 rounded-2xl text-[#0B1A2D] dark:text-white shadow-2xs">
+              <span className="font-semibold text-xs">
+                Filtros activos ({activeFiltersCount}): mostrando {filteredCourts.length} de {venueCourts.length} pistas
+              </span>
+              <button
+                type="button"
+                onClick={() => {
+                  setFormatFilter('all');
+                  setLocationFilter('all');
+                  setLightsFilter('all');
+                  setPanoramicFilter('all');
+                }}
+                className="text-xs font-bold text-[#0B1A2D] dark:text-[#B7F229] hover:underline cursor-pointer"
+              >
+                Limpiar filtros
+              </button>
             </div>
-
-            {/* 2. Botones de Ubicación */}
-            <div className="flex items-center gap-1.5">
-              {(['all', 'indoor', 'outdoor'] as const).map((loc) => (
-                <button
-                  key={loc}
-                  type="button"
-                  onClick={() => setLocationFilter(loc)}
-                  className={`py-1.5 px-3 rounded-xl font-bold text-xs transition cursor-pointer ${
-                    locationFilter === loc
-                      ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D] shadow-xs'
-                      : 'bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-                  }`}
-                >
-                  {loc === 'all'
-                    ? 'Todas las ubicaciones'
-                    : loc === 'indoor'
-                    ? 'Indoor'
-                    : 'Outdoor'}
-                </button>
-              ))}
-            </div>
-          </div>
+          )}
 
           {/* Grid de Pistas Homologadas con Domótica Integrada */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-4">
@@ -876,11 +888,159 @@ export const AdminCourtsManagement: React.FC<AdminCourtsManagementProps> = ({
       )}
 
       {/* ======================================================================
+          MODAL: FILTROS AVANZADOS DE PISTAS Y DOMÓTICA
+          ====================================================================== */}
+      {isFilterModalOpen && (
+        <div className="fixed inset-0 z-50 flex flex-col h-full overflow-y-auto bg-white dark:bg-[#071220] sm:bg-slate-950/70 sm:dark:bg-black/80 sm:backdrop-blur-xs sm:p-4 lg:p-6 sm:items-center sm:justify-center animate-in fade-in duration-150">
+          <div className="w-full flex-1 sm:flex-initial flex flex-col bg-white dark:bg-[#071220] sm:max-w-md sm:rounded-3xl shadow-2xl border-0 sm:border sm:border-slate-200/90 dark:sm:border-[#1A314D] my-0 sm:my-auto max-h-none sm:max-h-[92vh] overflow-hidden">
+            {/* Header */}
+            <div className="sticky top-0 z-20 px-5 sm:px-6 py-4 border-b border-slate-100 dark:border-[#1A314D] flex items-center justify-between bg-white/95 dark:bg-[#071220]/95 backdrop-blur-md shrink-0">
+              <div className="flex items-center gap-2">
+                <SlidersHorizontal className="w-4 h-4 text-[#0B1A2D] dark:text-[#B7F229]" />
+                <h2 className="text-base sm:text-lg font-black text-[#0B1A2D] dark:text-white tracking-tight">
+                  Filtros de Pistas
+                </h2>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsFilterModalOpen(false)}
+                className="p-2 -mr-1.5 text-slate-400 hover:text-slate-700 dark:hover:text-white rounded-xl hover:bg-slate-100 dark:hover:bg-[#0E2239] transition-colors cursor-pointer shrink-0"
+                title="Cerrar filtros"
+                aria-label="Cerrar"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Contenido con scroll fluido */}
+            <div className="flex-1 overflow-y-auto overscroll-contain p-5 sm:p-6 space-y-5 text-xs text-slate-900 dark:text-slate-100">
+              {/* Formato de pista */}
+              <div className="space-y-2">
+                <label className="block text-slate-700 dark:text-slate-300 font-bold text-xs uppercase tracking-wider">
+                  Formato de Juego
+                </label>
+                <div className="grid grid-cols-3 gap-2">
+                  {(['all', 'double', 'single'] as const).map((fmt) => (
+                    <button
+                      key={fmt}
+                      type="button"
+                      onClick={() => setFormatFilter(fmt)}
+                      className={`py-2 px-3 rounded-xl font-bold text-xs transition cursor-pointer text-center ${
+                        formatFilter === fmt
+                          ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D] shadow-xs'
+                          : 'bg-slate-50 dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] text-slate-600 dark:text-slate-400 hover:text-[#0B1A2D] dark:hover:text-white'
+                      }`}
+                    >
+                      {fmt === 'all' ? 'Todos' : fmt === 'double' ? 'Doble' : 'Individual'}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Ubicación */}
+              <div className="space-y-2">
+                <label className="block text-slate-700 dark:text-slate-300 font-bold text-xs uppercase tracking-wider">
+                  Ubicación
+                </label>
+                <div className="grid grid-cols-3 gap-2">
+                  {(['all', 'indoor', 'outdoor'] as const).map((loc) => (
+                    <button
+                      key={loc}
+                      type="button"
+                      onClick={() => setLocationFilter(loc)}
+                      className={`py-2 px-3 rounded-xl font-bold text-xs transition cursor-pointer text-center ${
+                        locationFilter === loc
+                          ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D] shadow-xs'
+                          : 'bg-slate-50 dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] text-slate-600 dark:text-slate-400 hover:text-[#0B1A2D] dark:hover:text-white'
+                      }`}
+                    >
+                      {loc === 'all' ? 'Todas' : loc === 'indoor' ? 'Indoor' : 'Outdoor'}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Iluminación LED IoT */}
+              <div className="space-y-2">
+                <label className="block text-slate-700 dark:text-slate-300 font-bold text-xs uppercase tracking-wider">
+                  Iluminación LED IoT
+                </label>
+                <div className="grid grid-cols-3 gap-2">
+                  {(['all', 'with_lights', 'without_lights'] as const).map((lit) => (
+                    <button
+                      key={lit}
+                      type="button"
+                      onClick={() => setLightsFilter(lit)}
+                      className={`py-2 px-2.5 rounded-xl font-bold text-xs transition cursor-pointer text-center ${
+                        lightsFilter === lit
+                          ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D] shadow-xs'
+                          : 'bg-slate-50 dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] text-slate-600 dark:text-slate-400 hover:text-[#0B1A2D] dark:hover:text-white'
+                      }`}
+                    >
+                      {lit === 'all' ? 'Todas' : lit === 'with_lights' ? 'Con Focos' : 'Sin Focos'}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Panorámica WPT */}
+              <div className="space-y-2">
+                <label className="block text-slate-700 dark:text-slate-300 font-bold text-xs uppercase tracking-wider">
+                  Estructura Panorámica
+                </label>
+                <div className="grid grid-cols-3 gap-2">
+                  {(['all', 'panoramic', 'standard'] as const).map((pan) => (
+                    <button
+                      key={pan}
+                      type="button"
+                      onClick={() => setPanoramicFilter(pan)}
+                      className={`py-2 px-2.5 rounded-xl font-bold text-xs transition cursor-pointer text-center ${
+                        panoramicFilter === pan
+                          ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D] shadow-xs'
+                          : 'bg-slate-50 dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] text-slate-600 dark:text-slate-400 hover:text-[#0B1A2D] dark:hover:text-white'
+                      }`}
+                    >
+                      {pan === 'all' ? 'Todas' : pan === 'panoramic' ? 'Panorámica' : 'Estándar'}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="sticky bottom-0 z-20 px-5 sm:px-6 py-3.5 sm:py-4 border-t border-slate-100 dark:border-[#1A314D] bg-white/95 dark:bg-[#071220]/95 backdrop-blur-md shrink-0 mt-auto">
+              <div className="grid grid-cols-2 gap-3 w-full">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setFormatFilter('all');
+                    setLocationFilter('all');
+                    setLightsFilter('all');
+                    setPanoramicFilter('all');
+                  }}
+                  className="w-full py-2.5 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-[#0E2239] dark:hover:bg-[#132A45] text-slate-700 dark:text-slate-300 font-bold text-xs border border-slate-200/80 dark:border-[#1A314D] transition cursor-pointer text-center"
+                >
+                  Restablecer
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsFilterModalOpen(false)}
+                  className="w-full py-2.5 px-3 rounded-xl bg-[#0B1A2D] hover:bg-[#132A45] text-white dark:bg-[#B7F229] dark:hover:bg-[#a6e61f] dark:text-[#0B1A2D] font-bold text-xs shadow-md transition cursor-pointer text-center"
+                >
+                  Aplicar ({filteredCourts.length})
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ======================================================================
           MODAL A PANTALLA COMPLETA (FULL-SCREEN SHEET): NUEVA / EDITAR PISTA
           ====================================================================== */}
       {isCreateModalOpen && (
-        <div className="fixed inset-0 z-50 flex flex-col bg-slate-950/60 dark:bg-black/75 backdrop-blur-xs overflow-y-auto sm:p-4 lg:p-6 sm:items-center sm:justify-center animate-in fade-in duration-150">
-          <div className="w-full min-h-screen sm:min-h-0 sm:max-w-2xl lg:max-w-3xl bg-white dark:bg-[#071220] sm:rounded-3xl shadow-2xl flex flex-col border-0 sm:border sm:border-slate-200/90 dark:sm:border-[#1A314D] overflow-hidden my-auto">
+        <div className="fixed inset-0 z-50 flex flex-col h-full overflow-y-auto bg-white dark:bg-[#071220] sm:bg-slate-950/70 sm:dark:bg-black/80 sm:backdrop-blur-xs sm:p-4 lg:p-6 sm:items-center sm:justify-center animate-in fade-in duration-150">
+          <div className="w-full flex-1 sm:flex-initial flex flex-col bg-white dark:bg-[#071220] sm:max-w-2xl lg:max-w-3xl sm:rounded-3xl shadow-2xl border-0 sm:border sm:border-slate-200/90 dark:sm:border-[#1A314D] my-0 sm:my-auto max-h-none sm:max-h-[92vh] overflow-hidden">
             {/* Header Limpio y Exclusivo con botón X */}
             <div className="sticky top-0 z-20 px-5 sm:px-6 py-4 border-b border-slate-100 dark:border-[#1A314D] flex items-center justify-between bg-white/95 dark:bg-[#071220]/95 backdrop-blur-md shrink-0">
               <h2 className="text-lg sm:text-xl font-black text-[#0B1A2D] dark:text-white tracking-tight">
@@ -897,8 +1057,8 @@ export const AdminCourtsManagement: React.FC<AdminCourtsManagementProps> = ({
               </button>
             </div>
 
-            {/* Contenido sin scrollbars anidadas */}
-            <form onSubmit={handleFormSubmit} className="p-5 sm:p-7 space-y-5 sm:space-y-6 text-xs text-slate-900 dark:text-slate-100 flex-1">
+            {/* Contenido sin scrollbars anidadas y con desplazamiento fluido */}
+            <form onSubmit={handleFormSubmit} className="flex-1 overflow-y-auto overscroll-contain p-5 sm:p-7 space-y-5 sm:space-y-6 text-xs text-slate-900 dark:text-slate-100">
               {isMultiVenueActive && (
                 <div>
                   <label className="block text-slate-700 dark:text-slate-300 font-bold mb-1.5 text-xs">
@@ -1076,7 +1236,7 @@ export const AdminCourtsManagement: React.FC<AdminCourtsManagementProps> = ({
             </form>
 
             {/* Footer Sólido y Simétrico a Ancho Completo (Distribución Equitativa 50/50) */}
-            <div className="sticky bottom-0 z-20 px-5 sm:px-6 py-3.5 sm:py-4 border-t border-slate-100 dark:border-[#1A314D] bg-white/95 dark:bg-[#071220]/95 backdrop-blur-md shrink-0">
+            <div className="sticky bottom-0 z-20 px-5 sm:px-6 py-3.5 sm:py-4 border-t border-slate-100 dark:border-[#1A314D] bg-white/95 dark:bg-[#071220]/95 backdrop-blur-md shrink-0 mt-auto">
               <div className="grid grid-cols-2 gap-3 w-full">
                 <button
                   type="button"
@@ -1102,8 +1262,8 @@ export const AdminCourtsManagement: React.FC<AdminCourtsManagementProps> = ({
           MODAL A PANTALLA COMPLETA (FULL-SCREEN SHEET): NUEVO ADAPTADOR IOT
           ====================================================================== */}
       {showAddDeviceModal && (
-        <div className="fixed inset-0 z-50 flex flex-col bg-slate-950/60 dark:bg-black/75 backdrop-blur-xs overflow-y-auto sm:p-4 lg:p-6 sm:items-center sm:justify-center animate-in fade-in duration-150">
-          <div className="w-full min-h-screen sm:min-h-0 sm:max-w-lg bg-white dark:bg-[#071220] sm:rounded-3xl shadow-2xl flex flex-col border-0 sm:border sm:border-slate-200/90 dark:sm:border-[#1A314D] overflow-hidden my-auto">
+        <div className="fixed inset-0 z-50 flex flex-col h-full overflow-y-auto bg-white dark:bg-[#071220] sm:bg-slate-950/70 sm:dark:bg-black/80 sm:backdrop-blur-xs sm:p-4 lg:p-6 sm:items-center sm:justify-center animate-in fade-in duration-150">
+          <div className="w-full flex-1 sm:flex-initial flex flex-col bg-white dark:bg-[#071220] sm:max-w-lg sm:rounded-3xl shadow-2xl border-0 sm:border sm:border-slate-200/90 dark:sm:border-[#1A314D] my-0 sm:my-auto max-h-none sm:max-h-[92vh] overflow-hidden">
             {/* Header Limpio y Exclusivo con botón X */}
             <div className="sticky top-0 z-20 px-5 sm:px-6 py-4 border-b border-slate-100 dark:border-[#1A314D] flex items-center justify-between bg-white/95 dark:bg-[#071220]/95 backdrop-blur-md shrink-0">
               <h2 className="text-lg sm:text-xl font-black text-[#0B1A2D] dark:text-white tracking-tight">
@@ -1120,8 +1280,8 @@ export const AdminCourtsManagement: React.FC<AdminCourtsManagementProps> = ({
               </button>
             </div>
 
-            {/* Formulario sin scrollbars anidadas */}
-            <form onSubmit={handleAddDeviceSubmit} className="p-5 sm:p-6 space-y-4 sm:space-y-5 text-xs text-slate-900 dark:text-slate-100 flex-1">
+            {/* Formulario con desplazamiento vertical fluido */}
+            <form onSubmit={handleAddDeviceSubmit} className="flex-1 overflow-y-auto overscroll-contain p-5 sm:p-6 space-y-4 sm:space-y-5 text-xs text-slate-900 dark:text-slate-100">
               {isMultiVenueActive && (
                 <div>
                   <label className="block text-slate-700 dark:text-slate-300 mb-1.5 font-bold text-xs">
@@ -1190,7 +1350,7 @@ export const AdminCourtsManagement: React.FC<AdminCourtsManagementProps> = ({
             </form>
 
             {/* Footer Sólido y Simétrico a Ancho Completo (Distribución Equitativa 50/50) */}
-            <div className="sticky bottom-0 z-20 px-5 sm:px-6 py-3.5 sm:py-4 border-t border-slate-100 dark:border-[#1A314D] bg-white/95 dark:bg-[#071220]/95 backdrop-blur-md shrink-0">
+            <div className="sticky bottom-0 z-20 px-5 sm:px-6 py-3.5 sm:py-4 border-t border-slate-100 dark:border-[#1A314D] bg-white/95 dark:bg-[#071220]/95 backdrop-blur-md shrink-0 mt-auto">
               <div className="grid grid-cols-2 gap-3 w-full">
                 <button
                   type="button"

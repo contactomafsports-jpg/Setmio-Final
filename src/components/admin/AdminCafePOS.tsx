@@ -2364,7 +2364,7 @@ export const AdminCafePOS: React.FC = () => {
           ====================================================================== */}
       {arqueoModalOpen && (
         <div className="fixed inset-0 z-[60] flex flex-col h-full overflow-y-auto bg-white dark:bg-[#071220] sm:bg-slate-950/70 sm:dark:bg-black/80 sm:backdrop-blur-xs sm:p-4 lg:p-6 sm:items-center sm:justify-center animate-in fade-in duration-150">
-          <div className="relative w-full flex-1 sm:flex-initial flex flex-col bg-white dark:bg-[#0E2239] border-0 sm:border sm:border-slate-200/90 dark:sm:border-[#1A314D] sm:rounded-3xl sm:shadow-2xl text-slate-900 dark:text-slate-100 sm:max-w-xl my-0 sm:my-auto">
+          <div className="relative w-full flex-1 sm:flex-initial flex flex-col bg-white dark:bg-[#0E2239] border-0 sm:border sm:border-slate-200/90 dark:sm:border-[#1A314D] sm:rounded-3xl sm:shadow-2xl text-slate-900 dark:text-slate-100 sm:max-w-xl my-0 sm:my-auto max-h-none sm:max-h-[92vh] overflow-hidden">
             {/* Header Fijo con X correctamente alineada */}
             <div className="p-5 sm:p-6 border-b border-slate-100 dark:border-[#1A314D] flex items-center justify-between shrink-0">
               <h3 className="text-lg font-black text-[#0B1A2D] dark:text-white">
@@ -2756,7 +2756,7 @@ export const AdminCafePOS: React.FC = () => {
           ====================================================================== */}
       {productFormModalOpen && (
         <div className="fixed inset-0 z-50 flex flex-col h-full overflow-y-auto bg-white dark:bg-[#071220] sm:bg-slate-950/70 sm:dark:bg-black/80 sm:backdrop-blur-xs sm:p-4 lg:p-6 sm:items-center sm:justify-center animate-in fade-in duration-150">
-          <div className="w-full flex-1 sm:flex-initial flex flex-col bg-white dark:bg-[#071220] sm:max-w-lg sm:rounded-3xl sm:shadow-2xl border-0 sm:border sm:border-slate-200/90 dark:sm:border-[#1A314D] my-0 sm:my-auto">
+          <div className="w-full flex-1 sm:flex-initial flex flex-col bg-white dark:bg-[#071220] sm:max-w-lg sm:rounded-3xl sm:shadow-2xl border-0 sm:border sm:border-slate-200/90 dark:sm:border-[#1A314D] my-0 sm:my-auto max-h-none sm:max-h-[92vh] overflow-hidden">
             {/* Cabecera Limpia y Exclusiva con botón X */}
             <div className="sticky top-0 z-20 px-5 sm:px-6 py-4 border-b border-slate-100 dark:border-[#1A314D] flex items-center justify-between bg-white/95 dark:bg-[#071220]/95 backdrop-blur-md shrink-0">
               <h2 className="text-lg sm:text-xl font-black text-[#0B1A2D] dark:text-white tracking-tight">
@@ -2774,7 +2774,7 @@ export const AdminCafePOS: React.FC = () => {
             </div>
 
             {/* Contenido sin scrollbars anidadas - Estilo Linear/Stripe */}
-            <form onSubmit={handleSaveProductSubmit} className="p-5 sm:p-6 space-y-4 sm:space-y-5 text-xs text-slate-900 dark:text-slate-100 flex-1">
+            <form onSubmit={handleSaveProductSubmit} className="flex-1 overflow-y-auto overscroll-contain p-5 sm:p-6 space-y-4 sm:space-y-5 text-xs text-slate-900 dark:text-slate-100">
               {/* Nombre del Producto */}
               <div>
                 <label className="block text-slate-700 dark:text-slate-300 font-bold mb-1.5 text-xs">
