@@ -3174,17 +3174,20 @@ export const AdminCafePOS: React.FC = () => {
           5. MODAL: ASIGNAR RESERVA O RECARGA DE MONEDERO
           ====================================================================== */}
       {assignModalOpen && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-[#0B1A2D]/75 backdrop-blur-sm p-4 overflow-hidden animate-in fade-in duration-150">
-          <div className="relative w-full max-w-xl bg-white dark:bg-[#0E2239] border border-slate-200/90 dark:border-[#1A314D] rounded-3xl shadow-2xl text-slate-900 dark:text-slate-100 flex flex-col max-h-[90vh] overflow-hidden">
+        <div className="fixed inset-0 z-[60] flex flex-col justify-end sm:justify-center sm:items-center bg-slate-950/60 dark:bg-black/75 backdrop-blur-xs p-0 sm:p-4 lg:p-6 overflow-y-auto animate-in fade-in duration-200">
+          <div className="relative w-full max-w-xl bg-white dark:bg-[#0E2239] border-t sm:border border-slate-200/90 dark:border-[#1A314D] rounded-t-[28px] sm:rounded-3xl shadow-2xl text-slate-900 dark:text-slate-100 flex flex-col max-h-[90vh] sm:max-h-[92vh] overflow-hidden mt-auto sm:my-auto animate-in slide-in-from-bottom-4 sm:slide-in-from-bottom-0 duration-200">
+            {/* Barra táctil indicadora superior en móvil */}
+            <div className="w-12 h-1 bg-slate-300 dark:bg-slate-700 rounded-full mx-auto my-2.5 sm:hidden shrink-0" />
+
             {/* Header Limpio sin icono deformado */}
-            <div className="p-5 sm:p-6 border-b border-slate-100 dark:border-[#1A314D] flex items-center justify-between shrink-0">
-              <h3 className="text-lg font-black text-[#0B1A2D] dark:text-white">
+            <div className="px-5 sm:px-6 py-4 border-b border-slate-100 dark:border-[#1A314D] flex items-center justify-between shrink-0">
+              <h3 className="text-base sm:text-lg font-black text-[#0B1A2D] dark:text-white">
                 Asignar Reserva o Recarga
               </h3>
               <button
                 type="button"
                 onClick={() => setAssignModalOpen(false)}
-                className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+                className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#132A45] transition cursor-pointer"
                 title="Cerrar ventana"
               >
                 <X className="w-5 h-5" />

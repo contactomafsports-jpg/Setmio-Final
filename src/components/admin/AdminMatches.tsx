@@ -1915,11 +1915,14 @@ export const AdminMatches: React.FC = () => {
           MODAL 1: DETALLE COMPLETO DE PARTIDA Y GESTIÓN DE SOLICITUDES
           ====================================================================== */}
       {selectedMatchForDetail && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs animate-in fade-in duration-150">
-          <div className="w-full max-w-xl rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl p-6 sm:p-7 space-y-5 max-h-[92vh] overflow-y-auto">
-            {/* Header del modal */}
-            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
-              <div className="space-y-1.5">
+        <div className="fixed inset-0 z-50 flex flex-col justify-end sm:justify-center sm:items-center bg-slate-950/60 dark:bg-black/75 backdrop-blur-xs p-0 sm:p-4 lg:p-6 overflow-y-auto animate-in fade-in duration-200">
+          <div className="w-full max-w-xl rounded-t-[28px] sm:rounded-3xl bg-white dark:bg-[#0E2239] border-t sm:border border-slate-200/90 dark:border-[#1A314D] shadow-2xl flex flex-col max-h-[90vh] sm:max-h-[92vh] overflow-hidden mt-auto sm:my-auto text-slate-900 dark:text-slate-100 animate-in slide-in-from-bottom-4 sm:slide-in-from-bottom-0 duration-200">
+            {/* Barra táctil indicadora superior en móvil */}
+            <div className="w-12 h-1 bg-slate-300 dark:bg-slate-700 rounded-full mx-auto my-2.5 sm:hidden shrink-0" />
+
+            {/* Header del modal fijo */}
+            <div className="px-5 sm:px-6 py-4 border-b border-slate-100 dark:border-[#1A314D] flex items-center justify-between bg-white dark:bg-[#0E2239] shrink-0">
+              <div className="space-y-1.5 min-w-0 pr-2">
                 <div className="flex flex-wrap items-center gap-1.5">
                   {/* Badge 1: Tipo de Partida (Abierta / Pública / Privada) */}
                   <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800">
@@ -1978,7 +1981,7 @@ export const AdminMatches: React.FC = () => {
                   )}
                 </div>
 
-                <h3 className="text-lg font-black text-slate-900 dark:text-white mt-1">
+                <h3 className="text-base sm:text-lg font-black text-slate-900 dark:text-white mt-1 truncate">
                   {selectedMatchForDetail.courtName} · Partida Play!
                 </h3>
                 <p className="text-xs text-slate-500 dark:text-slate-400 font-mono font-medium flex items-center gap-1.5 mt-0.5">
@@ -1993,13 +1996,16 @@ export const AdminMatches: React.FC = () => {
               <button
                 type="button"
                 onClick={closeMatchDetail}
-                className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer shrink-0"
+                className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer shrink-0"
+                title="Cerrar detalle"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            {/* Barra de Acciones de Administración si la partida está Abierta (Sin título redundante, contenedor sin desborde) */}
+            {/* Contenido scrolleable con overflow fluido */}
+            <div className="p-5 sm:p-6 overflow-y-auto overscroll-contain space-y-4 text-xs flex-1">
+              {/* Barra de Acciones de Administración si la partida está Abierta (Sin título redundante, contenedor sin desborde) */}
             {(selectedMatchForDetail.status === 'open' || selectedMatchForDetail.players.length < 4) && (
               <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-2.5">
                 <div className="flex items-center gap-2">
@@ -2286,14 +2292,15 @@ export const AdminMatches: React.FC = () => {
                 </div>
               )}
             </div>
+          </div>
 
-            {/* Footer con Copiar enlace, Compartir/Notificar y Notificar a grupo */}
-            <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2 flex-wrap">
+          {/* Sticky Footer con Copiar enlace, Compartir/Notificar y Notificar a grupo */}
+            <div className="px-5 sm:px-6 py-3.5 border-t border-slate-100 dark:border-[#1A314D] bg-slate-50/50 dark:bg-[#071220]/50 shrink-0 flex items-center justify-between gap-2 flex-wrap">
               <div className="flex items-center gap-2 flex-wrap">
                 <button
                   type="button"
                   onClick={() => handleCopyMatchLink(selectedMatchForDetail.id)}
-                  className="px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs hover:bg-slate-200 dark:hover:bg-slate-700 transition flex items-center gap-1.5 cursor-pointer"
+                  className="px-3.5 py-2 rounded-xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] text-slate-700 dark:text-slate-300 font-bold text-xs hover:bg-slate-100 dark:hover:bg-[#132A45] transition flex items-center gap-1.5 cursor-pointer shadow-2xs"
                   title="Copiar enlace"
                 >
                   <Copy className="w-3.5 h-3.5 text-slate-500" />
@@ -2306,9 +2313,9 @@ export const AdminMatches: React.FC = () => {
                     const m = selectedMatchForDetail;
                     handleOpenShareNotifyHub(m);
                   }}
-                  className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-95"
+                  className="px-3.5 py-2 rounded-xl bg-[#0B1A2D] dark:bg-white text-white dark:text-[#0B1A2D] hover:bg-[#132A45] dark:hover:bg-slate-100 font-bold text-xs transition flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-95"
                 >
-                  <Share2 className="w-3.5 h-3.5" />
+                  <Share2 className="w-3.5 h-3.5 text-[#B7F229] dark:text-[#8B5CF6]" />
                   <span>Compartir / Notificar</span>
                 </button>
 
@@ -2319,9 +2326,9 @@ export const AdminMatches: React.FC = () => {
                       const m = selectedMatchForDetail;
                       handleOpenNotifyGroup(m);
                     }}
-                    className="px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs transition flex items-center gap-1.5 cursor-pointer"
+                    className="px-3.5 py-2 rounded-xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] hover:bg-slate-100 dark:hover:bg-[#132A45] text-slate-700 dark:text-slate-300 font-bold text-xs transition flex items-center gap-1.5 cursor-pointer shadow-2xs"
                   >
-                    <Megaphone className="w-3.5 h-3.5 text-emerald-500" />
+                    <Megaphone className="w-3.5 h-3.5 text-[#8B5CF6]" />
                     <span>Notificar a grupo</span>
                   </button>
                 )}
@@ -2330,7 +2337,7 @@ export const AdminMatches: React.FC = () => {
               <button
                 type="button"
                 onClick={closeMatchDetail}
-                className="px-4 py-2 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-bold text-xs cursor-pointer"
+                className="px-4 py-2 rounded-xl bg-slate-200 hover:bg-slate-300 dark:bg-[#132A45] dark:hover:bg-[#1A314D] text-slate-800 dark:text-slate-200 font-bold text-xs cursor-pointer transition active:scale-95"
               >
                 {t('matches.detailClose', 'Cerrar Detalle')}
               </button>

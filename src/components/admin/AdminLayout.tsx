@@ -3,6 +3,8 @@ import { useApp, AdminTab } from '../../context/AppContext';
 import {
   LogOut,
   ChevronRight,
+  ChevronDown,
+  Check,
   X,
   Sun,
   Moon,
@@ -47,6 +49,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
 
   const [mobileMoreOpen, setMobileMoreOpen] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  const [isLangDropdownOpen, setIsLangDropdownOpen] = useState(false);
 
   useEffect(() => {
     const root = document.documentElement;
@@ -476,28 +479,58 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
                   </button>
                 </div>
 
-                {/* Selector de Idioma Segmentado (ES / EN / GL) */}
-                <div className="p-1 bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200/80 dark:border-[#1A314D] grid grid-cols-3 gap-1 text-[11px] font-mono font-bold shadow-2xs">
-                  {(['es', 'en', 'gl'] as const).map((code) => {
-                    const isLangActive = language === code;
-                    return (
-                      <button
-                        key={code}
-                        type="button"
-                        onClick={() => {
-                          i18n.changeLanguage(code);
-                          setLanguage(code as SupportedLanguage);
-                        }}
-                        className={`py-2 px-1 rounded-xl transition text-center cursor-pointer uppercase ${
-                          isLangActive
-                            ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D] shadow-2xs font-black'
-                            : 'text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'
-                        }`}
-                      >
-                        {code}
-                      </button>
-                    );
-                  })}
+                {/* Selector de Idiomas Flotante con Bandera Oficial */}
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={() => setIsLangDropdownOpen(!isLangDropdownOpen)}
+                    className="w-full h-full min-h-[38px] py-2 px-3 rounded-2xl bg-white dark:bg-[#0E2239] hover:bg-slate-50 dark:hover:bg-[#132A45] border border-slate-200/80 dark:border-[#1A314D] text-slate-800 dark:text-white font-bold text-xs flex items-center justify-between transition cursor-pointer shadow-2xs active:scale-[0.99]"
+                    title="Seleccionar idioma"
+                  >
+                    <div className="flex items-center gap-2 min-w-0">
+                      <OfficialFlag code={language as SupportedLanguage} className="w-5 h-3.5 rounded-xs shrink-0 shadow-2xs" />
+                      <span className="truncate text-xs font-bold text-[#0B1A2D] dark:text-white">
+                        {SUPPORTED_LANGUAGES.find((l) => l.code === language)?.name || 'Español'}
+                      </span>
+                    </div>
+                    <ChevronDown className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 shrink-0 ${isLangDropdownOpen ? 'rotate-180' : ''}`} />
+                  </button>
+
+                  {/* Popover desplegable flotante con todos los idiomas soportados */}
+                  {isLangDropdownOpen && (
+                    <div className="absolute bottom-full right-0 mb-2 w-56 max-h-64 overflow-y-auto overscroll-contain bg-white dark:bg-[#0E2239] border border-slate-200/90 dark:border-[#1A314D] rounded-2xl shadow-xl p-1.5 z-50 space-y-0.5 animate-in fade-in zoom-in-95 duration-150">
+                      <div className="px-2.5 py-1.5 text-[10px] font-black uppercase tracking-wider text-slate-400 border-b border-slate-100 dark:border-[#1A314D] mb-1">
+                        Selecciona un idioma
+                      </div>
+                      {SUPPORTED_LANGUAGES.map((item) => {
+                        const isSelected = language === item.code;
+                        return (
+                          <button
+                            key={item.code}
+                            type="button"
+                            onClick={() => {
+                              i18n.changeLanguage(item.code);
+                              setLanguage(item.code);
+                              setIsLangDropdownOpen(false);
+                            }}
+                            className={`w-full flex items-center justify-between px-2.5 py-2 rounded-xl text-xs font-semibold transition cursor-pointer ${
+                              isSelected
+                                ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D] font-black shadow-2xs'
+                                : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-[#132A45]'
+                            }`}
+                          >
+                            <div className="flex items-center gap-2.5 min-w-0">
+                              <OfficialFlag code={item.code} className="w-5 h-3.5 rounded-xs shrink-0 shadow-2xs" />
+                              <span className="truncate">{item.name}</span>
+                            </div>
+                            {isSelected && (
+                              <Check className="w-3.5 h-3.5 text-[#B7F229] dark:text-[#0B1A2D] shrink-0" />
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -508,6 +541,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
                     type="button"
                     onClick={() => {
                       setMobileMoreOpen(false);
+                      setIsLangDropdownOpen(false);
                       enterWhiteLabelPlayerPreview();
                     }}
                     className="w-full py-2.5 px-3 rounded-2xl bg-white dark:bg-[#0E2239] hover:bg-slate-100 dark:hover:bg-[#132A45] text-slate-800 dark:text-white font-bold text-xs border border-slate-200/80 dark:border-[#1A314D] transition flex items-center justify-center gap-2 active:scale-98 cursor-pointer shadow-2xs"

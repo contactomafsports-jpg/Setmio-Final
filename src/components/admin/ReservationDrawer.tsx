@@ -446,9 +446,12 @@ export const ReservationDrawer: React.FC<ReservationDrawerProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0B1A2D]/80 backdrop-blur-sm p-3 sm:p-4 overflow-hidden animate-in fade-in duration-200">
-      {/* Modal Dialog Container */}
-      <div className="w-full max-w-2xl bg-white dark:bg-[#0E2239] border border-slate-200/90 dark:border-[#1A314D] rounded-3xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden text-slate-900 dark:text-slate-100">
+    <div className="fixed inset-0 z-50 flex flex-col justify-end sm:justify-center sm:items-center bg-slate-950/60 dark:bg-black/75 backdrop-blur-xs p-0 sm:p-4 lg:p-6 overflow-y-auto animate-in fade-in duration-200">
+      {/* Modal Dialog Container / Bottom Sheet Flotante de Tercer Nivel */}
+      <div className="w-full max-w-2xl bg-white dark:bg-[#0E2239] border-t border-slate-200/90 dark:border-[#1A314D] sm:border sm:rounded-3xl rounded-t-[28px] shadow-2xl flex flex-col max-h-[90vh] sm:max-h-[92vh] overflow-hidden mt-auto sm:my-auto text-slate-900 dark:text-slate-100 animate-in slide-in-from-bottom-4 sm:slide-in-from-bottom-0 duration-200">
+        {/* Barra táctil indicadora superior en móvil */}
+        <div className="w-12 h-1 bg-slate-300 dark:bg-slate-700 rounded-full mx-auto my-2.5 sm:hidden shrink-0" />
+
         {/* 1. ENCABEZADO FIJO: PISTA, DEPORTE, SEDE, ESTADO Y FECHA */}
         <div className="px-5 sm:px-6 py-4 border-b border-slate-100 dark:border-[#1A314D] flex items-center justify-between bg-white dark:bg-[#0E2239] shrink-0">
           <div className="flex items-center gap-3 min-w-0">
@@ -499,7 +502,7 @@ export const ReservationDrawer: React.FC<ReservationDrawerProps> = ({
         </div>
 
         {/* 2. CONTENIDO PRINCIPAL SCROLLEABLE CON TARJETAS DE BORDE SUTIL */}
-        <div className="p-5 sm:p-6 overflow-y-auto space-y-3.5 text-xs flex-1">
+        <div className="p-5 sm:p-6 overflow-y-auto overscroll-contain space-y-3.5 text-xs flex-1">
           {/* Card: Modalidad & Carácter del Partido */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
             <div className="p-3.5 rounded-2xl bg-slate-50/60 dark:bg-[#071220]/60 border border-slate-200/80 dark:border-[#1A314D] flex items-center justify-between">
