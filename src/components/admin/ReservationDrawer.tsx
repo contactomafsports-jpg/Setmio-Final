@@ -452,91 +452,91 @@ export const ReservationDrawer: React.FC<ReservationDrawerProps> = ({
       {/* Expediente de Consulta y Auditoría de Nivel 3 (Full-Screen en Móvil / Centrado Ejecutivo en Desktop) */}
       <div className="w-full sm:max-w-2xl h-full sm:h-auto sm:max-h-[92vh] bg-white dark:bg-[#071220] sm:border border-slate-200/90 dark:border-[#1A314D] sm:rounded-3xl shadow-2xl flex flex-col overflow-hidden text-slate-900 dark:text-slate-100">
         
+        {/* Barra táctil indicadora en móvil */}
+        <div className="w-12 h-1 bg-slate-300 dark:bg-slate-700 rounded-full mx-auto my-2 sm:hidden shrink-0" />
+
         {/* 1. CABECERA ULTRA COMPACTA DE EXPEDIENTE (NIVEL 3 - MÁXIMO ESPACIO ÚTIL) */}
         <div className="px-5 sm:px-6 py-3 border-b border-slate-100 dark:border-[#1A314D] flex items-center justify-between bg-white dark:bg-[#071220] shrink-0">
-          <div className="min-w-0 pr-2">
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] font-black uppercase tracking-wider text-slate-400">
-                Expediente #{reservation.id.slice(-6).toUpperCase()}
+          <div className="min-w-0 pr-3">
+            <div className="flex items-center gap-2 mb-0.5">
+              <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400">
+                Expediente · Reserva #{reservation.id.slice(-6).toUpperCase()}
               </span>
               <span className="text-slate-300 dark:text-slate-700">·</span>
               {isPast ? (
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 dark:bg-[#0E2239] text-slate-600 dark:text-slate-400 border border-slate-200/80 dark:border-[#1A314D]">
+                <span className="inline-flex items-center gap-1 text-[10px] font-bold text-slate-500 dark:text-slate-400">
                   <CheckCircle2 className="w-3 h-3 text-slate-400" />
                   <span>{t('booking.status_past', 'Efectuada')}</span>
                 </span>
               ) : (
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#F0FCCF] dark:bg-[#B7F229]/20 text-[#0B1A2D] dark:text-[#B7F229] border border-[#B7F229]/50">
-                  <Clock className="w-3 h-3 text-[#5a8600] dark:text-[#B7F229]" />
+                <span className="inline-flex items-center gap-1 text-[10px] font-bold text-[#0B1A2D] dark:text-[#B7F229]">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#B7F229]" />
                   <span>{t('booking.status_upcoming', 'Próxima')}</span>
                 </span>
               )}
             </div>
-            <div className="flex items-center gap-2 mt-0.5">
+
+            <div className="flex items-baseline gap-2 flex-wrap">
               <h2 className="text-base sm:text-lg font-black text-[#0B1A2D] dark:text-white truncate">
                 {reservation.courtName}
               </h2>
-              <span className="text-xs font-semibold text-slate-400 truncate">
-                · {venueDisplayName}
-              </span>
+              {venueDisplayName && (
+                <span className="text-xs text-slate-400 dark:text-slate-500 truncate flex items-center gap-1">
+                  <Building2 className="w-3 h-3 text-[#0B1A2D] dark:text-[#B7F229]" />
+                  <span>{venueDisplayName}</span>
+                </span>
+              )}
             </div>
           </div>
 
           <button
             type="button"
             onClick={onClose}
-            className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-[#0E2239] dark:hover:bg-[#132A45] text-slate-500 hover:text-slate-900 dark:hover:text-white flex items-center justify-center transition shrink-0 cursor-pointer"
+            className="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-[#0E2239] transition cursor-pointer shrink-0"
             title="Cerrar expediente"
           >
-            <X className="w-4 h-4" />
+            <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* 2. EXPEDIENTE TIPOGRÁFICO LIMPIO (ADIÓS A CAJAS BLANCAS PESADAS Y BORDES ANIDADOS) */}
         <div className="p-5 sm:p-6 overflow-y-auto overscroll-contain space-y-4 text-xs flex-1">
-          {/* Ficha Rápida del Turno: Fecha, Horario y Modalidad */}
-          <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-100 dark:border-[#1A314D]">
-            <div className="flex items-center gap-2 text-xs font-medium text-slate-600 dark:text-slate-300">
-              <Calendar className="w-4 h-4 text-[#8B5CF6] shrink-0" />
+          {/* Ficha Rápida del Turno: Fecha, Horario, Modalidad y Deporte */}
+          <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-100 dark:border-[#1A314D] text-xs">
+            <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300 flex-wrap">
+              <Calendar className="w-3.5 h-3.5 text-[#8B5CF6] shrink-0" />
               <span className="font-bold text-[#0B1A2D] dark:text-white capitalize">{formattedExplicitDate}</span>
-              <span>·</span>
+              <span className="text-slate-300 dark:text-slate-700">·</span>
               <span className="font-mono font-bold text-[#0B1A2D] dark:text-[#B7F229]">{cleanTimeSlot}</span>
-              <span>·</span>
-              <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-slate-100 dark:bg-[#0E2239] text-slate-700 dark:text-slate-300 border border-slate-200/60 dark:border-[#1A314D]">
-                {sportType}
-              </span>
+              <span className="text-slate-300 dark:text-slate-700">·</span>
+              <span className="text-slate-500 dark:text-slate-400">{sportType}</span>
             </div>
 
-            <div className="flex items-center gap-1.5">
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 dark:bg-[#0E2239] text-[#0B1A2D] dark:text-slate-200 border border-slate-200/80 dark:border-[#1A314D]">
-                {matchGender === 'male' ? 'Masculino' : matchGender === 'female' ? 'Femenino' : 'Mixto'}
-              </span>
-              <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${
-                matchMode === 'competitive'
-                  ? 'bg-purple-50 dark:bg-[#8B5CF6]/20 text-[#8B5CF6] border-[#8B5CF6]/40'
-                  : 'bg-[#F0FCCF] dark:bg-[#B7F229]/20 text-[#0B1A2D] dark:text-[#B7F229] border-[#B7F229]/50'
-              }`}>
+            <div className="flex items-center gap-2 text-[11px] text-slate-500 dark:text-slate-400">
+              <span className="capitalize">{matchGender === 'male' ? 'Masculino' : matchGender === 'female' ? 'Femenino' : 'Mixto'}</span>
+              <span className="text-slate-300 dark:text-slate-700">·</span>
+              <span className={matchMode === 'competitive' ? 'text-[#8B5CF6] font-bold' : 'text-[#0B1A2D] dark:text-[#B7F229] font-bold'}>
                 {matchMode === 'competitive' ? 'Competitivo (ELO)' : 'Amistoso'}
               </span>
             </div>
           </div>
 
           {/* Bloque Financiero Tipográfico (Estilo Stripe / Linear Invoice) */}
-          <div className="p-4 rounded-2xl bg-slate-50/70 dark:bg-[#0E2239]/60 border border-slate-200/80 dark:border-[#1A314D] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="p-4 rounded-2xl bg-slate-50/70 dark:bg-[#0B1A2D]/40 border border-slate-200/80 dark:border-[#1A314D] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
               <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
                 Estado Financiero de la Pista
               </span>
-              <div className="flex items-center gap-2">
-                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold border ${
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-bold border ${
                   reservation.paymentStatus === 'paid'
                     ? 'bg-[#F0FCCF] text-[#0B1A2D] dark:bg-[#B7F229]/20 dark:text-[#B7F229] border-[#B7F229]/40'
-                    : 'bg-amber-100 text-amber-900 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-300 dark:border-amber-800'
+                    : 'bg-amber-100 text-amber-900 dark:bg-amber-950/60 dark:text-amber-300 border-amber-300 dark:border-amber-800'
                 }`}>
-                  {reservation.paymentStatus === 'paid' ? 'Abonado Íntegramente' : 'Pendiente de Cobro en Mostrador / TPV'}
+                  {reservation.paymentStatus === 'paid' ? 'Abonado Íntegramente' : 'Pendiente de Cobro'}
                 </span>
-                <span className="text-slate-400 text-xs">·</span>
-                <span className="text-xs text-slate-600 dark:text-slate-300 font-medium">
+                <span className="text-slate-300 dark:text-slate-700">·</span>
+                <span className="text-xs text-slate-500 dark:text-slate-400">
                   Cuota 1/4: <strong className="font-mono text-[#0B1A2D] dark:text-[#B7F229]">{pricePerPlayer.toFixed(2)} €</strong>
                 </span>
               </div>
@@ -550,7 +550,7 @@ export const ReservationDrawer: React.FC<ReservationDrawerProps> = ({
             </div>
           </div>
 
-          {/* Titular & Domótica IoT */}
+          {/* Titular & Domótica IoT en 2 columnas con tipografía limpia */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {/* Titular */}
             <div
@@ -560,7 +560,7 @@ export const ReservationDrawer: React.FC<ReservationDrawerProps> = ({
               onKeyDown={(e) => {
                 if (e.key === 'Enter' || e.key === ' ') handlePlayerClick(reservation.creatorName);
               }}
-              className="p-3.5 rounded-2xl bg-slate-50/70 dark:bg-[#0E2239]/60 border border-slate-200/80 dark:border-[#1A314D] hover:border-[#B7F229]/60 hover:bg-[#F0FCCF]/10 dark:hover:bg-[#132A45] transition cursor-pointer group space-y-1"
+              className="p-3.5 rounded-2xl border border-slate-200/80 dark:border-[#1A314D] hover:border-[#B7F229]/60 hover:bg-slate-50/50 dark:hover:bg-[#0B1A2D]/20 transition cursor-pointer group space-y-1 bg-white dark:bg-[#071220]"
               title={`Ver ficha de ${reservation.creatorName}`}
             >
               <div className="flex items-center justify-between">
@@ -568,22 +568,22 @@ export const ReservationDrawer: React.FC<ReservationDrawerProps> = ({
                   <span>Titular de la Reserva</span>
                   <span className="text-[#8B5CF6] font-normal">↗</span>
                 </span>
-                <span className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-[#071220] text-[10px] font-mono font-bold text-[#0B1A2D] dark:text-[#B7F229] border border-slate-200/80 dark:border-[#1A314D]">
+                <span className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-[#0E2239] text-[10px] font-mono font-bold text-[#0B1A2D] dark:text-[#B7F229] border border-slate-200/80 dark:border-[#1A314D]">
                   {reservation.creatorMemberNum || 'Socio #SM-408'}
                 </span>
               </div>
-              <div className="font-black text-sm text-[#0B1A2D] dark:text-white group-hover:text-[#0B1A2D] dark:group-hover:text-[#B7F229] flex items-center gap-1.5 transition">
+              <div className="font-black text-sm text-[#0B1A2D] dark:text-white group-hover:text-[#8B5CF6] flex items-center gap-1.5 transition">
                 <User className="w-4 h-4 text-[#8B5CF6]" />
                 <span>{reservation.creatorName}</span>
               </div>
-              <div className="text-[11px] text-slate-400 flex items-center gap-1">
+              <div className="text-[11px] text-slate-400 flex items-center gap-1 font-mono">
                 <Phone className="w-3 h-3" />
                 <span>{reservation.creatorPhone || '+34 611 22 33 44'}</span>
               </div>
             </div>
 
             {/* Acceso IoT & Luces */}
-            <div className="p-3.5 rounded-2xl bg-slate-50/70 dark:bg-[#0E2239]/60 border border-slate-200/80 dark:border-[#1A314D] flex items-center justify-between">
+            <div className="p-3.5 rounded-2xl border border-slate-200/80 dark:border-[#1A314D] flex items-center justify-between bg-white dark:bg-[#071220]">
               <div>
                 <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-0.5">
                   Automatización IoT
@@ -602,15 +602,15 @@ export const ReservationDrawer: React.FC<ReservationDrawerProps> = ({
                 <button
                   type="button"
                   onClick={handleCopyPin}
-                  className="p-2 rounded-xl bg-white dark:bg-[#071220] hover:bg-slate-100 dark:hover:bg-[#132A45] border border-slate-200/80 dark:border-[#1A314D] text-slate-600 dark:text-slate-300 transition cursor-pointer"
+                  className="p-2 rounded-xl bg-slate-50 dark:bg-[#0E2239] hover:bg-slate-100 dark:hover:bg-[#132A45] border border-slate-200/80 dark:border-[#1A314D] text-slate-600 dark:text-slate-300 transition cursor-pointer"
                   title="Copiar PIN"
                 >
-                  {copiedPin ? <Check className="w-3.5 h-3.5 text-[#5a8600] dark:text-[#B7F229]" /> : <Copy className="w-3.5 h-3.5" />}
+                  {copiedPin ? <Check className="w-3.5 h-3.5 text-[#5a8600] dark:text-[#B7F229]" /> : <Copy className="w-3.5 h-3.5 text-slate-400" />}
                 </button>
                 <button
                   type="button"
                   onClick={handleWhatsAppPin}
-                  className="p-2 rounded-xl bg-white dark:bg-[#071220] hover:bg-slate-100 dark:hover:bg-[#132A45] border border-slate-200/80 dark:border-[#1A314D] text-[#0B1A2D] dark:text-[#B7F229] transition cursor-pointer"
+                  className="p-2 rounded-xl bg-slate-50 dark:bg-[#0E2239] hover:bg-slate-100 dark:hover:bg-[#132A45] border border-slate-200/80 dark:border-[#1A314D] text-[#0B1A2D] dark:text-[#B7F229] transition cursor-pointer"
                   title="Enviar PIN por WhatsApp"
                 >
                   <MessageCircle className="w-3.5 h-3.5" />
@@ -661,7 +661,7 @@ export const ReservationDrawer: React.FC<ReservationDrawerProps> = ({
           {/* Lista Tipográfica Limpia: Jugadores Convocados (4 Plazas) */}
           <div className="space-y-2">
             <div className="flex items-center justify-between text-xs">
-              <span className="font-extrabold uppercase tracking-wider text-slate-400 text-[10px]">
+              <span className="font-bold uppercase tracking-wider text-slate-400 text-[10px]">
                 Jugadores Convocados ({participants.filter((p) => p.paid).length}/4 Abonados)
               </span>
               <span className="font-mono font-bold text-slate-400 text-[10px]">
@@ -669,7 +669,7 @@ export const ReservationDrawer: React.FC<ReservationDrawerProps> = ({
               </span>
             </div>
 
-            <div className="rounded-2xl border border-slate-200/80 dark:border-[#1A314D] divide-y divide-slate-100 dark:divide-[#1A314D] overflow-hidden bg-white dark:bg-[#0E2239]/40">
+            <div className="rounded-2xl border border-slate-200/80 dark:border-[#1A314D] divide-y divide-slate-100 dark:divide-[#1A314D] overflow-hidden bg-white dark:bg-[#071220]">
               {participants.map((p, idx) => (
                 <div
                   key={idx}
@@ -679,11 +679,11 @@ export const ReservationDrawer: React.FC<ReservationDrawerProps> = ({
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' || e.key === ' ') handlePlayerClick(p.name);
                   }}
-                  className="p-3 hover:bg-slate-50 dark:hover:bg-[#132A45]/40 transition flex items-center justify-between gap-3 text-xs cursor-pointer group"
+                  className="p-3.5 hover:bg-slate-50/50 dark:hover:bg-[#0B1A2D]/20 transition flex items-center justify-between gap-3 text-xs cursor-pointer group"
                   title={`Ver perfil de ${p.name}`}
                 >
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-8 h-8 rounded-full bg-[#0B1A2D] text-[#B7F229] font-black text-xs flex items-center justify-center shrink-0 shadow-2xs">
+                    <div className="w-8 h-8 rounded-xl bg-[#0B1A2D] dark:bg-[#0E2239] text-[#B7F229] border border-slate-200 dark:border-[#1A314D] font-black text-xs flex items-center justify-center shrink-0 shadow-2xs">
                       {p.name.slice(0, 2).toUpperCase()}
                     </div>
                     <div className="min-w-0">
@@ -691,7 +691,7 @@ export const ReservationDrawer: React.FC<ReservationDrawerProps> = ({
                         <span>{p.name}</span>
                         <span className="text-[10px] text-[#8B5CF6] opacity-0 group-hover:opacity-100 transition-opacity">↗</span>
                       </div>
-                      <div className="text-[10px] text-slate-400">
+                      <div className="text-[10px] text-slate-400 font-mono">
                         Nivel {p.level?.toFixed(2) || '4.00'} · {p.paymentMethod || 'TPV'}
                       </div>
                     </div>
@@ -701,8 +701,8 @@ export const ReservationDrawer: React.FC<ReservationDrawerProps> = ({
                     <span
                       className={`px-2 py-0.5 rounded-full text-[10px] font-bold block border ${
                         p.paid
-                          ? 'bg-[#F0FCCF] dark:bg-[#B7F229]/20 text-[#0B1A2D] dark:text-[#B7F229] border-[#B7F229]/50'
-                          : 'bg-slate-100 dark:bg-[#071220] text-slate-600 dark:text-slate-300 border-slate-200/80 dark:border-[#1A314D]'
+                          ? 'bg-[#F0FCCF] dark:bg-[#B7F229]/20 text-[#0B1A2D] dark:text-[#B7F229] border-[#B7F229]/40'
+                          : 'bg-slate-100 dark:bg-[#0E2239] text-slate-600 dark:text-slate-300 border border-slate-200/80 dark:border-[#1A314D]'
                       }`}
                     >
                       {p.statusText || (p.paid ? 'Pagado' : 'Pendiente TPV')}
@@ -718,9 +718,9 @@ export const ReservationDrawer: React.FC<ReservationDrawerProps> = ({
 
           {/* Marcador Post-Partido (Admin) */}
           {(!isPlayerRole || isPast) && (
-            <div className="p-3.5 rounded-2xl bg-slate-50/70 dark:bg-[#0E2239]/60 border border-slate-200/80 dark:border-[#1A314D] space-y-2 text-xs">
+            <div className="p-3.5 rounded-2xl border border-slate-200/80 dark:border-[#1A314D] bg-slate-50/50 dark:bg-[#0B1A2D]/20 space-y-2 text-xs">
               <div className="flex items-center justify-between">
-                <span className="font-extrabold text-[#0B1A2D] dark:text-white uppercase tracking-wider text-[10px] flex items-center gap-1.5">
+                <span className="font-bold text-[#0B1A2D] dark:text-white uppercase tracking-wider text-[10px] flex items-center gap-1.5">
                   <Trophy className="w-3.5 h-3.5 text-amber-500" />
                   <span>Resultado del Partido {matchMode === 'competitive' && '(Actualiza ELO)'}</span>
                 </span>
@@ -753,7 +753,7 @@ export const ReservationDrawer: React.FC<ReservationDrawerProps> = ({
         </div>
 
         {/* 3. BARRA DE ACCIONES INFERIORES: ACCIÓN PRINCIPAL DESTACADA + GRUPO COMPACTO */}
-        <div className="relative px-5 sm:px-6 py-3 border-t border-slate-100 dark:border-[#1A314D] bg-white dark:bg-[#071220] shrink-0">
+        <div className="relative px-5 sm:px-6 py-3.5 border-t border-slate-100 dark:border-[#1A314D] bg-white dark:bg-[#071220] shrink-0">
           {isPlayerRole ? (
             <div className="flex items-center justify-end gap-2.5">
               {!isPast ? (
@@ -761,7 +761,7 @@ export const ReservationDrawer: React.FC<ReservationDrawerProps> = ({
                   <button
                     type="button"
                     onClick={() => setIsPlayerEditModalOpen(true)}
-                    className="h-11 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-[#0E2239] dark:hover:bg-[#132A45] text-slate-800 dark:text-slate-200 font-bold text-xs transition flex items-center gap-1.5 cursor-pointer border border-slate-200/80 dark:border-[#1A314D] shadow-2xs active:scale-95"
+                    className="h-12 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-[#0E2239] dark:hover:bg-[#132A45] text-slate-800 dark:text-slate-200 font-bold text-xs transition flex items-center gap-1.5 cursor-pointer border border-slate-200/80 dark:border-[#1A314D] shadow-2xs active:scale-95"
                   >
                     <Edit3 className="w-3.5 h-3.5 text-[#8B5CF6]" />
                     <span>Editar mi plaza</span>
@@ -769,7 +769,7 @@ export const ReservationDrawer: React.FC<ReservationDrawerProps> = ({
                   <button
                     type="button"
                     onClick={() => setIsCancelConfirmModalOpen(true)}
-                    className="h-11 px-4 rounded-xl bg-amber-50 dark:bg-amber-950/40 hover:bg-amber-100 dark:hover:bg-amber-900/40 text-amber-800 dark:text-amber-300 font-bold text-xs transition border border-amber-200/80 dark:border-amber-800/80 flex items-center gap-1.5 cursor-pointer shadow-2xs active:scale-95"
+                    className="h-12 px-4 rounded-xl bg-amber-50 dark:bg-amber-950/40 hover:bg-amber-100 dark:hover:bg-amber-900/40 text-amber-800 dark:text-amber-300 font-bold text-xs transition border border-amber-200/80 dark:border-amber-800/80 flex items-center gap-1.5 cursor-pointer shadow-2xs active:scale-95"
                   >
                     <AlertTriangle className="w-3.5 h-3.5 text-amber-500" />
                     <span>Cancelar mi plaza</span>
@@ -780,6 +780,13 @@ export const ReservationDrawer: React.FC<ReservationDrawerProps> = ({
                   Reserva finalizada (Sin acciones disponibles)
                 </span>
               )}
+              <button
+                type="button"
+                onClick={onClose}
+                className="h-12 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-[#0E2239] dark:hover:bg-[#132A45] text-slate-700 dark:text-slate-200 font-bold text-xs cursor-pointer transition shrink-0"
+              >
+                Cerrar
+              </button>
             </div>
           ) : (
             <div className="flex items-center gap-2">
@@ -787,33 +794,25 @@ export const ReservationDrawer: React.FC<ReservationDrawerProps> = ({
               <button
                 type="button"
                 onClick={handleGoToTPV}
-                className="flex-1 h-12 px-4 rounded-xl bg-[#B7F229] hover:bg-[#a6df17] text-[#0B1A2D] font-black text-xs sm:text-sm transition shadow-sm flex items-center justify-center gap-2 active:scale-98 cursor-pointer"
+                className="flex-1 h-12 px-4 rounded-xl bg-[#B7F229] hover:bg-[#a6df17] text-[#0B1A2D] font-black text-sm transition shadow-md flex items-center justify-center gap-2 active:scale-98 cursor-pointer"
                 title="Cobrar en caja TPV"
               >
                 <CreditCard className="w-4 h-4 shrink-0 text-[#0B1A2D]" />
                 <span className="truncate">Abrir en TPV</span>
               </button>
 
-              {/* Acciones Secundarias en Retícula Compacta No Invasiva */}
-              <button
-                type="button"
-                onClick={handleWhatsAppPin}
-                className="h-12 w-12 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-[#0E2239] dark:hover:bg-[#132A45] border border-slate-200/80 dark:border-[#1A314D] text-[#0B1A2D] dark:text-[#B7F229] flex items-center justify-center transition active:scale-95 cursor-pointer shadow-2xs shrink-0"
-                title="Enviar PIN por WhatsApp"
-              >
-                <MessageCircle className="w-4 h-4" />
-              </button>
-
+              {/* Acción Secundaria: Editar Reserva */}
               <button
                 type="button"
                 onClick={handleOpenEditModal}
-                className="h-12 w-12 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-[#0E2239] dark:hover:bg-[#132A45] border border-slate-200/80 dark:border-[#1A314D] text-[#8B5CF6] flex items-center justify-center transition active:scale-95 cursor-pointer shadow-2xs shrink-0"
+                className="h-12 px-3.5 rounded-xl bg-slate-50 dark:bg-[#0E2239] hover:bg-slate-100 dark:hover:bg-[#132A45] border border-slate-200/80 dark:border-[#1A314D] text-[#8B5CF6] font-bold text-xs flex items-center gap-1.5 transition active:scale-95 cursor-pointer shadow-2xs shrink-0"
                 title="Editar reserva"
               >
-                <Edit3 className="w-4 h-4" />
+                <Edit3 className="w-4 h-4 text-[#8B5CF6]" />
+                <span className="hidden sm:inline">Editar</span>
               </button>
 
-              {/* Menú Contextual (···) para Reasignar, Cancelar y Eliminar */}
+              {/* Menú Contextual (···) para Reasignar, WhatsApp, Cancelar y Eliminar */}
               <div className="relative shrink-0">
                 <button
                   type="button"
@@ -821,52 +820,79 @@ export const ReservationDrawer: React.FC<ReservationDrawerProps> = ({
                   className={`h-12 w-12 rounded-xl border flex items-center justify-center transition active:scale-95 cursor-pointer shadow-2xs ${
                     showMoreActions
                       ? 'bg-[#0B1A2D] text-[#B7F229] border-[#0B1A2D]'
-                      : 'bg-slate-100 hover:bg-slate-200 dark:bg-[#0E2239] dark:hover:bg-[#132A45] border-slate-200/80 dark:border-[#1A314D] text-slate-700 dark:text-slate-300'
+                      : 'bg-slate-50 hover:bg-slate-100 dark:bg-[#0E2239] dark:hover:bg-[#132A45] border-slate-200/80 dark:border-[#1A314D] text-slate-700 dark:text-slate-300'
                   }`}
                   title="Más opciones de gestión"
                 >
-                  <MoreVertical className="w-4 h-4" />
+                  <MoreVertical className="w-5 h-5" />
                 </button>
 
                 {/* Popover hacia arriba */}
                 {showMoreActions && (
-                  <div className="absolute bottom-full right-0 mb-2 w-56 rounded-2xl bg-white dark:bg-[#0E2239] border border-slate-200 dark:border-[#1A314D] shadow-xl p-1.5 space-y-1 z-30 animate-in fade-in slide-in-from-bottom-2 text-xs">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setShowMoreActions(false);
-                        setIsReassigning(!isReassigning);
-                      }}
-                      className="w-full px-3 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-[#132A45] text-left font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2 transition cursor-pointer"
-                    >
-                      <RefreshCw className="w-4 h-4 text-indigo-500" />
-                      <span>Reasignar pista</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setShowMoreActions(false);
-                        setIsCancelConfirmModalOpen(true);
-                      }}
-                      className="w-full px-3 py-2.5 rounded-xl hover:bg-amber-50 dark:hover:bg-amber-950/40 text-left font-bold text-amber-700 dark:text-amber-300 flex items-center gap-2 transition cursor-pointer"
-                    >
-                      <AlertTriangle className="w-4 h-4 text-amber-500" />
-                      <span>Cancelar reserva</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setShowMoreActions(false);
-                        handleDelete();
-                      }}
-                      className="w-full px-3 py-2.5 rounded-xl hover:bg-rose-50 dark:hover:bg-rose-950/40 text-left font-bold text-rose-600 dark:text-rose-400 flex items-center gap-2 transition cursor-pointer border-t border-slate-100 dark:border-[#1A314D]"
-                    >
-                      <Trash2 className="w-4 h-4 text-rose-500" />
-                      <span>Eliminar reserva</span>
-                    </button>
-                  </div>
+                  <>
+                    <div
+                      className="fixed inset-0 z-40"
+                      onClick={() => setShowMoreActions(false)}
+                    />
+                    <div className="absolute bottom-full right-0 mb-2 w-60 rounded-2xl bg-white dark:bg-[#0E2239] border border-slate-200/90 dark:border-[#1A314D] shadow-xl p-1.5 space-y-1 z-50 animate-in fade-in zoom-in-95 duration-150 text-xs">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setShowMoreActions(false);
+                          handleWhatsAppPin();
+                        }}
+                        className="w-full px-3 py-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-[#132A45] text-left font-bold text-[#0B1A2D] dark:text-[#B7F229] flex items-center gap-2.5 transition cursor-pointer"
+                      >
+                        <MessageCircle className="w-4 h-4 text-[#0B1A2D] dark:text-[#B7F229]" />
+                        <span>Enviar PIN por WhatsApp</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setShowMoreActions(false);
+                          setIsReassigning(!isReassigning);
+                        }}
+                        className="w-full px-3 py-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-[#132A45] text-left font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2.5 transition cursor-pointer"
+                      >
+                        <RefreshCw className="w-4 h-4 text-indigo-500" />
+                        <span>Reasignar pista</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setShowMoreActions(false);
+                          setIsCancelConfirmModalOpen(true);
+                        }}
+                        className="w-full px-3 py-2.5 rounded-xl hover:bg-amber-50 dark:hover:bg-amber-950/40 text-left font-bold text-amber-700 dark:text-amber-300 flex items-center gap-2.5 transition cursor-pointer"
+                      >
+                        <AlertTriangle className="w-4 h-4 text-amber-500" />
+                        <span>Cancelar reserva</span>
+                      </button>
+                      <div className="h-px bg-slate-100 dark:bg-[#1A314D] my-1" />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setShowMoreActions(false);
+                          handleDelete();
+                        }}
+                        className="w-full px-3 py-2.5 rounded-xl hover:bg-rose-50 dark:hover:bg-rose-950/40 text-left font-bold text-rose-600 dark:text-rose-400 flex items-center gap-2.5 transition cursor-pointer"
+                      >
+                        <Trash2 className="w-4 h-4 text-rose-500" />
+                        <span>Eliminar reserva</span>
+                      </button>
+                    </div>
+                  </>
                 )}
               </div>
+
+              {/* Botón Cerrar */}
+              <button
+                type="button"
+                onClick={onClose}
+                className="h-12 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-[#0E2239] dark:hover:bg-[#132A45] text-slate-700 dark:text-slate-200 font-bold text-xs cursor-pointer transition shrink-0"
+              >
+                Cerrar
+              </button>
             </div>
           )}
         </div>

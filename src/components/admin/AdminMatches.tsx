@@ -2137,7 +2137,7 @@ export const AdminMatches: React.FC = () => {
               </div>
 
               {/* Solicitudes de Plaza por Nivel */}
-              <div className="rounded-2xl border border-slate-200/80 dark:border-[#1A314D] p-4 bg-slate-50/50 dark:bg-[#0B1A2D]/20 space-y-3">
+              <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <AlertCircle className="w-4 h-4 text-amber-500" />
@@ -2150,27 +2150,27 @@ export const AdminMatches: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => setSlotRequestTargetMatch(selectedMatchForDetail)}
-                      className="px-2.5 py-1 rounded-xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] text-[#0B1A2D] dark:text-[#B7F229] font-bold text-[10px] hover:border-[#B7F229] transition cursor-pointer shadow-2xs"
+                      className="px-2.5 py-1 rounded-xl bg-slate-50 dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] text-[#0B1A2D] dark:text-[#B7F229] font-bold text-[10px] hover:border-[#B7F229] transition cursor-pointer shadow-2xs"
                     >
                       + Solicitar Nivel
                     </button>
                   )}
                 </div>
 
-                <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
-                  Jugadores fuera de rango ({selectedMatchForDetail.minLevel.toFixed(2)} - {selectedMatchForDetail.maxLevel.toFixed(2)}) que solicitan plaza para aprobación.
+                <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                  Jugadores fuera de rango ({selectedMatchForDetail.minLevel.toFixed(2)} - {selectedMatchForDetail.maxLevel.toFixed(2)}) pendientes de aprobación.
                 </p>
 
                 {(!selectedMatchForDetail.slotRequests || selectedMatchForDetail.slotRequests.length === 0) ? (
-                  <div className="text-[11px] text-slate-400 italic py-1">
+                  <div className="text-[11px] text-slate-400 italic py-2 px-1">
                     No hay solicitudes de nivel pendientes.
                   </div>
                 ) : (
-                  <div className="space-y-2">
+                  <div className="rounded-2xl border border-slate-200/80 dark:border-[#1A314D] divide-y divide-slate-100 dark:divide-[#1A314D] overflow-hidden bg-white dark:bg-[#071220]">
                     {selectedMatchForDetail.slotRequests.map((req) => (
                       <div
                         key={req.id}
-                        className="p-3 rounded-xl bg-white dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs"
+                        className="p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-xs hover:bg-slate-50/50 dark:hover:bg-[#0B1A2D]/20 transition"
                       >
                         <div>
                           <div className="flex items-center gap-2 flex-wrap">
@@ -2188,16 +2188,16 @@ export const AdminMatches: React.FC = () => {
                             <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-slate-100 dark:bg-[#0E2239] text-[#0B1A2D] dark:text-[#B7F229] border border-slate-200/80 dark:border-[#1A314D]">
                               Nivel {req.playerLevel.toFixed(2)}
                             </span>
-                            <span className="text-[10px] text-slate-400 capitalize">
+                            <span className="text-[10px] text-slate-400 capitalize font-mono">
                               · {req.position || 'drive'}
                             </span>
                           </div>
-                          <div className="text-[10px] text-slate-400 mt-0.5">
+                          <div className="text-[10px] text-slate-400 mt-0.5 font-mono">
                             {req.requestedAt} · Tel: {req.playerPhone || 'N/A'}
                           </div>
                         </div>
 
-                        <div className="flex items-center gap-1.5 self-end sm:self-auto">
+                        <div className="flex items-center gap-1.5 self-end sm:self-auto shrink-0">
                           {req.status === 'pending' ? (
                             <>
                               <button
@@ -2218,7 +2218,7 @@ export const AdminMatches: React.FC = () => {
                           ) : req.status === 'accepted' ? (
                             <span className="px-2.5 py-1 rounded-xl bg-[#F0FCCF] dark:bg-[#B7F229]/20 text-[#0B1A2D] dark:text-[#B7F229] border border-[#B7F229]/40 font-bold text-xs flex items-center gap-1">
                               <Check className="w-3.5 h-3.5 text-[#5a8600] dark:text-[#B7F229]" />
-                              <span>Aceptada (En partida)</span>
+                              <span>Aceptada</span>
                             </span>
                           ) : (
                             <span className="px-2.5 py-1 rounded-xl bg-slate-100 dark:bg-[#0E2239] text-slate-500 font-bold text-xs">
