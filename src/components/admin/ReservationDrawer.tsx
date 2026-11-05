@@ -455,74 +455,76 @@ export const ReservationDrawer: React.FC<ReservationDrawerProps> = ({
         {/* Barra táctil indicadora en móvil */}
         <div className="w-12 h-1 bg-slate-300 dark:bg-slate-700 rounded-full mx-auto my-2 sm:hidden shrink-0" />
 
-        {/* 1. CABECERA ULTRA COMPACTA DE EXPEDIENTE (NIVEL 3 - MÁXIMO ESPACIO ÚTIL) */}
+        {/* 1. CABECERA MINIMALISTA FIJA (NIVEL 3 - MÁXIMO ESPACIO ÚTIL) */}
         <div className="px-5 sm:px-6 py-3 border-b border-slate-100 dark:border-[#1A314D] flex items-center justify-between bg-white dark:bg-[#071220] shrink-0">
-          <div className="min-w-0 pr-3">
-            <div className="flex items-center gap-2 mb-0.5">
-              <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400">
-                Expediente · Reserva #{reservation.id.slice(-6).toUpperCase()}
-              </span>
-              <span className="text-slate-300 dark:text-slate-700">·</span>
-              {isPast ? (
-                <span className="inline-flex items-center gap-1 text-[10px] font-bold text-slate-500 dark:text-slate-400">
-                  <CheckCircle2 className="w-3 h-3 text-slate-400" />
-                  <span>{t('booking.status_past', 'Efectuada')}</span>
-                </span>
-              ) : (
-                <span className="inline-flex items-center gap-1 text-[10px] font-bold text-[#0B1A2D] dark:text-[#B7F229]">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#B7F229]" />
-                  <span>{t('booking.status_upcoming', 'Próxima')}</span>
-                </span>
-              )}
-            </div>
-
-            <div className="flex items-baseline gap-2 flex-wrap">
-              <h2 className="text-base sm:text-lg font-black text-[#0B1A2D] dark:text-white truncate">
-                {reservation.courtName}
-              </h2>
-              {venueDisplayName && (
-                <span className="text-xs text-slate-400 dark:text-slate-500 truncate flex items-center gap-1">
-                  <Building2 className="w-3 h-3 text-[#0B1A2D] dark:text-[#B7F229]" />
-                  <span>{venueDisplayName}</span>
-                </span>
-              )}
-            </div>
+          <div className="flex items-center gap-2.5 min-w-0 pr-3">
+            <h2 className="text-base sm:text-lg font-black text-[#0B1A2D] dark:text-white truncate">
+              {reservation.courtName}
+            </h2>
+            <span className="text-[11px] font-mono font-medium text-slate-400 dark:text-slate-500 shrink-0">
+              #{reservation.id.slice(-6).toUpperCase()}
+            </span>
           </div>
 
           <button
             type="button"
             onClick={onClose}
-            className="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-[#0E2239] transition cursor-pointer shrink-0"
+            className="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-[#0B1A2D] dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#0E2239] transition cursor-pointer shrink-0"
             title="Cerrar expediente"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        {/* 2. EXPEDIENTE TIPOGRÁFICO LIMPIO (ADIÓS A CAJAS BLANCAS PESADAS Y BORDES ANIDADOS) */}
+        {/* 2. EXPEDIENTE TIPOGRÁFICO LIMPIO (CUERPO DEL EXPEDIENTE) */}
         <div className="p-5 sm:p-6 overflow-y-auto overscroll-contain space-y-4 text-xs flex-1">
-          {/* Ficha Rápida del Turno: Fecha, Horario, Modalidad y Deporte */}
-          <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-100 dark:border-[#1A314D] text-xs">
-            <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300 flex-wrap">
-              <Calendar className="w-3.5 h-3.5 text-[#8B5CF6] shrink-0" />
-              <span className="font-bold text-[#0B1A2D] dark:text-white capitalize">{formattedExplicitDate}</span>
-              <span className="text-slate-300 dark:text-slate-700">·</span>
-              <span className="font-mono font-bold text-[#0B1A2D] dark:text-[#B7F229]">{cleanTimeSlot}</span>
-              <span className="text-slate-300 dark:text-slate-700">·</span>
-              <span className="text-slate-500 dark:text-slate-400">{sportType}</span>
+          {/* Ficha Rápida del Turno: Sede, Estado, Fecha, Horario, Modalidad y Deporte */}
+          <div className="pb-3 border-b border-slate-100 dark:border-[#1A314D] space-y-1.5 text-xs">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300 flex-wrap">
+                <Calendar className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                <span className="font-bold text-[#0B1A2D] dark:text-white capitalize">{formattedExplicitDate}</span>
+                <span className="text-slate-300 dark:text-slate-700">·</span>
+                <span className="font-mono font-bold text-[#0B1A2D] dark:text-white">{cleanTimeSlot}</span>
+                <span className="text-slate-300 dark:text-slate-700">·</span>
+                <span className="text-slate-500 dark:text-slate-400">{sportType}</span>
+              </div>
+
+              <div className="flex items-center gap-2">
+                {isPast ? (
+                  <span className="inline-flex items-center gap-1 text-[11px] font-bold text-slate-500 dark:text-slate-400">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-slate-400" />
+                    <span>{t('booking.status_past', 'Efectuada')}</span>
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1 text-[11px] font-bold text-[#0B1A2D] dark:text-slate-200">
+                    <Clock className="w-3.5 h-3.5 text-slate-400" />
+                    <span>{t('booking.status_upcoming', 'Próxima')}</span>
+                  </span>
+                )}
+              </div>
             </div>
 
-            <div className="flex items-center gap-2 text-[11px] text-slate-500 dark:text-slate-400">
+            <div className="flex items-center gap-2 text-[11px] text-slate-500 dark:text-slate-400 flex-wrap">
+              {venueDisplayName && (
+                <>
+                  <span className="flex items-center gap-1 text-slate-600 dark:text-slate-300 font-medium">
+                    <Building2 className="w-3 h-3 text-slate-400" />
+                    <span>{venueDisplayName}</span>
+                  </span>
+                  <span className="text-slate-300 dark:text-slate-700">·</span>
+                </>
+              )}
               <span className="capitalize">{matchGender === 'male' ? 'Masculino' : matchGender === 'female' ? 'Femenino' : 'Mixto'}</span>
               <span className="text-slate-300 dark:text-slate-700">·</span>
-              <span className={matchMode === 'competitive' ? 'text-[#8B5CF6] font-bold' : 'text-[#0B1A2D] dark:text-[#B7F229] font-bold'}>
+              <span className="font-medium text-slate-700 dark:text-slate-300">
                 {matchMode === 'competitive' ? 'Competitivo (ELO)' : 'Amistoso'}
               </span>
             </div>
           </div>
 
           {/* Bloque Financiero Tipográfico (Estilo Stripe / Linear Invoice) */}
-          <div className="p-4 rounded-2xl bg-slate-50/70 dark:bg-[#0B1A2D]/40 border border-slate-200/80 dark:border-[#1A314D] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="p-4 rounded-2xl bg-slate-50/70 dark:bg-[#0E2239]/40 border border-slate-200/80 dark:border-[#1A314D] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
               <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
                 Estado Financiero de la Pista
@@ -530,14 +532,14 @@ export const ReservationDrawer: React.FC<ReservationDrawerProps> = ({
               <div className="flex items-center gap-2 flex-wrap">
                 <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-bold border ${
                   reservation.paymentStatus === 'paid'
-                    ? 'bg-[#F0FCCF] text-[#0B1A2D] dark:bg-[#B7F229]/20 dark:text-[#B7F229] border-[#B7F229]/40'
-                    : 'bg-amber-100 text-amber-900 dark:bg-amber-950/60 dark:text-amber-300 border-amber-300 dark:border-amber-800'
+                    ? 'bg-slate-100 dark:bg-[#071220] text-slate-700 dark:text-slate-300 border-slate-200 dark:border-[#1A314D]'
+                    : 'bg-amber-50 text-amber-800 dark:bg-amber-950/40 dark:text-amber-300 border-amber-200 dark:border-amber-900/60'
                 }`}>
                   {reservation.paymentStatus === 'paid' ? 'Abonado Íntegramente' : 'Pendiente de Cobro'}
                 </span>
                 <span className="text-slate-300 dark:text-slate-700">·</span>
                 <span className="text-xs text-slate-500 dark:text-slate-400">
-                  Cuota 1/4: <strong className="font-mono text-[#0B1A2D] dark:text-[#B7F229]">{pricePerPlayer.toFixed(2)} €</strong>
+                  Cuota 1/4: <strong className="font-mono text-[#0B1A2D] dark:text-white">{pricePerPlayer.toFixed(2)} €</strong>
                 </span>
               </div>
             </div>
@@ -560,20 +562,20 @@ export const ReservationDrawer: React.FC<ReservationDrawerProps> = ({
               onKeyDown={(e) => {
                 if (e.key === 'Enter' || e.key === ' ') handlePlayerClick(reservation.creatorName);
               }}
-              className="p-3.5 rounded-2xl border border-slate-200/80 dark:border-[#1A314D] hover:border-[#B7F229]/60 hover:bg-slate-50/50 dark:hover:bg-[#0B1A2D]/20 transition cursor-pointer group space-y-1 bg-white dark:bg-[#071220]"
+              className="p-3.5 rounded-2xl border border-slate-200/80 dark:border-[#1A314D] hover:border-slate-300 dark:hover:border-slate-700 transition cursor-pointer group space-y-1 bg-white dark:bg-[#071220]"
               title={`Ver ficha de ${reservation.creatorName}`}
             >
               <div className="flex items-center justify-between">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 group-hover:text-[#0B1A2D] dark:group-hover:text-[#B7F229] transition flex items-center gap-1">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 group-hover:text-[#0B1A2D] dark:group-hover:text-white transition flex items-center gap-1">
                   <span>Titular de la Reserva</span>
-                  <span className="text-[#8B5CF6] font-normal">↗</span>
+                  <span className="text-slate-400 font-normal">↗</span>
                 </span>
-                <span className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-[#0E2239] text-[10px] font-mono font-bold text-[#0B1A2D] dark:text-[#B7F229] border border-slate-200/80 dark:border-[#1A314D]">
+                <span className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-[#0E2239] text-[10px] font-mono font-bold text-slate-700 dark:text-slate-300 border border-slate-200/80 dark:border-[#1A314D]">
                   {reservation.creatorMemberNum || 'Socio #SM-408'}
                 </span>
               </div>
-              <div className="font-black text-sm text-[#0B1A2D] dark:text-white group-hover:text-[#8B5CF6] flex items-center gap-1.5 transition">
-                <User className="w-4 h-4 text-[#8B5CF6]" />
+              <div className="font-black text-sm text-[#0B1A2D] dark:text-white flex items-center gap-1.5 transition">
+                <User className="w-4 h-4 text-slate-500" />
                 <span>{reservation.creatorName}</span>
               </div>
               <div className="text-[11px] text-slate-400 flex items-center gap-1 font-mono">
@@ -589,11 +591,11 @@ export const ReservationDrawer: React.FC<ReservationDrawerProps> = ({
                   Automatización IoT
                 </span>
                 <div className="flex items-center gap-2">
-                  <span className="font-mono text-base font-black text-[#0B1A2D] dark:text-[#B7F229] tracking-wider">
+                  <span className="font-mono text-base font-black text-[#0B1A2D] dark:text-white tracking-wider">
                     PIN: {pinCode}
                   </span>
-                  <span className="inline-flex items-center gap-1 text-[10px] font-bold text-[#0B1A2D] dark:text-[#B7F229]">
-                    <Zap className="w-3 h-3 fill-[#B7F229] text-[#B7F229]" />
+                  <span className="inline-flex items-center gap-1 text-[10px] font-bold text-slate-600 dark:text-slate-400">
+                    <Zap className="w-3 h-3 fill-amber-500 text-amber-500" />
                     Luces OK
                   </span>
                 </div>
@@ -605,12 +607,12 @@ export const ReservationDrawer: React.FC<ReservationDrawerProps> = ({
                   className="p-2 rounded-xl bg-slate-50 dark:bg-[#0E2239] hover:bg-slate-100 dark:hover:bg-[#132A45] border border-slate-200/80 dark:border-[#1A314D] text-slate-600 dark:text-slate-300 transition cursor-pointer"
                   title="Copiar PIN"
                 >
-                  {copiedPin ? <Check className="w-3.5 h-3.5 text-[#5a8600] dark:text-[#B7F229]" /> : <Copy className="w-3.5 h-3.5 text-slate-400" />}
+                  {copiedPin ? <Check className="w-3.5 h-3.5 text-slate-700 dark:text-white" /> : <Copy className="w-3.5 h-3.5 text-slate-400" />}
                 </button>
                 <button
                   type="button"
                   onClick={handleWhatsAppPin}
-                  className="p-2 rounded-xl bg-slate-50 dark:bg-[#0E2239] hover:bg-slate-100 dark:hover:bg-[#132A45] border border-slate-200/80 dark:border-[#1A314D] text-[#0B1A2D] dark:text-[#B7F229] transition cursor-pointer"
+                  className="p-2 rounded-xl bg-slate-50 dark:bg-[#0E2239] hover:bg-slate-100 dark:hover:bg-[#132A45] border border-slate-200/80 dark:border-[#1A314D] text-slate-700 dark:text-slate-300 transition cursor-pointer"
                   title="Enviar PIN por WhatsApp"
                 >
                   <MessageCircle className="w-3.5 h-3.5" />
@@ -621,10 +623,10 @@ export const ReservationDrawer: React.FC<ReservationDrawerProps> = ({
 
           {/* Panel Desplegable de Reasignación Rápida */}
           {isReassigning && (
-            <div className="p-3.5 rounded-2xl bg-indigo-50/50 dark:bg-indigo-950/20 border border-indigo-200/80 dark:border-indigo-800/60 space-y-2.5 animate-in fade-in duration-150">
+            <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-[#0E2239] border border-slate-200 dark:border-[#1A314D] space-y-2.5 animate-in fade-in duration-150">
               <div className="flex items-center justify-between">
-                <span className="font-extrabold text-[#0B1A2D] dark:text-indigo-200 uppercase tracking-wider text-[11px] flex items-center gap-1.5">
-                  <RefreshCw className="w-3.5 h-3.5 text-[#8B5CF6]" />
+                <span className="font-extrabold text-[#0B1A2D] dark:text-white uppercase tracking-wider text-[11px] flex items-center gap-1.5">
+                  <RefreshCw className="w-3.5 h-3.5 text-slate-500" />
                   <span>Reasignar a Otra Pista Disponible</span>
                 </span>
                 <button
@@ -683,13 +685,13 @@ export const ReservationDrawer: React.FC<ReservationDrawerProps> = ({
                   title={`Ver perfil de ${p.name}`}
                 >
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-8 h-8 rounded-xl bg-[#0B1A2D] dark:bg-[#0E2239] text-[#B7F229] border border-slate-200 dark:border-[#1A314D] font-black text-xs flex items-center justify-center shrink-0 shadow-2xs">
+                    <div className="w-8 h-8 rounded-xl bg-[#0B1A2D] dark:bg-[#0E2239] text-white border border-slate-200 dark:border-[#1A314D] font-black text-xs flex items-center justify-center shrink-0 shadow-2xs">
                       {p.name.slice(0, 2).toUpperCase()}
                     </div>
                     <div className="min-w-0">
-                      <div className="font-bold text-[#0B1A2D] dark:text-white truncate text-xs group-hover:text-[#8B5CF6] transition flex items-center gap-1">
+                      <div className="font-bold text-[#0B1A2D] dark:text-white truncate text-xs group-hover:text-slate-600 dark:group-hover:text-slate-300 transition flex items-center gap-1">
                         <span>{p.name}</span>
-                        <span className="text-[10px] text-[#8B5CF6] opacity-0 group-hover:opacity-100 transition-opacity">↗</span>
+                        <span className="text-[10px] text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity">↗</span>
                       </div>
                       <div className="text-[10px] text-slate-400 font-mono">
                         Nivel {p.level?.toFixed(2) || '4.00'} · {p.paymentMethod || 'TPV'}
@@ -701,8 +703,8 @@ export const ReservationDrawer: React.FC<ReservationDrawerProps> = ({
                     <span
                       className={`px-2 py-0.5 rounded-full text-[10px] font-bold block border ${
                         p.paid
-                          ? 'bg-[#F0FCCF] dark:bg-[#B7F229]/20 text-[#0B1A2D] dark:text-[#B7F229] border-[#B7F229]/40'
-                          : 'bg-slate-100 dark:bg-[#0E2239] text-slate-600 dark:text-slate-300 border border-slate-200/80 dark:border-[#1A314D]'
+                          ? 'bg-slate-100 dark:bg-[#0E2239] text-slate-700 dark:text-slate-300 border-slate-200/80 dark:border-[#1A314D]'
+                          : 'bg-slate-50 dark:bg-[#071220] text-slate-500 border border-slate-200/60 dark:border-[#1A314D]'
                       }`}
                     >
                       {p.statusText || (p.paid ? 'Pagado' : 'Pendiente TPV')}
@@ -725,8 +727,8 @@ export const ReservationDrawer: React.FC<ReservationDrawerProps> = ({
                   <span>Resultado del Partido {matchMode === 'competitive' && '(Actualiza ELO)'}</span>
                 </span>
                 {isScoreSaved && (
-                  <span className="text-[10px] text-[#0B1A2D] dark:text-[#B7F229] font-bold flex items-center gap-1">
-                    <Check className="w-3 h-3 text-[#5a8600] dark:text-[#B7F229]" />
+                  <span className="text-[10px] text-slate-700 dark:text-slate-200 font-bold flex items-center gap-1">
+                    <Check className="w-3 h-3 text-slate-700 dark:text-slate-200" />
                     <span>Guardado</span>
                   </span>
                 )}
@@ -738,12 +740,12 @@ export const ReservationDrawer: React.FC<ReservationDrawerProps> = ({
                   placeholder="Ej. 6-4, 3-6, 7-6"
                   value={matchScoreInput}
                   onChange={(e) => setMatchScoreInput(e.target.value)}
-                  className="flex-1 px-3 py-2 bg-white dark:bg-[#071220] border border-slate-200/90 dark:border-[#1A314D] rounded-xl font-mono text-xs text-[#0B1A2D] dark:text-white focus:outline-none focus:border-[#B7F229]"
+                  className="flex-1 px-3 py-2 bg-white dark:bg-[#071220] border border-slate-200/90 dark:border-[#1A314D] rounded-xl font-mono text-xs text-[#0B1A2D] dark:text-white focus:outline-none focus:border-[#0B1A2D]"
                 />
                 <button
                   type="button"
                   onClick={handleSaveScore}
-                  className="px-4 py-2 rounded-xl bg-[#0B1A2D] hover:bg-[#132A45] text-[#B7F229] font-bold text-xs transition active:scale-95 shrink-0 cursor-pointer"
+                  className="px-4 py-2 rounded-xl bg-[#0B1A2D] hover:bg-[#132A45] text-white font-bold text-xs transition active:scale-95 shrink-0 cursor-pointer"
                 >
                   Guardar Marcador
                 </button>
@@ -763,7 +765,7 @@ export const ReservationDrawer: React.FC<ReservationDrawerProps> = ({
                     onClick={() => setIsPlayerEditModalOpen(true)}
                     className="h-12 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-[#0E2239] dark:hover:bg-[#132A45] text-slate-800 dark:text-slate-200 font-bold text-xs transition flex items-center gap-1.5 cursor-pointer border border-slate-200/80 dark:border-[#1A314D] shadow-2xs active:scale-95"
                   >
-                    <Edit3 className="w-3.5 h-3.5 text-[#8B5CF6]" />
+                    <Edit3 className="w-3.5 h-3.5 text-slate-500" />
                     <span>Editar mi plaza</span>
                   </button>
                   <button
@@ -790,11 +792,11 @@ export const ReservationDrawer: React.FC<ReservationDrawerProps> = ({
             </div>
           ) : (
             <div className="flex items-center gap-2">
-              {/* Acción Principal Destacada: Abrir en TPV */}
+              {/* Acción Principal Destacada: Abrir en TPV (Único elemento en Verde Lima) */}
               <button
                 type="button"
                 onClick={handleGoToTPV}
-                className="flex-1 h-12 px-4 rounded-xl bg-[#B7F229] hover:bg-[#a6df17] text-[#0B1A2D] font-black text-sm transition shadow-md flex items-center justify-center gap-2 active:scale-98 cursor-pointer"
+                className="flex-1 h-12 px-4 rounded-xl bg-[#B7F229] hover:bg-[#a6df17] text-[#0B1A2D] font-black text-sm transition shadow-sm flex items-center justify-center gap-2 active:scale-98 cursor-pointer"
                 title="Cobrar en caja TPV"
               >
                 <CreditCard className="w-4 h-4 shrink-0 text-[#0B1A2D]" />
@@ -805,10 +807,10 @@ export const ReservationDrawer: React.FC<ReservationDrawerProps> = ({
               <button
                 type="button"
                 onClick={handleOpenEditModal}
-                className="h-12 px-3.5 rounded-xl bg-slate-50 dark:bg-[#0E2239] hover:bg-slate-100 dark:hover:bg-[#132A45] border border-slate-200/80 dark:border-[#1A314D] text-[#8B5CF6] font-bold text-xs flex items-center gap-1.5 transition active:scale-95 cursor-pointer shadow-2xs shrink-0"
+                className="h-12 px-3.5 rounded-xl bg-slate-50 dark:bg-[#0E2239] hover:bg-slate-100 dark:hover:bg-[#132A45] border border-slate-200/80 dark:border-[#1A314D] text-slate-700 dark:text-slate-300 font-bold text-xs flex items-center gap-1.5 transition active:scale-95 cursor-pointer shadow-2xs shrink-0"
                 title="Editar reserva"
               >
-                <Edit3 className="w-4 h-4 text-[#8B5CF6]" />
+                <Edit3 className="w-4 h-4 text-slate-500" />
                 <span className="hidden sm:inline">Editar</span>
               </button>
 
@@ -819,7 +821,7 @@ export const ReservationDrawer: React.FC<ReservationDrawerProps> = ({
                   onClick={() => setShowMoreActions(!showMoreActions)}
                   className={`h-12 w-12 rounded-xl border flex items-center justify-center transition active:scale-95 cursor-pointer shadow-2xs ${
                     showMoreActions
-                      ? 'bg-[#0B1A2D] text-[#B7F229] border-[#0B1A2D]'
+                      ? 'bg-[#0B1A2D] text-white border-[#0B1A2D]'
                       : 'bg-slate-50 hover:bg-slate-100 dark:bg-[#0E2239] dark:hover:bg-[#132A45] border-slate-200/80 dark:border-[#1A314D] text-slate-700 dark:text-slate-300'
                   }`}
                   title="Más opciones de gestión"
@@ -841,9 +843,9 @@ export const ReservationDrawer: React.FC<ReservationDrawerProps> = ({
                           setShowMoreActions(false);
                           handleWhatsAppPin();
                         }}
-                        className="w-full px-3 py-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-[#132A45] text-left font-bold text-[#0B1A2D] dark:text-[#B7F229] flex items-center gap-2.5 transition cursor-pointer"
+                        className="w-full px-3 py-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-[#132A45] text-left font-bold text-[#0B1A2D] dark:text-slate-200 flex items-center gap-2.5 transition cursor-pointer"
                       >
-                        <MessageCircle className="w-4 h-4 text-[#0B1A2D] dark:text-[#B7F229]" />
+                        <MessageCircle className="w-4 h-4 text-slate-500" />
                         <span>Enviar PIN por WhatsApp</span>
                       </button>
                       <button
@@ -854,7 +856,7 @@ export const ReservationDrawer: React.FC<ReservationDrawerProps> = ({
                         }}
                         className="w-full px-3 py-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-[#132A45] text-left font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2.5 transition cursor-pointer"
                       >
-                        <RefreshCw className="w-4 h-4 text-indigo-500" />
+                        <RefreshCw className="w-4 h-4 text-slate-500" />
                         <span>Reasignar pista</span>
                       </button>
                       <button
@@ -863,7 +865,7 @@ export const ReservationDrawer: React.FC<ReservationDrawerProps> = ({
                           setShowMoreActions(false);
                           setIsCancelConfirmModalOpen(true);
                         }}
-                        className="w-full px-3 py-2.5 rounded-xl hover:bg-amber-50 dark:hover:bg-amber-950/40 text-left font-bold text-amber-700 dark:text-amber-300 flex items-center gap-2.5 transition cursor-pointer"
+                        className="w-full px-3 py-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-[#132A45] text-left font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2.5 transition cursor-pointer"
                       >
                         <AlertTriangle className="w-4 h-4 text-amber-500" />
                         <span>Cancelar reserva</span>
