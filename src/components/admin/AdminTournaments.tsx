@@ -789,8 +789,8 @@ export const AdminTournaments: React.FC = () => {
                     onClick={() => setStatusFilter(f.id as typeof statusFilter)}
                     className={`px-3 py-1.5 rounded-xl text-xs font-bold transition whitespace-nowrap cursor-pointer ${
                       statusFilter === f.id
-                        ? 'bg-emerald-600 text-white shadow-xs'
-                        : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800'
+                        ? 'bg-[#0B1A2D] dark:bg-[#B7F229] text-white dark:text-[#0B1A2D] shadow-xs'
+                        : 'bg-white dark:bg-[#0E2239] text-slate-700 dark:text-slate-300 border border-slate-200/80 dark:border-[#1A314D]'
                     }`}
                   >
                     {f.label}
@@ -808,24 +808,24 @@ export const AdminTournaments: React.FC = () => {
                   return (
                     <div
                       key={tournament.id}
-                      className="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 hover:border-emerald-500/50 transition-all duration-200 shadow-xs hover:shadow-md overflow-hidden flex flex-col md:flex-row group"
+                      className="rounded-3xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] hover:border-[#B7F229]/60 transition-all duration-200 shadow-xs hover:shadow-md overflow-hidden flex flex-col md:flex-row group"
                     >
                       {/* Portada */}
-                      <div className="relative w-full md:w-72 lg:w-80 h-48 md:h-auto shrink-0 overflow-hidden bg-slate-950">
+                      <div className="relative w-full md:w-72 lg:w-80 h-48 md:h-auto shrink-0 overflow-hidden bg-[#0B1A2D]">
                         <img
                           src={tournament.bannerUrl}
                           alt={tournament.title}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 opacity-90"
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-slate-950/80 via-slate-950/20 to-transparent" />
+                        <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-[#0B1A2D]/80 via-[#0B1A2D]/20 to-transparent" />
 
                         <div className="absolute top-3 left-3 flex flex-wrap gap-1.5">
                           <span
                             className={`px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider backdrop-blur-md shadow-xs ${
                               tournament.status === 'registration_open'
-                                ? 'bg-emerald-500 text-slate-950'
+                                ? 'bg-[#B7F229] text-[#0B1A2D]'
                                 : tournament.status === 'in_progress'
-                                ? 'bg-blue-500 text-white'
+                                ? 'bg-[#8B5CF6] text-white'
                                 : 'bg-slate-700 text-white'
                             }`}
                           >
@@ -838,7 +838,7 @@ export const AdminTournaments: React.FC = () => {
                         </div>
 
                         <div className="absolute bottom-3 left-3 text-white text-xs font-mono font-bold flex items-center gap-1.5 drop-shadow-md">
-                          <Calendar className="w-3.5 h-3.5 text-emerald-400" />
+                          <Calendar className="w-3.5 h-3.5 text-[#B7F229]" />
                           <span>{tournament.dates}</span>
                         </div>
                       </div>
@@ -847,7 +847,7 @@ export const AdminTournaments: React.FC = () => {
                       <div className="p-5 sm:p-6 flex-1 flex flex-col justify-between space-y-4">
                         <div className="space-y-2">
                           <div className="flex flex-wrap items-center justify-between gap-2">
-                            <span className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-500/20 px-2.5 py-0.5 rounded-full">
+                            <span className="text-[11px] font-bold text-[#8B5CF6] dark:text-[#C4B5FD] bg-[#8B5CF6]/10 border border-[#8B5CF6]/25 px-2.5 py-0.5 rounded-full">
                               {tournament.rankingCategory || 'Circuito Setmio Oro'}
                             </span>
                             <span className="text-[11px] text-slate-400 font-mono font-medium">
@@ -857,7 +857,7 @@ export const AdminTournaments: React.FC = () => {
 
                           <h2
                             onClick={() => handleOpenDetail(tournament)}
-                            className="text-lg sm:text-xl font-black text-slate-900 dark:text-white tracking-tight hover:text-emerald-500 transition cursor-pointer"
+                            className="text-lg sm:text-xl font-black text-slate-900 dark:text-white tracking-tight hover:text-[#8B5CF6] dark:hover:text-[#B7F229] transition cursor-pointer"
                           >
                             {tournament.title}
                           </h2>
@@ -867,44 +867,44 @@ export const AdminTournaments: React.FC = () => {
                         </div>
 
                         {/* Resumen Ejecutivo */}
-                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-2 border-t border-slate-100 dark:border-slate-800 text-xs">
-                          <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-950/70 border border-slate-200/60 dark:border-slate-800/80">
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-2 border-t border-slate-100 dark:border-[#1A314D] text-xs">
+                          <div className="p-2.5 rounded-xl bg-slate-50/80 dark:bg-[#071220]/70 border border-slate-200/60 dark:border-[#1A314D]">
                             <span className="text-[10px] text-slate-400 font-bold uppercase block">Inscritos</span>
                             <span className="font-black text-slate-900 dark:text-white font-mono text-xs">
                               {totalPairs} / {maxPairs} parejas
                             </span>
                             <div className="w-full bg-slate-200 dark:bg-slate-800 h-1 rounded-full mt-1.5 overflow-hidden">
                               <div
-                                className="bg-emerald-500 h-full rounded-full transition-all"
+                                className="bg-[#B7F229] h-full rounded-full transition-all"
                                 style={{ width: `${percentFilled}%` }}
                               />
                             </div>
                           </div>
 
-                          <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-950/70 border border-slate-200/60 dark:border-slate-800/80">
+                          <div className="p-2.5 rounded-xl bg-slate-50/80 dark:bg-[#071220]/70 border border-slate-200/60 dark:border-[#1A314D]">
                             <span className="text-[10px] text-slate-400 font-bold uppercase block">Formato</span>
                             <span className="font-bold text-slate-800 dark:text-slate-200 text-xs capitalize truncate block">
                               {tournament.format || 'Eliminación Directa'}
                             </span>
                           </div>
 
-                          <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-950/70 border border-slate-200/60 dark:border-slate-800/80">
+                          <div className="p-2.5 rounded-xl bg-slate-50/80 dark:bg-[#071220]/70 border border-slate-200/60 dark:border-[#1A314D]">
                             <span className="text-[10px] text-slate-400 font-bold uppercase block">Categorías</span>
                             <span className="font-bold text-slate-800 dark:text-slate-200 text-xs font-mono">
                               {tournament.categories.length} oficiales
                             </span>
                           </div>
 
-                          <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-950/70 border border-slate-200/60 dark:border-slate-800/80">
+                          <div className="p-2.5 rounded-xl bg-slate-50/80 dark:bg-[#071220]/70 border border-slate-200/60 dark:border-[#1A314D]">
                             <span className="text-[10px] text-slate-400 font-bold uppercase block">Premios</span>
-                            <span className="font-bold text-emerald-600 dark:text-emerald-400 text-xs truncate block font-mono">
+                            <span className="font-bold text-[#8B5CF6] dark:text-[#C4B5FD] text-xs truncate block font-mono">
                               1.500 € + Trofeos
                             </span>
                           </div>
                         </div>
 
-                        {/* Categorías y Cuota Oficial (Reubicadas aquí, justo antes de los botones de acción para máxima claridad) */}
-                        <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-950/80 border border-slate-200/80 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        {/* Categorías y Cuota Oficial */}
+                        <div className="p-3 rounded-2xl bg-slate-50/80 dark:bg-[#071220]/80 border border-slate-200/80 dark:border-[#1A314D] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                           <div className="space-y-1">
                             <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider block">
                               Categorías Oficiales:
@@ -913,7 +913,7 @@ export const AdminTournaments: React.FC = () => {
                               {tournament.categories.map((c) => (
                                 <span
                                   key={c.name}
-                                  className="text-[11px] font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-100/70 dark:bg-emerald-950/70 border border-emerald-500/25 px-2.5 py-0.5 rounded-lg"
+                                  className="text-[11px] font-bold text-[#0B1A2D] dark:text-[#B7F229] bg-[#F0FCCF] dark:bg-[#B7F229]/15 border border-[#B7F229]/30 px-2.5 py-0.5 rounded-lg"
                                 >
                                   {c.name}
                                 </span>
@@ -921,7 +921,7 @@ export const AdminTournaments: React.FC = () => {
                             </div>
                           </div>
 
-                          <div className="sm:text-right shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-200/60 dark:border-slate-800">
+                          <div className="sm:text-right shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-200/60 dark:border-[#1A314D]">
                             <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider block">
                               Cuota Inscripción:
                             </span>
@@ -935,16 +935,16 @@ export const AdminTournaments: React.FC = () => {
                         </div>
 
                         {/* Barra de Acciones de la Tarjeta con botón Ver torneo destacado */}
-                        <div className="pt-2 flex flex-wrap items-center justify-between gap-2.5 border-t border-slate-100 dark:border-slate-800/80">
+                        <div className="pt-2 flex flex-wrap items-center justify-between gap-2.5 border-t border-slate-100 dark:border-[#1A314D]">
                           <div className="flex items-center gap-2">
                             {/* Botón Ver Cartel compacto */}
                             <button
                               type="button"
                               onClick={() => setPosterModalUrl(tournament.bannerUrl)}
-                              className="px-2.5 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs transition flex items-center gap-1.5 cursor-pointer"
+                              className="px-2.5 py-1.5 rounded-xl bg-slate-100 dark:bg-[#071220] hover:bg-slate-200 dark:hover:bg-[#132A45] text-slate-700 dark:text-slate-300 font-bold text-xs transition flex items-center gap-1.5 cursor-pointer border border-slate-200/60 dark:border-[#1A314D]"
                               title="Ver Cartel Oficial"
                             >
-                              <Eye className="w-3.5 h-3.5 text-emerald-500" />
+                              <Eye className="w-3.5 h-3.5 text-[#8B5CF6]" />
                               <span>{t('tournaments.btn_view_poster', 'Ver cartel')}</span>
                             </button>
 
@@ -955,7 +955,7 @@ export const AdminTournaments: React.FC = () => {
                                 setSelectedTournamentForInscription(tournament.id);
                                 setIsInscriptionModalOpen(true);
                               }}
-                              className="px-3 py-1.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30 font-bold text-xs transition flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-95"
+                              className="px-3 py-1.5 rounded-xl bg-[#F0FCCF] dark:bg-[#B7F229]/20 hover:bg-[#E5F9AE] dark:hover:bg-[#B7F229]/30 text-[#0B1A2D] dark:text-[#B7F229] border border-[#B7F229]/40 font-bold text-xs transition flex items-center gap-1.5 cursor-pointer shadow-2xs active:scale-95"
                             >
                               <Users className="w-3.5 h-3.5" />
                               <span>{t('tournaments.btn_register_direct', 'Inscribirse')}</span>
@@ -965,7 +965,7 @@ export const AdminTournaments: React.FC = () => {
                           <button
                             type="button"
                             onClick={() => handleOpenDetail(tournament)}
-                            className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs transition shadow-sm hover:shadow-md flex items-center gap-2 cursor-pointer active:scale-95 ml-auto"
+                            className="px-5 py-2.5 rounded-xl bg-[#0B1A2D] dark:bg-[#B7F229] hover:bg-[#132A45] dark:hover:bg-[#a3db20] text-white dark:text-[#0B1A2D] font-black text-xs transition shadow-sm hover:shadow-md flex items-center gap-2 cursor-pointer active:scale-95 ml-auto"
                           >
                             <span>{t('tournaments.btn_view_tournament', 'Ver torneo')}</span>
                             <ArrowRight className="w-4 h-4" />
@@ -1121,57 +1121,57 @@ export const AdminTournaments: React.FC = () => {
             </div>
           </div>
 
-          {/* Cabecera / Primer Contenedor del Torneo: Máximo Contraste y Legibilidad */}
+          {/* Cabecera / Primer Contenedor del Torneo: Máximo Contraste y Compacta */}
           <div className="rounded-3xl bg-white dark:bg-[#0E2239] border border-slate-200/90 dark:border-[#1A314D] shadow-sm overflow-hidden flex flex-col md:flex-row">
-            {/* Imagen del Cartel / Banner Limpia y Delimitada */}
-            <div className="relative w-full md:w-80 lg:w-96 h-52 md:h-auto shrink-0 bg-[#0B1A2D] overflow-hidden">
+            {/* Imagen del Cartel / Banner Delimitada y Proporcionada */}
+            <div className="relative w-full md:w-64 lg:w-72 h-36 md:h-auto shrink-0 bg-[#0B1A2D] overflow-hidden">
               <img
                 src={selectedTournament.bannerUrl}
                 alt={selectedTournament.title}
                 className="w-full h-full object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-[#0B1A2D]/70 via-transparent to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-[#0B1A2D]/80 via-transparent to-transparent" />
               
               <div className="absolute top-3 left-3 flex flex-wrap gap-1.5">
                 <span className="px-2.5 py-1 rounded-lg bg-[#B7F229] text-[#0B1A2D] text-[10px] font-black uppercase tracking-wider shadow-sm">
                   {selectedTournament.status === 'registration_open' ? 'Inscripción Abierta' : 'En Curso'}
                 </span>
-                <span className="px-2.5 py-1 rounded-lg bg-[#0B1A2D]/85 backdrop-blur-xs text-white text-[10px] font-bold border border-white/20">
+                <span className="px-2.5 py-1 rounded-lg bg-[#0B1A2D]/90 backdrop-blur-xs text-white text-[10px] font-bold border border-white/20">
                   {selectedTournament.rankingCategory || 'Circuito Setmio Oro'}
                 </span>
               </div>
             </div>
 
             {/* Contenido Informativo con Fondo Sólido de Alto Contraste */}
-            <div className="p-6 flex-1 flex flex-col justify-between space-y-4">
-              <div className="space-y-2">
+            <div className="p-5 sm:p-6 flex-1 flex flex-col justify-between space-y-3.5">
+              <div className="space-y-1.5">
                 <div className="flex items-center gap-2 text-xs font-mono font-bold text-[#8B5CF6] dark:text-[#C4B5FD]">
-                  <Calendar className="w-4 h-4 shrink-0" />
+                  <Calendar className="w-3.5 h-3.5 shrink-0" />
                   <span>{selectedTournament.dates}</span>
                   <span>·</span>
                   <span className="text-slate-500 dark:text-slate-400 font-normal">Sede Oficial Club</span>
                 </div>
 
-                <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
+                <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
                   {selectedTournament.title}
                 </h1>
 
-                <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed max-w-2xl">
+                <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed max-w-2xl line-clamp-2">
                   {selectedTournament.description}
                 </p>
               </div>
 
-              {/* Métricas y Datos Clave en Cajas Limpias */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-3 border-t border-slate-100 dark:border-slate-800 text-xs">
-                <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800/80">
+              {/* Métricas y Datos Clave en Tira Tipográfica Lineal */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-3 border-t border-slate-100 dark:border-[#1A314D] text-xs">
+                <div className="p-2.5 rounded-2xl bg-slate-50/80 dark:bg-[#071220]/70 border border-slate-200/60 dark:border-[#1A314D]">
                   <span className="text-[10px] text-slate-400 font-bold uppercase block">Inscripción</span>
-                  <span className="font-mono font-black text-emerald-600 dark:text-emerald-400 text-base">
+                  <span className="font-mono font-black text-slate-900 dark:text-white text-base">
                     {selectedTournament.entryFee.toFixed(2)} €
                   </span>
                   <span className="text-[10px] text-slate-400 block font-medium">por jugador</span>
                 </div>
 
-                <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800/80">
+                <div className="p-2.5 rounded-2xl bg-slate-50/80 dark:bg-[#071220]/70 border border-slate-200/60 dark:border-[#1A314D]">
                   <span className="text-[10px] text-slate-400 font-bold uppercase block">Parejas</span>
                   <span className="font-mono font-bold text-slate-900 dark:text-white text-sm">
                     {selectedTournament.categories.reduce((acc, c) => acc + c.teamsCount, 0)} inscritas
@@ -1179,7 +1179,7 @@ export const AdminTournaments: React.FC = () => {
                   <span className="text-[10px] text-slate-400 block font-medium">en cuadros oficiales</span>
                 </div>
 
-                <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800/80">
+                <div className="p-2.5 rounded-2xl bg-slate-50/80 dark:bg-[#071220]/70 border border-slate-200/60 dark:border-[#1A314D]">
                   <span className="text-[10px] text-slate-400 font-bold uppercase block">Categorías</span>
                   <span className="font-mono font-bold text-slate-900 dark:text-white text-sm">
                     {selectedTournament.categories.length} divisiones
@@ -1187,24 +1187,24 @@ export const AdminTournaments: React.FC = () => {
                   <span className="text-[10px] text-slate-400 block font-medium">Masc / Fem / Mixto</span>
                 </div>
 
-                <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800/80">
+                <div className="p-2.5 rounded-2xl bg-slate-50/80 dark:bg-[#071220]/70 border border-slate-200/60 dark:border-[#1A314D]">
                   <span className="text-[10px] text-slate-400 font-bold uppercase block">Premios</span>
-                  <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400 text-sm">
+                  <span className="font-mono font-bold text-[#8B5CF6] dark:text-[#C4B5FD] text-sm">
                     1.500 € + Trofeos
                   </span>
                   <span className="text-[10px] text-slate-400 block font-medium">y textil oficial</span>
                 </div>
               </div>
 
-              {/* Botones de Acción dentro del primer contenedor */}
-              <div className="flex flex-wrap items-center justify-end gap-2.5 pt-3 border-t border-slate-100 dark:border-slate-800">
+              {/* Botones de Acción dentro de la cabecera */}
+              <div className="flex flex-wrap items-center justify-end gap-2.5 pt-2.5 border-t border-slate-100 dark:border-[#1A314D]">
                 <button
                   type="button"
                   onClick={() => setPosterModalUrl(selectedTournament.bannerUrl)}
-                  className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold text-xs border border-slate-200 dark:border-slate-700 transition flex items-center gap-1.5 cursor-pointer active:scale-95 shadow-2xs"
+                  className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-[#071220] dark:hover:bg-[#132A45] text-slate-800 dark:text-slate-200 font-bold text-xs border border-slate-200/80 dark:border-[#1A314D] transition flex items-center gap-1.5 cursor-pointer active:scale-95 shadow-2xs"
                   title="Ver Cartel Oficial"
                 >
-                  <Eye className="w-4 h-4 text-emerald-500" />
+                  <Eye className="w-3.5 h-3.5 text-[#8B5CF6]" />
                   <span>{t('tournaments.btn_view_poster', 'Ver cartel')}</span>
                 </button>
 
@@ -1214,17 +1214,17 @@ export const AdminTournaments: React.FC = () => {
                     setSelectedTournamentForInscription(selectedTournament.id);
                     setIsInscriptionModalOpen(true);
                   }}
-                  className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md transition flex items-center gap-1.5 cursor-pointer active:scale-95"
+                  className="px-4 py-2 rounded-xl bg-[#B7F229] hover:bg-[#a3db20] text-[#0B1A2D] font-black text-xs shadow-sm transition flex items-center gap-1.5 cursor-pointer active:scale-95"
                 >
                   <Users className="w-4 h-4" />
-                  <span>{t('tournaments.btn_register_pair', 'Inscribirse parejas')}</span>
+                  <span>{t('tournaments.btn_register_pair', 'Inscribir pareja')}</span>
                 </button>
               </div>
             </div>
           </div>
 
           {/* Sub-Tabs de Navegación del Detalle */}
-          <div className="flex items-center gap-1 p-1 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs text-xs font-semibold overflow-x-auto">
+          <div className="flex items-center gap-1 p-1 bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200/80 dark:border-[#1A314D] shadow-2xs text-xs font-semibold overflow-x-auto no-scrollbar">
             {[
               { id: 'info', label: t('tournaments.tab_info', 'Información Técnica & Bases'), icon: Award },
               { id: 'draws', label: t('tournaments.tab_brackets', 'Cuadros & Fases (Brackets)'), icon: Calendar },
@@ -1238,10 +1238,10 @@ export const AdminTournaments: React.FC = () => {
                   key={tab.id}
                   type="button"
                   onClick={() => setDetailSubTab(tab.id as typeof detailSubTab)}
-                  className={`px-4 py-2 rounded-xl transition flex items-center gap-2 whitespace-nowrap cursor-pointer ${
+                  className={`px-3.5 py-2 rounded-xl transition flex items-center gap-2 whitespace-nowrap cursor-pointer ${
                     isActive
-                      ? 'bg-emerald-600 text-white font-bold shadow-xs'
-                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800'
+                      ? 'bg-[#0B1A2D] dark:bg-[#B7F229] text-white dark:text-[#0B1A2D] font-bold shadow-xs'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#132A45]'
                   }`}
                 >
                   <Icon className="w-4 h-4" />
@@ -2218,127 +2218,139 @@ export const AdminTournaments: React.FC = () => {
       )}
 
       {/* ======================================================================
-          MODAL: INSCRIBIR PAREJA EN COMPETICIÓN (FLUJO CON TORNEO & CATEGORÍA)
+          MODAL: INSCRIBIR PAREJA EN COMPETICIÓN (NIVEL 4 - HOJA / MODAL RESPONSIVE)
           ====================================================================== */}
       {isInscriptionModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 backdrop-blur-xs p-4 animate-in fade-in duration-150">
-          <div className="w-full max-w-md rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 shadow-2xl text-slate-900 dark:text-slate-100 space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
-              <h3 className="text-base font-black text-slate-900 dark:text-white">
-                Inscribir Pareja en Competición
-              </h3>
+        <div className="fixed inset-0 z-50 flex flex-col justify-end sm:justify-center sm:items-center bg-slate-950/70 dark:bg-black/85 backdrop-blur-md p-0 sm:p-4 lg:p-6 overflow-hidden animate-in fade-in duration-200">
+          <div className="w-full sm:max-w-lg bg-white dark:bg-[#0E2239] border-t sm:border border-slate-200/80 dark:border-[#1A314D] rounded-t-[28px] sm:rounded-3xl shadow-2xl flex flex-col max-h-[92vh] sm:max-h-[88vh] overflow-hidden">
+            {/* Tirador de arrastre táctil para móvil */}
+            <div className="w-12 h-1 bg-slate-300 dark:bg-slate-700 rounded-full mx-auto my-2 sm:hidden shrink-0" />
+
+            {/* Cabecera Fija */}
+            <div className="px-5 sm:px-6 py-4 border-b border-slate-100 dark:border-[#1A314D] flex items-center justify-between shrink-0">
+              <div>
+                <h3 className="text-base sm:text-lg font-black text-slate-900 dark:text-white tracking-tight">
+                  Inscribir Pareja en Competición
+                </h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  Asignación oficial en el cuadro del torneo
+                </p>
+              </div>
               <button
                 type="button"
                 onClick={() => setIsInscriptionModalOpen(false)}
-                className="p-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white cursor-pointer"
+                className="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#132A45] transition cursor-pointer"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4" />
               </button>
             </div>
 
-            <form onSubmit={handleRegisterPair} className="space-y-3.5 text-xs">
-              {/* Selector de Torneo */}
-              <div>
-                <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
-                  Torneo / Competición *
-                </label>
-                <select
-                  value={selectedTournamentForInscription}
-                  onChange={(e) => {
-                    setSelectedTournamentForInscription(e.target.value);
-                    const targetT = tournaments.find((t) => t.id === e.target.value);
-                    if (targetT && targetT.categories.length > 0) {
-                      setPairCategory(targetT.categories[0].name);
-                    }
-                  }}
-                  className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 font-bold"
-                >
-                  {tournaments.map((t) => (
-                    <option key={t.id} value={t.id}>
-                      {t.title} ({t.dates})
-                    </option>
-                  ))}
-                </select>
+            <form onSubmit={handleRegisterPair} className="flex-1 overflow-y-auto overscroll-contain flex flex-col">
+              <div className="p-5 sm:p-6 space-y-4 text-xs flex-1">
+                {/* Selector de Torneo */}
+                <div>
+                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                    Torneo / Competición *
+                  </label>
+                  <select
+                    value={selectedTournamentForInscription}
+                    onChange={(e) => {
+                      setSelectedTournamentForInscription(e.target.value);
+                      const targetT = tournaments.find((t) => t.id === e.target.value);
+                      if (targetT && targetT.categories.length > 0) {
+                        setPairCategory(targetT.categories[0].name);
+                      }
+                    }}
+                    className="w-full bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-xl px-3.5 py-2.5 text-slate-900 dark:text-white focus:outline-none focus:border-[#B7F229] font-bold"
+                  >
+                    {tournaments.map((t) => (
+                      <option key={t.id} value={t.id}>
+                        {t.title} ({t.dates})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Selector Dinámico de Categoría del Torneo */}
+                <div>
+                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                    Categoría Específica *
+                  </label>
+                  <select
+                    value={pairCategory}
+                    onChange={(e) => setPairCategory(e.target.value)}
+                    className="w-full bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-xl px-3.5 py-2.5 text-slate-900 dark:text-white focus:outline-none focus:border-[#B7F229] font-bold"
+                  >
+                    {inscriptionAvailableCategories.map((cName) => (
+                      <option key={cName} value={cName}>
+                        {cName}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                    Jugador 1 (Capitán / Titular)
+                  </label>
+                  <select
+                    value={player1Name}
+                    onChange={(e) => setPlayer1Name(e.target.value)}
+                    className="w-full bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-xl px-3.5 py-2.5 text-slate-900 dark:text-white focus:outline-none focus:border-[#B7F229] font-bold"
+                  >
+                    {clubMembers.map((m) => (
+                      <option key={m.name} value={m.name}>
+                        {m.name} (Nivel FEP: {m.level})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                    Jugador 2 (Compañero)
+                  </label>
+                  <select
+                    value={player2Name}
+                    onChange={(e) => setPlayer2Name(e.target.value)}
+                    className="w-full bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-xl px-3.5 py-2.5 text-slate-900 dark:text-white focus:outline-none focus:border-[#B7F229] font-bold"
+                  >
+                    {clubMembers.map((m) => (
+                      <option key={m.name} value={m.name}>
+                        {m.name} (Nivel FEP: {m.level})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                    Método de Pago de la Cuota
+                  </label>
+                  <select
+                    value={pairPaymentMethod}
+                    onChange={(e) => setPairPaymentMethod(e.target.value as any)}
+                    className="w-full bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-xl px-3.5 py-2.5 text-slate-900 dark:text-white focus:outline-none focus:border-[#B7F229]"
+                  >
+                    <option value="club">Pago en Recepción / Mostrador</option>
+                    <option value="online">Pasarela Online (Stripe Tarjeta / Bizum)</option>
+                    <option value="wallet">Monedero del Socio / Saldo Virtual</option>
+                  </select>
+                </div>
               </div>
 
-              {/* Selector Dinámico de Categoría del Torneo */}
-              <div>
-                <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
-                  Categoría Específica *
-                </label>
-                <select
-                  value={pairCategory}
-                  onChange={(e) => setPairCategory(e.target.value)}
-                  className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 font-bold"
-                >
-                  {inscriptionAvailableCategories.map((cName) => (
-                    <option key={cName} value={cName}>
-                      {cName}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
-                  Jugador 1 (Capitán / Titular)
-                </label>
-                <select
-                  value={player1Name}
-                  onChange={(e) => setPlayer1Name(e.target.value)}
-                  className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 font-bold"
-                >
-                  {clubMembers.map((m) => (
-                    <option key={m.name} value={m.name}>
-                      {m.name} (Nivel FEP: {m.level})
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
-                  Jugador 2 (Compañero)
-                </label>
-                <select
-                  value={player2Name}
-                  onChange={(e) => setPlayer2Name(e.target.value)}
-                  className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 font-bold"
-                >
-                  {clubMembers.map((m) => (
-                    <option key={m.name} value={m.name}>
-                      {m.name} (Nivel FEP: {m.level})
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
-                  Método de Pago de la Cuota
-                </label>
-                <select
-                  value={pairPaymentMethod}
-                  onChange={(e) => setPairPaymentMethod(e.target.value as any)}
-                  className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
-                >
-                  <option value="club">Pago en Recepción / Mostrador</option>
-                  <option value="online">Pasarela Online (Stripe Tarjeta / Bizum)</option>
-                  <option value="wallet">Monedero del Socio / Saldo Virtual</option>
-                </select>
-              </div>
-
-              <div className="pt-2 flex items-center justify-end gap-2">
+              {/* Botonera Inferior Simétrica 50/50 */}
+              <div className="px-5 sm:px-6 py-3.5 border-t border-slate-100 dark:border-[#1A314D] bg-white dark:bg-[#071220] shrink-0 grid grid-cols-2 gap-3">
                 <button
                   type="button"
                   onClick={() => setIsInscriptionModalOpen(false)}
-                  className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold transition cursor-pointer"
+                  className="h-12 rounded-xl border border-slate-200 dark:border-[#1A314D] bg-slate-50 dark:bg-[#0E2239] hover:bg-slate-100 dark:hover:bg-[#132A45] text-slate-700 dark:text-slate-200 font-bold text-xs transition cursor-pointer"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold transition shadow-sm active:scale-95 cursor-pointer"
+                  className="h-12 rounded-xl bg-[#B7F229] hover:bg-[#a3db20] text-[#0B1A2D] font-black text-xs transition shadow-sm cursor-pointer"
                 >
                   Confirmar Inscripción
                 </button>
@@ -2349,21 +2361,30 @@ export const AdminTournaments: React.FC = () => {
       )}
 
       {/* ======================================================================
-          MODAL: CREAR NUEVA COMPETICIÓN
+          MODAL: CREAR NUEVA COMPETICIÓN OFICIAL (NIVEL 4 - HOJA / MODAL RESPONSIVE)
           ====================================================================== */}
       {isCreateModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 backdrop-blur-xs p-4 animate-in fade-in duration-150">
-          <div className="w-full max-w-lg rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 shadow-2xl text-slate-900 dark:text-slate-100 space-y-4 max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
-              <h3 className="text-base font-black text-slate-900 dark:text-white">
-                Crear Nueva Competición Oficial
-              </h3>
+        <div className="fixed inset-0 z-50 flex flex-col justify-end sm:justify-center sm:items-center bg-slate-950/70 dark:bg-black/85 backdrop-blur-md p-0 sm:p-4 lg:p-6 overflow-hidden animate-in fade-in duration-200">
+          <div className="w-full sm:max-w-xl bg-white dark:bg-[#0E2239] border-t sm:border border-slate-200/80 dark:border-[#1A314D] rounded-t-[28px] sm:rounded-3xl shadow-2xl flex flex-col max-h-[92vh] sm:max-h-[88vh] overflow-hidden">
+            {/* Tirador táctil en móvil */}
+            <div className="w-12 h-1 bg-slate-300 dark:bg-slate-700 rounded-full mx-auto my-2 sm:hidden shrink-0" />
+
+            {/* Cabecera Fija */}
+            <div className="px-5 sm:px-6 py-4 border-b border-slate-100 dark:border-[#1A314D] flex items-center justify-between shrink-0">
+              <div>
+                <h3 className="text-base sm:text-lg font-black text-slate-900 dark:text-white tracking-tight">
+                  Crear Nueva Competición Oficial
+                </h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  Configuración de formato, categorías y calendario oficial
+                </p>
+              </div>
               <button
                 type="button"
                 onClick={() => setIsCreateModalOpen(false)}
-                className="p-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white cursor-pointer"
+                className="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#132A45] transition cursor-pointer"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4" />
               </button>
             </div>
 
@@ -2377,74 +2398,77 @@ export const AdminTournaments: React.FC = () => {
                   'success'
                 );
               }}
-              className="space-y-3.5 text-xs"
+              className="flex-1 overflow-y-auto overscroll-contain flex flex-col"
             >
-              <div>
-                <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
-                  Título del Torneo *
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={newTitle}
-                  onChange={(e) => setNewTitle(e.target.value)}
-                  placeholder="ej. I Open Pádel San Mateo Invierno"
-                  className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 font-bold"
-                />
-              </div>
-
-              <div>
-                <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
-                  Fechas de Celebración
-                </label>
-                <input
-                  type="text"
-                  value={newDates}
-                  onChange={(e) => setNewDates(e.target.value)}
-                  className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 font-mono"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
+              <div className="p-5 sm:p-6 space-y-4 text-xs flex-1">
                 <div>
-                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
-                    Formato
-                  </label>
-                  <select
-                    value={newFormat}
-                    onChange={(e) => setNewFormat(e.target.value as any)}
-                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
-                  >
-                    <option value="elimination">Eliminación Directa</option>
-                    <option value="league">Liga / Round Robin</option>
-                    <option value="pozo">Formato Pozo Exprés</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
-                    Tarifa Inscripción (€)
+                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                    Título del Torneo *
                   </label>
                   <input
-                    type="number"
-                    value={newEntryFee}
-                    onChange={(e) => setNewEntryFee(parseFloat(e.target.value) || 0)}
-                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 font-mono font-bold"
+                    type="text"
+                    required
+                    value={newTitle}
+                    onChange={(e) => setNewTitle(e.target.value)}
+                    placeholder="ej. I Open Pádel San Mateo Invierno"
+                    className="w-full bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-xl px-3.5 py-2.5 text-slate-900 dark:text-white focus:outline-none focus:border-[#B7F229] font-bold"
                   />
+                </div>
+
+                <div>
+                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                    Fechas de Celebración
+                  </label>
+                  <input
+                    type="text"
+                    value={newDates}
+                    onChange={(e) => setNewDates(e.target.value)}
+                    className="w-full bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-xl px-3.5 py-2.5 text-slate-900 dark:text-white focus:outline-none focus:border-[#B7F229] font-mono"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                      Formato
+                    </label>
+                    <select
+                      value={newFormat}
+                      onChange={(e) => setNewFormat(e.target.value as any)}
+                      className="w-full bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-xl px-3.5 py-2.5 text-slate-900 dark:text-white focus:outline-none focus:border-[#B7F229]"
+                    >
+                      <option value="elimination">Eliminación Directa</option>
+                      <option value="league">Liga / Round Robin</option>
+                      <option value="pozo">Formato Pozo Exprés</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                      Tarifa Inscripción (€)
+                    </label>
+                    <input
+                      type="number"
+                      value={newEntryFee}
+                      onChange={(e) => setNewEntryFee(parseFloat(e.target.value) || 0)}
+                      className="w-full bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-xl px-3.5 py-2.5 text-slate-900 dark:text-white focus:outline-none focus:border-[#B7F229] font-mono font-bold"
+                    />
+                  </div>
                 </div>
               </div>
 
-              <div className="pt-2 flex items-center justify-end gap-2">
+              {/* Botonera Inferior Simétrica 50/50 */}
+              <div className="px-5 sm:px-6 py-3.5 border-t border-slate-100 dark:border-[#1A314D] bg-white dark:bg-[#071220] shrink-0 grid grid-cols-2 gap-3">
                 <button
                   type="button"
                   onClick={() => setIsCreateModalOpen(false)}
-                  className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold transition cursor-pointer"
+                  className="h-12 rounded-xl border border-slate-200 dark:border-[#1A314D] bg-slate-50 dark:bg-[#0E2239] hover:bg-slate-100 dark:hover:bg-[#132A45] text-slate-700 dark:text-slate-200 font-bold text-xs transition cursor-pointer"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold transition shadow-sm active:scale-95 cursor-pointer"
+                  className="h-12 rounded-xl bg-[#B7F229] hover:bg-[#a3db20] text-[#0B1A2D] font-black text-xs transition shadow-sm cursor-pointer"
                 >
                   Publicar Competición
                 </button>
@@ -2541,7 +2565,7 @@ export const AdminTournaments: React.FC = () => {
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold transition shadow-sm active:scale-95 cursor-pointer"
+                  className="px-5 py-2 rounded-xl bg-[#B7F229] hover:bg-[#a3db20] text-[#0B1A2D] font-black transition shadow-sm active:scale-95 cursor-pointer"
                 >
                   {t('tournaments.btnCreateRanking', 'Crear Ranking')}
                 </button>

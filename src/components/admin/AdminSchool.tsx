@@ -1203,19 +1203,19 @@ export const AdminSchool: React.FC = () => {
           ===================================================================== */}
       {selectedGroupDetail ? (
         <div className="space-y-6 animate-in fade-in duration-150">
-          {/* Header Superior con Botón Volver Rediseñado y Acciones Principales */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200/80 dark:border-slate-800">
+          {/* Header Superior con Botón Volver y Acciones Principales Optimizadas */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200/80 dark:border-[#1A314D]">
             <button
               type="button"
               onClick={() => setSelectedGroupDetail(null)}
-              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800 shadow-2xs font-bold text-xs transition cursor-pointer active:scale-95 group self-start"
+              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white dark:bg-[#0E2239] hover:bg-slate-50 dark:hover:bg-[#132A45] text-slate-700 dark:text-slate-300 border border-slate-200/80 dark:border-[#1A314D] shadow-2xs font-bold text-xs transition cursor-pointer active:scale-95 group self-start"
             >
-              <ArrowLeft className="w-4 h-4 text-emerald-500 group-hover:-translate-x-0.5 transition-transform" />
-              <span>{t('school.backToSchool', 'Volver al Listado de Escuela')}</span>
+              <ArrowLeft className="w-4 h-4 text-slate-600 dark:text-slate-300 group-hover:-translate-x-0.5 transition-transform" />
+              <span>{t('school.backToSchool', 'Volver a Escuela')}</span>
             </button>
 
             <div className="flex items-center gap-2 flex-wrap self-start sm:self-auto">
-              {/* Botón Notificar Ausencia */}
+              {/* Botón Notificar Ausencia (Secundario compacto) */}
               <button
                 type="button"
                 onClick={() => {
@@ -1223,13 +1223,13 @@ export const AdminSchool: React.FC = () => {
                   setAbsenceTargetSessionId(selectedGroupDetail.sessions?.[0]?.id || '');
                   setIsReportAbsenceModalOpen(true);
                 }}
-                className="px-3.5 py-2 rounded-xl bg-amber-50 dark:bg-amber-950/60 hover:bg-amber-100 dark:hover:bg-amber-900/40 text-amber-800 dark:text-amber-300 font-bold text-xs border border-amber-500/30 transition flex items-center gap-1.5 cursor-pointer active:scale-95"
+                className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-[#071220] dark:hover:bg-[#132A45] text-slate-700 dark:text-slate-300 font-bold text-xs border border-slate-200/70 dark:border-[#1A314D] transition flex items-center gap-1.5 cursor-pointer active:scale-95"
               >
-                <UserMinus className="w-4 h-4 text-amber-500" />
-                <span>Notificar Ausencia</span>
+                <UserMinus className="w-3.5 h-3.5 text-amber-500" />
+                <span className="hidden sm:inline">Notificar Ausencia</span>
               </button>
 
-              {/* Botón Aviso del Club a Alumnos */}
+              {/* Botón Aviso del Club a Alumnos (Secundario compacto) */}
               <button
                 type="button"
                 onClick={() => {
@@ -1237,26 +1237,10 @@ export const AdminSchool: React.FC = () => {
                   setClubNoticeMessage(`Recordatorio importante para los alumnos inscritos: `);
                   setIsClubNoticeModalOpen(true);
                 }}
-                className="px-3.5 py-2 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 font-bold text-xs border border-indigo-500/30 transition flex items-center gap-1.5 cursor-pointer active:scale-95"
+                className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-[#071220] dark:hover:bg-[#132A45] text-slate-700 dark:text-slate-300 font-bold text-xs border border-slate-200/70 dark:border-[#1A314D] transition flex items-center gap-1.5 cursor-pointer active:scale-95"
               >
-                <Send className="w-4 h-4 text-indigo-500" />
-                <span>Aviso Club a Alumnos</span>
-              </button>
-
-              {/* Botón Pasar Lista Rápido */}
-              <button
-                type="button"
-                onClick={() =>
-                  triggerDemoToast(
-                    t('school.attendance', 'Pasar Lista de Asistencia'),
-                    `Asistencias y firmas guardadas para ${selectedGroupDetail.name}.`,
-                    'success'
-                  )
-                }
-                className="px-3.5 py-2 rounded-xl bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 font-bold text-xs border border-slate-200 dark:border-slate-700 shadow-2xs transition flex items-center gap-1.5 cursor-pointer active:scale-95"
-              >
-                <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                <span>{t('school.attendance', 'Pasar Lista')}</span>
+                <Send className="w-3.5 h-3.5 text-[#8B5CF6]" />
+                <span className="hidden sm:inline">Aviso Alumnos</span>
               </button>
 
               {/* Editar Curso/Clase */}
@@ -1282,27 +1266,43 @@ export const AdminSchool: React.FC = () => {
                   });
                   setIsNewGroupModalOpen(true);
                 }}
-                className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs transition cursor-pointer flex items-center gap-1.5"
+                className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-[#071220] dark:hover:bg-[#132A45] text-slate-700 dark:text-slate-300 font-bold text-xs transition cursor-pointer flex items-center gap-1.5 border border-slate-200/70 dark:border-[#1A314D]"
                 title="Editar datos del curso"
               >
                 <Edit2 className="w-3.5 h-3.5" />
                 <span>Editar</span>
               </button>
+
+              {/* Botón Pasar Lista (Acción Primaria Destacada en #B7F229) */}
+              <button
+                type="button"
+                onClick={() =>
+                  triggerDemoToast(
+                    t('school.attendance', 'Pasar Lista de Asistencia'),
+                    `Asistencias y firmas guardadas para ${selectedGroupDetail.name}.`,
+                    'success'
+                  )
+                }
+                className="px-4 py-2 rounded-xl bg-[#B7F229] hover:bg-[#a3db20] text-[#0B1A2D] font-black text-xs shadow-sm transition flex items-center gap-1.5 cursor-pointer active:scale-95"
+              >
+                <CheckCircle2 className="w-4 h-4" />
+                <span>{t('school.attendance', 'Pasar Lista')}</span>
+              </button>
             </div>
           </div>
 
-          {/* Tarjeta Principal de Información Técnica */}
-          <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-sm space-y-6">
+          {/* Tarjeta Principal de Información Técnica - Compacta y en Paleta Corporativa */}
+          <div className="p-5 sm:p-6 rounded-3xl bg-white dark:bg-[#0E2239] border border-slate-200/90 dark:border-[#1A314D] shadow-sm space-y-4">
             <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
-              <div className="space-y-2">
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="text-[10px] font-black uppercase tracking-wider text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/80 px-2.5 py-0.5 rounded-md border border-emerald-500/30">
+              <div className="space-y-1.5">
+                <div className="flex flex-wrap items-center gap-1.5">
+                  <span className="text-[10px] font-black uppercase tracking-wider text-[#0B1A2D] dark:text-[#B7F229] bg-[#F0FCCF] dark:bg-[#B7F229]/20 px-2.5 py-0.5 rounded-md border border-[#B7F229]/40">
                     {selectedGroupDetail.durationLabel}
                   </span>
-                  <span className="text-[10px] font-bold text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/80 px-2.5 py-0.5 rounded-md border border-indigo-500/20">
+                  <span className="text-[10px] font-bold text-[#8B5CF6] dark:text-[#C4B5FD] bg-[#8B5CF6]/10 px-2.5 py-0.5 rounded-md border border-[#8B5CF6]/25">
                     {selectedGroupDetail.levelCategory}
                   </span>
-                  <span className="text-[10px] font-mono font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-md">
+                  <span className="text-[10px] font-mono font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-[#071220] px-2 py-0.5 rounded-md border border-slate-200/60 dark:border-[#1A314D]">
                     {selectedGroupDetail.days.join(' · ')}
                   </span>
                 </div>
@@ -1310,13 +1310,13 @@ export const AdminSchool: React.FC = () => {
                 <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
                   {selectedGroupDetail.name}
                 </h1>
-                <p className="text-xs text-slate-500 dark:text-slate-400">
+                <p className="text-xs text-slate-500 dark:text-slate-400 max-w-2xl">
                   {selectedGroupDetail.notes || 'Entrenamiento metodológico con monitor titulado y seguimiento de evolución técnica.'}
                 </p>
               </div>
 
               {/* Tarifas */}
-              <div className="bg-slate-50 dark:bg-slate-950 p-4 rounded-2xl border border-slate-200/60 dark:border-slate-800 flex items-center gap-4 text-right shrink-0">
+              <div className="bg-slate-50/80 dark:bg-[#071220]/70 p-3.5 rounded-2xl border border-slate-200/60 dark:border-[#1A314D] flex items-center gap-4 text-right shrink-0">
                 {selectedGroupDetail.registrationFee !== undefined && (
                   <div>
                     <div className="text-[10px] text-slate-400 uppercase font-bold">
@@ -1328,15 +1328,15 @@ export const AdminSchool: React.FC = () => {
                   </div>
                 )}
                 <div>
-                  <div className="text-[10px] text-emerald-600 dark:text-emerald-400 uppercase font-bold">
+                  <div className="text-[10px] text-slate-500 dark:text-slate-400 uppercase font-bold">
                     {t('school.monthlyFee', 'Cuota Socio')}
                   </div>
-                  <div className="text-base font-black font-mono text-emerald-600 dark:text-emerald-400">
+                  <div className="text-base font-black font-mono text-slate-900 dark:text-white">
                     {selectedGroupDetail.memberFee.toFixed(2)} €
                   </div>
                 </div>
                 <div>
-                  <div className="text-[10px] text-slate-500 uppercase font-bold">No Socio</div>
+                  <div className="text-[10px] text-slate-400 uppercase font-bold">No Socio</div>
                   <div className="text-sm font-black font-mono text-slate-700 dark:text-slate-300">
                     {selectedGroupDetail.nonMemberFee.toFixed(2)} €
                   </div>
@@ -1345,7 +1345,7 @@ export const AdminSchool: React.FC = () => {
             </div>
 
             {/* Parrilla Operativa: Pista, Horario y Profesor */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-3 border-t border-slate-100 dark:border-slate-800 text-xs">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-3 border-t border-slate-100 dark:border-[#1A314D] text-xs">
               {/* Profesor Clicable */}
               <div
                 onClick={() => {
@@ -1356,28 +1356,28 @@ export const AdminSchool: React.FC = () => {
                     setActiveMainTab('coaches');
                   }
                 }}
-                className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950/70 border border-slate-200/60 dark:border-slate-800 flex items-center justify-between gap-3 cursor-pointer hover:border-emerald-500/50 transition group"
+                className="p-3.5 rounded-2xl bg-slate-50/80 dark:bg-[#071220]/70 border border-slate-200/60 dark:border-[#1A314D] flex items-center justify-between gap-3 cursor-pointer hover:border-[#B7F229]/60 transition group"
                 title="Ver perfil completo y honorarios del profesor"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 font-bold flex items-center justify-center shrink-0">
+                  <div className="w-10 h-10 rounded-xl bg-[#F0FCCF] dark:bg-[#B7F229]/20 text-[#0B1A2D] dark:text-[#B7F229] font-bold flex items-center justify-center shrink-0">
                     <GraduationCap className="w-5 h-5" />
                   </div>
                   <div>
                     <div className="text-[10px] text-slate-400 font-bold uppercase">Profesor Asignado</div>
-                    <div className="font-bold text-slate-900 dark:text-white group-hover:text-emerald-600 transition flex items-center gap-1">
+                    <div className="font-bold text-slate-900 dark:text-white group-hover:text-[#8B5CF6] dark:group-hover:text-[#B7F229] transition flex items-center gap-1">
                       <span>{selectedGroupDetail.coachName}</span>
                       <ChevronRight className="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 transition-opacity" />
                     </div>
-                    <div className="text-[10px] text-emerald-600 dark:text-emerald-400">Monitor Titulado FEP</div>
+                    <div className="text-[10px] text-slate-500 dark:text-slate-400">Monitor Titulado FEP</div>
                   </div>
                 </div>
                 <ChevronRight className="w-4 h-4 text-slate-400" />
               </div>
 
               {/* Horario y Frecuencia */}
-              <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950/70 border border-slate-200/60 dark:border-slate-800 flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 font-bold flex items-center justify-center shrink-0">
+              <div className="p-3.5 rounded-2xl bg-slate-50/80 dark:bg-[#071220]/70 border border-slate-200/60 dark:border-[#1A314D] flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-blue-100/70 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 font-bold flex items-center justify-center shrink-0">
                   <Clock className="w-5 h-5" />
                 </div>
                 <div>
@@ -1390,16 +1390,16 @@ export const AdminSchool: React.FC = () => {
               </div>
 
               {/* Pista y Domótica */}
-              <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950/70 border border-slate-200/60 dark:border-slate-800 flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 font-bold flex items-center justify-center shrink-0">
+              <div className="p-3.5 rounded-2xl bg-slate-50/80 dark:bg-[#071220]/70 border border-slate-200/60 dark:border-[#1A314D] flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-[#8B5CF6]/15 text-[#8B5CF6] dark:text-[#C4B5FD] font-bold flex items-center justify-center shrink-0">
                   <MapPin className="w-5 h-5" />
                 </div>
                 <div>
                   <div className="text-[10px] text-slate-400 font-bold uppercase">Pista & Control de Acceso</div>
                   <div className="font-bold text-slate-900 dark:text-white">{selectedGroupDetail.courtName}</div>
-                  <div className="text-[10px] text-purple-600 dark:text-purple-400 flex items-center gap-1 font-mono font-bold">
+                  <div className="text-[10px] text-[#8B5CF6] dark:text-[#C4B5FD] flex items-center gap-1 font-mono font-bold">
                     <span>PIN: 4821#</span>
-                    <span className="text-[9px] bg-purple-100 dark:bg-purple-950/80 px-1.5 rounded-xs">Domótica Activa</span>
+                    <span className="text-[9px] bg-[#8B5CF6]/15 px-1.5 rounded-xs">Domótica Activa</span>
                   </div>
                 </div>
               </div>
@@ -1407,13 +1407,13 @@ export const AdminSchool: React.FC = () => {
           </div>
 
           {/* Sub-navegador de Pestañas del Grupo */}
-          <div className="flex border-b border-slate-200 dark:border-slate-800 space-x-2 text-xs font-bold">
+          <div className="flex border-b border-slate-200/80 dark:border-[#1A314D] space-x-2 text-xs font-bold">
             <button
               type="button"
               onClick={() => setActiveGroupTab('sessions')}
               className={`py-3 px-4 border-b-2 transition flex items-center gap-2 cursor-pointer ${
                 activeGroupTab === 'sessions'
-                  ? 'border-emerald-500 text-emerald-600 dark:text-emerald-400 bg-white dark:bg-slate-900/50 rounded-t-xl'
+                  ? 'border-[#0B1A2D] dark:border-[#B7F229] text-[#0B1A2D] dark:text-[#B7F229] bg-white dark:bg-[#0E2239] rounded-t-xl'
                   : 'border-transparent text-slate-500 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
@@ -1425,7 +1425,7 @@ export const AdminSchool: React.FC = () => {
               onClick={() => setActiveGroupTab('students')}
               className={`py-3 px-4 border-b-2 transition flex items-center gap-2 cursor-pointer ${
                 activeGroupTab === 'students'
-                  ? 'border-emerald-500 text-emerald-600 dark:text-emerald-400 bg-white dark:bg-slate-900/50 rounded-t-xl'
+                  ? 'border-[#0B1A2D] dark:border-[#B7F229] text-[#0B1A2D] dark:text-[#B7F229] bg-white dark:bg-[#0E2239] rounded-t-xl'
                   : 'border-transparent text-slate-500 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
@@ -1437,7 +1437,7 @@ export const AdminSchool: React.FC = () => {
               onClick={() => setActiveGroupTab('notices')}
               className={`py-3 px-4 border-b-2 transition flex items-center gap-2 cursor-pointer ${
                 activeGroupTab === 'notices'
-                  ? 'border-emerald-500 text-emerald-600 dark:text-emerald-400 bg-white dark:bg-slate-900/50 rounded-t-xl'
+                  ? 'border-[#0B1A2D] dark:border-[#B7F229] text-[#0B1A2D] dark:text-[#B7F229] bg-white dark:bg-[#0E2239] rounded-t-xl'
                   : 'border-transparent text-slate-500 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
@@ -2204,18 +2204,18 @@ export const AdminSchool: React.FC = () => {
                 return (
                   <div
                     key={group.id}
-                    className="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 p-5 shadow-sm space-y-4 hover:border-emerald-500/50 transition flex flex-col justify-between"
+                    className="rounded-3xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] p-5 shadow-xs space-y-4 hover:border-[#B7F229]/60 transition flex flex-col justify-between"
                   >
                     <div className="space-y-3">
                       {/* Cabecera de la tarjeta */}
                       <div className="flex items-start justify-between gap-3">
                         <div className="space-y-0.5">
-                          <span className="text-[10px] font-extrabold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/70 px-2.5 py-0.5 rounded-md border border-emerald-500/20">
+                          <span className="text-[10px] font-black uppercase tracking-wider text-[#0B1A2D] dark:text-[#B7F229] bg-[#F0FCCF] dark:bg-[#B7F229]/20 px-2.5 py-0.5 rounded-md border border-[#B7F229]/40">
                             {group.durationLabel}
                           </span>
                           <h2
                             onClick={() => setSelectedGroupDetail(group)}
-                            className="text-base font-black text-slate-900 dark:text-white mt-1 hover:text-emerald-500 cursor-pointer transition"
+                            className="text-base font-black text-slate-900 dark:text-white mt-1 hover:text-[#8B5CF6] dark:hover:text-[#B7F229] cursor-pointer transition"
                           >
                             {group.name}
                           </h2>
@@ -2225,45 +2225,45 @@ export const AdminSchool: React.FC = () => {
                         </div>
 
                         {/* Cuotas */}
-                        <div className="text-right shrink-0 bg-slate-50 dark:bg-slate-950 p-2.5 rounded-2xl border border-slate-200/60 dark:border-slate-800">
-                          <div className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold uppercase">
+                        <div className="text-right shrink-0 bg-slate-50/80 dark:bg-[#071220]/70 p-2.5 rounded-2xl border border-slate-200/60 dark:border-[#1A314D]">
+                          <div className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase">
                             Socio: <span className="font-mono text-sm font-black text-slate-900 dark:text-white">{group.memberFee.toFixed(2)} €</span>
                           </div>
-                          <div className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">
+                          <div className="text-[10px] text-slate-400 font-medium">
                             No Socio: <span className="font-mono font-bold text-slate-700 dark:text-slate-300">{group.nonMemberFee.toFixed(2)} €</span>
                           </div>
                         </div>
                       </div>
 
                       {/* Detalles operativos */}
-                      <div className="grid grid-cols-2 gap-2 text-xs pt-1 border-t border-slate-100 dark:border-slate-800">
-                        <div className="p-2 rounded-xl bg-slate-50 dark:bg-slate-950/50 border border-slate-200/60 dark:border-slate-800 space-y-0.5">
+                      <div className="grid grid-cols-2 gap-2 text-xs pt-1 border-t border-slate-100 dark:border-[#1A314D]">
+                        <div className="p-2 rounded-xl bg-slate-50/80 dark:bg-[#071220]/50 border border-slate-200/60 dark:border-[#1A314D] space-y-0.5">
                           <span className="text-[10px] text-slate-400 font-bold block">{t('school.assignedCoach', 'Profesor')}:</span>
                           <span className="font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
-                            <GraduationCap className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                            <GraduationCap className="w-3.5 h-3.5 text-[#8B5CF6] shrink-0" />
                             <span className="truncate">{group.coachName}</span>
                           </span>
                         </div>
 
-                        <div className="p-2 rounded-xl bg-slate-50 dark:bg-slate-950/50 border border-slate-200/60 dark:border-slate-800 space-y-0.5">
+                        <div className="p-2 rounded-xl bg-slate-50/80 dark:bg-[#071220]/50 border border-slate-200/60 dark:border-[#1A314D] space-y-0.5">
                           <span className="text-[10px] text-slate-400 font-bold block">{t('school.scheduleDays', 'Horario')}:</span>
                           <span className="font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
-                            <Clock className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                            <Clock className="w-3.5 h-3.5 text-blue-500 shrink-0" />
                             <span className="truncate">{group.schedule}</span>
                           </span>
                         </div>
                       </div>
 
                       {/* Pista Asignada */}
-                      <div className="flex items-center justify-between text-xs p-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800">
+                      <div className="flex items-center justify-between text-xs p-2.5 rounded-xl bg-slate-50/80 dark:bg-[#071220]/70 border border-slate-200/60 dark:border-[#1A314D]">
                         <div className="flex items-center gap-2">
                           <MapPin className="w-3.5 h-3.5 text-slate-400" />
                           <span className="font-bold text-slate-700 dark:text-slate-300 text-[11px] truncate">
                             {group.courtName}
                           </span>
                         </div>
-                        <span className="flex items-center gap-1 text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950 px-2 py-0.5 rounded-full border border-emerald-500/20">
-                          <CheckCircle2 className="w-3 h-3 text-emerald-500" />
+                        <span className="flex items-center gap-1 text-[10px] font-bold text-[#0B1A2D] dark:text-[#B7F229] bg-[#F0FCCF] dark:bg-[#B7F229]/15 px-2 py-0.5 rounded-full border border-[#B7F229]/30">
+                          <CheckCircle2 className="w-3 h-3 text-[#B7F229]" />
                           Pista Verificada
                         </span>
                       </div>
@@ -2275,7 +2275,7 @@ export const AdminSchool: React.FC = () => {
                             Alumnos: <strong>{group.currentStudents}</strong> de <strong>{group.maxStudents}</strong> plazas
                           </span>
                           {openSpots > 0 ? (
-                            <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">
+                            <span className="text-[10px] font-bold text-[#0B1A2D] dark:text-[#B7F229]">
                               {openSpots} {t('school.vacantSpots', 'Plazas Libres')}
                             </span>
                           ) : (
@@ -2286,7 +2286,7 @@ export const AdminSchool: React.FC = () => {
                         <div className="w-full h-2 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
                           <div
                             className={`h-full rounded-full transition-all ${
-                              isFull ? 'bg-emerald-500' : 'bg-emerald-400'
+                              isFull ? 'bg-[#0B1A2D] dark:bg-white' : 'bg-[#B7F229]'
                             }`}
                             style={{ width: `${(group.currentStudents / group.maxStudents) * 100}%` }}
                           />
@@ -2295,29 +2295,29 @@ export const AdminSchool: React.FC = () => {
                     </div>
 
                     {/* Acciones de la Tarjeta Reorganizadas y Protegidas contra Desbordamiento */}
-                    <div className="pt-3 border-t border-slate-100 dark:border-slate-800 space-y-2.5 text-xs mt-3">
+                    <div className="pt-3 border-t border-slate-100 dark:border-[#1A314D] space-y-2.5 text-xs mt-3">
                       {/* Fila de gestión de plazas libres (si aplica) con wrap responsivo */}
                       {openSpots > 0 && (
-                        <div className="flex flex-wrap items-center gap-1.5 p-2 rounded-2xl bg-emerald-50/70 dark:bg-emerald-950/40 border border-emerald-500/20">
-                          <span className="text-[10px] font-bold text-emerald-800 dark:text-emerald-300 uppercase tracking-wider mr-1">
+                        <div className="flex flex-wrap items-center gap-1.5 p-2 rounded-2xl bg-[#F0FCCF]/60 dark:bg-[#B7F229]/10 border border-[#B7F229]/30">
+                          <span className="text-[10px] font-bold text-[#0B1A2D] dark:text-[#B7F229] uppercase tracking-wider mr-1">
                             Plazas Libres:
                           </span>
                           <button
                             type="button"
                             onClick={() => handleOpenNotifyGroupForClass(group)}
-                            className="px-2.5 py-1 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[11px] shadow-2xs flex items-center gap-1 transition cursor-pointer active:scale-95"
+                            className="px-2.5 py-1 rounded-xl bg-[#0B1A2D] hover:bg-[#132A45] text-white font-bold text-[11px] shadow-2xs flex items-center gap-1 transition cursor-pointer active:scale-95"
                             title="Convocatoria instantánea a grupos de jugadores (WhatsApp)"
                           >
-                            <Megaphone className="w-3 h-3" />
+                            <Megaphone className="w-3 h-3 text-[#B7F229]" />
                             <span>Notificar Grupo</span>
                           </button>
                           <button
                             type="button"
                             onClick={() => setConfirmPublishClass(group)}
-                            className="px-2.5 py-1 rounded-xl bg-white dark:bg-slate-800 hover:bg-emerald-50 dark:hover:bg-slate-700 text-emerald-700 dark:text-emerald-300 font-bold text-[11px] border border-emerald-500/30 flex items-center gap-1 transition cursor-pointer"
+                            className="px-2.5 py-1 rounded-xl bg-white dark:bg-[#071220] hover:bg-slate-50 dark:hover:bg-[#132A45] text-slate-700 dark:text-slate-300 font-bold text-[11px] border border-slate-200/80 dark:border-[#1A314D] flex items-center gap-1 transition cursor-pointer"
                             title="Ofertar hueco a jugadores externos"
                           >
-                            <Bell className="w-3 h-3 text-emerald-500" />
+                            <Bell className="w-3 h-3 text-[#8B5CF6]" />
                             <span>{group.publishedAsOpen ? t('school.publishedSpots', 'Plaza Publicada') : t('school.publishSpots', 'Publicar Plazas')}</span>
                           </button>
                           <button
@@ -2357,7 +2357,7 @@ export const AdminSchool: React.FC = () => {
                               });
                               setIsNewGroupModalOpen(true);
                             }}
-                            className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition cursor-pointer"
+                            className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-[#071220] dark:hover:bg-[#132A45] text-slate-700 dark:text-slate-300 border border-slate-200/60 dark:border-[#1A314D] transition cursor-pointer"
                             title="Editar"
                           >
                             <Edit2 className="w-3.5 h-3.5" />
@@ -2365,7 +2365,7 @@ export const AdminSchool: React.FC = () => {
                           <button
                             type="button"
                             onClick={() => setConfirmDeleteGroup(group)}
-                            className="p-2 rounded-xl bg-slate-100 hover:bg-rose-100 dark:bg-slate-800 dark:hover:bg-rose-950/50 text-slate-700 dark:text-slate-300 hover:text-rose-600 transition cursor-pointer"
+                            className="p-2 rounded-xl bg-slate-100 hover:bg-rose-100 dark:bg-[#071220] dark:hover:bg-rose-950/50 text-slate-700 dark:text-slate-300 hover:text-rose-600 border border-slate-200/60 dark:border-[#1A314D] transition cursor-pointer"
                             title="Eliminar"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
@@ -2376,11 +2376,11 @@ export const AdminSchool: React.FC = () => {
                         <button
                           type="button"
                           onClick={() => setSelectedGroupDetail(group)}
-                          className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-slate-800 dark:hover:bg-slate-700 text-white font-bold text-xs transition flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-95 shrink-0"
+                          className="px-4 py-2 rounded-xl bg-[#0B1A2D] dark:bg-[#B7F229] hover:bg-[#132A45] dark:hover:bg-[#a3db20] text-white dark:text-[#0B1A2D] font-black text-xs transition flex items-center gap-1.5 cursor-pointer shadow-sm active:scale-95 shrink-0"
                           title={`Ver detalles de ${isSingleClass ? 'la clase suelta' : 'este curso'}`}
                         >
                           <span>{isSingleClass ? 'Ver Clase' : 'Ver Curso'}</span>
-                          <ChevronRight className="w-3.5 h-3.5 text-emerald-400" />
+                          <ChevronRight className="w-3.5 h-3.5 text-[#B7F229] dark:text-[#0B1A2D]" />
                         </button>
                       </div>
                     </div>
@@ -2754,17 +2754,23 @@ export const AdminSchool: React.FC = () => {
       )}
 
       {/* =====================================================================
-          MODAL: NUEVO GRUPO (MATRÍCULA, CUOTA PERIODICA, DIAS)
+          MODAL: NUEVO GRUPO (NIVEL 4 - HOJA / MODAL RESPONSIVE)
           ===================================================================== */}
       {isNewGroupModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-sm animate-in fade-in duration-150">
-          <div className="relative w-full max-w-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl text-slate-900 dark:text-slate-100 space-y-4 max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
-              <div className="flex items-center gap-2">
-                <GraduationCap className="w-5 h-5 text-emerald-500" />
-                <h3 className="text-base font-black text-slate-900 dark:text-white">
+        <div className="fixed inset-0 z-50 flex flex-col justify-end sm:justify-center sm:items-center bg-slate-950/70 dark:bg-black/85 backdrop-blur-md p-0 sm:p-4 lg:p-6 overflow-hidden animate-in fade-in duration-200">
+          <div className="w-full sm:max-w-xl bg-white dark:bg-[#0E2239] border-t sm:border border-slate-200/80 dark:border-[#1A314D] rounded-t-[28px] sm:rounded-3xl shadow-2xl flex flex-col max-h-[92vh] sm:max-h-[88vh] overflow-hidden">
+            {/* Tirador táctil para móvil */}
+            <div className="w-12 h-1 bg-slate-300 dark:bg-slate-700 rounded-full mx-auto my-2 sm:hidden shrink-0" />
+
+            {/* Cabecera Fija */}
+            <div className="px-5 sm:px-6 py-4 border-b border-slate-100 dark:border-[#1A314D] flex items-center justify-between shrink-0">
+              <div>
+                <h3 className="text-base sm:text-lg font-black text-slate-900 dark:text-white tracking-tight">
                   {editingGroup ? t('school.modals.editGroupTitle', 'Editar Grupo de Escuela') : t('school.modals.newGroupTitle', 'Crear Nuevo Grupo de Escuela')}
                 </h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  Configuración pedagógica, plazas y tarifas periódicas
+                </p>
               </div>
               <button
                 type="button"
@@ -2772,181 +2778,187 @@ export const AdminSchool: React.FC = () => {
                   setIsNewGroupModalOpen(false);
                   setEditingGroup(null);
                 }}
-                className="p-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white"
+                className="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#132A45] transition cursor-pointer"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4" />
               </button>
             </div>
 
-            <form onSubmit={handleGroupSubmit} className="space-y-3.5 text-xs">
-              <div>
-                <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
-                  Nombre del Grupo *
-                </label>
-                <input
-                  type="text"
-                  required
-                  placeholder="Ej: Iniciación Técnica Adultos Nivel 2.5"
-                  value={groupFormData.name}
-                  onChange={(e) => setGroupFormData({ ...groupFormData, name: e.target.value })}
-                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
+            <form onSubmit={handleGroupSubmit} className="flex-1 overflow-y-auto overscroll-contain flex flex-col">
+              <div className="p-5 sm:p-6 space-y-4 text-xs flex-1">
                 <div>
-                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
-                    Periodicidad del Curso
-                  </label>
-                  <select
-                    value={groupFormData.periodicity}
-                    onChange={(e) =>
-                      setGroupFormData({
-                        ...groupFormData,
-                        periodicity: e.target.value as 'course_monthly' | 'course_quarterly',
-                      })
-                    }
-                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
-                  >
-                    <option value="course_monthly">Mensual (1 mes)</option>
-                    <option value="course_quarterly">Trimestral (3 meses)</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
-                    Nivel Recomendado
+                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                    Nombre del Grupo *
                   </label>
                   <input
                     type="text"
-                    value={groupFormData.levelCategory}
-                    onChange={(e) => setGroupFormData({ ...groupFormData, levelCategory: e.target.value })}
-                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
-                    Profesor Asignado
-                  </label>
-                  <select
-                    value={groupFormData.coachName}
-                    onChange={(e) => setGroupFormData({ ...groupFormData, coachName: e.target.value })}
-                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
-                  >
-                    {coachesList.map((c) => (
-                      <option key={c.id} value={c.name}>
-                        {c.name} ({c.roleTitle})
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
-                    Pista Asignada
-                  </label>
-                  <select
-                    value={groupFormData.courtName}
-                    onChange={(e) => setGroupFormData({ ...groupFormData, courtName: e.target.value })}
-                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
-                  >
-                    {courts.map((court) => (
-                      <option key={court.id} value={court.name}>
-                        {court.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
-                    Horario de Clase
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="19:00 - 20:00"
-                    value={groupFormData.schedule}
-                    onChange={(e) => setGroupFormData({ ...groupFormData, schedule: e.target.value })}
-                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                    required
+                    placeholder="Ej: Iniciación Técnica Adultos Nivel 2.5"
+                    value={groupFormData.name}
+                    onChange={(e) => setGroupFormData({ ...groupFormData, name: e.target.value })}
+                    className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-[#B7F229] font-bold"
                   />
                 </div>
 
-                <div>
-                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
-                    Cupo Máximo Alumnos
-                  </label>
-                  <input
-                    type="number"
-                    min="1"
-                    max="8"
-                    value={groupFormData.maxStudents}
-                    onChange={(e) => setGroupFormData({ ...groupFormData, maxStudents: Number(e.target.value) })}
-                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
-                  />
-                </div>
-              </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                      Periodicidad del Curso
+                    </label>
+                    <select
+                      value={groupFormData.periodicity}
+                      onChange={(e) =>
+                        setGroupFormData({
+                          ...groupFormData,
+                          periodicity: e.target.value as 'course_monthly' | 'course_quarterly',
+                        })
+                      }
+                      className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-[#B7F229]"
+                    >
+                      <option value="course_monthly">Mensual (1 mes)</option>
+                      <option value="course_quarterly">Trimestral (3 meses)</option>
+                    </select>
+                  </div>
 
-              {/* Matrícula y Cuotas */}
-              <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 space-y-2.5">
-                <span className="font-extrabold text-[11px] uppercase tracking-wider text-slate-600 dark:text-slate-400 block">
-                  Matrícula y Cuotas Periódicas
-                </span>
-                <div className="grid grid-cols-3 gap-2.5">
                   <div>
-                    <label className="block font-bold text-slate-600 dark:text-slate-400 mb-1 text-[10px]">
-                      Matrícula (€)
+                    <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                      Nivel Recomendado
                     </label>
                     <input
-                      type="number"
-                      step="1"
-                      value={groupFormData.registrationFee}
-                      onChange={(e) => setGroupFormData({ ...groupFormData, registrationFee: Number(e.target.value) })}
-                      className="w-full px-2.5 py-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl font-mono text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="block font-bold text-emerald-600 dark:text-emerald-400 mb-1 text-[10px]">
-                      Cuota Socio (€)
-                    </label>
-                    <input
-                      type="number"
-                      step="1"
-                      value={groupFormData.memberFee}
-                      onChange={(e) => setGroupFormData({ ...groupFormData, memberFee: Number(e.target.value) })}
-                      className="w-full px-2.5 py-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl font-mono text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="block font-bold text-slate-600 dark:text-slate-400 mb-1 text-[10px]">
-                      Cuota No Socio (€)
-                    </label>
-                    <input
-                      type="number"
-                      step="1"
-                      value={groupFormData.nonMemberFee}
-                      onChange={(e) => setGroupFormData({ ...groupFormData, nonMemberFee: Number(e.target.value) })}
-                      className="w-full px-2.5 py-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl font-mono text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                      type="text"
+                      value={groupFormData.levelCategory}
+                      onChange={(e) => setGroupFormData({ ...groupFormData, levelCategory: e.target.value })}
+                      className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-[#B7F229]"
                     />
                   </div>
                 </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                      Profesor Asignado
+                    </label>
+                    <select
+                      value={groupFormData.coachName}
+                      onChange={(e) => setGroupFormData({ ...groupFormData, coachName: e.target.value })}
+                      className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-[#B7F229]"
+                    >
+                      {coachesList.map((c) => (
+                        <option key={c.id} value={c.name}>
+                          {c.name} ({c.roleTitle})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                      Pista Asignada
+                    </label>
+                    <select
+                      value={groupFormData.courtName}
+                      onChange={(e) => setGroupFormData({ ...groupFormData, courtName: e.target.value })}
+                      className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-[#B7F229]"
+                    >
+                      {courts.map((court) => (
+                        <option key={court.id} value={court.name}>
+                          {court.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                      Horario de Clase
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="19:00 - 20:00"
+                      value={groupFormData.schedule}
+                      onChange={(e) => setGroupFormData({ ...groupFormData, schedule: e.target.value })}
+                      className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-[#B7F229]"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                      Cupo Máximo Alumnos
+                    </label>
+                    <input
+                      type="number"
+                      min="1"
+                      max="8"
+                      value={groupFormData.maxStudents}
+                      onChange={(e) => setGroupFormData({ ...groupFormData, maxStudents: Number(e.target.value) })}
+                      className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-[#B7F229] font-mono font-bold"
+                    />
+                  </div>
+                </div>
+
+                {/* Matrícula y Cuotas */}
+                <div className="p-3.5 rounded-2xl bg-slate-50/80 dark:bg-[#071220]/70 border border-slate-200/60 dark:border-[#1A314D] space-y-2.5">
+                  <span className="font-extrabold text-[11px] uppercase tracking-wider text-slate-600 dark:text-slate-400 block">
+                    Matrícula y Cuotas Periódicas
+                  </span>
+                  <div className="grid grid-cols-3 gap-2.5">
+                    <div>
+                      <label className="block font-bold text-slate-600 dark:text-slate-400 mb-1 text-[10px]">
+                        Matrícula (€)
+                      </label>
+                      <input
+                        type="number"
+                        step="1"
+                        value={groupFormData.registrationFee}
+                        onChange={(e) => setGroupFormData({ ...groupFormData, registrationFee: Number(e.target.value) })}
+                        className="w-full px-2.5 py-1.5 bg-white dark:bg-[#0E2239] border border-slate-200/70 dark:border-[#1A314D] rounded-xl font-mono text-slate-900 dark:text-white focus:outline-none focus:border-[#B7F229]"
+                      />
+                    </div>
+                    <div>
+                      <label className="block font-bold text-slate-600 dark:text-slate-400 mb-1 text-[10px]">
+                        Cuota Socio (€)
+                      </label>
+                      <input
+                        type="number"
+                        step="1"
+                        value={groupFormData.memberFee}
+                        onChange={(e) => setGroupFormData({ ...groupFormData, memberFee: Number(e.target.value) })}
+                        className="w-full px-2.5 py-1.5 bg-white dark:bg-[#0E2239] border border-slate-200/70 dark:border-[#1A314D] rounded-xl font-mono text-slate-900 dark:text-white focus:outline-none focus:border-[#B7F229] font-bold"
+                      />
+                    </div>
+                    <div>
+                      <label className="block font-bold text-slate-600 dark:text-slate-400 mb-1 text-[10px]">
+                        Cuota No Socio (€)
+                      </label>
+                      <input
+                        type="number"
+                        step="1"
+                        value={groupFormData.nonMemberFee}
+                        onChange={(e) => setGroupFormData({ ...groupFormData, nonMemberFee: Number(e.target.value) })}
+                        className="w-full px-2.5 py-1.5 bg-white dark:bg-[#0E2239] border border-slate-200/70 dark:border-[#1A314D] rounded-xl font-mono text-slate-900 dark:text-white focus:outline-none focus:border-[#B7F229]"
+                      />
+                    </div>
+                  </div>
+                </div>
               </div>
 
-              <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex justify-end gap-2">
+              {/* Botonera Inferior Simétrica 50/50 */}
+              <div className="px-5 sm:px-6 py-3.5 border-t border-slate-100 dark:border-[#1A314D] bg-white dark:bg-[#071220] shrink-0 grid grid-cols-2 gap-3">
                 <button
                   type="button"
-                  onClick={() => setIsNewGroupModalOpen(false)}
-                  className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold transition cursor-pointer"
+                  onClick={() => {
+                    setIsNewGroupModalOpen(false);
+                    setEditingGroup(null);
+                  }}
+                  className="h-12 rounded-xl border border-slate-200 dark:border-[#1A314D] bg-slate-50 dark:bg-[#0E2239] hover:bg-slate-100 dark:hover:bg-[#132A45] text-slate-700 dark:text-slate-200 font-bold text-xs transition cursor-pointer"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold transition shadow-xs cursor-pointer"
+                  className="h-12 rounded-xl bg-[#B7F229] hover:bg-[#a3db20] text-[#0B1A2D] font-black text-xs transition shadow-sm cursor-pointer"
                 >
                   {editingGroup ? 'Guardar Cambios' : 'Crear Grupo'}
                 </button>
@@ -2959,154 +2971,166 @@ export const AdminSchool: React.FC = () => {
       {/* =====================================================================
           MODAL: NUEVA CLASE SUELTA (SESIÓN PUNTUAL, PLAZAS LIBRES, PRECIO SESIÓN)
           ===================================================================== */}
+      {/* =====================================================================
+          MODAL: NUEVA CLASE SUELTA (NIVEL 4 - HOJA / MODAL RESPONSIVE)
+          ===================================================================== */}
       {isNewClassModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-sm animate-in fade-in duration-150">
-          <div className="relative w-full max-w-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl text-slate-900 dark:text-slate-100 space-y-4 max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
-              <div className="flex items-center gap-2">
-                <Clock className="w-5 h-5 text-emerald-500" />
-                <h3 className="text-base font-black text-slate-900 dark:text-white">
+        <div className="fixed inset-0 z-50 flex flex-col justify-end sm:justify-center sm:items-center bg-slate-950/70 dark:bg-black/85 backdrop-blur-md p-0 sm:p-4 lg:p-6 overflow-hidden animate-in fade-in duration-200">
+          <div className="w-full sm:max-w-xl bg-white dark:bg-[#0E2239] border-t sm:border border-slate-200/80 dark:border-[#1A314D] rounded-t-[28px] sm:rounded-3xl shadow-2xl flex flex-col max-h-[92vh] sm:max-h-[88vh] overflow-hidden">
+            {/* Tirador táctil para móvil */}
+            <div className="w-12 h-1 bg-slate-300 dark:bg-slate-700 rounded-full mx-auto my-2 sm:hidden shrink-0" />
+
+            {/* Cabecera Fija */}
+            <div className="px-5 sm:px-6 py-4 border-b border-slate-100 dark:border-[#1A314D] flex items-center justify-between shrink-0">
+              <div>
+                <h3 className="text-base sm:text-lg font-black text-slate-900 dark:text-white tracking-tight">
                   {t('school.modals.newClassTitle', 'Crear Nueva Clase Suelta')}
                 </h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  Sesión técnica puntual, reserva directa y plazas sueltas
+                </p>
               </div>
               <button
                 type="button"
                 onClick={() => setIsNewClassModalOpen(false)}
-                className="p-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white"
+                className="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#132A45] transition cursor-pointer"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4" />
               </button>
             </div>
 
-            <form onSubmit={handleClassSubmit} className="space-y-3.5 text-xs">
-              <div>
-                <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
-                  Temática o Título de la Clase *
-                </label>
-                <input
-                  type="text"
-                  required
-                  placeholder="Ej: Clínica Intensiva de Víbora y Remate por 3"
-                  value={classFormData.name}
-                  onChange={(e) => setClassFormData({ ...classFormData, name: e.target.value })}
-                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
+            <form onSubmit={handleClassSubmit} className="flex-1 overflow-y-auto overscroll-contain flex flex-col">
+              <div className="p-5 sm:p-6 space-y-4 text-xs flex-1">
                 <div>
-                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
-                    Fecha de la Sesión
+                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                    Temática o Título de la Clase *
                   </label>
                   <input
                     type="text"
-                    value={classFormData.date}
-                    onChange={(e) => setClassFormData({ ...classFormData, date: e.target.value })}
-                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                    required
+                    placeholder="Ej: Clínica Intensiva de Víbora y Remate por 3"
+                    value={classFormData.name}
+                    onChange={(e) => setClassFormData({ ...classFormData, name: e.target.value })}
+                    className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-[#B7F229] font-bold"
                   />
                 </div>
 
-                <div>
-                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
-                    Horario de Sesión (minutos)
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                      Fecha de la Sesión
+                    </label>
+                    <input
+                      type="text"
+                      value={classFormData.date}
+                      onChange={(e) => setClassFormData({ ...classFormData, date: e.target.value })}
+                      className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-[#B7F229] font-mono"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                      Horario de Sesión (minutos)
+                    </label>
+                    <input
+                      type="text"
+                      value={classFormData.schedule}
+                      onChange={(e) => setClassFormData({ ...classFormData, schedule: e.target.value })}
+                      className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-[#B7F229]"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                      Profesor Asignado
+                    </label>
+                    <select
+                      value={classFormData.coachName}
+                      onChange={(e) => setClassFormData({ ...classFormData, coachName: e.target.value })}
+                      className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-[#B7F229]"
+                    >
+                      {coachesList.map((c) => (
+                        <option key={c.id} value={c.name}>
+                          {c.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                      Pista Asignada
+                    </label>
+                    <select
+                      value={classFormData.courtName}
+                      onChange={(e) => setClassFormData({ ...classFormData, courtName: e.target.value })}
+                      className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-[#B7F229]"
+                    >
+                      {courts.map((court) => (
+                        <option key={court.id} value={court.name}>
+                          {court.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                {/* Precios de la Sesión Suelta */}
+                <div className="p-3.5 rounded-2xl bg-slate-50/80 dark:bg-[#071220]/70 border border-slate-200/60 dark:border-[#1A314D] grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block font-bold text-slate-600 dark:text-slate-400 mb-1 text-[11px]">
+                      Precio Sesión Socio (€)
+                    </label>
+                    <input
+                      type="number"
+                      step="0.5"
+                      value={classFormData.memberFee}
+                      onChange={(e) => setClassFormData({ ...classFormData, memberFee: Number(e.target.value) })}
+                      className="w-full px-3 py-2 bg-white dark:bg-[#0E2239] border border-slate-200/70 dark:border-[#1A314D] rounded-xl font-mono text-slate-900 dark:text-white focus:outline-none focus:border-[#B7F229] font-bold"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block font-bold text-slate-600 dark:text-slate-400 mb-1 text-[11px]">
+                      Precio Sesión No Socio (€)
+                    </label>
+                    <input
+                      type="number"
+                      step="0.5"
+                      value={classFormData.nonMemberFee}
+                      onChange={(e) => setClassFormData({ ...classFormData, nonMemberFee: Number(e.target.value) })}
+                      className="w-full px-3 py-2 bg-white dark:bg-[#0E2239] border border-slate-200/70 dark:border-[#1A314D] rounded-xl font-mono text-slate-900 dark:text-white focus:outline-none focus:border-[#B7F229]"
+                    />
+                  </div>
+                </div>
+
+                <div className="pt-2">
+                  <label className="flex items-center gap-2.5 cursor-pointer text-slate-700 dark:text-slate-300">
+                    <input
+                      type="checkbox"
+                      checked={classFormData.publishedAsOpen}
+                      onChange={(e) => setClassFormData({ ...classFormData, publishedAsOpen: e.target.checked })}
+                      className="w-4 h-4 rounded text-[#0B1A2D] accent-[#B7F229] focus:ring-[#B7F229]"
+                    />
+                    <span className="font-bold text-xs">Publicar plazas abiertas en la app para jugadores externos</span>
                   </label>
-                  <input
-                    type="text"
-                    value={classFormData.schedule}
-                    onChange={(e) => setClassFormData({ ...classFormData, schedule: e.target.value })}
-                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
-                  />
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
-                    Profesor Asignado
-                  </label>
-                  <select
-                    value={classFormData.coachName}
-                    onChange={(e) => setClassFormData({ ...classFormData, coachName: e.target.value })}
-                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
-                  >
-                    {coachesList.map((c) => (
-                      <option key={c.id} value={c.name}>
-                        {c.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
-                    Pista Asignada
-                  </label>
-                  <select
-                    value={classFormData.courtName}
-                    onChange={(e) => setClassFormData({ ...classFormData, courtName: e.target.value })}
-                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
-                  >
-                    {courts.map((court) => (
-                      <option key={court.id} value={court.name}>
-                        {court.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              {/* Precios de la Sesión Suelta */}
-              <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block font-bold text-emerald-600 dark:text-emerald-400 mb-1 text-[11px]">
-                    Precio Sesión Socio (€)
-                  </label>
-                  <input
-                    type="number"
-                    step="0.5"
-                    value={classFormData.memberFee}
-                    onChange={(e) => setClassFormData({ ...classFormData, memberFee: Number(e.target.value) })}
-                    className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl font-mono text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
-                  />
-                </div>
-
-                <div>
-                  <label className="block font-bold text-slate-600 dark:text-slate-400 mb-1 text-[11px]">
-                    Precio Sesión No Socio (€)
-                  </label>
-                  <input
-                    type="number"
-                    step="0.5"
-                    value={classFormData.nonMemberFee}
-                    onChange={(e) => setClassFormData({ ...classFormData, nonMemberFee: Number(e.target.value) })}
-                    className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl font-mono text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
-                  />
-                </div>
-              </div>
-
-              <div className="pt-2">
-                <label className="flex items-center gap-2 cursor-pointer text-slate-700 dark:text-slate-300">
-                  <input
-                    type="checkbox"
-                    checked={classFormData.publishedAsOpen}
-                    onChange={(e) => setClassFormData({ ...classFormData, publishedAsOpen: e.target.checked })}
-                    className="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500"
-                  />
-                  <span className="font-bold">Publicar plazas abiertas en la app para jugadores externos</span>
-                </label>
-              </div>
-
-              <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex justify-end gap-2">
+              {/* Botonera Inferior Simétrica 50/50 */}
+              <div className="px-5 sm:px-6 py-3.5 border-t border-slate-100 dark:border-[#1A314D] bg-white dark:bg-[#071220] shrink-0 grid grid-cols-2 gap-3">
                 <button
                   type="button"
                   onClick={() => setIsNewClassModalOpen(false)}
-                  className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold transition cursor-pointer"
+                  className="h-12 rounded-xl border border-slate-200 dark:border-[#1A314D] bg-slate-50 dark:bg-[#0E2239] hover:bg-slate-100 dark:hover:bg-[#132A45] text-slate-700 dark:text-slate-200 font-bold text-xs transition cursor-pointer"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold transition shadow-xs cursor-pointer"
+                  className="h-12 rounded-xl bg-[#B7F229] hover:bg-[#a3db20] text-[#0B1A2D] font-black text-xs transition shadow-sm cursor-pointer"
                 >
                   Publicar Clase Suelta
                 </button>

@@ -985,27 +985,27 @@ export const AdminCustomers: React.FC = () => {
 
       {/* VISTA 1: SOCIOS & CRM TRADICIONAL */}
       {crmSubTab === 'members' && (
-        <div className="space-y-6 animate-in fade-in duration-150">
-          {/* Filter and search bar with canonical styling */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-4 rounded-2xl bg-white dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 shadow-sm">
-            <div className="relative w-full sm:w-72">
+        <div className="space-y-4 animate-in fade-in duration-150">
+          {/* Barra de Filtro y Búsqueda Estilo Master */}
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-3 sm:p-3.5 rounded-2xl bg-white dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] shadow-2xs">
+            <div className="relative w-full sm:w-80">
               <Search className="absolute left-3 top-2.5 w-4 h-4 text-slate-400" />
               <input
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Buscar por nombre, email o teléfono..."
-                className="w-full pl-9 pr-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-emerald-500 transition"
+                className="w-full pl-9 pr-3 py-2 bg-slate-50 dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-[#0B1A2D] dark:focus:border-[#B7F229] transition"
               />
             </div>
 
-            <div className="flex items-center gap-1 bg-slate-50 dark:bg-slate-900 p-1 rounded-xl border border-slate-200/80 dark:border-slate-700/80 text-xs font-semibold">
+            <div className="flex items-center gap-1 bg-slate-100 dark:bg-[#0E2239] p-1 rounded-xl border border-slate-200/80 dark:border-[#1A314D] text-xs font-semibold w-full sm:w-auto">
               <button
                 type="button"
                 onClick={() => setFilterType('all')}
-                className={`px-3 py-1.5 rounded-lg transition cursor-pointer ${
+                className={`flex-1 sm:flex-none px-3 py-1.5 rounded-lg transition cursor-pointer text-center ${
                   filterType === 'all'
-                    ? 'bg-emerald-600 text-white shadow-xs'
+                    ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D] shadow-2xs font-bold'
                     : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                 }`}
               >
@@ -1014,9 +1014,9 @@ export const AdminCustomers: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setFilterType('members')}
-                className={`px-3 py-1.5 rounded-lg transition cursor-pointer ${
+                className={`flex-1 sm:flex-none px-3 py-1.5 rounded-lg transition cursor-pointer text-center ${
                   filterType === 'members'
-                    ? 'bg-emerald-600 text-white shadow-xs'
+                    ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D] shadow-2xs font-bold'
                     : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                 }`}
               >
@@ -1025,9 +1025,9 @@ export const AdminCustomers: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setFilterType('non_members')}
-                className={`px-3 py-1.5 rounded-lg transition cursor-pointer ${
+                className={`flex-1 sm:flex-none px-3 py-1.5 rounded-lg transition cursor-pointer text-center ${
                   filterType === 'non_members'
-                    ? 'bg-emerald-600 text-white shadow-xs'
+                    ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D] shadow-2xs font-bold'
                     : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                 }`}
               >
@@ -1036,11 +1036,11 @@ export const AdminCustomers: React.FC = () => {
             </div>
           </div>
 
-          {/* Customers table */}
-          <div className="bg-white dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 rounded-2xl overflow-hidden shadow-sm">
+          {/* Tabla de Socios con Estilo Linear / Stripe */}
+          <div className="bg-white dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-2xl overflow-hidden shadow-2xs">
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs">
-                <thead className="bg-slate-50 dark:bg-slate-900 text-slate-500 dark:text-slate-400 font-semibold border-b border-slate-200 dark:border-slate-700">
+                <thead className="bg-slate-50/80 dark:bg-[#0E2239]/60 text-slate-500 dark:text-slate-400 font-semibold border-b border-slate-200/80 dark:border-[#1A314D]">
                   <tr>
                     <th className="py-3 px-4">Jugador</th>
                     <th className="py-3 px-4">Nivel Oficial</th>
@@ -1050,11 +1050,11 @@ export const AdminCustomers: React.FC = () => {
                     <th className="py-3 px-4 text-right">Acciones</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 dark:divide-slate-700/50">
+                <tbody className="divide-y divide-slate-100 dark:divide-[#1A314D]">
                   {filtered.map((customer) => (
                     <tr
                       key={customer.id}
-                      className="hover:bg-slate-50/80 dark:hover:bg-slate-700/30 transition group"
+                      className="hover:bg-slate-50/60 dark:hover:bg-[#0E2239]/40 transition group"
                     >
                       <td className="py-3 px-4">
                         <div className="flex items-center gap-3">
@@ -1066,7 +1066,7 @@ export const AdminCustomers: React.FC = () => {
                           <div>
                             <div
                               onClick={() => handleSelectCustomer(customer)}
-                              className="font-bold text-slate-900 dark:text-white hover:text-emerald-600 dark:hover:text-emerald-400 cursor-pointer"
+                              className="font-bold text-[#0B1A2D] dark:text-white hover:text-slate-600 dark:hover:text-slate-300 transition cursor-pointer"
                             >
                               {customer.name}
                             </div>
@@ -1077,7 +1077,7 @@ export const AdminCustomers: React.FC = () => {
                         </div>
                       </td>
                       <td className="py-3 px-4">
-                        <span className="px-2 py-0.5 rounded-md text-[11px] font-mono font-bold bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20">
+                        <span className="px-2 py-0.5 rounded-md text-[11px] font-mono font-bold bg-[#F0FCCF] dark:bg-[#B7F229]/20 text-[#0B1A2D] dark:text-[#B7F229] border border-[#B7F229]/40">
                           Nivel {customer.level.toFixed(2)}
                         </span>
                       </td>
@@ -1086,8 +1086,8 @@ export const AdminCustomers: React.FC = () => {
                       </td>
                       <td className="py-3 px-4">
                         {customer.isMember ? (
-                          <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-600 dark:text-emerald-400">
-                            <CheckCircle2 className="w-3.5 h-3.5" />
+                          <span className="inline-flex items-center gap-1 text-[11px] font-bold text-[#0B1A2D] dark:text-slate-200">
+                            <CheckCircle2 className="w-3.5 h-3.5 text-[#0B1A2D] dark:text-[#B7F229]" />
                             <span>Socio #{customer.memberNum}</span>
                           </span>
                         ) : (
@@ -1095,7 +1095,7 @@ export const AdminCustomers: React.FC = () => {
                         )}
                       </td>
                       <td className="py-3 px-4">
-                        <span className="font-mono font-bold text-slate-900 dark:text-white">
+                        <span className="font-mono font-bold text-[#0B1A2D] dark:text-white">
                           {customer.balance.toFixed(2)} €
                         </span>
                       </td>
@@ -1104,14 +1104,14 @@ export const AdminCustomers: React.FC = () => {
                           <button
                             type="button"
                             onClick={() => handleSelectCustomer(customer)}
-                            className="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-700 hover:bg-emerald-500 hover:text-white text-slate-700 dark:text-slate-200 text-xs font-bold transition cursor-pointer"
+                            className="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-[#0E2239] hover:bg-[#0B1A2D] hover:text-white dark:hover:bg-white dark:hover:text-[#0B1A2D] text-slate-700 dark:text-slate-200 text-xs font-bold transition cursor-pointer border border-slate-200/60 dark:border-[#1A314D]"
                           >
                             Ver Ficha
                           </button>
                           <button
                             type="button"
                             onClick={() => handleOpenEditCustomer(customer)}
-                            className="p-1.5 rounded-lg text-slate-500 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-700 transition cursor-pointer"
+                            className="p-1.5 rounded-lg text-slate-500 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#0E2239] transition cursor-pointer"
                             title="Editar socio o cliente"
                           >
                             <Edit3 className="w-3.5 h-3.5" />
@@ -1515,315 +1515,322 @@ export const AdminCustomers: React.FC = () => {
         </div>
       )}
 
-      {/* MODAL NUEVO JUGADOR CON FORMULARIO Y VALIDACIONES (Requerimiento 7) */}
+      {/* MODAL NUEVO JUGADOR - NIVEL 4 (HOJA FLUIDA CON BOTONERA INFERIOR SIMÉTRICA) */}
       {isNewPlayerModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-sm animate-in fade-in duration-150">
-          <div className="relative w-full max-w-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl text-slate-900 dark:text-slate-100 space-y-4 max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+        <div className="fixed inset-0 z-50 flex flex-col justify-end sm:justify-center sm:items-center bg-slate-950/70 dark:bg-black/85 backdrop-blur-md p-0 sm:p-4 lg:p-6 overflow-hidden animate-in fade-in duration-200">
+          <div className="w-full sm:max-w-xl h-full sm:h-auto sm:max-h-[92vh] bg-white dark:bg-[#071220] sm:border border-slate-200/90 dark:border-[#1A314D] sm:rounded-3xl rounded-t-[28px] shadow-2xl flex flex-col overflow-hidden text-slate-900 dark:text-slate-100">
+            {/* Barra táctil indicadora en móvil */}
+            <div className="w-12 h-1 bg-slate-300 dark:bg-slate-700 rounded-full mx-auto my-2 sm:hidden shrink-0" />
+
+            {/* Cabecera Fija */}
+            <div className="px-5 sm:px-6 py-3.5 border-b border-slate-100 dark:border-[#1A314D] flex items-center justify-between shrink-0 bg-white dark:bg-[#071220]">
               <div className="flex items-center gap-2">
-                <UserPlus className="w-5 h-5 text-emerald-500" />
-                <h3 className="text-base font-black text-slate-900 dark:text-white">
+                <UserPlus className="w-5 h-5 text-[#0B1A2D] dark:text-[#B7F229]" />
+                <h3 className="text-base font-black text-[#0B1A2D] dark:text-white">
                   Alta de Nuevo Jugador
                 </h3>
               </div>
               <button
                 type="button"
                 onClick={() => setIsNewPlayerModalOpen(false)}
-                className="p-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white"
+                className="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-[#0B1A2D] dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#0E2239] transition cursor-pointer shrink-0"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleCreatePlayer} className="space-y-4 text-xs">
-              <div>
-                <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
-                  Nombre y Apellidos *
-                </label>
-                <input
-                  type="text"
-                  placeholder="Ej: Marcos Regueiro"
-                  value={newPlayerForm.name}
-                  onChange={(e) => setNewPlayerForm({ ...newPlayerForm, name: e.target.value })}
-                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
-                />
-                {errors.name && <span className="text-rose-500 text-[11px] mt-0.5 block">{errors.name}</span>}
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
+            <form onSubmit={handleCreatePlayer} className="flex flex-col flex-1 overflow-hidden">
+              <div className="p-5 sm:p-6 overflow-y-auto overscroll-contain space-y-4 text-xs flex-1">
                 <div>
                   <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
-                    Email *
-                  </label>
-                  <input
-                    type="email"
-                    placeholder="marcos@email.com"
-                    value={newPlayerForm.email}
-                    onChange={(e) => setNewPlayerForm({ ...newPlayerForm, email: e.target.value })}
-                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
-                  />
-                  {errors.email && <span className="text-rose-500 text-[11px] mt-0.5 block">{errors.email}</span>}
-                </div>
-
-                <div>
-                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
-                    Teléfono *
+                    Nombre y Apellidos *
                   </label>
                   <input
                     type="text"
-                    placeholder="+34 600 11 22 33"
-                    value={newPlayerForm.phone}
-                    onChange={(e) => setNewPlayerForm({ ...newPlayerForm, phone: e.target.value })}
-                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                    placeholder="Ej: Marcos Regueiro"
+                    value={newPlayerForm.name}
+                    onChange={(e) => setNewPlayerForm({ ...newPlayerForm, name: e.target.value })}
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-[#0B1A2D] dark:focus:border-[#B7F229]"
                   />
-                  {errors.phone && <span className="text-rose-500 text-[11px] mt-0.5 block">{errors.phone}</span>}
-                </div>
-              </div>
-
-              <div className="grid grid-cols-3 gap-3">
-                <div>
-                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
-                    Nivel FEP (1.0 - 7.0)
-                  </label>
-                  <input
-                    type="number"
-                    step="0.05"
-                    min="1.0"
-                    max="7.0"
-                    value={newPlayerForm.level}
-                    onChange={(e) => setNewPlayerForm({ ...newPlayerForm, level: parseFloat(e.target.value) || 3.5 })}
-                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl font-mono text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
-                  />
-                  {errors.level && <span className="text-rose-500 text-[11px] mt-0.5 block">{errors.level}</span>}
+                  {errors.name && <span className="text-rose-500 text-[11px] mt-0.5 block">{errors.name}</span>}
                 </div>
 
-                <div>
-                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
-                    Posición
-                  </label>
-                  <select
-                    value={newPlayerForm.position}
-                    onChange={(e) => setNewPlayerForm({ ...newPlayerForm, position: e.target.value as any })}
-                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
-                  >
-                    <option value="Revés">Revés</option>
-                    <option value="Drive">Drive</option>
-                    <option value="Ambas">Ambas</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
-                    Mano
-                  </label>
-                  <select
-                    value={newPlayerForm.hand}
-                    onChange={(e) => setNewPlayerForm({ ...newPlayerForm, hand: e.target.value as any })}
-                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
-                  >
-                    <option value="Diestro">Diestro</option>
-                    <option value="Zurdo">Zurdo</option>
-                  </select>
-                </div>
-              </div>
-
-              {/* Condición de Socio & Cuotas */}
-              <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 space-y-3.5">
-                <label className="flex items-center gap-2 cursor-pointer font-bold text-slate-800 dark:text-slate-200">
-                  <input
-                    type="checkbox"
-                    checked={newPlayerForm.isMember}
-                    onChange={(e) => setNewPlayerForm({ ...newPlayerForm, isMember: e.target.checked })}
-                    className="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500"
-                  />
-                  <span>Es socio del club con cuota de membresía</span>
-                </label>
-
-                {newPlayerForm.isMember && (
-                  <div className="space-y-3 pt-1 border-t border-slate-200 dark:border-slate-800">
-                    <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <label className="block text-[11px] font-semibold text-slate-500 mb-1">
-                          Número de Socio
-                        </label>
-                        <input
-                          type="text"
-                          value={newPlayerForm.memberNum}
-                          onChange={(e) => setNewPlayerForm({ ...newPlayerForm, memberNum: e.target.value })}
-                          className="w-full px-3 py-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-[11px] font-semibold text-slate-500 mb-1">
-                          Saldo Inicial de Monedero (€)
-                        </label>
-                        <input
-                          type="number"
-                          min="0"
-                          step="5"
-                          value={newPlayerForm.initialBalance}
-                          onChange={(e) => setNewPlayerForm({ ...newPlayerForm, initialBalance: parseFloat(e.target.value) || 0 })}
-                          className="w-full px-3 py-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-mono text-slate-900 dark:text-white"
-                        />
-                      </div>
-                    </div>
-
-                    {/* Opción Explícita: Cuota 0€ */}
-                    <div className="p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
-                      <label className="flex items-center gap-2 cursor-pointer text-xs font-bold text-slate-800 dark:text-slate-200">
-                        <input
-                          type="checkbox"
-                          checked={newPlayerForm.isZeroFee}
-                          onChange={(e) => setNewPlayerForm({ ...newPlayerForm, isZeroFee: e.target.checked })}
-                          className="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500"
-                        />
-                        <span>{t('crm.zeroFeeOption', 'Registrar Socio con Cuota 0€ (Cortesía / Convenio / Cantera)')}</span>
-                      </label>
-                    </div>
-
-                    {/* Importe de la Cuota y Cobro en TPV */}
-                    {!newPlayerForm.isZeroFee && (
-                      <div className="space-y-3 p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
-                        <div className="grid grid-cols-2 gap-3">
-                          <div>
-                            <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">
-                              {t('crm.initialFee', 'Cuota Inicial de Alta (€)')}
-                            </label>
-                            <input
-                              type="number"
-                              min="1"
-                              step="5"
-                              value={newPlayerForm.feeAmount}
-                              onChange={(e) => setNewPlayerForm({ ...newPlayerForm, feeAmount: parseFloat(e.target.value) || 0 })}
-                              className="w-full px-3 py-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-mono font-bold text-slate-900 dark:text-white"
-                            />
-                          </div>
-
-                          <div>
-                            <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">
-                              {t('crm.recurringInterval', 'Periodicidad de la Cuota')}
-                            </label>
-                            <select
-                              value={newPlayerForm.recurringInterval}
-                              onChange={(e) => setNewPlayerForm({ ...newPlayerForm, recurringInterval: e.target.value as any })}
-                              className="w-full px-3 py-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white"
-                            >
-                              <option value="monthly">{t('crm.intervalMonthly', 'Mensual')}</option>
-                              <option value="quarterly">{t('crm.intervalQuarterly', 'Trimestral')}</option>
-                              <option value="annual">{t('crm.intervalAnnual', 'Anual')}</option>
-                            </select>
-                          </div>
-                        </div>
-
-                        {/* Cobro inicial en TPV */}
-                        <div className="pt-2 border-t border-slate-100 dark:border-slate-800 space-y-2">
-                          <label className="flex items-center gap-2 cursor-pointer text-xs font-bold text-slate-800 dark:text-slate-200">
-                            <input
-                              type="checkbox"
-                              checked={newPlayerForm.chargeInitialFeeInPOS}
-                              onChange={(e) => setNewPlayerForm({ ...newPlayerForm, chargeInitialFeeInPOS: e.target.checked })}
-                              className="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500"
-                            />
-                            <span>{t('crm.chargeInPOS', 'Cobrar cuota inicial directamente en el TPV')}</span>
-                          </label>
-
-                          {newPlayerForm.chargeInitialFeeInPOS && (
-                            <div className="grid grid-cols-3 gap-1.5 pt-1">
-                              <button
-                                type="button"
-                                onClick={() => setNewPlayerForm({ ...newPlayerForm, initialFeePaymentMethod: 'card' })}
-                                className={`py-1.5 px-2 rounded-lg text-[11px] font-bold border transition ${
-                                  newPlayerForm.initialFeePaymentMethod === 'card'
-                                    ? 'bg-emerald-600 border-emerald-600 text-white shadow-xs'
-                                    : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300'
-                                }`}
-                              >
-                                {t('crm.methodCard', 'Tarjeta / Datáfono')}
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => setNewPlayerForm({ ...newPlayerForm, initialFeePaymentMethod: 'cash' })}
-                                className={`py-1.5 px-2 rounded-lg text-[11px] font-bold border transition ${
-                                  newPlayerForm.initialFeePaymentMethod === 'cash'
-                                    ? 'bg-emerald-600 border-emerald-600 text-white shadow-xs'
-                                    : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300'
-                                }`}
-                              >
-                                {t('crm.methodCash', 'Efectivo (Mostrador)')}
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => setNewPlayerForm({ ...newPlayerForm, initialFeePaymentMethod: 'app' })}
-                                className={`py-1.5 px-2 rounded-lg text-[11px] font-bold border transition ${
-                                  newPlayerForm.initialFeePaymentMethod === 'app'
-                                    ? 'bg-emerald-600 border-emerald-600 text-white shadow-xs'
-                                    : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300'
-                                }`}
-                              >
-                                {t('crm.methodApp', 'Cobro Push / App')}
-                              </button>
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Cobro recurrente periódico */}
-                        <div className="pt-2 border-t border-slate-100 dark:border-slate-800 space-y-2">
-                          <label className="flex items-center gap-2 cursor-pointer text-xs font-bold text-slate-800 dark:text-slate-200">
-                            <input
-                              type="checkbox"
-                              checked={newPlayerForm.recurringBilling}
-                              onChange={(e) => setNewPlayerForm({ ...newPlayerForm, recurringBilling: e.target.checked })}
-                              className="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500"
-                            />
-                            <span>{t('crm.recurringBilling', 'Activar Cobro Recurrente Periódico')}</span>
-                          </label>
-
-                          {newPlayerForm.recurringBilling && (
-                            <div className="grid grid-cols-2 gap-2 pt-1">
-                              <button
-                                type="button"
-                                onClick={() => setNewPlayerForm({ ...newPlayerForm, recurringBillingType: 'stripe' })}
-                                className={`py-1.5 px-2 rounded-lg text-[11px] font-bold border text-left transition ${
-                                  newPlayerForm.recurringBillingType === 'stripe'
-                                    ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-500 text-emerald-700 dark:text-emerald-300'
-                                    : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400'
-                                }`}
-                              >
-                                {t('crm.recurringStripe', 'Suscripción Automática Stripe')}
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => setNewPlayerForm({ ...newPlayerForm, recurringBillingType: 'manual' })}
-                                className={`py-1.5 px-2 rounded-lg text-[11px] font-bold border text-left transition ${
-                                  newPlayerForm.recurringBillingType === 'manual'
-                                    ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-500 text-emerald-700 dark:text-emerald-300'
-                                    : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400'
-                                }`}
-                              >
-                                {t('crm.recurringManual', 'Renovación en Mostrador / Remesa')}
-                              </button>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    )}
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                      Email *
+                    </label>
+                    <input
+                      type="email"
+                      placeholder="marcos@email.com"
+                      value={newPlayerForm.email}
+                      onChange={(e) => setNewPlayerForm({ ...newPlayerForm, email: e.target.value })}
+                      className="w-full px-3 py-2 bg-slate-50 dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-[#0B1A2D] dark:focus:border-[#B7F229]"
+                    />
+                    {errors.email && <span className="text-rose-500 text-[11px] mt-0.5 block">{errors.email}</span>}
                   </div>
-                )}
+
+                  <div>
+                    <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                      Teléfono *
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="+34 600 11 22 33"
+                      value={newPlayerForm.phone}
+                      onChange={(e) => setNewPlayerForm({ ...newPlayerForm, phone: e.target.value })}
+                      className="w-full px-3 py-2 bg-slate-50 dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-[#0B1A2D] dark:focus:border-[#B7F229]"
+                    />
+                    {errors.phone && <span className="text-rose-500 text-[11px] mt-0.5 block">{errors.phone}</span>}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-3 gap-3">
+                  <div>
+                    <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                      Nivel FEP (1.0 - 7.0)
+                    </label>
+                    <input
+                      type="number"
+                      step="0.05"
+                      min="1.0"
+                      max="7.0"
+                      value={newPlayerForm.level}
+                      onChange={(e) => setNewPlayerForm({ ...newPlayerForm, level: parseFloat(e.target.value) || 3.5 })}
+                      className="w-full px-3 py-2 bg-slate-50 dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] rounded-xl font-mono text-xs text-slate-900 dark:text-white focus:outline-none focus:border-[#0B1A2D] dark:focus:border-[#B7F229]"
+                    />
+                    {errors.level && <span className="text-rose-500 text-[11px] mt-0.5 block">{errors.level}</span>}
+                  </div>
+
+                  <div>
+                    <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                      Posición
+                    </label>
+                    <select
+                      value={newPlayerForm.position}
+                      onChange={(e) => setNewPlayerForm({ ...newPlayerForm, position: e.target.value as any })}
+                      className="w-full px-3 py-2 bg-slate-50 dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-[#0B1A2D] dark:focus:border-[#B7F229]"
+                    >
+                      <option value="Revés">Revés</option>
+                      <option value="Drive">Drive</option>
+                      <option value="Ambas">Ambas</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                      Mano de Juego
+                    </label>
+                    <select
+                      value={newPlayerForm.hand}
+                      onChange={(e) => setNewPlayerForm({ ...newPlayerForm, hand: e.target.value as any })}
+                      className="w-full px-3 py-2 bg-slate-50 dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-[#0B1A2D] dark:focus:border-[#B7F229]"
+                    >
+                      <option value="Diestro">Diestro</option>
+                      <option value="Zurdo">Zurdo</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Condición de Socio & Cuotas */}
+                <div className="p-4 rounded-2xl bg-slate-50/70 dark:bg-[#0E2239]/50 border border-slate-200/80 dark:border-[#1A314D] space-y-3.5">
+                  <label className="flex items-center gap-2 cursor-pointer font-bold text-slate-800 dark:text-slate-200">
+                    <input
+                      type="checkbox"
+                      checked={newPlayerForm.isMember}
+                      onChange={(e) => setNewPlayerForm({ ...newPlayerForm, isMember: e.target.checked })}
+                      className="w-4 h-4 rounded text-[#0B1A2D] focus:ring-[#B7F229]"
+                    />
+                    <span>Es socio del club con cuota de membresía</span>
+                  </label>
+
+                  {newPlayerForm.isMember && (
+                    <div className="space-y-3 pt-1 border-t border-slate-200/80 dark:border-[#1A314D]">
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-[11px] font-semibold text-slate-500 mb-1">
+                            Número de Socio
+                          </label>
+                          <input
+                            type="text"
+                            value={newPlayerForm.memberNum}
+                            onChange={(e) => setNewPlayerForm({ ...newPlayerForm, memberNum: e.target.value })}
+                            className="w-full px-3 py-1.5 bg-white dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-xl text-xs text-slate-900 dark:text-white"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[11px] font-semibold text-slate-500 mb-1">
+                            Saldo Inicial de Monedero (€)
+                          </label>
+                          <input
+                            type="number"
+                            min="0"
+                            step="5"
+                            value={newPlayerForm.initialBalance}
+                            onChange={(e) => setNewPlayerForm({ ...newPlayerForm, initialBalance: parseFloat(e.target.value) || 0 })}
+                            className="w-full px-3 py-1.5 bg-white dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-xl text-xs font-mono text-slate-900 dark:text-white"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Opción Explícita: Cuota 0€ */}
+                      <div className="p-2.5 rounded-xl bg-white dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D]">
+                        <label className="flex items-center gap-2 cursor-pointer text-xs font-bold text-slate-800 dark:text-slate-200">
+                          <input
+                            type="checkbox"
+                            checked={newPlayerForm.isZeroFee}
+                            onChange={(e) => setNewPlayerForm({ ...newPlayerForm, isZeroFee: e.target.checked })}
+                            className="w-4 h-4 rounded text-[#0B1A2D] focus:ring-[#B7F229]"
+                          />
+                          <span>{t('crm.zeroFeeOption', 'Registrar Socio con Cuota 0€ (Cortesía / Convenio / Cantera)')}</span>
+                        </label>
+                      </div>
+
+                      {/* Importe de la Cuota y Cobro en TPV */}
+                      {!newPlayerForm.isZeroFee && (
+                        <div className="space-y-3 p-3 rounded-xl bg-white dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D]">
+                          <div className="grid grid-cols-2 gap-3">
+                            <div>
+                              <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">
+                                {t('crm.initialFee', 'Cuota Inicial de Alta (€)')}
+                              </label>
+                              <input
+                                type="number"
+                                min="1"
+                                step="5"
+                                value={newPlayerForm.feeAmount}
+                                onChange={(e) => setNewPlayerForm({ ...newPlayerForm, feeAmount: parseFloat(e.target.value) || 0 })}
+                                className="w-full px-3 py-1.5 bg-slate-50 dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] rounded-xl text-xs font-mono font-bold text-slate-900 dark:text-white"
+                              />
+                            </div>
+
+                            <div>
+                              <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">
+                                {t('crm.recurringInterval', 'Periodicidad de la Cuota')}
+                              </label>
+                              <select
+                                value={newPlayerForm.recurringInterval}
+                                onChange={(e) => setNewPlayerForm({ ...newPlayerForm, recurringInterval: e.target.value as any })}
+                                className="w-full px-3 py-1.5 bg-slate-50 dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] rounded-xl text-xs font-bold text-slate-900 dark:text-white"
+                              >
+                                <option value="monthly">{t('crm.intervalMonthly', 'Mensual')}</option>
+                                <option value="quarterly">{t('crm.intervalQuarterly', 'Trimestral')}</option>
+                                <option value="annual">{t('crm.intervalAnnual', 'Anual')}</option>
+                              </select>
+                            </div>
+                          </div>
+
+                          {/* Cobro inicial en TPV */}
+                          <div className="pt-2 border-t border-slate-100 dark:border-[#1A314D] space-y-2">
+                            <label className="flex items-center gap-2 cursor-pointer text-xs font-bold text-slate-800 dark:text-slate-200">
+                              <input
+                                type="checkbox"
+                                checked={newPlayerForm.chargeInitialFeeInPOS}
+                                onChange={(e) => setNewPlayerForm({ ...newPlayerForm, chargeInitialFeeInPOS: e.target.checked })}
+                                className="w-4 h-4 rounded text-[#0B1A2D] focus:ring-[#B7F229]"
+                              />
+                              <span>{t('crm.chargeInPOS', 'Cobrar cuota inicial directamente en el TPV')}</span>
+                            </label>
+
+                            {newPlayerForm.chargeInitialFeeInPOS && (
+                              <div className="grid grid-cols-3 gap-1.5 pt-1">
+                                <button
+                                  type="button"
+                                  onClick={() => setNewPlayerForm({ ...newPlayerForm, initialFeePaymentMethod: 'card' })}
+                                  className={`py-1.5 px-2 rounded-lg text-[11px] font-bold border transition cursor-pointer ${
+                                    newPlayerForm.initialFeePaymentMethod === 'card'
+                                      ? 'bg-[#0B1A2D] border-[#0B1A2D] text-white shadow-xs'
+                                      : 'bg-slate-50 dark:bg-[#0E2239] border-slate-200/80 dark:border-[#1A314D] text-slate-700 dark:text-slate-300'
+                                  }`}
+                                >
+                                  {t('crm.methodCard', 'Tarjeta / Datáfono')}
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => setNewPlayerForm({ ...newPlayerForm, initialFeePaymentMethod: 'cash' })}
+                                  className={`py-1.5 px-2 rounded-lg text-[11px] font-bold border transition cursor-pointer ${
+                                    newPlayerForm.initialFeePaymentMethod === 'cash'
+                                      ? 'bg-[#0B1A2D] border-[#0B1A2D] text-white shadow-xs'
+                                      : 'bg-slate-50 dark:bg-[#0E2239] border-slate-200/80 dark:border-[#1A314D] text-slate-700 dark:text-slate-300'
+                                  }`}
+                                >
+                                  {t('crm.methodCash', 'Efectivo (Mostrador)')}
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => setNewPlayerForm({ ...newPlayerForm, initialFeePaymentMethod: 'app' })}
+                                  className={`py-1.5 px-2 rounded-lg text-[11px] font-bold border transition cursor-pointer ${
+                                    newPlayerForm.initialFeePaymentMethod === 'app'
+                                      ? 'bg-[#0B1A2D] border-[#0B1A2D] text-white shadow-xs'
+                                      : 'bg-slate-50 dark:bg-[#0E2239] border-slate-200/80 dark:border-[#1A314D] text-slate-700 dark:text-slate-300'
+                                  }`}
+                                >
+                                  {t('crm.methodApp', 'Cobro Push / App')}
+                                </button>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Cobro recurrente periódico */}
+                          <div className="pt-2 border-t border-slate-100 dark:border-[#1A314D] space-y-2">
+                            <label className="flex items-center gap-2 cursor-pointer text-xs font-bold text-slate-800 dark:text-slate-200">
+                              <input
+                                type="checkbox"
+                                checked={newPlayerForm.recurringBilling}
+                                onChange={(e) => setNewPlayerForm({ ...newPlayerForm, recurringBilling: e.target.checked })}
+                                className="w-4 h-4 rounded text-[#0B1A2D] focus:ring-[#B7F229]"
+                              />
+                              <span>{t('crm.recurringBilling', 'Activar Cobro Recurrente Periódico')}</span>
+                            </label>
+
+                            {newPlayerForm.recurringBilling && (
+                              <div className="grid grid-cols-2 gap-2 pt-1">
+                                <button
+                                  type="button"
+                                  onClick={() => setNewPlayerForm({ ...newPlayerForm, recurringBillingType: 'stripe' })}
+                                  className={`py-1.5 px-2 rounded-lg text-[11px] font-bold border text-left transition cursor-pointer ${
+                                    newPlayerForm.recurringBillingType === 'stripe'
+                                      ? 'bg-[#F0FCCF] dark:bg-[#B7F229]/20 border-[#B7F229] text-[#0B1A2D] dark:text-[#B7F229]'
+                                      : 'bg-slate-50 dark:bg-[#0E2239] border-slate-200/80 dark:border-[#1A314D] text-slate-600 dark:text-slate-400'
+                                  }`}
+                                >
+                                  {t('crm.recurringStripe', 'Suscripción Automática Stripe')}
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => setNewPlayerForm({ ...newPlayerForm, recurringBillingType: 'manual' })}
+                                  className={`py-1.5 px-2 rounded-lg text-[11px] font-bold border text-left transition cursor-pointer ${
+                                    newPlayerForm.recurringBillingType === 'manual'
+                                      ? 'bg-[#F0FCCF] dark:bg-[#B7F229]/20 border-[#B7F229] text-[#0B1A2D] dark:text-[#B7F229]'
+                                      : 'bg-slate-50 dark:bg-[#0E2239] border-slate-200/80 dark:border-[#1A314D] text-slate-600 dark:text-slate-400'
+                                  }`}
+                                >
+                                  {t('crm.recurringManual', 'Renovación en Mostrador / Remesa')}
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
 
-              <div className="pt-2 flex justify-end gap-2 border-t border-slate-100 dark:border-slate-800">
+              {/* Botonera Inferior Simétrica a Ancho Completo */}
+              <div className="px-5 sm:px-6 py-3.5 border-t border-slate-100 dark:border-[#1A314D] bg-white dark:bg-[#071220] shrink-0 grid grid-cols-2 gap-3">
                 <button
                   type="button"
                   onClick={() => setIsNewPlayerModalOpen(false)}
-                  className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs"
+                  className="h-12 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-[#0E2239] dark:hover:bg-[#132A45] text-slate-700 dark:text-slate-200 font-bold text-xs transition cursor-pointer"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-sm flex items-center gap-1.5"
+                  className="h-12 rounded-xl bg-[#B7F229] hover:bg-[#a6df17] text-[#0B1A2D] font-black text-xs sm:text-sm shadow-sm flex items-center justify-center gap-2 transition active:scale-98 cursor-pointer"
                 >
-                  <Check className="w-4 h-4" />
+                  <Check className="w-4 h-4 stroke-[2.5]" />
                   <span>Crear Ficha de Jugador</span>
                 </button>
               </div>
