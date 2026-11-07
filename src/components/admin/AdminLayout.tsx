@@ -367,8 +367,8 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
               </button>
             </div>
 
-            {/* Módulos en Drawer Secundario (Estilo Linear / Stripe con espaciado amplio y tipografía cuidada) */}
-            <div className="flex-1 overflow-y-auto overscroll-contain px-4 py-3 space-y-1.5">
+            {/* Módulos en Drawer Secundario (Estilo Linear / Stripe: Filas limpias, sin tarjetas anidadas) */}
+            <div className="flex-1 overflow-y-auto overscroll-contain px-4 py-2 divide-y divide-slate-100 dark:divide-[#1A314D]/40">
               {secondaryItems.map((tab) => {
                 const Icon = tab.icon;
                 const isActive = adminTab === tab.id;
@@ -380,30 +380,34 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
                       setMobileMoreOpen(false);
                       handleSelectTab(tab.id);
                     }}
-                    className={`w-full flex items-center justify-between p-2.5 rounded-2xl transition text-left cursor-pointer group active:scale-[0.99] border ${
+                    className={`w-full flex items-center justify-between py-3 px-2 rounded-xl transition text-left cursor-pointer group active:scale-[0.99] ${
                       isActive
-                        ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D] border-transparent shadow-xs'
-                        : 'bg-slate-50/70 dark:bg-[#0E2239]/60 hover:bg-slate-100 dark:hover:bg-[#132A45] border-slate-200/60 dark:border-[#1A314D]/60 text-slate-800 dark:text-slate-100'
+                        ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D] shadow-xs my-0.5'
+                        : 'hover:bg-slate-50 dark:hover:bg-[#0E2239]/60 text-slate-800 dark:text-slate-100'
                     }`}
                   >
                     <div className="flex items-center gap-3 min-w-0">
                       <div
-                        className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 border transition ${
+                        className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 transition ${
                           isActive
-                            ? 'bg-white/10 dark:bg-[#0B1A2D]/10 border-white/20 dark:border-[#0B1A2D]/20 text-[#B7F229] dark:text-[#0B1A2D]'
-                            : 'bg-white dark:bg-[#071220] border-slate-200/80 dark:border-[#1A314D] text-[#0B1A2D] dark:text-[#B7F229]'
+                            ? 'bg-white/10 dark:bg-[#0B1A2D]/10 text-[#B7F229] dark:text-[#0B1A2D]'
+                            : 'bg-slate-100 dark:bg-[#0E2239] text-[#0B1A2D] dark:text-[#B7F229] group-hover:bg-slate-200/70 dark:group-hover:bg-[#132A45]'
                         }`}
                       >
-                        <Icon className="w-4 h-4 stroke-[2.2]" />
+                        <Icon className="w-4 h-4 stroke-[2]" />
                       </div>
                       <div className="min-w-0">
-                        <span className="text-xs font-bold tracking-tight block truncate">
+                        <span
+                          className={`text-xs font-bold tracking-tight block truncate ${
+                            isActive ? 'text-white dark:text-[#0B1A2D]' : 'text-slate-800 dark:text-slate-100'
+                          }`}
+                        >
                           {tab.label}
                         </span>
                         {tab.desc && (
                           <span
-                            className={`text-[10px] truncate block ${
-                              isActive ? 'text-white/70 dark:text-[#0B1A2D]/70' : 'text-slate-400 dark:text-slate-400'
+                            className={`text-[10px] truncate block leading-tight ${
+                              isActive ? 'text-white/70 dark:text-[#0B1A2D]/70' : 'text-slate-400 dark:text-slate-400 font-normal'
                             }`}
                           >
                             {tab.desc}
@@ -414,17 +418,17 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
                     <div className="flex items-center gap-2 shrink-0">
                       {tab.badge && (
                         <span
-                          className={`text-[9px] uppercase px-2 py-0.5 rounded-lg font-mono font-bold tracking-wide ${
+                          className={`text-[9px] uppercase px-2 py-0.5 rounded-md font-mono font-bold tracking-wide ${
                             isActive
                               ? 'bg-[#B7F229] text-[#0B1A2D]'
-                              : 'bg-slate-200/80 dark:bg-[#1A314D] text-[#8B5CF6] dark:text-[#B7F229]'
+                              : 'bg-[#F0FCCF] dark:bg-[#B7F229]/15 text-[#0B1A2D] dark:text-[#B7F229] border border-[#B7F229]/30'
                           }`}
                         >
                           {tab.badge}
                         </span>
                       )}
                       <ChevronRight
-                        className={`w-4 h-4 transition-transform ${
+                        className={`w-4 h-4 transition-transform group-hover:translate-x-0.5 ${
                           isActive
                             ? 'text-white dark:text-[#0B1A2D]'
                             : 'text-slate-300 dark:text-slate-600 group-hover:text-slate-500 dark:group-hover:text-slate-300'
@@ -441,7 +445,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
               {/* Selectores Simétricos 50/50 en Botones de Segmento */}
               <div className="grid grid-cols-2 gap-2.5">
                 {/* Selector de Tema Segmentado */}
-                <div className="p-1 bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200/80 dark:border-[#1A314D] grid grid-cols-2 gap-1 text-[11px] font-bold shadow-2xs">
+                <div className="h-11 p-1 bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200/80 dark:border-[#1A314D] grid grid-cols-2 gap-1 text-[11px] font-bold shadow-2xs items-center">
                   <button
                     type="button"
                     onClick={() => {
@@ -450,7 +454,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
                       document.documentElement.classList.remove('dark');
                       document.documentElement.classList.add('light');
                     }}
-                    className={`flex items-center justify-center gap-1.5 py-2 px-2 rounded-xl transition cursor-pointer ${
+                    className={`h-full flex items-center justify-center gap-1.5 rounded-xl transition cursor-pointer ${
                       adminTheme === 'dark' || theme === 'dark'
                         ? 'text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'
                         : 'bg-[#0B1A2D] text-white shadow-2xs font-extrabold'
@@ -468,7 +472,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
                       document.documentElement.classList.remove('light');
                       document.documentElement.classList.add('dark');
                     }}
-                    className={`flex items-center justify-center gap-1.5 py-2 px-2 rounded-xl transition cursor-pointer ${
+                    className={`h-full flex items-center justify-center gap-1.5 rounded-xl transition cursor-pointer ${
                       adminTheme === 'dark' || theme === 'dark'
                         ? 'bg-white text-[#0B1A2D] dark:bg-white dark:text-[#0B1A2D] shadow-2xs font-extrabold'
                         : 'text-slate-500 hover:text-slate-900'
@@ -484,7 +488,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
                   <button
                     type="button"
                     onClick={() => setIsLangDropdownOpen(!isLangDropdownOpen)}
-                    className="w-full h-full min-h-[38px] py-2 px-3 rounded-2xl bg-white dark:bg-[#0E2239] hover:bg-slate-50 dark:hover:bg-[#132A45] border border-slate-200/80 dark:border-[#1A314D] text-slate-800 dark:text-white font-bold text-xs flex items-center justify-between transition cursor-pointer shadow-2xs active:scale-[0.99]"
+                    className="w-full h-11 px-3 rounded-2xl bg-white dark:bg-[#0E2239] hover:bg-slate-50 dark:hover:bg-[#132A45] border border-slate-200/80 dark:border-[#1A314D] text-slate-800 dark:text-white font-bold text-xs flex items-center justify-between transition cursor-pointer shadow-2xs active:scale-[0.99]"
                     title="Seleccionar idioma"
                   >
                     <div className="flex items-center gap-2 min-w-0">
@@ -544,21 +548,21 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
                       setIsLangDropdownOpen(false);
                       enterWhiteLabelPlayerPreview();
                     }}
-                    className="w-full py-2.5 px-3 rounded-2xl bg-white dark:bg-[#0E2239] hover:bg-slate-100 dark:hover:bg-[#132A45] text-slate-800 dark:text-white font-bold text-xs border border-slate-200/80 dark:border-[#1A314D] transition flex items-center justify-center gap-2 active:scale-98 cursor-pointer shadow-2xs"
+                    className="w-full h-11 px-3 rounded-2xl bg-white dark:bg-[#0E2239] hover:bg-slate-50 dark:hover:bg-[#132A45] text-slate-800 dark:text-slate-100 font-bold text-xs border border-slate-200/80 dark:border-[#1A314D] transition flex items-center justify-center gap-2 active:scale-[0.98] cursor-pointer shadow-2xs"
                   >
-                    <Eye className="w-3.5 h-3.5 text-[#8B5CF6]" />
+                    <Eye className="w-4 h-4 text-[#8B5CF6] dark:text-[#C4B5FD]" />
                     <span>Vista Jugador</span>
                   </button>
-                ) : (
-                  <div />
-                )}
+                ) : null}
 
                 <button
                   type="button"
                   onClick={logoutOrExitDemo}
-                  className="w-full py-2.5 px-3 rounded-2xl bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-300 font-bold text-xs border border-rose-200/60 dark:border-rose-900/40 transition flex items-center justify-center gap-2 active:scale-98 cursor-pointer hover:bg-rose-100 dark:hover:bg-rose-950/60 shadow-2xs"
+                  className={`w-full h-11 px-3 rounded-2xl bg-rose-50/70 hover:bg-rose-100 dark:bg-rose-950/30 dark:hover:bg-rose-950/50 text-rose-600 dark:text-rose-400 font-bold text-xs border border-rose-200/60 dark:border-rose-900/40 transition flex items-center justify-center gap-2 active:scale-[0.98] cursor-pointer shadow-2xs ${
+                    isReception ? 'col-span-2' : ''
+                  }`}
                 >
-                  <LogOut className="w-3.5 h-3.5 text-rose-500" />
+                  <LogOut className="w-4 h-4 text-rose-500 dark:text-rose-400" />
                   <span>Cerrar Sesión</span>
                 </button>
               </div>
