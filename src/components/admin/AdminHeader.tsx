@@ -127,30 +127,16 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
               </div>
             </div>
           ) : (
-            /* Vista Admin Club / Escuela / Profesor / Atleta: Branding Oficial Setmio Pro con Isotipo Cuadrado PWA */
-            <div className="flex items-center gap-2.5 shrink-0">
+            /* Admin de club / escuela / profesor / atleta: wordmark oficial adaptable al tema */
+            <div className="flex min-w-0 items-center gap-2.5">
               <button
                 type="button"
                 onClick={() => onSelectTab?.('dashboard')}
-                className="flex items-center gap-2 cursor-pointer select-none group text-left p-0 bg-transparent border-0 focus:outline-none"
-                title="Ir al Inicio de Setmio"
+                className="inline-flex min-w-0 max-w-[148px] items-center rounded-md p-0 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B7F229] sm:max-w-[190px]"
+                title="Ir al inicio de Setmio"
+                aria-label="Ir al inicio de Setmio"
               >
-                {/* Logotipo Cuadrado PWA con Isotipo Oficial en Verde Lima #B7F229 */}
-                <div className="w-8 h-8 sm:w-8.5 sm:h-8.5 rounded-xl overflow-hidden bg-[#0B1A2D] border border-[#B7F229]/40 dark:border-[#B7F229]/50 flex items-center justify-center shrink-0 shadow-xs group-hover:scale-102 transition-transform">
-                  <img
-                    src="/icon.svg"
-                    alt="Setmio Pro"
-                    className="w-full h-full object-cover select-none"
-                  />
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <span className="text-[19px] sm:text-[21px] font-extrabold tracking-tight text-[#0B1A2D] dark:text-white uppercase font-sans leading-none select-none">
-                    SETMIO
-                  </span>
-                  <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-[#B7F229] text-[#0B1A2D] tracking-wider leading-none shrink-0 shadow-2xs border border-[#B7F229]">
-                    PRO
-                  </span>
-                </div>
+                <SetmioLogo variant="horizontal" size="md" className="max-w-full" />
               </button>
               <div className="flex items-center gap-2">
                 {isProAthleteAdmin ? (

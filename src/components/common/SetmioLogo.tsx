@@ -133,24 +133,15 @@ export const SetmioWordmark: React.FC<{
       ? 'text-[#64748B]'
       : 'text-slate-500 dark:text-slate-300';
 
-  // Tamaños tipográficos proporcionales
-  const sizeConfig = {
-    xs: { text: 'text-base', sub: 'text-[7px]', tracking: 'tracking-[0.35em]', gap: 'gap-0.5' },
-    sm: { text: 'text-lg', sub: 'text-[8px]', tracking: 'tracking-[0.4em]', gap: 'gap-0.5' },
-    md: { text: 'text-xl sm:text-2xl', sub: 'text-[9px] sm:text-[10px]', tracking: 'tracking-[0.45em]', gap: 'gap-1' },
-    lg: { text: 'text-2xl sm:text-3xl', sub: 'text-[11px] sm:text-xs', tracking: 'tracking-[0.5em]', gap: 'gap-1.5' },
-    xl: { text: 'text-3xl sm:text-4xl', sub: 'text-xs sm:text-sm', tracking: 'tracking-[0.55em]', gap: 'gap-2' },
-  }[size];
-
-  const logoClass = `block h-auto w-auto object-contain ${className}`;
-  const lightLogo = 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/file_0000000043648210ab56eea231335cd7-87tt8C4C7lgK4g6JQGTnSwM8Jo2NeH.png';
-  const darkLogo = 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/file_000000002f4881f4a7c85b58efed2a73-qKpfsSjD3erXD5N0Mu1PpeqbAGBloG.png';
-  const heightClass = { xs: 'h-5', sm: 'h-6', md: 'h-8', lg: 'h-10', xl: 'h-12' }[size];
+  const heightClass = { xs: 'h-5', sm: 'h-6', md: 'h-7 sm:h-8', lg: 'h-10', xl: 'h-12' }[size];
+  const imageClass = `block h-full w-auto max-w-full object-contain ${className}`;
+  const navyLogo = '/branding/setmio-horizontal-navy.png';
+  const whiteLogo = '/branding/setmio-horizontal-white.png';
 
   return (
-    <span className={`inline-flex ${heightClass} ${sizeConfig.gap} select-none`} aria-label="Setmio Pádel">
-      <img src={darkLogo} alt="Setmio Pádel" className={`${logoClass} dark:hidden`} />
-      <img src={lightLogo} alt="" aria-hidden="true" className={`${logoClass} hidden dark:block`} />
+    <span className={`inline-flex max-w-full ${heightClass} select-none`} aria-label="Setmio Pádel">
+      <img src={navyLogo} alt="Setmio Pádel" className={`${imageClass} dark:hidden`} />
+      <img src={whiteLogo} alt="" aria-hidden="true" className={`${imageClass} hidden dark:block`} />
     </span>
   );
 };
