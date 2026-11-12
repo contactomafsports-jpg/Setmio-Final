@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useApp } from '../../context/AppContext';
 import {
   X,
@@ -447,10 +448,16 @@ export const ReservationDrawer: React.FC<ReservationDrawerProps> = ({
     }
   };
 
-  return (
-    <div className="fixed inset-0 z-50 flex flex-col justify-end sm:justify-center sm:items-center bg-slate-950/70 dark:bg-black/85 backdrop-blur-md p-0 sm:p-4 lg:p-6 overflow-hidden animate-in fade-in duration-200">
-      {/* Expediente de Consulta y Auditoría de Nivel 3 (Full-Screen en Móvil / Centrado Ejecutivo en Desktop) */}
-      <div className="w-full sm:max-w-2xl h-full sm:h-auto sm:max-h-[92vh] bg-white dark:bg-[#071220] sm:border border-slate-200/90 dark:border-[#1A314D] sm:rounded-3xl shadow-2xl flex flex-col overflow-hidden text-slate-900 dark:text-slate-100">
+  const drawerContent = (
+    <div
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/70 dark:bg-black/85 backdrop-blur-md p-3 pt-[max(1rem,env(safe-area-inset-top))] pb-[max(1rem,env(safe-area-inset-bottom))] sm:p-4 lg:p-6 overflow-hidden animate-in fade-in duration-200"
+      onClick={onClose}
+    >
+      {/* Expediente de Consulta y Auditoría de Nivel 3 (Centrado seguro con scroll interno) */}
+      <div
+        className="w-full sm:max-w-2xl max-h-[calc(100dvh-2rem)] sm:max-h-[90vh] bg-white dark:bg-[#071220] border border-slate-200/90 dark:border-[#1A314D] rounded-3xl shadow-2xl flex flex-col overflow-hidden text-slate-900 dark:text-slate-100"
+        onClick={(e) => e.stopPropagation()}
+      >
         
         {/* Barra táctil indicadora en móvil */}
         <div className="w-12 h-1 bg-slate-300 dark:bg-slate-700 rounded-full mx-auto my-2 sm:hidden shrink-0" />
@@ -785,7 +792,7 @@ export const ReservationDrawer: React.FC<ReservationDrawerProps> = ({
               <button
                 type="button"
                 onClick={onClose}
-                className="h-12 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-[#0E2239] dark:hover:bg-[#132A45] text-slate-700 dark:text-slate-200 font-bold text-xs cursor-pointer transition shrink-0"
+                className="h-12 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-[#0E2239] dark:hover:bg-[#132A45] border border-slate-200/80 dark:border-[#1A314D] text-slate-700 dark:text-slate-200 font-bold text-xs cursor-pointer transition shrink-0"
               >
                 Cerrar
               </button>
@@ -891,7 +898,7 @@ export const ReservationDrawer: React.FC<ReservationDrawerProps> = ({
               <button
                 type="button"
                 onClick={onClose}
-                className="h-12 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-[#0E2239] dark:hover:bg-[#132A45] text-slate-700 dark:text-slate-200 font-bold text-xs cursor-pointer transition shrink-0"
+                className="h-12 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-[#0E2239] dark:hover:bg-[#132A45] border border-slate-200/80 dark:border-[#1A314D] text-slate-700 dark:text-slate-200 font-bold text-xs cursor-pointer transition shrink-0"
               >
                 Cerrar
               </button>
@@ -1296,6 +1303,8 @@ export const ReservationDrawer: React.FC<ReservationDrawerProps> = ({
       </div>
     </div>
   );
+
+  return typeof document !== 'undefined' ? createPortal(drawerContent, document.body) : drawerContent;
 };
 
 export default ReservationDrawer;

@@ -683,9 +683,9 @@ export const ClubDashboard: React.FC = () => {
             if (typeof window !== 'undefined') window.history.pushState({}, '', '/admin/reservas/todas');
             setAdminTab('all_bookings');
           }}
-          className="w-full py-2.5 px-4 rounded-xl bg-[#0B1A2D] hover:bg-[#132A45] text-white font-bold text-xs flex items-center justify-center gap-2 transition-colors shadow-sm cursor-pointer"
+          className="w-full py-2.5 dark:py-3 px-4 rounded-xl bg-[#0B1A2D] hover:bg-[#132A45] dark:bg-white/[0.06] dark:hover:bg-white/[0.1] border border-transparent dark:border-white/10 text-white font-bold text-xs flex items-center justify-center gap-2 transition-colors shadow-sm cursor-pointer"
         >
-          <Calendar className="w-4 h-4 text-white" />
+          <Calendar className="w-4 h-4 text-white dark:text-[#B7F229] shrink-0" />
           <span>Todas las reservas</span>
         </button>
 
