@@ -904,16 +904,15 @@ export const AdminCustomers: React.FC = () => {
   }
 
   return (
-    <div className="space-y-4 text-slate-900 dark:text-slate-100 max-w-7xl mx-auto pb-12 font-sans antialiased">
-      <div className="flex items-center justify-between gap-3 pt-2 pb-1">
+    <div className="max-w-7xl mx-auto pt-3 pb-24 sm:pb-16 space-y-6 sm:space-y-8 font-sans text-[#0B1A2D] dark:text-slate-100 antialiased">
+      {/* Cabecera Minimalista Ejecutiva */}
+      <div className="flex items-center justify-between gap-3 mt-2 mb-6">
         <div>
-          <span className="text-xs font-medium text-slate-400 dark:text-slate-500 tracking-wide block mb-0.5">
+          <span className="text-sm font-medium text-slate-500 dark:text-slate-400 tracking-wide block mb-1">
             {currentTenant?.name || 'Centro de Pádel San Mateo'}
           </span>
-          <h1 className="text-[22px] font-extrabold text-[#0B1A2D] dark:text-white tracking-tight leading-tight">
-            {crmSubTab === 'members'
-              ? 'Socios & Clientes'
-              : 'Grupos & Convocatorias'}
+          <h1 className="text-[26px] sm:text-3xl font-bold text-[#0B1A2D] dark:text-white tracking-tight leading-tight">
+            {crmSubTab === 'members' ? 'Clientes' : 'Grupo'}
           </h1>
         </div>
 
@@ -925,43 +924,43 @@ export const AdminCustomers: React.FC = () => {
               setErrors({});
               setIsNewPlayerModalOpen(true);
             }}
-            className="p-1.5 text-slate-700 dark:text-slate-300 hover:text-[#0B1A2D] dark:hover:text-[#B7F229] transition-colors cursor-pointer active:scale-95 flex items-center gap-1.5 shrink-0"
-            title="Nuevo Jugador"
-            aria-label="Nuevo Jugador"
+            className="min-h-[44px] px-3 py-2 rounded-xl text-slate-700 dark:text-slate-300 hover:text-[#0B1A2D] dark:hover:text-[#B7F229] hover:bg-slate-100/80 dark:hover:bg-white/[0.06] transition-colors cursor-pointer active:scale-95 flex items-center gap-1.5 shrink-0"
+            title="Nuevo Cliente"
+            aria-label="Nuevo Cliente"
           >
             <Plus className="w-5 h-5 stroke-[2.2]" />
-            <span className="text-xs font-bold sm:inline hidden">Nuevo Jugador</span>
+            <span className="text-xs sm:text-sm font-bold sm:inline hidden whitespace-nowrap">Nuevo Cliente</span>
           </button>
         ) : isProOrEnterprise ? (
           <button
             type="button"
             onClick={handleOpenNewGroupModal}
-            className="p-1.5 text-slate-700 dark:text-slate-300 hover:text-[#0B1A2D] dark:hover:text-[#B7F229] transition-colors cursor-pointer active:scale-95 flex items-center gap-1.5 shrink-0"
+            className="min-h-[44px] px-3 py-2 rounded-xl text-slate-700 dark:text-slate-300 hover:text-[#0B1A2D] dark:hover:text-[#B7F229] hover:bg-slate-100/80 dark:hover:bg-white/[0.06] transition-colors cursor-pointer active:scale-95 flex items-center gap-1.5 shrink-0"
             title="Crear Grupo"
             aria-label="Crear Grupo"
           >
             <Plus className="w-5 h-5 stroke-[2.2]" />
-            <span className="text-xs font-bold sm:inline hidden">Crear Grupo</span>
+            <span className="text-xs sm:text-sm font-bold sm:inline hidden whitespace-nowrap">Crear Grupo</span>
           </button>
         ) : null}
       </div>
 
-      {/* Subtabs de Navegación: CRM Socios vs Grupos WhatsApp */}
-      <div className="flex items-center gap-1.5 p-1 bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] rounded-2xl shadow-2xs w-full sm:w-fit overflow-x-auto">
+      {/* Selector de Pestañas Consistente con el Sistema de Diseño Global */}
+      <div className="p-1 bg-slate-100 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-2xl grid grid-cols-2 gap-1 w-full sm:w-fit sm:inline-grid text-xs sm:text-sm select-none shadow-2xs">
         <button
           type="button"
           onClick={() => {
             setCrmSubTab('members');
             if (typeof window !== 'undefined') window.history.pushState({}, '', '/admin/socios');
           }}
-          className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shrink-0 ${
+          className={`px-4 py-2.5 rounded-xl font-bold transition flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap ${
             crmSubTab === 'members'
               ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D] shadow-xs'
-              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+              : 'text-slate-600 dark:text-slate-400 hover:text-[#0B1A2D] dark:hover:text-white'
           }`}
         >
-          <Users className="w-3.5 h-3.5" />
-          <span>Socios ({customerList.length})</span>
+          <Users className="w-4 h-4 shrink-0" />
+          <span>Clientes ({customerList.length})</span>
         </button>
         <button
           type="button"
@@ -969,165 +968,195 @@ export const AdminCustomers: React.FC = () => {
             setCrmSubTab('groups');
             if (typeof window !== 'undefined') window.history.pushState({}, '', '/admin/socios/grupos');
           }}
-          className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shrink-0 ${
+          className={`px-4 py-2.5 rounded-xl font-bold transition flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap ${
             crmSubTab === 'groups'
               ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D] shadow-xs'
-              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+              : 'text-slate-600 dark:text-slate-400 hover:text-[#0B1A2D] dark:hover:text-white'
           }`}
         >
-          <MessageCircle className="w-3.5 h-3.5" />
-          <span>Grupos & Convocatorias ({playerGroups.length})</span>
-          <span className="text-[9px] font-black uppercase px-1.5 py-0.5 rounded bg-[#8B5CF6]/15 text-[#8B5CF6] dark:text-[#C4B5FD]">
+          <MessageCircle className="w-4 h-4 shrink-0" />
+          <span>Grupo ({playerGroups.length})</span>
+          <span
+            className={`text-[10px] font-bold uppercase px-1.5 py-0.5 rounded-md shrink-0 ${
+              crmSubTab === 'groups'
+                ? 'bg-[#8B5CF6]/20 text-[#C4B5FD] dark:bg-[#8B5CF6]/15 dark:text-[#8B5CF6]'
+                : 'bg-[#8B5CF6]/15 text-[#8B5CF6] dark:text-[#C4B5FD]'
+            }`}
+          >
             Pro
           </span>
         </button>
       </div>
 
-      {/* VISTA 1: SOCIOS & CRM TRADICIONAL */}
+      {/* VISTA 1: DIRECTORIO DE CLIENTES */}
       {crmSubTab === 'members' && (
-        <div className="space-y-4 animate-in fade-in duration-150">
-          {/* Barra de Filtro y Búsqueda Estilo Master */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-3 sm:p-3.5 rounded-2xl bg-white dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] shadow-2xs">
-            <div className="relative w-full sm:w-80">
-              <Search className="absolute left-3 top-2.5 w-4 h-4 text-slate-400" />
-              <input
-                type="text"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Buscar por nombre, email o teléfono..."
-                className="w-full pl-9 pr-3 py-2 bg-slate-50 dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-[#0B1A2D] dark:focus:border-[#B7F229] transition"
-              />
-            </div>
+        <div className="space-y-6 animate-in fade-in duration-150">
+          {/* Cabecera Fija (Sticky) para Búsqueda y Filtros a Ancho Completo */}
+          <div className="sticky top-[52px] sm:top-[56px] z-30 -mx-4 px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8 py-3 bg-slate-50/90 dark:bg-[#0B1A2D]/90 backdrop-blur-md border-b border-slate-200/70 dark:border-white/10 transition-colors">
+            <div className="flex flex-col gap-2.5 w-full">
+              <div className="relative w-full">
+                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+                <input
+                  type="text"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Buscar por nombre, email o teléfono..."
+                  className="w-full min-h-[42px] pl-10 pr-4 py-2 bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] rounded-xl text-xs sm:text-sm text-[#0B1A2D] dark:text-white placeholder-slate-400 focus:outline-none focus:border-[#0B1A2D] dark:focus:border-[#B7F229] transition shadow-2xs"
+                />
+              </div>
 
-            <div className="flex items-center gap-1 bg-slate-100 dark:bg-[#0E2239] p-1 rounded-xl border border-slate-200/80 dark:border-[#1A314D] text-xs font-semibold w-full sm:w-auto">
-              <button
-                type="button"
-                onClick={() => setFilterType('all')}
-                className={`flex-1 sm:flex-none px-3 py-1.5 rounded-lg transition cursor-pointer text-center ${
-                  filterType === 'all'
-                    ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D] shadow-2xs font-bold'
-                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-                }`}
-              >
-                Todos ({customerList.length})
-              </button>
-              <button
-                type="button"
-                onClick={() => setFilterType('members')}
-                className={`flex-1 sm:flex-none px-3 py-1.5 rounded-lg transition cursor-pointer text-center ${
-                  filterType === 'members'
-                    ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D] shadow-2xs font-bold'
-                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-                }`}
-              >
-                Socios ({customerList.filter((c) => c.isMember).length})
-              </button>
-              <button
-                type="button"
-                onClick={() => setFilterType('non_members')}
-                className={`flex-1 sm:flex-none px-3 py-1.5 rounded-lg transition cursor-pointer text-center ${
-                  filterType === 'non_members'
-                    ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D] shadow-2xs font-bold'
-                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-                }`}
-              >
-                No socios ({customerList.filter((c) => !c.isMember).length})
-              </button>
+              <div className="grid grid-cols-3 gap-2 w-full">
+                <button
+                  type="button"
+                  onClick={() => setFilterType('all')}
+                  className={`w-full min-h-[40px] px-2 sm:px-4 py-2 rounded-xl text-xs font-bold transition cursor-pointer text-center whitespace-nowrap truncate ${
+                    filterType === 'all'
+                      ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D] shadow-2xs'
+                      : 'bg-white/80 dark:bg-[#0E2239]/80 border border-slate-200/80 dark:border-[#1A314D] text-slate-600 dark:text-slate-300 hover:text-[#0B1A2D] dark:hover:text-white'
+                  }`}
+                >
+                  Todos ({customerList.length})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setFilterType('members')}
+                  className={`w-full min-h-[40px] px-2 sm:px-4 py-2 rounded-xl text-xs font-bold transition cursor-pointer text-center whitespace-nowrap truncate ${
+                    filterType === 'members'
+                      ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D] shadow-2xs'
+                      : 'bg-white/80 dark:bg-[#0E2239]/80 border border-slate-200/80 dark:border-[#1A314D] text-slate-600 dark:text-slate-300 hover:text-[#0B1A2D] dark:hover:text-white'
+                  }`}
+                >
+                  Socios ({customerList.filter((c) => c.isMember).length})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setFilterType('non_members')}
+                  className={`w-full min-h-[40px] px-2 sm:px-4 py-2 rounded-xl text-xs font-bold transition cursor-pointer text-center whitespace-nowrap truncate ${
+                    filterType === 'non_members'
+                      ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D] shadow-2xs'
+                      : 'bg-white/80 dark:bg-[#0E2239]/80 border border-slate-200/80 dark:border-[#1A314D] text-slate-600 dark:text-slate-300 hover:text-[#0B1A2D] dark:hover:text-white'
+                  }`}
+                >
+                  No socios ({customerList.filter((c) => !c.isMember).length})
+                </button>
+              </div>
             </div>
           </div>
 
-          {/* Tabla de Socios con Estilo Linear / Stripe */}
-          <div className="bg-white dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-2xl overflow-hidden shadow-2xs">
+          {/* Tabla de Clientes con Scroll Horizontal Fluido y Filas Espaciosas */}
+          <div className="mb-8 bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] rounded-2xl overflow-hidden shadow-2xs">
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs">
-                <thead className="bg-slate-50/80 dark:bg-[#0E2239]/60 text-slate-500 dark:text-slate-400 font-semibold border-b border-slate-200/80 dark:border-[#1A314D]">
+              <table className="w-full min-w-[820px] text-left text-xs sm:text-[13px]">
+                <thead className="bg-slate-50/90 dark:bg-[#071220]/70 text-slate-500 dark:text-slate-400 font-semibold border-b border-slate-200/80 dark:border-[#1A314D]">
                   <tr>
-                    <th className="py-3 px-4">Jugador</th>
-                    <th className="py-3 px-4">Nivel Oficial</th>
-                    <th className="py-3 px-4">Posición / Mano</th>
-                    <th className="py-3 px-4">Estado Socio</th>
-                    <th className="py-3 px-4">Saldo Monedero</th>
-                    <th className="py-3 px-4 text-right">Acciones</th>
+                    <th className="py-3.5 px-5 whitespace-nowrap">Jugador</th>
+                    <th className="py-3.5 px-5 whitespace-nowrap">Nivel Oficial</th>
+                    <th className="py-3.5 px-5 whitespace-nowrap">Posición / Mano</th>
+                    <th className="py-3.5 px-5 whitespace-nowrap">Estado Socio</th>
+                    <th className="py-3.5 px-5 whitespace-nowrap text-right">Saldo Monedero</th>
+                    <th className="py-3.5 px-5 whitespace-nowrap text-right">Acciones</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 dark:divide-[#1A314D]">
-                  {filtered.map((customer) => (
-                    <tr
-                      key={customer.id}
-                      className="hover:bg-slate-50/60 dark:hover:bg-[#0E2239]/40 transition group"
-                    >
-                      <td className="py-3 px-4">
-                        <div className="flex items-center gap-3">
-                          <img
-                            src={customer.avatarUrl || 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=200&q=80'}
-                            alt={customer.name}
-                            className="w-9 h-9 rounded-xl object-cover ring-1 ring-slate-200 dark:ring-slate-700"
-                          />
-                          <div>
-                            <div
-                              onClick={() => handleSelectCustomer(customer)}
-                              className="font-bold text-[#0B1A2D] dark:text-white hover:text-slate-600 dark:hover:text-slate-300 transition cursor-pointer"
-                            >
-                              {customer.name}
-                            </div>
-                            <div className="text-[11px] text-slate-400">
-                              {customer.email} · {customer.phone}
-                            </div>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="py-3 px-4">
-                        <span className="px-2 py-0.5 rounded-md text-[11px] font-mono font-bold bg-[#F0FCCF] dark:bg-[#B7F229]/20 text-[#0B1A2D] dark:text-[#B7F229] border border-[#B7F229]/40">
-                          Nivel {customer.level.toFixed(2)}
-                        </span>
-                      </td>
-                      <td className="py-3 px-4 text-slate-600 dark:text-slate-300">
-                        {customer.position || 'Revés'} · {customer.hand || 'Diestro'}
-                      </td>
-                      <td className="py-3 px-4">
-                        {customer.isMember ? (
-                          <span className="inline-flex items-center gap-1 text-[11px] font-bold text-[#0B1A2D] dark:text-slate-200">
-                            <CheckCircle2 className="w-3.5 h-3.5 text-[#0B1A2D] dark:text-[#B7F229]" />
-                            <span>Socio #{customer.memberNum}</span>
-                          </span>
-                        ) : (
-                          <span className="text-[11px] text-slate-400 font-medium">No socio</span>
-                        )}
-                      </td>
-                      <td className="py-3 px-4">
-                        <span className="font-mono font-bold text-[#0B1A2D] dark:text-white">
-                          {customer.balance.toFixed(2)} €
-                        </span>
-                      </td>
-                      <td className="py-3 px-4 text-right">
-                        <div className="flex items-center justify-end gap-1.5">
-                          <button
-                            type="button"
-                            onClick={() => handleSelectCustomer(customer)}
-                            className="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-[#0E2239] hover:bg-[#0B1A2D] hover:text-white dark:hover:bg-white dark:hover:text-[#0B1A2D] text-slate-700 dark:text-slate-200 text-xs font-bold transition cursor-pointer border border-slate-200/60 dark:border-[#1A314D]"
-                          >
-                            Ver Ficha
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => handleOpenEditCustomer(customer)}
-                            className="p-1.5 rounded-lg text-slate-500 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#0E2239] transition cursor-pointer"
-                            title="Editar socio o cliente"
-                          >
-                            <Edit3 className="w-3.5 h-3.5" />
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => setCustomerToDelete(customer)}
-                            className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition cursor-pointer"
-                            title="Eliminar socio o cliente"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
+                <tbody className="divide-y divide-slate-100 dark:divide-white/5">
+                  {filtered.length === 0 ? (
+                    <tr>
+                      <td colSpan={6} className="py-12 px-5 text-center text-slate-500 dark:text-slate-400">
+                        <div className="max-w-sm mx-auto space-y-2">
+                          <Users className="w-7 h-7 mx-auto text-slate-400 dark:text-slate-500" />
+                          <p className="text-sm font-bold text-[#0B1A2D] dark:text-white">
+                            No hay clientes que coincidan
+                          </p>
+                          <p className="text-xs text-slate-500 dark:text-slate-400">
+                            Prueba con otro término de búsqueda o cambia el filtro activo.
+                          </p>
                         </div>
                       </td>
                     </tr>
-                  ))}
+                  ) : (
+                    filtered.map((customer) => (
+                      <tr
+                        key={customer.id}
+                        className="hover:bg-slate-50/70 dark:hover:bg-white/[0.03] transition group"
+                      >
+                        <td className="py-4 px-5">
+                          <div className="flex items-center gap-3.5 min-w-[220px]">
+                            <img
+                              src={customer.avatarUrl || 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=200&q=80'}
+                              alt={customer.name}
+                              referrerPolicy="no-referrer"
+                              className="w-10 h-10 rounded-full object-cover flex-shrink-0 ring-1 ring-slate-200/80 dark:ring-[#1A314D]"
+                            />
+                            <div className="min-w-0">
+                              <button
+                                type="button"
+                                onClick={() => handleSelectCustomer(customer)}
+                                className="font-bold text-sm text-[#0B1A2D] dark:text-white hover:text-[#8B5CF6] dark:hover:text-[#B7F229] transition cursor-pointer text-left truncate block"
+                              >
+                                {customer.name}
+                              </button>
+                              <div className="text-xs text-slate-500 dark:text-slate-400 truncate mt-0.5">
+                                {customer.email} · {customer.phone}
+                              </div>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="py-4 px-5 whitespace-nowrap">
+                          <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-mono tabular-nums font-bold bg-[#F0FCCF] dark:bg-[#B7F229]/20 text-[#0B1A2D] dark:text-[#B7F229] border border-[#B7F229]/40">
+                            Nivel {customer.level.toFixed(2)}
+                          </span>
+                        </td>
+                        <td className="py-4 px-5 text-slate-600 dark:text-slate-300 whitespace-nowrap font-medium">
+                          {customer.position || 'Revés'} · {customer.hand || 'Diestro'}
+                        </td>
+                        <td className="py-4 px-5 whitespace-nowrap">
+                          {customer.isMember ? (
+                            <span className="inline-flex items-center gap-1.5 text-xs font-bold text-[#0B1A2D] dark:text-slate-200">
+                              <CheckCircle2 className="w-4 h-4 text-[#82b805] dark:text-[#B7F229] shrink-0" />
+                              <span>Socio #{customer.memberNum}</span>
+                            </span>
+                          ) : (
+                            <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                              No socio
+                            </span>
+                          )}
+                        </td>
+                        <td className="py-4 px-5 whitespace-nowrap text-right">
+                          <span className="font-mono tabular-nums font-bold text-sm text-[#0B1A2D] dark:text-white">
+                            {customer.balance.toFixed(2)} €
+                          </span>
+                        </td>
+                        <td className="py-4 px-5 text-right whitespace-nowrap">
+                          <div className="flex items-center justify-end gap-2">
+                            <button
+                              type="button"
+                              onClick={() => handleSelectCustomer(customer)}
+                              className="min-h-[40px] px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-[#071220] hover:bg-[#0B1A2D] hover:text-white dark:hover:bg-white dark:hover:text-[#0B1A2D] text-[#0B1A2D] dark:text-slate-200 text-xs font-bold transition cursor-pointer border border-slate-200/80 dark:border-[#1A314D] whitespace-nowrap shrink-0"
+                            >
+                              Ver Ficha
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleOpenEditCustomer(customer)}
+                              className="min-h-[40px] min-w-[40px] p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:text-[#0B1A2D] dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#071220] transition cursor-pointer flex items-center justify-center shrink-0"
+                              title="Editar cliente"
+                              aria-label={`Editar ${customer.name}`}
+                            >
+                              <Edit3 className="w-4 h-4" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setCustomerToDelete(customer)}
+                              className="min-h-[40px] min-w-[40px] p-2 rounded-xl text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition cursor-pointer flex items-center justify-center shrink-0"
+                              title="Eliminar cliente"
+                              aria-label={`Eliminar ${customer.name}`}
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  )}
                 </tbody>
               </table>
             </div>
@@ -1135,18 +1164,18 @@ export const AdminCustomers: React.FC = () => {
         </div>
       )}
 
-      {/* VISTA 2: MÓDULO DE GRUPOS DE JUGADORES Y CONVOCATORIAS (SUSTITUTO DE WHATSAPP) */}
+      {/* VISTA 2: MÓDULO DE GRUPO Y CONVOCATORIAS */}
       {crmSubTab === 'groups' && (
-        <div className="space-y-6 animate-in fade-in duration-150">
+        <div className="space-y-6 mb-8 animate-in fade-in duration-150">
           {!isProOrEnterprise ? (
             /* CONDICIONAMIENTO POR SUSCRIPCIÓN (Planes Pro/Enterprise) */
-            <div className="p-8 sm:p-10 rounded-3xl bg-gradient-to-br from-slate-900 via-slate-950 to-slate-900 text-white border border-emerald-500/30 shadow-2xl relative overflow-hidden">
+            <div className="p-8 sm:p-10 rounded-3xl bg-[#0B1A2D] text-white border border-[#1A314D] shadow-2xl relative overflow-hidden">
               <div className="absolute top-0 right-0 p-8 opacity-10 pointer-events-none">
-                <MessageCircle className="w-64 h-64 text-emerald-400" />
+                <MessageCircle className="w-64 h-64 text-[#B7F229]" />
               </div>
 
               <div className="max-w-2xl space-y-4 relative z-10">
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-xs font-extrabold uppercase tracking-wider">
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#B7F229]/15 text-[#B7F229] border border-[#B7F229]/30 text-xs font-extrabold uppercase tracking-wider">
                   <Crown className="w-3.5 h-3.5" />
                   <span>Exclusivo para Planes Setmio Pro y Enterprise</span>
                 </div>
@@ -1160,29 +1189,29 @@ export const AdminCustomers: React.FC = () => {
                 </p>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 text-xs">
-                  <div className="p-3 rounded-2xl bg-white/5 border border-white/10 flex items-start gap-2.5">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                  <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10 flex items-start gap-2.5">
+                    <CheckCircle2 className="w-4 h-4 text-[#B7F229] shrink-0 mt-0.5" />
                     <div>
                       <strong className="block text-white font-bold">Listas por Nivel Decimal</strong>
                       <span className="text-slate-400 text-[11px]">Segmentación exacta (ej. 3.5 a 4.0) basada en ELO real.</span>
                     </div>
                   </div>
-                  <div className="p-3 rounded-2xl bg-white/5 border border-white/10 flex items-start gap-2.5">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                  <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10 flex items-start gap-2.5">
+                    <CheckCircle2 className="w-4 h-4 text-[#B7F229] shrink-0 mt-0.5" />
                     <div>
                       <strong className="block text-white font-bold">Convocatorias en 1 Clic</strong>
                       <span className="text-slate-400 text-[11px]">Notificación push instantánea a la app del socio y SMS.</span>
                     </div>
                   </div>
-                  <div className="p-3 rounded-2xl bg-white/5 border border-white/10 flex items-start gap-2.5">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                  <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10 flex items-start gap-2.5">
+                    <CheckCircle2 className="w-4 h-4 text-[#B7F229] shrink-0 mt-0.5" />
                     <div>
                       <strong className="block text-white font-bold">Cobro Dividido Garantizado</strong>
                       <span className="text-slate-400 text-[11px]">Enlace directo a la plaza con pago con monedero o tarjeta.</span>
                     </div>
                   </div>
-                  <div className="p-3 rounded-2xl bg-white/5 border border-white/10 flex items-start gap-2.5">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                  <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10 flex items-start gap-2.5">
+                    <CheckCircle2 className="w-4 h-4 text-[#B7F229] shrink-0 mt-0.5" />
                     <div>
                       <strong className="block text-white font-bold">Cumplimiento RGPD Blindado</strong>
                       <span className="text-slate-400 text-[11px]">Sin exposición de teléfonos ni datos personales entre usuarios.</span>
@@ -1195,9 +1224,9 @@ export const AdminCustomers: React.FC = () => {
                     type="button"
                     onClick={() => {
                       setForcePreviewGroups(true);
-                      triggerDemoToast('Modo Demostración Activado', 'Probando módulo de Grupos y Convocatorias.', 'info');
+                      triggerDemoToast('Modo Demostración Activado', 'Probando módulo de Grupo y Convocatorias.', 'info');
                     }}
-                    className="px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs shadow-md transition active:scale-95 cursor-pointer flex items-center gap-1.5"
+                    className="min-h-[44px] px-5 py-2.5 rounded-xl bg-[#B7F229] hover:bg-[#a6df17] text-[#0B1A2D] font-black text-xs shadow-md transition active:scale-95 cursor-pointer flex items-center gap-1.5"
                   >
                     <Sparkles className="w-4 h-4" />
                     <span>Probar Módulo en Modo Demo</span>
@@ -1205,7 +1234,7 @@ export const AdminCustomers: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setAdminTab('subscription')}
-                    className="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs border border-white/20 transition cursor-pointer"
+                    className="min-h-[44px] px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs border border-white/20 transition cursor-pointer"
                   >
                     Ver Planes y Precios
                   </button>
@@ -1213,105 +1242,107 @@ export const AdminCustomers: React.FC = () => {
               </div>
             </div>
           ) : (
-            /* INTERFAZ COMPLETA DE GRUPOS & CONVOCATORIAS PRO */
+            /* INTERFAZ COMPLETA DE GRUPO & CONVOCATORIAS PRO */
             <div className="space-y-6">
-              {/* KPIs de Grupos y Convocatorias */}
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-                <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-1">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+              {/* KPIs de Grupo y Convocatorias */}
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="p-5 rounded-2xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] shadow-2xs space-y-1.5 min-w-0">
+                  <span className="text-xs font-semibold text-slate-600 dark:text-slate-300 block truncate">
                     Grupos / Listas
                   </span>
-                  <div className="text-2xl font-black text-slate-900 dark:text-white font-mono">
+                  <div className="text-2xl sm:text-3xl font-extrabold text-[#0B1A2D] dark:text-white font-mono tabular-nums">
                     {playerGroups.length}
                   </div>
-                  <span className="text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1">
-                    <CheckCircle2 className="w-3.5 h-3.5" />
-                    <span>Segmentación activa</span>
+                  <span className="text-xs text-[#82b805] dark:text-[#B7F229] font-semibold flex items-center gap-1.5">
+                    <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+                    <span className="truncate">Segmentación activa</span>
                   </span>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-1">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                <div className="p-5 rounded-2xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] shadow-2xs space-y-1.5 min-w-0">
+                  <span className="text-xs font-semibold text-slate-600 dark:text-slate-300 block truncate">
                     Socios Clasificados
                   </span>
-                  <div className="text-2xl font-black text-slate-900 dark:text-white font-mono">
+                  <div className="text-2xl sm:text-3xl font-extrabold text-[#0B1A2D] dark:text-white font-mono tabular-nums">
                     {playerGroups.reduce((acc, g) => acc + g.memberCount, 0)}
                   </div>
-                  <span className="text-[11px] text-slate-500 dark:text-slate-400">
+                  <span className="text-xs text-slate-500 dark:text-slate-400 block truncate">
                     Distribuidos en listas
                   </span>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-1">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                    Convocatorias Lanzadas
+                <div className="p-5 rounded-2xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] shadow-2xs space-y-1.5 min-w-0">
+                  <span className="text-xs font-semibold text-slate-600 dark:text-slate-300 block truncate">
+                    Convocatorias
                   </span>
-                  <div className="text-2xl font-black text-slate-900 dark:text-white font-mono">
+                  <div className="text-2xl sm:text-3xl font-extrabold text-[#0B1A2D] dark:text-white font-mono tabular-nums">
                     {groupConvocatorias.length}
                   </div>
-                  <span className="text-[11px] text-indigo-600 dark:text-indigo-400 font-semibold flex items-center gap-1">
-                    <Send className="w-3.5 h-3.5" />
-                    <span>Histórico guardado</span>
+                  <span className="text-xs text-[#8B5CF6] dark:text-[#C4B5FD] font-semibold flex items-center gap-1.5">
+                    <Send className="w-3.5 h-3.5 shrink-0" />
+                    <span className="truncate">Histórico guardado</span>
                   </span>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-1">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                <div className="p-5 rounded-2xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] shadow-2xs space-y-1.5 min-w-0">
+                  <span className="text-xs font-semibold text-slate-600 dark:text-slate-300 block truncate">
                     Tiempo Cierre Plaza
                   </span>
-                  <div className="text-2xl font-black text-emerald-600 dark:text-emerald-400 font-mono">
+                  <div className="text-2xl sm:text-3xl font-extrabold text-[#82b805] dark:text-[#B7F229] font-mono tabular-nums">
                     ~14 min
                   </div>
-                  <span className="text-[11px] text-slate-500 dark:text-slate-400">
+                  <span className="text-xs text-slate-500 dark:text-slate-400 block truncate">
                     88% tasa de cobertura
                   </span>
                 </div>
               </div>
 
-              {/* Filtros y Buscador de Grupos */}
-              <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-4 rounded-2xl bg-white dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 shadow-sm">
-                <div className="relative w-full sm:w-72">
-                  <Search className="absolute left-3 top-2.5 w-4 h-4 text-slate-400" />
-                  <input
-                    type="text"
-                    value={groupSearch}
-                    onChange={(e) => setGroupSearch(e.target.value)}
-                    placeholder="Buscar grupo o lista..."
-                    className="w-full pl-9 pr-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-emerald-500 transition"
-                  />
-                </div>
+              {/* Cabecera Fija (Sticky) para Búsqueda y Filtros de Grupo a Ancho Completo */}
+              <div className="sticky top-[52px] sm:top-[56px] z-30 -mx-4 px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8 py-3 bg-slate-50/90 dark:bg-[#0B1A2D]/90 backdrop-blur-md border-b border-slate-200/70 dark:border-white/10 transition-colors">
+                <div className="flex flex-col gap-2.5 w-full">
+                  <div className="relative w-full">
+                    <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+                    <input
+                      type="text"
+                      value={groupSearch}
+                      onChange={(e) => setGroupSearch(e.target.value)}
+                      placeholder="Buscar grupo o lista..."
+                      className="w-full min-h-[42px] pl-10 pr-4 py-2 bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] rounded-xl text-xs sm:text-sm text-[#0B1A2D] dark:text-white placeholder-slate-400 focus:outline-none focus:border-[#0B1A2D] dark:focus:border-[#B7F229] transition shadow-2xs"
+                    />
+                  </div>
 
-                <div className="flex flex-wrap items-center gap-1 bg-slate-50 dark:bg-slate-900 p-1 rounded-xl border border-slate-200/80 dark:border-slate-700/80 text-xs font-semibold">
-                  {[
-                    { id: 'all', label: `Todos (${playerGroups.length})` },
-                    { id: 'level', label: 'Nivel ELO' },
-                    { id: 'academy', label: 'Escuela' },
-                    { id: 'venue', label: 'Sede' },
-                    { id: 'social', label: 'Social' },
-                  ].map((cat) => (
-                    <button
-                      key={cat.id}
-                      type="button"
-                      onClick={() => setGroupCategoryFilter(cat.id as any)}
-                      className={`px-3 py-1.5 rounded-lg transition ${
-                        groupCategoryFilter === cat.id
-                          ? 'bg-emerald-600 text-white shadow-xs'
-                          : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-                      }`}
-                    >
-                      {cat.label}
-                    </button>
-                  ))}
+                  <div className="flex items-center gap-1.5 w-full">
+                    {[
+                      { id: 'all', label: `Todos (${playerGroups.length})` },
+                      { id: 'level', label: 'Nivel ELO' },
+                      { id: 'academy', label: 'Escuela' },
+                      { id: 'venue', label: 'Sede' },
+                      { id: 'social', label: 'Social' },
+                    ].map((cat) => (
+                      <button
+                        key={cat.id}
+                        type="button"
+                        onClick={() => setGroupCategoryFilter(cat.id as any)}
+                        className={`flex-1 min-h-[40px] px-2 sm:px-3.5 py-2 rounded-xl text-xs font-bold transition cursor-pointer text-center whitespace-nowrap truncate ${
+                          groupCategoryFilter === cat.id
+                            ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D] shadow-2xs'
+                            : 'bg-white/80 dark:bg-[#0E2239]/80 border border-slate-200/80 dark:border-[#1A314D] text-slate-600 dark:text-slate-300 hover:text-[#0B1A2D] dark:hover:text-white'
+                        }`}
+                      >
+                        {cat.label}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
 
               {/* Grid de Grupos de Jugadores */}
               {filteredGroups.length === 0 ? (
-                <div className="p-12 text-center rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-3">
-                  <div className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-400 mx-auto flex items-center justify-center">
+                <div className="p-12 text-center rounded-2xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] space-y-3">
+                  <div className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-[#071220] text-slate-400 mx-auto flex items-center justify-center">
                     <MessageCircle className="w-6 h-6" />
                   </div>
-                  <h3 className="text-base font-bold text-slate-900 dark:text-white">
+                  <h3 className="text-base font-bold text-[#0B1A2D] dark:text-white">
                     No se encontraron grupos de jugadores
                   </h3>
                   <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto">
@@ -1320,31 +1351,31 @@ export const AdminCustomers: React.FC = () => {
                   <button
                     type="button"
                     onClick={handleOpenNewGroupModal}
-                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md transition cursor-pointer"
+                    className="min-h-[44px] inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-[#0B1A2D] hover:bg-[#132A45] dark:bg-[#B7F229] dark:hover:bg-[#a6df17] text-white dark:text-[#0B1A2D] font-bold text-xs shadow-sm transition cursor-pointer"
                   >
                     <Plus className="w-4 h-4" />
                     <span>Crear Primer Grupo</span>
                   </button>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
                   {filteredGroups.map((group) => {
                     return (
                       <div
                         key={group.id}
-                        className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-xs hover:shadow-md transition-all flex flex-col justify-between space-y-4 group"
+                        className="p-5 sm:p-6 rounded-2xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] shadow-2xs hover:shadow-md transition-all flex flex-col justify-between space-y-5 group"
                       >
-                        <div className="space-y-3">
+                        <div className="space-y-4">
                           {/* Encabezado: Categoría y Sustituto WhatsApp */}
                           <div className="flex items-start justify-between gap-2">
                             <span
-                              className={`text-[9px] font-bold px-2 py-0.5 rounded-md uppercase tracking-wider ${
+                              className={`text-[10px] font-bold px-2.5 py-0.5 rounded-md uppercase tracking-wider ${
                                 group.category === 'level'
-                                  ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800'
+                                  ? 'bg-[#F0FCCF] dark:bg-[#B7F229]/20 text-[#0B1A2D] dark:text-[#B7F229] border border-[#B7F229]/40'
                                   : group.category === 'academy'
-                                  ? 'bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800'
+                                  ? 'bg-[#8B5CF6]/10 dark:bg-[#8B5CF6]/20 text-[#8B5CF6] dark:text-[#C4B5FD] border border-[#8B5CF6]/30'
                                   : group.category === 'venue'
-                                  ? 'bg-teal-50 dark:bg-teal-950/60 text-teal-700 dark:text-teal-300 border border-teal-200 dark:border-teal-800'
+                                  ? 'bg-slate-100 dark:bg-[#071220] text-[#0B1A2D] dark:text-slate-200 border border-slate-200 dark:border-[#1A314D]'
                                   : 'bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800'
                               }`}
                             >
@@ -1357,15 +1388,15 @@ export const AdminCustomers: React.FC = () => {
                                 : 'Competición'}
                             </span>
 
-                            <span className="inline-flex items-center gap-1 text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800">
-                              <MessageCircle className="w-2.5 h-2.5 text-emerald-600 dark:text-emerald-400" />
+                            <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-100 dark:bg-[#071220] text-slate-600 dark:text-slate-300 border border-slate-200/80 dark:border-[#1A314D]">
+                              <MessageCircle className="w-3 h-3 text-[#82b805] dark:text-[#B7F229]" />
                               <span>Sustituto WhatsApp</span>
                             </span>
                           </div>
 
                           {/* Nombre y Descripción */}
                           <div>
-                            <h3 className="text-base font-black text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition">
+                            <h3 className="text-base font-bold text-[#0B1A2D] dark:text-white group-hover:text-[#8B5CF6] dark:group-hover:text-[#B7F229] transition">
                               {group.name}
                             </h3>
                             <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-2 leading-relaxed">
@@ -1375,9 +1406,9 @@ export const AdminCustomers: React.FC = () => {
 
                           {/* Nivel ELO si aplica */}
                           {group.minLevel && group.maxLevel && (
-                            <div className="flex items-center justify-between text-xs py-1.5 px-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800/80">
-                              <span className="text-slate-500 dark:text-slate-400 text-[11px]">Rango de Nivel:</span>
-                              <span className="font-mono font-bold text-slate-800 dark:text-slate-200 text-xs">
+                            <div className="flex items-center justify-between text-xs py-2 border-y border-slate-100 dark:border-white/5">
+                              <span className="text-slate-500 dark:text-slate-400">Rango de Nivel:</span>
+                              <span className="font-mono tabular-nums font-bold text-[#0B1A2D] dark:text-white">
                                 {group.minLevel.toFixed(2)} - {group.maxLevel.toFixed(2)}
                               </span>
                             </div>
@@ -1385,9 +1416,9 @@ export const AdminCustomers: React.FC = () => {
 
                           {/* Jugadores y Avatares */}
                           <div>
-                            <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">
+                            <div className="flex items-center justify-between text-xs font-medium text-slate-500 dark:text-slate-400 mb-2">
                               <span>Miembros registrados</span>
-                              <span className="font-mono text-slate-700 dark:text-slate-300">
+                              <span className="font-mono tabular-nums font-bold text-[#0B1A2D] dark:text-slate-200">
                                 {group.memberCount} jugadores
                               </span>
                             </div>
@@ -1396,14 +1427,14 @@ export const AdminCustomers: React.FC = () => {
                               {group.playerNames.slice(0, 5).map((playerName, pIdx) => (
                                 <div
                                   key={pIdx}
-                                  className="w-7 h-7 rounded-full bg-emerald-600 text-white font-black text-[10px] flex items-center justify-center border-2 border-white dark:border-slate-900 shadow-2xs shrink-0"
+                                  className="w-8 h-8 rounded-full bg-[#0B1A2D] dark:bg-[#B7F229] text-white dark:text-[#0B1A2D] font-bold text-[10px] flex items-center justify-center flex-shrink-0 border border-white dark:border-[#0E2239] shadow-2xs"
                                   title={playerName}
                                 >
                                   {playerName.slice(0, 2).toUpperCase()}
                                 </div>
                               ))}
                               {group.playerNames.length > 5 && (
-                                <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 pl-1">
+                                <span className="text-xs font-bold text-slate-500 dark:text-slate-400 pl-1">
                                   +{group.playerNames.length - 5} más
                                 </span>
                               )}
@@ -1411,8 +1442,8 @@ export const AdminCustomers: React.FC = () => {
                           </div>
 
                           {/* Info de última convocatoria */}
-                          <div className="pt-2 border-t border-slate-100 dark:border-slate-800/80 text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
-                            <Send className="w-3 h-3 text-slate-400 shrink-0" />
+                          <div className="pt-2 border-t border-slate-100 dark:border-white/5 text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+                            <Send className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                             <span className="truncate">
                               {group.lastConvocatoriaAt
                                 ? `${group.lastConvocatoriaAt}: ${group.lastConvocatoriaSubject || 'Convocatoria'}`
@@ -1422,14 +1453,14 @@ export const AdminCustomers: React.FC = () => {
                         </div>
 
                         {/* Botones de acción */}
-                        <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2">
+                        <div className="pt-4 border-t border-slate-100 dark:border-white/5 flex items-center justify-between gap-2">
                           <button
                             type="button"
                             onClick={() => {
                               setSelectedGroupForAction(group);
                               setIsGroupMembersModalOpen(true);
                             }}
-                            className="px-2.5 py-1.5 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-bold transition flex items-center gap-1"
+                            className="min-h-[40px] px-3 py-2 rounded-xl border border-slate-200/80 dark:border-[#1A314D] hover:bg-slate-100 dark:hover:bg-[#071220] text-[#0B1A2D] dark:text-slate-200 text-xs font-bold transition flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
                           >
                             <Users className="w-3.5 h-3.5" />
                             <span>Ver ({group.memberCount})</span>
@@ -1439,28 +1470,28 @@ export const AdminCustomers: React.FC = () => {
                             <button
                               type="button"
                               onClick={() => handleOpenEditGroup(group)}
-                              className="p-1.5 rounded-lg text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+                              className="min-h-[40px] min-w-[40px] p-2 rounded-xl text-slate-400 hover:text-[#0B1A2D] dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#071220] transition cursor-pointer flex items-center justify-center shrink-0"
                               title="Editar grupo"
                             >
-                              <Edit3 className="w-3.5 h-3.5" />
+                              <Edit3 className="w-4 h-4" />
                             </button>
 
                             <button
                               type="button"
                               onClick={() => setGroupToDelete(group)}
-                              className="p-1.5 rounded-lg text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition cursor-pointer"
+                              className="min-h-[40px] min-w-[40px] p-2 rounded-xl text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition cursor-pointer flex items-center justify-center shrink-0"
                               title="Eliminar grupo"
                             >
-                              <Trash2 className="w-3.5 h-3.5" />
+                              <Trash2 className="w-4 h-4" />
                             </button>
 
                             <button
                               type="button"
                               onClick={() => handleOpenConvocatoriaModal(group)}
-                              className="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-xs transition flex items-center gap-1.5 active:scale-95 cursor-pointer"
+                              className="min-h-[40px] px-3.5 py-2 rounded-xl bg-[#0B1A2D] hover:bg-[#132A45] dark:bg-[#B7F229] dark:hover:bg-[#a6df17] text-white dark:text-[#0B1A2D] font-bold text-xs shadow-2xs transition flex items-center gap-1.5 active:scale-95 cursor-pointer whitespace-nowrap shrink-0"
                             >
                               <Send className="w-3.5 h-3.5" />
-                              <span>Notificar a Grupo</span>
+                              <span>Notificar</span>
                             </button>
                           </div>
                         </div>
@@ -1472,36 +1503,36 @@ export const AdminCustomers: React.FC = () => {
 
               {/* Historial de Convocatorias Realizadas */}
               {groupConvocatorias.length > 0 && (
-                <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-xs space-y-3">
+                <div className="p-5 sm:p-6 rounded-2xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] shadow-2xs space-y-3">
                   <div className="flex items-center justify-between">
                     <div className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
-                      <Send className="w-3.5 h-3.5 text-emerald-500" />
+                      <Send className="w-3.5 h-3.5 text-[#82b805] dark:text-[#B7F229]" />
                       <span>Historial de Convocatorias Instantáneas Enviadas</span>
                     </div>
-                    <span className="text-[11px] font-mono text-emerald-600 dark:text-emerald-400 font-bold">
+                    <span className="text-xs font-mono tabular-nums text-[#82b805] dark:text-[#B7F229] font-bold">
                       {groupConvocatorias.length} registradas
                     </span>
                   </div>
 
-                  <div className="divide-y divide-slate-100 dark:divide-slate-800 text-xs">
+                  <div className="divide-y divide-slate-100 dark:divide-white/5 text-xs">
                     {groupConvocatorias.map((conv) => (
-                      <div key={conv.id} className="py-2.5 flex items-start justify-between gap-3">
+                      <div key={conv.id} className="py-3 flex items-start justify-between gap-3">
                         <div className="min-w-0">
                           <div className="flex items-center gap-2">
-                            <strong className="font-bold text-slate-900 dark:text-white truncate">
+                            <strong className="font-bold text-[#0B1A2D] dark:text-white truncate">
                               {conv.title}
                             </strong>
-                            <span className="px-1.5 py-0.2 rounded bg-slate-100 dark:bg-slate-800 text-[10px] text-slate-600 dark:text-slate-300 font-bold shrink-0">
+                            <span className="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-[#071220] text-[10px] text-slate-600 dark:text-slate-300 font-bold shrink-0">
                               {conv.groupName} ({conv.recipientsCount} socios)
                             </span>
                           </div>
-                          <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 truncate">
+                          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 truncate">
                             {conv.message}
                           </p>
                         </div>
                         <div className="text-right shrink-0">
-                          <span className="text-[10px] font-mono text-slate-400 block">{conv.sentAt}</span>
-                          <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold">
+                          <span className="text-[11px] font-mono tabular-nums text-slate-400 block">{conv.sentAt}</span>
+                          <span className="text-[11px] text-[#82b805] dark:text-[#B7F229] font-bold">
                             Push + WhatsApp
                           </span>
                         </div>

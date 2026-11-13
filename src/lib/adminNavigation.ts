@@ -135,7 +135,7 @@ export function getAdminNavConfig(
       },
       {
         id: 'customers',
-        label: 'Miembros & Clientes',
+        label: 'Clientes',
         icon: Users,
         desc: 'Búsqueda rápida de socios y cobros de monedero',
         isPrimary: false,
@@ -528,7 +528,7 @@ export function getAdminNavConfig(
       },
       {
         id: 'customers',
-        label: 'Miembros',
+        label: 'Clientes',
         icon: Users,
         desc: 'Directorio de socios, cartera y niveles de juego',
         isPrimary: false,
