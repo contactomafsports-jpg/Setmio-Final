@@ -1685,7 +1685,7 @@ export const deLocale: Record<string, string> = {
   "crm.toastZeroFee": "Registrado con Cuota 0€ (Exenta)",
   "crm.goToMembers": "Ir a Socios & CRM",
   "agenda.eyebrow": "Cuadrante Ocupación",
-  "agenda.title": "Reservas y Disponibilidad",
+  "agenda.title": "Reservas",
   "agenda.subtitle": "Cuadrante interactivo, franjas horarias y ocupación diaria del club.",
   "agenda.clientTypeAnonymous": "Anónimo / Ocasional",
   "agenda.anonymousNotice": "Reserva anónima sin vincular a ficha de socio. Se registra como Cliente Ocasional.",

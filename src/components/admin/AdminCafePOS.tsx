@@ -1124,19 +1124,19 @@ export const AdminCafePOS: React.FC = () => {
   });
 
   return (
-    <div className="max-w-7xl mx-auto pt-2 pb-16 space-y-4 font-sans text-[#0B1A2D] dark:text-slate-100 antialiased">
+    <div className="max-w-7xl mx-auto pt-3 pb-24 sm:pb-16 space-y-7 sm:space-y-8 font-sans text-[#0B1A2D] dark:text-slate-100 antialiased">
       {/* ======================================================================
           1. CABECERA LIMPIA Y SIMÉTRICA (ESTILO INICIO, RESERVAS & PARTIDAS)
           (Oculta cuando se abre una subpágina de Nivel 2 para evitar sangrado inferior)
           ====================================================================== */}
       {!isCatalogManagementOpen && !transactionsModalOpen && (
-        <section className="pt-2 pb-1 space-y-3" data-purpose="header-section">
-        <div className="flex items-center justify-between">
+        <section className="pt-2 pb-1 space-y-5" data-purpose="header-section">
+        <div className="flex items-center justify-between gap-3">
           <div>
-            <span className="text-xs font-medium text-slate-400 dark:text-slate-500 tracking-wide block mb-0.5">
+            <span className="text-sm font-medium text-slate-600 dark:text-slate-300 tracking-wide block mb-1">
               {currentTenant?.name || 'Centro de Pádel San Mateo'}
             </span>
-            <h1 className="text-[22px] font-extrabold text-[#0B1A2D] dark:text-white tracking-tight leading-tight">
+            <h1 className="text-[26px] sm:text-3xl font-bold text-[#0B1A2D] dark:text-white tracking-tight leading-tight">
               TPV / Caja
             </h1>
           </div>
@@ -1144,28 +1144,28 @@ export const AdminCafePOS: React.FC = () => {
 
         {/* Pill de Sede y Estado Operativo Unificado */}
         <div className="relative">
-          <div className="flex items-center justify-between p-2.5 bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200/80 dark:border-[#1A314D] shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
+          <div className="flex items-center justify-between gap-2.5 sm:gap-3 p-3.5 sm:p-5 bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200/80 dark:border-[#1A314D] shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
             {/* Selector de Sede */}
             <div
               onClick={() => setIsVenueSelectorOpen(!isVenueSelectorOpen)}
-              className="flex items-center gap-2 cursor-pointer group select-none min-w-0"
+              className="flex items-center gap-2.5 sm:gap-3 cursor-pointer group select-none min-w-0 flex-1"
               title="Cambiar sede activa o ver red consolidada"
             >
-              <div className="w-8 h-8 rounded-xl bg-slate-50 dark:bg-[#071220] border border-slate-100 dark:border-[#1A314D] flex items-center justify-center text-[#0B1A2D] dark:text-slate-200 shrink-0">
-                <Building2 className="w-4 h-4 text-[#0B1A2D] dark:text-white" />
+              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-slate-50 dark:bg-[#071220] border border-slate-100 dark:border-[#1A314D] flex items-center justify-center text-[#0B1A2D] dark:text-slate-200 shrink-0">
+                <Building2 className="w-4 h-4 sm:w-4.5 sm:h-4.5 text-[#0B1A2D] dark:text-white" />
               </div>
-              <div className="min-w-0">
-                <div className="flex items-center gap-1.5">
-                  <span className="text-xs font-bold text-[#0B1A2D] dark:text-white truncate">
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-1 min-w-0">
+                  <span className="text-[13px] sm:text-base font-bold text-[#0B1A2D] dark:text-white truncate whitespace-nowrap">
                     {isConsolidatedView ? 'Todas las Sedes' : selectedVenue.shortName || selectedVenue.name}
                   </span>
                   <ChevronDown
-                    className={`w-3.5 h-3.5 text-slate-400 group-hover:text-[#0B1A2D] dark:group-hover:text-white transition-transform ${
+                    className={`w-4 h-4 text-slate-500 group-hover:text-[#0B1A2D] dark:text-slate-400 dark:group-hover:text-white transition-transform shrink-0 ${
                       isVenueSelectorOpen ? 'rotate-180 text-[#0B1A2D] dark:text-white' : ''
                     }`}
                   />
                 </div>
-                <span className="text-[10px] font-medium text-slate-400 block truncate">
+                <span className="text-xs sm:text-[13px] font-medium text-slate-600 dark:text-slate-300 block truncate whitespace-nowrap">
                   {venues.length > 1 ? `${venues.length} sedes conectadas` : 'Sede oficial'}
                 </span>
               </div>
@@ -1175,7 +1175,7 @@ export const AdminCafePOS: React.FC = () => {
             <button
               type="button"
               onClick={isConsolidatedView ? () => setIsVenueSelectorOpen((prev) => !prev) : toggleClubOpenState}
-              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#F0FCCF] dark:bg-[#B7F229]/20 border border-[#B7F229]/50 transition-all cursor-pointer hover:scale-102 shrink-0 select-none"
+              className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-full bg-[#F0FCCF] dark:bg-[#B7F229]/20 border border-[#B7F229]/50 transition-all cursor-pointer hover:scale-102 shrink-0 select-none whitespace-nowrap"
               title={
                 isConsolidatedView
                   ? `Red multisede consolidada (${venues.length} sedes operativas)`
@@ -1183,7 +1183,7 @@ export const AdminCafePOS: React.FC = () => {
               }
             >
               <span
-                className={`w-2 h-2 rounded-full ${
+                className={`w-2 h-2 rounded-full shrink-0 ${
                   isConsolidatedView
                     ? 'bg-[#82b805] dark:bg-[#B7F229]'
                     : isClubOpen
@@ -1191,7 +1191,7 @@ export const AdminCafePOS: React.FC = () => {
                     : 'bg-rose-500'
                 }`}
               />
-              <span className="text-[11px] font-bold text-[#0B1A2D] dark:text-[#B7F229]">
+              <span className="text-xs sm:text-[13px] font-bold text-[#0B1A2D] dark:text-[#B7F229] whitespace-nowrap">
                 {isConsolidatedView
                   ? `${venues.length} Sedes Activas`
                   : isClubOpen
@@ -1204,7 +1204,7 @@ export const AdminCafePOS: React.FC = () => {
           {/* Menú Desplegable de Sedes */}
           {isVenueSelectorOpen && (
             <div className="absolute top-full left-0 right-0 mt-2 z-30 p-2 bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200 dark:border-[#1A314D] shadow-xl space-y-1 animate-in fade-in slide-in-from-top-2 duration-150">
-              <div className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 px-2 py-1">
+              <div className="text-xs font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400 px-2.5 py-1.5">
                 Red Deportiva · Seleccionar Sede
               </div>
 
@@ -1216,17 +1216,17 @@ export const AdminCafePOS: React.FC = () => {
                     setPosVenueFilter('all');
                     setIsVenueSelectorOpen(false);
                   }}
-                  className={`w-full flex items-center justify-between p-2 rounded-xl text-xs font-bold transition text-left cursor-pointer ${
+                  className={`w-full flex items-center justify-between p-2.5 rounded-xl text-sm font-bold transition text-left cursor-pointer ${
                     isConsolidatedView
                       ? 'bg-[#B7F229]/20 text-[#0B1A2D] dark:text-white'
                       : 'hover:bg-slate-50 dark:hover:bg-[#132A45] text-slate-700 dark:text-slate-300'
                   }`}
                 >
                   <span className="flex items-center gap-2">
-                    <Layers className="w-3.5 h-3.5 text-[#8B5CF6]" />
+                    <Layers className="w-4 h-4 text-[#8B5CF6]" />
                     <span>Todas las Sedes</span>
                   </span>
-                  {isConsolidatedView && <CheckCircle2 className="w-3.5 h-3.5 text-[#82b805]" />}
+                  {isConsolidatedView && <CheckCircle2 className="w-4 h-4 text-[#82b805]" />}
                 </button>
               )}
 
@@ -1243,17 +1243,17 @@ export const AdminCafePOS: React.FC = () => {
                         setPosVenueFilter(venue.id);
                         setIsVenueSelectorOpen(false);
                       }}
-                      className={`w-full flex items-center justify-between p-2 rounded-xl text-xs font-bold transition text-left cursor-pointer ${
+                      className={`w-full flex items-center justify-between p-2.5 rounded-xl text-sm font-bold transition text-left cursor-pointer ${
                         isSelected
                           ? 'bg-[#B7F229]/20 text-[#0B1A2D] dark:text-white'
                           : 'hover:bg-slate-50 dark:hover:bg-[#132A45] text-slate-700 dark:text-slate-300'
                       }`}
                     >
                       <span className="flex items-center gap-2 truncate">
-                        <Building2 className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                        <Building2 className="w-4 h-4 text-slate-400 shrink-0" />
                         <span className="truncate">{venue.name}</span>
                       </span>
-                      {isSelected && <CheckCircle2 className="w-3.5 h-3.5 text-[#82b805] shrink-0" />}
+                      {isSelected && <CheckCircle2 className="w-4 h-4 text-[#82b805] shrink-0" />}
                     </button>
                   );
                 })}
@@ -1262,68 +1262,68 @@ export const AdminCafePOS: React.FC = () => {
         </div>
 
         {/* Componente Superior de Resumen (Total Turno, Cobros, Ticket Medio, Estado) */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-          <div className="p-3 bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200/80 dark:border-[#1A314D] shadow-2xs flex flex-col justify-between">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Total Turno</span>
-            <div className="my-0.5">
-              <span className="text-xl sm:text-2xl font-extrabold font-mono text-[#0B1A2D] dark:text-white tracking-tight">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5 sm:gap-4 pt-1">
+          <div className="p-4 sm:p-6 bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200/80 dark:border-[#1A314D] shadow-2xs flex flex-col justify-between space-y-1.5 min-w-0">
+            <span className="text-xs sm:text-[13px] font-semibold text-slate-600 dark:text-slate-300 truncate whitespace-nowrap">Total Turno</span>
+            <div>
+              <span className="text-2xl sm:text-3xl font-extrabold font-mono text-[#0B1A2D] dark:text-white tracking-tight whitespace-nowrap">
                 {sessionSalesTotal.toFixed(2)} €
               </span>
             </div>
-            <span className="text-[10px] text-slate-400 font-medium">Facturación acumulada</span>
+            <span className="text-xs sm:text-[13px] text-slate-600 dark:text-slate-300 font-medium truncate whitespace-nowrap">Facturación acumulada</span>
           </div>
 
-          <div className="p-3 bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200/80 dark:border-[#1A314D] shadow-2xs flex flex-col justify-between">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Cobros Registrados</span>
-            <div className="my-0.5 flex items-baseline gap-1">
-              <span className="text-xl sm:text-2xl font-extrabold font-mono text-[#0B1A2D] dark:text-white tracking-tight">
+          <div className="p-4 sm:p-6 bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200/80 dark:border-[#1A314D] shadow-2xs flex flex-col justify-between space-y-1.5 min-w-0">
+            <span className="text-xs sm:text-[13px] font-semibold text-slate-600 dark:text-slate-300 truncate whitespace-nowrap">Cobros Registrados</span>
+            <div className="flex items-baseline gap-1.5 whitespace-nowrap">
+              <span className="text-2xl sm:text-3xl font-extrabold font-mono text-[#0B1A2D] dark:text-white tracking-tight">
                 {activeShiftTransactions.filter((tx) => tx.date === 'Hoy' || !tx.date).length}
               </span>
-              <span className="text-xs text-slate-400 font-medium">tickets</span>
+              <span className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 font-medium">tickets</span>
             </div>
-            <span className="text-[10px] text-slate-400 font-medium">En sesión de caja</span>
+            <span className="text-xs sm:text-[13px] text-slate-600 dark:text-slate-300 font-medium truncate whitespace-nowrap">En sesión de caja</span>
           </div>
 
-          <div className="p-3 bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200/80 dark:border-[#1A314D] shadow-2xs flex flex-col justify-between">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Ticket Medio</span>
-            <div className="my-0.5">
-              <span className="text-xl sm:text-2xl font-extrabold font-mono text-[#0B1A2D] dark:text-white tracking-tight">
+          <div className="p-4 sm:p-6 bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200/80 dark:border-[#1A314D] shadow-2xs flex flex-col justify-between space-y-1.5 min-w-0">
+            <span className="text-xs sm:text-[13px] font-semibold text-slate-600 dark:text-slate-300 truncate whitespace-nowrap">Ticket Medio</span>
+            <div>
+              <span className="text-2xl sm:text-3xl font-extrabold font-mono text-[#0B1A2D] dark:text-white tracking-tight whitespace-nowrap">
                 {activeShiftTransactions.filter((tx) => tx.date === 'Hoy' || !tx.date).length > 0
                   ? (sessionSalesTotal / activeShiftTransactions.filter((tx) => tx.date === 'Hoy' || !tx.date).length).toFixed(2)
                   : '0.00'}{' '}
                 €
               </span>
             </div>
-            <span className="text-[10px] text-slate-400 font-medium">Promedio por venta</span>
+            <span className="text-xs sm:text-[13px] text-slate-600 dark:text-slate-300 font-medium truncate whitespace-nowrap">Promedio por venta</span>
           </div>
 
-          <div className="p-3 bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200/80 dark:border-[#1A314D] shadow-2xs flex flex-col justify-between">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Estado Mostrador</span>
-            <div className="my-0.5 flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-[#82b805] animate-pulse"></span>
-              <span className="text-sm font-bold text-[#0B1A2D] dark:text-white truncate">
+          <div className="p-4 sm:p-6 bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200/80 dark:border-[#1A314D] shadow-2xs flex flex-col justify-between space-y-1.5 min-w-0">
+            <span className="text-xs sm:text-[13px] font-semibold text-slate-600 dark:text-slate-300 truncate whitespace-nowrap">Estado Mostrador</span>
+            <div className="flex items-center gap-1.5 min-w-0">
+              <span className="w-2.5 h-2.5 rounded-full bg-[#82b805] animate-pulse shrink-0"></span>
+              <span className="text-sm sm:text-base font-bold text-[#0B1A2D] dark:text-white truncate whitespace-nowrap">
                 Caja Operativa
               </span>
             </div>
-            <span className="text-[10px] text-slate-400 font-medium truncate">
+            <span className="text-xs sm:text-[13px] text-slate-600 dark:text-slate-300 font-medium truncate whitespace-nowrap">
               {isConsolidatedView ? 'Todas las Sedes' : selectedVenue.shortName || selectedVenue.name}
             </span>
           </div>
         </div>
 
         {/* Retícula Simétrica 2x2 de Acciones Principales */}
-        <div className="grid grid-cols-2 gap-2.5 w-full pt-1">
+        <div className="grid grid-cols-2 gap-3 w-full pt-1">
           {/* 1. Asignar Reserva */}
           <button
             type="button"
             onClick={() => setAssignModalOpen(true)}
-            className="w-full h-12 px-3.5 rounded-xl bg-white dark:bg-[#0E2239] hover:bg-slate-50 dark:hover:bg-[#132A45] border border-slate-200/80 dark:border-[#1A314D] shadow-2xs flex items-center justify-start text-left gap-2.5 sm:gap-3 transition active:scale-95 cursor-pointer group"
+            className="w-full h-14 px-3 sm:px-4 rounded-xl bg-white dark:bg-[#0E2239] hover:bg-slate-50 dark:hover:bg-[#132A45] border border-slate-200/80 dark:border-[#1A314D] shadow-2xs flex items-center justify-start text-left gap-2 sm:gap-3 transition active:scale-95 cursor-pointer group min-w-0"
             title="Asignar o vincular una reserva de pista"
           >
-            <div className="w-7 h-7 rounded-lg bg-slate-100 dark:bg-[#152e4d] flex items-center justify-center shrink-0 text-slate-600 dark:text-slate-300 group-hover:text-[#0B1A2D] dark:group-hover:text-[#B7F229] transition-colors">
+            <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-[#152e4d] flex items-center justify-center shrink-0 text-slate-600 dark:text-slate-300 group-hover:text-[#0B1A2D] dark:group-hover:text-[#B7F229] transition-colors">
               <Calendar className="w-4 h-4 stroke-[2.2]" />
             </div>
-            <span className="text-xs font-bold text-[#0B1A2D] dark:text-white truncate">
+            <span className="text-[13px] sm:text-sm font-bold text-[#0B1A2D] dark:text-white truncate whitespace-nowrap">
               Asignar Reserva
             </span>
           </button>
@@ -1332,16 +1332,16 @@ export const AdminCafePOS: React.FC = () => {
           <button
             type="button"
             onClick={() => setTransactionsModalOpen(true)}
-            className="w-full h-12 px-3.5 rounded-xl bg-white dark:bg-[#0E2239] hover:bg-slate-50 dark:hover:bg-[#132A45] border border-slate-200/80 dark:border-[#1A314D] shadow-2xs flex items-center justify-start text-left gap-2.5 sm:gap-3 transition active:scale-95 cursor-pointer group"
+            className="w-full h-14 px-3 sm:px-4 rounded-xl bg-white dark:bg-[#0E2239] hover:bg-slate-50 dark:hover:bg-[#132A45] border border-slate-200/80 dark:border-[#1A314D] shadow-2xs flex items-center justify-start text-left gap-2 sm:gap-3 transition active:scale-95 cursor-pointer group min-w-0"
             title="Ver pagos consolidados de todos los turnos y recepcionistas"
           >
-            <div className="w-7 h-7 rounded-lg bg-slate-100 dark:bg-[#152e4d] flex items-center justify-center shrink-0 text-slate-600 dark:text-slate-300 group-hover:text-[#0B1A2D] dark:group-hover:text-[#B7F229] transition-colors">
+            <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-[#152e4d] flex items-center justify-center shrink-0 text-slate-600 dark:text-slate-300 group-hover:text-[#0B1A2D] dark:group-hover:text-[#B7F229] transition-colors">
               <Receipt className="w-4 h-4 stroke-[2.2]" />
             </div>
-            <span className="text-xs font-bold text-[#0B1A2D] dark:text-white truncate">
+            <span className="text-[13px] sm:text-sm font-bold text-[#0B1A2D] dark:text-white truncate whitespace-nowrap">
               Pagos
             </span>
-            <span className="ml-auto font-mono text-[10px] px-1.5 py-0.5 rounded-md bg-slate-100 dark:bg-[#152e4d] text-slate-600 dark:text-slate-300 font-bold shrink-0">
+            <span className="ml-auto font-mono text-xs px-2 py-0.5 rounded-md bg-slate-100 dark:bg-[#152e4d] text-slate-600 dark:text-slate-300 font-bold shrink-0 whitespace-nowrap">
               {filteredGlobalPayments.length}
             </span>
           </button>
@@ -1350,13 +1350,13 @@ export const AdminCafePOS: React.FC = () => {
           <button
             type="button"
             onClick={() => setIsCatalogManagementOpen(true)}
-            className="w-full h-12 px-3.5 rounded-xl bg-white dark:bg-[#0E2239] hover:bg-slate-50 dark:hover:bg-[#132A45] border border-slate-200/80 dark:border-[#1A314D] shadow-2xs flex items-center justify-start text-left gap-2.5 sm:gap-3 transition active:scale-95 cursor-pointer group"
+            className="w-full h-14 px-3 sm:px-4 rounded-xl bg-white dark:bg-[#0E2239] hover:bg-slate-50 dark:hover:bg-[#132A45] border border-slate-200/80 dark:border-[#1A314D] shadow-2xs flex items-center justify-start text-left gap-2 sm:gap-3 transition active:scale-95 cursor-pointer group min-w-0"
             title="Gestión de catálogo, existencias y productos destacados en mostrador"
           >
-            <div className="w-7 h-7 rounded-lg bg-slate-100 dark:bg-[#152e4d] flex items-center justify-center shrink-0 text-slate-600 dark:text-slate-300 group-hover:text-[#0B1A2D] dark:group-hover:text-[#B7F229] transition-colors">
+            <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-[#152e4d] flex items-center justify-center shrink-0 text-slate-600 dark:text-slate-300 group-hover:text-[#0B1A2D] dark:group-hover:text-[#B7F229] transition-colors">
               <ShoppingBag className="w-4 h-4 stroke-[2.2]" />
             </div>
-            <span className="text-xs font-bold text-[#0B1A2D] dark:text-white truncate">
+            <span className="text-[13px] sm:text-sm font-bold text-[#0B1A2D] dark:text-white truncate whitespace-nowrap">
               Productos
             </span>
           </button>
@@ -1365,13 +1365,13 @@ export const AdminCafePOS: React.FC = () => {
           <button
             type="button"
             onClick={() => setArqueoModalOpen(true)}
-            className="w-full h-12 px-3.5 rounded-xl bg-white dark:bg-[#0E2239] hover:bg-slate-50 dark:hover:bg-[#132A45] border border-slate-200/80 dark:border-[#1A314D] shadow-2xs flex items-center justify-start text-left gap-2.5 sm:gap-3 transition active:scale-95 cursor-pointer group"
+            className="w-full h-14 px-3 sm:px-4 rounded-xl bg-white dark:bg-[#0E2239] hover:bg-slate-50 dark:hover:bg-[#132A45] border border-slate-200/80 dark:border-[#1A314D] shadow-2xs flex items-center justify-start text-left gap-2 sm:gap-3 transition active:scale-95 cursor-pointer group min-w-0"
             title="Arqueo y cierre de turno"
           >
-            <div className="w-7 h-7 rounded-lg bg-slate-100 dark:bg-[#152e4d] flex items-center justify-center shrink-0 text-slate-600 dark:text-slate-300 group-hover:text-[#0B1A2D] dark:group-hover:text-[#B7F229] transition-colors">
+            <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-[#152e4d] flex items-center justify-center shrink-0 text-slate-600 dark:text-slate-300 group-hover:text-[#0B1A2D] dark:group-hover:text-[#B7F229] transition-colors">
               <Calculator className="w-4 h-4 stroke-[2.2]" />
             </div>
-            <span className="text-xs font-bold text-[#0B1A2D] dark:text-white truncate">
+            <span className="text-[13px] sm:text-sm font-bold text-[#0B1A2D] dark:text-white truncate whitespace-nowrap">
               Arqueo de Caja
             </span>
           </button>
@@ -1638,21 +1638,21 @@ export const AdminCafePOS: React.FC = () => {
 
       {/* 2. POS Interface: Product Catalog + Fast Ticket Register */}
       {!isCatalogManagementOpen && !transactionsModalOpen && (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* Products Grid */}
-        <div className="lg:col-span-7 space-y-3.5">
+        <div className="lg:col-span-7 space-y-4">
           {/* Categories bar con botón minimalista para gestionar categorías */}
           <div className="flex items-center justify-between gap-2 pb-1">
-            <div className="flex items-center gap-1.5 overflow-x-auto hide-scrollbar">
+            <div className="flex items-center gap-2 overflow-x-auto hide-scrollbar">
               {categories.map((c) => (
                 <button
                   key={c}
                   type="button"
                   onClick={() => setActiveCategory(c)}
-                  className={`px-3 py-1.5 rounded-xl text-xs transition cursor-pointer shrink-0 font-bold ${
+                  className={`px-3.5 py-2 rounded-xl text-sm transition cursor-pointer shrink-0 font-bold ${
                     activeCategory === c
                       ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D] shadow-xs'
-                      : 'bg-white dark:bg-slate-800/90 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white border border-slate-200/80 dark:border-slate-700/80'
+                      : 'bg-white dark:bg-slate-800/90 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white border border-slate-200/80 dark:border-slate-700/80'
                   }`}
                 >
                   {c === 'all' ? 'Todos los Artículos' : c}
@@ -1664,17 +1664,17 @@ export const AdminCafePOS: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setIsCategoryModalOpen(true)}
-                className="px-2.5 py-1.5 rounded-xl bg-white dark:bg-slate-800/90 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 hover:text-[#0B1A2D] dark:hover:text-white border border-slate-200/80 dark:border-slate-700/80 shadow-2xs flex items-center gap-1.5 text-xs font-bold transition cursor-pointer shrink-0"
+                className="px-3 py-2 rounded-xl bg-white dark:bg-slate-800/90 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 hover:text-[#0B1A2D] dark:hover:text-white border border-slate-200/80 dark:border-slate-700/80 shadow-2xs flex items-center gap-1.5 text-sm font-bold transition cursor-pointer shrink-0"
                 title="Gestionar categorías de artículos"
               >
-                <Sliders className="w-3.5 h-3.5 text-[#8B5CF6]" />
+                <Sliders className="w-4 h-4 text-[#8B5CF6]" />
                 <span className="hidden sm:inline">Categorías</span>
               </button>
             </div>
           </div>
 
           {/* Touch item cards con Imagen de Vista Previa Arriba y Badge de Categoría Superpuesto */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3.5 sm:gap-4">
             {filteredProducts.map((prod) => (
               <div
                 key={prod.id}
@@ -1687,7 +1687,7 @@ export const AdminCafePOS: React.FC = () => {
                     addItemToPOS(prod);
                   }
                 }}
-                className="p-2.5 rounded-2xl bg-white dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 hover:border-[#8B5CF6]/50 text-left transition flex flex-col group shadow-xs hover:shadow-md hover:scale-[1.01] active:scale-[0.98] cursor-pointer overflow-hidden select-none"
+                className="p-3.5 sm:p-4 rounded-2xl bg-white dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 hover:border-[#8B5CF6]/50 text-left transition flex flex-col group shadow-xs hover:shadow-md hover:scale-[1.01] active:scale-[0.98] cursor-pointer overflow-hidden select-none"
               >
                 {/* 1. Imagen Superior con Badges Superpuestos */}
                 <div className="relative w-full h-28 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-700/50 shrink-0">
@@ -1709,35 +1709,35 @@ export const AdminCafePOS: React.FC = () => {
                       e.stopPropagation();
                       setSelectedProductDetail(prod);
                     }}
-                    className="absolute bottom-1.5 right-1.5 p-1 rounded-lg bg-[#0B1A2D]/80 hover:bg-[#0B1A2D] text-white transition z-10"
+                    className="absolute bottom-1.5 right-1.5 p-1.5 rounded-lg bg-[#0B1A2D]/80 hover:bg-[#0B1A2D] text-white transition z-10"
                     title="Ver detalle del producto"
                   >
-                    <Info className="w-3 h-3" />
+                    <Info className="w-3.5 h-3.5" />
                   </button>
 
                   {/* Badge de Categoría Superpuesto en esquina superior izquierda */}
-                  <span className="absolute top-1.5 left-1.5 px-2 py-0.5 rounded-md bg-[#0B1A2D]/85 backdrop-blur-xs text-[9px] font-bold text-white uppercase tracking-wider shadow-xs">
+                  <span className="absolute top-2 left-2 px-2 py-0.5 rounded-md bg-[#0B1A2D]/85 backdrop-blur-xs text-[10px] font-bold text-white uppercase tracking-wider shadow-xs truncate max-w-[60%] whitespace-nowrap">
                     {prod.category}
                   </span>
 
                   {/* Badge de Stock en esquina superior derecha */}
-                  <span className="absolute top-1.5 right-1.5 px-1.5 py-0.5 rounded-md bg-white/95 dark:bg-slate-900/95 backdrop-blur-xs text-[9px] font-mono font-bold text-slate-800 dark:text-slate-200 shadow-xs">
+                  <span className="absolute top-2 right-2 px-2 py-0.5 rounded-md bg-white/95 dark:bg-slate-900/95 backdrop-blur-xs text-[10px] font-mono font-bold text-slate-800 dark:text-slate-200 shadow-xs whitespace-nowrap">
                     {prod.stock} ud.
                   </span>
                 </div>
 
                 {/* 2. Información Inferior: Título y Precio/Botón en estructura vertical */}
-                <div className="flex flex-col flex-1 justify-between pt-2">
-                  <div className="font-bold text-xs text-slate-900 dark:text-white group-hover:text-[#8B5CF6] dark:group-hover:text-[#B7F229] transition line-clamp-1 leading-snug">
+                <div className="flex flex-col flex-1 justify-between pt-3 space-y-2 min-w-0">
+                  <div className="font-bold text-xs sm:text-sm text-slate-900 dark:text-white group-hover:text-[#8B5CF6] dark:group-hover:text-[#B7F229] transition truncate whitespace-nowrap leading-snug">
                     {prod.name}
                   </div>
 
-                  <div className="flex items-center justify-between pt-1.5 mt-1.5 border-t border-slate-100 dark:border-slate-700/60">
-                    <span className="font-mono font-black text-sm text-[#0B1A2D] dark:text-[#B7F229]">
+                  <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-700/60 gap-2">
+                    <span className="font-mono font-black text-sm sm:text-base text-[#0B1A2D] dark:text-[#B7F229] whitespace-nowrap">
                       {prod.price.toFixed(2)} €
                     </span>
-                    <span className="p-1 rounded-lg bg-slate-100 dark:bg-slate-700 text-[#0B1A2D] dark:text-slate-200 group-hover:bg-[#B7F229] group-hover:text-[#0B1A2D] transition-colors">
-                      <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
+                    <span className="p-1.5 rounded-lg bg-slate-100 dark:bg-slate-700 text-[#0B1A2D] dark:text-slate-200 group-hover:bg-[#B7F229] group-hover:text-[#0B1A2D] transition-colors shrink-0">
+                      <Plus className="w-4 h-4 stroke-[2.5]" />
                     </span>
                   </div>
                 </div>
@@ -1747,17 +1747,17 @@ export const AdminCafePOS: React.FC = () => {
         </div>
 
         {/* Ticket / POS Cart Register & Últimos Pagos */}
-        <div className="lg:col-span-5 space-y-4">
-          <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-4 sm:p-5 shadow-sm space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
-              <div className="flex items-center gap-2">
-                <div className="p-1.5 rounded-lg bg-[#8B5CF6]/10 text-[#8B5CF6]">
+        <div className="lg:col-span-5 space-y-7 min-w-0">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-5 sm:p-6 shadow-sm space-y-5 min-w-0 overflow-hidden">
+            <div className="flex items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-3.5 min-w-0">
+              <div className="flex items-center gap-2 min-w-0">
+                <div className="p-2 rounded-lg bg-[#8B5CF6]/10 text-[#8B5CF6] shrink-0">
                   <ShoppingCart className="w-4 h-4 text-[#8B5CF6]" />
                 </div>
-                <h2 className="font-black text-xs uppercase tracking-wider text-[#0B1A2D] dark:text-white">
+                <h2 className="font-semibold text-base sm:text-xl text-[#0B1A2D] dark:text-white tracking-tight truncate whitespace-nowrap">
                   Ticket en Curso
                 </h2>
-                <span className="font-mono font-bold text-[10px] px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
+                <span className="font-mono font-bold text-xs px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 whitespace-nowrap shrink-0">
                   {posCart.reduce((acc, i) => acc + i.qty, 0)} arts.
                 </span>
               </div>
@@ -1765,7 +1765,7 @@ export const AdminCafePOS: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setPosCart([])}
-                  className="text-[11px] font-bold text-rose-500 hover:text-rose-600 transition cursor-pointer"
+                  className="text-xs sm:text-[13px] font-bold text-rose-500 hover:text-rose-600 transition cursor-pointer whitespace-nowrap shrink-0"
                 >
                   Vaciar Ticket
                 </button>
@@ -1773,23 +1773,23 @@ export const AdminCafePOS: React.FC = () => {
             </div>
 
             {/* Cart items list */}
-            <div className="space-y-2 max-h-72 overflow-y-auto pr-1">
+            <div className="space-y-3 max-h-72 overflow-y-auto pr-1">
               {posCart.length === 0 ? (
-                <div className="py-12 text-center text-slate-400 dark:text-slate-500 text-xs">
-                  <ShoppingCart className="w-8 h-8 mx-auto mb-2 text-slate-300 dark:text-slate-600" />
+                <div className="py-10 text-center text-slate-500 dark:text-slate-400 text-sm">
+                  <ShoppingCart className="w-9 h-9 mx-auto mb-2.5 text-slate-300 dark:text-slate-600" />
                   Ticket vacío. Selecciona artículos del catálogo o pulsa en "Asignar Reserva".
                 </div>
               ) : (
                 posCart.map(({ product, qty, meta }, index) => (
                   <div
                     key={`${product.id}-${index}`}
-                    className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60 flex items-center justify-between gap-2 text-xs"
+                    className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60 flex items-center justify-between gap-3 text-sm min-w-0"
                   >
-                    <div className="min-w-0 flex-1">
-                      <div className="font-bold text-slate-900 dark:text-white truncate">
+                    <div className="min-w-0 flex-1 space-y-0.5">
+                      <div className="font-bold text-slate-900 dark:text-white truncate whitespace-nowrap">
                         {product.name}
                       </div>
-                      <div className="text-[10px] text-slate-500 dark:text-slate-400">
+                      <div className="text-xs sm:text-[13px] text-slate-600 dark:text-slate-300 truncate whitespace-nowrap">
                         {meta?.bookingId
                           ? 'Reserva vinculada'
                           : meta?.isWalletTopup
@@ -1804,21 +1804,21 @@ export const AdminCafePOS: React.FC = () => {
                         <button
                           type="button"
                           onClick={() => updateQty(product.id, -1)}
-                          className="px-2 py-1 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700 transition"
+                          className="px-2.5 py-1.5 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700 transition"
                         >
-                          <Minus className="w-3 h-3" />
+                          <Minus className="w-3.5 h-3.5" />
                         </button>
-                        <span className="px-2 font-mono font-bold text-xs">{qty}</span>
+                        <span className="px-2.5 font-mono font-bold text-sm">{qty}</span>
                         <button
                           type="button"
                           onClick={() => updateQty(product.id, 1)}
-                          className="px-2 py-1 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700 transition"
+                          className="px-2.5 py-1.5 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700 transition"
                         >
-                          <Plus className="w-3 h-3" />
+                          <Plus className="w-3.5 h-3.5" />
                         </button>
                       </div>
 
-                      <span className="font-mono font-black text-xs w-14 text-right text-[#0B1A2D] dark:text-white">
+                      <span className="font-mono font-black text-sm w-16 text-right text-[#0B1A2D] dark:text-white whitespace-nowrap">
                         {(product.price * qty).toFixed(2)} €
                       </span>
                     </div>
@@ -1828,8 +1828,8 @@ export const AdminCafePOS: React.FC = () => {
             </div>
 
             {/* Payment Method Selector (Filtered by Club Settings) */}
-            <div className="pt-2 border-t border-slate-100 dark:border-slate-800 space-y-2">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
+            <div className="pt-3 border-t border-slate-100 dark:border-slate-800 space-y-3">
+              <span className="text-xs sm:text-[13px] font-semibold text-slate-600 dark:text-slate-300 block truncate whitespace-nowrap">
                 Método de Cobro en Mostrador:
               </span>
               <div className={`grid ${availablePaymentMethods.length <= 2 ? 'grid-cols-2' : availablePaymentMethods.length <= 3 ? 'grid-cols-3' : 'grid-cols-2 sm:grid-cols-3'} gap-2`}>
@@ -1841,13 +1841,13 @@ export const AdminCafePOS: React.FC = () => {
                       key={m.id}
                       type="button"
                       onClick={() => setPaymentMethod(m.id)}
-                      className={`p-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 ${
+                      className={`p-2.5 rounded-xl text-xs sm:text-[13px] font-bold transition flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 min-w-0 whitespace-nowrap ${
                         isSelected
                           ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D] border border-[#0B1A2D] dark:border-white shadow-xs ring-2 ring-[#0B1A2D]/10 dark:ring-white/20'
-                          : 'bg-slate-50 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80'
+                          : 'bg-slate-50 dark:bg-slate-800/80 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80'
                       }`}
                     >
-                      <IconComponent className="w-3.5 h-3.5" />
+                      <IconComponent className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
                       <span className="truncate">{m.label}</span>
                     </button>
                   );
@@ -1856,18 +1856,18 @@ export const AdminCafePOS: React.FC = () => {
             </div>
 
             {/* Cart Total & Action */}
-            <div className="pt-3 border-t border-slate-100 dark:border-slate-800 space-y-3">
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-slate-500 font-medium">{t('pos.selectedPaymentMethod', 'Método seleccionado:')}</span>
-                <span className="font-bold text-[#0B1A2D] dark:text-slate-200 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#8B5CF6]/10 text-[#8B5CF6] border border-[#8B5CF6]/20">
-                  {activePaymentMethodObj && <activePaymentMethodObj.icon className="w-3.5 h-3.5 text-[#8B5CF6]" />}
+            <div className="pt-3 border-t border-slate-100 dark:border-slate-800 space-y-4">
+              <div className="flex items-center justify-between gap-2 text-xs sm:text-sm min-w-0">
+                <span className="text-slate-600 dark:text-slate-300 font-medium truncate whitespace-nowrap">{t('pos.selectedPaymentMethod', 'Método seleccionado:')}</span>
+                <span className="font-bold text-[#0B1A2D] dark:text-slate-200 inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-lg bg-[#8B5CF6]/10 text-[#8B5CF6] border border-[#8B5CF6]/20 whitespace-nowrap shrink-0">
+                  {activePaymentMethodObj && <activePaymentMethodObj.icon className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#8B5CF6] shrink-0" />}
                   <span>{activePaymentMethodObj?.label}</span>
                 </span>
               </div>
 
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-slate-500">Total a Cobrar:</span>
-                <span className="text-2xl sm:text-3xl font-black font-mono text-[#0B1A2D] dark:text-white tracking-tight">
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-sm font-bold text-slate-600 dark:text-slate-300 whitespace-nowrap">Total a Cobrar:</span>
+                <span className="text-2xl sm:text-3xl font-black font-mono text-[#0B1A2D] dark:text-white tracking-tight whitespace-nowrap">
                   {cartTotal.toFixed(2)} €
                 </span>
               </div>
@@ -1877,10 +1877,10 @@ export const AdminCafePOS: React.FC = () => {
                 type="button"
                 onClick={handleChargeSale}
                 disabled={posCart.length === 0}
-                className="w-full py-3.5 rounded-xl bg-[#B7F229] hover:bg-[#a6e61f] disabled:opacity-40 text-[#0B1A2D] font-black text-sm sm:text-base shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-95"
+                className="w-full py-4 px-4 rounded-xl bg-[#B7F229] hover:bg-[#a6e61f] disabled:opacity-40 text-[#0B1A2D] font-black text-sm sm:text-base shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-95 whitespace-nowrap"
               >
-                <CheckCircle2 className="w-4 h-4 stroke-[2.5]" />
-                <span>
+                <CheckCircle2 className="w-4.5 h-4.5 stroke-[2.5] shrink-0" />
+                <span className="truncate">
                   Cobrar con {activePaymentMethodObj?.label || 'TPV'}
                 </span>
               </button>
@@ -1888,61 +1888,61 @@ export const AdminCafePOS: React.FC = () => {
           </div>
 
           {/* Bloque de los Últimos Pagos Registrados (Limpio, Sin subtítulo '5 en turno', Clic abre Detalle del Pago) */}
-          <div className="space-y-3 pt-2">
-            <div className="flex items-center justify-between">
+          <div className="space-y-4 pt-1">
+            <div className="flex items-center justify-between gap-2">
               <div>
-                <h3 className="text-base font-bold text-[#0B1A2D] dark:text-white">
+                <h3 className="text-lg sm:text-xl font-semibold text-[#0B1A2D] dark:text-white tracking-tight whitespace-nowrap">
                   Últimos Pagos
                 </h3>
               </div>
               <button
                 type="button"
                 onClick={() => setTransactionsModalOpen(true)}
-                className="text-xs font-bold text-[#8B5CF6] dark:text-purple-400 hover:underline cursor-pointer"
+                className="text-sm font-semibold text-[#8B5CF6] dark:text-purple-400 hover:underline cursor-pointer whitespace-nowrap shrink-0"
               >
                 ver todos
               </button>
             </div>
 
             {activeShiftTransactions.length === 0 ? (
-              <div className="p-4 text-center text-xs text-slate-400 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800">
+              <div className="p-6 text-center text-sm text-slate-500 dark:text-slate-400 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800">
                 No hay pagos registrados todavía en este turno para esta sede.
               </div>
             ) : (
-              <div className="space-y-2">
+              <div className="space-y-3">
                 {activeShiftTransactions.slice(0, 5).map((tx) => (
                   <div
                     key={tx.id}
                     onClick={() => setSelectedPaymentDetail(tx)}
-                    className="p-3.5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-2xs hover:border-[#8B5CF6]/50 dark:hover:border-slate-700 transition flex items-center justify-between gap-3 text-xs cursor-pointer group"
+                    className="p-5 sm:p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-2xs hover:border-[#8B5CF6]/50 dark:hover:border-slate-700 transition flex items-center justify-between gap-3 sm:gap-4 text-sm cursor-pointer group min-w-0 overflow-hidden"
                     title="Haz clic para ver el detalle de este pago"
                   >
-                    <div className="min-w-0 flex-1 space-y-0.5">
-                      <div className="flex items-center gap-1.5">
-                        <span className="font-mono font-bold text-[10px] text-slate-400 shrink-0">{tx.time}</span>
-                        <span className="font-bold text-slate-900 dark:text-white truncate text-[11px] group-hover:text-[#8B5CF6] transition-colors">{tx.concept}</span>
+                    <div className="min-w-0 flex-1 space-y-1.5">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <span className="font-mono font-bold text-xs sm:text-[13px] text-slate-500 dark:text-slate-400 shrink-0 whitespace-nowrap">{tx.time}</span>
+                        <span className="font-bold text-slate-900 dark:text-white truncate whitespace-nowrap text-xs sm:text-sm group-hover:text-[#8B5CF6] transition-colors">{tx.concept}</span>
                       </div>
-                      <div className="text-[10px] text-slate-500 dark:text-slate-400 flex flex-wrap items-center gap-1.5 truncate">
-                        <span>{tx.customerName || 'Cliente Mostrador'}</span>
-                        <span>·</span>
-                        <span className="text-[#8B5CF6] font-medium">{tx.paymentMethod}</span>
-                        <span>·</span>
-                        <span className="text-slate-600 dark:text-slate-300 font-medium inline-flex items-center gap-1">
-                          <User className="w-3 h-3 text-slate-400 shrink-0" />
-                          <span>{tx.cashierName || 'Recepción Mostrador'}</span>
+                      <div className="text-xs sm:text-[13px] text-slate-600 dark:text-slate-300 flex items-center gap-1.5 min-w-0 truncate whitespace-nowrap">
+                        <span className="truncate">{tx.customerName || 'Cliente Mostrador'}</span>
+                        <span className="shrink-0">·</span>
+                        <span className="text-[#8B5CF6] dark:text-[#C4B5FD] font-medium shrink-0">{tx.paymentMethod}</span>
+                        <span className="shrink-0 hidden sm:inline">·</span>
+                        <span className="text-slate-700 dark:text-slate-200 font-medium hidden sm:inline-flex items-center gap-1 truncate">
+                          <User className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                          <span className="truncate">{tx.cashierName || 'Recepción Mostrador'}</span>
                         </span>
-                        <span>·</span>
-                        <span className="text-slate-400 font-medium inline-flex items-center gap-1">
-                          <Building2 className="w-3 h-3 text-slate-400 shrink-0" />
-                          <span>{formatVenueDisplayName(tx.venueName, tx.venueId)}</span>
+                        <span className="shrink-0">·</span>
+                        <span className="text-slate-500 dark:text-slate-400 font-medium inline-flex items-center gap-1 truncate">
+                          <Building2 className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                          <span className="truncate">{formatVenueDisplayName(tx.venueName, tx.venueId)}</span>
                         </span>
                       </div>
                     </div>
-                    <div className="text-right shrink-0">
-                      <div className="font-mono font-black text-xs text-[#0B1A2D] dark:text-[#B7F229]">
+                    <div className="text-right shrink-0 space-y-1">
+                      <div className="font-mono font-black text-sm sm:text-base text-[#0B1A2D] dark:text-[#B7F229] whitespace-nowrap">
                         +{tx.amount.toFixed(2)} €
                       </div>
-                      <span className="text-[9px] font-black text-[#0B1A2D] bg-[#B7F229] px-1.5 py-0.5 rounded shadow-2xs">
+                      <span className="inline-block text-[11px] sm:text-xs font-bold text-[#0B1A2D] bg-[#B7F229] px-2 py-0.5 rounded shadow-2xs whitespace-nowrap">
                         Cobrado
                       </span>
                     </div>

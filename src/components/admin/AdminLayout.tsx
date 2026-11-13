@@ -108,7 +108,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   };
 
   return (
-    <div data-admin-shell className="min-h-screen bg-slate-50 dark:bg-[#0B1A2D] text-slate-900 dark:text-slate-100 flex flex-col md:flex-row pb-24 md:pb-0 transition-colors duration-200 w-full max-w-full overflow-x-hidden font-sans">
+    <div data-admin-shell className="min-h-screen bg-slate-50 dark:bg-[#0B1A2D] text-slate-900 dark:text-slate-100 flex flex-col md:flex-row pb-28 md:pb-0 transition-colors duration-200 w-full max-w-full overflow-x-hidden font-sans">
       {/* ======================================================================
           SIDEBAR LATERAL UNIFICADO (ESCRITORIO / TABLET)
           - En Marca Blanca (Recepción): Menú único, adaptado y limpio
@@ -315,8 +315,8 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
           />
         )}
 
-        {/* Contenido Dinámico de la Pestaña Activa con márgenes optimizados px-3.5 */}
-        <main className={`flex-1 px-3.5 py-3 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto ${(adminTab === 'all_bookings' || adminTab === 'new_match' || adminTab === 'new_booking') ? 'pt-4 sm:pt-6' : ''}`}>
+        {/* Contenido Dinámico de la Pestaña Activa con márgenes generosos */}
+        <main className={`flex-1 px-4 py-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto ${(adminTab === 'all_bookings' || adminTab === 'new_match' || adminTab === 'new_booking') ? 'pt-5 sm:pt-7' : ''}`}>
           {children}
         </main>
       </div>

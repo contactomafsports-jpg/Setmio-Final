@@ -605,19 +605,19 @@ export const AdminAgenda: React.FC = () => {
     currentUser.role === 'PROFESSIONAL_PLAYER';
 
   return (
-    <div className="max-w-7xl mx-auto pt-2 pb-16 space-y-4 font-sans text-[#0B1A2D] dark:text-slate-100 antialiased">
+    <div className="max-w-7xl mx-auto pt-3 pb-24 sm:pb-16 space-y-7 sm:space-y-8 font-sans text-[#0B1A2D] dark:text-slate-100 antialiased">
       {/* ======================================================================
           1. CABECERA LIMPIA Y SIMÉTRICA (ESTILO INICIO)
           ====================================================================== */}
-      <section className="pt-2 pb-1 space-y-3" data-purpose="header-section">
+      <section className="pt-2 pb-1 space-y-5" data-purpose="header-section">
         {/* Título de sección limpio y simétrico con Inicio con botón minimalista '+' en la esquina derecha */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-3">
           <div>
-            <span className="text-xs font-medium text-slate-400 dark:text-slate-500 tracking-wide block mb-0.5">
+            <span className="text-sm font-medium text-slate-600 dark:text-slate-300 tracking-wide block mb-1">
               {currentTenant?.name || 'Centro de Pádel San Mateo'}
             </span>
-            <h1 className="text-[22px] font-extrabold text-[#0B1A2D] dark:text-white tracking-tight leading-tight">
-              {t('agenda.title', 'Reservas y Disponibilidad')}
+            <h1 className="text-[26px] sm:text-3xl font-bold text-[#0B1A2D] dark:text-white tracking-tight leading-tight">
+              {t('agenda.title', 'Reservas')}
             </h1>
           </div>
 
@@ -635,7 +635,7 @@ export const AdminAgenda: React.FC = () => {
                 window.history.pushState({}, '', '/gestion/reservas/nueva');
               }
             }}
-            className="p-1 text-slate-700 dark:text-slate-300 hover:text-[#0B1A2D] dark:hover:text-[#B7F229] transition-colors cursor-pointer active:scale-95"
+            className="p-2 text-slate-700 dark:text-slate-300 hover:text-[#0B1A2D] dark:hover:text-[#B7F229] transition-colors cursor-pointer active:scale-95"
             title="Nueva reserva"
             aria-label="Nueva reserva"
           >
@@ -645,28 +645,28 @@ export const AdminAgenda: React.FC = () => {
 
         {/* Pill de Sede y Estado Operativo Unificado idéntico a la página de Inicio */}
         <div className="relative">
-          <div className="flex items-center justify-between p-2.5 bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200/80 dark:border-[#1A314D] shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
+          <div className="flex items-center justify-between gap-2.5 sm:gap-3 p-3.5 sm:p-5 bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200/80 dark:border-[#1A314D] shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
             {/* Selector de Sede */}
             <div
               onClick={() => setIsVenueSelectorOpen(!isVenueSelectorOpen)}
-              className="flex items-center gap-2 cursor-pointer group select-none min-w-0"
+              className="flex items-center gap-2.5 sm:gap-3 cursor-pointer group select-none min-w-0 flex-1"
               title="Cambiar sede activa o ver red consolidada"
             >
-              <div className="w-8 h-8 rounded-xl bg-slate-50 dark:bg-[#071220] border border-slate-100 dark:border-[#1A314D] flex items-center justify-center text-[#0B1A2D] dark:text-slate-200 shrink-0">
-                <Building2 className="w-4 h-4 text-[#0B1A2D] dark:text-white" />
+              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-slate-50 dark:bg-[#071220] border border-slate-100 dark:border-[#1A314D] flex items-center justify-center text-[#0B1A2D] dark:text-slate-200 shrink-0">
+                <Building2 className="w-4 h-4 sm:w-4.5 sm:h-4.5 text-[#0B1A2D] dark:text-white" />
               </div>
-              <div className="min-w-0">
-                <div className="flex items-center gap-1.5">
-                  <span className="text-xs font-bold text-[#0B1A2D] dark:text-white truncate">
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-1 min-w-0">
+                  <span className="text-[13px] sm:text-base font-bold text-[#0B1A2D] dark:text-white truncate whitespace-nowrap">
                     {isConsolidatedView ? 'Todas las Sedes' : selectedVenue.shortName || selectedVenue.name}
                   </span>
                   <ChevronDown
-                    className={`w-3.5 h-3.5 text-slate-400 group-hover:text-[#0B1A2D] dark:group-hover:text-white transition-transform ${
+                    className={`w-4 h-4 text-slate-500 group-hover:text-[#0B1A2D] dark:text-slate-400 dark:group-hover:text-white transition-transform shrink-0 ${
                       isVenueSelectorOpen ? 'rotate-180 text-[#0B1A2D] dark:text-white' : ''
                     }`}
                   />
                 </div>
-                <span className="text-[10px] font-medium text-slate-400 block truncate">
+                <span className="text-xs sm:text-[13px] font-medium text-slate-600 dark:text-slate-300 block truncate whitespace-nowrap">
                   {venues.length > 1 ? `${venues.length} sedes conectadas` : 'Sede oficial'}
                 </span>
               </div>
@@ -676,7 +676,7 @@ export const AdminAgenda: React.FC = () => {
             <button
               type="button"
               onClick={isConsolidatedView ? () => setIsVenueSelectorOpen((prev) => !prev) : toggleClubOpenState}
-              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#F0FCCF] dark:bg-[#B7F229]/20 border border-[#B7F229]/50 transition-all cursor-pointer hover:scale-102 shrink-0 select-none"
+              className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-full bg-[#F0FCCF] dark:bg-[#B7F229]/20 border border-[#B7F229]/50 transition-all cursor-pointer hover:scale-102 shrink-0 select-none whitespace-nowrap"
               title={
                 isConsolidatedView
                   ? `Red multisede consolidada (${venues.length} sedes operativas)`
@@ -684,7 +684,7 @@ export const AdminAgenda: React.FC = () => {
               }
             >
               <span
-                className={`w-2 h-2 rounded-full ${
+                className={`w-2 h-2 rounded-full shrink-0 ${
                   isConsolidatedView
                     ? 'bg-[#82b805] dark:bg-[#B7F229]'
                     : isClubOpen
@@ -692,7 +692,7 @@ export const AdminAgenda: React.FC = () => {
                     : 'bg-rose-500'
                 }`}
               />
-              <span className="text-[11px] font-bold text-[#0B1A2D] dark:text-[#B7F229]">
+              <span className="text-xs sm:text-[13px] font-bold text-[#0B1A2D] dark:text-[#B7F229] whitespace-nowrap">
                 {isConsolidatedView
                   ? `${venues.length} Sedes Activas`
                   : isClubOpen
@@ -761,7 +761,7 @@ export const AdminAgenda: React.FC = () => {
         </div>
 
         {/* Reordenación Superior: Botón "Todas las reservas" POR ENCIMA del selector de fechas */}
-        <div className="space-y-2">
+        <div className="space-y-3.5 pt-1">
           {/* Botón Sólido de Marca: Todas las Reservas (Idéntico a Inicio) */}
           <button
             type="button"
@@ -771,25 +771,25 @@ export const AdminAgenda: React.FC = () => {
               }
               setAdminTab('all_bookings');
             }}
-            className="w-full py-2.5 dark:py-3 px-4 rounded-xl bg-[#0B1A2D] hover:bg-[#132A45] dark:bg-white/[0.06] dark:hover:bg-white/[0.1] border border-transparent dark:border-white/10 text-white font-bold text-xs flex items-center justify-center gap-2 transition-colors shadow-sm cursor-pointer"
+            className="w-full py-3.5 px-5 rounded-xl bg-[#0B1A2D] hover:bg-[#132A45] dark:bg-white/[0.06] dark:hover:bg-white/[0.1] border border-transparent dark:border-white/10 text-white font-bold text-sm flex items-center justify-center gap-2.5 transition-colors shadow-sm cursor-pointer whitespace-nowrap"
           >
             <Calendar className="w-4 h-4 text-white dark:text-[#B7F229] shrink-0" />
             <span>Todas las reservas</span>
           </button>
 
           {/* Selector de Fecha Tipo Ribbon */}
-          <div className="flex items-center justify-between bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-xl px-2.5 py-2 shadow-2xs h-10">
+          <div className="flex items-center justify-between bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-xl px-3 py-2.5 shadow-2xs h-11">
             <button
               type="button"
               onClick={() => stepDate(-1)}
-              className="p-1 rounded-lg text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 active:scale-90 transition-transform cursor-pointer shrink-0"
+              className="p-1.5 rounded-lg text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 active:scale-90 transition-transform cursor-pointer shrink-0"
               title="Día anterior"
             >
-              <ChevronLeft className="w-3.5 h-3.5" />
+              <ChevronLeft className="w-4 h-4" />
             </button>
-            <div className="relative flex items-center justify-center gap-1.5 text-xs sm:text-sm font-bold text-slate-900 dark:text-white cursor-pointer select-none truncate">
-              <Calendar className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-              <span className="truncate">{formattedDateLabel}</span>
+            <div className="relative flex items-center justify-center gap-2 text-sm font-bold text-slate-900 dark:text-white cursor-pointer select-none min-w-0 truncate">
+              <Calendar className="w-4 h-4 text-slate-500 dark:text-slate-400 shrink-0" />
+              <span className="truncate whitespace-nowrap">{formattedDateLabel}</span>
               <input
                 ref={dateInputRef}
                 type="date"
@@ -804,10 +804,10 @@ export const AdminAgenda: React.FC = () => {
             <button
               type="button"
               onClick={() => stepDate(1)}
-              className="p-1 rounded-lg text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 active:scale-90 transition-transform cursor-pointer shrink-0"
+              className="p-1.5 rounded-lg text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 active:scale-90 transition-transform cursor-pointer shrink-0"
               title="Día siguiente"
             >
-              <ChevronRight className="w-3.5 h-3.5" />
+              <ChevronRight className="w-4 h-4" />
             </button>
           </div>
         </div>
@@ -816,19 +816,19 @@ export const AdminAgenda: React.FC = () => {
       {/* ======================================================================
           3. CUADRANTE DE DISPONIBILIDAD (GRID UNIFICADO HASTA LAS 00:00)
           ====================================================================== */}
-      <section className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-3.5 sm:p-4 shadow-sm space-y-3">
+      <section className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-5 sm:p-6 shadow-sm space-y-4">
         {/* Cabecera del Cuadrante */}
-        <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
-          <div className="flex items-center gap-2">
-            <span className="p-1 rounded-lg bg-[#8B5CF6]/10 text-[#8B5CF6]">
-              <Calendar className="w-4 h-4 text-[#8B5CF6]" />
+        <div className="flex items-center justify-between gap-2 pb-3 border-b border-slate-100 dark:border-slate-800 min-w-0">
+          <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
+            <span className="p-1.5 rounded-lg bg-[#8B5CF6]/10 text-[#8B5CF6] shrink-0">
+              <Calendar className="w-4 h-4 sm:w-4.5 sm:h-4.5 text-[#8B5CF6]" />
             </span>
-            <span className="text-xs sm:text-sm font-bold text-[#0B1A2D] dark:text-white">
+            <h2 className="text-base sm:text-xl font-semibold text-[#0B1A2D] dark:text-white tracking-tight truncate whitespace-nowrap">
               Turnos en Tiempo Real
-            </span>
+            </h2>
           </div>
-          <div className="flex items-center">
-            <span className="text-xs text-[#64748B] dark:text-slate-400 font-medium">
+          <div className="flex items-center shrink-0">
+            <span className="text-xs sm:text-[13px] text-slate-600 dark:text-slate-300 font-medium whitespace-nowrap">
               Desliza pistas →
             </span>
           </div>
@@ -839,15 +839,15 @@ export const AdminAgenda: React.FC = () => {
           <div className="min-w-[420px]">
             {/* Header Courts Row con columnas dinámicas */}
             <div
-              className="pb-2.5 border-b border-slate-100 dark:border-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-300 items-end"
+              className="pb-3 border-b border-slate-100 dark:border-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-300 items-end"
               style={{
                 display: 'grid',
-                gridTemplateColumns: `80px repeat(${displayedCourts.length}, minmax(135px, 1fr))`,
-                gap: '8px',
+                gridTemplateColumns: `84px repeat(${displayedCourts.length}, minmax(145px, 1fr))`,
+                gap: '10px',
               }}
             >
               <div className="text-left pl-1">
-                <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+                <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                   HORA
                 </span>
               </div>
@@ -876,17 +876,17 @@ export const AdminAgenda: React.FC = () => {
                 return (
                   <div
                     key={court.id}
-                    className="rounded-xl px-2.5 py-1.5 bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60 text-left flex flex-col justify-between"
+                    className="rounded-xl px-3 py-2 bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60 text-left flex flex-col justify-between gap-0.5"
                   >
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold text-slate-900 dark:text-white truncate">
+                    <div className="flex items-center justify-between gap-1.5">
+                      <span className="text-[13px] font-bold text-slate-900 dark:text-white truncate">
                         {court.name.split('—')[0].trim()}
                       </span>
-                      <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 shrink-0">
+                      <span className="text-xs font-semibold text-slate-600 dark:text-slate-300 shrink-0">
                         {court.hourlyRate}€/h
                       </span>
                     </div>
-                    <div className="flex items-center gap-1.5 text-[10px] text-slate-500 dark:text-slate-400 font-medium truncate pt-0.5">
+                    <div className="flex items-center gap-1.5 text-xs text-slate-600 dark:text-slate-300 font-medium truncate">
                       <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${venueInfo.dot}`} />
                       <span className="truncate">{venueInfo.name}</span>
                     </div>
@@ -896,7 +896,7 @@ export const AdminAgenda: React.FC = () => {
             </div>
 
             {/* Time Rows Unificadas */}
-            <div className="space-y-2 pt-2">
+            <div className="space-y-2.5 pt-2.5">
               {timeRows.map((time) => {
                 const isLateSlot = time === '23:00 - 00:00';
                 return (
@@ -905,11 +905,11 @@ export const AdminAgenda: React.FC = () => {
                     className="items-center"
                     style={{
                       display: 'grid',
-                      gridTemplateColumns: `80px repeat(${displayedCourts.length}, minmax(135px, 1fr))`,
-                      gap: '8px',
+                      gridTemplateColumns: `84px repeat(${displayedCourts.length}, minmax(145px, 1fr))`,
+                      gap: '10px',
                     }}
                   >
-                    <div className="text-xs font-semibold text-[#64748B] dark:text-slate-400 pl-1 font-mono">
+                    <div className="text-[13px] font-semibold text-slate-600 dark:text-slate-300 pl-1 font-mono">
                       {time}
                     </div>
 
@@ -940,21 +940,21 @@ export const AdminAgenda: React.FC = () => {
                           <div
                             key={court.id}
                             onClick={() => handleOpenBooking(booking)}
-                            className={`bg-white dark:bg-slate-800/90 border border-[#E5E7EB] dark:border-slate-700 rounded-xl px-2.5 py-2 shadow-2xs flex flex-col justify-between h-[58px] cursor-pointer hover:shadow-xs active:scale-98 transition ${borderAccent}`}
+                            className={`bg-white dark:bg-slate-800/90 border border-[#E5E7EB] dark:border-slate-700 rounded-xl px-3 py-2.5 shadow-2xs flex flex-col justify-between h-[64px] cursor-pointer hover:shadow-xs active:scale-98 transition ${borderAccent}`}
                           >
-                            <div className="flex items-center justify-between gap-1">
-                              <span className="text-xs font-bold text-[#0B1A2D] dark:text-white truncate">
+                            <div className="flex items-center justify-between gap-1.5">
+                              <span className="text-[13px] font-bold text-[#0B1A2D] dark:text-white truncate">
                                 {booking.creatorName.split(' ')[0]} {booking.creatorName.split(' ')[1]?.[0] ? `${booking.creatorName.split(' ')[1][0]}.` : ''}
                               </span>
                               <span className={`w-2 h-2 rounded-full shrink-0 ring-2 ${dotAccent}`} />
                             </div>
-                            <div className="flex items-center justify-between text-[11px] text-[#64748B] dark:text-slate-400">
+                            <div className="flex items-center justify-between text-xs text-slate-600 dark:text-slate-300">
                               <span className="font-bold text-[#0B1A2D] dark:text-white font-mono">
                                 {isPlayerRole
                                   ? `${(booking.participants?.[0]?.amount || (booking.totalPrice / 4)).toFixed(0)}€`
                                   : `${booking.totalPrice}€`}
                               </span>
-                              <span className="font-mono text-[10px]">
+                              <span className="font-mono text-[11px]">
                                 {booking.accessPin ? `PIN: ${booking.accessPin}` : `#${booking.id.slice(-4)}`}
                               </span>
                             </div>
@@ -981,10 +981,10 @@ export const AdminAgenda: React.FC = () => {
                                 window.history.pushState({}, '', '/gestion/reservas/nueva');
                               }
                             }}
-                            className="border border-dashed border-[#E5E7EB] dark:border-slate-700/80 bg-slate-50 dark:bg-slate-800/40 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl px-2.5 py-2 text-center text-[#64748B] dark:text-slate-400 text-xs font-semibold transition active:scale-95 flex items-center justify-center gap-1.5 h-[58px] shadow-2xs cursor-pointer"
+                            className="border border-dashed border-[#E5E7EB] dark:border-slate-700/80 bg-slate-50 dark:bg-slate-800/40 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl px-3 py-2.5 text-center text-slate-600 dark:text-slate-300 text-[13px] font-semibold transition active:scale-95 flex items-center justify-center gap-1.5 h-[64px] shadow-2xs cursor-pointer"
                             title={`Turno tardío / Cierre en ${court.name}`}
                           >
-                            <Lock className="w-3.5 h-3.5 text-[#64748B] dark:text-slate-500" />
+                            <Lock className="w-4 h-4 text-slate-500 dark:text-slate-400" />
                             <span>Cierre</span>
                           </button>
                         );
@@ -1008,10 +1008,10 @@ export const AdminAgenda: React.FC = () => {
                               window.history.pushState({}, '', '/gestion/reservas/nueva');
                             }
                           }}
-                          className="border border-dashed border-[#E5E7EB] dark:border-slate-700 bg-white dark:bg-slate-800/30 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl px-2.5 py-2 text-center text-[#64748B] dark:text-slate-400 text-xs font-semibold transition active:scale-95 flex items-center justify-center gap-1 h-[58px] shadow-2xs cursor-pointer"
+                          className="border border-dashed border-[#E5E7EB] dark:border-slate-700 bg-white dark:bg-slate-800/30 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl px-3 py-2.5 text-center text-slate-600 dark:text-slate-300 text-[13px] font-semibold transition active:scale-95 flex items-center justify-center gap-1.5 h-[64px] shadow-2xs cursor-pointer"
                           title={`Reservar ${court.name} a las ${time}`}
                         >
-                          <Plus className="w-3.5 h-3.5 text-[#64748B] dark:text-slate-400" />
+                          <Plus className="w-4 h-4 text-slate-500 dark:text-slate-300" />
                           <span>Disponible</span>
                         </button>
                       );
@@ -1027,25 +1027,25 @@ export const AdminAgenda: React.FC = () => {
       {/* ======================================================================
           4. BLOQUE "RESERVAS DEL DÍA" (ESPACIADO GENEROSO Y COHERENCIA CON INICIO)
           ====================================================================== */}
-      <section className="mt-8 pt-1 space-y-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-baseline gap-2">
-            <h2 className="text-base font-bold text-[#0B1A2D] dark:text-white">
+      <section className="mt-8 pt-1 space-y-4">
+        <div className="flex items-center justify-between min-w-0">
+          <div className="flex items-baseline gap-2 min-w-0">
+            <h2 className="text-lg sm:text-xl font-semibold text-[#0B1A2D] dark:text-white tracking-tight whitespace-nowrap shrink-0">
               Reservas del Día
             </h2>
-            <span className="text-xs font-semibold text-slate-400 dark:text-slate-500">
+            <span className="text-xs sm:text-sm font-medium text-slate-600 dark:text-slate-300 truncate whitespace-nowrap">
               · {formattedDayTitleLabel}
             </span>
           </div>
         </div>
 
         {dayBookings.length === 0 ? (
-          <div className="py-8 text-center text-slate-400 dark:text-slate-500 text-xs bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-6">
-            <Calendar className="w-8 h-8 mx-auto mb-2 text-slate-300 dark:text-slate-600" />
+          <div className="py-10 px-6 text-center text-slate-600 dark:text-slate-300 text-sm bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800">
+            <Calendar className="w-9 h-9 mx-auto mb-3 text-slate-400 dark:text-slate-500" />
             No hay reservas registradas para esta fecha y sede. Puedes hacer clic en una pista disponible para reservar.
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-4">
             {dayBookings.map((b) => {
               const drawerData = convertBookingToDrawer(b);
               return (

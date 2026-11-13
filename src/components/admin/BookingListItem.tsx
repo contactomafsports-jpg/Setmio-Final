@@ -144,69 +144,69 @@ export const BookingListItem: React.FC<BookingListItemProps> = ({
           onClick?.();
         }
       }}
-      className={`w-full bg-white dark:bg-[#0E2239] rounded-2xl p-3.5 sm:p-4 border border-slate-200/80 dark:border-[#1A314D] shadow-2xs space-y-3 cursor-pointer transition hover:border-[#8B5CF6]/50 hover:shadow-xs group text-left active:scale-[0.99] ${className}`}
+      className={`w-full min-w-0 overflow-hidden bg-white dark:bg-[#0E2239] rounded-2xl p-5 sm:p-6 border border-slate-200/80 dark:border-[#1A314D] shadow-2xs space-y-4 cursor-pointer transition hover:border-[#8B5CF6]/50 hover:shadow-xs group text-left active:scale-[0.99] ${className}`}
     >
       {/* 1. Header: Franja horaria a la izquierda, Pista a la derecha en la misma línea superior */}
-      <div className="flex items-center justify-between gap-2">
-        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#EDE9FE] dark:bg-[#8B5CF6]/20 border border-[#8B5CF6]/30 text-[#6D28D9] dark:text-[#C4B5FD] text-xs font-bold tracking-tight shrink-0">
-          <Clock className="w-3.5 h-3.5 text-[#8B5CF6] shrink-0" />
+      <div className="flex items-center justify-between gap-2 min-w-0">
+        <span className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full bg-[#EDE9FE] dark:bg-[#8B5CF6]/20 border border-[#8B5CF6]/30 text-[#6D28D9] dark:text-[#C4B5FD] text-xs sm:text-[13px] font-bold tracking-tight shrink-0 whitespace-nowrap">
+          <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#8B5CF6] shrink-0" />
           <span>{timeText}</span>
-          <span className="text-[11px] opacity-80 font-semibold">· {calculateDurationMinutes(booking.startTime, booking.endTime, timeText)} min</span>
+          <span className="text-xs opacity-85 font-semibold">· {calculateDurationMinutes(booking.startTime, booking.endTime, timeText)} min</span>
         </span>
 
-        <span className="text-xs font-semibold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800/80 border border-slate-200/70 dark:border-slate-700 px-2.5 py-1 rounded-full truncate max-w-[180px] sm:max-w-none shrink-0">
+        <span className="text-xs sm:text-[13px] font-semibold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800/80 border border-slate-200/70 dark:border-slate-700 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full truncate whitespace-nowrap min-w-0 max-w-[140px] sm:max-w-none">
           {booking.courtName}
         </span>
       </div>
 
       {/* 2. Protagonismo del Cliente y Precio en la misma fila sin amontonamiento */}
-      <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
+      <div className="flex items-start justify-between gap-3 min-w-0">
+        <div className="min-w-0 flex-1 space-y-1">
           {/* Micro-texto de Sede en Vista Consolidada ("Todas las Sedes") */}
           {isConsolidatedView && (booking.venueShortName || booking.venueName) && (
-            <div className="flex items-center gap-1 text-[11px] font-bold text-[#0B1A2D] dark:text-[#B7F229] mb-0.5 tracking-tight">
-              <Building2 className="w-3 h-3 text-[#0B1A2D] dark:text-[#B7F229] shrink-0" />
-              <span>{cleanVenue(booking.venueShortName || booking.venueName)}</span>
+            <div className="flex items-center gap-1.5 text-xs sm:text-[13px] font-bold text-[#0B1A2D] dark:text-[#B7F229] tracking-tight whitespace-nowrap truncate">
+              <Building2 className="w-3.5 h-3.5 text-[#0B1A2D] dark:text-[#B7F229] shrink-0" />
+              <span className="truncate">{cleanVenue(booking.venueShortName || booking.venueName)}</span>
             </div>
           )}
-          <h4 className="text-sm font-bold text-[#0B1A2D] dark:text-white truncate group-hover:text-[#8B5CF6] transition-colors">
+          <h4 className="text-base font-bold text-[#0B1A2D] dark:text-white truncate whitespace-nowrap group-hover:text-[#8B5CF6] transition-colors">
             {booking.creatorName}
             {booking.creatorMemberNum && (
-              <span className="ml-1.5 text-xs font-normal text-slate-400 dark:text-slate-500">
+              <span className="ml-1.5 text-xs sm:text-[13px] font-medium text-slate-500 dark:text-slate-400">
                 ({booking.creatorMemberNum})
               </span>
             )}
           </h4>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 truncate">
+          <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 truncate whitespace-nowrap">
             {typeText} • {booking.sport || 'Pádel'}
           </p>
         </div>
-        <span className="text-sm font-extrabold text-[#0B1A2D] dark:text-white font-mono shrink-0">
+        <span className="text-base sm:text-lg font-extrabold text-[#0B1A2D] dark:text-white font-mono shrink-0 whitespace-nowrap">
           {formatPrice()}
         </span>
       </div>
 
       {/* 3. Distribución Inferior Limpia: Estado de Pago a la izquierda, PIN de Acceso a la derecha */}
-      <div className="flex items-center justify-between pt-2.5 border-t border-slate-100 dark:border-slate-800">
+      <div className="flex items-center justify-between pt-3.5 border-t border-slate-100 dark:border-slate-800 gap-2 min-w-0">
         {isCanceled ? (
-          <span className="inline-flex items-center gap-1 text-[11px] font-bold text-rose-700 dark:text-rose-300 bg-rose-50 dark:bg-rose-950/80 px-2.5 py-0.5 rounded-full border border-rose-200 dark:border-rose-800">
-            <XCircle className="w-3 h-3 text-rose-500" />
+          <span className="inline-flex items-center gap-1.5 text-xs sm:text-[13px] font-bold text-rose-700 dark:text-rose-300 bg-rose-50 dark:bg-rose-950/80 px-2.5 sm:px-3 py-1 rounded-full border border-rose-200 dark:border-rose-800 whitespace-nowrap shrink-0">
+            <XCircle className="w-3.5 h-3.5 text-rose-500 shrink-0" />
             <span>CANCELADA</span>
           </span>
         ) : isPaid ? (
-          <span className="inline-flex items-center gap-1 text-[11px] font-bold text-[#0B1A2D] dark:text-[#B7F229] bg-[#F0FCCF] dark:bg-[#B7F229]/20 px-2.5 py-0.5 rounded-full border border-[#B7F229]/50">
-            <CheckCircle2 className="w-3 h-3 text-[#659b02] dark:text-[#B7F229]" />
+          <span className="inline-flex items-center gap-1.5 text-xs sm:text-[13px] font-bold text-[#0B1A2D] dark:text-[#B7F229] bg-[#F0FCCF] dark:bg-[#B7F229]/20 px-2.5 sm:px-3 py-1 rounded-full border border-[#B7F229]/50 whitespace-nowrap shrink-0">
+            <CheckCircle2 className="w-3.5 h-3.5 text-[#659b02] dark:text-[#B7F229] shrink-0" />
             <span>PAGADO</span>
           </span>
         ) : (
-          <span className="inline-flex items-center gap-1 text-[11px] font-bold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-2.5 py-0.5 rounded-full border border-slate-200/80 dark:border-slate-700">
-            <AlertCircle className="w-3 h-3 text-slate-500 dark:text-slate-400" />
+          <span className="inline-flex items-center gap-1.5 text-xs sm:text-[13px] font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 px-2.5 sm:px-3 py-1 rounded-full border border-slate-200/80 dark:border-slate-700 whitespace-nowrap shrink-0">
+            <AlertCircle className="w-3.5 h-3.5 text-slate-600 dark:text-slate-300 shrink-0" />
             <span>PENDIENTE TPV</span>
           </span>
         )}
 
         {/* Tag de Acceso Domótico PIN: Contenedor neutro y limpio (#0B1A2D / Slate) */}
-        <div className="inline-flex items-center gap-1.5 bg-slate-50 dark:bg-slate-800/80 border border-slate-200/70 dark:border-slate-700/80 px-2.5 py-1 rounded-full text-xs font-bold text-[#0B1A2D] dark:text-slate-200 font-mono tracking-wide shadow-2xs">
+        <div className="inline-flex items-center gap-1.5 bg-slate-50 dark:bg-slate-800/80 border border-slate-200/70 dark:border-slate-700/80 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs sm:text-[13px] font-bold text-[#0B1A2D] dark:text-slate-200 font-mono tracking-wide shadow-2xs whitespace-nowrap shrink-0">
           <KeyRound className="w-3.5 h-3.5 text-[#0B1A2D] dark:text-slate-300 shrink-0" />
           <span>PIN: <strong className="text-[#0B1A2D] dark:text-white font-black">{pinCode}</strong></span>
         </div>

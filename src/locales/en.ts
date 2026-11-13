@@ -1767,7 +1767,7 @@ export const enLocale: Record<string, string> = {
   "crm.toastZeroFee": "Registered with 0€ Fee (Exempt)",
   "crm.goToMembers": "Go to Members & CRM",
   "agenda.eyebrow": "Official Quadrant & Occupancy",
-  "agenda.title": "Bookings & Availability",
+  "agenda.title": "Bookings",
   "agenda.subtitle": "Interactive quadrant, time slots and daily club schedule.",
   "agenda.clientTypeAnonymous": "Anonymous / Casual",
   "agenda.anonymousNotice": "Anonymous booking without member profile. Logged as Casual Player.",

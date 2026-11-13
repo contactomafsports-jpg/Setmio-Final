@@ -1074,17 +1074,17 @@ export const AdminMatches: React.FC = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto pt-2 pb-16 space-y-4 font-sans text-[#0B1A2D] dark:text-slate-100 antialiased">
+    <div className="max-w-7xl mx-auto pt-3 pb-24 sm:pb-16 space-y-7 sm:space-y-8 font-sans text-[#0B1A2D] dark:text-slate-100 antialiased">
       {/* ======================================================================
           1. CABECERA LIMPIA Y SIMÉTRICA (ESTILO INICIO & RESERVAS)
           ====================================================================== */}
-      <section className="pt-2 pb-1 space-y-3" data-purpose="header-section">
-        <div className="flex items-center justify-between">
+      <section className="pt-2 pb-1 space-y-5" data-purpose="header-section">
+        <div className="flex items-center justify-between gap-3">
           <div>
-            <span className="text-xs font-medium text-slate-400 dark:text-slate-500 tracking-wide block mb-0.5">
+            <span className="text-sm font-medium text-slate-600 dark:text-slate-300 tracking-wide block mb-1">
               {currentTenant?.name || 'Centro de Pádel San Mateo'}
             </span>
-            <h1 className="text-[22px] font-extrabold text-[#0B1A2D] dark:text-white tracking-tight leading-tight">
+            <h1 className="text-[26px] sm:text-3xl font-bold text-[#0B1A2D] dark:text-white tracking-tight leading-tight">
               Partidas Abiertas
             </h1>
           </div>
@@ -1097,7 +1097,7 @@ export const AdminMatches: React.FC = () => {
                 window.history.pushState({}, '', '/gestion/partidas/nueva');
               }
             }}
-            className="p-1 text-slate-700 dark:text-slate-300 hover:text-[#0B1A2D] dark:hover:text-[#B7F229] transition-colors cursor-pointer active:scale-95"
+            className="p-2 text-slate-700 dark:text-slate-300 hover:text-[#0B1A2D] dark:hover:text-[#B7F229] transition-colors cursor-pointer active:scale-95"
             title="Nueva partida"
             aria-label="Nueva partida"
           >
@@ -1107,28 +1107,28 @@ export const AdminMatches: React.FC = () => {
 
         {/* Pill de Sede y Estado Operativo Unificado (colocado antes del Dashboard de Métricas) */}
         <div className="relative">
-          <div className="flex items-center justify-between p-2.5 bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200/80 dark:border-[#1A314D] shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
+          <div className="flex items-center justify-between gap-2.5 sm:gap-3 p-3.5 sm:p-5 bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200/80 dark:border-[#1A314D] shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
             {/* Selector de Sede */}
             <div
               onClick={() => setIsVenueSelectorOpen(!isVenueSelectorOpen)}
-              className="flex items-center gap-2 cursor-pointer group select-none min-w-0"
+              className="flex items-center gap-2.5 sm:gap-3 cursor-pointer group select-none min-w-0 flex-1"
               title="Cambiar sede activa o ver red consolidada"
             >
-              <div className="w-8 h-8 rounded-xl bg-slate-50 dark:bg-[#071220] border border-slate-100 dark:border-[#1A314D] flex items-center justify-center text-[#0B1A2D] dark:text-slate-200 shrink-0">
-                <Building2 className="w-4 h-4 text-[#0B1A2D] dark:text-white" />
+              <div className="w-10 h-10 rounded-xl bg-slate-50 dark:bg-[#071220] border border-slate-100 dark:border-[#1A314D] flex items-center justify-center text-[#0B1A2D] dark:text-slate-200 shrink-0">
+                <Building2 className="w-4.5 h-4.5 text-[#0B1A2D] dark:text-white" />
               </div>
-              <div className="min-w-0">
-                <div className="flex items-center gap-1.5">
-                  <span className="text-xs font-bold text-[#0B1A2D] dark:text-white truncate">
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-1.5 min-w-0">
+                  <span className="text-[13px] sm:text-base font-bold text-[#0B1A2D] dark:text-white truncate whitespace-nowrap">
                     {isConsolidatedView ? 'Todas las Sedes' : selectedVenue.shortName || selectedVenue.name}
                   </span>
                   <ChevronDown
-                    className={`w-3.5 h-3.5 text-slate-400 group-hover:text-[#0B1A2D] dark:group-hover:text-white transition-transform ${
+                    className={`w-4 h-4 text-slate-500 group-hover:text-[#0B1A2D] dark:text-slate-400 dark:group-hover:text-white transition-transform shrink-0 ${
                       isVenueSelectorOpen ? 'rotate-180 text-[#0B1A2D] dark:text-white' : ''
                     }`}
                   />
                 </div>
-                <span className="text-[10px] font-medium text-slate-400 block truncate">
+                <span className="text-xs sm:text-[13px] font-medium text-slate-600 dark:text-slate-300 block truncate whitespace-nowrap">
                   {venues.length > 1 ? `${venues.length} sedes conectadas` : 'Sede oficial'}
                 </span>
               </div>
@@ -1138,7 +1138,7 @@ export const AdminMatches: React.FC = () => {
             <button
               type="button"
               onClick={isConsolidatedView ? () => setIsVenueSelectorOpen((prev) => !prev) : toggleClubOpenState}
-              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#F0FCCF] dark:bg-[#B7F229]/20 border border-[#B7F229]/50 transition-all cursor-pointer hover:scale-102 shrink-0 select-none"
+              className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-full bg-[#F0FCCF] dark:bg-[#B7F229]/20 border border-[#B7F229]/50 transition-all cursor-pointer hover:scale-102 shrink-0 select-none whitespace-nowrap"
               title={
                 isConsolidatedView
                   ? `Red multisede consolidada (${venues.length} sedes operativas)`
@@ -1146,7 +1146,7 @@ export const AdminMatches: React.FC = () => {
               }
             >
               <span
-                className={`w-2 h-2 rounded-full ${
+                className={`w-2 h-2 rounded-full shrink-0 ${
                   isConsolidatedView
                     ? 'bg-[#82b805] dark:bg-[#B7F229]'
                     : isClubOpen
@@ -1154,7 +1154,7 @@ export const AdminMatches: React.FC = () => {
                     : 'bg-rose-500'
                 }`}
               />
-              <span className="text-[11px] font-bold text-[#0B1A2D] dark:text-[#B7F229]">
+              <span className="text-xs sm:text-[13px] font-bold text-[#0B1A2D] dark:text-[#B7F229] whitespace-nowrap">
                 {isConsolidatedView
                   ? `${venues.length} Sedes Activas`
                   : isClubOpen
@@ -1167,7 +1167,7 @@ export const AdminMatches: React.FC = () => {
           {/* Menú Desplegable de Sedes */}
           {isVenueSelectorOpen && (
             <div className="absolute top-full left-0 right-0 mt-2 z-30 p-2 bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200 dark:border-[#1A314D] shadow-xl space-y-1 animate-in fade-in slide-in-from-top-2 duration-150">
-              <div className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 px-2 py-1">
+              <div className="text-xs font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400 px-2.5 py-1.5">
                 Red Deportiva · Seleccionar Sede
               </div>
 
@@ -1178,17 +1178,17 @@ export const AdminMatches: React.FC = () => {
                     setSelectedVenueId('all');
                     setIsVenueSelectorOpen(false);
                   }}
-                  className={`w-full flex items-center justify-between p-2 rounded-xl text-xs font-bold transition text-left cursor-pointer ${
+                  className={`w-full flex items-center justify-between p-2.5 rounded-xl text-sm font-bold transition text-left cursor-pointer ${
                     isConsolidatedView
                       ? 'bg-[#B7F229]/20 text-[#0B1A2D] dark:text-white'
                       : 'hover:bg-slate-50 dark:hover:bg-[#132A45] text-slate-700 dark:text-slate-300'
                   }`}
                 >
                   <span className="flex items-center gap-2">
-                    <Layers className="w-3.5 h-3.5 text-[#8B5CF6]" />
+                    <Layers className="w-4 h-4 text-[#8B5CF6]" />
                     <span>Todas las Sedes (Consolidado)</span>
                   </span>
-                  {isConsolidatedView && <CheckCircle2 className="w-3.5 h-3.5 text-[#82b805]" />}
+                  {isConsolidatedView && <CheckCircle2 className="w-4 h-4 text-[#82b805]" />}
                 </button>
               )}
 
@@ -1204,17 +1204,17 @@ export const AdminMatches: React.FC = () => {
                         setSelectedVenueId(venue.id);
                         setIsVenueSelectorOpen(false);
                       }}
-                      className={`w-full flex items-center justify-between p-2 rounded-xl text-xs font-bold transition text-left cursor-pointer ${
+                      className={`w-full flex items-center justify-between p-2.5 rounded-xl text-sm font-bold transition text-left cursor-pointer ${
                         isSelected
                           ? 'bg-[#B7F229]/20 text-[#0B1A2D] dark:text-white'
                           : 'hover:bg-slate-50 dark:hover:bg-[#132A45] text-slate-700 dark:text-slate-300'
                       }`}
                     >
                       <span className="flex items-center gap-2 truncate">
-                        <Building2 className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                        <Building2 className="w-4 h-4 text-slate-400 shrink-0" />
                         <span className="truncate">{venue.name}</span>
                       </span>
-                      {isSelected && <CheckCircle2 className="w-3.5 h-3.5 text-[#82b805] shrink-0" />}
+                      {isSelected && <CheckCircle2 className="w-4 h-4 text-[#82b805] shrink-0" />}
                     </button>
                   );
                 })}
@@ -1224,64 +1224,64 @@ export const AdminMatches: React.FC = () => {
       </section>
 
       {/* 2. KPIs Ejecutivos de Partidas (Bento Grid) */}
-      <section className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4" data-purpose="bento-metrics">
+      <section className="grid grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4" data-purpose="bento-metrics">
         {/* Total Partidas */}
-        <div className="bg-white dark:bg-slate-900 rounded-2xl p-3.5 sm:p-4 border border-slate-200/80 dark:border-slate-800 shadow-2xs flex flex-col justify-between relative overflow-hidden">
-          <div className="flex items-center justify-between">
-            <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-6 border border-slate-200/80 dark:border-slate-800 shadow-2xs flex flex-col justify-between relative overflow-hidden min-w-0">
+          <div className="flex items-center justify-between gap-2 min-w-0">
+            <p className="text-xs sm:text-[13px] font-semibold text-slate-600 dark:text-slate-300 truncate whitespace-nowrap">
               {t('matches.kpiTotal', 'Total Partidas')}
             </p>
-            <span className="w-6 h-6 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-400">
-              <Clock className="w-3.5 h-3.5" />
+            <span className="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300 shrink-0">
+              <Clock className="w-4 h-4" />
             </span>
           </div>
-          <div className="my-1.5">
+          <div className="my-2">
             <span className="text-3xl font-extrabold text-[#0B1A2D] dark:text-white tracking-tight font-mono">
               {openMatches.length}
             </span>
           </div>
-          <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400">
+          <p className="text-xs sm:text-[13px] font-medium text-slate-600 dark:text-slate-300 truncate whitespace-nowrap">
             {fullMatchesCount} completadas (4/4)
           </p>
         </div>
 
         {/* Plazas Libres */}
-        <div className="bg-white dark:bg-slate-900 rounded-2xl p-3.5 sm:p-4 border border-[#B7F229]/60 dark:border-[#B7F229]/40 shadow-2xs flex flex-col justify-between relative overflow-hidden">
-          <div className="flex items-center justify-between">
-            <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-6 border border-[#B7F229]/60 dark:border-[#B7F229]/40 shadow-2xs flex flex-col justify-between relative overflow-hidden min-w-0">
+          <div className="flex items-center justify-between gap-2 min-w-0">
+            <p className="text-xs sm:text-[13px] font-semibold text-slate-600 dark:text-slate-300 truncate whitespace-nowrap">
               {t('matches.kpiSlots', 'Plazas Libres')}
             </p>
-            <span className="px-1.5 py-0.5 rounded-full bg-[#B7F229] text-[#0B1A2D] text-[9px] font-extrabold uppercase tracking-wide">
+            <span className="px-2 py-0.5 rounded-full bg-[#B7F229] text-[#0B1A2D] text-[11px] font-extrabold uppercase tracking-wide whitespace-nowrap shrink-0">
               Activo
             </span>
           </div>
-          <div className="my-1.5 flex items-baseline gap-1.5">
+          <div className="my-2 flex items-baseline gap-2">
             <span className="text-3xl font-extrabold text-[#0B1A2D] dark:text-white tracking-tight font-mono">
               {totalOpenSlots}
             </span>
-            <span className="w-2 h-2 rounded-full bg-[#B7F229]"></span>
+            <span className="w-2.5 h-2.5 rounded-full bg-[#B7F229] shrink-0"></span>
           </div>
-          <p className="text-[11px] font-semibold text-[#0B1A2D] dark:text-[#B7F229]">
+          <p className="text-xs sm:text-[13px] font-semibold text-[#0B1A2D] dark:text-[#B7F229] truncate whitespace-nowrap">
             {t('matches.kpiSlotsDesc', 'Buscando jugadores')}
           </p>
         </div>
 
         {/* Jugadores Activos */}
-        <div className="bg-white dark:bg-slate-900 rounded-2xl p-3.5 sm:p-4 border border-slate-200/80 dark:border-slate-800 shadow-2xs flex flex-col justify-between relative overflow-hidden">
-          <div className="flex items-center justify-between">
-            <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-6 border border-slate-200/80 dark:border-slate-800 shadow-2xs flex flex-col justify-between relative overflow-hidden min-w-0">
+          <div className="flex items-center justify-between gap-2 min-w-0">
+            <p className="text-xs sm:text-[13px] font-semibold text-slate-600 dark:text-slate-300 truncate whitespace-nowrap">
               {t('matches.kpiPlayers', 'Jugadores Activos')}
             </p>
-            <span className="w-6 h-6 rounded-lg bg-[#8B5CF6]/10 dark:bg-[#8B5CF6]/20 flex items-center justify-center text-[#8B5CF6]">
-              <Users className="w-3.5 h-3.5" />
+            <span className="w-7 h-7 rounded-lg bg-[#8B5CF6]/10 dark:bg-[#8B5CF6]/20 flex items-center justify-center text-[#8B5CF6] shrink-0">
+              <Users className="w-4 h-4" />
             </span>
           </div>
-          <div className="my-1.5">
+          <div className="my-2">
             <span className="text-3xl font-extrabold text-[#0B1A2D] dark:text-white tracking-tight font-mono">
               {activePlayersCount}
             </span>
           </div>
-          <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400">
+          <p className="text-xs sm:text-[13px] font-medium text-slate-600 dark:text-slate-300 truncate whitespace-nowrap">
             {t('matches.kpiPlayersDesc', 'En convocatoria')}
           </p>
         </div>
@@ -1293,31 +1293,31 @@ export const AdminMatches: React.FC = () => {
               openMatchDetail(matchWithPendingRequest);
             }
           }}
-          className={`bg-white dark:bg-slate-900 rounded-2xl p-3.5 sm:p-4 border border-slate-200/80 dark:border-slate-800 shadow-2xs flex flex-col justify-between relative overflow-hidden transition-all ${
+          className={`bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-6 border border-slate-200/80 dark:border-slate-800 shadow-2xs flex flex-col justify-between relative overflow-hidden transition-all min-w-0 ${
             matchWithPendingRequest ? 'cursor-pointer hover:border-[#8B5CF6]/60 hover:shadow-sm' : ''
           }`}
         >
-          <div className="flex items-center justify-between gap-1.5">
-            <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 whitespace-nowrap">
+          <div className="flex items-center justify-between gap-1.5 min-w-0">
+            <p className="text-xs sm:text-[13px] font-semibold text-slate-600 dark:text-slate-300 truncate whitespace-nowrap">
               Solicitudes
             </p>
             {pendingRequestsTotal > 0 ? (
-              <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-400 text-[10px] font-bold border border-amber-200 dark:border-amber-800 whitespace-nowrap shrink-0">
+              <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-400 text-[11px] font-bold border border-amber-200 dark:border-amber-800 whitespace-nowrap shrink-0">
                 {pendingRequestsTotal} pend.
               </span>
             ) : (
-              <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-[#F0FCCF] dark:bg-[#B7F229]/20 text-[#0B1A2D] dark:text-[#B7F229] text-[10px] font-bold border border-[#B7F229]/50 whitespace-nowrap shrink-0">
+              <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-[#F0FCCF] dark:bg-[#B7F229]/20 text-[#0B1A2D] dark:text-[#B7F229] text-[11px] font-bold border border-[#B7F229]/50 whitespace-nowrap shrink-0">
                 Al día
               </span>
             )}
           </div>
-          <div className="my-1.5">
+          <div className="my-2">
             <span className={`text-3xl font-extrabold tracking-tight font-mono ${pendingRequestsTotal > 0 ? 'text-amber-500' : 'text-[#0B1A2D] dark:text-white'}`}>
               {pendingRequestsTotal}
             </span>
           </div>
-          <div className="flex items-center justify-between gap-1">
-            <p className="text-[11px] font-medium text-slate-400 dark:text-slate-500 truncate">
+          <div className="flex items-center justify-between gap-1.5 min-w-0">
+            <p className="text-xs sm:text-[13px] font-medium text-slate-600 dark:text-slate-300 truncate whitespace-nowrap min-w-0 flex-1">
               {pendingRequestsTotal > 0 ? 'Pendientes de aprobar' : 'Sin pendientes'}
             </p>
             {matchWithPendingRequest ? (
@@ -1327,11 +1327,11 @@ export const AdminMatches: React.FC = () => {
                   e.stopPropagation();
                   openMatchDetail(matchWithPendingRequest);
                 }}
-                className="inline-flex items-center gap-1 text-[11px] font-bold text-[#8B5CF6] hover:text-[#7C3AED] hover:underline cursor-pointer shrink-0"
+                className="inline-flex items-center gap-1 text-xs sm:text-[13px] font-bold text-[#8B5CF6] hover:text-[#7C3AED] hover:underline cursor-pointer shrink-0 whitespace-nowrap"
                 title="Abrir partida con solicitud pendiente"
               >
-                <span>Ver partida</span>
-                <ArrowRight className="w-3 h-3" />
+                <span>Ver<span className="hidden sm:inline"> partida</span></span>
+                <ArrowRight className="w-3.5 h-3.5" />
               </button>
             ) : null}
           </div>
@@ -1339,23 +1339,23 @@ export const AdminMatches: React.FC = () => {
       </section>
 
       {/* 3. Filtros Horizontales Modernos (Dos filas limpias sin contenedores pesados) */}
-      <section className="space-y-2.5" data-purpose="filtering-section">
+      <section className="space-y-3.5" data-purpose="filtering-section">
         {/* Fila 1: Barra de búsqueda superior con icono de filtro perfectamente alineado */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2.5">
           <div className="relative flex-1">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+            <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Buscar por pista, jugador, nivel o fecha..."
-              className="w-full pl-9 pr-8 py-2 rounded-xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] text-xs font-medium text-[#0B1A2D] dark:text-white placeholder-slate-400 shadow-xs focus:outline-none focus:border-[#8B5CF6] transition-colors"
+              className="w-full h-11 pl-10 pr-8 rounded-xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] text-sm font-medium text-[#0B1A2D] dark:text-white placeholder-slate-400 shadow-xs focus:outline-none focus:border-[#8B5CF6] transition-colors"
             />
             {search && (
               <button
                 type="button"
                 onClick={() => setSearch('')}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-0.5"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-0.5"
                 title="Limpiar búsqueda"
               >
                 ✕
@@ -1366,18 +1366,18 @@ export const AdminMatches: React.FC = () => {
           <button
             type="button"
             onClick={openFilterModal}
-            className={`h-9 px-3 bg-white dark:bg-[#0E2239] border rounded-xl shadow-xs active:scale-95 transition-all cursor-pointer flex items-center gap-1.5 shrink-0 text-xs font-semibold ${
+            className={`h-11 px-4 bg-white dark:bg-[#0E2239] border rounded-xl shadow-xs active:scale-95 transition-all cursor-pointer flex items-center gap-2 shrink-0 text-sm font-semibold ${
               activeFiltersCount > 0
                 ? 'border-[#8B5CF6] text-[#8B5CF6]'
-                : 'border-slate-200/80 dark:border-[#1A314D] text-slate-600 dark:text-slate-300 hover:text-[#0B1A2D] dark:hover:text-white hover:border-slate-300'
+                : 'border-slate-200/80 dark:border-[#1A314D] text-slate-700 dark:text-slate-200 hover:text-[#0B1A2D] dark:hover:text-white hover:border-slate-300'
             }`}
             title="Más filtros"
             aria-label="Más filtros"
           >
-            <Filter className="w-3.5 h-3.5" />
+            <Filter className="w-4 h-4" />
             <span className="hidden sm:inline">Filtros</span>
             {activeFiltersCount > 0 && (
-              <span className="w-4 h-4 rounded-full bg-[#8B5CF6] text-white text-[10px] flex items-center justify-center font-bold">
+              <span className="w-5 h-5 rounded-full bg-[#8B5CF6] text-white text-xs flex items-center justify-center font-bold">
                 {activeFiltersCount}
               </span>
             )}
@@ -1385,43 +1385,43 @@ export const AdminMatches: React.FC = () => {
         </div>
 
         {/* Fila 2: Pestañas de estado planas, modernas y limpias (Fila fija simétrica sin scroll) */}
-        <div className="grid grid-cols-3 gap-1.5 w-full py-0.5">
+        <div className="grid grid-cols-3 gap-2 w-full py-0.5">
           <button
             type="button"
             onClick={() => setStatusFilter('all')}
-            className={`w-full px-2 py-1.5 rounded-xl text-xs transition cursor-pointer font-bold flex items-center justify-center gap-1 text-center whitespace-nowrap ${
+            className={`w-full px-2 sm:px-3 py-2.5 rounded-xl text-xs sm:text-sm transition cursor-pointer font-bold flex items-center justify-center gap-1 sm:gap-1.5 text-center whitespace-nowrap min-w-0 ${
               statusFilter === 'all'
                 ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D] shadow-xs'
-                : 'bg-white/80 dark:bg-[#0E2239]/80 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white border border-slate-200/70 dark:border-[#1A314D]'
+                : 'bg-white/80 dark:bg-[#0E2239]/80 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white border border-slate-200/70 dark:border-[#1A314D]'
             }`}
           >
-            <span>Todas</span>
-            <span className="font-mono text-[10px] opacity-75">({venueFilteredMatches.length})</span>
+            <span className="truncate">Todas</span>
+            <span className="font-mono text-[11px] sm:text-xs opacity-75 shrink-0">({venueFilteredMatches.length})</span>
           </button>
           <button
             type="button"
             onClick={() => setStatusFilter('open')}
-            className={`w-full px-2 py-1.5 rounded-xl text-xs transition cursor-pointer font-bold flex items-center justify-center gap-1 text-center whitespace-nowrap ${
+            className={`w-full px-2 sm:px-3 py-2.5 rounded-xl text-xs sm:text-sm transition cursor-pointer font-bold flex items-center justify-center gap-1 sm:gap-1.5 text-center whitespace-nowrap min-w-0 ${
               statusFilter === 'open'
                 ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D] shadow-xs'
-                : 'bg-white/80 dark:bg-[#0E2239]/80 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white border border-slate-200/70 dark:border-[#1A314D]'
+                : 'bg-white/80 dark:bg-[#0E2239]/80 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white border border-slate-200/70 dark:border-[#1A314D]'
             }`}
           >
-            <span>Buscando</span>
-            <span className="font-mono text-[10px] opacity-75">({venueFilteredMatches.filter((m) => m.players.length < 4).length})</span>
+            <span className="truncate">Buscando</span>
+            <span className="font-mono text-[11px] sm:text-xs opacity-75 shrink-0">({venueFilteredMatches.filter((m) => m.players.length < 4).length})</span>
           </button>
           <button
             type="button"
             onClick={() => setStatusFilter('full')}
-            className={`w-full px-2 py-1.5 rounded-xl text-xs transition cursor-pointer font-bold flex items-center justify-center gap-1 text-center whitespace-nowrap ${
+            className={`w-full px-2 sm:px-3 py-2.5 rounded-xl text-xs sm:text-sm transition cursor-pointer font-bold flex items-center justify-center gap-1 sm:gap-1.5 text-center whitespace-nowrap min-w-0 ${
               statusFilter === 'full'
                 ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D] shadow-xs'
-                : 'bg-white/80 dark:bg-[#0E2239]/80 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white border border-slate-200/70 dark:border-[#1A314D]'
+                : 'bg-white/80 dark:bg-[#0E2239]/80 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white border border-slate-200/70 dark:border-[#1A314D]'
             }`}
           >
-            <span className="w-1.5 h-1.5 rounded-full bg-[#B7F229] shrink-0" />
-            <span>Completa</span>
-            <span className="font-mono text-[10px] opacity-75">({fullMatchesCount})</span>
+            <span className="w-2 h-2 rounded-full bg-[#B7F229] shrink-0" />
+            <span className="truncate">Completa</span>
+            <span className="font-mono text-[11px] sm:text-xs opacity-75 shrink-0">({fullMatchesCount})</span>
           </button>
         </div>
 
@@ -1661,14 +1661,14 @@ export const AdminMatches: React.FC = () => {
 
       {/* 4. Listado de Partidas con Tarjetas Estándar Pro */}
       {filteredMatches.length === 0 ? (
-        <div className="p-12 text-center rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-3">
+        <div className="p-12 text-center rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-4">
           <div className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-400 mx-auto flex items-center justify-center">
             <Trophy className="w-6 h-6" />
           </div>
-          <h3 className="text-base font-bold text-slate-900 dark:text-white">
+          <h3 className="text-lg font-bold text-slate-900 dark:text-white">
             {t('matches.emptyTitle', 'No se encontraron partidas abiertas')}
           </h3>
-          <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto">
+          <p className="text-sm text-slate-600 dark:text-slate-300 max-w-sm mx-auto">
             {t(
               'matches.emptyDesc',
               'Crea una nueva partida abierta para dinamizar la ocupación de pistas y fomentar el juego nivelado entre los socios.'
@@ -1682,14 +1682,14 @@ export const AdminMatches: React.FC = () => {
                 window.history.pushState({}, '', '/gestion/partidas/nueva');
               }
             }}
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-[#0B1A2D] hover:bg-[#132A45] dark:bg-[#B7F229] dark:hover:bg-[#a3db22] text-white dark:text-[#0B1A2D] font-extrabold text-xs transition cursor-pointer active:scale-95 shadow-md"
+            className="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-[#0B1A2D] hover:bg-[#132A45] dark:bg-[#B7F229] dark:hover:bg-[#a3db22] text-white dark:text-[#0B1A2D] font-extrabold text-sm transition cursor-pointer active:scale-95 shadow-md"
           >
             <Plus className="w-4 h-4 stroke-[2.5]" />
             <span>{t('matches.createFirstBtn', 'Crear Primera Partida')}</span>
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
           {filteredMatches.map((m) => {
             const isFull = m.players.length >= 4;
             const openSlots = Math.max(0, 4 - m.players.length);
@@ -1715,80 +1715,80 @@ export const AdminMatches: React.FC = () => {
               <article
                 key={m.id}
                 onClick={() => openMatchDetail(m)}
-                className={`p-4 rounded-2xl bg-white dark:bg-slate-900 border transition-all duration-200 shadow-xs hover:border-slate-300 dark:hover:border-slate-700 flex flex-col justify-between cursor-pointer group space-y-3.5 ${
+                className={`w-full min-w-0 overflow-hidden p-5 sm:p-6 rounded-2xl bg-white dark:bg-slate-900 border transition-all duration-200 shadow-xs hover:border-slate-300 dark:hover:border-slate-700 flex flex-col justify-between cursor-pointer group space-y-4 ${
                   isFull
                     ? 'border-slate-300/80 dark:border-slate-700'
                     : 'border-slate-200/80 dark:border-slate-800 hover:shadow-md'
                 }`}
               >
-                {/* 1. Fila Superior: Fecha y Hora Simplificada + Badges de Plazas y Género */}
-                <div className="flex items-start justify-between gap-2">
-                  <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300">
-                    <Clock className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                    <span className="text-[#0B1A2D] dark:text-white font-bold">
+                {/* 1. Fila Superior: Fecha y Hora Simplificada + Badges de Plazas y Género (Una sola línea) */}
+                <div className="flex items-center justify-between gap-2 min-w-0">
+                  <div className="flex items-center gap-1.5 text-xs sm:text-[13px] font-semibold text-slate-700 dark:text-slate-200 min-w-0 flex-1">
+                    <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-400 shrink-0" />
+                    <span className="text-[#0B1A2D] dark:text-white font-bold truncate whitespace-nowrap">
                       {formatSimplifiedMatchDate(m.startTime)}
                     </span>
-                    <span className="inline-flex items-center px-1.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-[10px] font-bold text-slate-600 dark:text-slate-300 whitespace-nowrap shrink-0">
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-[11px] font-bold text-slate-600 dark:text-slate-300 whitespace-nowrap shrink-0">
                       {m.durationMinutes || 90} min
                     </span>
                   </div>
 
                   <div className="flex items-center gap-1.5 shrink-0">
                     {isFull ? (
-                      <span className="inline-flex items-center gap-1.5 bg-[#F0FCCF] dark:bg-[#B7F229]/20 text-[#0B1A2D] dark:text-[#B7F229] text-[10px] font-bold px-2.5 py-0.5 rounded-full border border-[#B7F229]/50 shadow-2xs">
-                        <span className="w-1.5 h-1.5 rounded-full bg-[#B7F229]"></span>
-                        Completa
+                      <span className="inline-flex items-center gap-1 bg-[#F0FCCF] dark:bg-[#B7F229]/20 text-[#0B1A2D] dark:text-[#B7F229] text-[11px] font-bold px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full border border-[#B7F229]/50 shadow-2xs whitespace-nowrap shrink-0">
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#B7F229] shrink-0"></span>
+                        <span>Completa</span>
                       </span>
                     ) : (
-                      <span className="inline-flex items-center gap-1 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-[10px] font-bold px-2.5 py-0.5 rounded-full border border-slate-200 dark:border-slate-700">
-                        <span className="w-1.5 h-1.5 rounded-full bg-[#B7F229]"></span>
-                        {openSlots} {openSlots === 1 ? 'libre' : 'libres'}
+                      <span className="inline-flex items-center gap-1 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-[11px] font-bold px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full border border-slate-200 dark:border-slate-700 whitespace-nowrap shrink-0">
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#B7F229] shrink-0"></span>
+                        <span>{openSlots} {openSlots === 1 ? 'libre' : 'libres'}</span>
                       </span>
                     )}
 
-                    <span className="bg-[#8B5CF6]/10 text-[#8B5CF6] dark:text-[#a78bfa] text-[10px] font-semibold px-2 py-0.5 rounded-md">
+                    <span className="bg-[#8B5CF6]/10 text-[#8B5CF6] dark:text-[#a78bfa] text-[11px] font-semibold px-2 py-0.5 sm:py-1 rounded-md whitespace-nowrap shrink-0">
                       {m.gender === 'female' ? 'Femenina' : m.gender === 'mixed' ? 'Mixta' : 'Masculina'}
                     </span>
                   </div>
                 </div>
 
                 {/* 2. Pista y Organizador */}
-                <div>
-                  <h2 className="text-sm font-extrabold text-[#0B1A2D] dark:text-white tracking-tight truncate group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition">
+                <div className="space-y-1 min-w-0">
+                  <h2 className="text-base sm:text-lg font-bold text-[#0B1A2D] dark:text-white tracking-tight truncate whitespace-nowrap group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition">
                     {m.courtName}
                   </h2>
-                  <div className="flex items-center gap-2 mt-0.5">
-                    <p className="text-xs text-slate-500 dark:text-slate-400 font-medium truncate">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 font-medium truncate whitespace-nowrap min-w-0">
                       {organizerDisplay}
                     </p>
                     {isMultiVenue && (m.venueShortName || m.venueName) && (
-                      <span className="inline-flex items-center gap-1 px-1.5 py-0.2 rounded bg-[#0B1A2D]/5 dark:bg-[#B7F229]/15 text-[#0B1A2D] dark:text-[#B7F229] font-bold text-[9px] border border-slate-200/80 dark:border-[#B7F229]/30 shrink-0">
-                        <Building2 className="w-2.5 h-2.5 text-[#0B1A2D] dark:text-[#B7F229] shrink-0" />
-                        <span className="truncate max-w-[80px]">{m.venueShortName || m.venueName}</span>
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-[#0B1A2D]/5 dark:bg-[#B7F229]/15 text-[#0B1A2D] dark:text-[#B7F229] font-bold text-[11px] border border-slate-200/80 dark:border-[#B7F229]/30 shrink-0 whitespace-nowrap">
+                        <Building2 className="w-3 h-3 text-[#0B1A2D] dark:text-[#B7F229] shrink-0" />
+                        <span className="truncate max-w-[90px]">{m.venueShortName || m.venueName}</span>
                       </span>
                     )}
                   </div>
                 </div>
 
                 {/* 3. Nivel ELO & Desglose de Precios (Socio / No socio) */}
-                <div className="flex items-center justify-between px-3 py-2 bg-slate-50 dark:bg-slate-950/70 rounded-xl text-xs border border-slate-100 dark:border-slate-800/80">
-                  <div className="font-medium text-slate-600 dark:text-slate-300 flex items-center gap-1.5">
-                    <span className="text-[11px] uppercase tracking-wider text-slate-400 font-bold">Nivel:</span>
-                    <span className="text-[#0B1A2D] dark:text-white font-bold bg-white dark:bg-slate-900 px-2 py-0.5 rounded-md border border-slate-200/60 dark:border-slate-800 shadow-2xs font-mono">
+                <div className="flex items-center justify-between gap-2 px-3.5 sm:px-4 py-3 bg-slate-50 dark:bg-slate-950/70 rounded-xl text-xs sm:text-sm border border-slate-100 dark:border-slate-800/80 min-w-0">
+                  <div className="font-medium text-slate-600 dark:text-slate-300 flex items-center gap-1.5 min-w-0">
+                    <span className="text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400 font-bold whitespace-nowrap">Nivel:</span>
+                    <span className="text-[#0B1A2D] dark:text-white font-bold bg-white dark:bg-slate-900 px-2 py-0.5 rounded-md border border-slate-200/60 dark:border-slate-800 shadow-2xs font-mono text-xs sm:text-[13px] whitespace-nowrap">
                       {m.minLevel.toFixed(2)} – {m.maxLevel.toFixed(2)}
                     </span>
                   </div>
 
-                  <div className="text-right flex flex-col items-end leading-tight">
-                    <div className="flex items-baseline gap-1">
-                      <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wide">Socio:</span>
-                      <span className="text-sm font-extrabold text-[#0B1A2D] dark:text-white font-mono">
+                  <div className="text-right flex flex-col items-end leading-tight space-y-0.5 shrink-0">
+                    <div className="flex items-baseline gap-1 whitespace-nowrap">
+                      <span className="text-xs font-semibold text-slate-600 dark:text-slate-300">Socio:</span>
+                      <span className="text-sm sm:text-base font-extrabold text-[#0B1A2D] dark:text-white font-mono">
                         {socioPrice.toFixed(2)} €
                       </span>
                     </div>
-                    <div className="flex items-baseline gap-1 text-[11px] text-slate-500 dark:text-slate-400">
-                      <span className="text-[9px] font-medium text-slate-400">No socio:</span>
-                      <span className="font-semibold text-slate-600 dark:text-slate-300 font-mono">
+                    <div className="flex items-baseline gap-1 text-xs text-slate-600 dark:text-slate-300 whitespace-nowrap">
+                      <span className="text-[11px] sm:text-xs font-medium text-slate-500 dark:text-slate-400">No socio:</span>
+                      <span className="font-semibold text-slate-700 dark:text-slate-200 font-mono">
                         {noSocioPrice.toFixed(2)} €
                       </span>
                     </div>
@@ -1796,8 +1796,8 @@ export const AdminMatches: React.FC = () => {
                 </div>
 
                 {/* 4. Avatares de Jugadores y Plazas Libres */}
-                <div className="flex items-center justify-between pt-0.5">
-                  <div className="flex items-center gap-2">
+                <div className="flex items-center justify-between gap-2 pt-1 min-w-0">
+                  <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
                     {m.players.map((p, idx) => (
                       <div
                         key={idx}
@@ -1813,17 +1813,17 @@ export const AdminMatches: React.FC = () => {
                             navigateToPlayerProfile(p.name, 'matches');
                           }
                         }}
-                        className="relative group/avatar cursor-pointer hover:scale-105 transition-transform"
+                        className="relative group/avatar cursor-pointer hover:scale-105 transition-transform shrink-0"
                         title={`${p.name} · Ver perfil del jugador · Nivel ${p.level.toFixed(2)} (${p.position}) · ${p.paid ? 'Pagado' : 'Pendiente de pago'}`}
                       >
                         <div
-                          className={`w-8 h-8 rounded-full ${
+                          className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full ${
                             idx === 0 ? 'bg-[#0B1A2D]' : 'bg-slate-700 dark:bg-slate-800'
                           } text-white font-bold text-xs flex items-center justify-center shadow-xs border border-white/20`}
                         >
                           {p.name.slice(0, 2).toUpperCase()}
                         </div>
-                        <span className="absolute -bottom-1 -right-1 bg-slate-700 text-[8px] font-bold text-white w-3.5 h-3.5 rounded-full flex items-center justify-center border border-white dark:border-slate-900">
+                        <span className="absolute -bottom-1 -right-1 bg-slate-700 text-[9px] font-bold text-white w-4 h-4 rounded-full flex items-center justify-center border border-white dark:border-slate-900">
                           {p.position === 'drive' ? 'D' : p.position === 'reves' ? 'R' : 'A'}
                         </span>
                       </div>
@@ -1838,15 +1838,15 @@ export const AdminMatches: React.FC = () => {
                           e.stopPropagation();
                           setSelectedMatchForAdd(m);
                         }}
-                        className="w-8 h-8 rounded-full border-2 border-dashed border-slate-300 dark:border-slate-700 flex items-center justify-center text-slate-400 hover:border-slate-400 dark:hover:border-slate-500 transition-colors cursor-pointer bg-slate-50/50 dark:bg-slate-800/40"
+                        className="w-8 h-8 sm:w-9 sm:h-9 rounded-full border-2 border-dashed border-slate-300 dark:border-slate-700 flex items-center justify-center text-slate-400 hover:border-slate-400 dark:hover:border-slate-500 transition-colors cursor-pointer bg-slate-50/50 dark:bg-slate-800/40 shrink-0"
                         title="Inscribir jugador en esta plaza"
                       >
-                        <Plus className="w-3.5 h-3.5 text-slate-400 stroke-[2.5]" />
+                        <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-400 stroke-[2.5]" />
                       </button>
                     ))}
                   </div>
 
-                  <span className="text-xs font-bold text-[#0B1A2D] dark:text-slate-200 hover:text-slate-600 dark:hover:text-slate-400 inline-flex items-center gap-1 transition-colors group/detail">
+                  <span className="text-xs sm:text-sm font-bold text-[#0B1A2D] dark:text-slate-200 hover:text-slate-600 dark:hover:text-slate-400 inline-flex items-center gap-1 transition-colors group/detail whitespace-nowrap shrink-0">
                     <span>ver detalle</span>
                     <span aria-hidden="true" className="group-hover/detail:translate-x-0.5 transition-transform">
                       →
@@ -1854,11 +1854,11 @@ export const AdminMatches: React.FC = () => {
                   </span>
                 </div>
 
-                {/* 5. Footer de Acciones Rápidas */}
-                <div className="flex items-center justify-between pt-3 border-t border-slate-100 dark:border-slate-800/80 gap-2">
-                  <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 font-medium">
-                    <CreditCard className="w-3.5 h-3.5 text-slate-400" />
-                    <span>
+                {/* 5. Footer de Acciones Rápidas (Fluido 100% ancho sin desbordamiento) */}
+                <div className="w-full flex items-center justify-between gap-2 pt-4 border-t border-slate-100 dark:border-slate-800/80 min-w-0">
+                  <div className="flex items-center gap-1.5 text-xs sm:text-[13px] text-slate-600 dark:text-slate-300 font-medium min-w-0 flex-1">
+                    <CreditCard className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-400 shrink-0" />
+                    <span className="truncate whitespace-nowrap">
                       {m.paymentPolicy === 'online_only'
                         ? 'Online'
                         : m.paymentPolicy === 'counter_only'
@@ -1867,7 +1867,7 @@ export const AdminMatches: React.FC = () => {
                     </span>
                   </div>
 
-                  <div className="flex items-center gap-1.5">
+                  <div className="flex items-center justify-end gap-1.5 shrink-0">
                     <button
                       aria-label="Copiar enlace de partida"
                       type="button"
@@ -1875,10 +1875,10 @@ export const AdminMatches: React.FC = () => {
                         e.stopPropagation();
                         handleCopyMatchLink(m.id);
                       }}
-                      className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200/60 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 hover:text-[#0B1A2D] dark:hover:text-white transition-colors cursor-pointer"
+                      className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200/60 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 hover:text-[#0B1A2D] dark:hover:text-white transition-colors cursor-pointer shrink-0"
                       title="Copiar enlace"
                     >
-                      <Copy className="w-3.5 h-3.5" />
+                      <Copy className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                     </button>
 
                     <button
@@ -1888,10 +1888,10 @@ export const AdminMatches: React.FC = () => {
                         e.stopPropagation();
                         handleOpenShareNotifyHub(m);
                       }}
-                      className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200/60 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 hover:text-[#0B1A2D] dark:hover:text-white transition-colors cursor-pointer"
+                      className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200/60 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 hover:text-[#0B1A2D] dark:hover:text-white transition-colors cursor-pointer shrink-0"
                       title="Compartir o notificar"
                     >
-                      <Share2 className="w-3.5 h-3.5" />
+                      <Share2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                     </button>
 
                     {!isFull && (
@@ -1901,9 +1901,9 @@ export const AdminMatches: React.FC = () => {
                           e.stopPropagation();
                           setSelectedMatchForAdd(m);
                         }}
-                        className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#0B1A2D] hover:bg-[#132A45] text-white rounded-xl text-xs font-extrabold shadow-xs active:scale-95 transition-all cursor-pointer"
+                        className="inline-flex items-center justify-center gap-1 px-3 sm:px-3.5 py-2 bg-[#0B1A2D] hover:bg-[#132A45] text-white rounded-xl text-xs sm:text-[13px] font-bold shadow-xs active:scale-95 transition-all cursor-pointer whitespace-nowrap shrink-0"
                       >
-                        <Plus className="w-3.5 h-3.5 text-white stroke-[2.5]" />
+                        <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white stroke-[2.5] shrink-0" />
                         <span>Inscribir</span>
                       </button>
                     )}
