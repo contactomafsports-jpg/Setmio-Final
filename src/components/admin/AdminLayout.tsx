@@ -3,21 +3,11 @@ import { useApp, AdminTab } from '../../context/AppContext';
 import {
   LogOut,
   ChevronRight,
-  ChevronDown,
-  Check,
   X,
-  Sun,
-  Moon,
-  Globe,
-  CheckCircle2,
   User,
-  Eye,
 } from 'lucide-react';
 import { AdminHeader } from './AdminHeader';
 import { PrivateMobileNav } from '../common/PrivateMobileNav';
-import { SUPPORTED_LANGUAGES, SupportedLanguage } from '../../lib/i18n';
-import { OfficialFlag } from '../common/OfficialFlag';
-import { i18n } from '../../i18n';
 import { getAdminNavConfig } from '../../lib/adminNavigation';
 import { SetmioLogo } from '../common/SetmioLogo';
 
@@ -32,14 +22,6 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
     setAdminTab,
     currentUser,
     logoutOrExitDemo,
-    theme,
-    setTheme,
-    toggleTheme,
-    adminTheme,
-    setAdminTheme,
-    language,
-    setLanguage,
-    enterWhiteLabelPlayerPreview,
     setSelectedCustomerId,
     isMultiVenue,
     venues,
@@ -49,7 +31,6 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
 
   const [mobileMoreOpen, setMobileMoreOpen] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
-  const [isLangDropdownOpen, setIsLangDropdownOpen] = useState(false);
 
   useEffect(() => {
     const root = document.documentElement;
@@ -66,11 +47,18 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
 
   useEffect(() => {
     if (!mobileMoreOpen) return;
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
     const closeOnEscape = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') setMobileMoreOpen(false);
+      if (event.key === 'Escape') {
+        setMobileMoreOpen(false);
+      }
     };
     window.addEventListener('keydown', closeOnEscape);
-    return () => window.removeEventListener('keydown', closeOnEscape);
+    return () => {
+      document.body.style.overflow = prevOverflow;
+      window.removeEventListener('keydown', closeOnEscape);
+    };
   }, [mobileMoreOpen]);
 
   // Configuración de navegación centralizada y unificada
@@ -332,43 +320,35 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
       />
 
       {/* ======================================================================
-          DRAWER TÁCTIL "MÁS" EN MÓVIL (Módulos Secundarios en Idéntico Orden)
+          VISTA A PANTALLA COMPLETA "PANEL DE CONTROL" (+)
           ====================================================================== */}
       {mobileMoreOpen && (
-        <div className="md:hidden fixed inset-0 z-50 flex flex-col justify-end bg-slate-950/70 dark:bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
-          <div className="w-full bg-white dark:bg-[#071220] rounded-t-[32px] border-t border-slate-200/90 dark:border-[#1A314D] shadow-[0_-12px_40px_rgba(0,0,0,0.35)] flex flex-col max-h-[88vh] overflow-hidden animate-in slide-in-from-bottom-6 duration-200">
-            {/* Barra táctil indicadora superior */}
-            <div className="w-12 h-1 bg-slate-300 dark:bg-slate-700 rounded-full mx-auto mt-3 mb-1 shrink-0" />
-
-            {/* Cabecera del Panel */}
-            <div className="px-5 pb-3 pt-1 border-b border-slate-100 dark:border-[#1A314D] flex items-center justify-between shrink-0">
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-2xl bg-[#0B1A2D] dark:bg-white text-white dark:text-[#0B1A2D] flex items-center justify-center shadow-xs shrink-0">
-                  <SetmioLogo variant="symbol" size="sm" />
-                </div>
-                <div>
-                  <div className="font-black text-sm tracking-tight text-[#0B1A2D] dark:text-white">
-                    Módulos & Herramientas
-                  </div>
-                  <div className="text-[11px] text-slate-500 dark:text-slate-400 font-medium flex items-center gap-1.5">
-                    <span className="font-bold text-[#8B5CF6] dark:text-[#B7F229]">{roleTitle}</span>
-                    <span>·</span>
-                    <span className="truncate max-w-[170px]">{currentTenant.name}</span>
-                  </div>
-                </div>
-              </div>
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="Panel de Control"
+          className="fixed inset-0 z-50 flex flex-col min-h-dvh h-dvh w-screen bg-slate-50 dark:bg-[#0B1A2D] text-[#0B1A2D] dark:text-slate-100 overflow-hidden animate-in fade-in slide-in-from-bottom-3 duration-200"
+        >
+          {/* Cabecera Minimalista: Solo Título y Botón de Cierre */}
+          <header className="px-5 sm:px-8 pt-[max(1.75rem,env(safe-area-inset-top))] pb-4 shrink-0">
+            <div className="max-w-2xl mx-auto flex items-center justify-between gap-4">
+              <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#0B1A2D] dark:text-white leading-tight truncate">
+                Panel de Control
+              </h2>
               <button
                 type="button"
                 onClick={() => setMobileMoreOpen(false)}
-                className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#0E2239] transition cursor-pointer"
-                aria-label="Cerrar panel"
+                className="min-h-[44px] min-w-[44px] w-11 h-11 rounded-2xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] flex items-center justify-center text-[#0B1A2D] dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-[#132A45] transition cursor-pointer active:scale-95 shrink-0"
+                aria-label="Cerrar panel de control"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
+          </header>
 
-            {/* Módulos en Drawer Secundario (Estilo Linear / Stripe: Filas limpias, sin tarjetas anidadas) */}
-            <div className="flex-1 overflow-y-auto overscroll-contain px-4 py-2 divide-y divide-slate-100 dark:divide-[#1A314D]/40">
+          {/* Contenedor Único Maestro con Lista Continua */}
+          <div className="flex-1 overflow-y-auto overscroll-contain px-5 sm:px-8 pt-2 pb-[max(2rem,env(safe-area-inset-bottom))]">
+            <div className="max-w-2xl mx-auto bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200/80 dark:border-[#1A314D] shadow-2xs overflow-hidden divide-y divide-slate-100 dark:divide-white/5">
               {secondaryItems.map((tab) => {
                 const Icon = tab.icon;
                 const isActive = adminTab === tab.id;
@@ -380,48 +360,40 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
                       setMobileMoreOpen(false);
                       handleSelectTab(tab.id);
                     }}
-                    className={`w-full flex items-center justify-between py-3 px-2 rounded-xl transition text-left cursor-pointer group active:scale-[0.99] ${
+                    className={`w-full h-14 px-4 sm:px-5 flex items-center justify-between gap-3 text-left transition-colors duration-150 cursor-pointer group active:bg-slate-100/80 dark:active:bg-white/10 min-w-0 ${
                       isActive
-                        ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D] shadow-xs my-0.5'
-                        : 'hover:bg-slate-50 dark:hover:bg-[#0E2239]/60 text-slate-800 dark:text-slate-100'
+                        ? 'bg-slate-50 dark:bg-white/[0.06]'
+                        : 'hover:bg-slate-50/80 dark:hover:bg-white/[0.03]'
                     }`}
                   >
-                    <div className="flex items-center gap-3 min-w-0">
+                    <div className="flex items-center gap-3.5 min-w-0 flex-1">
                       <div
-                        className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 transition ${
+                        className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-colors ${
                           isActive
-                            ? 'bg-white/10 dark:bg-[#0B1A2D]/10 text-[#B7F229] dark:text-[#0B1A2D]'
-                            : 'bg-slate-100 dark:bg-[#0E2239] text-[#0B1A2D] dark:text-[#B7F229] group-hover:bg-slate-200/70 dark:group-hover:bg-[#132A45]'
+                            ? 'bg-[#0B1A2D] text-[#B7F229] dark:bg-[#B7F229] dark:text-[#0B1A2D]'
+                            : 'bg-slate-100/90 dark:bg-[#071220] text-[#0B1A2D] dark:text-[#B7F229] group-hover:bg-[#F0FCCF] dark:group-hover:bg-[#132A45]'
                         }`}
                       >
-                        <Icon className="w-4 h-4 stroke-[2]" />
+                        <Icon className="w-4.5 h-4.5" strokeWidth={2} />
                       </div>
-                      <div className="min-w-0">
-                        <span
-                          className={`text-xs font-bold tracking-tight block truncate ${
-                            isActive ? 'text-white dark:text-[#0B1A2D]' : 'text-slate-800 dark:text-slate-100'
-                          }`}
-                        >
-                          {tab.label}
-                        </span>
-                        {tab.desc && (
-                          <span
-                            className={`text-[10px] truncate block leading-tight ${
-                              isActive ? 'text-white/70 dark:text-[#0B1A2D]/70' : 'text-slate-400 dark:text-slate-400 font-normal'
-                            }`}
-                          >
-                            {tab.desc}
-                          </span>
-                        )}
-                      </div>
+                      <span
+                        className={`text-[15px] tracking-tight truncate ${
+                          isActive
+                            ? 'font-bold text-[#0B1A2D] dark:text-[#B7F229]'
+                            : 'font-semibold text-[#0B1A2D] dark:text-slate-100'
+                        }`}
+                      >
+                        {tab.label}
+                      </span>
                     </div>
-                    <div className="flex items-center gap-2 shrink-0">
+
+                    <div className="flex items-center gap-2.5 shrink-0">
                       {tab.badge && (
                         <span
-                          className={`text-[9px] uppercase px-2 py-0.5 rounded-md font-mono font-bold tracking-wide ${
+                          className={`text-[11px] px-2 py-0.5 rounded-md font-semibold tracking-tight whitespace-nowrap ${
                             isActive
-                              ? 'bg-[#B7F229] text-[#0B1A2D]'
-                              : 'bg-[#F0FCCF] dark:bg-[#B7F229]/15 text-[#0B1A2D] dark:text-[#B7F229] border border-[#B7F229]/30'
+                              ? 'bg-[#0B1A2D] text-[#B7F229] dark:bg-[#B7F229] dark:text-[#0B1A2D]'
+                              : 'bg-[#F0FCCF] dark:bg-[#B7F229]/15 text-[#0B1A2D] dark:text-[#B7F229] border border-[#B7F229]/40'
                           }`}
                         >
                           {tab.badge}
@@ -430,142 +402,14 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
                       <ChevronRight
                         className={`w-4 h-4 transition-transform group-hover:translate-x-0.5 ${
                           isActive
-                            ? 'text-white dark:text-[#0B1A2D]'
-                            : 'text-slate-300 dark:text-slate-600 group-hover:text-slate-500 dark:group-hover:text-slate-300'
+                            ? 'text-[#0B1A2D] dark:text-[#B7F229]'
+                            : 'text-slate-400 dark:text-slate-500 group-hover:text-[#0B1A2D] dark:group-hover:text-white'
                         }`}
                       />
                     </div>
                   </button>
                 );
               })}
-            </div>
-
-            {/* Barra Inferior Simétrica: Selectores de Tema & Idioma + Acciones */}
-            <div className="p-4 border-t border-slate-100 dark:border-[#1A314D] bg-slate-50/80 dark:bg-[#071220]/90 backdrop-blur-md space-y-3 shrink-0">
-              {/* Selectores Simétricos 50/50 en Botones de Segmento */}
-              <div className="grid grid-cols-2 gap-2.5">
-                {/* Selector de Tema Segmentado */}
-                <div className="h-11 p-1 bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200/80 dark:border-[#1A314D] grid grid-cols-2 gap-1 text-[11px] font-bold shadow-2xs items-center">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (setTheme) setTheme('light');
-                      if (setAdminTheme) setAdminTheme('light');
-                      document.documentElement.classList.remove('dark');
-                      document.documentElement.classList.add('light');
-                    }}
-                    className={`h-full flex items-center justify-center gap-1.5 rounded-xl transition cursor-pointer ${
-                      adminTheme === 'dark' || theme === 'dark'
-                        ? 'text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'
-                        : 'bg-[#0B1A2D] text-white shadow-2xs font-extrabold'
-                    }`}
-                  >
-                    <Sun className={`w-3.5 h-3.5 ${adminTheme === 'dark' || theme === 'dark' ? 'text-slate-400' : 'text-amber-400'}`} />
-                    <span>Claro</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (setTheme) setTheme('dark');
-                      if (setAdminTheme) setAdminTheme('dark');
-                      document.documentElement.classList.remove('light');
-                      document.documentElement.classList.add('dark');
-                    }}
-                    className={`h-full flex items-center justify-center gap-1.5 rounded-xl transition cursor-pointer ${
-                      adminTheme === 'dark' || theme === 'dark'
-                        ? 'bg-white text-[#0B1A2D] dark:bg-white dark:text-[#0B1A2D] shadow-2xs font-extrabold'
-                        : 'text-slate-500 hover:text-slate-900'
-                    }`}
-                  >
-                    <Moon className={`w-3.5 h-3.5 ${adminTheme === 'dark' || theme === 'dark' ? 'text-[#8B5CF6] dark:text-[#0B1A2D]' : 'text-slate-400'}`} />
-                    <span>Oscuro</span>
-                  </button>
-                </div>
-
-                {/* Selector de Idiomas Flotante con Bandera Oficial */}
-                <div className="relative">
-                  <button
-                    type="button"
-                    onClick={() => setIsLangDropdownOpen(!isLangDropdownOpen)}
-                    className="w-full h-11 px-3 rounded-2xl bg-white dark:bg-[#0E2239] hover:bg-slate-50 dark:hover:bg-[#132A45] border border-slate-200/80 dark:border-[#1A314D] text-slate-800 dark:text-white font-bold text-xs flex items-center justify-between transition cursor-pointer shadow-2xs active:scale-[0.99]"
-                    title="Seleccionar idioma"
-                  >
-                    <div className="flex items-center gap-2 min-w-0">
-                      <OfficialFlag code={language as SupportedLanguage} className="w-5 h-3.5 rounded-xs shrink-0 shadow-2xs" />
-                      <span className="truncate text-xs font-bold text-[#0B1A2D] dark:text-white">
-                        {SUPPORTED_LANGUAGES.find((l) => l.code === language)?.name || 'Español'}
-                      </span>
-                    </div>
-                    <ChevronDown className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 shrink-0 ${isLangDropdownOpen ? 'rotate-180' : ''}`} />
-                  </button>
-
-                  {/* Popover desplegable flotante con todos los idiomas soportados */}
-                  {isLangDropdownOpen && (
-                    <div className="absolute bottom-full right-0 mb-2 w-56 max-h-64 overflow-y-auto overscroll-contain bg-white dark:bg-[#0E2239] border border-slate-200/90 dark:border-[#1A314D] rounded-2xl shadow-xl p-1.5 z-50 space-y-0.5 animate-in fade-in zoom-in-95 duration-150">
-                      <div className="px-2.5 py-1.5 text-[10px] font-black uppercase tracking-wider text-slate-400 border-b border-slate-100 dark:border-[#1A314D] mb-1">
-                        Selecciona un idioma
-                      </div>
-                      {SUPPORTED_LANGUAGES.map((item) => {
-                        const isSelected = language === item.code;
-                        return (
-                          <button
-                            key={item.code}
-                            type="button"
-                            onClick={() => {
-                              i18n.changeLanguage(item.code);
-                              setLanguage(item.code);
-                              setIsLangDropdownOpen(false);
-                            }}
-                            className={`w-full flex items-center justify-between px-2.5 py-2 rounded-xl text-xs font-semibold transition cursor-pointer ${
-                              isSelected
-                                ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D] font-black shadow-2xs'
-                                : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-[#132A45]'
-                            }`}
-                          >
-                            <div className="flex items-center gap-2.5 min-w-0">
-                              <OfficialFlag code={item.code} className="w-5 h-3.5 rounded-xs shrink-0 shadow-2xs" />
-                              <span className="truncate">{item.name}</span>
-                            </div>
-                            {isSelected && (
-                              <Check className="w-3.5 h-3.5 text-[#B7F229] dark:text-[#0B1A2D] shrink-0" />
-                            )}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Acciones Rápidas Inferiores (Vista Jugador & Cerrar Sesión) */}
-              <div className="grid grid-cols-2 gap-2.5">
-                {!isReception ? (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setMobileMoreOpen(false);
-                      setIsLangDropdownOpen(false);
-                      enterWhiteLabelPlayerPreview();
-                    }}
-                    className="w-full h-11 px-3 rounded-2xl bg-white dark:bg-[#0E2239] hover:bg-slate-50 dark:hover:bg-[#132A45] text-slate-800 dark:text-slate-100 font-bold text-xs border border-slate-200/80 dark:border-[#1A314D] transition flex items-center justify-center gap-2 active:scale-[0.98] cursor-pointer shadow-2xs"
-                  >
-                    <Eye className="w-4 h-4 text-[#8B5CF6] dark:text-[#C4B5FD]" />
-                    <span>Vista Jugador</span>
-                  </button>
-                ) : null}
-
-                <button
-                  type="button"
-                  onClick={logoutOrExitDemo}
-                  className={`w-full h-11 px-3 rounded-2xl bg-rose-50/70 hover:bg-rose-100 dark:bg-rose-950/30 dark:hover:bg-rose-950/50 text-rose-600 dark:text-rose-400 font-bold text-xs border border-rose-200/60 dark:border-rose-900/40 transition flex items-center justify-center gap-2 active:scale-[0.98] cursor-pointer shadow-2xs ${
-                    isReception ? 'col-span-2' : ''
-                  }`}
-                >
-                  <LogOut className="w-4 h-4 text-rose-500 dark:text-rose-400" />
-                  <span>Cerrar Sesión</span>
-                </button>
-              </div>
             </div>
           </div>
         </div>
