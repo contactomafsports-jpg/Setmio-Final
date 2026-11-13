@@ -30,6 +30,7 @@ export const AdminCourtsManagement: React.FC<AdminCourtsManagementProps> = ({
   initialTab = 'courts',
 }) => {
   const {
+    currentTenant,
     courts,
     addCourt,
     updateCourt,
@@ -309,217 +310,231 @@ export const AdminCourtsManagement: React.FC<AdminCourtsManagementProps> = ({
   });
 
   return (
-    <div className="space-y-4 text-slate-900 dark:text-slate-100 max-w-7xl mx-auto pb-12 font-sans antialiased">
+    <div className="max-w-7xl mx-auto pt-3 pb-24 sm:pb-16 space-y-6 sm:space-y-8 font-sans text-[#0B1A2D] dark:text-slate-100 antialiased">
       {/* 1. CABECERA LIMPIA Y SIMÉTRICA CON MENÚ RÁPIDO DE ACCIÓN "+" */}
-      <div className="flex items-center justify-between pt-2 pb-1" data-purpose="header-section">
-        <h1 className="text-[22px] font-extrabold text-[#0B1A2D] dark:text-white tracking-tight leading-tight">
-          Pistas y domótica
-        </h1>
+      <section data-purpose="header-section">
+        <div className="flex items-center justify-between gap-3 mt-2 mb-6">
+          <div className="min-w-0">
+            <span className="text-sm font-medium text-slate-600 dark:text-slate-300 tracking-wide block mb-1 truncate">
+              {currentTenant?.name || 'Centro de Pádel San Mateo'}
+            </span>
+            <h1 className="text-[26px] sm:text-3xl font-bold text-[#0B1A2D] dark:text-white tracking-tight leading-tight">
+              Pistas y domótica
+            </h1>
+          </div>
 
-        <div className="relative" ref={actionMenuRef}>
-          <button
-            type="button"
-            onClick={() => setIsActionMenuOpen((prev) => !prev)}
-            className="p-1 text-slate-700 dark:text-slate-300 hover:text-[#0B1A2D] dark:hover:text-[#B7F229] transition-colors cursor-pointer active:scale-95"
-            title="Añadir Pista o Adaptador IoT"
-            aria-label="Añadir Pista o Adaptador IoT"
-          >
-            <Plus className="w-6 h-6 stroke-[2.2]" />
-          </button>
+          <div className="relative shrink-0" ref={actionMenuRef}>
+            <button
+              type="button"
+              onClick={() => setIsActionMenuOpen((prev) => !prev)}
+              className="p-2 text-slate-700 dark:text-slate-300 hover:text-[#0B1A2D] dark:hover:text-[#B7F229] transition-colors cursor-pointer active:scale-95"
+              title="Añadir Pista o Adaptador IoT"
+              aria-label="Añadir Pista o Adaptador IoT"
+            >
+              <Plus className="w-6 h-6 stroke-[2.2]" />
+            </button>
 
-          {/* Menú Contextual Desplegable */}
-          {isActionMenuOpen && (
-            <div className="absolute right-0 top-full mt-2 w-48 rounded-2xl bg-white dark:bg-[#0E2239] border border-slate-200/90 dark:border-[#1A314D] shadow-xl py-1.5 z-40 animate-in fade-in slide-in-from-top-1 duration-150">
-              <button
-                type="button"
-                onClick={() => {
-                  setIsActionMenuOpen(false);
-                  openCreateModal();
-                }}
-                className="w-full px-3.5 py-2.5 text-left text-xs font-bold text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-[#132A45] hover:text-[#0B1A2D] dark:hover:text-[#B7F229] flex items-center gap-2.5 transition cursor-pointer"
-              >
-                <span>Nueva Pista</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setIsActionMenuOpen(false);
-                  setShowAddDeviceModal(true);
-                }}
-                className="w-full px-3.5 py-2.5 text-left text-xs font-bold text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-[#132A45] hover:text-[#0B1A2D] dark:hover:text-[#B7F229] flex items-center gap-2.5 transition cursor-pointer"
-              >
-                <span>Nuevo Adaptador IoT</span>
-              </button>
+            {/* Menú Contextual Desplegable */}
+            {isActionMenuOpen && (
+              <div className="absolute right-0 top-full mt-2 w-48 rounded-2xl bg-white dark:bg-[#0E2239] border border-slate-200/90 dark:border-[#1A314D] shadow-xl py-1.5 z-40 animate-in fade-in slide-in-from-top-1 duration-150">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsActionMenuOpen(false);
+                    openCreateModal();
+                  }}
+                  className="w-full px-3.5 py-2.5 text-left text-xs font-bold text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-[#132A45] hover:text-[#0B1A2D] dark:hover:text-[#B7F229] flex items-center gap-2.5 transition cursor-pointer"
+                >
+                  <span>Nueva Pista</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsActionMenuOpen(false);
+                    setShowAddDeviceModal(true);
+                  }}
+                  className="w-full px-3.5 py-2.5 text-left text-xs font-bold text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-[#132A45] hover:text-[#0B1A2D] dark:hover:text-[#B7F229] flex items-center gap-2.5 transition cursor-pointer"
+                >
+                  <span>Nuevo Adaptador IoT</span>
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* 1.1 SELECTOR DE SEDE Y ESTADO OPERATIVO UNIFICADO */}
+        <div className="relative" ref={venueSelectorRef}>
+          <div className="flex items-center justify-between gap-2.5 sm:gap-3 p-3.5 sm:p-5 bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200/80 dark:border-[#1A314D] shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
+            {/* Selector de Sede */}
+            <div
+              onClick={() => setIsVenueSelectorOpen(!isVenueSelectorOpen)}
+              className="flex items-center gap-2.5 sm:gap-3 cursor-pointer group select-none min-w-0 flex-1"
+              title="Cambiar sede activa o ver red consolidada"
+            >
+              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-slate-50 dark:bg-[#071220] border border-slate-100 dark:border-[#1A314D] flex items-center justify-center text-[#0B1A2D] dark:text-slate-200 shrink-0">
+                <Building2 className="w-4 h-4 sm:w-4.5 sm:h-4.5 text-[#0B1A2D] dark:text-white" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-1 min-w-0">
+                  <span className="text-[13px] sm:text-base font-bold text-[#0B1A2D] dark:text-white truncate whitespace-nowrap">
+                    {isConsolidatedView ? 'Todas las Sedes' : selectedVenue?.shortName || selectedVenue?.name || 'Sede'}
+                  </span>
+                  <ChevronDown
+                    className={`w-4 h-4 text-slate-500 group-hover:text-[#0B1A2D] dark:text-slate-400 dark:group-hover:text-white transition-transform shrink-0 ${
+                      isVenueSelectorOpen ? 'rotate-180 text-[#0B1A2D] dark:text-white' : ''
+                    }`}
+                  />
+                </div>
+                <span className="text-xs sm:text-[13px] font-medium text-slate-600 dark:text-slate-300 block truncate whitespace-nowrap">
+                  {venues.length > 1 ? `${venues.length} sedes conectadas` : 'Sede oficial'}
+                </span>
+              </div>
+            </div>
+
+            {/* Badge Dinámico de Apertura / Resumen Multisede */}
+            <button
+              type="button"
+              onClick={isConsolidatedView ? () => setIsVenueSelectorOpen((prev) => !prev) : toggleClubOpenState}
+              className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-full bg-[#F0FCCF] dark:bg-[#B7F229]/20 border border-[#B7F229]/50 transition-all cursor-pointer hover:scale-102 shrink-0 select-none whitespace-nowrap"
+              title={
+                isConsolidatedView
+                  ? `Red multisede consolidada (${venues.length} sedes operativas)`
+                  : 'Haz clic para conmutar estado de apertura de la sede'
+              }
+            >
+              <span
+                className={`w-2 h-2 rounded-full shrink-0 ${
+                  isConsolidatedView
+                    ? 'bg-[#82b805] dark:bg-[#B7F229]'
+                    : isClubOpen
+                    ? 'bg-[#82b805] animate-pulse'
+                    : 'bg-rose-500'
+                }`}
+              />
+              <span className="text-xs sm:text-[13px] font-bold text-[#0B1A2D] dark:text-[#B7F229] whitespace-nowrap">
+                {isConsolidatedView
+                  ? `${venues.length} Sedes Activas`
+                  : isClubOpen
+                  ? 'Abierto · hasta 23:30'
+                  : 'Cerrado temporal'}
+              </span>
+            </button>
+          </div>
+
+          {/* Menú Desplegable de Sedes */}
+          {isVenueSelectorOpen && (
+            <div className="absolute top-full left-0 right-0 mt-2 z-30 p-2 bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200 dark:border-[#1A314D] shadow-xl space-y-1 animate-in fade-in slide-in-from-top-2 duration-150">
+              <div className="text-xs font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400 px-2.5 py-1.5">
+                Red Deportiva · Seleccionar Sede
+              </div>
+
+              {venues.length > 1 && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedVenueId('all');
+                    setIsVenueSelectorOpen(false);
+                  }}
+                  className={`w-full flex items-center justify-between p-2.5 rounded-xl text-sm font-bold transition text-left cursor-pointer ${
+                    isConsolidatedView
+                      ? 'bg-[#B7F229]/20 text-[#0B1A2D] dark:text-white'
+                      : 'hover:bg-slate-50 dark:hover:bg-[#132A45] text-slate-700 dark:text-slate-300'
+                  }`}
+                >
+                  <span>Todas las Sedes (Consolidado)</span>
+                  {isConsolidatedView && <CheckCircle2 className="w-4 h-4 text-[#82b805]" />}
+                </button>
+              )}
+
+              {venues
+                .filter((v) => v.id !== 'all')
+                .map((venue) => {
+                  const isSelected = !isConsolidatedView && selectedVenueId === venue.id;
+                  return (
+                    <button
+                      key={venue.id}
+                      type="button"
+                      onClick={() => {
+                        setSelectedVenueId(venue.id);
+                        setIsVenueSelectorOpen(false);
+                      }}
+                      className={`w-full flex items-center justify-between p-2.5 rounded-xl text-sm font-bold transition text-left cursor-pointer ${
+                        isSelected
+                          ? 'bg-[#B7F229]/20 text-[#0B1A2D] dark:text-white'
+                          : 'hover:bg-slate-50 dark:hover:bg-[#132A45] text-slate-700 dark:text-slate-300'
+                      }`}
+                    >
+                      <span className="truncate">{venue.name}</span>
+                      {isSelected && <CheckCircle2 className="w-4 h-4 text-[#82b805] shrink-0" />}
+                    </button>
+                  );
+                })}
             </div>
           )}
         </div>
-      </div>
+      </section>
 
-      {/* 1.1 SELECTOR DE SEDE Y ESTADO OPERATIVO UNIFICADO */}
-      <div className="relative" ref={venueSelectorRef}>
-        <div className="flex items-center justify-between p-2.5 bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200/80 dark:border-[#1A314D] shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
-          {/* Selector de Sede */}
-          <div
-            onClick={() => setIsVenueSelectorOpen(!isVenueSelectorOpen)}
-            className="flex items-center gap-2 cursor-pointer group select-none min-w-0"
-            title="Cambiar sede activa o ver red consolidada"
-          >
-            <div className="w-8 h-8 rounded-xl bg-slate-50 dark:bg-[#071220] border border-slate-100 dark:border-[#1A314D] flex items-center justify-center text-[#0B1A2D] dark:text-slate-200 shrink-0">
-              <Building2 className="w-4 h-4 text-[#0B1A2D] dark:text-white" />
-            </div>
-            <div className="min-w-0">
-              <div className="flex items-center gap-1.5">
-                <span className="text-xs font-bold text-[#0B1A2D] dark:text-white truncate">
-                  {isConsolidatedView ? 'Todas las Sedes' : selectedVenue?.shortName || selectedVenue?.name || 'Sede'}
-                </span>
-                <ChevronDown
-                  className={`w-3.5 h-3.5 text-slate-400 group-hover:text-[#0B1A2D] dark:group-hover:text-white transition-transform ${
-                    isVenueSelectorOpen ? 'rotate-180 text-[#0B1A2D] dark:text-white' : ''
-                  }`}
-                />
-              </div>
-              <span className="text-[10px] font-medium text-slate-400 block truncate">
-                {venues.length > 1 ? `${venues.length} sedes conectadas` : 'Sede oficial'}
-              </span>
-            </div>
-          </div>
-
-          {/* Badge Dinámico de Apertura / Resumen Multisede */}
-          <button
-            type="button"
-            onClick={isConsolidatedView ? () => setIsVenueSelectorOpen((prev) => !prev) : toggleClubOpenState}
-            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#F0FCCF] dark:bg-[#B7F229]/20 border border-[#B7F229]/50 transition-all cursor-pointer hover:scale-102 shrink-0 select-none"
-            title={
-              isConsolidatedView
-                ? `Red multisede consolidada (${venues.length} sedes operativas)`
-                : 'Haz clic para conmutar estado de apertura de la sede'
-            }
-          >
-            <span
-              className={`w-2 h-2 rounded-full ${
-                isConsolidatedView
-                  ? 'bg-[#82b805] dark:bg-[#B7F229]'
-                  : isClubOpen
-                  ? 'bg-[#82b805] animate-pulse'
-                  : 'bg-rose-500'
-              }`}
-            />
-            <span className="text-[11px] font-bold text-[#0B1A2D] dark:text-[#B7F229]">
-              {isConsolidatedView
-                ? `${venues.length} Sedes Activas`
-                : isClubOpen
-                ? 'Abierto · hasta 23:30'
-                : 'Cerrado temporal'}
-            </span>
-          </button>
-        </div>
-
-        {/* Menú Desplegable de Sedes */}
-        {isVenueSelectorOpen && (
-          <div className="absolute top-full left-0 right-0 mt-2 z-30 p-2 bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200 dark:border-[#1A314D] shadow-xl space-y-1 animate-in fade-in slide-in-from-top-2 duration-150">
-            <div className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 px-2 py-1">
-              Red Deportiva · Seleccionar Sede
-            </div>
-
-            {venues.length > 1 && (
-              <button
-                type="button"
-                onClick={() => {
-                  setSelectedVenueId('all');
-                  setIsVenueSelectorOpen(false);
-                }}
-                className={`w-full flex items-center justify-between p-2 rounded-xl text-xs font-bold transition text-left cursor-pointer ${
-                  isConsolidatedView
-                    ? 'bg-[#B7F229]/20 text-[#0B1A2D] dark:text-white'
-                    : 'hover:bg-slate-50 dark:hover:bg-[#132A45] text-slate-700 dark:text-slate-300'
-                }`}
-              >
-                <span>Todas las Sedes (Consolidado)</span>
-                {isConsolidatedView && <CheckCircle2 className="w-3.5 h-3.5 text-[#82b805]" />}
-              </button>
-            )}
-
-            {venues
-              .filter((v) => v.id !== 'all')
-              .map((venue) => {
-                const isSelected = !isConsolidatedView && selectedVenueId === venue.id;
-                return (
-                  <button
-                    key={venue.id}
-                    type="button"
-                    onClick={() => {
-                      setSelectedVenueId(venue.id);
-                      setIsVenueSelectorOpen(false);
-                    }}
-                    className={`w-full flex items-center justify-between p-2 rounded-xl text-xs font-bold transition text-left cursor-pointer ${
-                      isSelected
-                        ? 'bg-[#B7F229]/20 text-[#0B1A2D] dark:text-white'
-                        : 'hover:bg-slate-50 dark:hover:bg-[#132A45] text-slate-700 dark:text-slate-300'
-                    }`}
-                  >
-                    <span className="truncate">{venue.name}</span>
-                    {isSelected && <CheckCircle2 className="w-3.5 h-3.5 text-[#82b805] shrink-0" />}
-                  </button>
-                );
-              })}
-          </div>
-        )}
-      </div>
-
-      {/* 2. DASHBOARD DE MÉTRICAS */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5">
-        <div className="p-3 bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200/80 dark:border-[#1A314D] shadow-2xs space-y-1">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
+      {/* 2. DASHBOARD DE MÉTRICAS (KPI Cards con espaciado generoso) */}
+      <section className="grid grid-cols-2 lg:grid-cols-4 gap-4" data-purpose="kpi-metrics">
+        <div className="p-5 bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200/80 dark:border-[#1A314D] shadow-2xs flex flex-col justify-between gap-2 min-w-0">
+          <span className="text-xs sm:text-[13px] font-semibold text-slate-600 dark:text-slate-300 truncate whitespace-nowrap">
             Pistas Activas
           </span>
-          <div className="text-xl sm:text-2xl font-black font-mono text-[#0B1A2D] dark:text-white">
+          <div className="text-2xl sm:text-3xl font-extrabold font-mono tabular-nums text-[#0B1A2D] dark:text-white tracking-tight">
             {venueCourts.length}
           </div>
-          <span className="text-[10px] text-slate-500 dark:text-slate-400 font-medium flex items-center gap-1">
-            <CheckCircle2 className="w-3 h-3 text-[#82b805] dark:text-[#B7F229]" /> 100% Operativas
+          <span className="text-xs text-slate-500 dark:text-slate-400 font-medium flex items-center gap-1.5 truncate whitespace-nowrap">
+            <CheckCircle2 className="w-3.5 h-3.5 text-[#82b805] dark:text-[#B7F229] shrink-0" />
+            <span>100% Operativas</span>
           </span>
         </div>
 
-        <div className="p-3 bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200/80 dark:border-[#1A314D] shadow-2xs space-y-1">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
+        <div className="p-5 bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200/80 dark:border-[#1A314D] shadow-2xs flex flex-col justify-between gap-2 min-w-0">
+          <span className="text-xs sm:text-[13px] font-semibold text-slate-600 dark:text-slate-300 truncate whitespace-nowrap">
             Tarifa Media
           </span>
-          <div className="text-xl sm:text-2xl font-black font-mono text-[#0B1A2D] dark:text-white">
+          <div className="text-2xl sm:text-3xl font-extrabold font-mono tabular-nums text-[#0B1A2D] dark:text-white tracking-tight">
             {avgRate.toFixed(2)} €/h
           </div>
-          <span className="text-[10px] text-slate-400 font-medium">Por sesión de juego</span>
+          <span className="text-xs text-slate-500 dark:text-slate-400 font-medium truncate whitespace-nowrap">
+            Por sesión de juego
+          </span>
         </div>
 
-        <div className="p-3 bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200/80 dark:border-[#1A314D] shadow-2xs space-y-1">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
+        <div className="p-5 bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200/80 dark:border-[#1A314D] shadow-2xs flex flex-col justify-between gap-2 min-w-0">
+          <span className="text-xs sm:text-[13px] font-semibold text-slate-600 dark:text-slate-300 truncate whitespace-nowrap">
             Iluminación IoT
           </span>
-          <div className="text-xl sm:text-2xl font-black font-mono text-amber-500 flex items-center gap-1.5">
+          <div className="text-2xl sm:text-3xl font-extrabold font-mono tabular-nums text-amber-500 flex items-center gap-2 tracking-tight">
             <span>{activeLightsCount} / {venueCourts.length}</span>
-            <Zap className="w-4 h-4 text-amber-500 animate-pulse" />
+            <Zap className="w-5 h-5 text-amber-500 shrink-0" />
           </div>
-          <span className="text-[10px] text-slate-400 font-medium">Focos Shelly Cloud</span>
+          <span className="text-xs text-slate-500 dark:text-slate-400 font-medium truncate whitespace-nowrap">
+            Focos Shelly Cloud
+          </span>
         </div>
 
-        <div className="p-3 bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200/80 dark:border-[#1A314D] shadow-2xs space-y-1">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
+        <div className="p-5 bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200/80 dark:border-[#1A314D] shadow-2xs flex flex-col justify-between gap-2 min-w-0">
+          <span className="text-xs sm:text-[13px] font-semibold text-slate-600 dark:text-slate-300 truncate whitespace-nowrap">
             Cerraduras & Tornos
           </span>
-          <div className="text-base sm:text-lg font-black font-mono text-[#0B1A2D] dark:text-[#B7F229] flex items-center gap-1.5 pt-0.5">
-            <span>Salto KS Online</span>
-            <ShieldCheck className="w-4 h-4 text-[#82b805] dark:text-[#B7F229] shrink-0" />
+          <div className="text-lg sm:text-2xl font-extrabold text-[#0B1A2D] dark:text-[#B7F229] flex items-center gap-1.5 min-w-0 tracking-tight">
+            <span className="truncate whitespace-nowrap">Salto KS Online</span>
+            <ShieldCheck className="w-4 h-4 sm:w-5 sm:h-5 text-[#82b805] dark:text-[#B7F229] shrink-0" />
           </div>
-          <span className="text-[10px] text-slate-400 font-medium">PIN Dinámico Auto</span>
+          <span className="text-xs text-slate-500 dark:text-slate-400 font-medium truncate whitespace-nowrap">
+            PIN Dinámico Auto
+          </span>
         </div>
-      </div>
+      </section>
 
       {/* 3. CONTROL DE SEGMENTOS ("PISTAS" Y "REGISTROS") CON BOTÓN DE FILTRO INTEGRADO EN LA MISMA FRANJA */}
-      <div className="flex items-center gap-2 w-full">
-        <div className="flex-1 p-1 bg-slate-100 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-2xl grid grid-cols-2 gap-1 text-xs select-none shadow-2xs">
+      <div className="flex items-center gap-2.5 w-full">
+        <div className="flex-1 p-1 bg-slate-100 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-2xl grid grid-cols-2 gap-1 text-xs sm:text-sm select-none shadow-2xs">
           <button
             type="button"
             onClick={() => setActiveTab('courts')}
-            className={`w-full py-2.5 px-3 rounded-xl font-bold transition text-center cursor-pointer ${
+            className={`w-full py-2.5 px-3 rounded-xl font-bold transition text-center cursor-pointer whitespace-nowrap ${
               activeTab === 'courts'
                 ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D] shadow-xs'
                 : 'text-slate-600 dark:text-slate-400 hover:text-[#0B1A2D] dark:hover:text-white'
@@ -531,7 +546,7 @@ export const AdminCourtsManagement: React.FC<AdminCourtsManagementProps> = ({
           <button
             type="button"
             onClick={() => setActiveTab('logs')}
-            className={`w-full py-2.5 px-3 rounded-xl font-bold transition text-center cursor-pointer ${
+            className={`w-full py-2.5 px-3 rounded-xl font-bold transition text-center cursor-pointer whitespace-nowrap ${
               activeTab === 'logs'
                 ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D] shadow-xs'
                 : 'text-slate-600 dark:text-slate-400 hover:text-[#0B1A2D] dark:hover:text-white'
@@ -545,7 +560,7 @@ export const AdminCourtsManagement: React.FC<AdminCourtsManagementProps> = ({
         <button
           type="button"
           onClick={() => setIsFilterModalOpen(true)}
-          className={`relative p-2.5 rounded-2xl border transition-all cursor-pointer active:scale-95 flex items-center justify-center shrink-0 shadow-2xs ${
+          className={`relative min-h-[44px] min-w-[44px] p-2.5 rounded-2xl border transition-all cursor-pointer active:scale-95 flex items-center justify-center shrink-0 shadow-2xs ${
             hasActiveFilters
               ? 'bg-[#B7F229]/20 border-[#B7F229] text-[#0B1A2D] dark:text-[#B7F229]'
               : 'bg-white dark:bg-[#071220] border-slate-200/80 dark:border-[#1A314D] text-slate-600 dark:text-slate-400 hover:text-[#0B1A2D] dark:hover:text-white'
@@ -566,10 +581,10 @@ export const AdminCourtsManagement: React.FC<AdminCourtsManagementProps> = ({
           PESTAÑA 1: PISTAS (CON DOMÓTICA INTEGRADA EN CADA TARJETA)
           ====================================================================== */}
       {activeTab === 'courts' && (
-        <div className="space-y-4 animate-in fade-in duration-150">
+        <div className="space-y-5 animate-in fade-in duration-150">
           {/* Indicador sutil de filtros activos si los hay */}
           {hasActiveFilters && (
-            <div className="flex items-center justify-between text-xs py-2 px-3.5 bg-[#B7F229]/15 border border-[#B7F229]/40 rounded-2xl text-[#0B1A2D] dark:text-white shadow-2xs">
+            <div className="flex items-center justify-between text-xs py-2.5 px-4 bg-[#B7F229]/15 border border-[#B7F229]/40 rounded-2xl text-[#0B1A2D] dark:text-white shadow-2xs">
               <span className="font-semibold text-xs">
                 Filtros activos ({activeFiltersCount}): mostrando {filteredCourts.length} de {venueCourts.length} pistas
               </span>
@@ -581,7 +596,7 @@ export const AdminCourtsManagement: React.FC<AdminCourtsManagementProps> = ({
                   setLightsFilter('all');
                   setPanoramicFilter('all');
                 }}
-                className="text-xs font-bold text-[#0B1A2D] dark:text-[#B7F229] hover:underline cursor-pointer"
+                className="text-xs font-bold text-[#0B1A2D] dark:text-[#B7F229] hover:underline cursor-pointer shrink-0 ml-2"
               >
                 Limpiar filtros
               </button>
@@ -589,7 +604,7 @@ export const AdminCourtsManagement: React.FC<AdminCourtsManagementProps> = ({
           )}
 
           {/* Grid de Pistas Homologadas con Domótica Integrada */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 mb-8">
             {filteredCourts.map((court) => {
               const courtDevices = smartDevices.filter((d) => d.courtId === court.id);
               const hasShelly = courtDevices.some((d) => d.deviceType === 'light_relay') || court.hasLights;
@@ -601,16 +616,17 @@ export const AdminCourtsManagement: React.FC<AdminCourtsManagementProps> = ({
                   className="rounded-3xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] hover:border-slate-300 dark:hover:border-slate-700 transition overflow-hidden shadow-2xs flex flex-col justify-between group"
                 >
                   {/* Foto & Badges Superiores */}
-                  <div className="relative h-44 w-full bg-slate-950 overflow-hidden">
+                  <div className="relative h-44 sm:h-48 w-full bg-slate-950 overflow-hidden">
                     <img
                       src={court.photoUrl}
                       alt={court.name}
+                      referrerPolicy="no-referrer"
                       className="w-full h-full object-cover group-hover:scale-103 transition duration-300 opacity-90"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/25 to-transparent" />
 
                     {/* Badges superiores */}
-                    <div className="absolute top-3 left-3 flex flex-wrap gap-1.5">
+                    <div className="absolute top-3 left-3 right-24 flex flex-wrap gap-1.5">
                       {isMultiVenueActive && (
                         <span className="px-2 py-0.5 rounded-md bg-[#0B1A2D]/85 backdrop-blur-md text-white text-[10px] font-bold border border-white/10 uppercase shadow-xs">
                           {court.venueName || activeVenueObj?.shortName || 'Sede'}
@@ -631,33 +647,33 @@ export const AdminCourtsManagement: React.FC<AdminCourtsManagementProps> = ({
                     </div>
 
                     {/* Indicador IoT Conectado */}
-                    <div className="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-[#0B1A2D]/85 backdrop-blur-md text-[#82b805] dark:text-[#B7F229] border border-white/10 text-[10px] font-bold flex items-center gap-1.5 shadow-xs">
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#82b805] dark:bg-[#B7F229] animate-pulse" />
+                    <div className="absolute top-3 right-3 px-2.5 py-0.5 rounded-full bg-[#0B1A2D]/85 backdrop-blur-md text-[#B7F229] border border-white/10 text-[10px] font-bold flex items-center gap-1.5 shadow-xs whitespace-nowrap">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#B7F229]" />
                       <span>IoT Online</span>
                     </div>
 
                     {/* Tarifa destacada abajo a la derecha de la foto */}
                     <div className="absolute bottom-3 right-3 px-2.5 py-1 rounded-xl bg-[#0B1A2D]/85 backdrop-blur-md border border-white/10 text-right">
-                      <div className="text-[9px] text-slate-400 font-bold uppercase">Tarifa</div>
-                      <div className="text-base font-black font-mono text-[#B7F229]">
+                      <div className="text-[9px] text-slate-300 font-bold uppercase">Tarifa</div>
+                      <div className="text-base font-black font-mono tabular-nums text-[#B7F229]">
                         {court.hourlyRate.toFixed(2)} €<span className="text-[10px] font-normal text-slate-300">/h</span>
                       </div>
                     </div>
 
                     {/* Nombre de la pista */}
-                    <div className="absolute bottom-3 left-3 text-white">
-                      <h3 className="text-base font-black tracking-tight">{court.name}</h3>
-                      <div className="text-[11px] text-slate-300">{court.surface}</div>
+                    <div className="absolute bottom-3 left-3 right-28 text-white min-w-0">
+                      <h3 className="text-base font-bold tracking-tight truncate">{court.name}</h3>
+                      <div className="text-xs text-slate-300 truncate">{court.surface}</div>
                     </div>
                   </div>
 
-                  {/* FUSIÓN TOTAL DE DOMÓTICA EN LA PROPIA TARJETA (Sin tarjetas anidadas redundantes) */}
-                  <div className="p-4 space-y-3 flex-1 flex flex-col justify-between text-xs">
-                    {/* Dispositivo Asociado & Estado de Conexión */}
-                    <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 dark:bg-[#071220] border border-slate-200/60 dark:border-[#1A314D] text-xs">
+                  {/* Controles IoT con padding espacioso y jerarquía limpia */}
+                  <div className="p-5 sm:p-6 space-y-5 flex-1 flex flex-col justify-between text-xs">
+                    {/* Pasarela IoT asociada (línea limpia sin caja anidada) */}
+                    <div className="flex items-center justify-between gap-2 pb-3.5 border-b border-slate-100 dark:border-[#1A314D]">
                       <div className="flex items-center gap-2 min-w-0">
-                        <span className="w-2 h-2 rounded-full bg-[#82b805] dark:bg-[#B7F229] shrink-0 animate-pulse" />
-                        <span className="font-bold text-[#0B1A2D] dark:text-white truncate">
+                        <span className="w-2 h-2 rounded-full bg-[#82b805] dark:bg-[#B7F229] shrink-0" />
+                        <span className="font-semibold text-[#0B1A2D] dark:text-white truncate">
                           {hasShelly && hasSalto
                             ? 'Shelly Pro DIN + Salto KS'
                             : hasShelly
@@ -667,79 +683,91 @@ export const AdminCourtsManagement: React.FC<AdminCourtsManagementProps> = ({
                             : 'Pasarela IoT Conectada'}
                         </span>
                       </div>
-                      <span className="text-[10px] font-mono text-[#82b805] dark:text-[#B7F229] font-bold shrink-0">
+                      <span className="text-[11px] font-mono text-[#82b805] dark:text-[#B7F229] font-bold shrink-0 whitespace-nowrap">
                         Conectado
                       </span>
                     </div>
 
-                    {/* Control Rápido: Focos LED (Shelly) */}
-                    <div className="flex items-center justify-between pt-1">
-                      <div className="flex items-center gap-2">
-                        <Zap className={`w-4 h-4 ${court.isLightOn ? 'text-amber-500' : 'text-slate-400'}`} />
-                        <div>
-                          <span className="font-bold text-[#0B1A2D] dark:text-white block">Iluminación LED</span>
-                          <span className="text-[10px] text-slate-400">
-                            {court.isLightOn ? 'Focos activos (4.2 kW)' : 'Relé en espera'}
-                          </span>
-                        </div>
-                      </div>
-
-                      <button
-                        type="button"
-                        onClick={() => toggleCourtLight(court.id)}
-                        className={`px-3 py-1.5 rounded-xl font-bold text-xs transition cursor-pointer active:scale-95 flex items-center gap-1.5 ${
-                          court.isLightOn
-                            ? 'bg-[#0B1A2D] text-white dark:bg-[#B7F229] dark:text-[#0B1A2D] shadow-xs'
-                            : 'bg-slate-100 hover:bg-slate-200 dark:bg-[#071220] dark:hover:bg-[#132A45] text-slate-700 dark:text-slate-300 border border-slate-200/80 dark:border-[#1A314D]'
-                        }`}
-                      >
-                        <Power className="w-3.5 h-3.5" />
-                        <span>{court.isLightOn ? 'ENCENDIDA' : 'APAGADA'}</span>
-                      </button>
-                    </div>
-
-                    {/* Control Rápido: Acceso / Salto KS */}
-                    <div className="flex items-center justify-between pt-2.5 border-t border-slate-100 dark:border-[#1A314D]">
-                      <div className="flex items-center gap-2">
-                        <KeyRound className="w-4 h-4 text-[#8B5CF6]" />
-                        <div>
-                          <span className="font-bold text-[#0B1A2D] dark:text-white block">Acceso Autónomo</span>
-                          <div className="flex items-center gap-1 text-[11px] text-slate-500 dark:text-slate-400">
-                            <span>PIN Activo:</span>
-                            <span className="font-mono font-bold text-[#0B1A2D] dark:text-[#B7F229]">
-                              {court.accessPin || '4821#'}
+                    {/* Bloque de Controles Rápidos IoT */}
+                    <div className="space-y-4">
+                      {/* Control Rápido: Focos LED (Shelly) */}
+                      <div className="flex items-center justify-between gap-3 py-1">
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-[#071220] border border-slate-200/70 dark:border-[#1A314D] flex items-center justify-center shrink-0">
+                            <Zap className={`w-4 h-4 ${court.isLightOn ? 'text-amber-500' : 'text-slate-400'}`} />
+                          </div>
+                          <div className="min-w-0">
+                            <span className="text-[13px] font-bold text-[#0B1A2D] dark:text-white block truncate">
+                              Iluminación LED
+                            </span>
+                            <span className="text-xs text-slate-500 dark:text-slate-400 block truncate">
+                              {court.isLightOn ? 'Focos activos (4.2 kW)' : 'Relé en espera'}
                             </span>
                           </div>
                         </div>
+
+                        <button
+                          type="button"
+                          onClick={() => toggleCourtLight(court.id)}
+                          className={`min-h-[40px] px-3.5 py-2 rounded-xl font-bold text-xs transition cursor-pointer active:scale-95 flex items-center gap-1.5 shrink-0 whitespace-nowrap ${
+                            court.isLightOn
+                              ? 'bg-[#0B1A2D] text-white dark:bg-[#B7F229] dark:text-[#0B1A2D] shadow-xs'
+                              : 'bg-slate-100 hover:bg-slate-200 dark:bg-[#071220] dark:hover:bg-[#132A45] text-[#0B1A2D] dark:text-slate-200 border border-slate-200/80 dark:border-[#1A314D]'
+                          }`}
+                        >
+                          <Power className="w-3.5 h-3.5 shrink-0" />
+                          <span>{court.isLightOn ? 'ENCENDIDA' : 'APAGADA'}</span>
+                        </button>
                       </div>
 
-                      <button
-                        type="button"
-                        onClick={() => openCourtDoor(court.id)}
-                        className="px-3 py-1.5 rounded-xl font-bold text-xs bg-slate-100 hover:bg-slate-200 dark:bg-[#071220] dark:hover:bg-[#132A45] text-slate-700 dark:text-slate-300 border border-slate-200/80 dark:border-[#1A314D] transition cursor-pointer flex items-center gap-1.5 active:scale-95"
-                      >
-                        <span>Abrir Torno</span>
-                      </button>
+                      {/* Control Rápido: Acceso / Salto KS */}
+                      <div className="flex items-center justify-between gap-3 pt-4 border-t border-slate-100 dark:border-[#1A314D]">
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className="w-9 h-9 rounded-xl bg-[#8B5CF6]/10 dark:bg-[#8B5CF6]/15 border border-[#8B5CF6]/20 flex items-center justify-center shrink-0">
+                            <KeyRound className="w-4 h-4 text-[#8B5CF6]" />
+                          </div>
+                          <div className="min-w-0">
+                            <span className="text-[13px] font-bold text-[#0B1A2D] dark:text-white block truncate">
+                              Acceso Autónomo
+                            </span>
+                            <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 truncate">
+                              <span>PIN Activo:</span>
+                              <span className="font-mono font-bold text-[#0B1A2D] dark:text-[#B7F229]">
+                                {court.accessPin || '4821#'}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() => openCourtDoor(court.id)}
+                          className="min-h-[40px] px-3.5 py-2 rounded-xl font-bold text-xs bg-slate-100 hover:bg-slate-200 dark:bg-[#071220] dark:hover:bg-[#132A45] text-[#0B1A2D] dark:text-slate-200 border border-slate-200/80 dark:border-[#1A314D] transition cursor-pointer flex items-center gap-1.5 active:scale-95 shrink-0 whitespace-nowrap"
+                        >
+                          <span>Abrir Torno</span>
+                        </button>
+                      </div>
                     </div>
 
-                    {/* Acciones de Pista */}
-                    <div className="pt-2.5 flex items-center gap-2 border-t border-slate-100 dark:border-[#1A314D]">
+                    {/* Acciones Secundarias de Pista (Separadas con calma visual) */}
+                    <div className="pt-4 mt-1 flex items-center gap-2.5 border-t border-slate-100 dark:border-[#1A314D]">
                       <button
                         type="button"
                         onClick={() => openEditModal(court)}
-                        className="flex-1 py-2.5 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-[#071220] dark:hover:bg-[#132A45] text-slate-700 dark:text-slate-200 font-bold text-xs border border-slate-200/80 dark:border-[#1A314D] transition flex items-center justify-center gap-1.5 cursor-pointer"
+                        className="flex-1 min-h-[44px] py-2.5 px-4 rounded-xl bg-white hover:bg-slate-50 dark:bg-[#071220]/70 dark:hover:bg-[#132A45] text-[#0B1A2D] dark:text-slate-100 font-semibold text-[13px] border border-slate-200 dark:border-[#1A314D] transition flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap"
                       >
-                        <Edit2 className="w-3.5 h-3.5" />
+                        <Edit2 className="w-3.5 h-3.5 shrink-0 text-slate-500 dark:text-slate-400" />
                         <span>Editar Parámetros</span>
                       </button>
 
                       <button
                         type="button"
                         onClick={() => setDeletingCourtId(court.id)}
-                        className="p-2.5 rounded-xl text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/50 border border-slate-200/80 dark:border-[#1A314D] hover:border-rose-200 transition cursor-pointer"
+                        className="min-h-[44px] min-w-[44px] p-2.5 rounded-xl text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/50 border border-slate-200 dark:border-[#1A314D] hover:border-rose-200 transition cursor-pointer flex items-center justify-center shrink-0"
                         title="Desactivar o Eliminar Pista"
+                        aria-label="Desactivar o Eliminar Pista"
                       >
-                        <Trash2 className="w-3.5 h-3.5" />
+                        <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
                   </div>
@@ -843,7 +871,7 @@ export const AdminCourtsManagement: React.FC<AdminCourtsManagementProps> = ({
                               {log.target}
                             </span>
                           )}
-                          <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-600 dark:text-emerald-400">
+                          <span className="inline-flex items-center gap-1 text-[10px] font-bold text-[#82b805] dark:text-[#B7F229]">
                             <CheckCircle2 className="w-3 h-3" />
                             <span>Ejecutado</span>
                           </span>
