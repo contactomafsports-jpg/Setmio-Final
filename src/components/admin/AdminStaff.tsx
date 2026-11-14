@@ -257,6 +257,7 @@ const INITIAL_SHIFTS: StaffShift[] = [
 
 export const AdminStaff: React.FC = () => {
   const {
+    currentTenant,
     venues,
     selectedVenueId,
     setSelectedVenueId,
@@ -470,40 +471,36 @@ export const AdminStaff: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6 text-slate-900 dark:text-slate-100 max-w-7xl mx-auto pb-16">
+    <div className="space-y-6 text-[#0B1A2D] dark:text-slate-100 max-w-7xl mx-auto pb-24 sm:pb-16 antialiased">
       {/* ======================================================================
-          1. HEADER PRINCIPAL
+          1. HEADER PRINCIPAL (PALETA OFICIAL SETMIO)
           ====================================================================== */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <div className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
-            <UserCheck className="w-4 h-4 text-emerald-500" />
-            <span>Módulo de RRHH y Gestión Docente</span>
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight mt-0.5">
-            Personal, Profesores & Turnos
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pt-2 pb-1">
+        <div className="min-w-0">
+          <span className="text-sm font-medium text-slate-600 dark:text-slate-300 tracking-wide block mb-1 truncate">
+            {currentTenant?.name || 'Centro de Pádel San Mateo'}
+          </span>
+          <h1 className="text-[26px] sm:text-3xl font-bold text-[#0B1A2D] dark:text-white tracking-tight leading-tight">
+            Personal & Profesores
           </h1>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-            Gestión integral de plantilla, configuración de turnos, asignación de cursos y registro de auditoría de acciones.
-          </p>
         </div>
 
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-2 self-start sm:self-auto shrink-0">
           <button
             type="button"
             onClick={() => setIsNewShiftModalOpen(true)}
-            className="px-3.5 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs hover:bg-slate-50 dark:hover:bg-slate-800 transition cursor-pointer shadow-xs flex items-center gap-1.5"
+            className="min-h-[40px] px-3.5 py-2 rounded-xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] text-[#0B1A2D] dark:text-slate-200 font-bold text-xs hover:bg-slate-50 dark:hover:bg-[#132A45] transition cursor-pointer shadow-2xs flex items-center gap-1.5 whitespace-nowrap shrink-0"
           >
-            <Clock className="w-3.5 h-3.5 text-emerald-500" />
+            <Clock className="w-3.5 h-3.5 text-[#0B1A2D] dark:text-[#B7F229] shrink-0" />
             <span>Nuevo Turno</span>
           </button>
 
           <button
             type="button"
             onClick={() => setIsNewStaffModalOpen(true)}
-            className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md transition active:scale-95 cursor-pointer flex items-center gap-1.5"
+            className="min-h-[40px] px-4 py-2 rounded-xl bg-[#0B1A2D] hover:bg-[#132A45] dark:bg-[#B7F229] dark:hover:bg-[#a3db20] text-white dark:text-[#0B1A2D] font-bold text-xs shadow-2xs transition active:scale-95 cursor-pointer flex items-center gap-1.5 whitespace-nowrap shrink-0"
           >
-            <Plus className="w-4 h-4" />
+            <Plus className="w-4 h-4 text-[#B7F229] dark:text-[#0B1A2D] shrink-0" />
             <span>Añadir Personal</span>
           </button>
         </div>
@@ -513,11 +510,11 @@ export const AdminStaff: React.FC = () => {
           2. FILTRO DE SEDE (SI ES CLUB MULTI-SEDE)
           ====================================================================== */}
       {Boolean(isMultiVenue) && Array.isArray(venues) && venues.length > 1 && (
-        <div className="flex flex-wrap items-center justify-between gap-2.5 p-3 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-2xs">
+        <div className="flex flex-wrap items-center justify-between gap-2.5 p-3.5 rounded-2xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] shadow-2xs">
           <div className="flex items-center gap-2">
-            <Building2 className="w-4 h-4 text-emerald-500" />
-            <span className="text-xs font-bold text-slate-700 dark:text-slate-300">
-              Filtrar por Instalación / Sede:
+            <Building2 className="w-4 h-4 text-[#0B1A2D] dark:text-[#B7F229]" />
+            <span className="text-xs font-bold text-[#0B1A2D] dark:text-slate-200">
+              Sede:
             </span>
           </div>
 
@@ -528,13 +525,13 @@ export const AdminStaff: React.FC = () => {
                 setVenueFilter('all');
                 setSelectedVenueId('all');
               }}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer border ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer border whitespace-nowrap ${
                 venueFilter === 'all'
-                  ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs'
-                  : 'bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-slate-300'
+                  ? 'bg-[#0B1A2D] text-white border-[#0B1A2D] dark:bg-[#B7F229] dark:text-[#0B1A2D] dark:border-[#B7F229]'
+                  : 'bg-slate-50 dark:bg-[#071220] text-slate-600 dark:text-slate-300 border-slate-200/80 dark:border-[#1A314D] hover:border-slate-300'
               }`}
             >
-              Todas las Sedes ({staffList.length})
+              Todas ({staffList.length})
             </button>
             {venues
               .filter((v) => v.id !== 'all')
@@ -549,10 +546,10 @@ export const AdminStaff: React.FC = () => {
                       setVenueFilter(v.id);
                       setSelectedVenueId(v.id);
                     }}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer border ${
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer border whitespace-nowrap ${
                       isSelected
-                        ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs'
-                        : 'bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-slate-300'
+                        ? 'bg-[#0B1A2D] text-white border-[#0B1A2D] dark:bg-[#B7F229] dark:text-[#0B1A2D] dark:border-[#B7F229]'
+                        : 'bg-slate-50 dark:bg-[#071220] text-slate-600 dark:text-slate-300 border-slate-200/80 dark:border-[#1A314D] hover:border-slate-300'
                     }`}
                   >
                     {v.shortName || v.name} ({count})
@@ -567,111 +564,111 @@ export const AdminStaff: React.FC = () => {
           3. KPIS DE PERSONAL Y AUDITORÍA
           ====================================================================== */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-1">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+        <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] shadow-2xs flex flex-col justify-between gap-1.5 min-w-0">
+          <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 truncate">
             Plantilla Total
           </span>
-          <div className="text-2xl font-black text-slate-900 dark:text-white font-mono">
+          <div className="text-2xl sm:text-3xl font-extrabold text-[#0B1A2D] dark:text-white font-mono tabular-nums tracking-tight">
             {staffList.length}
           </div>
-          <span className="text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1">
-            <CheckCircle2 className="w-3.5 h-3.5" />
+          <span className="text-xs text-slate-500 dark:text-slate-400 font-medium flex items-center gap-1.5 truncate">
+            <CheckCircle2 className="w-3.5 h-3.5 text-[#82b805] dark:text-[#B7F229] shrink-0" />
             <span>{activeStaffCount} activos hoy</span>
           </span>
         </div>
 
-        <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-1">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-            Profesores & Monitores
+        <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] shadow-2xs flex flex-col justify-between gap-1.5 min-w-0">
+          <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 truncate">
+            Profesores
           </span>
-          <div className="text-2xl font-black text-indigo-600 dark:text-indigo-400 font-mono">
+          <div className="text-2xl sm:text-3xl font-extrabold text-[#0B1A2D] dark:text-white font-mono tabular-nums tracking-tight">
             {coachesCount}
           </div>
-          <span className="text-[11px] text-slate-500 dark:text-slate-400">
+          <span className="text-xs text-slate-500 dark:text-slate-400 truncate">
             Docencia y competición
           </span>
         </div>
 
-        <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-1">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+        <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] shadow-2xs flex flex-col justify-between gap-1.5 min-w-0">
+          <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 truncate">
             Turnos Hoy
           </span>
-          <div className="text-2xl font-black text-amber-500 font-mono">
+          <div className="text-2xl sm:text-3xl font-extrabold text-[#0B1A2D] dark:text-white font-mono tabular-nums tracking-tight">
             {todayShiftsCount}
           </div>
-          <span className="text-[11px] text-slate-500 dark:text-slate-400">
-            Cuadrante de trabajo activo
+          <span className="text-xs text-slate-500 dark:text-slate-400 truncate">
+            Cuadrante activo
           </span>
         </div>
 
-        <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-1">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-            Registro de Acciones
+        <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] shadow-2xs flex flex-col justify-between gap-1.5 min-w-0">
+          <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 truncate">
+            Auditoría
           </span>
-          <div className="text-2xl font-black text-emerald-600 dark:text-emerald-400 font-mono">
+          <div className="text-2xl sm:text-3xl font-extrabold text-[#0B1A2D] dark:text-[#B7F229] font-mono tabular-nums tracking-tight">
             {totalAuditActionsCount}
           </div>
-          <span className="text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-1">
-            <Activity className="w-3 h-3 text-emerald-500" />
-            <span>Trazabilidad 100% auditable</span>
+          <span className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1.5 truncate">
+            <Activity className="w-3.5 h-3.5 text-[#82b805] dark:text-[#B7F229] shrink-0" />
+            <span>Trazabilidad activa</span>
           </span>
         </div>
       </div>
 
       {/* ======================================================================
-          4. NAVEGACIÓN POR PESTAÑAS DEL MÓDULO
+          4. NAVEGACIÓN POR PESTAÑAS DEL MÓDULO (SEGMENTED CONTROL)
           ====================================================================== */}
-      <div className="flex items-center gap-1.5 p-1 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-x-auto shadow-2xs">
+      <div className="flex items-center gap-1 p-1 bg-slate-100 dark:bg-[#071220] rounded-2xl border border-slate-200/80 dark:border-[#1A314D] overflow-x-auto no-scrollbar shadow-2xs">
         <button
           type="button"
           onClick={() => setActiveTab('directorio')}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition cursor-pointer whitespace-nowrap ${
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition cursor-pointer whitespace-nowrap shrink-0 ${
             activeTab === 'directorio'
-              ? 'bg-emerald-600 text-white shadow-xs'
-              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+              ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D] shadow-xs'
+              : 'text-slate-600 dark:text-slate-400 hover:text-[#0B1A2D] dark:hover:text-white'
           }`}
         >
           <Users className="w-3.5 h-3.5" />
-          <span>Equipo & Profesores ({filteredStaff.length})</span>
+          <span>Equipo ({filteredStaff.length})</span>
         </button>
 
         <button
           type="button"
           onClick={() => setActiveTab('turnos')}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition cursor-pointer whitespace-nowrap ${
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition cursor-pointer whitespace-nowrap shrink-0 ${
             activeTab === 'turnos'
-              ? 'bg-emerald-600 text-white shadow-xs'
-              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+              ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D] shadow-xs'
+              : 'text-slate-600 dark:text-slate-400 hover:text-[#0B1A2D] dark:hover:text-white'
           }`}
         >
           <Clock className="w-3.5 h-3.5" />
-          <span>Gestión de Turnos & Horarios</span>
+          <span>Turnos & Horarios</span>
         </button>
 
         <button
           type="button"
           onClick={() => setActiveTab('auditoria')}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition cursor-pointer whitespace-nowrap ${
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition cursor-pointer whitespace-nowrap shrink-0 ${
             activeTab === 'auditoria'
-              ? 'bg-emerald-600 text-white shadow-xs'
-              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+              ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D] shadow-xs'
+              : 'text-slate-600 dark:text-slate-400 hover:text-[#0B1A2D] dark:hover:text-white'
           }`}
         >
           <Shield className="w-3.5 h-3.5" />
-          <span>Control de Acciones (Auditoría)</span>
+          <span>Auditoría</span>
         </button>
 
         <button
           type="button"
           onClick={() => setActiveTab('asignaciones')}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition cursor-pointer whitespace-nowrap ${
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition cursor-pointer whitespace-nowrap shrink-0 ${
             activeTab === 'asignaciones'
-              ? 'bg-emerald-600 text-white shadow-xs'
-              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+              ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D] shadow-xs'
+              : 'text-slate-600 dark:text-slate-400 hover:text-[#0B1A2D] dark:hover:text-white'
           }`}
         >
           <GraduationCap className="w-3.5 h-3.5" />
-          <span>Asignación de Clases & Calendario</span>
+          <span>Asignación de Clases</span>
         </button>
       </div>
 
@@ -679,23 +676,23 @@ export const AdminStaff: React.FC = () => {
           TAB 1: DIRECTORIO DE PERSONAL Y PROFESORES
           ====================================================================== */}
       {activeTab === 'directorio' && (
-        <div className="space-y-4">
+        <div className="space-y-4 mb-8">
           {/* Barra de Filtros y Búsqueda */}
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-3 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xs">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-2.5 w-4 h-4 text-slate-400" />
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Buscar por nombre, cargo, email..."
-                className="w-full pl-9 pr-8 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-emerald-500"
+                className="w-full pl-9 pr-8 py-2.5 bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] rounded-2xl text-xs text-[#0B1A2D] dark:text-white placeholder-slate-400 focus:outline-none focus:border-[#0B1A2D] dark:focus:border-[#B7F229] shadow-2xs"
               />
               {searchQuery && (
                 <button
                   type="button"
                   onClick={() => setSearchQuery('')}
-                  className="absolute right-2.5 top-2.5 text-xs text-slate-400 hover:text-slate-600"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400 hover:text-slate-600 cursor-pointer"
                 >
                   ✕
                 </button>
@@ -706,7 +703,7 @@ export const AdminStaff: React.FC = () => {
               <select
                 value={roleFilter}
                 onChange={(e) => setRoleFilter(e.target.value)}
-                className="px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-bold text-slate-800 dark:text-slate-200 focus:outline-none focus:border-emerald-500"
+                className="px-3.5 py-2.5 bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] rounded-2xl text-xs font-bold text-[#0B1A2D] dark:text-slate-200 focus:outline-none focus:border-[#0B1A2D] dark:focus:border-[#B7F229] shadow-2xs"
               >
                 <option value="all">Todos los Roles</option>
                 <option value="HEAD_COACH">Director Deportivo</option>
@@ -717,8 +714,8 @@ export const AdminStaff: React.FC = () => {
             </div>
           </div>
 
-          {/* Grid de Fichas de Empleados / Profesores */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {/* Grid de Fichas de Empleados / Profesores (Estructura de lista limpia y espaciosa) */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
             {filteredStaff.map((staff) => {
               const assignedGroups = academyGroups.filter((g) =>
                 staff.assignedGroupIds?.includes(g.id) || g.coachName === staff.name
@@ -727,106 +724,86 @@ export const AdminStaff: React.FC = () => {
               return (
                 <div
                   key={staff.id}
-                  className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-xs hover:shadow-md transition-all flex flex-col justify-between space-y-4"
+                  className="p-5 sm:p-6 rounded-2xl sm:rounded-3xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] shadow-2xs hover:border-slate-300 dark:hover:border-slate-600 transition-all flex flex-col justify-between gap-4"
                 >
-                  <div className="space-y-3">
+                  <div className="space-y-4">
                     {/* Header de la tarjeta */}
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex items-center gap-3 min-w-0">
                         <img
                           src={staff.avatarUrl}
                           alt={staff.name}
-                          className="w-12 h-12 rounded-2xl object-cover border-2 border-slate-100 dark:border-slate-800 shrink-0"
+                          referrerPolicy="no-referrer"
+                          className="w-11 h-11 rounded-2xl object-cover border border-slate-200 dark:border-[#1A314D] shrink-0"
                         />
                         <div className="min-w-0">
-                          <h3 className="font-extrabold text-sm text-slate-900 dark:text-white truncate">
+                          <h3 className="font-bold text-[15px] text-[#0B1A2D] dark:text-white truncate">
                             {staff.name}
                           </h3>
-                          <p className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 truncate">
+                          <p className="text-xs font-medium text-slate-600 dark:text-slate-300 truncate">
                             {staff.roleTitle}
                           </p>
-                          <div className="flex items-center gap-1 text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">
-                            <Building2 className="w-3 h-3 text-slate-400 shrink-0" />
-                            <span className="truncate">{staff.venueName}</span>
+                          <div className="text-[11px] text-slate-400 dark:text-slate-500 truncate mt-0.5">
+                            {staff.venueName}
                           </div>
                         </div>
                       </div>
 
                       <span
-                        className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider shrink-0 ${
+                        className={`px-2 py-0.5 rounded-md text-[10px] font-bold tracking-wide shrink-0 whitespace-nowrap ${
                           staff.status === 'active'
-                            ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300'
+                            ? 'bg-[#F0FCCF] dark:bg-[#B7F229]/15 text-[#0B1A2D] dark:text-[#B7F229]'
                             : staff.status === 'break'
-                            ? 'bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300'
-                            : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
+                            ? 'bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-300'
+                            : 'bg-slate-100 dark:bg-[#071220] text-slate-500 dark:text-slate-400'
                         }`}
                       >
                         {staff.status === 'active' ? 'En Turno' : staff.status === 'break' ? 'Descanso' : 'Fuera'}
                       </span>
                     </div>
 
-                    {/* Datos de contacto y contrato */}
-                    <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-950/70 border border-slate-100 dark:border-slate-800/80 space-y-1.5 text-xs">
-                      <div className="flex items-center justify-between text-[11px]">
-                        <span className="text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
-                          <Mail className="w-3 h-3" />
-                          <span className="truncate max-w-[160px]">{staff.email}</span>
-                        </span>
-                        <span className="font-bold text-slate-700 dark:text-slate-300">
-                          {staff.weeklyHours}h / sem.
-                        </span>
+                    {/* Estructura de lista limpia y espaciosa (sin caja anidada) */}
+                    <div className="divide-y divide-slate-100 dark:divide-[#1A314D] border-y border-slate-100 dark:border-[#1A314D] text-xs">
+                      <div className="py-2.5 flex items-center justify-between gap-3">
+                        <span className="text-slate-400 dark:text-slate-500 font-medium shrink-0">Contacto</span>
+                        <div className="text-right min-w-0">
+                          <div className="text-[#0B1A2D] dark:text-slate-200 font-medium truncate">{staff.email}</div>
+                          <div className="text-[11px] text-slate-500 dark:text-slate-400 font-mono tabular-nums">{staff.phone}</div>
+                        </div>
                       </div>
 
-                      <div className="flex items-center justify-between text-[11px]">
-                        <span className="text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
-                          <Phone className="w-3 h-3" />
-                          <span>{staff.phone}</span>
-                        </span>
-                        {staff.hourlyRate && (
-                          <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400">
-                            {staff.hourlyRate} €/h
-                          </span>
-                        )}
+                      <div className="py-2.5 flex items-center justify-between gap-3">
+                        <span className="text-slate-400 dark:text-slate-500 font-medium shrink-0">Jornada & Tarifa</span>
+                        <div className="flex items-center gap-2 font-mono tabular-nums">
+                          <span className="font-bold text-[#0B1A2D] dark:text-white">{staff.weeklyHours}h/sem</span>
+                          {staff.hourlyRate !== undefined && (
+                            <>
+                              <span className="text-slate-300 dark:text-slate-600" aria-hidden="true">·</span>
+                              <span className="font-bold text-[#0B1A2D] dark:text-[#B7F229]">{staff.hourlyRate.toFixed(0)} €/h</span>
+                            </>
+                          )}
+                        </div>
                       </div>
 
-                      {staff.certifications && (
-                        <div className="pt-1 border-t border-slate-200/60 dark:border-slate-800 text-[10px] text-slate-500 dark:text-slate-400 flex items-center gap-1 truncate">
-                          <Award className="w-3 h-3 text-amber-500 shrink-0" />
-                          <span className="truncate">{staff.certifications}</span>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Cursos / Grupos de Escuela Asignados */}
-                    <div>
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
-                        Clases / Grupos Asignados ({assignedGroups.length}):
-                      </span>
-                      {assignedGroups.length === 0 ? (
-                        <p className="text-[11px] text-slate-400 italic">Sin grupos vinculados actualmente.</p>
-                      ) : (
-                        <div className="flex flex-wrap gap-1">
-                          {assignedGroups.map((g) => (
-                            <span
-                              key={g.id}
-                              className="px-2 py-0.5 rounded-lg bg-indigo-50 dark:bg-indigo-950/70 border border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300 text-[10px] font-bold"
-                            >
-                              {g.name.split('—')[0]}
-                            </span>
-                          ))}
-                        </div>
-                      )}
+                      <div className="py-2.5 flex items-center justify-between gap-3">
+                        <span className="text-slate-400 dark:text-slate-500 font-medium shrink-0">Grupos</span>
+                        <span className="text-right text-slate-700 dark:text-slate-300 font-medium truncate">
+                          {assignedGroups.length === 0
+                            ? 'Sin asignar'
+                            : assignedGroups.map((g) => g.name.split('—')[0].trim()).join(', ')}
+                        </span>
+                      </div>
                     </div>
                   </div>
 
-                  {/* Acciones */}
-                  <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2">
+                  {/* Accesos Rápidos */}
+                  <div className="flex items-center justify-between gap-2.5">
                     <button
                       type="button"
                       onClick={() => handleOpenAssignModal(staff)}
-                      className="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs transition cursor-pointer flex items-center gap-1"
+                      className="flex-1 min-h-[38px] px-3 py-2 rounded-xl bg-slate-100/80 dark:bg-[#071220] hover:bg-slate-200/80 dark:hover:bg-[#132A45] text-[#0B1A2D] dark:text-slate-200 font-bold text-xs transition cursor-pointer flex items-center justify-center gap-1.5 whitespace-nowrap"
                     >
-                      <GraduationCap className="w-3.5 h-3.5 text-indigo-500" />
+                      <GraduationCap className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400 shrink-0" />
                       <span>Asignar Grupos</span>
                     </button>
 
@@ -836,9 +813,9 @@ export const AdminStaff: React.FC = () => {
                         setSelectedCoachForCalendar(staff.id);
                         setActiveTab('turnos');
                       }}
-                      className="px-3 py-1.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 text-emerald-700 dark:text-emerald-300 font-bold text-xs transition cursor-pointer flex items-center gap-1"
+                      className="flex-1 min-h-[38px] px-3 py-2 rounded-xl bg-[#0B1A2D] hover:bg-[#132A45] dark:bg-[#B7F229] dark:hover:bg-[#a3db20] text-white dark:text-[#0B1A2D] font-bold text-xs transition cursor-pointer flex items-center justify-center gap-1.5 whitespace-nowrap"
                     >
-                      <Calendar className="w-3.5 h-3.5 text-emerald-500" />
+                      <Calendar className="w-3.5 h-3.5 text-[#B7F229] dark:text-[#0B1A2D] shrink-0" />
                       <span>Ver Turnos</span>
                     </button>
                   </div>
@@ -853,13 +830,13 @@ export const AdminStaff: React.FC = () => {
           TAB 2: GESTIÓN DE TURNOS & HORARIOS LABORALES
           ====================================================================== */}
       {activeTab === 'turnos' && (
-        <div className="space-y-4">
+        <div className="space-y-4 mb-8">
           {/* Barra de Filtros de Turnos */}
-          <div className="p-3.5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-3 shadow-2xs">
+          <div className="p-3.5 rounded-2xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] flex flex-wrap items-center justify-between gap-3 shadow-2xs">
             <div className="flex items-center gap-2">
-              <Clock className="w-4 h-4 text-emerald-500" />
-              <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
-                Cuadrante de Turnos Laborales:
+              <Clock className="w-4 h-4 text-[#0B1A2D] dark:text-[#B7F229]" />
+              <span className="text-xs font-bold text-[#0B1A2D] dark:text-slate-200">
+                Cuadrante de Turnos Laborales
               </span>
             </div>
 
@@ -868,7 +845,7 @@ export const AdminStaff: React.FC = () => {
               <select
                 value={selectedCoachForCalendar}
                 onChange={(e) => setSelectedCoachForCalendar(e.target.value)}
-                className="px-3 py-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-bold text-slate-800 dark:text-slate-200"
+                className="px-3 py-1.5 bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-xl text-xs font-bold text-[#0B1A2D] dark:text-slate-200"
               >
                 <option value="all">Todo el Personal</option>
                 {staffList.map((s) => (
@@ -881,20 +858,20 @@ export const AdminStaff: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setIsNewShiftModalOpen(true)}
-                className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition cursor-pointer flex items-center gap-1 shadow-xs"
+                className="px-3 py-1.5 rounded-xl bg-[#0B1A2D] hover:bg-[#132A45] dark:bg-[#B7F229] dark:hover:bg-[#a3db20] text-white dark:text-[#0B1A2D] font-bold text-xs transition cursor-pointer flex items-center gap-1 shadow-2xs whitespace-nowrap"
               >
-                <Plus className="w-3.5 h-3.5" />
+                <Plus className="w-3.5 h-3.5 text-[#B7F229] dark:text-[#0B1A2D]" />
                 <span>Planificar Turno</span>
               </button>
             </div>
           </div>
 
           {/* Tabla de Turnos Programados */}
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-xs">
+          <div className="bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] rounded-2xl overflow-hidden shadow-2xs">
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse text-xs">
                 <thead>
-                  <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-950/70 text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                  <tr className="border-b border-slate-200 dark:border-[#1A314D] bg-slate-50/70 dark:bg-[#071220] text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                     <th className="py-3.5 px-4">Empleado / Cargo</th>
                     <th className="py-3.5 px-4">Fecha</th>
                     <th className="py-3.5 px-4">Horario</th>
@@ -904,27 +881,27 @@ export const AdminStaff: React.FC = () => {
                     <th className="py-3.5 px-4 text-right">Observaciones</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                <tbody className="divide-y divide-slate-100 dark:divide-[#1A314D]">
                   {filteredShifts.map((shift) => (
                     <tr
                       key={shift.id}
-                      className="hover:bg-slate-50/60 dark:hover:bg-slate-800/40 transition"
+                      className="hover:bg-slate-50/60 dark:hover:bg-white/[0.02] transition"
                     >
-                      <td className="py-3.5 px-4 font-bold text-slate-900 dark:text-white">
+                      <td className="py-3.5 px-4 font-bold text-[#0B1A2D] dark:text-white">
                         <div>{shift.staffName}</div>
                         <div className="text-[10px] text-slate-400 font-normal">{shift.roleTitle}</div>
                       </td>
-                      <td className="py-3.5 px-4 font-mono font-bold text-slate-700 dark:text-slate-300">
+                      <td className="py-3.5 px-4 font-mono tabular-nums font-bold text-slate-700 dark:text-slate-300">
                         {shift.date}
                       </td>
-                      <td className="py-3.5 px-4 font-mono font-extrabold text-emerald-600 dark:text-emerald-400">
+                      <td className="py-3.5 px-4 font-mono tabular-nums font-extrabold text-[#0B1A2D] dark:text-[#B7F229]">
                         {shift.startTime} - {shift.endTime}
                       </td>
                       <td className="py-3.5 px-4 text-slate-600 dark:text-slate-300">
                         {shift.venueName}
                       </td>
                       <td className="py-3.5 px-4">
-                        <span className="px-2 py-0.5 rounded-lg bg-indigo-50 dark:bg-indigo-950/70 border border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300 text-[10px] font-bold">
+                        <span className="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-[#071220] text-[#0B1A2D] dark:text-slate-300 text-[10px] font-bold">
                           {shift.shiftType === 'recepcion'
                             ? 'Recepción & Caja'
                             : shift.shiftType === 'clases_pista'
@@ -936,12 +913,12 @@ export const AdminStaff: React.FC = () => {
                       </td>
                       <td className="py-3.5 px-4">
                         <span
-                          className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider ${
+                          className={`px-2 py-0.5 rounded-md text-[10px] font-bold tracking-wide ${
                             shift.status === 'active'
-                              ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300'
+                              ? 'bg-[#F0FCCF] dark:bg-[#B7F229]/15 text-[#0B1A2D] dark:text-[#B7F229]'
                               : shift.status === 'completed'
-                              ? 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
-                              : 'bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300'
+                              ? 'bg-slate-100 dark:bg-[#071220] text-slate-600 dark:text-slate-400'
+                              : 'bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-300'
                           }`}
                         >
                           {shift.status === 'active' ? 'En Curso' : shift.status === 'completed' ? 'Completado' : 'Programado'}
@@ -963,9 +940,9 @@ export const AdminStaff: React.FC = () => {
           TAB 3: CONTROL DE ACCIONES & AUDITORÍA EN TIEMPO REAL
           ====================================================================== */}
       {activeTab === 'auditoria' && (
-        <div className="space-y-4">
+        <div className="space-y-4 mb-8">
           {/* Barra de Filtros de Auditoría */}
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-3.5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xs">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-3.5 rounded-2xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] shadow-2xs">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-2.5 w-4 h-4 text-slate-400" />
               <input
@@ -973,7 +950,7 @@ export const AdminStaff: React.FC = () => {
                 value={auditSearchQuery}
                 onChange={(e) => setAuditSearchQuery(e.target.value)}
                 placeholder="Buscar por usuario, acción, target o detalle..."
-                className="w-full pl-9 pr-8 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-emerald-500"
+                className="w-full pl-9 pr-8 py-2 bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-xl text-xs text-[#0B1A2D] dark:text-white placeholder-slate-400 focus:outline-none focus:border-[#0B1A2D] dark:focus:border-[#B7F229]"
               />
               {auditSearchQuery && (
                 <button
@@ -990,7 +967,7 @@ export const AdminStaff: React.FC = () => {
               <select
                 value={auditActionFilter}
                 onChange={(e) => setAuditActionFilter(e.target.value)}
-                className="px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-bold text-slate-800 dark:text-slate-200 focus:outline-none focus:border-emerald-500"
+                className="px-3 py-2 bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-xl text-xs font-bold text-[#0B1A2D] dark:text-slate-200 focus:outline-none focus:border-[#0B1A2D] dark:focus:border-[#B7F229]"
               >
                 <option value="all">Todas las Acciones</option>
                 <option value="Tarifas">Tarifas y Precios</option>
@@ -1010,29 +987,29 @@ export const AdminStaff: React.FC = () => {
                   });
                   triggerDemoToast('Entrada de Auditoría Registrada', 'Nueva traza de auditoría generada.', 'info');
                 }}
-                className="px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs transition cursor-pointer flex items-center gap-1.5"
+                className="px-3 py-2 rounded-xl bg-slate-100 dark:bg-[#071220] hover:bg-slate-200 dark:hover:bg-[#132A45] text-[#0B1A2D] dark:text-slate-300 font-bold text-xs transition cursor-pointer flex items-center gap-1.5"
               >
-                <Shield className="w-3.5 h-3.5 text-emerald-500" />
+                <Shield className="w-3.5 h-3.5 text-[#0B1A2D] dark:text-[#B7F229]" />
                 <span>Traza Test</span>
               </button>
             </div>
           </div>
 
           {/* Tabla de Logs de Auditoría */}
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-xs">
+          <div className="bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] rounded-2xl overflow-hidden shadow-2xs">
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse text-xs">
                 <thead>
-                  <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-950/70 text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                  <tr className="border-b border-slate-200 dark:border-[#1A314D] bg-slate-50/70 dark:bg-[#071220] text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                     <th className="py-3.5 px-4">Fecha / Hora</th>
                     <th className="py-3.5 px-4">Responsable (Actor)</th>
                     <th className="py-3.5 px-4">Rol en el Sistema</th>
                     <th className="py-3.5 px-4">Acción Realizada</th>
-                    <th className="py-3.5 px-4">Elemento Afectado (Target)</th>
-                    <th className="py-3.5 px-4">Detalles de la Operación</th>
+                    <th className="py-3.5 px-4">Elemento Afectado</th>
+                    <th className="py-3.5 px-4">Detalles</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-medium">
+                <tbody className="divide-y divide-slate-100 dark:divide-[#1A314D] font-medium">
                   {filteredAuditLogs.length === 0 ? (
                     <tr>
                       <td colSpan={6} className="py-8 text-center text-slate-400 text-xs">
@@ -1043,20 +1020,20 @@ export const AdminStaff: React.FC = () => {
                     filteredAuditLogs.map((log) => (
                       <tr
                         key={log.id}
-                        className="hover:bg-slate-50/60 dark:hover:bg-slate-800/40 transition"
+                        className="hover:bg-slate-50/60 dark:hover:bg-white/[0.02] transition"
                       >
-                        <td className="py-3.5 px-4 font-mono font-bold text-slate-500 whitespace-nowrap">
+                        <td className="py-3.5 px-4 font-mono tabular-nums font-bold text-slate-500 whitespace-nowrap">
                           {log.timestamp}
                         </td>
-                        <td className="py-3.5 px-4 font-bold text-slate-900 dark:text-white whitespace-nowrap">
+                        <td className="py-3.5 px-4 font-bold text-[#0B1A2D] dark:text-white whitespace-nowrap">
                           {log.actor}
                         </td>
                         <td className="py-3.5 px-4">
-                          <span className="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-mono text-[10px] font-bold">
+                          <span className="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-[#071220] text-slate-700 dark:text-slate-300 font-mono text-[10px] font-bold">
                             {log.role}
                           </span>
                         </td>
-                        <td className="py-3.5 px-4 font-extrabold text-emerald-600 dark:text-emerald-400 whitespace-nowrap">
+                        <td className="py-3.5 px-4 font-bold text-[#0B1A2D] dark:text-[#B7F229] whitespace-nowrap">
                           {log.action}
                         </td>
                         <td className="py-3.5 px-4 font-bold text-slate-800 dark:text-slate-200">
@@ -1079,22 +1056,22 @@ export const AdminStaff: React.FC = () => {
           TAB 4: ASIGNACIÓN DE CLASES Y CALENDARIO FILTRADO POR PROFESOR
           ====================================================================== */}
       {activeTab === 'asignaciones' && (
-        <div className="space-y-4">
-          <div className="p-4 rounded-2xl bg-indigo-50/70 dark:bg-indigo-950/40 border border-indigo-200/80 dark:border-indigo-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="space-y-4 mb-8">
+          <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
             <div>
-              <h3 className="font-extrabold text-sm text-indigo-950 dark:text-indigo-200">
-                Distribución de Alumnos y Cursos de Academia
+              <h3 className="font-bold text-sm text-[#0B1A2D] dark:text-white">
+                Distribución de Alumnos y Cursos de Escuela
               </h3>
-              <p className="text-xs text-indigo-700 dark:text-indigo-300 mt-0.5">
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                 Asigna cursos a cada monitor y visualiza el calendario de pistas reservadas para docencia.
               </p>
             </div>
             <button
               type="button"
               onClick={() => setAdminTab('academy')}
-              className="px-3.5 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs transition cursor-pointer whitespace-nowrap shadow-xs"
+              className="px-4 py-2 rounded-xl bg-[#0B1A2D] hover:bg-[#132A45] dark:bg-[#B7F229] dark:hover:bg-[#a3db20] text-white dark:text-[#0B1A2D] font-bold text-xs transition cursor-pointer whitespace-nowrap shadow-2xs"
             >
-              Ir al Módulo de Escuela
+              Ir a Escuela
             </button>
           </div>
 
@@ -1109,20 +1086,21 @@ export const AdminStaff: React.FC = () => {
                 return (
                   <div
                     key={coach.id}
-                    className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs space-y-3"
+                    className="p-5 sm:p-6 rounded-2xl sm:rounded-3xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] shadow-2xs space-y-4"
                   >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="flex items-center gap-3 min-w-0">
                         <img
                           src={coach.avatarUrl}
                           alt={coach.name}
-                          className="w-10 h-10 rounded-xl object-cover"
+                          referrerPolicy="no-referrer"
+                          className="w-10 h-10 rounded-xl object-cover border border-slate-200 dark:border-[#1A314D] shrink-0"
                         />
-                        <div>
-                          <h4 className="font-extrabold text-sm text-slate-900 dark:text-white">
+                        <div className="min-w-0">
+                          <h4 className="font-bold text-sm text-[#0B1A2D] dark:text-white truncate">
                             {coach.name}
                           </h4>
-                          <span className="text-xs text-emerald-600 dark:text-emerald-400 font-bold">
+                          <span className="text-xs text-slate-500 dark:text-slate-400 font-medium block truncate">
                             {coach.roleTitle}
                           </span>
                         </div>
@@ -1131,36 +1109,38 @@ export const AdminStaff: React.FC = () => {
                       <button
                         type="button"
                         onClick={() => handleOpenAssignModal(coach)}
-                        className="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-emerald-50 text-slate-700 dark:text-slate-300 font-bold text-xs transition cursor-pointer"
+                        className="px-3 py-1.5 rounded-xl bg-slate-100/80 dark:bg-[#071220] hover:bg-slate-200 dark:hover:bg-[#132A45] text-[#0B1A2D] dark:text-slate-200 font-bold text-xs transition cursor-pointer whitespace-nowrap shrink-0"
                       >
                         Gestionar Asignaciones
                       </button>
                     </div>
 
-                    <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-slate-800">
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
-                        Cursos Impartidos ({assigned.length}):
+                    <div className="space-y-2 pt-3 border-t border-slate-100 dark:border-[#1A314D]">
+                      <span className="text-[11px] font-semibold text-slate-400 block">
+                        Cursos Impartidos ({assigned.length})
                       </span>
 
                       {assigned.length === 0 ? (
                         <p className="text-xs text-slate-400 italic">No tiene grupos asignados.</p>
                       ) : (
-                        assigned.map((g) => (
-                          <div
-                            key={g.id}
-                            className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 flex items-center justify-between text-xs"
-                          >
-                            <div>
-                              <div className="font-bold text-slate-900 dark:text-white">{g.name}</div>
-                              <div className="text-[10px] text-slate-500 dark:text-slate-400">
-                                {g.schedule || 'Martes y Jueves'} · Máx {g.maxStudents} alumnos
+                        <div className="divide-y divide-slate-100 dark:divide-[#1A314D]">
+                          {assigned.map((g) => (
+                            <div
+                              key={g.id}
+                              className="py-2.5 flex items-center justify-between gap-3 text-xs"
+                            >
+                              <div className="min-w-0">
+                                <div className="font-bold text-[#0B1A2D] dark:text-white truncate">{g.name}</div>
+                                <div className="text-[11px] text-slate-500 dark:text-slate-400">
+                                  {g.schedule || 'Martes y Jueves'} · Máx {g.maxStudents} alumnos
+                                </div>
                               </div>
+                              <span className="font-mono tabular-nums font-bold text-[#0B1A2D] dark:text-[#B7F229] shrink-0">
+                                {g.monthlyFee} €/mes
+                              </span>
                             </div>
-                            <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400">
-                              {g.monthlyFee} €/mes
-                            </span>
-                          </div>
-                        ))
+                          ))}
+                        </div>
                       )}
                     </div>
                   </div>
@@ -1175,20 +1155,20 @@ export const AdminStaff: React.FC = () => {
           ====================================================================== */}
       {isNewStaffModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs animate-in fade-in duration-150">
-          <div className="w-full max-w-lg rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl p-6 sm:p-7 space-y-4 max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
-              <div className="flex items-center gap-2">
-                <div className="p-2 rounded-xl bg-emerald-50 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400">
+          <div className="w-full max-w-lg rounded-3xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] shadow-2xl p-6 sm:p-7 space-y-4 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-[#1A314D] pb-3">
+              <div className="flex items-center gap-2.5">
+                <div className="p-2 rounded-xl bg-slate-100 dark:bg-[#071220] text-[#0B1A2D] dark:text-[#B7F229]">
                   <UserCheck className="w-4 h-4" />
                 </div>
-                <h3 className="font-black text-base text-slate-900 dark:text-white">
+                <h3 className="font-bold text-base text-[#0B1A2D] dark:text-white">
                   Alta de Empleado / Profesor
                 </h3>
               </div>
               <button
                 type="button"
                 onClick={() => setIsNewStaffModalOpen(false)}
-                className="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
+                className="p-1.5 rounded-full text-slate-400 hover:text-[#0B1A2D] dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#132A45] cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -1336,17 +1316,17 @@ export const AdminStaff: React.FC = () => {
                 </div>
               </div>
 
-              <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-end gap-2">
+              <div className="pt-3 border-t border-slate-100 dark:border-[#1A314D] flex items-center justify-end gap-2">
                 <button
                   type="button"
                   onClick={() => setIsNewStaffModalOpen(false)}
-                  className="px-4 py-2 rounded-xl text-slate-500 font-bold hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+                  className="px-4 py-2 rounded-xl text-slate-500 font-bold hover:bg-slate-100 dark:hover:bg-[#132A45] transition cursor-pointer"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold transition cursor-pointer shadow-md"
+                  className="px-4 py-2 rounded-xl bg-[#B7F229] hover:bg-[#a3db20] text-[#0B1A2D] font-bold transition cursor-pointer shadow-2xs"
                 >
                   Guardar y Registrar
                 </button>
@@ -1361,20 +1341,20 @@ export const AdminStaff: React.FC = () => {
           ====================================================================== */}
       {isNewShiftModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs animate-in fade-in duration-150">
-          <div className="w-full max-w-md rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl p-6 space-y-4 max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
-              <div className="flex items-center gap-2">
-                <div className="p-2 rounded-xl bg-emerald-50 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400">
+          <div className="w-full max-w-md rounded-3xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] shadow-2xl p-6 space-y-4 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-[#1A314D] pb-3">
+              <div className="flex items-center gap-2.5">
+                <div className="p-2 rounded-xl bg-slate-100 dark:bg-[#071220] text-[#0B1A2D] dark:text-[#B7F229]">
                   <Clock className="w-4 h-4" />
                 </div>
-                <h3 className="font-black text-base text-slate-900 dark:text-white">
+                <h3 className="font-bold text-base text-[#0B1A2D] dark:text-white">
                   Planificar Turno Laboral
                 </h3>
               </div>
               <button
                 type="button"
                 onClick={() => setIsNewShiftModalOpen(false)}
-                className="p-1 rounded-lg text-slate-400 hover:text-slate-600 cursor-pointer"
+                className="p-1.5 rounded-full text-slate-400 hover:text-[#0B1A2D] dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#132A45] cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -1388,7 +1368,7 @@ export const AdminStaff: React.FC = () => {
                 <select
                   value={shiftStaffId}
                   onChange={(e) => setShiftStaffId(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-bold text-slate-900 dark:text-white"
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-xl text-xs font-bold text-[#0B1A2D] dark:text-white"
                 >
                   {staffList.map((s) => (
                     <option key={s.id} value={s.id}>
@@ -1406,7 +1386,7 @@ export const AdminStaff: React.FC = () => {
                   <select
                     value={shiftVenueId}
                     onChange={(e) => setShiftVenueId(e.target.value)}
-                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-bold text-slate-900 dark:text-white"
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-xl text-xs font-bold text-[#0B1A2D] dark:text-white"
                   >
                     {venues
                       .filter((v) => v.id !== 'all')
@@ -1427,7 +1407,7 @@ export const AdminStaff: React.FC = () => {
                     required
                     value={shiftDate}
                     onChange={(e) => setShiftDate(e.target.value)}
-                    className="w-full px-2.5 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs text-slate-900 dark:text-white"
+                    className="w-full px-2.5 py-2 bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-xl text-xs text-[#0B1A2D] dark:text-white"
                   />
                 </div>
                 <div>
@@ -1437,7 +1417,7 @@ export const AdminStaff: React.FC = () => {
                     required
                     value={shiftStartTime}
                     onChange={(e) => setShiftStartTime(e.target.value)}
-                    className="w-full px-2.5 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-mono font-bold text-slate-900 dark:text-white"
+                    className="w-full px-2.5 py-2 bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-xl text-xs font-mono font-bold text-[#0B1A2D] dark:text-white"
                   />
                 </div>
                 <div>
@@ -1447,7 +1427,7 @@ export const AdminStaff: React.FC = () => {
                     required
                     value={shiftEndTime}
                     onChange={(e) => setShiftEndTime(e.target.value)}
-                    className="w-full px-2.5 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-mono font-bold text-slate-900 dark:text-white"
+                    className="w-full px-2.5 py-2 bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-xl text-xs font-mono font-bold text-[#0B1A2D] dark:text-white"
                   />
                 </div>
               </div>
@@ -1458,19 +1438,19 @@ export const AdminStaff: React.FC = () => {
                 </label>
                 <div className="grid grid-cols-2 gap-2">
                   {[
-                    { id: 'clases_pista', label: '🎾 Clases en Pista' },
-                    { id: 'recepcion', label: '🎟️ Recepción & TPV' },
-                    { id: 'coordinacion', label: '📋 Coordinación' },
-                    { id: 'cierre', label: '🔒 Cierre & Domótica' },
+                    { id: 'clases_pista', label: 'Clases en Pista' },
+                    { id: 'recepcion', label: 'Recepción & TPV' },
+                    { id: 'coordinacion', label: 'Coordinación' },
+                    { id: 'cierre', label: 'Cierre & Domótica' },
                   ].map((f) => (
                     <button
                       key={f.id}
                       type="button"
                       onClick={() => setShiftType(f.id as any)}
-                      className={`p-2 rounded-xl text-xs font-bold transition border text-left cursor-pointer ${
+                      className={`p-2.5 rounded-xl text-xs font-bold transition border text-left cursor-pointer ${
                         shiftType === f.id
-                          ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-500 text-emerald-700 dark:text-emerald-300'
-                          : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400'
+                          ? 'bg-[#0B1A2D] dark:bg-[#B7F229] border-[#0B1A2D] dark:border-[#B7F229] text-white dark:text-[#0B1A2D]'
+                          : 'bg-slate-50 dark:bg-[#071220] border-slate-200/80 dark:border-[#1A314D] text-slate-600 dark:text-slate-400'
                       }`}
                     >
                       {f.label}
@@ -1488,21 +1468,21 @@ export const AdminStaff: React.FC = () => {
                   placeholder="Ej. Revisar luces pista 4 y arqueo de caja..."
                   value={shiftNotes}
                   onChange={(e) => setShiftNotes(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs text-slate-900 dark:text-white"
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-xl text-xs text-[#0B1A2D] dark:text-white"
                 />
               </div>
 
-              <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-end gap-2">
+              <div className="pt-3 border-t border-slate-100 dark:border-[#1A314D] flex items-center justify-end gap-2">
                 <button
                   type="button"
                   onClick={() => setIsNewShiftModalOpen(false)}
-                  className="px-4 py-2 rounded-xl text-slate-500 font-bold hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+                  className="px-4 py-2 rounded-xl text-slate-500 font-bold hover:bg-slate-100 dark:hover:bg-[#132A45] transition cursor-pointer"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold transition cursor-pointer shadow-md"
+                  className="px-4 py-2 rounded-xl bg-[#B7F229] hover:bg-[#a3db20] text-[#0B1A2D] font-bold transition cursor-pointer shadow-2xs"
                 >
                   Guardar Turno
                 </button>
@@ -1517,18 +1497,18 @@ export const AdminStaff: React.FC = () => {
           ====================================================================== */}
       {selectedStaffForAssignment && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs animate-in fade-in duration-150">
-          <div className="w-full max-w-md rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl p-6 space-y-4 max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
-              <div className="flex items-center gap-2">
-                <GraduationCap className="w-4 h-4 text-indigo-500" />
-                <h3 className="font-black text-base text-slate-900 dark:text-white">
+          <div className="w-full max-w-md rounded-3xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] shadow-2xl p-6 space-y-4 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-[#1A314D] pb-3">
+              <div className="flex items-center gap-2.5">
+                <GraduationCap className="w-4 h-4 text-[#0B1A2D] dark:text-[#B7F229]" />
+                <h3 className="font-bold text-base text-[#0B1A2D] dark:text-white">
                   Asignar Cursos a {selectedStaffForAssignment.name}
                 </h3>
               </div>
               <button
                 type="button"
                 onClick={() => setSelectedStaffForAssignment(null)}
-                className="p-1 rounded-lg text-slate-400 hover:text-slate-600 cursor-pointer"
+                className="p-1.5 rounded-full text-slate-400 hover:text-[#0B1A2D] dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#132A45] cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -1547,8 +1527,8 @@ export const AdminStaff: React.FC = () => {
                       key={g.id}
                       className={`flex items-center justify-between p-3 rounded-xl border transition cursor-pointer select-none ${
                         isChecked
-                          ? 'bg-indigo-50 dark:bg-indigo-950/60 border-indigo-400 text-indigo-950 dark:text-indigo-200 font-bold'
-                          : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300'
+                          ? 'bg-[#F0FCCF]/60 dark:bg-[#B7F229]/15 border-[#B7F229] text-[#0B1A2D] dark:text-white font-bold'
+                          : 'bg-slate-50 dark:bg-[#071220] border-slate-200/80 dark:border-[#1A314D] text-slate-700 dark:text-slate-300'
                       }`}
                     >
                       <div className="flex items-center gap-2.5">
@@ -1562,7 +1542,7 @@ export const AdminStaff: React.FC = () => {
                               setAssignedGroupsTemp((prev) => prev.filter((id) => id !== g.id));
                             }
                           }}
-                          className="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500"
+                          className="w-4 h-4 rounded accent-[#0B1A2D] dark:accent-[#B7F229]"
                         />
                         <div>
                           <div className="font-bold">{g.name}</div>
@@ -1571,7 +1551,7 @@ export const AdminStaff: React.FC = () => {
                           </div>
                         </div>
                       </div>
-                      <span className="text-[10px] font-mono font-bold text-slate-400">
+                      <span className="text-[10px] font-mono tabular-nums font-bold text-slate-400">
                         {g.currentStudents}/{g.maxStudents} alumnos
                       </span>
                     </label>
@@ -1580,18 +1560,18 @@ export const AdminStaff: React.FC = () => {
               </div>
             </div>
 
-            <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-end gap-2">
+            <div className="pt-3 border-t border-slate-100 dark:border-[#1A314D] flex items-center justify-end gap-2">
               <button
                 type="button"
                 onClick={() => setSelectedStaffForAssignment(null)}
-                className="px-4 py-2 rounded-xl text-slate-500 font-bold hover:bg-slate-100 transition cursor-pointer text-xs"
+                className="px-4 py-2 rounded-xl text-slate-500 font-bold hover:bg-slate-100 dark:hover:bg-[#132A45] transition cursor-pointer text-xs"
               >
                 Cancelar
               </button>
               <button
                 type="button"
                 onClick={handleSaveAssignments}
-                className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold transition cursor-pointer shadow-md text-xs"
+                className="px-4 py-2 rounded-xl bg-[#B7F229] hover:bg-[#a3db20] text-[#0B1A2D] font-bold transition cursor-pointer shadow-2xs text-xs"
               >
                 Guardar Asignaciones
               </button>

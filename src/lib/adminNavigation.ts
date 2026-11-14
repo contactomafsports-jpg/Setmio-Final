@@ -542,9 +542,16 @@ export function getAdminNavConfig(
       },
       {
         id: 'academy',
-        label: 'Escuela de Pádel',
+        label: 'Escuela',
         icon: GraduationCap,
         desc: 'Grupos, alumnos y entrenadores de la escuela',
+        isPrimary: false,
+      },
+      {
+        id: 'staff',
+        label: 'Personal & Profesores',
+        icon: UserCheck,
+        desc: 'Gestión de empleados, turnos laborales y registro de acciones',
         isPrimary: false,
       },
       {
@@ -597,13 +604,6 @@ export function getAdminNavConfig(
         label: 'Configuración Club',
         icon: Settings,
         desc: 'Horarios, políticas, luces domóticas y WhatsApp',
-        isPrimary: false,
-      },
-      {
-        id: 'staff',
-        label: 'Personal & Profesores',
-        icon: UserCheck,
-        desc: 'Gestión de empleados, turnos laborales y registro de acciones',
         isPrimary: false,
       },
     ];
