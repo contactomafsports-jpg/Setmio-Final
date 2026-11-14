@@ -142,7 +142,7 @@ export function getAdminNavConfig(
       },
       {
         id: 'tournaments',
-        label: 'Torneos del Club',
+        label: 'Competiciones',
         icon: Trophy,
         desc: 'Consulta de cuadros y estado de inscripciones',
         isPrimary: false,
@@ -535,7 +535,7 @@ export function getAdminNavConfig(
       },
       {
         id: 'tournaments',
-        label: 'Torneos',
+        label: 'Competiciones',
         icon: Trophy,
         desc: 'Torneos oficiales, cuadros y rankings',
         isPrimary: false,
