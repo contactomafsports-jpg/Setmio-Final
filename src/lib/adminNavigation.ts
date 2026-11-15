@@ -149,7 +149,7 @@ export function getAdminNavConfig(
       },
       {
         id: 'shop',
-        label: 'Tienda Mostrador',
+        label: 'Tienda',
         icon: ShoppingBag,
         desc: 'Venta de pelotas, grips y bebidas en recepción',
         isPrimary: false,
@@ -564,7 +564,7 @@ export function getAdminNavConfig(
       },
       {
         id: 'shop',
-        label: 'Tienda y Pedidos',
+        label: 'Tienda',
         icon: ShoppingBag,
         desc: 'Catálogo de palas, accesorios e inventario del club',
         isPrimary: false,
