@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useApp } from '../../context/AppContext';
 import {
   Shield,
@@ -8,36 +8,49 @@ import {
   Filter,
   Calendar,
   MapPin,
-  Clock,
-  CheckCircle2,
-  XCircle,
-  HelpCircle,
   Award,
   ChevronRight,
   ArrowLeft,
   X,
-  Check,
-  Edit2,
-  Trash2,
   Navigation,
-  Activity,
   Dumbbell,
   ExternalLink,
   Share2,
   Copy,
   Trophy,
-  Phone,
-  MessageSquare,
-  Flame,
   Target,
-  Star,
   UserCheck,
   Crown,
-  FileSpreadsheet,
-  AlertCircle,
-  Map,
   Lock,
 } from 'lucide-react';
+
+const TeamBannerImage: React.FC<{
+  src?: string;
+  alt: string;
+  className?: string;
+}> = ({ src, alt, className = '' }) => {
+  const [hasError, setHasError] = useState(false);
+
+  if (!src || hasError) {
+    return (
+      <div
+        className={`w-full h-full bg-linear-to-br from-[#0B1A2D] via-[#0E2239] to-[#1A314D] flex items-center justify-center ${className}`}
+      >
+        <Shield className="w-10 h-10 text-[#B7F229]/40" />
+      </div>
+    );
+  }
+
+  return (
+    <img
+      src={src}
+      alt={alt}
+      referrerPolicy="no-referrer"
+      onError={() => setHasError(true)}
+      className={className}
+    />
+  );
+};
 
 export interface TeamPlayer {
   id: string;
@@ -405,7 +418,7 @@ const INITIAL_TEAMS: ClubTeamFull[] = [
 ];
 
 export const AdminTeams: React.FC = () => {
-  const { currentTenant, triggerDemoToast, navigateToPlayerProfile, customers, coaches, venues, isMultiVenue, courts } = useApp();
+  const { currentTenant, triggerDemoToast, navigateToPlayerProfile, venues, isMultiVenue, courts } = useApp();
 
   const [teams, setTeams] = useState<ClubTeamFull[]>(() => {
     try {
@@ -423,6 +436,20 @@ export const AdminTeams: React.FC = () => {
   const [filterAge, setFilterAge] = useState<'all' | 'absoluto' | 'veteranos' | 'menores'>('all');
   const [filterVenue, setFilterVenue] = useState<string>('all');
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
+
+  // Header "+" Action Dropdown
+  const [isActionMenuOpen, setIsActionMenuOpen] = useState(false);
+  const actionMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (actionMenuRef.current && !actionMenuRef.current.contains(event.target as Node)) {
+        setIsActionMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   // Modals
   const [isNewTeamModalOpen, setIsNewTeamModalOpen] = useState(false);
@@ -778,58 +805,57 @@ ${declined.map((p) => `• ${p.playerName}`).join('\n')}
     (isMultiVenue && filterVenue !== 'all' ? 1 : 0);
 
   // =========================================================================
-  // VISTA DE DETALLES DEL EQUIPO SELECCIONADO (REDiseño ESPECTACULAR)
+  // VISTA DE DETALLES DEL EQUIPO SELECCIONADO
   // =========================================================================
   if (selectedTeam) {
     const totalPlayers = selectedTeam.players.length;
-    const captain = selectedTeam.players.find((p) => p.isCaptain) || selectedTeam.players[0];
     const upcomingCallout = selectedTeam.callouts.find((c) => c.status === 'upcoming');
     const currentPoints = selectedTeam.standings?.find((s) => s.isOurClub)?.points ?? 9;
     const currentPos = selectedTeam.standings?.find((s) => s.isOurClub)?.position ?? 1;
 
     return (
-      <div className="space-y-6 text-slate-900 dark:text-slate-100 max-w-7xl mx-auto pb-16 animate-in fade-in duration-150">
+      <div className="max-w-7xl mx-auto pt-3 pb-24 sm:pb-16 space-y-6 font-sans text-[#0B1A2D] dark:text-slate-100 antialiased animate-in fade-in duration-150">
         {/* Barra superior de regreso y acciones */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200/80 dark:border-slate-800">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200/80 dark:border-[#1A314D]">
           <button
             type="button"
             onClick={() => {
               setSelectedTeam(null);
               window.scrollTo({ top: 0, behavior: 'smooth' });
             }}
-            className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs font-bold text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition cursor-pointer shadow-xs active:scale-95 self-start"
+            className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] text-xs font-bold text-[#0B1A2D] dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-[#132A45] transition cursor-pointer shadow-2xs active:scale-95 self-start"
           >
             <ArrowLeft className="w-4 h-4" />
-            <span>Volver a la Lista de Equipos</span>
+            <span>Volver a Equipos</span>
           </button>
 
           <div className="flex items-center gap-2">
             <span className="text-xs font-mono font-bold text-slate-400">
               Actualizado: {selectedTeam.updatedAt}
             </span>
-            <span className="px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 font-black text-[10px] uppercase border border-emerald-500/20">
+            <span className="px-2.5 py-1 rounded-full bg-[#B7F229]/20 dark:bg-[#B7F229]/15 text-[#0B1A2D] dark:text-[#B7F229] font-bold text-[10px] uppercase border border-[#B7F229]/40">
               Equipo Oficial FGP
             </span>
           </div>
         </div>
 
-        {/* HERO CARD DEL EQUIPO: DISEÑO PREMIUM */}
-        <div className="relative overflow-hidden rounded-3xl bg-linear-to-br from-slate-900 via-slate-850 to-slate-950 text-white p-6 sm:p-8 border border-slate-800 shadow-xl space-y-6">
+        {/* HERO CARD DEL EQUIPO: PALETA SETMIO */}
+        <div className="relative overflow-hidden rounded-3xl bg-linear-to-br from-[#0B1A2D] via-[#0E2239] to-[#071220] text-white p-6 sm:p-8 border border-[#1A314D] shadow-xl space-y-6">
           {selectedTeam.photoUrl && (
             <div className="absolute inset-0 opacity-15 mix-blend-luminosity pointer-events-none">
-              <img src={selectedTeam.photoUrl} alt="" className="w-full h-full object-cover" />
+              <TeamBannerImage src={selectedTeam.photoUrl} alt="" className="w-full h-full object-cover" />
             </div>
           )}
-          <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute bottom-0 left-1/3 w-64 h-64 bg-cyan-500/10 rounded-full blur-2xl pointer-events-none" />
+          <div className="absolute top-0 right-0 w-96 h-96 bg-[#B7F229]/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute bottom-0 left-1/3 w-64 h-64 bg-[#8B5CF6]/15 rounded-full blur-2xl pointer-events-none" />
 
           <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
             <div className="space-y-3 max-w-3xl">
               <div className="flex flex-wrap items-center gap-2">
-                <span className="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-black uppercase tracking-wider border border-emerald-500/30">
+                <span className="px-3 py-1 rounded-full bg-[#B7F229] text-[#0B1A2D] text-xs font-extrabold uppercase tracking-wider">
                   {selectedTeam.category}
                 </span>
-                <span className="px-3 py-1 rounded-full bg-slate-800/80 text-slate-300 text-xs font-bold capitalize border border-slate-700">
+                <span className="px-3 py-1 rounded-full bg-white/10 text-slate-200 text-xs font-bold capitalize border border-white/15">
                   {selectedTeam.gender} · {selectedTeam.ageGroup}
                 </span>
                 <span className="px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 text-xs font-bold border border-amber-500/30 flex items-center gap-1">
@@ -838,14 +864,14 @@ ${declined.map((p) => `• ${p.playerName}`).join('\n')}
                 </span>
               </div>
 
-              <h1 className="text-2xl sm:text-4xl font-black text-white tracking-tight">
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
                 {selectedTeam.name}
               </h1>
 
               <p className="text-xs sm:text-sm text-slate-300 flex flex-wrap items-center gap-x-4 gap-y-1">
                 <span>
                   Responsable Técnico:{' '}
-                  <strong className="text-emerald-400 font-bold">{selectedTeam.coachName}</strong>{' '}
+                  <strong className="text-[#B7F229] font-bold">{selectedTeam.coachName}</strong>{' '}
                   {selectedTeam.coachSpecialty && `(${selectedTeam.coachSpecialty})`}
                 </span>
                 <span>·</span>
@@ -858,11 +884,11 @@ ${declined.map((p) => `• ${p.playerName}`).join('\n')}
               </p>
 
               {selectedTeam.tacticalStyle && (
-                <div className="pt-2">
-                  <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-800/60 border border-slate-700 text-xs text-slate-300">
-                    <Target className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+                <div className="pt-1">
+                  <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-xs text-slate-300">
+                    <Target className="w-3.5 h-3.5 text-[#B7F229] shrink-0" />
                     <span>
-                      <strong>Estilo Táctico:</strong> {selectedTeam.tacticalStyle}
+                      <strong className="text-white">Estilo Táctico:</strong> {selectedTeam.tacticalStyle}
                     </span>
                   </div>
                 </div>
@@ -871,25 +897,25 @@ ${declined.map((p) => `• ${p.playerName}`).join('\n')}
 
             {/* Quick Metrics Bar */}
             <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-2 xl:grid-cols-4 gap-3 shrink-0">
-              <div className="p-3.5 rounded-2xl bg-slate-800/60 border border-slate-700/80 backdrop-blur-xs text-center">
-                <div className="text-[10px] text-slate-400 uppercase font-black">Plantilla</div>
-                <div className="text-2xl font-black font-mono text-emerald-400 mt-0.5">
+              <div className="p-3.5 rounded-2xl bg-[#071220]/70 border border-[#1A314D] backdrop-blur-xs text-center">
+                <div className="text-[10px] text-slate-400 uppercase font-bold">Plantilla</div>
+                <div className="text-2xl font-extrabold font-mono text-[#B7F229] mt-0.5">
                   {totalPlayers}
                 </div>
                 <div className="text-[10px] text-slate-400">fichas activas</div>
               </div>
 
-              <div className="p-3.5 rounded-2xl bg-slate-800/60 border border-slate-700/80 backdrop-blur-xs text-center">
-                <div className="text-[10px] text-slate-400 uppercase font-black">Puesto Liga</div>
-                <div className="text-2xl font-black font-mono text-amber-400 mt-0.5">
+              <div className="p-3.5 rounded-2xl bg-[#071220]/70 border border-[#1A314D] backdrop-blur-xs text-center">
+                <div className="text-[10px] text-slate-400 uppercase font-bold">Puesto Liga</div>
+                <div className="text-2xl font-extrabold font-mono text-amber-400 mt-0.5">
                   #{currentPos}
                 </div>
                 <div className="text-[10px] text-slate-400">{currentPoints} pts clasif.</div>
               </div>
 
-              <div className="p-3.5 rounded-2xl bg-slate-800/60 border border-slate-700/80 backdrop-blur-xs text-center">
-                <div className="text-[10px] text-slate-400 uppercase font-black">Convocados</div>
-                <div className="text-2xl font-black font-mono text-cyan-400 mt-0.5">
+              <div className="p-3.5 rounded-2xl bg-[#071220]/70 border border-[#1A314D] backdrop-blur-xs text-center">
+                <div className="text-[10px] text-slate-400 uppercase font-bold">Convocados</div>
+                <div className="text-2xl font-extrabold font-mono text-white mt-0.5">
                   {upcomingCallout
                     ? upcomingCallout.attendance.filter((a) => a.status === 'confirmed').length
                     : 0}
@@ -897,9 +923,9 @@ ${declined.map((p) => `• ${p.playerName}`).join('\n')}
                 <div className="text-[10px] text-slate-400">para próx. partido</div>
               </div>
 
-              <div className="p-3.5 rounded-2xl bg-slate-800/60 border border-slate-700/80 backdrop-blur-xs text-center">
-                <div className="text-[10px] text-slate-400 uppercase font-black">Entrenamientos</div>
-                <div className="text-2xl font-black font-mono text-indigo-400 mt-0.5">
+              <div className="p-3.5 rounded-2xl bg-[#071220]/70 border border-[#1A314D] backdrop-blur-xs text-center">
+                <div className="text-[10px] text-slate-400 uppercase font-bold">Entrenamientos</div>
+                <div className="text-2xl font-extrabold font-mono text-[#8B5CF6] mt-0.5">
                   {selectedTeam.trainings.length}
                 </div>
                 <div className="text-[10px] text-slate-400">turnos/semana</div>
@@ -909,12 +935,12 @@ ${declined.map((p) => `• ${p.playerName}`).join('\n')}
         </div>
 
         {/* NAVEGACIÓN POR SUBPESTAÑAS DE LA FICHA DEL EQUIPO */}
-        <div className="flex items-center gap-1 overflow-x-auto pb-1 border-b border-slate-200 dark:border-slate-800 scrollbar-none">
+        <div className="flex items-center gap-1 overflow-x-auto pb-1 border-b border-slate-200 dark:border-[#1A314D] scrollbar-none">
           {[
-            { id: 'players', label: `Plantilla Oficial (${totalPlayers})`, icon: Users },
-            { id: 'standings', label: 'Competición & Clasificación', icon: Trophy },
-            { id: 'matches', label: 'Partidos & Calendario', icon: Calendar },
-            { id: 'callouts', label: `Convocatorias Activas (${selectedTeam.callouts.length})`, icon: Navigation },
+            { id: 'players', label: `Plantilla (${totalPlayers})`, icon: Users },
+            { id: 'standings', label: 'Clasificación', icon: Trophy },
+            { id: 'matches', label: 'Partidos', icon: Calendar },
+            { id: 'callouts', label: `Convocatorias (${selectedTeam.callouts.length})`, icon: Navigation },
             { id: 'trainings', label: `Entrenamientos (${selectedTeam.trainings.length})`, icon: Dumbbell },
             { id: 'coaching', label: 'Cuerpo Técnico', icon: Award },
           ].map((tab) => {
@@ -925,10 +951,10 @@ ${declined.map((p) => `• ${p.playerName}`).join('\n')}
                 key={tab.id}
                 type="button"
                 onClick={() => setActiveTeamTab(tab.id as any)}
-                className={`flex items-center gap-2 px-4 py-3 text-xs font-black whitespace-nowrap border-b-2 transition cursor-pointer ${
+                className={`flex items-center gap-2 px-4 py-3 text-xs font-bold whitespace-nowrap border-b-2 transition cursor-pointer ${
                   isActive
-                    ? 'border-emerald-500 text-emerald-600 dark:text-emerald-400 bg-emerald-50/50 dark:bg-emerald-950/20'
-                    : 'border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                    ? 'border-[#0B1A2D] text-[#0B1A2D] dark:border-[#B7F229] dark:text-[#B7F229]'
+                    : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-[#0B1A2D] dark:hover:text-white'
                 }`}
               >
                 <Icon className="w-4 h-4" />
@@ -942,40 +968,39 @@ ${declined.map((p) => `• ${p.playerName}`).join('\n')}
             SUBPESTAÑA 1: PLANTILLA OFICIAL DE JUGADORES
             =================================================================== */}
         {activeTeamTab === 'players' && (
-          <div className="space-y-6">
+          <div className="space-y-6 mb-8">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
-                <h2 className="text-base font-black text-slate-900 dark:text-white flex items-center gap-2">
-                  <Users className="w-5 h-5 text-emerald-500" />
-                  <span>Jugadores Inscritos en Federación & Club</span>
+                <h2 className="text-base font-bold text-[#0B1A2D] dark:text-white flex items-center gap-2">
+                  <Users className="w-5 h-5 text-[#0B1A2D] dark:text-[#B7F229]" />
+                  <span>Jugadores Inscritos</span>
                 </h2>
                 <p className="text-xs text-slate-500 dark:text-slate-400">
-                  Haz clic en cualquier jugador para abrir su perfil en el CRM de Socios o asignarlo como Capitán.
+                  Haz clic en cualquier jugador para abrir su perfil o asignarlo como Capitán.
                 </p>
               </div>
 
               <button
                 type="button"
                 onClick={() => setIsAddPlayerModalOpen(true)}
-                className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1.5 transition shadow-xs self-start sm:self-auto cursor-pointer"
+                className="px-3.5 py-2 rounded-xl bg-[#0B1A2D] hover:bg-[#132A45] text-white dark:bg-[#B7F229] dark:text-[#0B1A2D] dark:hover:bg-[#c8fa48] font-bold text-xs flex items-center gap-1.5 transition shadow-2xs self-start sm:self-auto cursor-pointer"
               >
                 <Plus className="w-4 h-4" />
-                <span>Fichar / Añadir Jugador</span>
+                <span>Añadir Jugador</span>
               </button>
             </div>
 
-            {/* Grid de Jugadores */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
               {selectedTeam.players.map((p) => {
                 const isCap = p.isCaptain || p.name === selectedTeam.captainName;
 
                 return (
                   <div
                     key={p.id}
-                    className={`p-4 rounded-3xl border transition shadow-xs flex flex-col justify-between group ${
+                    className={`p-4 rounded-2xl border transition shadow-2xs flex flex-col justify-between group ${
                       isCap
                         ? 'bg-amber-50/40 dark:bg-amber-950/20 border-amber-300 dark:border-amber-800'
-                        : 'bg-white dark:bg-slate-900 border-slate-200/80 dark:border-slate-800 hover:border-emerald-500/40'
+                        : 'bg-white dark:bg-[#0E2239] border-slate-200/80 dark:border-[#1A314D] hover:border-[#0B1A2D]/30 dark:hover:border-[#B7F229]/40'
                     }`}
                   >
                     <div className="space-y-3">
@@ -985,19 +1010,20 @@ ${declined.map((p) => `• ${p.playerName}`).join('\n')}
                             <img
                               src={p.avatar}
                               alt={p.name}
-                              className="w-12 h-12 rounded-2xl object-cover shrink-0 border border-slate-200 dark:border-slate-700"
+                              referrerPolicy="no-referrer"
+                              className="w-12 h-12 rounded-2xl object-cover shrink-0 border border-slate-200 dark:border-[#1A314D]"
                             />
                           ) : (
-                            <div className="w-12 h-12 rounded-2xl bg-emerald-600 text-white font-black text-sm flex items-center justify-center shrink-0">
+                            <div className="w-12 h-12 rounded-2xl bg-[#0B1A2D] text-[#B7F229] dark:bg-[#B7F229] dark:text-[#0B1A2D] font-extrabold text-sm flex items-center justify-center shrink-0">
                               {p.name.slice(0, 2).toUpperCase()}
                             </div>
                           )}
 
                           <div>
-                            <div className="font-black text-sm text-slate-900 dark:text-white flex items-center gap-1.5">
+                            <div className="font-bold text-sm text-[#0B1A2D] dark:text-white flex items-center gap-1.5">
                               <span>{p.name}</span>
                               {isCap && (
-                                <span className="p-0.5 rounded-full bg-amber-400 text-slate-950" title="Capitán Oficial">
+                                <span className="p-0.5 rounded-full bg-amber-400 text-[#0B1A2D]" title="Capitán Oficial">
                                   <Crown className="w-3.5 h-3.5" />
                                 </span>
                               )}
@@ -1008,44 +1034,44 @@ ${declined.map((p) => `• ${p.playerName}`).join('\n')}
                           </div>
                         </div>
 
-                        <span className="px-2 py-0.5 rounded-md bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 text-[10px] font-black font-mono">
+                        <span className="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-[#071220] text-[#0B1A2D] dark:text-[#B7F229] border border-slate-200/70 dark:border-[#1A314D] text-[10px] font-bold font-mono">
                           Nivel {p.level.toFixed(2)}
                         </span>
                       </div>
 
-                      <div className="grid grid-cols-2 gap-2 text-xs pt-2 border-t border-slate-100 dark:border-slate-800/80">
-                        <div className="p-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800">
+                      <div className="grid grid-cols-2 gap-2 text-xs pt-2 border-t border-slate-100 dark:border-[#1A314D]">
+                        <div className="p-2 rounded-xl bg-slate-50 dark:bg-[#071220] border border-slate-200/60 dark:border-[#1A314D]">
                           <span className="text-[10px] text-slate-400 block font-bold">Lado de Pista</span>
-                          <span className="font-bold text-slate-800 dark:text-slate-200">{p.position}</span>
+                          <span className="font-bold text-[#0B1A2D] dark:text-slate-200">{p.position}</span>
                         </div>
-                        <div className="p-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800">
+                        <div className="p-2 rounded-xl bg-slate-50 dark:bg-[#071220] border border-slate-200/60 dark:border-[#1A314D]">
                           <span className="text-[10px] text-slate-400 block font-bold">Teléfono</span>
-                          <span className="font-bold text-slate-800 dark:text-slate-200 truncate block">
+                          <span className="font-bold text-[#0B1A2D] dark:text-slate-200 truncate block">
                             {p.phone || 'Sin registrar'}
                           </span>
                         </div>
                       </div>
                     </div>
 
-                    <div className="pt-3 mt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2">
+                    <div className="pt-3 mt-3 border-t border-slate-100 dark:border-[#1A314D] flex items-center justify-between gap-2">
                       <button
                         type="button"
                         onClick={() => navigateToPlayerProfile(p.name, 'teams')}
-                        className="flex-1 py-1.5 px-3 rounded-xl bg-slate-100 hover:bg-emerald-600 hover:text-white dark:bg-slate-800 dark:hover:bg-emerald-600 text-slate-700 dark:text-slate-300 text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer"
+                        className="flex-1 py-2 px-3 rounded-xl bg-slate-100 hover:bg-[#0B1A2D] hover:text-white dark:bg-[#071220] dark:hover:bg-[#B7F229] dark:hover:text-[#0B1A2D] text-[#0B1A2D] dark:text-slate-200 text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer"
                       >
                         <UserCheck className="w-3.5 h-3.5" />
-                        <span>Ver Perfil Socio</span>
+                        <span>Ver Perfil</span>
                       </button>
 
                       {!isCap && (
                         <button
                           type="button"
                           onClick={() => handleSetCaptain(p)}
-                          className="py-1.5 px-2.5 rounded-xl border border-amber-300 dark:border-amber-700 hover:bg-amber-100 dark:hover:bg-amber-950 text-amber-800 dark:text-amber-300 text-xs font-bold transition cursor-pointer"
+                          className="py-2 px-2.5 rounded-xl border border-amber-300 dark:border-amber-700 hover:bg-amber-100 dark:hover:bg-amber-950 text-amber-800 dark:text-amber-300 text-xs font-bold transition cursor-pointer"
                           title="Nombrar como Capitán del equipo"
                         >
                           <Crown className="w-3.5 h-3.5 inline mr-1" />
-                          <span>Hacer Capitán</span>
+                          <span>Capitán</span>
                         </button>
                       )}
                     </div>
@@ -1060,10 +1086,10 @@ ${declined.map((p) => `• ${p.playerName}`).join('\n')}
             SUBPESTAÑA 2: COMPETICIÓN & CLASIFICACIÓN
             =================================================================== */}
         {activeTeamTab === 'standings' && (
-          <div className="space-y-6">
+          <div className="space-y-6 mb-8">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
-                <h2 className="text-base font-black text-slate-900 dark:text-white flex items-center gap-2">
+                <h2 className="text-base font-bold text-[#0B1A2D] dark:text-white flex items-center gap-2">
                   <Trophy className="w-5 h-5 text-amber-500" />
                   <span>Clasificación Oficial — {selectedTeam.category}</span>
                 </h2>
@@ -1072,18 +1098,15 @@ ${declined.map((p) => `• ${p.playerName}`).join('\n')}
                 </p>
               </div>
 
-              <div className="flex items-center gap-2">
-                <span className="px-3 py-1 rounded-xl bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 font-bold text-xs border border-emerald-500/20">
-                  Fase Regular · 1ª Vuelta
-                </span>
-              </div>
+              <span className="px-3 py-1 rounded-xl bg-slate-100 dark:bg-[#0E2239] text-[#0B1A2D] dark:text-[#B7F229] font-bold text-xs border border-slate-200 dark:border-[#1A314D] self-start sm:self-auto">
+                Fase Regular · 1ª Vuelta
+              </span>
             </div>
 
-            {/* Tabla de Clasificación */}
-            <div className="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 overflow-hidden shadow-xs">
+            <div className="rounded-2xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] overflow-hidden shadow-2xs">
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs">
-                  <thead className="bg-slate-50 dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 text-[11px] font-black uppercase tracking-wider text-slate-400">
+                  <thead className="bg-slate-50 dark:bg-[#071220] border-b border-slate-200 dark:border-[#1A314D] text-[11px] font-bold uppercase tracking-wider text-slate-400">
                     <tr>
                       <th className="py-3 px-4 text-center w-12">Pos</th>
                       <th className="py-3 px-4">Equipo</th>
@@ -1096,23 +1119,23 @@ ${declined.map((p) => `• ${p.playerName}`).join('\n')}
                       <th className="py-3 px-4 text-right">Puntos</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800/80">
+                  <tbody className="divide-y divide-slate-100 dark:divide-[#1A314D]">
                     {(selectedTeam.standings || []).map((row) => (
                       <tr
                         key={row.position}
                         className={`transition ${
                           row.isOurClub
-                            ? 'bg-emerald-50/70 dark:bg-emerald-950/40 font-bold'
-                            : 'hover:bg-slate-50 dark:hover:bg-slate-850'
+                            ? 'bg-[#B7F229]/15 dark:bg-[#B7F229]/10 font-bold'
+                            : 'hover:bg-slate-50 dark:hover:bg-[#132A45]/60'
                         }`}
                       >
                         <td className="py-3.5 px-4 text-center">
                           <span
-                            className={`w-6 h-6 rounded-full inline-flex items-center justify-center font-black text-xs ${
+                            className={`w-6 h-6 rounded-full inline-flex items-center justify-center font-extrabold text-xs ${
                               row.position === 1
-                                ? 'bg-amber-400 text-slate-950'
+                                ? 'bg-[#B7F229] text-[#0B1A2D]'
                                 : row.position <= 2
-                                ? 'bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200'
+                                ? 'bg-slate-200 dark:bg-[#1A314D] text-[#0B1A2D] dark:text-slate-200'
                                 : 'text-slate-400'
                             }`}
                           >
@@ -1121,11 +1144,11 @@ ${declined.map((p) => `• ${p.playerName}`).join('\n')}
                         </td>
                         <td className="py-3.5 px-4">
                           <div className="flex items-center gap-2">
-                            <span className="font-bold text-slate-900 dark:text-white">
+                            <span className="font-bold text-[#0B1A2D] dark:text-white">
                               {row.teamName}
                             </span>
                             {row.isOurClub && (
-                              <span className="px-2 py-0.5 rounded-md bg-emerald-600 text-white text-[9px] font-black uppercase">
+                              <span className="px-2 py-0.5 rounded-md bg-[#0B1A2D] text-[#B7F229] dark:bg-[#B7F229] dark:text-[#0B1A2D] text-[9px] font-extrabold uppercase">
                                 Nuestro Club
                               </span>
                             )}
@@ -1134,7 +1157,7 @@ ${declined.map((p) => `• ${p.playerName}`).join('\n')}
                         <td className="py-3.5 px-3 text-center font-mono text-slate-700 dark:text-slate-300">
                           {row.played}
                         </td>
-                        <td className="py-3.5 px-3 text-center font-mono text-emerald-600 font-bold">
+                        <td className="py-3.5 px-3 text-center font-mono text-[#6e9e02] dark:text-[#B7F229] font-bold">
                           {row.won}
                         </td>
                         <td className="py-3.5 px-3 text-center font-mono text-rose-500 font-bold">
@@ -1146,11 +1169,11 @@ ${declined.map((p) => `• ${p.playerName}`).join('\n')}
                         <td className="py-3.5 px-3 text-center font-mono text-slate-600 dark:text-slate-400">
                           {row.setsLost}
                         </td>
-                        <td className="py-3.5 px-3 text-center font-mono font-bold text-emerald-600 dark:text-emerald-400">
+                        <td className="py-3.5 px-3 text-center font-mono font-bold text-[#0B1A2D] dark:text-[#B7F229]">
                           {row.setsDiff}
                         </td>
                         <td className="py-3.5 px-4 text-right">
-                          <span className="text-sm font-black font-mono text-emerald-600 dark:text-emerald-400">
+                          <span className="text-sm font-extrabold font-mono text-[#0B1A2D] dark:text-[#B7F229]">
                             {row.points} pts
                           </span>
                         </td>
@@ -1167,11 +1190,11 @@ ${declined.map((p) => `• ${p.playerName}`).join('\n')}
             SUBPESTAÑA 3: PARTIDOS & CALENDARIO
             =================================================================== */}
         {activeTeamTab === 'matches' && (
-          <div className="space-y-6">
+          <div className="space-y-6 mb-8">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
-                <h2 className="text-base font-black text-slate-900 dark:text-white flex items-center gap-2">
-                  <Calendar className="w-5 h-5 text-emerald-500" />
+                <h2 className="text-base font-bold text-[#0B1A2D] dark:text-white flex items-center gap-2">
+                  <Calendar className="w-5 h-5 text-[#0B1A2D] dark:text-[#B7F229]" />
                   <span>Calendario Oficial de Jornadas y Resultados</span>
                 </h2>
                 <p className="text-xs text-slate-500 dark:text-slate-400">
@@ -1182,80 +1205,78 @@ ${declined.map((p) => `• ${p.playerName}`).join('\n')}
               <button
                 type="button"
                 onClick={() => setIsNewCalloutModalOpen(true)}
-                className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1.5 transition shadow-xs self-start sm:self-auto cursor-pointer"
+                className="px-3.5 py-2 rounded-xl bg-[#0B1A2D] hover:bg-[#132A45] text-white dark:bg-[#B7F229] dark:text-[#0B1A2D] dark:hover:bg-[#c8fa48] font-bold text-xs flex items-center gap-1.5 transition shadow-2xs self-start sm:self-auto cursor-pointer"
               >
                 <Plus className="w-4 h-4" />
-                <span>+ Programar Partido</span>
+                <span>Programar Partido</span>
               </button>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-4 mb-8">
               {(selectedTeam.matches || []).map((match) => {
                 const isPlayed = match.status === 'played';
 
                 return (
                   <div
                     key={match.id}
-                    className="p-5 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 space-y-4 shadow-xs"
+                    className="p-5 rounded-2xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] space-y-4 shadow-2xs"
                   >
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-3">
-                      <div className="flex items-center gap-2">
-                        <span className="px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-[10px] font-black uppercase">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 dark:border-[#1A314D] pb-3">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-[#071220] text-[#0B1A2D] dark:text-slate-300 text-[10px] font-bold uppercase">
                           {match.round}
                         </span>
                         <span className="text-xs text-slate-500 dark:text-slate-400 font-bold">
-                          {match.date} a las {match.time}
+                          {match.date} · {match.time}
                         </span>
                         <span
-                          className={`px-2 py-0.5 rounded-md text-[10px] font-black uppercase ${
+                          className={`px-2 py-0.5 rounded-md text-[10px] font-bold uppercase ${
                             match.isHome
-                              ? 'bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300'
-                              : 'bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300'
+                              ? 'bg-[#0B1A2D]/10 dark:bg-[#B7F229]/15 text-[#0B1A2D] dark:text-[#B7F229]'
+                              : 'bg-[#8B5CF6]/15 text-[#6d28d9] dark:text-[#c4b5fd]'
                           }`}
                         >
-                          {match.isHome ? 'Local (En Casa)' : 'Visitante (Fuera)'}
+                          {match.isHome ? 'Local' : 'Visitante'}
                         </span>
                       </div>
 
                       <div className="flex items-center gap-2">
                         {isPlayed ? (
-                          <span className="px-3 py-1 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 font-black text-xs">
-                            Resultado Final: {match.result}
+                          <span className="px-3 py-1 rounded-xl bg-[#B7F229]/25 dark:bg-[#B7F229]/15 text-[#0B1A2D] dark:text-[#B7F229] font-bold text-xs">
+                            Resultado: {match.result}
                           </span>
                         ) : (
-                          <span className="px-3 py-1 rounded-xl bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 font-black text-xs">
+                          <span className="px-3 py-1 rounded-xl bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 font-bold text-xs">
                             Programado
                           </span>
                         )}
                       </div>
                     </div>
 
-                    {/* Enfrentamiento Principal */}
                     <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
                       <div className="md:col-span-5 text-left md:text-right space-y-0.5">
-                        <div className="text-xs text-slate-400 uppercase font-black">Equipo Local</div>
-                        <div className="text-base font-black text-slate-900 dark:text-white">
+                        <div className="text-xs text-slate-400 uppercase font-bold">Equipo Local</div>
+                        <div className="text-base font-extrabold text-[#0B1A2D] dark:text-white">
                           {match.homeTeam}
                         </div>
                       </div>
 
-                      <div className="md:col-span-2 text-center py-2 px-3 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800">
+                      <div className="md:col-span-2 text-center py-2 px-3 rounded-2xl bg-slate-50 dark:bg-[#071220] border border-slate-200/60 dark:border-[#1A314D]">
                         <span className="text-xs font-mono font-bold text-slate-400 block">VS</span>
-                        <span className="text-lg font-black font-mono text-emerald-600 dark:text-emerald-400">
+                        <span className="text-lg font-extrabold font-mono text-[#0B1A2D] dark:text-[#B7F229]">
                           {match.result || 'Próximo'}
                         </span>
                       </div>
 
                       <div className="md:col-span-5 text-left space-y-0.5">
-                        <div className="text-xs text-slate-400 uppercase font-black">Equipo Visitante</div>
-                        <div className="text-base font-black text-slate-900 dark:text-white">
+                        <div className="text-xs text-slate-400 uppercase font-bold">Equipo Visitante</div>
+                        <div className="text-base font-extrabold text-[#0B1A2D] dark:text-white">
                           {match.awayTeam}
                         </div>
                       </div>
                     </div>
 
-                    {/* Sede y Pistas */}
-                    <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+                    <div className="p-3 rounded-2xl bg-slate-50 dark:bg-[#071220] border border-slate-200/60 dark:border-[#1A314D] flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
                       <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400">
                         <MapPin className="w-4 h-4 text-rose-500 shrink-0" />
                         <span>
@@ -1268,7 +1289,7 @@ ${declined.map((p) => `• ${p.playerName}`).join('\n')}
                           href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(match.location)}`}
                           target="_blank"
                           rel="noreferrer"
-                          className="inline-flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-bold hover:underline"
+                          className="inline-flex items-center gap-1.5 text-[#0B1A2D] dark:text-[#B7F229] font-bold hover:underline"
                         >
                           <Navigation className="w-3.5 h-3.5" />
                           <span>Cómo llegar (GPS)</span>
@@ -1276,25 +1297,24 @@ ${declined.map((p) => `• ${p.playerName}`).join('\n')}
                       )}
                     </div>
 
-                    {/* Desglose de Parejas (si jugado) */}
                     {match.pairs && match.pairs.length > 0 && (
-                      <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-slate-800">
-                        <span className="text-[11px] font-black uppercase text-slate-400 block">
+                      <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-[#1A314D]">
+                        <span className="text-[11px] font-bold uppercase text-slate-400 block">
                           Resultados por Parejas Federadas
                         </span>
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                           {match.pairs.map((p) => (
                             <div
                               key={p.pairNumber}
-                              className="p-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 space-y-1 text-xs"
+                              className="p-2.5 rounded-xl bg-slate-50 dark:bg-[#071220] border border-slate-200/70 dark:border-[#1A314D] space-y-1 text-xs"
                             >
                               <div className="flex items-center justify-between text-[10px] font-bold text-slate-400">
                                 <span>Punto {p.pairNumber}</span>
-                                <span className={p.isWon ? 'text-emerald-500 font-black' : 'text-rose-500'}>
+                                <span className={p.isWon ? 'text-[#6e9e02] dark:text-[#B7F229] font-extrabold' : 'text-rose-500'}>
                                   {p.result}
                                 </span>
                               </div>
-                              <div className="font-bold text-slate-900 dark:text-white truncate">
+                              <div className="font-bold text-[#0B1A2D] dark:text-white truncate">
                                 {p.ourPair}
                               </div>
                               <div className="text-[11px] text-slate-400 truncate">
@@ -1316,11 +1336,11 @@ ${declined.map((p) => `• ${p.playerName}`).join('\n')}
             SUBPESTAÑA 4: CONVOCATORIAS ACTIVAS & DESPLAZAMIENTOS
             =================================================================== */}
         {activeTeamTab === 'callouts' && (
-          <div className="space-y-6">
+          <div className="space-y-6 mb-8">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
-                <h2 className="text-base font-black text-slate-900 dark:text-white flex items-center gap-2">
-                  <Navigation className="w-5 h-5 text-emerald-500" />
+                <h2 className="text-base font-bold text-[#0B1A2D] dark:text-white flex items-center gap-2">
+                  <Navigation className="w-5 h-5 text-[#0B1A2D] dark:text-[#B7F229]" />
                   <span>Convocatorias Activas, Asistencia y Rutas</span>
                 </h2>
                 <p className="text-xs text-slate-500 dark:text-slate-400">
@@ -1331,15 +1351,15 @@ ${declined.map((p) => `• ${p.playerName}`).join('\n')}
               <button
                 type="button"
                 onClick={() => setIsNewCalloutModalOpen(true)}
-                className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1.5 transition shadow-xs self-start sm:self-auto cursor-pointer"
+                className="px-3.5 py-2 rounded-xl bg-[#0B1A2D] hover:bg-[#132A45] text-white dark:bg-[#B7F229] dark:text-[#0B1A2D] dark:hover:bg-[#c8fa48] font-bold text-xs flex items-center gap-1.5 transition shadow-2xs self-start sm:self-auto cursor-pointer"
               >
                 <Plus className="w-4 h-4" />
-                <span>+ Convocar Encuentro</span>
+                <span>Convocar Encuentro</span>
               </button>
             </div>
 
             {selectedTeam.callouts.length === 0 ? (
-              <div className="p-12 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 text-center space-y-2">
+              <div className="p-12 rounded-2xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] text-center space-y-2 mb-8">
                 <Navigation className="w-10 h-10 mx-auto text-slate-400 opacity-60" />
                 <div className="font-bold text-sm">No hay convocatorias activas para este equipo</div>
                 <p className="text-xs text-slate-400 max-w-md mx-auto">
@@ -1347,7 +1367,7 @@ ${declined.map((p) => `• ${p.playerName}`).join('\n')}
                 </p>
               </div>
             ) : (
-              <div className="space-y-6">
+              <div className="space-y-6 mb-8">
                 {selectedTeam.callouts.map((call) => {
                   const confirmed = call.attendance.filter((a) => a.status === 'confirmed');
                   const doubts = call.attendance.filter((a) => a.status === 'doubt');
@@ -1356,44 +1376,42 @@ ${declined.map((p) => `• ${p.playerName}`).join('\n')}
                   return (
                     <div
                       key={call.id}
-                      className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 space-y-5 shadow-sm"
+                      className="p-6 rounded-2xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] space-y-5 shadow-2xs"
                     >
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 dark:border-slate-800 pb-4">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 dark:border-[#1A314D] pb-4">
                         <div>
                           <div className="flex items-center gap-2 mb-1">
-                            <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 font-black text-[10px] uppercase">
+                            <span className="px-2.5 py-0.5 rounded-full bg-[#B7F229]/25 dark:bg-[#B7F229]/15 text-[#0B1A2D] dark:text-[#B7F229] font-bold text-[10px] uppercase">
                               {call.competition}
                             </span>
                             <span className="text-xs font-bold text-slate-500 dark:text-slate-400">
                               {call.date} · {call.time}h
                             </span>
                           </div>
-                          <h3 className="text-lg font-black text-slate-900 dark:text-white">
+                          <h3 className="text-lg font-extrabold text-[#0B1A2D] dark:text-white">
                             Rival Oficial: {call.rivalTeam} ({call.rivalClub})
                           </h3>
                         </div>
 
-                        {/* Botón WhatsApp Share */}
                         <button
                           type="button"
                           onClick={() => {
                             setWhatsAppCallout(call);
                             setIsWhatsAppModalOpen(true);
                           }}
-                          className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-2 shadow-xs transition active:scale-95 cursor-pointer self-start sm:self-auto"
+                          className="px-4 py-2.5 rounded-xl bg-[#0B1A2D] hover:bg-[#132A45] text-white dark:bg-[#B7F229] dark:text-[#0B1A2D] dark:hover:bg-[#c8fa48] font-bold text-xs flex items-center gap-2 shadow-2xs transition active:scale-95 cursor-pointer self-start sm:self-auto"
                         >
                           <Share2 className="w-4 h-4" />
                           <span>Compartir por WhatsApp</span>
                         </button>
                       </div>
 
-                      {/* Dirección del rival y Mapa Interactivo */}
-                      <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800 space-y-3">
-                        <div className="flex items-start justify-between gap-3">
+                      <div className="p-4 rounded-2xl bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] space-y-3">
+                        <div className="flex flex-wrap items-start justify-between gap-3">
                           <div className="flex items-start gap-2.5">
                             <MapPin className="w-5 h-5 text-rose-500 shrink-0 mt-0.5" />
                             <div>
-                              <span className="font-black text-slate-900 dark:text-white block text-xs">
+                              <span className="font-bold text-[#0B1A2D] dark:text-white block text-xs">
                                 Instalación del Encuentro:
                               </span>
                               <span className="text-xs text-slate-600 dark:text-slate-400 block">
@@ -1406,34 +1424,32 @@ ${declined.map((p) => `• ${p.playerName}`).join('\n')}
                             href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(call.address)}`}
                             target="_blank"
                             rel="noreferrer"
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 transition shrink-0"
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white dark:bg-[#0E2239] border border-slate-200 dark:border-[#1A314D] text-xs font-bold text-[#0B1A2D] dark:text-[#B7F229] hover:bg-slate-100 dark:hover:bg-[#132A45] transition shrink-0"
                           >
                             <ExternalLink className="w-3.5 h-3.5" />
-                            <span>Abrir en Google Maps / Waze</span>
+                            <span>Abrir en Google Maps</span>
                           </a>
                         </div>
 
-                        {/* Visualizador de mapa integrado */}
-                        <div className="relative h-44 rounded-xl overflow-hidden bg-slate-200 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+                        <div className="relative h-44 rounded-xl overflow-hidden bg-slate-200 dark:bg-[#0B1A2D] border border-slate-200 dark:border-[#1A314D]">
                           <iframe
                             title={`Mapa ${call.rivalClub}`}
                             width="100%"
                             height="100%"
                             frameBorder="0"
                             src={`https://maps.google.com/maps?q=${encodeURIComponent(call.address)}&t=&z=14&ie=UTF8&iwloc=&output=embed`}
-                            className="w-full h-full filter saturate-150 opacity-95 hover:opacity-100 transition"
+                            className="w-full h-full opacity-95 hover:opacity-100 transition"
                           />
                         </div>
                       </div>
 
-                      {/* Resumen y Matriz de Asistencia */}
                       <div className="space-y-3 pt-2">
                         <div className="flex flex-wrap items-center justify-between gap-2">
-                          <div className="flex items-center gap-2">
-                            <span className="text-xs font-black text-slate-900 dark:text-white">
-                              Estado de la Convocatoria:
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span className="text-xs font-bold text-[#0B1A2D] dark:text-white">
+                              Estado:
                             </span>
-                            <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 font-bold text-xs">
+                            <span className="px-2.5 py-0.5 rounded-full bg-[#B7F229]/25 dark:bg-[#B7F229]/15 text-[#0B1A2D] dark:text-[#B7F229] font-bold text-xs">
                               {confirmed.length} Confirmados
                             </span>
                             <span className="px-2.5 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 font-bold text-xs">
@@ -1444,7 +1460,7 @@ ${declined.map((p) => `• ${p.playerName}`).join('\n')}
                             </span>
                           </div>
                           <span className="text-[11px] text-slate-400">
-                            Haz clic sobre un jugador para cambiar su estado (Sí / Duda / Baja)
+                            Toca sobre un jugador para cambiar su estado
                           </span>
                         </div>
 
@@ -1458,17 +1474,17 @@ ${declined.map((p) => `• ${p.playerName}`).join('\n')}
                                 key={att.playerId}
                                 type="button"
                                 onClick={() => handleToggleAttendance(call.id, att.playerId, att.status)}
-                                className={`p-2.5 rounded-2xl border flex items-center justify-between gap-2 text-left transition cursor-pointer active:scale-95 ${
+                                className={`p-2.5 rounded-xl border flex items-center justify-between gap-2 text-left transition cursor-pointer active:scale-95 ${
                                   isConfirmed
-                                    ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-300 dark:border-emerald-800 text-emerald-950 dark:text-emerald-200'
+                                    ? 'bg-[#B7F229]/15 dark:bg-[#B7F229]/10 border-[#B7F229]/60 text-[#0B1A2D] dark:text-[#B7F229]'
                                     : isDoubt
                                     ? 'bg-amber-50 dark:bg-amber-950/60 border-amber-300 dark:border-amber-800 text-amber-950 dark:text-amber-200'
                                     : 'bg-rose-50 dark:bg-rose-950/60 border-rose-300 dark:border-rose-800 text-rose-950 dark:text-rose-200'
                                 }`}
                               >
                                 <span className="font-bold text-xs truncate">{att.playerName}</span>
-                                <span className="text-[10px] font-mono font-black uppercase px-2 py-0.5 rounded-md bg-white/70 dark:bg-black/30 shrink-0">
-                                  {isConfirmed ? '✔ Disponible' : isDoubt ? '⏳ En Duda' : '✖ Baja'}
+                                <span className="text-[10px] font-mono font-bold uppercase px-2 py-0.5 rounded-md bg-white/80 dark:bg-[#071220] shrink-0">
+                                  {isConfirmed ? 'Disponible' : isDoubt ? 'En Duda' : 'Baja'}
                                 </span>
                               </button>
                             );
@@ -1487,11 +1503,11 @@ ${declined.map((p) => `• ${p.playerName}`).join('\n')}
             SUBPESTAÑA 5: ENTRENAMIENTOS & TÁCTICA
             =================================================================== */}
         {activeTeamTab === 'trainings' && (
-          <div className="space-y-6">
+          <div className="space-y-6 mb-8">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
-                <h2 className="text-base font-black text-slate-900 dark:text-white flex items-center gap-2">
-                  <Dumbbell className="w-5 h-5 text-emerald-500" />
+                <h2 className="text-base font-bold text-[#0B1A2D] dark:text-white flex items-center gap-2">
+                  <Dumbbell className="w-5 h-5 text-[#0B1A2D] dark:text-[#B7F229]" />
                   <span>Sesiones Semanales de Equipo & Táctica</span>
                 </h2>
                 <p className="text-xs text-slate-500 dark:text-slate-400">
@@ -1502,42 +1518,44 @@ ${declined.map((p) => `• ${p.playerName}`).join('\n')}
               <button
                 type="button"
                 onClick={() => setIsNewTrainingModalOpen(true)}
-                className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1.5 transition shadow-xs self-start sm:self-auto cursor-pointer"
+                className="px-3.5 py-2 rounded-xl bg-[#0B1A2D] hover:bg-[#132A45] text-white dark:bg-[#B7F229] dark:text-[#0B1A2D] dark:hover:bg-[#c8fa48] font-bold text-xs flex items-center gap-1.5 transition shadow-2xs self-start sm:self-auto cursor-pointer"
               >
                 <Plus className="w-4 h-4" />
-                <span>+ Añadir Sesión</span>
+                <span>Añadir Sesión</span>
               </button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
               {selectedTeam.trainings.map((tr) => (
                 <div
                   key={tr.id}
-                  className="p-5 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 space-y-3 shadow-xs"
+                  className="p-5 rounded-2xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] space-y-3 shadow-2xs"
                 >
-                  <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2.5">
+                  <div className="flex items-center justify-between border-b border-slate-100 dark:border-[#1A314D] pb-2.5 gap-2 flex-wrap">
                     <div className="flex items-center gap-2">
-                      <Calendar className="w-4 h-4 text-emerald-500" />
-                      <span className="font-black text-slate-900 dark:text-white text-sm">
+                      <Calendar className="w-4 h-4 text-[#0B1A2D] dark:text-[#B7F229]" />
+                      <span className="font-bold text-[#0B1A2D] dark:text-white text-sm">
                         {tr.day} · {tr.time}
                       </span>
                     </div>
                     <div className="flex items-center gap-1.5 flex-wrap">
-                      <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold ${
-                        tr.positionMode === 'fixed'
-                          ? 'bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 border border-purple-500/30'
-                          : 'bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 border border-blue-500/30'
-                      }`}>
-                        {tr.positionMode === 'fixed' ? '🔒 Posiciones Fijas' : '🔄 Modo Recomendado'}
+                      <span
+                        className={`px-2 py-0.5 rounded-md text-[10px] font-bold ${
+                          tr.positionMode === 'fixed'
+                            ? 'bg-[#8B5CF6]/15 text-[#6d28d9] dark:text-[#c4b5fd] border border-[#8B5CF6]/30'
+                            : 'bg-slate-100 dark:bg-[#071220] text-[#0B1A2D] dark:text-slate-300 border border-slate-200 dark:border-[#1A314D]'
+                        }`}
+                      >
+                        {tr.positionMode === 'fixed' ? 'Posiciones Fijas' : 'Modo Recomendado'}
                       </span>
-                      <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 font-bold text-xs border border-emerald-500/20">
+                      <span className="px-2.5 py-0.5 rounded-full bg-[#B7F229]/20 dark:bg-[#B7F229]/15 text-[#0B1A2D] dark:text-[#B7F229] font-bold text-xs border border-[#B7F229]/30">
                         {tr.courtName}
                       </span>
                     </div>
                   </div>
 
                   <div className="space-y-1 text-xs">
-                    <span className="text-[10px] text-slate-400 font-black uppercase block">
+                    <span className="text-[10px] text-slate-400 font-bold uppercase block">
                       Enfoque Técnico y Táctico:
                     </span>
                     <p className="text-slate-700 dark:text-slate-300 font-medium">
@@ -1547,7 +1565,7 @@ ${declined.map((p) => `• ${p.playerName}`).join('\n')}
 
                   <div className="pt-2 flex items-center justify-between text-[11px] text-slate-400">
                     <span>Entrenador: {selectedTeam.coachName}</span>
-                    <span className="text-emerald-600 font-bold">Pista Reservada en Cuadrante</span>
+                    <span className="text-[#6e9e02] dark:text-[#B7F229] font-bold">Pista Reservada en Cuadrante</span>
                   </div>
                 </div>
               ))}
@@ -1559,10 +1577,10 @@ ${declined.map((p) => `• ${p.playerName}`).join('\n')}
             SUBPESTAÑA 6: CUERPO TÉCNICO & STAFF
             =================================================================== */}
         {activeTeamTab === 'coaching' && (
-          <div className="space-y-6">
+          <div className="space-y-6 mb-8">
             <div>
-              <h2 className="text-base font-black text-slate-900 dark:text-white flex items-center gap-2">
-                <Award className="w-5 h-5 text-emerald-500" />
+              <h2 className="text-base font-bold text-[#0B1A2D] dark:text-white flex items-center gap-2">
+                <Award className="w-5 h-5 text-[#0B1A2D] dark:text-[#B7F229]" />
                 <span>Cuerpo Técnico y Liderazgo Deportivo</span>
               </h2>
               <p className="text-xs text-slate-500 dark:text-slate-400">
@@ -1570,19 +1588,19 @@ ${declined.map((p) => `• ${p.playerName}`).join('\n')}
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
               {/* Entrenador Principal */}
-              <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 space-y-4 shadow-sm">
+              <div className="p-6 rounded-2xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] space-y-4 shadow-2xs">
                 <div className="flex items-start gap-4">
-                  <div className="w-16 h-16 rounded-2xl bg-emerald-600 text-white font-black text-xl flex items-center justify-center shrink-0 shadow-md">
+                  <div className="w-16 h-16 rounded-2xl bg-[#0B1A2D] text-[#B7F229] dark:bg-[#B7F229] dark:text-[#0B1A2D] font-extrabold text-xl flex items-center justify-center shrink-0">
                     {selectedTeam.coachName.slice(0, 2).toUpperCase()}
                   </div>
 
                   <div className="space-y-1">
-                    <span className="px-2 py-0.5 rounded-md bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 font-black text-[10px] uppercase">
+                    <span className="px-2 py-0.5 rounded-md bg-[#B7F229]/25 dark:bg-[#B7F229]/15 text-[#0B1A2D] dark:text-[#B7F229] font-bold text-[10px] uppercase">
                       Entrenador Jefe
                     </span>
-                    <h3 className="text-lg font-black text-slate-900 dark:text-white">
+                    <h3 className="text-lg font-extrabold text-[#0B1A2D] dark:text-white">
                       {selectedTeam.coachName}
                     </h3>
                     <p className="text-xs text-slate-500 dark:text-slate-400">
@@ -1591,19 +1609,19 @@ ${declined.map((p) => `• ${p.playerName}`).join('\n')}
                   </div>
                 </div>
 
-                <div className="space-y-2 text-xs pt-3 border-t border-slate-100 dark:border-slate-800">
+                <div className="space-y-2 text-xs pt-3 border-t border-slate-100 dark:border-[#1A314D]">
                   <div className="flex items-center justify-between">
                     <span className="text-slate-400">Contacto Directo:</span>
-                    <span className="font-bold text-slate-800 dark:text-slate-200">{selectedTeam.coachPhone || '+34 600 11 22 33'}</span>
+                    <span className="font-bold text-[#0B1A2D] dark:text-slate-200">{selectedTeam.coachPhone || '+34 600 11 22 33'}</span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-slate-400">Certificación:</span>
-                    <span className="font-bold text-emerald-600 dark:text-emerald-400">Nivel 2 Federación Española de Pádel</span>
+                    <span className="font-bold text-[#6e9e02] dark:text-[#B7F229]">Nivel 2 Federación Española</span>
                   </div>
                 </div>
 
-                <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800 text-xs space-y-1">
-                  <span className="font-black text-slate-900 dark:text-white block">Filosofía de Juego:</span>
+                <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-[#071220] border border-slate-200/60 dark:border-[#1A314D] text-xs space-y-1">
+                  <span className="font-bold text-[#0B1A2D] dark:text-white block">Filosofía de Juego:</span>
                   <p className="text-slate-600 dark:text-slate-400 text-[11px]">
                     {selectedTeam.tacticalStyle || 'Presión en la red y control de ritmos en puntos largos.'}
                   </p>
@@ -1611,17 +1629,17 @@ ${declined.map((p) => `• ${p.playerName}`).join('\n')}
               </div>
 
               {/* Capitán Designado */}
-              <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 space-y-4 shadow-sm">
+              <div className="p-6 rounded-2xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] space-y-4 shadow-2xs">
                 <div className="flex items-start gap-4">
-                  <div className="w-16 h-16 rounded-2xl bg-amber-500 text-slate-950 font-black text-xl flex items-center justify-center shrink-0 shadow-md">
+                  <div className="w-16 h-16 rounded-2xl bg-amber-500 text-[#0B1A2D] font-extrabold text-xl flex items-center justify-center shrink-0">
                     <Crown className="w-8 h-8" />
                   </div>
 
                   <div className="space-y-1">
-                    <span className="px-2 py-0.5 rounded-md bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 font-black text-[10px] uppercase">
+                    <span className="px-2 py-0.5 rounded-md bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 font-bold text-[10px] uppercase">
                       Capitán Oficial
                     </span>
-                    <h3 className="text-lg font-black text-slate-900 dark:text-white">
+                    <h3 className="text-lg font-extrabold text-[#0B1A2D] dark:text-white">
                       {selectedTeam.captainName}
                     </h3>
                     <p className="text-xs text-slate-500 dark:text-slate-400">
@@ -1630,24 +1648,24 @@ ${declined.map((p) => `• ${p.playerName}`).join('\n')}
                   </div>
                 </div>
 
-                <div className="space-y-2 text-xs pt-3 border-t border-slate-100 dark:border-slate-800">
+                <div className="space-y-2 text-xs pt-3 border-t border-slate-100 dark:border-[#1A314D]">
                   <div className="flex items-center justify-between">
                     <span className="text-slate-400">Funciones:</span>
-                    <span className="font-bold text-slate-800 dark:text-slate-200">Alineación, firma de actas y gestión de pista</span>
+                    <span className="font-bold text-[#0B1A2D] dark:text-slate-200">Alineación, actas y pista</span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-slate-400">Comunicación con Federación:</span>
-                    <span className="font-bold text-emerald-600 dark:text-emerald-400">Habilitado para firma digital</span>
+                    <span className="text-slate-400">Federación:</span>
+                    <span className="font-bold text-[#6e9e02] dark:text-[#B7F229]">Habilitado para firma digital</span>
                   </div>
                 </div>
 
                 <button
                   type="button"
                   onClick={() => navigateToPlayerProfile(selectedTeam.captainName, 'teams')}
-                  className="w-full py-2.5 rounded-xl bg-slate-100 hover:bg-emerald-600 hover:text-white dark:bg-slate-800 dark:hover:bg-emerald-600 text-slate-700 dark:text-slate-300 font-bold text-xs transition cursor-pointer flex items-center justify-center gap-2"
+                  className="w-full py-2.5 rounded-xl bg-slate-100 hover:bg-[#0B1A2D] hover:text-white dark:bg-[#071220] dark:hover:bg-[#B7F229] dark:hover:text-[#0B1A2D] text-[#0B1A2D] dark:text-slate-200 font-bold text-xs transition cursor-pointer flex items-center justify-center gap-2"
                 >
                   <UserCheck className="w-4 h-4" />
-                  <span>Ver Ficha Completa del Capitán</span>
+                  <span>Ver Ficha del Capitán</span>
                 </button>
               </div>
             </div>
@@ -1656,19 +1674,19 @@ ${declined.map((p) => `• ${p.playerName}`).join('\n')}
 
         {/* MODAL: AÑADIR JUGADOR A LA PLANTILLA */}
         {isAddPlayerModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-sm animate-in fade-in duration-150">
-            <div className="relative w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl space-y-4">
-              <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#071220]/75 p-4 backdrop-blur-sm animate-in fade-in duration-150">
+            <div className="relative w-full max-w-md bg-white dark:bg-[#0E2239] border border-slate-200 dark:border-[#1A314D] rounded-3xl p-6 shadow-2xl space-y-4">
+              <div className="flex items-center justify-between border-b border-slate-100 dark:border-[#1A314D] pb-3">
                 <div className="flex items-center gap-2">
-                  <Users className="w-5 h-5 text-emerald-500" />
-                  <h3 className="text-base font-black text-slate-900 dark:text-white">
-                    Fichar Jugador para {selectedTeam.name}
+                  <Users className="w-5 h-5 text-[#0B1A2D] dark:text-[#B7F229]" />
+                  <h3 className="text-base font-bold text-[#0B1A2D] dark:text-white">
+                    Añadir Jugador a {selectedTeam.name}
                   </h3>
                 </div>
                 <button
                   type="button"
                   onClick={() => setIsAddPlayerModalOpen(false)}
-                  className="p-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white cursor-pointer"
+                  className="p-1 rounded-lg text-slate-400 hover:text-[#0B1A2D] dark:hover:text-white cursor-pointer"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -1685,7 +1703,7 @@ ${declined.map((p) => `• ${p.playerName}`).join('\n')}
                     placeholder="Ej: Rodrigo Valenzuela"
                     value={newPlayerForm.name}
                     onChange={(e) => setNewPlayerForm({ ...newPlayerForm, name: e.target.value })}
-                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-[#071220] border border-slate-200 dark:border-[#1A314D] rounded-xl text-[#0B1A2D] dark:text-white focus:outline-none focus:border-[#0B1A2D] dark:focus:border-[#B7F229]"
                   />
                 </div>
 
@@ -1701,7 +1719,7 @@ ${declined.map((p) => `• ${p.playerName}`).join('\n')}
                       max="7.0"
                       value={newPlayerForm.level}
                       onChange={(e) => setNewPlayerForm({ ...newPlayerForm, level: Number(e.target.value) })}
-                      className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 font-mono"
+                      className="w-full px-3 py-2 bg-slate-50 dark:bg-[#071220] border border-slate-200 dark:border-[#1A314D] rounded-xl text-[#0B1A2D] dark:text-white focus:outline-none focus:border-[#0B1A2D] dark:focus:border-[#B7F229] font-mono"
                     />
                   </div>
 
@@ -1712,7 +1730,7 @@ ${declined.map((p) => `• ${p.playerName}`).join('\n')}
                     <select
                       value={newPlayerForm.position}
                       onChange={(e) => setNewPlayerForm({ ...newPlayerForm, position: e.target.value as any })}
-                      className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                      className="w-full px-3 py-2 bg-slate-50 dark:bg-[#071220] border border-slate-200 dark:border-[#1A314D] rounded-xl text-[#0B1A2D] dark:text-white focus:outline-none focus:border-[#0B1A2D] dark:focus:border-[#B7F229]"
                     >
                       <option value="Revés">Revés</option>
                       <option value="Drive">Drive</option>
@@ -1731,7 +1749,7 @@ ${declined.map((p) => `• ${p.playerName}`).join('\n')}
                       placeholder="+34 600..."
                       value={newPlayerForm.phone}
                       onChange={(e) => setNewPlayerForm({ ...newPlayerForm, phone: e.target.value })}
-                      className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                      className="w-full px-3 py-2 bg-slate-50 dark:bg-[#071220] border border-slate-200 dark:border-[#1A314D] rounded-xl text-[#0B1A2D] dark:text-white focus:outline-none focus:border-[#0B1A2D] dark:focus:border-[#B7F229]"
                     />
                   </div>
 
@@ -1744,7 +1762,7 @@ ${declined.map((p) => `• ${p.playerName}`).join('\n')}
                       placeholder="GA-9912-M"
                       value={newPlayerForm.federationLicense}
                       onChange={(e) => setNewPlayerForm({ ...newPlayerForm, federationLicense: e.target.value })}
-                      className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 font-mono"
+                      className="w-full px-3 py-2 bg-slate-50 dark:bg-[#071220] border border-slate-200 dark:border-[#1A314D] rounded-xl text-[#0B1A2D] dark:text-white focus:outline-none focus:border-[#0B1A2D] dark:focus:border-[#B7F229] font-mono"
                     />
                   </div>
                 </div>
@@ -1754,26 +1772,26 @@ ${declined.map((p) => `• ${p.playerName}`).join('\n')}
                     type="checkbox"
                     checked={newPlayerForm.isCaptain}
                     onChange={(e) => setNewPlayerForm({ ...newPlayerForm, isCaptain: e.target.checked })}
-                    className="rounded text-emerald-600 focus:ring-emerald-500"
+                    className="rounded accent-[#0B1A2D] dark:accent-[#B7F229]"
                   />
                   <span className="font-bold text-slate-700 dark:text-slate-300">
                     Designar directamente como Capitán del Equipo
                   </span>
                 </label>
 
-                <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex justify-end gap-2">
+                <div className="pt-3 border-t border-slate-100 dark:border-[#1A314D] flex justify-end gap-2">
                   <button
                     type="button"
                     onClick={() => setIsAddPlayerModalOpen(false)}
-                    className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold transition cursor-pointer"
+                    className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-[#071220] text-slate-700 dark:text-slate-300 font-bold transition cursor-pointer"
                   >
                     Cancelar
                   </button>
                   <button
                     type="submit"
-                    className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold transition shadow-xs cursor-pointer"
+                    className="px-5 py-2 rounded-xl bg-[#0B1A2D] hover:bg-[#132A45] text-white dark:bg-[#B7F229] dark:text-[#0B1A2D] dark:hover:bg-[#c8fa48] font-bold transition shadow-2xs cursor-pointer"
                   >
-                    Fichar Jugador
+                    Añadir Jugador
                   </button>
                 </div>
               </form>
@@ -1783,19 +1801,19 @@ ${declined.map((p) => `• ${p.playerName}`).join('\n')}
 
         {/* MODAL: NUEVA CONVOCATORIA DE PARTIDO */}
         {isNewCalloutModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-sm animate-in fade-in duration-150">
-            <div className="relative w-full max-w-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
-              <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#071220]/75 p-4 backdrop-blur-sm animate-in fade-in duration-150">
+            <div className="relative w-full max-w-lg bg-white dark:bg-[#0E2239] border border-slate-200 dark:border-[#1A314D] rounded-3xl p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+              <div className="flex items-center justify-between border-b border-slate-100 dark:border-[#1A314D] pb-3">
                 <div className="flex items-center gap-2">
-                  <Navigation className="w-5 h-5 text-emerald-500" />
-                  <h3 className="text-base font-black text-slate-900 dark:text-white">
+                  <Navigation className="w-5 h-5 text-[#0B1A2D] dark:text-[#B7F229]" />
+                  <h3 className="text-base font-bold text-[#0B1A2D] dark:text-white">
                     Abrir Convocatoria Oficial
                   </h3>
                 </div>
                 <button
                   type="button"
                   onClick={() => setIsNewCalloutModalOpen(false)}
-                  className="p-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white cursor-pointer"
+                  className="p-1 rounded-lg text-slate-400 hover:text-[#0B1A2D] dark:hover:text-white cursor-pointer"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -1811,7 +1829,7 @@ ${declined.map((p) => `• ${p.playerName}`).join('\n')}
                     required
                     value={newCalloutForm.competition}
                     onChange={(e) => setNewCalloutForm({ ...newCalloutForm, competition: e.target.value })}
-                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-[#071220] border border-slate-200 dark:border-[#1A314D] rounded-xl text-[#0B1A2D] dark:text-white focus:outline-none focus:border-[#0B1A2D] dark:focus:border-[#B7F229]"
                   />
                 </div>
 
@@ -1826,7 +1844,7 @@ ${declined.map((p) => `• ${p.playerName}`).join('\n')}
                       placeholder="Ej: Club Pádel Coruña"
                       value={newCalloutForm.rivalClub}
                       onChange={(e) => setNewCalloutForm({ ...newCalloutForm, rivalClub: e.target.value })}
-                      className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                      className="w-full px-3 py-2 bg-slate-50 dark:bg-[#071220] border border-slate-200 dark:border-[#1A314D] rounded-xl text-[#0B1A2D] dark:text-white focus:outline-none focus:border-[#0B1A2D] dark:focus:border-[#B7F229]"
                     />
                   </div>
 
@@ -1840,7 +1858,7 @@ ${declined.map((p) => `• ${p.playerName}`).join('\n')}
                       placeholder="Ej: Coruña Pro A"
                       value={newCalloutForm.rivalTeam}
                       onChange={(e) => setNewCalloutForm({ ...newCalloutForm, rivalTeam: e.target.value })}
-                      className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                      className="w-full px-3 py-2 bg-slate-50 dark:bg-[#071220] border border-slate-200 dark:border-[#1A314D] rounded-xl text-[#0B1A2D] dark:text-white focus:outline-none focus:border-[#0B1A2D] dark:focus:border-[#B7F229]"
                     />
                   </div>
                 </div>
@@ -1856,7 +1874,7 @@ ${declined.map((p) => `• ${p.playerName}`).join('\n')}
                       placeholder="Ej: Domingo 19 Octubre 2026"
                       value={newCalloutForm.date}
                       onChange={(e) => setNewCalloutForm({ ...newCalloutForm, date: e.target.value })}
-                      className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                      className="w-full px-3 py-2 bg-slate-50 dark:bg-[#071220] border border-slate-200 dark:border-[#1A314D] rounded-xl text-[#0B1A2D] dark:text-white focus:outline-none focus:border-[#0B1A2D] dark:focus:border-[#B7F229]"
                     />
                   </div>
 
@@ -1870,7 +1888,7 @@ ${declined.map((p) => `• ${p.playerName}`).join('\n')}
                       placeholder="11:00"
                       value={newCalloutForm.time}
                       onChange={(e) => setNewCalloutForm({ ...newCalloutForm, time: e.target.value })}
-                      className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 font-mono"
+                      className="w-full px-3 py-2 bg-slate-50 dark:bg-[#071220] border border-slate-200 dark:border-[#1A314D] rounded-xl text-[#0B1A2D] dark:text-white focus:outline-none focus:border-[#0B1A2D] dark:focus:border-[#B7F229] font-mono"
                     />
                   </div>
                 </div>
@@ -1885,21 +1903,21 @@ ${declined.map((p) => `• ${p.playerName}`).join('\n')}
                     placeholder="Calle, número, código postal y ciudad..."
                     value={newCalloutForm.address}
                     onChange={(e) => setNewCalloutForm({ ...newCalloutForm, address: e.target.value })}
-                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-[#071220] border border-slate-200 dark:border-[#1A314D] rounded-xl text-[#0B1A2D] dark:text-white focus:outline-none focus:border-[#0B1A2D] dark:focus:border-[#B7F229]"
                   />
                 </div>
 
-                <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex justify-end gap-2">
+                <div className="pt-3 border-t border-slate-100 dark:border-[#1A314D] flex justify-end gap-2">
                   <button
                     type="button"
                     onClick={() => setIsNewCalloutModalOpen(false)}
-                    className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold transition cursor-pointer"
+                    className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-[#071220] text-slate-700 dark:text-slate-300 font-bold transition cursor-pointer"
                   >
                     Cancelar
                   </button>
                   <button
                     type="submit"
-                    className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold transition shadow-xs cursor-pointer"
+                    className="px-5 py-2 rounded-xl bg-[#0B1A2D] hover:bg-[#132A45] text-white dark:bg-[#B7F229] dark:text-[#0B1A2D] dark:hover:bg-[#c8fa48] font-bold transition shadow-2xs cursor-pointer"
                   >
                     Lanzar Convocatoria
                   </button>
@@ -1911,19 +1929,19 @@ ${declined.map((p) => `• ${p.playerName}`).join('\n')}
 
         {/* MODAL: COMPARTIR CONVOCATORIA WHATSAPP */}
         {isWhatsAppModalOpen && whatsAppCallout && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-sm animate-in fade-in duration-150">
-            <div className="relative w-full max-w-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl space-y-4">
-              <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#071220]/75 p-4 backdrop-blur-sm animate-in fade-in duration-150">
+            <div className="relative w-full max-w-lg bg-white dark:bg-[#0E2239] border border-slate-200 dark:border-[#1A314D] rounded-3xl p-6 shadow-2xl space-y-4">
+              <div className="flex items-center justify-between border-b border-slate-100 dark:border-[#1A314D] pb-3">
                 <div className="flex items-center gap-2">
-                  <Share2 className="w-5 h-5 text-emerald-500" />
-                  <h3 className="text-base font-black text-slate-900 dark:text-white">
+                  <Share2 className="w-5 h-5 text-[#0B1A2D] dark:text-[#B7F229]" />
+                  <h3 className="text-base font-bold text-[#0B1A2D] dark:text-white">
                     Difusión por WhatsApp del Equipo
                   </h3>
                 </div>
                 <button
                   type="button"
                   onClick={() => setIsWhatsAppModalOpen(false)}
-                  className="p-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white cursor-pointer"
+                  className="p-1 rounded-lg text-slate-400 hover:text-[#0B1A2D] dark:hover:text-white cursor-pointer"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -1934,7 +1952,7 @@ ${declined.map((p) => `• ${p.playerName}`).join('\n')}
                   Mensaje formateado listo para enviar al grupo de WhatsApp del equipo con las confirmaciones actuales y el enlace de Google Maps:
                 </p>
 
-                <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 font-mono text-[11px] leading-relaxed whitespace-pre-wrap max-h-60 overflow-y-auto text-slate-800 dark:text-slate-200">
+                <div className="p-4 rounded-2xl bg-slate-50 dark:bg-[#071220] border border-slate-200 dark:border-[#1A314D] font-mono text-[11px] leading-relaxed whitespace-pre-wrap max-h-60 overflow-y-auto text-[#0B1A2D] dark:text-slate-200">
                   {getWhatsAppMessage(whatsAppCallout, selectedTeam)}
                 </div>
 
@@ -1945,7 +1963,7 @@ ${declined.map((p) => `• ${p.playerName}`).join('\n')}
                       navigator.clipboard.writeText(getWhatsAppMessage(whatsAppCallout, selectedTeam));
                       triggerDemoToast('Mensaje Copiado', 'Texto de la convocatoria copiado al portapapeles.', 'success');
                     }}
-                    className="flex-1 py-2.5 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold transition flex items-center justify-center gap-2 cursor-pointer"
+                    className="flex-1 py-2.5 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-[#071220] dark:hover:bg-[#132A45] text-[#0B1A2D] dark:text-slate-200 font-bold transition flex items-center justify-center gap-2 cursor-pointer"
                   >
                     <Copy className="w-4 h-4" />
                     <span>Copiar Texto</span>
@@ -1955,7 +1973,7 @@ ${declined.map((p) => `• ${p.playerName}`).join('\n')}
                     href={`https://wa.me/?text=${encodeURIComponent(getWhatsAppMessage(whatsAppCallout, selectedTeam))}`}
                     target="_blank"
                     rel="noreferrer"
-                    className="flex-1 py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold transition flex items-center justify-center gap-2 cursor-pointer shadow-xs text-center"
+                    className="flex-1 py-2.5 px-4 rounded-xl bg-[#0B1A2D] hover:bg-[#132A45] text-white dark:bg-[#B7F229] dark:text-[#0B1A2D] dark:hover:bg-[#c8fa48] font-bold transition flex items-center justify-center gap-2 cursor-pointer shadow-2xs text-center"
                   >
                     <Share2 className="w-4 h-4" />
                     <span>Abrir WhatsApp Web</span>
@@ -1968,19 +1986,19 @@ ${declined.map((p) => `• ${p.playerName}`).join('\n')}
 
         {/* MODAL: PROGRAMAR ENTRENAMIENTO */}
         {isNewTrainingModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-sm animate-in fade-in duration-150">
-            <div className="relative w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl space-y-4">
-              <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#071220]/75 p-4 backdrop-blur-sm animate-in fade-in duration-150">
+            <div className="relative w-full max-w-lg bg-white dark:bg-[#0E2239] border border-slate-200 dark:border-[#1A314D] rounded-3xl p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+              <div className="flex items-center justify-between border-b border-slate-100 dark:border-[#1A314D] pb-3">
                 <div className="flex items-center gap-2">
-                  <Dumbbell className="w-5 h-5 text-emerald-500" />
-                  <h3 className="text-base font-black text-slate-900 dark:text-white">
+                  <Dumbbell className="w-5 h-5 text-[#0B1A2D] dark:text-[#B7F229]" />
+                  <h3 className="text-base font-bold text-[#0B1A2D] dark:text-white">
                     Programar Turno de Entrenamiento
                   </h3>
                 </div>
                 <button
                   type="button"
                   onClick={() => setIsNewTrainingModalOpen(false)}
-                  className="p-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white cursor-pointer"
+                  className="p-1 rounded-lg text-slate-400 hover:text-[#0B1A2D] dark:hover:text-white cursor-pointer"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -1995,15 +2013,13 @@ ${declined.map((p) => `• ${p.playerName}`).join('\n')}
                     <select
                       value={newTrainingForm.day}
                       onChange={(e) => setNewTrainingForm({ ...newTrainingForm, day: e.target.value })}
-                      className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                      className="w-full px-3 py-2 bg-slate-50 dark:bg-[#071220] border border-slate-200 dark:border-[#1A314D] rounded-xl text-[#0B1A2D] dark:text-white focus:outline-none focus:border-[#0B1A2D] dark:focus:border-[#B7F229]"
                     >
-                      <option value="Lunes">Lunes</option>
-                      <option value="Martes">Martes</option>
-                      <option value="Miércoles">Miércoles</option>
-                      <option value="Jueves">Jueves</option>
-                      <option value="Viernes">Viernes</option>
-                      <option value="Sábado">Sábado</option>
-                      <option value="Domingo">Domingo</option>
+                      {['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'].map((d) => (
+                        <option key={d} value={d}>
+                          {d}
+                        </option>
+                      ))}
                     </select>
                   </div>
 
@@ -2017,22 +2033,26 @@ ${declined.map((p) => `• ${p.playerName}`).join('\n')}
                       placeholder="20:00 - 21:30"
                       value={newTrainingForm.time}
                       onChange={(e) => setNewTrainingForm({ ...newTrainingForm, time: e.target.value })}
-                      className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 font-mono"
+                      className="w-full px-3 py-2 bg-slate-50 dark:bg-[#071220] border border-slate-200 dark:border-[#1A314D] rounded-xl text-[#0B1A2D] dark:text-white focus:outline-none focus:border-[#0B1A2D] dark:focus:border-[#B7F229] font-mono"
                     />
                   </div>
                 </div>
 
                 <div>
                   <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
-                    Pista Reservada
+                    Pista Asignada
                   </label>
-                  <input
-                    type="text"
-                    required
+                  <select
                     value={newTrainingForm.courtName}
                     onChange={(e) => setNewTrainingForm({ ...newTrainingForm, courtName: e.target.value })}
-                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
-                  />
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-[#071220] border border-slate-200 dark:border-[#1A314D] rounded-xl text-[#0B1A2D] dark:text-white font-bold focus:outline-none focus:border-[#0B1A2D] dark:focus:border-[#B7F229]"
+                  >
+                    {(courts || []).map((c: any) => (
+                      <option key={c.id} value={c.name}>
+                        {c.name} {c.surface ? `(${c.surface})` : ''}
+                      </option>
+                    ))}
+                  </select>
                 </div>
 
                 <div>
@@ -2044,21 +2064,74 @@ ${declined.map((p) => `• ${p.playerName}`).join('\n')}
                     required
                     value={newTrainingForm.focus}
                     onChange={(e) => setNewTrainingForm({ ...newTrainingForm, focus: e.target.value })}
-                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-[#071220] border border-slate-200 dark:border-[#1A314D] rounded-xl text-[#0B1A2D] dark:text-white focus:outline-none focus:border-[#0B1A2D] dark:focus:border-[#B7F229]"
                   />
                 </div>
 
-                <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex justify-end gap-2">
+                <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-[#071220] border border-slate-200 dark:border-[#1A314D] space-y-2.5">
+                  <div className="flex items-center justify-between">
+                    <label className="font-bold text-[#0B1A2D] dark:text-slate-200 uppercase tracking-wider text-[11px] flex items-center gap-1.5">
+                      <Target className="w-3.5 h-3.5 text-[#0B1A2D] dark:text-[#B7F229]" />
+                      <span>Sistema de Posiciones y Parejas</span>
+                    </label>
+                    <span
+                      className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${
+                        newTrainingForm.positionMode === 'fixed'
+                          ? 'bg-[#8B5CF6]/15 text-[#6d28d9] dark:text-[#c4b5fd]'
+                          : 'bg-[#B7F229]/25 text-[#0B1A2D] dark:bg-[#B7F229]/15 dark:text-[#B7F229]'
+                      }`}
+                    >
+                      {newTrainingForm.positionMode === 'fixed' ? 'Posiciones Fijas' : 'Recomendadas'}
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setNewTrainingForm({ ...newTrainingForm, positionMode: 'recommended' })}
+                      className={`p-2.5 rounded-xl border text-left transition cursor-pointer ${
+                        newTrainingForm.positionMode === 'recommended'
+                          ? 'bg-white dark:bg-[#0E2239] border-[#0B1A2D] dark:border-[#B7F229] text-[#0B1A2D] dark:text-white font-bold shadow-2xs'
+                          : 'bg-slate-100 dark:bg-[#0E2239]/50 border-slate-200 dark:border-[#1A314D] text-slate-600 dark:text-slate-400'
+                      }`}
+                    >
+                      <div className="text-xs font-bold">Modo Recomendado</div>
+                      <div className="text-[10px] text-slate-500 dark:text-slate-400 font-normal mt-0.5 leading-snug">
+                        Los jugadores rotan lado (Drive/Revés) y pareja de entrenamiento.
+                      </div>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setNewTrainingForm({ ...newTrainingForm, positionMode: 'fixed' })}
+                      className={`p-2.5 rounded-xl border text-left transition cursor-pointer ${
+                        newTrainingForm.positionMode === 'fixed'
+                          ? 'bg-white dark:bg-[#0E2239] border-[#8B5CF6] text-[#0B1A2D] dark:text-white font-bold shadow-2xs'
+                          : 'bg-slate-100 dark:bg-[#0E2239]/50 border-slate-200 dark:border-[#1A314D] text-slate-600 dark:text-slate-400'
+                      }`}
+                    >
+                      <div className="text-xs font-bold flex items-center gap-1">
+                        <Lock className="w-3 h-3 text-[#8B5CF6]" />
+                        <span>Posiciones Fijas</span>
+                      </div>
+                      <div className="text-[10px] text-slate-500 dark:text-slate-400 font-normal mt-0.5 leading-snug">
+                        Posición estricta asignada por el entrenador sin cambio.
+                      </div>
+                    </button>
+                  </div>
+                </div>
+
+                <div className="pt-3 border-t border-slate-100 dark:border-[#1A314D] flex justify-end gap-2">
                   <button
                     type="button"
                     onClick={() => setIsNewTrainingModalOpen(false)}
-                    className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold transition cursor-pointer"
+                    className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-[#071220] text-slate-700 dark:text-slate-300 font-bold transition cursor-pointer"
                   >
                     Cancelar
                   </button>
                   <button
                     type="submit"
-                    className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold transition shadow-xs cursor-pointer"
+                    className="px-5 py-2 rounded-xl bg-[#0B1A2D] hover:bg-[#132A45] text-white dark:bg-[#B7F229] dark:text-[#0B1A2D] dark:hover:bg-[#c8fa48] font-bold transition shadow-2xs cursor-pointer"
                   >
                     Guardar Sesión
                   </button>
@@ -2072,125 +2145,154 @@ ${declined.map((p) => `• ${p.playerName}`).join('\n')}
   }
 
   // =========================================================================
-  // VISTA PRINCIPAL: LISTA DE EQUIPOS CON FILTROS
+  // VISTA PRINCIPAL: EQUIPOS (DISEÑO MINIMALISTA SETMIO)
   // =========================================================================
   return (
-    <div className="space-y-6 text-slate-900 dark:text-slate-100 max-w-7xl mx-auto pb-16">
-      {/* 1. Header Setmio Canónico */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <div className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
-            Competiciones Interclubes & Federadas
+    <div className="max-w-7xl mx-auto pt-3 pb-24 sm:pb-16 space-y-6 font-sans text-[#0B1A2D] dark:text-slate-100 antialiased animate-in fade-in duration-150">
+      {/* 1. Cabecera Limpia con Título "Equipos" + Menú Desplegable "+" */}
+      <section className="pt-2 pb-1 space-y-4" data-purpose="header-section">
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <span className="text-sm font-medium text-slate-600 dark:text-slate-300 tracking-wide block mb-1">
+              {currentTenant?.name || 'Centro de Pádel San Mateo'}
+            </span>
+            <h1 className="text-[26px] sm:text-3xl font-bold text-[#0B1A2D] dark:text-white tracking-tight leading-tight">
+              Equipos
+            </h1>
           </div>
-          <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight mt-0.5">
-            Equipos y Plantillas del Club — {currentTenant.name}
-          </h1>
-          <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
-            Gestión de capitanes, listas de jugadores, sedes, desplazamientos externos con mapa y entrenamientos.
-          </p>
+
+          <div className="relative shrink-0" ref={actionMenuRef}>
+            <button
+              type="button"
+              onClick={() => setIsActionMenuOpen((prev) => !prev)}
+              className="p-2 text-slate-700 dark:text-slate-300 hover:text-[#0B1A2D] dark:hover:text-[#B7F229] transition-colors cursor-pointer active:scale-95"
+              title="Añadir Equipo"
+              aria-label="Añadir Equipo"
+              aria-expanded={isActionMenuOpen}
+            >
+              <Plus className="w-6 h-6 stroke-[2.2]" />
+            </button>
+
+            {isActionMenuOpen && (
+              <div className="absolute right-0 top-full mt-2 w-48 rounded-2xl bg-white dark:bg-[#0E2239] border border-slate-200/90 dark:border-[#1A314D] shadow-xl py-1.5 z-40 animate-in fade-in slide-in-from-top-1 duration-150">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsActionMenuOpen(false);
+                    setIsNewTeamModalOpen(true);
+                  }}
+                  className="w-full px-3.5 py-2.5 text-left text-xs font-bold text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-[#132A45] hover:text-[#0B1A2D] dark:hover:text-[#B7F229] flex items-center gap-2.5 transition cursor-pointer"
+                >
+                  <Shield className="w-4 h-4 text-[#0B1A2D] dark:text-[#B7F229] shrink-0" />
+                  <span>Nuevo Equipo</span>
+                </button>
+              </div>
+            )}
+          </div>
         </div>
+      </section>
 
-        <button
-          type="button"
-          onClick={() => setIsNewTeamModalOpen(true)}
-          className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-2 shadow-xs transition active:scale-95 cursor-pointer self-start sm:self-auto"
-        >
-          <Plus className="w-4 h-4" />
-          <span>Nuevo Equipo</span>
-        </button>
-      </div>
-
-      {/* 2. Barra de Búsqueda y Botón Desplegable de Filtros Minimalista */}
-      <div className="p-4 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-3">
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-          <div className="relative flex-1 max-w-lg">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+      {/* 2. Barra de Búsqueda + Filtro Flotando Directamente en Una Única Línea */}
+      <div className="space-y-2.5">
+        <div className="flex items-center gap-2 w-full">
+          <div className="relative flex-1 min-w-0">
+            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
             <input
               type="text"
-              placeholder="Buscar por equipo, categoría, capitán o entrenador..."
+              placeholder="Buscar equipo, categoría o capitán..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-emerald-500 transition"
+              className="w-full pl-10 pr-9 py-2.5 rounded-xl bg-white dark:bg-[#0E2239] border border-slate-200/90 dark:border-[#1A314D] text-xs sm:text-sm text-[#0B1A2D] dark:text-white placeholder-slate-400 focus:outline-none focus:border-[#0B1A2D] dark:focus:border-[#B7F229] transition shadow-2xs"
             />
             {search && (
               <button
                 type="button"
                 onClick={() => setSearch('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 dark:hover:text-white cursor-pointer"
+                aria-label="Limpiar búsqueda"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-[#0B1A2D] dark:hover:text-white cursor-pointer"
               >
                 <X className="w-3.5 h-3.5" />
               </button>
             )}
           </div>
 
-          <div className="flex items-center gap-2 self-start sm:self-auto">
-            {/* Botón Icono Filtros Minimalista */}
-            <button
-              type="button"
-              onClick={() => setIsFilterModalOpen(true)}
-              className={`px-3.5 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 cursor-pointer border shadow-2xs active:scale-95 ${
-                activeFiltersCount > 0
-                  ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-500 text-emerald-700 dark:text-emerald-300'
-                  : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-slate-300 dark:hover:border-slate-700'
-              }`}
-            >
-              <Filter className={`w-4 h-4 ${activeFiltersCount > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-500'}`} />
-              <span>Filtros</span>
-              {activeFiltersCount > 0 && (
-                <span className="w-5 h-5 rounded-full bg-emerald-600 text-white font-mono text-[10px] flex items-center justify-center font-bold">
-                  {activeFiltersCount}
-                </span>
-              )}
-            </button>
-
+          <button
+            type="button"
+            onClick={() => setIsFilterModalOpen(true)}
+            aria-label="Filtros de equipos"
+            title="Filtros"
+            className={`shrink-0 h-[40px] sm:h-[42px] px-3 sm:px-3.5 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer border shadow-2xs active:scale-95 ${
+              activeFiltersCount > 0
+                ? 'bg-[#0B1A2D] text-[#B7F229] border-[#0B1A2D] dark:bg-[#B7F229] dark:text-[#0B1A2D] dark:border-[#B7F229]'
+                : 'bg-white dark:bg-[#0E2239] border-slate-200/90 dark:border-[#1A314D] text-[#0B1A2D] dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-[#132A45]'
+            }`}
+          >
+            <Filter className="w-4 h-4 shrink-0" />
+            <span className="hidden sm:inline">Filtros</span>
             {activeFiltersCount > 0 && (
-              <button
-                type="button"
-                onClick={() => {
-                  setFilterGender('all');
-                  setFilterAge('all');
-                  setFilterVenue('all');
-                }}
-                className="text-xs text-slate-500 dark:text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 font-semibold transition cursor-pointer px-2 py-1"
+              <span
+                className={`w-4 h-4 rounded-full font-mono text-[10px] flex items-center justify-center font-extrabold ${
+                  activeFiltersCount > 0
+                    ? 'bg-[#B7F229] text-[#0B1A2D] dark:bg-[#0B1A2D] dark:text-[#B7F229]'
+                    : ''
+                }`}
               >
-                Limpiar filtros
-              </button>
+                {activeFiltersCount}
+              </span>
             )}
-          </div>
+          </button>
         </div>
 
-        {/* Chips activos si hay filtros */}
+        {/* Chips activos directamente sobre el fondo si hay filtros */}
         {activeFiltersCount > 0 && (
-          <div className="flex flex-wrap items-center gap-1.5 pt-2 border-t border-slate-100 dark:border-slate-800 text-xs">
-            <span className="text-[11px] font-bold text-slate-400">Filtros aplicados:</span>
+          <div className="flex flex-wrap items-center gap-1.5 text-xs">
             {filterGender !== 'all' && (
-              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-medium capitalize">
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] text-[#0B1A2D] dark:text-slate-200 font-semibold capitalize">
                 <span>Género: {filterGender}</span>
-                <button type="button" onClick={() => setFilterGender('all')} className="hover:text-rose-500"><X className="w-3 h-3" /></button>
+                <button type="button" onClick={() => setFilterGender('all')} className="hover:text-rose-500 cursor-pointer">
+                  <X className="w-3 h-3" />
+                </button>
               </span>
             )}
             {filterAge !== 'all' && (
-              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-medium capitalize">
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] text-[#0B1A2D] dark:text-slate-200 font-semibold capitalize">
                 <span>Edad: {filterAge}</span>
-                <button type="button" onClick={() => setFilterAge('all')} className="hover:text-rose-500"><X className="w-3 h-3" /></button>
+                <button type="button" onClick={() => setFilterAge('all')} className="hover:text-rose-500 cursor-pointer">
+                  <X className="w-3 h-3" />
+                </button>
               </span>
             )}
             {isMultiVenue && filterVenue !== 'all' && (
-              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20 font-medium">
-                <MapPin className="w-3 h-3 text-emerald-500" />
-                <span>Sede: {venues.find((v) => v.id === filterVenue)?.name || filterVenue}</span>
-                <button type="button" onClick={() => setFilterVenue('all')} className="hover:text-rose-500"><X className="w-3 h-3" /></button>
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] text-[#0B1A2D] dark:text-[#B7F229] font-semibold">
+                <MapPin className="w-3 h-3 shrink-0" />
+                <span>{venues.find((v) => v.id === filterVenue)?.name || filterVenue}</span>
+                <button type="button" onClick={() => setFilterVenue('all')} className="hover:text-rose-500 cursor-pointer">
+                  <X className="w-3 h-3" />
+                </button>
               </span>
             )}
+            <button
+              type="button"
+              onClick={() => {
+                setFilterGender('all');
+                setFilterAge('all');
+                setFilterVenue('all');
+              }}
+              className="text-xs text-slate-500 dark:text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 font-semibold transition cursor-pointer px-2 py-1"
+            >
+              Limpiar
+            </button>
           </div>
         )}
       </div>
 
-      {/* 3. Grid de Tarjetas de Equipos Oficiales con Imagen Integrada */}
+      {/* 3. Grid de Tarjetas de Equipos */}
       {filteredTeams.length === 0 ? (
-        <div className="p-12 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 text-center space-y-3">
+        <div className="p-12 mb-8 rounded-3xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] text-center space-y-3 shadow-2xs">
           <Shield className="w-10 h-10 text-slate-400 mx-auto opacity-50" />
-          <h3 className="text-base font-bold text-slate-900 dark:text-white">No hay equipos que coincidan con la búsqueda</h3>
+          <h3 className="text-base font-bold text-[#0B1A2D] dark:text-white">
+            No hay equipos que coincidan con la búsqueda
+          </h3>
           <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto">
             Prueba a modificar los filtros de género, edad o sede para ver más equipos registrados.
           </p>
@@ -2202,88 +2304,91 @@ ${declined.map((p) => `• ${p.playerName}`).join('\n')}
               setFilterAge('all');
               setFilterVenue('all');
             }}
-            className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs cursor-pointer hover:bg-slate-200 transition"
+            className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-[#071220] text-[#0B1A2D] dark:text-slate-200 font-bold text-xs cursor-pointer hover:bg-slate-200 dark:hover:bg-[#132A45] transition"
           >
-            Restablecer todos los filtros
+            Restablecer filtros
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 mb-8">
           {filteredTeams.map((team) => (
             <div
               key={team.id}
-              className="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 hover:border-emerald-500/50 shadow-sm overflow-hidden flex flex-col justify-between transition group hover:shadow-md"
+              className="rounded-3xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] hover:border-[#0B1A2D]/30 dark:hover:border-[#B7F229]/50 shadow-2xs overflow-hidden flex flex-col justify-between transition group hover:shadow-md"
             >
-              {/* Imagen representativa del equipo integrada en la cabecera */}
-              <div className="relative h-44 w-full bg-slate-950 overflow-hidden">
-                <img
-                  src={team.photoUrl || 'https://images.unsplash.com/photo-1554068865-24cecd4e34b8?auto=format&fit=crop&w=800&q=80'}
+              {/* Imagen representativa del equipo */}
+              <div className="relative h-44 w-full bg-[#071220] overflow-hidden">
+                <TeamBannerImage
+                  src={team.photoUrl}
                   alt={team.name}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/30 to-transparent" />
+                <div className="absolute inset-0 bg-linear-to-t from-[#071220] via-[#071220]/30 to-transparent" />
 
                 <div className="absolute top-3 left-3 right-3 flex items-center justify-between gap-2">
-                  <span className="px-2.5 py-1 rounded-full bg-emerald-500 text-slate-950 font-black text-[10px] uppercase shadow-sm">
+                  <span className="px-2.5 py-1 rounded-full bg-[#B7F229] text-[#0B1A2D] font-extrabold text-[10px] uppercase shadow-sm truncate max-w-[60%]">
                     {team.category}
                   </span>
-                  <span className="px-2.5 py-1 rounded-full bg-slate-950/80 backdrop-blur-xs text-white text-[10px] font-bold border border-white/20 capitalize">
+                  <span className="px-2.5 py-1 rounded-full bg-[#071220]/85 backdrop-blur-xs text-white text-[10px] font-bold border border-white/15 capitalize shrink-0">
                     {team.gender} · {team.ageGroup}
                   </span>
                 </div>
 
-                {/* Sede chip si aplica */}
                 {team.venueName && (
-                  <div className="absolute bottom-3 left-3 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-900/90 backdrop-blur-xs text-white text-[10px] font-bold border border-white/20 shadow-sm">
-                    <MapPin className="w-3 h-3 text-emerald-400 shrink-0" />
+                  <div className="absolute bottom-3 left-3 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#071220]/90 backdrop-blur-xs text-white text-[10px] font-bold border border-white/15 shadow-sm">
+                    <MapPin className="w-3 h-3 text-[#B7F229] shrink-0" />
                     <span className="truncate max-w-[200px]">{team.venueName}</span>
                   </div>
                 )}
               </div>
 
-              {/* Contenido descriptivo del equipo */}
+              {/* Contenido del equipo */}
               <div className="p-5 space-y-4 flex-1 flex flex-col justify-between">
                 <div className="space-y-3">
-                  <h2 className="text-base font-black text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition leading-tight">
+                  <h2 className="text-base font-bold text-[#0B1A2D] dark:text-white leading-tight">
                     {team.name}
                   </h2>
 
-                  <div className="space-y-2 text-xs text-slate-500 dark:text-slate-400 pt-2 border-t border-slate-100 dark:border-slate-800">
-                    <div className="flex items-center justify-between">
+                  <div className="space-y-2 text-xs text-slate-500 dark:text-slate-400 pt-2.5 border-t border-slate-100 dark:border-[#1A314D]">
+                    <div className="flex items-center justify-between gap-2">
                       <span className="flex items-center gap-1.5 text-slate-500 dark:text-slate-400">
-                        <Crown className="w-3.5 h-3.5 text-amber-500" />
-                        <span>Capitán:</span>
+                        <Crown className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                        <span>Capitán</span>
                       </span>
-                      <strong className="text-slate-900 dark:text-slate-100 font-bold">{team.captainName}</strong>
+                      <strong className="text-[#0B1A2D] dark:text-slate-100 font-bold truncate">
+                        {team.captainName}
+                      </strong>
                     </div>
 
-                    <div className="flex items-center justify-between">
-                      <span>Entrenador:</span>
-                      <span className="font-semibold text-slate-700 dark:text-slate-300">{team.coachName}</span>
+                    <div className="flex items-center justify-between gap-2">
+                      <span>Entrenador</span>
+                      <span className="font-semibold text-slate-700 dark:text-slate-300 truncate">
+                        {team.coachName}
+                      </span>
                     </div>
 
-                    <div className="flex items-center justify-between">
-                      <span>Plantilla Oficial:</span>
-                      <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400">
+                    <div className="flex items-center justify-between gap-2">
+                      <span>Jugadores</span>
+                      <span className="font-mono font-bold text-[#0B1A2D] dark:text-[#B7F229]">
                         {team.players.length} fichas
                       </span>
                     </div>
                   </div>
 
                   {team.callouts.length > 0 && (
-                    <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800 text-[11px] text-slate-600 dark:text-slate-400 flex items-center justify-between">
-                      <span className="flex items-center gap-1.5">
-                        <Navigation className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-                        <span>Próximo encuentro fuera</span>
+                    <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-[#071220] border border-slate-200/70 dark:border-[#1A314D] text-[11px] text-slate-600 dark:text-slate-400 flex items-center justify-between gap-2">
+                      <span className="flex items-center gap-1.5 truncate">
+                        <Navigation className="w-3.5 h-3.5 text-[#8B5CF6] shrink-0" />
+                        <span className="truncate">Próximo encuentro</span>
                       </span>
-                      <span className="font-bold text-slate-900 dark:text-white">
+                      <span className="font-bold text-[#0B1A2D] dark:text-white shrink-0">
                         {team.callouts[0].date.split(' ')[0]}
                       </span>
                     </div>
                   )}
                 </div>
 
-                <div className="pt-3 border-t border-slate-100 dark:border-slate-800">
+                <div className="pt-3 border-t border-slate-100 dark:border-[#1A314D]">
                   <button
                     type="button"
                     onClick={() => {
@@ -2291,9 +2396,9 @@ ${declined.map((p) => `• ${p.playerName}`).join('\n')}
                       setActiveTeamTab('players');
                       window.scrollTo({ top: 0, behavior: 'smooth' });
                     }}
-                    className="w-full py-2.5 rounded-xl bg-slate-100 hover:bg-emerald-600 hover:text-white dark:bg-slate-800 dark:hover:bg-emerald-600 text-slate-800 dark:text-slate-200 font-bold text-xs transition flex items-center justify-center gap-1.5 cursor-pointer shadow-xs active:scale-95"
+                    className="w-full py-2.5 rounded-xl bg-[#0B1A2D] hover:bg-[#132A45] text-white dark:bg-[#B7F229] dark:hover:bg-[#c8fa48] dark:text-[#0B1A2D] font-bold text-xs transition flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs active:scale-95"
                   >
-                    <span>Ficha del Equipo & Convocatorias</span>
+                    <span>Ver Equipo</span>
                     <ChevronRight className="w-4 h-4" />
                   </button>
                 </div>
@@ -2307,31 +2412,30 @@ ${declined.map((p) => `• ${p.playerName}`).join('\n')}
           MODAL MINIMALISTA DE FILTROS (GÉNERO, EDAD Y MULTI-SEDE)
           ===================================================================== */}
       {isFilterModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-sm animate-in fade-in duration-150">
-          <div className="relative w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl space-y-5 text-slate-900 dark:text-slate-100">
-            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#071220]/75 p-4 backdrop-blur-sm animate-in fade-in duration-150">
+          <div className="relative w-full max-w-md bg-white dark:bg-[#0E2239] border border-slate-200 dark:border-[#1A314D] rounded-3xl p-6 shadow-2xl space-y-5 text-[#0B1A2D] dark:text-slate-100">
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-[#1A314D] pb-3">
               <div className="flex items-center gap-2">
-                <Filter className="w-5 h-5 text-emerald-500" />
-                <h3 className="text-base font-black text-slate-900 dark:text-white">
+                <Filter className="w-5 h-5 text-[#0B1A2D] dark:text-[#B7F229]" />
+                <h3 className="text-base font-bold text-[#0B1A2D] dark:text-white">
                   Filtros de Equipos
                 </h3>
               </div>
               <button
                 type="button"
                 onClick={() => setIsFilterModalOpen(false)}
-                className="p-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white cursor-pointer"
+                className="p-1 rounded-lg text-slate-400 hover:text-[#0B1A2D] dark:hover:text-white cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             <div className="space-y-4 text-xs">
-              {/* Filtro Multi-Sede (si el club gestiona múltiples sedes) */}
               {isMultiVenue && venues.length > 1 && (
                 <div>
-                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1.5 flex items-center gap-1.5">
-                    <MapPin className="w-3.5 h-3.5 text-emerald-500" />
-                    <span>Sede / Localización del Club:</span>
+                  <label className="font-bold text-slate-700 dark:text-slate-300 mb-1.5 flex items-center gap-1.5">
+                    <MapPin className="w-3.5 h-3.5 text-[#0B1A2D] dark:text-[#B7F229]" />
+                    <span>Sede del Club:</span>
                   </label>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     <button
@@ -2339,8 +2443,8 @@ ${declined.map((p) => `• ${p.playerName}`).join('\n')}
                       onClick={() => setFilterVenue('all')}
                       className={`p-2.5 rounded-xl border text-left font-bold transition cursor-pointer ${
                         filterVenue === 'all'
-                          ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-500 text-emerald-700 dark:text-emerald-300'
-                          : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-slate-300'
+                          ? 'bg-[#0B1A2D] text-white border-[#0B1A2D] dark:bg-[#B7F229] dark:text-[#0B1A2D] dark:border-[#B7F229]'
+                          : 'bg-slate-50 dark:bg-[#071220] border-slate-200 dark:border-[#1A314D] text-slate-700 dark:text-slate-300 hover:border-slate-300'
                       }`}
                     >
                       Todas las Sedes
@@ -2352,8 +2456,8 @@ ${declined.map((p) => `• ${p.playerName}`).join('\n')}
                         onClick={() => setFilterVenue(v.id)}
                         className={`p-2.5 rounded-xl border text-left font-bold transition cursor-pointer truncate ${
                           filterVenue === v.id
-                            ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-500 text-emerald-700 dark:text-emerald-300'
-                            : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-slate-300'
+                            ? 'bg-[#0B1A2D] text-white border-[#0B1A2D] dark:bg-[#B7F229] dark:text-[#0B1A2D] dark:border-[#B7F229]'
+                            : 'bg-slate-50 dark:bg-[#071220] border-slate-200 dark:border-[#1A314D] text-slate-700 dark:text-slate-300 hover:border-slate-300'
                         }`}
                       >
                         {v.name}
@@ -2363,7 +2467,6 @@ ${declined.map((p) => `• ${p.playerName}`).join('\n')}
                 </div>
               )}
 
-              {/* Filtro de Género */}
               <div>
                 <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">
                   Modalidad / Género:
@@ -2376,8 +2479,8 @@ ${declined.map((p) => `• ${p.playerName}`).join('\n')}
                       onClick={() => setFilterGender(g)}
                       className={`py-2 px-3 rounded-xl border text-center font-bold capitalize transition cursor-pointer ${
                         filterGender === g
-                          ? 'bg-emerald-600 text-white border-emerald-600 shadow-2xs'
-                          : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-slate-300'
+                          ? 'bg-[#0B1A2D] text-white border-[#0B1A2D] dark:bg-[#B7F229] dark:text-[#0B1A2D] dark:border-[#B7F229] shadow-2xs'
+                          : 'bg-slate-50 dark:bg-[#071220] border-slate-200 dark:border-[#1A314D] text-slate-700 dark:text-slate-300 hover:border-slate-300'
                       }`}
                     >
                       {g === 'all' ? 'Todos' : g}
@@ -2386,7 +2489,6 @@ ${declined.map((p) => `• ${p.playerName}`).join('\n')}
                 </div>
               </div>
 
-              {/* Filtro de Edad */}
               <div>
                 <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">
                   Categoría de Edad:
@@ -2399,8 +2501,8 @@ ${declined.map((p) => `• ${p.playerName}`).join('\n')}
                       onClick={() => setFilterAge(a)}
                       className={`py-2 px-3 rounded-xl border text-center font-bold capitalize transition cursor-pointer ${
                         filterAge === a
-                          ? 'bg-emerald-600 text-white border-emerald-600 shadow-2xs'
-                          : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-slate-300'
+                          ? 'bg-[#0B1A2D] text-white border-[#0B1A2D] dark:bg-[#B7F229] dark:text-[#0B1A2D] dark:border-[#B7F229] shadow-2xs'
+                          : 'bg-slate-50 dark:bg-[#071220] border-slate-200 dark:border-[#1A314D] text-slate-700 dark:text-slate-300 hover:border-slate-300'
                       }`}
                     >
                       {a === 'all' ? 'Todos' : a}
@@ -2410,7 +2512,7 @@ ${declined.map((p) => `• ${p.playerName}`).join('\n')}
               </div>
             </div>
 
-            <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-3">
+            <div className="pt-3 border-t border-slate-100 dark:border-[#1A314D] flex items-center justify-between gap-3">
               <button
                 type="button"
                 onClick={() => {
@@ -2418,7 +2520,7 @@ ${declined.map((p) => `• ${p.playerName}`).join('\n')}
                   setFilterAge('all');
                   setFilterVenue('all');
                 }}
-                className="px-4 py-2 rounded-xl text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white font-bold text-xs cursor-pointer"
+                className="px-4 py-2 rounded-xl text-slate-600 dark:text-slate-400 hover:text-[#0B1A2D] dark:hover:text-white font-bold text-xs cursor-pointer"
               >
                 Limpiar Todo
               </button>
@@ -2426,7 +2528,7 @@ ${declined.map((p) => `• ${p.playerName}`).join('\n')}
               <button
                 type="button"
                 onClick={() => setIsFilterModalOpen(false)}
-                className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition shadow-xs cursor-pointer active:scale-95"
+                className="px-5 py-2.5 rounded-xl bg-[#0B1A2D] hover:bg-[#132A45] text-white dark:bg-[#B7F229] dark:text-[#0B1A2D] dark:hover:bg-[#c8fa48] font-bold text-xs transition shadow-2xs cursor-pointer active:scale-95"
               >
                 Aplicar Filtros
               </button>
@@ -2439,19 +2541,19 @@ ${declined.map((p) => `• ${p.playerName}`).join('\n')}
           MODAL: NUEVO EQUIPO
           ===================================================================== */}
       {isNewTeamModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-sm animate-in fade-in duration-150">
-          <div className="relative w-full max-w-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl text-slate-900 dark:text-slate-100 space-y-4 max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#071220]/75 p-4 backdrop-blur-sm animate-in fade-in duration-150">
+          <div className="relative w-full max-w-lg bg-white dark:bg-[#0E2239] border border-slate-200 dark:border-[#1A314D] rounded-3xl p-6 shadow-2xl text-[#0B1A2D] dark:text-slate-100 space-y-4 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-[#1A314D] pb-3">
               <div className="flex items-center gap-2">
-                <Shield className="w-5 h-5 text-emerald-500" />
-                <h3 className="text-base font-black text-slate-900 dark:text-white">
-                  Crear Nuevo Equipo Oficial
+                <Shield className="w-5 h-5 text-[#0B1A2D] dark:text-[#B7F229]" />
+                <h3 className="text-base font-bold text-[#0B1A2D] dark:text-white">
+                  Crear Nuevo Equipo
                 </h3>
               </div>
               <button
                 type="button"
                 onClick={() => setIsNewTeamModalOpen(false)}
-                className="p-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white cursor-pointer"
+                className="p-1 rounded-lg text-slate-400 hover:text-[#0B1A2D] dark:hover:text-white cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -2468,7 +2570,7 @@ ${declined.map((p) => `• ${p.playerName}`).join('\n')}
                   placeholder="Ej: Pádel San Mateo — 2ª División Absoluta B"
                   value={newTeamForm.name}
                   onChange={(e) => setNewTeamForm({ ...newTeamForm, name: e.target.value })}
-                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-[#071220] border border-slate-200 dark:border-[#1A314D] rounded-xl text-[#0B1A2D] dark:text-white focus:outline-none focus:border-[#0B1A2D] dark:focus:border-[#B7F229]"
                 />
               </div>
 
@@ -2482,7 +2584,7 @@ ${declined.map((p) => `• ${p.playerName}`).join('\n')}
                   placeholder="Ej: Liga Gallega FGP · 1ª Categoría"
                   value={newTeamForm.category}
                   onChange={(e) => setNewTeamForm({ ...newTeamForm, category: e.target.value })}
-                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-[#071220] border border-slate-200 dark:border-[#1A314D] rounded-xl text-[#0B1A2D] dark:text-white focus:outline-none focus:border-[#0B1A2D] dark:focus:border-[#B7F229]"
                 />
               </div>
 
@@ -2499,7 +2601,7 @@ ${declined.map((p) => `• ${p.playerName}`).join('\n')}
                         gender: e.target.value as 'masculino' | 'femenino' | 'mixto',
                       })
                     }
-                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-[#071220] border border-slate-200 dark:border-[#1A314D] rounded-xl text-[#0B1A2D] dark:text-white focus:outline-none focus:border-[#0B1A2D] dark:focus:border-[#B7F229]"
                   >
                     <option value="masculino">Masculino</option>
                     <option value="femenino">Femenino</option>
@@ -2519,7 +2621,7 @@ ${declined.map((p) => `• ${p.playerName}`).join('\n')}
                         ageGroup: e.target.value as 'absoluto' | 'veteranos' | 'menores',
                       })
                     }
-                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-[#071220] border border-slate-200 dark:border-[#1A314D] rounded-xl text-[#0B1A2D] dark:text-white focus:outline-none focus:border-[#0B1A2D] dark:focus:border-[#B7F229]"
                   >
                     <option value="absoluto">Absoluto</option>
                     <option value="veteranos">Veteranos (+35/+40/+45)</option>
@@ -2538,7 +2640,7 @@ ${declined.map((p) => `• ${p.playerName}`).join('\n')}
                     placeholder="Nombre del capitán"
                     value={newTeamForm.captainName}
                     onChange={(e) => setNewTeamForm({ ...newTeamForm, captainName: e.target.value })}
-                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-[#071220] border border-slate-200 dark:border-[#1A314D] rounded-xl text-[#0B1A2D] dark:text-white focus:outline-none focus:border-[#0B1A2D] dark:focus:border-[#B7F229]"
                   />
                 </div>
 
@@ -2550,22 +2652,21 @@ ${declined.map((p) => `• ${p.playerName}`).join('\n')}
                     type="text"
                     value={newTeamForm.coachName}
                     onChange={(e) => setNewTeamForm({ ...newTeamForm, coachName: e.target.value })}
-                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-[#071220] border border-slate-200 dark:border-[#1A314D] rounded-xl text-[#0B1A2D] dark:text-white focus:outline-none focus:border-[#0B1A2D] dark:focus:border-[#B7F229]"
                   />
                 </div>
               </div>
 
-              {/* Sede del Club si es multi-sede */}
               {isMultiVenue && venues.length > 1 && (
                 <div>
-                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1 flex items-center gap-1.5">
-                    <MapPin className="w-3.5 h-3.5 text-emerald-500" />
-                    <span>Sede Oficial del Equipo *</span>
+                  <label className="font-bold text-slate-700 dark:text-slate-300 mb-1 flex items-center gap-1.5">
+                    <MapPin className="w-3.5 h-3.5 text-[#0B1A2D] dark:text-[#B7F229]" />
+                    <span>Sede del Equipo *</span>
                   </label>
                   <select
                     value={newTeamForm.venueId}
                     onChange={(e) => setNewTeamForm({ ...newTeamForm, venueId: e.target.value })}
-                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-[#071220] border border-slate-200 dark:border-[#1A314D] rounded-xl text-[#0B1A2D] dark:text-white focus:outline-none focus:border-[#0B1A2D] dark:focus:border-[#B7F229]"
                   >
                     {venues.map((v) => (
                       <option key={v.id} value={v.id}>
@@ -2576,205 +2677,45 @@ ${declined.map((p) => `• ${p.playerName}`).join('\n')}
                 </div>
               )}
 
-              {/* Imagen representativa del equipo */}
               <div>
                 <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
-                  URL de Imagen Representativa (Foto del Equipo / Cartel)
+                  URL de Imagen Representativa
                 </label>
                 <input
                   type="url"
                   placeholder="https://images.unsplash.com/photo-..."
                   value={newTeamForm.photoUrl}
                   onChange={(e) => setNewTeamForm({ ...newTeamForm, photoUrl: e.target.value })}
-                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 font-mono text-[11px]"
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-[#071220] border border-slate-200 dark:border-[#1A314D] rounded-xl text-[#0B1A2D] dark:text-white focus:outline-none focus:border-[#0B1A2D] dark:focus:border-[#B7F229] font-mono text-[11px]"
                 />
               </div>
 
               <div>
                 <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
-                  Jugadores de la Plantilla (uno por línea)
+                  Jugadores iniciales (uno por línea)
                 </label>
                 <textarea
                   rows={3}
                   placeholder={'Carlos Méndez\nDiego Soto\nMateo Varela'}
                   value={newTeamForm.initialPlayersText}
                   onChange={(e) => setNewTeamForm({ ...newTeamForm, initialPlayersText: e.target.value })}
-                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-[#071220] border border-slate-200 dark:border-[#1A314D] rounded-xl text-[#0B1A2D] dark:text-white focus:outline-none focus:border-[#0B1A2D] dark:focus:border-[#B7F229]"
                 />
               </div>
 
-              <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex justify-end gap-2">
+              <div className="pt-3 border-t border-slate-100 dark:border-[#1A314D] flex justify-end gap-2">
                 <button
                   type="button"
                   onClick={() => setIsNewTeamModalOpen(false)}
-                  className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold transition cursor-pointer"
+                  className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-[#071220] text-slate-700 dark:text-slate-300 font-bold transition cursor-pointer"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold transition shadow-xs cursor-pointer"
+                  className="px-5 py-2 rounded-xl bg-[#0B1A2D] hover:bg-[#132A45] text-white dark:bg-[#B7F229] dark:text-[#0B1A2D] dark:hover:bg-[#c8fa48] font-bold transition shadow-2xs cursor-pointer"
                 >
                   Crear Equipo
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* =====================================================================
-          MODAL: NUEVA SESIÓN DE ENTRENAMIENTO & TÁCTICA
-          ===================================================================== */}
-      {isNewTrainingModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-sm animate-in fade-in duration-150">
-          <div className="relative w-full max-w-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl text-slate-900 dark:text-slate-100 space-y-4 max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
-              <div className="flex items-center gap-2">
-                <Dumbbell className="w-5 h-5 text-emerald-500" />
-                <h3 className="text-base font-black text-slate-900 dark:text-white">
-                  Programar Sesión de Entrenamiento Oficial
-                </h3>
-              </div>
-              <button
-                type="button"
-                onClick={() => setIsNewTrainingModalOpen(false)}
-                className="p-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white cursor-pointer"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <form onSubmit={handleCreateTraining} className="space-y-3.5 text-xs">
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
-                    Día de la Semana *
-                  </label>
-                  <select
-                    value={newTrainingForm.day}
-                    onChange={(e) => setNewTrainingForm({ ...newTrainingForm, day: e.target.value })}
-                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white font-bold focus:outline-none focus:border-emerald-500"
-                  >
-                    {['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'].map((d) => (
-                      <option key={d} value={d}>
-                        {d}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
-                    Horario de Sesión *
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="20:00 - 21:30"
-                    value={newTrainingForm.time}
-                    onChange={(e) => setNewTrainingForm({ ...newTrainingForm, time: e.target.value })}
-                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white font-mono font-bold focus:outline-none focus:border-emerald-500"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
-                  Pista Asignada para el Equipo *
-                </label>
-                <select
-                  value={newTrainingForm.courtName}
-                  onChange={(e) => setNewTrainingForm({ ...newTrainingForm, courtName: e.target.value })}
-                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white font-bold focus:outline-none focus:border-emerald-500"
-                >
-                  {(courts || []).map((c: any) => (
-                    <option key={c.id} value={c.name}>
-                      {c.name} {c.surface ? `(${c.surface})` : ''}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
-                  Enfoque Técnico y Táctico de la Sesión *
-                </label>
-                <textarea
-                  rows={2}
-                  required
-                  placeholder="Ej: Trabajo de transiciones red-fondo, salidas de pared agresivas y puntos simulados bajo presión."
-                  value={newTrainingForm.focus}
-                  onChange={(e) => setNewTrainingForm({ ...newTrainingForm, focus: e.target.value })}
-                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
-                />
-              </div>
-
-              {/* Sistema de Posiciones y Parejas: Fijas vs Recomendadas */}
-              <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 space-y-2.5">
-                <div className="flex items-center justify-between">
-                  <label className="block font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider text-[11px] flex items-center gap-1.5">
-                    <Target className="w-3.5 h-3.5 text-emerald-500" />
-                    <span>Sistema de Posiciones y Parejas</span>
-                  </label>
-                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${
-                    newTrainingForm.positionMode === 'fixed'
-                      ? 'bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300'
-                      : 'bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300'
-                  }`}>
-                    {newTrainingForm.positionMode === 'fixed' ? '🔒 Posiciones Fijas' : '🔄 Recomendadas'}
-                  </span>
-                </div>
-
-                <div className="grid grid-cols-2 gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setNewTrainingForm({ ...newTrainingForm, positionMode: 'recommended' })}
-                    className={`p-2.5 rounded-xl border text-left transition cursor-pointer ${
-                      newTrainingForm.positionMode === 'recommended'
-                        ? 'bg-white dark:bg-slate-900 border-blue-500 text-blue-900 dark:text-blue-200 font-bold shadow-2xs'
-                        : 'bg-slate-100 dark:bg-slate-900/60 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400'
-                    }`}
-                  >
-                    <div className="text-xs font-bold">Modo Recomendado</div>
-                    <div className="text-[10px] text-slate-500 dark:text-slate-400 font-normal mt-0.5 leading-snug">
-                      Los jugadores eligen o rotan lado (Drive/Revés) y pareja de entrenamiento.
-                    </div>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setNewTrainingForm({ ...newTrainingForm, positionMode: 'fixed' })}
-                    className={`p-2.5 rounded-xl border text-left transition cursor-pointer ${
-                      newTrainingForm.positionMode === 'fixed'
-                        ? 'bg-white dark:bg-slate-900 border-purple-500 text-purple-900 dark:text-purple-200 font-bold shadow-2xs'
-                        : 'bg-slate-100 dark:bg-slate-900/60 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400'
-                    }`}
-                  >
-                    <div className="text-xs font-bold flex items-center gap-1">
-                      <Lock className="w-3 h-3 text-purple-500" />
-                      <span>Posiciones Fijas</span>
-                    </div>
-                    <div className="text-[10px] text-slate-500 dark:text-slate-400 font-normal mt-0.5 leading-snug">
-                      Posición estricta bloqueada por el entrenador sin cambio permitido.
-                    </div>
-                  </button>
-                </div>
-              </div>
-
-              <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex justify-end gap-2">
-                <button
-                  type="button"
-                  onClick={() => setIsNewTrainingModalOpen(false)}
-                  className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold transition cursor-pointer"
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="submit"
-                  className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold transition shadow-xs cursor-pointer"
-                >
-                  Guardar Sesión
                 </button>
               </div>
             </form>

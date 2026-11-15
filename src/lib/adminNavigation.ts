@@ -571,7 +571,7 @@ export function getAdminNavConfig(
       },
       {
         id: 'teams',
-        label: 'Equipos del Club',
+        label: 'Equipos',
         icon: Users,
         desc: 'Convocatorias de ligas federadas y capitanes',
         isPrimary: false,
