@@ -1,6 +1,6 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { useApp } from '../../context/AppContext';
-import { Coach, AcademyGroup, UserRole } from '../../types/database';
+import { UserRole } from '../../types/database';
 import {
   Users,
   UserCheck,
@@ -9,25 +9,19 @@ import {
   Shield,
   Plus,
   Search,
-  Filter,
   CheckCircle2,
-  AlertCircle,
   Building2,
   GraduationCap,
-  Briefcase,
   Activity,
   ChevronRight,
-  Eye,
+  ChevronDown,
+  ArrowLeft,
   Edit3,
   Trash2,
   X,
-  FileSpreadsheet,
-  Check,
-  Lock,
   Phone,
   Mail,
   Award,
-  Sparkles,
 } from 'lucide-react';
 
 export interface StaffMember {
@@ -260,23 +254,57 @@ export const AdminStaff: React.FC = () => {
     currentTenant,
     venues,
     selectedVenueId,
+    selectedVenue,
     setSelectedVenueId,
+    isConsolidatedView,
+    isClubOpen,
+    toggleClubOpenState,
     isMultiVenue,
-    coaches,
     academyGroups,
     auditLogs,
     addAuditLog,
     triggerDemoToast,
-    currentUser,
     setAdminTab,
   } = useApp();
 
-  const [activeTab, setActiveTab] = useState<'directorio' | 'turnos' | 'auditoria' | 'asignaciones'>('directorio');
+  const [activeTab, setActiveTab] = useState<'directorio' | 'turnos' | 'asignaciones' | 'auditoria'>('directorio');
   const [staffList, setStaffList] = useState<StaffMember[]>(INITIAL_STAFF_MEMBERS);
   const [shifts, setShifts] = useState<StaffShift[]>(INITIAL_SHIFTS);
-  const [venueFilter, setVenueFilter] = useState<string>(selectedVenueId || 'all');
   const [searchQuery, setSearchQuery] = useState('');
   const [roleFilter, setRoleFilter] = useState<string>('all');
+
+  // Vista de detalle de segundo nivel para un empleado
+  const [selectedStaffDetailId, setSelectedStaffDetailId] = useState<string | null>(null);
+
+  // Menú contextual '+' y selector estándar de sede
+  const [isActionMenuOpen, setIsActionMenuOpen] = useState(false);
+  const actionMenuRef = useRef<HTMLDivElement>(null);
+  const [isVenueSelectorOpen, setIsVenueSelectorOpen] = useState(false);
+  const venueSelectorRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (actionMenuRef.current && !actionMenuRef.current.contains(e.target as Node)) {
+        setIsActionMenuOpen(false);
+      }
+      if (venueSelectorRef.current && !venueSelectorRef.current.contains(e.target as Node)) {
+        setIsVenueSelectorOpen(false);
+      }
+    };
+    if (isActionMenuOpen || isVenueSelectorOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isActionMenuOpen, isVenueSelectorOpen]);
+
+  const realVenues = (venues || []).filter((v) => v.id !== 'all');
+  const isMultiVenueActive = Boolean(isMultiVenue) && realVenues.length > 1;
+  const effectiveVenueId =
+    selectedVenueId && selectedVenueId !== 'all'
+      ? selectedVenueId
+      : realVenues[0]?.id || 'venue-san-mateo';
 
   // Modal Nuevo Empleado / Profesor
   const [isNewStaffModalOpen, setIsNewStaffModalOpen] = useState(false);
@@ -285,37 +313,49 @@ export const AdminStaff: React.FC = () => {
   const [newStaffPhone, setNewStaffPhone] = useState('+34 600 00 00 00');
   const [newStaffRole, setNewStaffRole] = useState<UserRole>('COACH');
   const [newStaffRoleTitle, setNewStaffRoleTitle] = useState('Profesor de Pádel');
-  const [newStaffVenueId, setNewStaffVenueId] = useState(venues[1]?.id || 'venue-san-mateo');
+  const [newStaffVenueId, setNewStaffVenueId] = useState(realVenues[0]?.id || 'venue-san-mateo');
   const [newStaffHourlyRate, setNewStaffHourlyRate] = useState('30');
   const [newStaffContract, setNewStaffContract] = useState<'indefinido' | 'temporal' | 'autonomo' | 'parcial'>('indefinido');
   const [newStaffWeeklyHours, setNewStaffWeeklyHours] = useState('35');
 
-  // Modal Nuevo Turno
-  const [isNewShiftModalOpen, setIsNewShiftModalOpen] = useState(false);
+  // Modal Nuevo / Editar Turno
+  const [isShiftModalOpen, setIsShiftModalOpen] = useState(false);
+  const [editingShiftId, setEditingShiftId] = useState<string | null>(null);
   const [shiftStaffId, setShiftStaffId] = useState(staffList[0]?.id || 'staff-1');
   const [shiftDate, setShiftDate] = useState('2026-09-30');
   const [shiftStartTime, setShiftStartTime] = useState('15:30');
   const [shiftEndTime, setShiftEndTime] = useState('22:00');
   const [shiftType, setShiftType] = useState<StaffShift['shiftType']>('clases_pista');
-  const [shiftVenueId, setShiftVenueId] = useState(venues[1]?.id || 'venue-san-mateo');
+  const [shiftStatus, setShiftStatus] = useState<StaffShift['status']>('scheduled');
+  const [shiftVenueId, setShiftVenueId] = useState(realVenues[0]?.id || 'venue-san-mateo');
   const [shiftNotes, setShiftNotes] = useState('');
+
+  // Confirmación de eliminación de turno
+  const [shiftToDelete, setShiftToDelete] = useState<StaffShift | null>(null);
 
   // Modal Asignar Clases a Profesor
   const [selectedStaffForAssignment, setSelectedStaffForAssignment] = useState<StaffMember | null>(null);
   const [assignedGroupsTemp, setAssignedGroupsTemp] = useState<string[]>([]);
 
   // Filtros Auditoría
-  const [auditActorFilter, setAuditActorFilter] = useState('all');
+  const [auditActorFilter] = useState('all');
   const [auditActionFilter, setAuditActionFilter] = useState('all');
   const [auditSearchQuery, setAuditSearchQuery] = useState('');
 
-  // Filtro de profesor para el calendario de clases
+  // Filtro de empleado para turnos
   const [selectedCoachForCalendar, setSelectedCoachForCalendar] = useState<string>('all');
 
-  // Filtrado de Personal
+  // Empleado seleccionado para vista de detalle
+  const selectedStaffDetail = useMemo(
+    () => staffList.find((s) => s.id === selectedStaffDetailId) || null,
+    [staffList, selectedStaffDetailId]
+  );
+
+  // Filtrado de Personal sincronizado con selector estándar de sede
   const filteredStaff = useMemo(() => {
     return staffList.filter((s) => {
-      const matchesVenue = !isMultiVenue || venueFilter === 'all' || s.venueId === venueFilter;
+      const matchesVenue =
+        !isMultiVenueActive || isConsolidatedView || selectedVenueId === 'all' || s.venueId === selectedVenueId;
       const matchesRole = roleFilter === 'all' || s.role === roleFilter;
       const term = searchQuery.toLowerCase().trim();
       const matchesSearch =
@@ -325,16 +365,17 @@ export const AdminStaff: React.FC = () => {
         s.roleTitle.toLowerCase().includes(term);
       return matchesVenue && matchesRole && matchesSearch;
     });
-  }, [staffList, venueFilter, roleFilter, searchQuery, isMultiVenue]);
+  }, [staffList, isMultiVenueActive, isConsolidatedView, selectedVenueId, roleFilter, searchQuery]);
 
-  // Filtrado de Turnos
+  // Filtrado de Turnos sincronizado con selector estándar de sede
   const filteredShifts = useMemo(() => {
     return shifts.filter((s) => {
-      const matchesVenue = !isMultiVenue || venueFilter === 'all' || s.venueId === venueFilter;
+      const matchesVenue =
+        !isMultiVenueActive || isConsolidatedView || selectedVenueId === 'all' || s.venueId === selectedVenueId;
       const matchesStaff = selectedCoachForCalendar === 'all' || s.staffId === selectedCoachForCalendar;
       return matchesVenue && matchesStaff;
     });
-  }, [shifts, venueFilter, selectedCoachForCalendar, isMultiVenue]);
+  }, [shifts, isMultiVenueActive, isConsolidatedView, selectedVenueId, selectedCoachForCalendar]);
 
   // Filtrado de Logs de Auditoría
   const filteredAuditLogs = useMemo(() => {
@@ -401,43 +442,137 @@ export const AdminStaff: React.FC = () => {
     setNewStaffEmail('');
   };
 
-  const handleCreateShift = (e: React.FormEvent) => {
+  const handleOpenCreateShiftModal = (preselectedStaffId?: string) => {
+    setEditingShiftId(null);
+    const targetStaffId = preselectedStaffId || staffList[0]?.id || 'staff-1';
+    const targetStaff = staffList.find((s) => s.id === targetStaffId);
+    setShiftStaffId(targetStaffId);
+    setShiftVenueId(targetStaff?.venueId || effectiveVenueId);
+    setShiftDate('2026-09-30');
+    setShiftStartTime('15:30');
+    setShiftEndTime('22:00');
+    setShiftType('clases_pista');
+    setShiftStatus('scheduled');
+    setShiftNotes('');
+    setIsShiftModalOpen(true);
+  };
+
+  const handleOpenEditShiftModal = (shift: StaffShift) => {
+    setEditingShiftId(shift.id);
+    setShiftStaffId(shift.staffId);
+    setShiftVenueId(shift.venueId);
+    setShiftDate(shift.date);
+    setShiftStartTime(shift.startTime);
+    setShiftEndTime(shift.endTime);
+    setShiftType(shift.shiftType);
+    setShiftStatus(shift.status);
+    setShiftNotes(shift.notes || '');
+    setIsShiftModalOpen(true);
+  };
+
+  const handleSaveShift = (e: React.FormEvent) => {
     e.preventDefault();
     const staff = staffList.find((s) => s.id === shiftStaffId) || staffList[0];
-    const targetVenue = venues.find((v) => v.id === shiftVenueId) || venues[1] || venues[0];
+    const targetVenue = venues.find((v) => v.id === shiftVenueId) || realVenues[0] || venues[0];
 
-    const newShift: StaffShift = {
-      id: `shift-${Date.now()}`,
-      staffId: staff.id,
-      staffName: staff.name,
-      roleTitle: staff.roleTitle,
-      venueId: targetVenue.id,
-      venueName: targetVenue.shortName || targetVenue.name,
-      date: shiftDate,
-      startTime: shiftStartTime,
-      endTime: shiftEndTime,
-      shiftType,
-      status: 'scheduled',
-      notes: shiftNotes.trim() || undefined,
-    };
+    if (editingShiftId) {
+      setShifts((prev) =>
+        prev.map((sh) =>
+          sh.id === editingShiftId
+            ? {
+                ...sh,
+                staffId: staff.id,
+                staffName: staff.name,
+                roleTitle: staff.roleTitle,
+                venueId: targetVenue.id,
+                venueName: targetVenue.shortName || targetVenue.name,
+                date: shiftDate,
+                startTime: shiftStartTime,
+                endTime: shiftEndTime,
+                shiftType,
+                status: shiftStatus,
+                notes: shiftNotes.trim() || undefined,
+              }
+            : sh
+        )
+      );
 
-    setShifts((prev) => [newShift, ...prev]);
+      addAuditLog({
+        action: 'Edición de Turno Laboral',
+        target: `${staff.name} (${shiftDate})`,
+        details: `Turno actualizado de ${shiftStartTime} a ${shiftEndTime} en ${targetVenue.shortName || targetVenue.name}.`,
+      });
 
-    // Registrar en auditoría
+      triggerDemoToast(
+        'Turno Actualizado',
+        `Cambios guardados para el turno de ${staff.name} (${shiftStartTime} - ${shiftEndTime}).`,
+        'success'
+      );
+    } else {
+      const newShift: StaffShift = {
+        id: `shift-${Date.now()}`,
+        staffId: staff.id,
+        staffName: staff.name,
+        roleTitle: staff.roleTitle,
+        venueId: targetVenue.id,
+        venueName: targetVenue.shortName || targetVenue.name,
+        date: shiftDate,
+        startTime: shiftStartTime,
+        endTime: shiftEndTime,
+        shiftType,
+        status: shiftStatus,
+        notes: shiftNotes.trim() || undefined,
+      };
+
+      setShifts((prev) => [newShift, ...prev]);
+
+      addAuditLog({
+        action: 'Creación de Turno Laboral',
+        target: `${staff.name} (${shiftDate})`,
+        details: `Turno de ${shiftStartTime} a ${shiftEndTime} en ${targetVenue.shortName || targetVenue.name} · Función: ${shiftType}.`,
+      });
+
+      triggerDemoToast(
+        'Turno Configurado',
+        `Turno asignado a ${staff.name} para el ${shiftDate} (${shiftStartTime} - ${shiftEndTime}).`,
+        'success'
+      );
+    }
+
+    setIsShiftModalOpen(false);
+    setEditingShiftId(null);
+    setShiftNotes('');
+  };
+
+  const handleConfirmDeleteShift = () => {
+    if (!shiftToDelete) return;
+    setShifts((prev) => prev.filter((sh) => sh.id !== shiftToDelete.id));
+
     addAuditLog({
-      action: 'Creación de Turno Laboral',
-      target: `${staff.name} (${shiftDate})`,
-      details: `Turno de ${shiftStartTime} a ${shiftEndTime} en ${targetVenue.shortName} · Función: ${shiftType}.`,
+      action: 'Eliminación de Turno Laboral',
+      target: `${shiftToDelete.staffName} (${shiftToDelete.date})`,
+      details: `Turno eliminado (${shiftToDelete.startTime} - ${shiftToDelete.endTime}) en ${shiftToDelete.venueName}.`,
     });
 
     triggerDemoToast(
-      'Turno Configurado',
-      `Turno asignado a ${staff.name} para el ${shiftDate} (${shiftStartTime} - ${shiftEndTime}).`,
-      'success'
+      'Turno Eliminado',
+      `Se ha eliminado el turno de ${shiftToDelete.staffName} del ${shiftToDelete.date}.`,
+      'info'
     );
+    setShiftToDelete(null);
+  };
 
-    setIsNewShiftModalOpen(false);
-    setShiftNotes('');
+  const handleToggleStaffStatus = (staff: StaffMember, nextStatus: StaffMember['status']) => {
+    setStaffList((prev) =>
+      prev.map((s) => (s.id === staff.id ? { ...s, status: nextStatus } : s))
+    );
+    const statusLabel = nextStatus === 'active' ? 'En Turno' : nextStatus === 'break' ? 'Descanso' : 'Fuera';
+    addAuditLog({
+      action: 'Cambio de Estado de Personal',
+      target: staff.name,
+      details: `Estado actualizado a "${statusLabel}".`,
+    });
+    triggerDemoToast('Estado Actualizado', `${staff.name} ahora figura como "${statusLabel}".`, 'success');
   };
 
   const handleOpenAssignModal = (staff: StaffMember) => {
@@ -470,210 +605,582 @@ export const AdminStaff: React.FC = () => {
     setSelectedStaffForAssignment(null);
   };
 
+  const contractLabels: Record<StaffMember['contractType'], string> = {
+    indefinido: 'Indefinido',
+    temporal: 'Temporal',
+    autonomo: 'Autónomo',
+    parcial: 'Tiempo Parcial',
+  };
+
+  const shiftTypeLabels: Record<StaffShift['shiftType'], string> = {
+    recepcion: 'Recepción & Caja',
+    clases_pista: 'Clases en Pista',
+    coordinacion: 'Coordinación',
+    mantenimiento: 'Mantenimiento',
+    cierre: 'Cierre & Domótica',
+  };
+
   return (
-    <div className="space-y-6 text-[#0B1A2D] dark:text-slate-100 max-w-7xl mx-auto pb-24 sm:pb-16 antialiased">
+    <div className="max-w-7xl mx-auto pt-3 pb-24 sm:pb-16 space-y-6 sm:space-y-8 font-sans text-[#0B1A2D] dark:text-slate-100 antialiased">
       {/* ======================================================================
-          1. HEADER PRINCIPAL (PALETA OFICIAL SETMIO)
+          VISTA DE DETALLE DE SEGUNDO NIVEL (EMPLEADO SELECCIONADO)
           ====================================================================== */}
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pt-2 pb-1">
-        <div className="min-w-0">
-          <span className="text-sm font-medium text-slate-600 dark:text-slate-300 tracking-wide block mb-1 truncate">
-            {currentTenant?.name || 'Centro de Pádel San Mateo'}
-          </span>
-          <h1 className="text-[26px] sm:text-3xl font-bold text-[#0B1A2D] dark:text-white tracking-tight leading-tight">
-            Personal & Profesores
-          </h1>
-        </div>
+      {selectedStaffDetail ? (
+        (() => {
+          const detailGroups = academyGroups.filter(
+            (g) => selectedStaffDetail.assignedGroupIds?.includes(g.id) || g.coachName === selectedStaffDetail.name
+          );
+          const detailShifts = shifts.filter((sh) => sh.staffId === selectedStaffDetail.id);
 
-        <div className="flex items-center gap-2 self-start sm:self-auto shrink-0">
-          <button
-            type="button"
-            onClick={() => setIsNewShiftModalOpen(true)}
-            className="min-h-[40px] px-3.5 py-2 rounded-xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] text-[#0B1A2D] dark:text-slate-200 font-bold text-xs hover:bg-slate-50 dark:hover:bg-[#132A45] transition cursor-pointer shadow-2xs flex items-center gap-1.5 whitespace-nowrap shrink-0"
-          >
-            <Clock className="w-3.5 h-3.5 text-[#0B1A2D] dark:text-[#B7F229] shrink-0" />
-            <span>Nuevo Turno</span>
-          </button>
+          return (
+            <div className="space-y-6 sm:space-y-7 mb-8 animate-in fade-in duration-150">
+              {/* Barra superior de retorno y acciones */}
+              <div className="flex flex-wrap items-center justify-between gap-3 mt-2">
+                <button
+                  type="button"
+                  onClick={() => setSelectedStaffDetailId(null)}
+                  className="inline-flex items-center gap-2 min-h-[44px] px-3.5 py-2 rounded-xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] text-xs sm:text-sm font-bold text-[#0B1A2D] dark:text-white hover:bg-slate-50 dark:hover:bg-[#132A45] transition cursor-pointer shadow-2xs"
+                >
+                  <ArrowLeft className="w-4 h-4" />
+                  <span>Volver a Personal</span>
+                </button>
 
-          <button
-            type="button"
-            onClick={() => setIsNewStaffModalOpen(true)}
-            className="min-h-[40px] px-4 py-2 rounded-xl bg-[#0B1A2D] hover:bg-[#132A45] dark:bg-[#B7F229] dark:hover:bg-[#a3db20] text-white dark:text-[#0B1A2D] font-bold text-xs shadow-2xs transition active:scale-95 cursor-pointer flex items-center gap-1.5 whitespace-nowrap shrink-0"
-          >
-            <Plus className="w-4 h-4 text-[#B7F229] dark:text-[#0B1A2D] shrink-0" />
-            <span>Añadir Personal</span>
-          </button>
-        </div>
-      </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => handleOpenAssignModal(selectedStaffDetail)}
+                    className="min-h-[40px] px-3.5 py-2 rounded-xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] text-xs font-bold text-[#0B1A2D] dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-[#132A45] transition cursor-pointer flex items-center gap-1.5"
+                  >
+                    <GraduationCap className="w-4 h-4 text-slate-500 dark:text-[#B7F229]" />
+                    <span>Asignar Grupos</span>
+                  </button>
 
-      {/* ======================================================================
-          2. FILTRO DE SEDE (SI ES CLUB MULTI-SEDE)
-          ====================================================================== */}
-      {Boolean(isMultiVenue) && Array.isArray(venues) && venues.length > 1 && (
-        <div className="flex flex-wrap items-center justify-between gap-2.5 p-3.5 rounded-2xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] shadow-2xs">
-          <div className="flex items-center gap-2">
-            <Building2 className="w-4 h-4 text-[#0B1A2D] dark:text-[#B7F229]" />
-            <span className="text-xs font-bold text-[#0B1A2D] dark:text-slate-200">
-              Sede:
-            </span>
+                  <button
+                    type="button"
+                    onClick={() => handleOpenCreateShiftModal(selectedStaffDetail.id)}
+                    className="min-h-[40px] px-3.5 py-2 rounded-xl bg-[#0B1A2D] hover:bg-[#132A45] dark:bg-[#B7F229] dark:hover:bg-[#a3db20] text-white dark:text-[#0B1A2D] font-bold text-xs transition cursor-pointer flex items-center gap-1.5 shadow-2xs"
+                  >
+                    <Plus className="w-4 h-4" />
+                    <span>Nuevo Turno</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Cabecera del Perfil */}
+              <div className="p-5 sm:p-6 rounded-2xl sm:rounded-3xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-5">
+                <div className="flex items-center gap-4 min-w-0">
+                  <img
+                    src={selectedStaffDetail.avatarUrl}
+                    alt={selectedStaffDetail.name}
+                    referrerPolicy="no-referrer"
+                    className="w-16 h-16 sm:w-20 sm:h-20 rounded-full object-cover border border-slate-200 dark:border-[#1A314D] shrink-0"
+                  />
+                  <div className="min-w-0 space-y-1">
+                    <h1 className="text-xl sm:text-2xl font-bold text-[#0B1A2D] dark:text-white tracking-tight truncate">
+                      {selectedStaffDetail.name}
+                    </h1>
+                    <p className="text-sm font-medium text-slate-600 dark:text-slate-300 truncate">
+                      {selectedStaffDetail.roleTitle}
+                    </p>
+                    <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+                      <span className="inline-flex items-center gap-1">
+                        <Building2 className="w-3.5 h-3.5" />
+                        {selectedStaffDetail.venueName}
+                      </span>
+                      {selectedStaffDetail.certifications && (
+                        <>
+                          <span aria-hidden="true">·</span>
+                          <span className="inline-flex items-center gap-1">
+                            <Award className="w-3.5 h-3.5 text-[#82b805] dark:text-[#B7F229]" />
+                            {selectedStaffDetail.certifications}
+                          </span>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Selector rápido de estado operativo */}
+                <div className="flex items-center gap-1 p-1 bg-slate-100 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-xl self-start sm:self-center shrink-0">
+                  {[
+                    { id: 'active', label: 'En Turno' },
+                    { id: 'break', label: 'Descanso' },
+                    { id: 'off', label: 'Fuera' },
+                  ].map((st) => {
+                    const isCurrent = selectedStaffDetail.status === st.id;
+                    return (
+                      <button
+                        key={st.id}
+                        type="button"
+                        onClick={() => handleToggleStaffStatus(selectedStaffDetail, st.id as StaffMember['status'])}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer whitespace-nowrap ${
+                          isCurrent
+                            ? st.id === 'active'
+                              ? 'bg-[#B7F229] text-[#0B1A2D] shadow-xs'
+                              : st.id === 'break'
+                              ? 'bg-amber-400 text-[#0B1A2D] shadow-xs'
+                              : 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D] shadow-xs'
+                            : 'text-slate-600 dark:text-slate-400 hover:text-[#0B1A2D] dark:hover:text-white'
+                        }`}
+                      >
+                        {st.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Detalles contractuales y grupos */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5">
+                {/* Información profesional y contacto */}
+                <div className="p-5 sm:p-6 rounded-2xl sm:rounded-3xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] shadow-2xs space-y-4">
+                  <h2 className="text-sm font-bold text-[#0B1A2D] dark:text-white">
+                    Información Profesional y Contacto
+                  </h2>
+                  <div className="divide-y divide-slate-100 dark:divide-[#1A314D] text-xs sm:text-sm">
+                    <div className="py-3 flex items-center justify-between gap-3">
+                      <span className="text-slate-500 dark:text-slate-400 flex items-center gap-2 shrink-0">
+                        <Mail className="w-3.5 h-3.5" /> Email
+                      </span>
+                      <span className="font-medium text-[#0B1A2D] dark:text-slate-200 truncate">
+                        {selectedStaffDetail.email}
+                      </span>
+                    </div>
+                    <div className="py-3 flex items-center justify-between gap-3">
+                      <span className="text-slate-500 dark:text-slate-400 flex items-center gap-2 shrink-0">
+                        <Phone className="w-3.5 h-3.5" /> Teléfono
+                      </span>
+                      <span className="font-mono tabular-nums font-medium text-[#0B1A2D] dark:text-slate-200">
+                        {selectedStaffDetail.phone}
+                      </span>
+                    </div>
+                    <div className="py-3 flex items-center justify-between gap-3">
+                      <span className="text-slate-500 dark:text-slate-400 shrink-0">Contrato</span>
+                      <span className="font-bold text-[#0B1A2D] dark:text-white">
+                        {contractLabels[selectedStaffDetail.contractType]}
+                      </span>
+                    </div>
+                    <div className="py-3 flex items-center justify-between gap-3">
+                      <span className="text-slate-500 dark:text-slate-400 shrink-0">Jornada & Tarifa</span>
+                      <span className="font-mono tabular-nums font-bold text-[#0B1A2D] dark:text-[#B7F229]">
+                        {selectedStaffDetail.weeklyHours}h/sem
+                        {selectedStaffDetail.hourlyRate !== undefined && ` · ${selectedStaffDetail.hourlyRate.toFixed(0)} €/h`}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Grupos asignados */}
+                <div className="p-5 sm:p-6 rounded-2xl sm:rounded-3xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] shadow-2xs space-y-4">
+                  <div className="flex items-center justify-between gap-3">
+                    <h2 className="text-sm font-bold text-[#0B1A2D] dark:text-white">
+                      Grupos de Escuela ({detailGroups.length})
+                    </h2>
+                    <button
+                      type="button"
+                      onClick={() => handleOpenAssignModal(selectedStaffDetail)}
+                      className="text-xs font-bold text-[#0B1A2D] dark:text-[#B7F229] hover:underline cursor-pointer"
+                    >
+                      Editar asignaciones
+                    </button>
+                  </div>
+
+                  {detailGroups.length === 0 ? (
+                    <div className="py-8 text-center text-xs text-slate-400 dark:text-slate-500">
+                      Sin grupos de academia asignados actualmente.
+                    </div>
+                  ) : (
+                    <div className="divide-y divide-slate-100 dark:divide-[#1A314D]">
+                      {detailGroups.map((g) => (
+                        <div key={g.id} className="py-3 flex items-center justify-between gap-3 text-xs sm:text-sm">
+                          <div className="min-w-0">
+                            <div className="font-bold text-[#0B1A2D] dark:text-white truncate">{g.name}</div>
+                            <div className="text-xs text-slate-500 dark:text-slate-400">
+                              {g.schedule || 'Horario oficial'} · {g.currentStudents}/{g.maxStudents} alumnos
+                            </div>
+                          </div>
+                          <span className="font-mono tabular-nums font-bold text-[#0B1A2D] dark:text-[#B7F229] shrink-0">
+                            {g.monthlyFee} €/mes
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Turnos asignados del empleado */}
+              <div className="bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xs mb-8">
+                <div className="px-5 py-4 border-b border-slate-100 dark:border-[#1A314D] flex items-center justify-between gap-3">
+                  <h2 className="text-sm font-bold text-[#0B1A2D] dark:text-white">
+                    Turnos Programados ({detailShifts.length})
+                  </h2>
+                  <button
+                    type="button"
+                    onClick={() => handleOpenCreateShiftModal(selectedStaffDetail.id)}
+                    className="text-xs font-bold text-[#0B1A2D] dark:text-[#B7F229] hover:underline cursor-pointer flex items-center gap-1"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>Añadir turno</span>
+                  </button>
+                </div>
+
+                {detailShifts.length === 0 ? (
+                  <div className="p-8 text-center text-xs text-slate-400 dark:text-slate-500">
+                    Este miembro no tiene turnos programados todavía.
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse text-xs">
+                      <thead>
+                        <tr className="border-b border-slate-200 dark:border-[#1A314D] bg-slate-50/70 dark:bg-[#071220] text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                          <th className="py-3.5 px-4">Fecha</th>
+                          <th className="py-3.5 px-4">Horario</th>
+                          <th className="py-3.5 px-4">Sede</th>
+                          <th className="py-3.5 px-4">Función</th>
+                          <th className="py-3.5 px-4">Estado</th>
+                          <th className="py-3.5 px-4 text-right">Acciones</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100 dark:divide-[#1A314D]">
+                        {detailShifts.map((shift) => (
+                          <tr key={shift.id} className="hover:bg-slate-50/60 dark:hover:bg-white/[0.02] transition">
+                            <td className="py-3.5 px-4 font-mono tabular-nums font-bold text-slate-700 dark:text-slate-300 whitespace-nowrap">
+                              {shift.date}
+                            </td>
+                            <td className="py-3.5 px-4 font-mono tabular-nums font-extrabold text-[#0B1A2D] dark:text-[#B7F229] whitespace-nowrap">
+                              {shift.startTime} - {shift.endTime}
+                            </td>
+                            <td className="py-3.5 px-4 text-slate-600 dark:text-slate-300 whitespace-nowrap">
+                              {shift.venueName}
+                            </td>
+                            <td className="py-3.5 px-4 whitespace-nowrap">
+                              <span className="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-[#071220] text-[#0B1A2D] dark:text-slate-300 text-[10px] font-bold">
+                                {shiftTypeLabels[shift.shiftType]}
+                              </span>
+                            </td>
+                            <td className="py-3.5 px-4 whitespace-nowrap">
+                              <span
+                                className={`px-2 py-0.5 rounded-md text-[10px] font-bold tracking-wide ${
+                                  shift.status === 'active'
+                                    ? 'bg-[#F0FCCF] dark:bg-[#B7F229]/15 text-[#0B1A2D] dark:text-[#B7F229]'
+                                    : shift.status === 'completed'
+                                    ? 'bg-slate-100 dark:bg-[#071220] text-slate-600 dark:text-slate-400'
+                                    : 'bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-300'
+                                }`}
+                              >
+                                {shift.status === 'active' ? 'En Curso' : shift.status === 'completed' ? 'Completado' : 'Programado'}
+                              </span>
+                            </td>
+                            <td className="py-3 px-4 text-right whitespace-nowrap">
+                              <div className="inline-flex items-center gap-1">
+                                <button
+                                  type="button"
+                                  onClick={() => handleOpenEditShiftModal(shift)}
+                                  className="p-2 rounded-lg text-slate-500 hover:text-[#0B1A2D] dark:text-slate-400 dark:hover:text-[#B7F229] hover:bg-slate-100 dark:hover:bg-[#132A45] transition cursor-pointer"
+                                  title="Editar turno"
+                                  aria-label="Editar turno"
+                                >
+                                  <Edit3 className="w-3.5 h-3.5" />
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => setShiftToDelete(shift)}
+                                  className="p-2 rounded-lg text-slate-500 hover:text-rose-600 dark:text-slate-400 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition cursor-pointer"
+                                  title="Eliminar turno"
+                                  aria-label="Eliminar turno"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            </div>
+          );
+        })()
+      ) : (
+        <>
+          {/* ======================================================================
+              1. CABECERA LIMPIA CON BOTÓN DESPLEGABLE "+" Y SELECTOR DE SEDE ESTÁNDAR
+              ====================================================================== */}
+          <section data-purpose="header-section">
+            <div className="flex items-center justify-between gap-3 mt-2 mb-6">
+              <div className="min-w-0">
+                <span className="text-sm font-medium text-slate-600 dark:text-slate-300 tracking-wide block mb-1 truncate">
+                  {currentTenant?.name || 'Centro de Pádel San Mateo'}
+                </span>
+                <h1 className="text-[26px] sm:text-3xl font-bold text-[#0B1A2D] dark:text-white tracking-tight leading-tight">
+                  Personal
+                </h1>
+              </div>
+
+              <div className="relative shrink-0" ref={actionMenuRef}>
+                <button
+                  type="button"
+                  onClick={() => setIsActionMenuOpen((prev) => !prev)}
+                  className="p-2 text-slate-700 dark:text-slate-300 hover:text-[#0B1A2D] dark:hover:text-[#B7F229] transition-colors cursor-pointer active:scale-95"
+                  title="Añadir Personal o Nuevo Turno"
+                  aria-label="Añadir Personal o Nuevo Turno"
+                >
+                  <Plus className="w-6 h-6 stroke-[2.2]" />
+                </button>
+
+                {isActionMenuOpen && (
+                  <div className="absolute right-0 top-full mt-2 w-48 rounded-2xl bg-white dark:bg-[#0E2239] border border-slate-200/90 dark:border-[#1A314D] shadow-xl py-1.5 z-40 animate-in fade-in slide-in-from-top-1 duration-150">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsActionMenuOpen(false);
+                        setIsNewStaffModalOpen(true);
+                      }}
+                      className="w-full px-3.5 py-2.5 text-left text-xs font-bold text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-[#132A45] hover:text-[#0B1A2D] dark:hover:text-[#B7F229] flex items-center gap-2.5 transition cursor-pointer"
+                    >
+                      <span>Añadir Personal</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsActionMenuOpen(false);
+                        handleOpenCreateShiftModal();
+                      }}
+                      className="w-full px-3.5 py-2.5 text-left text-xs font-bold text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-[#132A45] hover:text-[#0B1A2D] dark:hover:text-[#B7F229] flex items-center gap-2.5 transition cursor-pointer"
+                    >
+                      <span>Nuevo Turno</span>
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* 1.1 SELECTOR DE SEDE Y ESTADO OPERATIVO UNIFICADO */}
+            <div className="relative" ref={venueSelectorRef}>
+              <div className="flex items-center justify-between gap-2.5 sm:gap-3 p-3.5 sm:p-5 bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200/80 dark:border-[#1A314D] shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
+                <div
+                  onClick={() => setIsVenueSelectorOpen(!isVenueSelectorOpen)}
+                  className="flex items-center gap-2.5 sm:gap-3 cursor-pointer group select-none min-w-0 flex-1"
+                  title="Cambiar sede activa o ver red consolidada"
+                >
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-slate-50 dark:bg-[#071220] border border-slate-100 dark:border-[#1A314D] flex items-center justify-center text-[#0B1A2D] dark:text-slate-200 shrink-0">
+                    <Building2 className="w-4 h-4 sm:w-4.5 sm:h-4.5 text-[#0B1A2D] dark:text-white" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-1 min-w-0">
+                      <span className="text-[13px] sm:text-base font-bold text-[#0B1A2D] dark:text-white truncate whitespace-nowrap">
+                        {isConsolidatedView ? 'Todas las Sedes' : selectedVenue?.shortName || selectedVenue?.name || 'Sede'}
+                      </span>
+                      <ChevronDown
+                        className={`w-4 h-4 text-slate-500 group-hover:text-[#0B1A2D] dark:text-slate-400 dark:group-hover:text-white transition-transform shrink-0 ${
+                          isVenueSelectorOpen ? 'rotate-180 text-[#0B1A2D] dark:text-white' : ''
+                        }`}
+                      />
+                    </div>
+                    <span className="text-xs sm:text-[13px] font-medium text-slate-600 dark:text-slate-300 block truncate whitespace-nowrap">
+                      {venues.length > 1 ? `${venues.length} sedes conectadas` : 'Sede oficial'}
+                    </span>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={isConsolidatedView ? () => setIsVenueSelectorOpen((prev) => !prev) : toggleClubOpenState}
+                  className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-full bg-[#F0FCCF] dark:bg-[#B7F229]/20 border border-[#B7F229]/50 transition-all cursor-pointer hover:scale-102 shrink-0 select-none whitespace-nowrap"
+                  title={
+                    isConsolidatedView
+                      ? `Red multisede consolidada (${venues.length} sedes operativas)`
+                      : 'Haz clic para conmutar estado de apertura de la sede'
+                  }
+                >
+                  <span
+                    className={`w-2 h-2 rounded-full shrink-0 ${
+                      isConsolidatedView
+                        ? 'bg-[#82b805] dark:bg-[#B7F229]'
+                        : isClubOpen
+                        ? 'bg-[#82b805] animate-pulse'
+                        : 'bg-rose-500'
+                    }`}
+                  />
+                  <span className="text-xs sm:text-[13px] font-bold text-[#0B1A2D] dark:text-[#B7F229] whitespace-nowrap">
+                    {isConsolidatedView
+                      ? `${venues.length} Sedes Activas`
+                      : isClubOpen
+                      ? 'Abierto · hasta 23:30'
+                      : 'Cerrado temporal'}
+                  </span>
+                </button>
+              </div>
+
+              {isVenueSelectorOpen && (
+                <div className="absolute top-full left-0 right-0 mt-2 z-30 p-2 bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200 dark:border-[#1A314D] shadow-xl space-y-1 animate-in fade-in slide-in-from-top-2 duration-150">
+                  <div className="text-xs font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400 px-2.5 py-1.5">
+                    Red Deportiva · Seleccionar Sede
+                  </div>
+
+                  {venues.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedVenueId('all');
+                        setIsVenueSelectorOpen(false);
+                      }}
+                      className={`w-full flex items-center justify-between p-2.5 rounded-xl text-sm font-bold transition text-left cursor-pointer ${
+                        isConsolidatedView
+                          ? 'bg-[#B7F229]/20 text-[#0B1A2D] dark:text-white'
+                          : 'hover:bg-slate-50 dark:hover:bg-[#132A45] text-slate-700 dark:text-slate-300'
+                      }`}
+                    >
+                      <span>Todas las Sedes (Consolidado)</span>
+                      {isConsolidatedView && <CheckCircle2 className="w-4 h-4 text-[#82b805]" />}
+                    </button>
+                  )}
+
+                  {venues
+                    .filter((v) => v.id !== 'all')
+                    .map((venue) => {
+                      const isSelected = !isConsolidatedView && selectedVenueId === venue.id;
+                      return (
+                        <button
+                          key={venue.id}
+                          type="button"
+                          onClick={() => {
+                            setSelectedVenueId(venue.id);
+                            setIsVenueSelectorOpen(false);
+                          }}
+                          className={`w-full flex items-center justify-between p-2.5 rounded-xl text-sm font-bold transition text-left cursor-pointer ${
+                            isSelected
+                              ? 'bg-[#B7F229]/20 text-[#0B1A2D] dark:text-white'
+                              : 'hover:bg-slate-50 dark:hover:bg-[#132A45] text-slate-700 dark:text-slate-300'
+                          }`}
+                        >
+                          <span className="truncate">{venue.name}</span>
+                          {isSelected && <CheckCircle2 className="w-4 h-4 text-[#82b805] shrink-0" />}
+                        </button>
+                      );
+                    })}
+                </div>
+              )}
+            </div>
+          </section>
+
+          {/* ======================================================================
+              2. KPIS DE PERSONAL Y AUDITORÍA
+              ====================================================================== */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+            <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] shadow-2xs flex flex-col justify-between gap-1.5 min-w-0">
+              <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 truncate">
+                Plantilla Total
+              </span>
+              <div className="text-2xl sm:text-3xl font-extrabold text-[#0B1A2D] dark:text-white font-mono tabular-nums tracking-tight">
+                {staffList.length}
+              </div>
+              <span className="text-xs text-slate-500 dark:text-slate-400 font-medium flex items-center gap-1.5 truncate">
+                <CheckCircle2 className="w-3.5 h-3.5 text-[#82b805] dark:text-[#B7F229] shrink-0" />
+                <span>{activeStaffCount} activos hoy</span>
+              </span>
+            </div>
+
+            <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] shadow-2xs flex flex-col justify-between gap-1.5 min-w-0">
+              <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 truncate">
+                Profesores
+              </span>
+              <div className="text-2xl sm:text-3xl font-extrabold text-[#0B1A2D] dark:text-white font-mono tabular-nums tracking-tight">
+                {coachesCount}
+              </div>
+              <span className="text-xs text-slate-500 dark:text-slate-400 truncate">
+                Docencia y competición
+              </span>
+            </div>
+
+            <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] shadow-2xs flex flex-col justify-between gap-1.5 min-w-0">
+              <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 truncate">
+                Turnos Hoy
+              </span>
+              <div className="text-2xl sm:text-3xl font-extrabold text-[#0B1A2D] dark:text-white font-mono tabular-nums tracking-tight">
+                {todayShiftsCount}
+              </div>
+              <span className="text-xs text-slate-500 dark:text-slate-400 truncate">
+                Cuadrante activo
+              </span>
+            </div>
+
+            <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] shadow-2xs flex flex-col justify-between gap-1.5 min-w-0">
+              <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 truncate">
+                Auditoría
+              </span>
+              <div className="text-2xl sm:text-3xl font-extrabold text-[#0B1A2D] dark:text-[#B7F229] font-mono tabular-nums tracking-tight">
+                {totalAuditActionsCount}
+              </div>
+              <span className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1.5 truncate">
+                <Activity className="w-3.5 h-3.5 text-[#82b805] dark:text-[#B7F229] shrink-0" />
+                <span>Trazabilidad activa</span>
+              </span>
+            </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-1.5">
+          {/* ======================================================================
+              3. NAVEGACIÓN POR PESTAÑAS DEL MÓDULO (DESLIZABLE TÁCTIL)
+              ====================================================================== */}
+          <div className="flex items-center gap-1 p-1 bg-slate-100 dark:bg-[#071220] rounded-2xl border border-slate-200/80 dark:border-[#1A314D] overflow-x-auto no-scrollbar shadow-2xs touch-pan-x snap-x">
             <button
               type="button"
-              onClick={() => {
-                setVenueFilter('all');
-                setSelectedVenueId('all');
-              }}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer border whitespace-nowrap ${
-                venueFilter === 'all'
-                  ? 'bg-[#0B1A2D] text-white border-[#0B1A2D] dark:bg-[#B7F229] dark:text-[#0B1A2D] dark:border-[#B7F229]'
-                  : 'bg-slate-50 dark:bg-[#071220] text-slate-600 dark:text-slate-300 border-slate-200/80 dark:border-[#1A314D] hover:border-slate-300'
+              onClick={() => setActiveTab('directorio')}
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition cursor-pointer whitespace-nowrap shrink-0 snap-start ${
+                activeTab === 'directorio'
+                  ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D] shadow-xs'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-[#0B1A2D] dark:hover:text-white'
               }`}
             >
-              Todas ({staffList.length})
+              <Users className="w-3.5 h-3.5 shrink-0" />
+              <span>Equipo ({filteredStaff.length})</span>
             </button>
-            {venues
-              .filter((v) => v.id !== 'all')
-              .map((v) => {
-                const count = staffList.filter((s) => s.venueId === v.id).length;
-                const isSelected = venueFilter === v.id;
-                return (
-                  <button
-                    key={v.id}
-                    type="button"
-                    onClick={() => {
-                      setVenueFilter(v.id);
-                      setSelectedVenueId(v.id);
-                    }}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer border whitespace-nowrap ${
-                      isSelected
-                        ? 'bg-[#0B1A2D] text-white border-[#0B1A2D] dark:bg-[#B7F229] dark:text-[#0B1A2D] dark:border-[#B7F229]'
-                        : 'bg-slate-50 dark:bg-[#071220] text-slate-600 dark:text-slate-300 border-slate-200/80 dark:border-[#1A314D] hover:border-slate-300'
-                    }`}
-                  >
-                    {v.shortName || v.name} ({count})
-                  </button>
-                );
-              })}
+
+            <button
+              type="button"
+              onClick={() => setActiveTab('turnos')}
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition cursor-pointer whitespace-nowrap shrink-0 snap-start ${
+                activeTab === 'turnos'
+                  ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D] shadow-xs'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-[#0B1A2D] dark:hover:text-white'
+              }`}
+            >
+              <Clock className="w-3.5 h-3.5 shrink-0" />
+              <span>Turnos</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveTab('asignaciones')}
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition cursor-pointer whitespace-nowrap shrink-0 snap-start ${
+                activeTab === 'asignaciones'
+                  ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D] shadow-xs'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-[#0B1A2D] dark:hover:text-white'
+              }`}
+            >
+              <GraduationCap className="w-3.5 h-3.5 shrink-0" />
+              <span>Asignaciones</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveTab('auditoria')}
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition cursor-pointer whitespace-nowrap shrink-0 snap-start ${
+                activeTab === 'auditoria'
+                  ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D] shadow-xs'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-[#0B1A2D] dark:hover:text-white'
+              }`}
+            >
+              <Shield className="w-3.5 h-3.5 shrink-0" />
+              <span>Auditoría</span>
+            </button>
           </div>
-        </div>
-      )}
 
       {/* ======================================================================
-          3. KPIS DE PERSONAL Y AUDITORÍA
-          ====================================================================== */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] shadow-2xs flex flex-col justify-between gap-1.5 min-w-0">
-          <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 truncate">
-            Plantilla Total
-          </span>
-          <div className="text-2xl sm:text-3xl font-extrabold text-[#0B1A2D] dark:text-white font-mono tabular-nums tracking-tight">
-            {staffList.length}
-          </div>
-          <span className="text-xs text-slate-500 dark:text-slate-400 font-medium flex items-center gap-1.5 truncate">
-            <CheckCircle2 className="w-3.5 h-3.5 text-[#82b805] dark:text-[#B7F229] shrink-0" />
-            <span>{activeStaffCount} activos hoy</span>
-          </span>
-        </div>
-
-        <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] shadow-2xs flex flex-col justify-between gap-1.5 min-w-0">
-          <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 truncate">
-            Profesores
-          </span>
-          <div className="text-2xl sm:text-3xl font-extrabold text-[#0B1A2D] dark:text-white font-mono tabular-nums tracking-tight">
-            {coachesCount}
-          </div>
-          <span className="text-xs text-slate-500 dark:text-slate-400 truncate">
-            Docencia y competición
-          </span>
-        </div>
-
-        <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] shadow-2xs flex flex-col justify-between gap-1.5 min-w-0">
-          <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 truncate">
-            Turnos Hoy
-          </span>
-          <div className="text-2xl sm:text-3xl font-extrabold text-[#0B1A2D] dark:text-white font-mono tabular-nums tracking-tight">
-            {todayShiftsCount}
-          </div>
-          <span className="text-xs text-slate-500 dark:text-slate-400 truncate">
-            Cuadrante activo
-          </span>
-        </div>
-
-        <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] shadow-2xs flex flex-col justify-between gap-1.5 min-w-0">
-          <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 truncate">
-            Auditoría
-          </span>
-          <div className="text-2xl sm:text-3xl font-extrabold text-[#0B1A2D] dark:text-[#B7F229] font-mono tabular-nums tracking-tight">
-            {totalAuditActionsCount}
-          </div>
-          <span className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1.5 truncate">
-            <Activity className="w-3.5 h-3.5 text-[#82b805] dark:text-[#B7F229] shrink-0" />
-            <span>Trazabilidad activa</span>
-          </span>
-        </div>
-      </div>
-
-      {/* ======================================================================
-          4. NAVEGACIÓN POR PESTAÑAS DEL MÓDULO (SEGMENTED CONTROL)
-          ====================================================================== */}
-      <div className="flex items-center gap-1 p-1 bg-slate-100 dark:bg-[#071220] rounded-2xl border border-slate-200/80 dark:border-[#1A314D] overflow-x-auto no-scrollbar shadow-2xs">
-        <button
-          type="button"
-          onClick={() => setActiveTab('directorio')}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition cursor-pointer whitespace-nowrap shrink-0 ${
-            activeTab === 'directorio'
-              ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D] shadow-xs'
-              : 'text-slate-600 dark:text-slate-400 hover:text-[#0B1A2D] dark:hover:text-white'
-          }`}
-        >
-          <Users className="w-3.5 h-3.5" />
-          <span>Equipo ({filteredStaff.length})</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setActiveTab('turnos')}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition cursor-pointer whitespace-nowrap shrink-0 ${
-            activeTab === 'turnos'
-              ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D] shadow-xs'
-              : 'text-slate-600 dark:text-slate-400 hover:text-[#0B1A2D] dark:hover:text-white'
-          }`}
-        >
-          <Clock className="w-3.5 h-3.5" />
-          <span>Turnos & Horarios</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setActiveTab('auditoria')}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition cursor-pointer whitespace-nowrap shrink-0 ${
-            activeTab === 'auditoria'
-              ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D] shadow-xs'
-              : 'text-slate-600 dark:text-slate-400 hover:text-[#0B1A2D] dark:hover:text-white'
-          }`}
-        >
-          <Shield className="w-3.5 h-3.5" />
-          <span>Auditoría</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setActiveTab('asignaciones')}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition cursor-pointer whitespace-nowrap shrink-0 ${
-            activeTab === 'asignaciones'
-              ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D] shadow-xs'
-              : 'text-slate-600 dark:text-slate-400 hover:text-[#0B1A2D] dark:hover:text-white'
-          }`}
-        >
-          <GraduationCap className="w-3.5 h-3.5" />
-          <span>Asignación de Clases</span>
-        </button>
-      </div>
-
-      {/* ======================================================================
-          TAB 1: DIRECTORIO DE PERSONAL Y PROFESORES
+          TAB 1: DIRECTORIO DE PERSONAL (TARJETAS LIGERAS + ACCESO A DETALLE)
           ====================================================================== */}
       {activeTab === 'directorio' && (
         <div className="space-y-4 mb-8">
@@ -703,7 +1210,7 @@ export const AdminStaff: React.FC = () => {
               <select
                 value={roleFilter}
                 onChange={(e) => setRoleFilter(e.target.value)}
-                className="px-3.5 py-2.5 bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] rounded-2xl text-xs font-bold text-[#0B1A2D] dark:text-slate-200 focus:outline-none focus:border-[#0B1A2D] dark:focus:border-[#B7F229] shadow-2xs"
+                className="w-full sm:w-auto px-3.5 py-2.5 bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] rounded-2xl text-xs font-bold text-[#0B1A2D] dark:text-slate-200 focus:outline-none focus:border-[#0B1A2D] dark:focus:border-[#B7F229] shadow-2xs"
               >
                 <option value="all">Todos los Roles</option>
                 <option value="HEAD_COACH">Director Deportivo</option>
@@ -714,115 +1221,58 @@ export const AdminStaff: React.FC = () => {
             </div>
           </div>
 
-          {/* Grid de Fichas de Empleados / Profesores (Estructura de lista limpia y espaciosa) */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
-            {filteredStaff.map((staff) => {
-              const assignedGroups = academyGroups.filter((g) =>
-                staff.assignedGroupIds?.includes(g.id) || g.coachName === staff.name
-              );
-
-              return (
-                <div
+          {/* Grid de Fichas Ligeras (Avatar, Nombre, Cargo, Sede, Estado) */}
+          {filteredStaff.length === 0 ? (
+            <div className="p-10 rounded-2xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] text-center text-xs text-slate-500 dark:text-slate-400 mb-8">
+              No se encontraron miembros del equipo con los filtros actuales.
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 mb-8">
+              {filteredStaff.map((staff) => (
+                <button
                   key={staff.id}
-                  className="p-5 sm:p-6 rounded-2xl sm:rounded-3xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] shadow-2xs hover:border-slate-300 dark:hover:border-slate-600 transition-all flex flex-col justify-between gap-4"
+                  type="button"
+                  onClick={() => setSelectedStaffDetailId(staff.id)}
+                  className="w-full text-left p-5 rounded-2xl sm:rounded-3xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] shadow-2xs hover:border-slate-300 dark:hover:border-slate-600 transition-all flex items-center justify-between gap-3.5 cursor-pointer group active:scale-[0.99]"
                 >
-                  <div className="space-y-4">
-                    {/* Header de la tarjeta */}
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="flex items-center gap-3 min-w-0">
-                        <img
-                          src={staff.avatarUrl}
-                          alt={staff.name}
-                          referrerPolicy="no-referrer"
-                          className="w-11 h-11 rounded-2xl object-cover border border-slate-200 dark:border-[#1A314D] shrink-0"
-                        />
-                        <div className="min-w-0">
-                          <h3 className="font-bold text-[15px] text-[#0B1A2D] dark:text-white truncate">
-                            {staff.name}
-                          </h3>
-                          <p className="text-xs font-medium text-slate-600 dark:text-slate-300 truncate">
-                            {staff.roleTitle}
-                          </p>
-                          <div className="text-[11px] text-slate-400 dark:text-slate-500 truncate mt-0.5">
-                            {staff.venueName}
-                          </div>
-                        </div>
-                      </div>
-
-                      <span
-                        className={`px-2 py-0.5 rounded-md text-[10px] font-bold tracking-wide shrink-0 whitespace-nowrap ${
-                          staff.status === 'active'
-                            ? 'bg-[#F0FCCF] dark:bg-[#B7F229]/15 text-[#0B1A2D] dark:text-[#B7F229]'
-                            : staff.status === 'break'
-                            ? 'bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-300'
-                            : 'bg-slate-100 dark:bg-[#071220] text-slate-500 dark:text-slate-400'
-                        }`}
-                      >
-                        {staff.status === 'active' ? 'En Turno' : staff.status === 'break' ? 'Descanso' : 'Fuera'}
-                      </span>
-                    </div>
-
-                    {/* Estructura de lista limpia y espaciosa (sin caja anidada) */}
-                    <div className="divide-y divide-slate-100 dark:divide-[#1A314D] border-y border-slate-100 dark:border-[#1A314D] text-xs">
-                      <div className="py-2.5 flex items-center justify-between gap-3">
-                        <span className="text-slate-400 dark:text-slate-500 font-medium shrink-0">Contacto</span>
-                        <div className="text-right min-w-0">
-                          <div className="text-[#0B1A2D] dark:text-slate-200 font-medium truncate">{staff.email}</div>
-                          <div className="text-[11px] text-slate-500 dark:text-slate-400 font-mono tabular-nums">{staff.phone}</div>
-                        </div>
-                      </div>
-
-                      <div className="py-2.5 flex items-center justify-between gap-3">
-                        <span className="text-slate-400 dark:text-slate-500 font-medium shrink-0">Jornada & Tarifa</span>
-                        <div className="flex items-center gap-2 font-mono tabular-nums">
-                          <span className="font-bold text-[#0B1A2D] dark:text-white">{staff.weeklyHours}h/sem</span>
-                          {staff.hourlyRate !== undefined && (
-                            <>
-                              <span className="text-slate-300 dark:text-slate-600" aria-hidden="true">·</span>
-                              <span className="font-bold text-[#0B1A2D] dark:text-[#B7F229]">{staff.hourlyRate.toFixed(0)} €/h</span>
-                            </>
-                          )}
-                        </div>
-                      </div>
-
-                      <div className="py-2.5 flex items-center justify-between gap-3">
-                        <span className="text-slate-400 dark:text-slate-500 font-medium shrink-0">Grupos</span>
-                        <span className="text-right text-slate-700 dark:text-slate-300 font-medium truncate">
-                          {assignedGroups.length === 0
-                            ? 'Sin asignar'
-                            : assignedGroups.map((g) => g.name.split('—')[0].trim()).join(', ')}
-                        </span>
+                  <div className="flex items-center gap-3.5 min-w-0">
+                    <img
+                      src={staff.avatarUrl}
+                      alt={staff.name}
+                      referrerPolicy="no-referrer"
+                      className="w-12 h-12 rounded-full object-cover border border-slate-200 dark:border-[#1A314D] shrink-0"
+                    />
+                    <div className="min-w-0">
+                      <h3 className="font-bold text-[15px] text-[#0B1A2D] dark:text-white truncate">
+                        {staff.name}
+                      </h3>
+                      <p className="text-xs font-medium text-slate-600 dark:text-slate-300 truncate">
+                        {staff.roleTitle}
+                      </p>
+                      <div className="text-[11px] text-slate-400 dark:text-slate-500 truncate mt-0.5">
+                        {staff.venueName}
                       </div>
                     </div>
                   </div>
 
-                  {/* Accesos Rápidos */}
-                  <div className="flex items-center justify-between gap-2.5">
-                    <button
-                      type="button"
-                      onClick={() => handleOpenAssignModal(staff)}
-                      className="flex-1 min-h-[38px] px-3 py-2 rounded-xl bg-slate-100/80 dark:bg-[#071220] hover:bg-slate-200/80 dark:hover:bg-[#132A45] text-[#0B1A2D] dark:text-slate-200 font-bold text-xs transition cursor-pointer flex items-center justify-center gap-1.5 whitespace-nowrap"
+                  <div className="flex items-center gap-2 shrink-0">
+                    <span
+                      className={`px-2.5 py-1 rounded-md text-[10px] font-bold tracking-wide whitespace-nowrap ${
+                        staff.status === 'active'
+                          ? 'bg-[#F0FCCF] dark:bg-[#B7F229]/15 text-[#0B1A2D] dark:text-[#B7F229]'
+                          : staff.status === 'break'
+                          ? 'bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-300'
+                          : 'bg-slate-100 dark:bg-[#071220] text-slate-500 dark:text-slate-400'
+                      }`}
                     >
-                      <GraduationCap className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400 shrink-0" />
-                      <span>Asignar Grupos</span>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setSelectedCoachForCalendar(staff.id);
-                        setActiveTab('turnos');
-                      }}
-                      className="flex-1 min-h-[38px] px-3 py-2 rounded-xl bg-[#0B1A2D] hover:bg-[#132A45] dark:bg-[#B7F229] dark:hover:bg-[#a3db20] text-white dark:text-[#0B1A2D] font-bold text-xs transition cursor-pointer flex items-center justify-center gap-1.5 whitespace-nowrap"
-                    >
-                      <Calendar className="w-3.5 h-3.5 text-[#B7F229] dark:text-[#0B1A2D] shrink-0" />
-                      <span>Ver Turnos</span>
-                    </button>
+                      {staff.status === 'active' ? 'En Turno' : staff.status === 'break' ? 'Descanso' : 'Fuera'}
+                    </span>
+                    <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-[#0B1A2D] dark:group-hover:text-[#B7F229] transition-colors" />
                   </div>
-                </div>
-              );
-            })}
-          </div>
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       )}
 
@@ -832,7 +1282,7 @@ export const AdminStaff: React.FC = () => {
       {activeTab === 'turnos' && (
         <div className="space-y-4 mb-8">
           {/* Barra de Filtros de Turnos */}
-          <div className="p-3.5 rounded-2xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] flex flex-wrap items-center justify-between gap-3 shadow-2xs">
+          <div className="p-3.5 sm:p-4 rounded-2xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] flex flex-wrap items-center justify-between gap-3 shadow-2xs">
             <div className="flex items-center gap-2">
               <Clock className="w-4 h-4 text-[#0B1A2D] dark:text-[#B7F229]" />
               <span className="text-xs font-bold text-[#0B1A2D] dark:text-slate-200">
@@ -840,7 +1290,7 @@ export const AdminStaff: React.FC = () => {
               </span>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <label className="text-xs text-slate-500 font-medium">Empleado:</label>
               <select
                 value={selectedCoachForCalendar}
@@ -857,7 +1307,7 @@ export const AdminStaff: React.FC = () => {
 
               <button
                 type="button"
-                onClick={() => setIsNewShiftModalOpen(true)}
+                onClick={() => handleOpenCreateShiftModal()}
                 className="px-3 py-1.5 rounded-xl bg-[#0B1A2D] hover:bg-[#132A45] dark:bg-[#B7F229] dark:hover:bg-[#a3db20] text-white dark:text-[#0B1A2D] font-bold text-xs transition cursor-pointer flex items-center gap-1 shadow-2xs whitespace-nowrap"
               >
                 <Plus className="w-3.5 h-3.5 text-[#B7F229] dark:text-[#0B1A2D]" />
@@ -866,8 +1316,8 @@ export const AdminStaff: React.FC = () => {
             </div>
           </div>
 
-          {/* Tabla de Turnos Programados */}
-          <div className="bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] rounded-2xl overflow-hidden shadow-2xs">
+          {/* Tabla de Turnos Programados con Edición y Eliminación */}
+          <div className="bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] rounded-2xl overflow-hidden shadow-2xs mb-8">
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse text-xs">
                 <thead>
@@ -878,57 +1328,82 @@ export const AdminStaff: React.FC = () => {
                     <th className="py-3.5 px-4">Sede / Ubicación</th>
                     <th className="py-3.5 px-4">Función / Puesto</th>
                     <th className="py-3.5 px-4">Estado</th>
-                    <th className="py-3.5 px-4 text-right">Observaciones</th>
+                    <th className="py-3.5 px-4">Observaciones</th>
+                    <th className="py-3.5 px-4 text-right">Acciones</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 dark:divide-[#1A314D]">
-                  {filteredShifts.map((shift) => (
-                    <tr
-                      key={shift.id}
-                      className="hover:bg-slate-50/60 dark:hover:bg-white/[0.02] transition"
-                    >
-                      <td className="py-3.5 px-4 font-bold text-[#0B1A2D] dark:text-white">
-                        <div>{shift.staffName}</div>
-                        <div className="text-[10px] text-slate-400 font-normal">{shift.roleTitle}</div>
-                      </td>
-                      <td className="py-3.5 px-4 font-mono tabular-nums font-bold text-slate-700 dark:text-slate-300">
-                        {shift.date}
-                      </td>
-                      <td className="py-3.5 px-4 font-mono tabular-nums font-extrabold text-[#0B1A2D] dark:text-[#B7F229]">
-                        {shift.startTime} - {shift.endTime}
-                      </td>
-                      <td className="py-3.5 px-4 text-slate-600 dark:text-slate-300">
-                        {shift.venueName}
-                      </td>
-                      <td className="py-3.5 px-4">
-                        <span className="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-[#071220] text-[#0B1A2D] dark:text-slate-300 text-[10px] font-bold">
-                          {shift.shiftType === 'recepcion'
-                            ? 'Recepción & Caja'
-                            : shift.shiftType === 'clases_pista'
-                            ? 'Clases en Pistas'
-                            : shift.shiftType === 'cierre'
-                            ? 'Cierre & Domótica'
-                            : 'Coordinación'}
-                        </span>
-                      </td>
-                      <td className="py-3.5 px-4">
-                        <span
-                          className={`px-2 py-0.5 rounded-md text-[10px] font-bold tracking-wide ${
-                            shift.status === 'active'
-                              ? 'bg-[#F0FCCF] dark:bg-[#B7F229]/15 text-[#0B1A2D] dark:text-[#B7F229]'
-                              : shift.status === 'completed'
-                              ? 'bg-slate-100 dark:bg-[#071220] text-slate-600 dark:text-slate-400'
-                              : 'bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-300'
-                          }`}
-                        >
-                          {shift.status === 'active' ? 'En Curso' : shift.status === 'completed' ? 'Completado' : 'Programado'}
-                        </span>
-                      </td>
-                      <td className="py-3.5 px-4 text-right text-slate-500 dark:text-slate-400 text-[11px]">
-                        {shift.notes || '—'}
+                  {filteredShifts.length === 0 ? (
+                    <tr>
+                      <td colSpan={8} className="py-8 text-center text-slate-400 text-xs">
+                        No hay turnos programados para los filtros seleccionados.
                       </td>
                     </tr>
-                  ))}
+                  ) : (
+                    filteredShifts.map((shift) => (
+                      <tr
+                        key={shift.id}
+                        className="hover:bg-slate-50/60 dark:hover:bg-white/[0.02] transition"
+                      >
+                        <td className="py-3.5 px-4 font-bold text-[#0B1A2D] dark:text-white whitespace-nowrap">
+                          <div>{shift.staffName}</div>
+                          <div className="text-[10px] text-slate-400 font-normal">{shift.roleTitle}</div>
+                        </td>
+                        <td className="py-3.5 px-4 font-mono tabular-nums font-bold text-slate-700 dark:text-slate-300 whitespace-nowrap">
+                          {shift.date}
+                        </td>
+                        <td className="py-3.5 px-4 font-mono tabular-nums font-extrabold text-[#0B1A2D] dark:text-[#B7F229] whitespace-nowrap">
+                          {shift.startTime} - {shift.endTime}
+                        </td>
+                        <td className="py-3.5 px-4 text-slate-600 dark:text-slate-300 whitespace-nowrap">
+                          {shift.venueName}
+                        </td>
+                        <td className="py-3.5 px-4 whitespace-nowrap">
+                          <span className="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-[#071220] text-[#0B1A2D] dark:text-slate-300 text-[10px] font-bold">
+                            {shiftTypeLabels[shift.shiftType]}
+                          </span>
+                        </td>
+                        <td className="py-3.5 px-4 whitespace-nowrap">
+                          <span
+                            className={`px-2 py-0.5 rounded-md text-[10px] font-bold tracking-wide ${
+                              shift.status === 'active'
+                                ? 'bg-[#F0FCCF] dark:bg-[#B7F229]/15 text-[#0B1A2D] dark:text-[#B7F229]'
+                                : shift.status === 'completed'
+                                ? 'bg-slate-100 dark:bg-[#071220] text-slate-600 dark:text-slate-400'
+                                : 'bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-300'
+                            }`}
+                          >
+                            {shift.status === 'active' ? 'En Curso' : shift.status === 'completed' ? 'Completado' : 'Programado'}
+                          </span>
+                        </td>
+                        <td className="py-3.5 px-4 text-slate-500 dark:text-slate-400 text-[11px] max-w-[220px] truncate">
+                          {shift.notes || '—'}
+                        </td>
+                        <td className="py-3 px-4 text-right whitespace-nowrap">
+                          <div className="inline-flex items-center gap-1">
+                            <button
+                              type="button"
+                              onClick={() => handleOpenEditShiftModal(shift)}
+                              className="p-2 rounded-lg text-slate-500 hover:text-[#0B1A2D] dark:text-slate-400 dark:hover:text-[#B7F229] hover:bg-slate-100 dark:hover:bg-[#132A45] transition cursor-pointer"
+                              title="Editar turno"
+                              aria-label="Editar turno"
+                            >
+                              <Edit3 className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setShiftToDelete(shift)}
+                              className="p-2 rounded-lg text-slate-500 hover:text-rose-600 dark:text-slate-400 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition cursor-pointer"
+                              title="Eliminar turno"
+                              aria-label="Eliminar turno"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  )}
                 </tbody>
               </table>
             </div>
@@ -1094,7 +1569,7 @@ export const AdminStaff: React.FC = () => {
                           src={coach.avatarUrl}
                           alt={coach.name}
                           referrerPolicy="no-referrer"
-                          className="w-10 h-10 rounded-xl object-cover border border-slate-200 dark:border-[#1A314D] shrink-0"
+                          className="w-10 h-10 rounded-full object-cover border border-slate-200 dark:border-[#1A314D] shrink-0"
                         />
                         <div className="min-w-0">
                           <h4 className="font-bold text-sm text-[#0B1A2D] dark:text-white truncate">
@@ -1148,6 +1623,8 @@ export const AdminStaff: React.FC = () => {
               })}
           </div>
         </div>
+      )}
+        </>
       )}
 
       {/* ======================================================================
@@ -1337,9 +1814,9 @@ export const AdminStaff: React.FC = () => {
       )}
 
       {/* ======================================================================
-          MODAL 2: NUEVO TURNO LABORAL
+          MODAL 2: CREAR / EDITAR TURNO LABORAL
           ====================================================================== */}
-      {isNewShiftModalOpen && (
+      {isShiftModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs animate-in fade-in duration-150">
           <div className="w-full max-w-md rounded-3xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] shadow-2xl p-6 space-y-4 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b border-slate-100 dark:border-[#1A314D] pb-3">
@@ -1348,19 +1825,22 @@ export const AdminStaff: React.FC = () => {
                   <Clock className="w-4 h-4" />
                 </div>
                 <h3 className="font-bold text-base text-[#0B1A2D] dark:text-white">
-                  Planificar Turno Laboral
+                  {editingShiftId ? 'Editar Turno Laboral' : 'Planificar Turno Laboral'}
                 </h3>
               </div>
               <button
                 type="button"
-                onClick={() => setIsNewShiftModalOpen(false)}
+                onClick={() => {
+                  setIsShiftModalOpen(false);
+                  setEditingShiftId(null);
+                }}
                 className="p-1.5 rounded-full text-slate-400 hover:text-[#0B1A2D] dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#132A45] cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
-            <form onSubmit={handleCreateShift} className="space-y-3 text-xs">
+            <form onSubmit={handleSaveShift} className="space-y-3 text-xs">
               <div>
                 <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
                   Empleado / Profesor Asignado
@@ -1459,6 +1939,23 @@ export const AdminStaff: React.FC = () => {
                 </div>
               </div>
 
+              {editingShiftId && (
+                <div>
+                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                    Estado del Turno
+                  </label>
+                  <select
+                    value={shiftStatus}
+                    onChange={(e) => setShiftStatus(e.target.value as StaffShift['status'])}
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-xl text-xs font-bold text-[#0B1A2D] dark:text-white"
+                  >
+                    <option value="scheduled">Programado</option>
+                    <option value="active">En Curso</option>
+                    <option value="completed">Completado</option>
+                  </select>
+                </div>
+              )}
+
               <div>
                 <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
                   Notas / Instrucciones del Turno
@@ -1475,7 +1972,10 @@ export const AdminStaff: React.FC = () => {
               <div className="pt-3 border-t border-slate-100 dark:border-[#1A314D] flex items-center justify-end gap-2">
                 <button
                   type="button"
-                  onClick={() => setIsNewShiftModalOpen(false)}
+                  onClick={() => {
+                    setIsShiftModalOpen(false);
+                    setEditingShiftId(null);
+                  }}
                   className="px-4 py-2 rounded-xl text-slate-500 font-bold hover:bg-slate-100 dark:hover:bg-[#132A45] transition cursor-pointer"
                 >
                   Cancelar
@@ -1484,10 +1984,56 @@ export const AdminStaff: React.FC = () => {
                   type="submit"
                   className="px-4 py-2 rounded-xl bg-[#B7F229] hover:bg-[#a3db20] text-[#0B1A2D] font-bold transition cursor-pointer shadow-2xs"
                 >
-                  Guardar Turno
+                  {editingShiftId ? 'Actualizar Turno' : 'Guardar Turno'}
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* ======================================================================
+          MODAL CONFIRMACIÓN ELIMINAR TURNO
+          ====================================================================== */}
+      {shiftToDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs animate-in fade-in duration-150">
+          <div className="w-full max-w-sm rounded-3xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] shadow-2xl p-6 space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-[#1A314D] pb-3">
+              <h3 className="font-bold text-base text-[#0B1A2D] dark:text-white">
+                Eliminar Turno
+              </h3>
+              <button
+                type="button"
+                onClick={() => setShiftToDelete(null)}
+                className="p-1.5 rounded-full text-slate-400 hover:text-[#0B1A2D] dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#132A45] cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+              ¿Confirmas que deseas eliminar el turno de{' '}
+              <strong className="text-[#0B1A2D] dark:text-white">{shiftToDelete.staffName}</strong> para el{' '}
+              <span className="font-mono font-bold">{shiftToDelete.date}</span> ({shiftToDelete.startTime} -{' '}
+              {shiftToDelete.endTime})?
+            </p>
+
+            <div className="pt-2 flex items-center justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setShiftToDelete(null)}
+                className="px-4 py-2 rounded-xl text-slate-500 font-bold hover:bg-slate-100 dark:hover:bg-[#132A45] transition cursor-pointer text-xs"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmDeleteShift}
+                className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold transition cursor-pointer shadow-2xs text-xs"
+              >
+                Eliminar Turno
+              </button>
+            </div>
           </div>
         </div>
       )}

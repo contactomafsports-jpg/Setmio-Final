@@ -549,7 +549,7 @@ export function getAdminNavConfig(
       },
       {
         id: 'staff',
-        label: 'Personal & Profesores',
+        label: 'Personal',
         icon: UserCheck,
         desc: 'Gestión de empleados, turnos laborales y registro de acciones',
         isPrimary: false,
