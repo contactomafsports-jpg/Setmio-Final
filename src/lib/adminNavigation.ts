@@ -593,7 +593,7 @@ export function getAdminNavConfig(
       },
       {
         id: 'subscription',
-        label: 'Suscripción SaaS',
+        label: 'Suscripción',
         icon: Briefcase,
         desc: 'Plan Enterprise Top activo de Setmio',
         badge: 'Enterprise',
@@ -601,9 +601,9 @@ export function getAdminNavConfig(
       },
       {
         id: 'settings',
-        label: 'Configuración Club',
+        label: 'Configuración',
         icon: Settings,
-        desc: 'Horarios, políticas, luces domóticas y WhatsApp',
+        desc: 'Datos generales, horarios, pagos y avisos',
         isPrimary: false,
       },
     ];
