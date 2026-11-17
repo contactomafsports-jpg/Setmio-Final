@@ -33,6 +33,7 @@ import {
   Crown,
 } from 'lucide-react';
 import { AdminMemberProfile, AdminMemberData } from './AdminMemberProfile';
+import { AdminSectionHeader } from './AdminSectionHeader';
 
 export interface CustomerItem {
   id: string;
@@ -904,46 +905,37 @@ export const AdminCustomers: React.FC = () => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto pt-3 pb-24 sm:pb-16 space-y-6 sm:space-y-8 font-sans text-[#0B1A2D] dark:text-slate-100 antialiased">
-      {/* Cabecera Minimalista Ejecutiva */}
-      <div className="flex items-center justify-between gap-3 mt-2 mb-6">
-        <div>
-          <span className="text-sm font-medium text-slate-500 dark:text-slate-400 tracking-wide block mb-1">
-            {currentTenant?.name || 'Centro de Pádel San Mateo'}
-          </span>
-          <h1 className="text-[26px] sm:text-3xl font-bold text-[#0B1A2D] dark:text-white tracking-tight leading-tight">
-            {crmSubTab === 'members' ? 'Clientes' : 'Grupo'}
-          </h1>
-        </div>
-
-        {/* Botón Acción Principal */}
-        {crmSubTab === 'members' ? (
-          <button
-            type="button"
-            onClick={() => {
-              setErrors({});
-              setIsNewPlayerModalOpen(true);
-            }}
-            className="min-h-[44px] px-3 py-2 rounded-xl text-slate-700 dark:text-slate-300 hover:text-[#0B1A2D] dark:hover:text-[#B7F229] hover:bg-slate-100/80 dark:hover:bg-white/[0.06] transition-colors cursor-pointer active:scale-95 flex items-center gap-1.5 shrink-0"
-            title="Nuevo Cliente"
-            aria-label="Nuevo Cliente"
-          >
-            <Plus className="w-5 h-5 stroke-[2.2]" />
-            <span className="text-xs sm:text-sm font-bold sm:inline hidden whitespace-nowrap">Nuevo Cliente</span>
-          </button>
-        ) : isProOrEnterprise ? (
-          <button
-            type="button"
-            onClick={handleOpenNewGroupModal}
-            className="min-h-[44px] px-3 py-2 rounded-xl text-slate-700 dark:text-slate-300 hover:text-[#0B1A2D] dark:hover:text-[#B7F229] hover:bg-slate-100/80 dark:hover:bg-white/[0.06] transition-colors cursor-pointer active:scale-95 flex items-center gap-1.5 shrink-0"
-            title="Crear Grupo"
-            aria-label="Crear Grupo"
-          >
-            <Plus className="w-5 h-5 stroke-[2.2]" />
-            <span className="text-xs sm:text-sm font-bold sm:inline hidden whitespace-nowrap">Crear Grupo</span>
-          </button>
-        ) : null}
-      </div>
+    <div className="max-w-7xl mx-auto pb-24 sm:pb-16 space-y-5 font-sans text-[#0B1A2D] dark:text-slate-100 antialiased">
+      {/* Cabecera Estándar con Selector de Sede Unificado */}
+      <AdminSectionHeader
+        title={crmSubTab === 'members' ? 'Clientes' : 'Grupo'}
+        rightSlot={
+          crmSubTab === 'members' ? (
+            <button
+              type="button"
+              onClick={() => {
+                setErrors({});
+                setIsNewPlayerModalOpen(true);
+              }}
+              className="p-2 text-slate-700 dark:text-slate-300 hover:text-[#0B1A2D] dark:hover:text-[#B7F229] transition-colors cursor-pointer active:scale-95"
+              title="Nuevo Cliente"
+              aria-label="Nuevo Cliente"
+            >
+              <Plus className="w-6 h-6 stroke-[2.2]" />
+            </button>
+          ) : isProOrEnterprise ? (
+            <button
+              type="button"
+              onClick={handleOpenNewGroupModal}
+              className="p-2 text-slate-700 dark:text-slate-300 hover:text-[#0B1A2D] dark:hover:text-[#B7F229] transition-colors cursor-pointer active:scale-95"
+              title="Crear Grupo"
+              aria-label="Crear Grupo"
+            >
+              <Plus className="w-6 h-6 stroke-[2.2]" />
+            </button>
+          ) : null
+        }
+      />
 
       {/* Selector de Pestañas Consistente con el Sistema de Diseño Global */}
       <div className="p-1 bg-slate-100 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-2xl grid grid-cols-2 gap-1 w-full sm:w-fit sm:inline-grid text-xs sm:text-sm select-none shadow-2xs">

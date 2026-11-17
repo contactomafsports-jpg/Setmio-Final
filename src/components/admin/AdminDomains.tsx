@@ -17,6 +17,7 @@ import {
   X,
   Star,
 } from 'lucide-react';
+import { AdminSectionHeader } from './AdminSectionHeader';
 
 export const AdminDomains: React.FC = () => {
   const { currentTenant, updateCurrentTenant, triggerDemoToast, setCurrentView } = useApp();
@@ -180,30 +181,24 @@ export const AdminDomains: React.FC = () => {
   ];
 
   return (
-    <div className="max-w-7xl mx-auto pt-3 pb-24 sm:pb-16 space-y-6 sm:space-y-8 font-sans text-[#0B1A2D] dark:text-slate-100 antialiased animate-in fade-in duration-150">
+    <div className="max-w-7xl mx-auto pb-24 sm:pb-16 space-y-5 font-sans text-[#0B1A2D] dark:text-slate-100 antialiased animate-in fade-in duration-150">
       {/* =====================================================================
-          1. CABECERA LIMPIA + ICONO "+" PARA AÑADIR DOMINIO
+          1. CABECERA LIMPIA + ICONO "+" + SELECTOR DE SEDE UNIFICADO
           ===================================================================== */}
-      <section className="pt-2 pb-1 flex items-center justify-between gap-3">
-        <div>
-          <span className="text-sm font-medium text-slate-600 dark:text-slate-300 tracking-wide block mb-1">
-            {currentTenant?.name || 'Centro de Pádel San Mateo'}
-          </span>
-          <h1 className="text-[26px] sm:text-3xl font-bold text-[#0B1A2D] dark:text-white tracking-tight leading-tight">
-            Dominios y DNS
-          </h1>
-        </div>
-
-        <button
-          type="button"
-          onClick={() => setIsAddDomainModalOpen(true)}
-          className="p-2 text-slate-700 dark:text-slate-300 hover:text-[#0B1A2D] dark:hover:text-[#B7F229] transition-colors cursor-pointer active:scale-95 shrink-0"
-          title="Añadir dominio personalizado"
-          aria-label="Añadir dominio personalizado"
-        >
-          <Plus className="w-6 h-6 stroke-[2.2]" />
-        </button>
-      </section>
+      <AdminSectionHeader
+        title="Dominios y DNS"
+        rightSlot={
+          <button
+            type="button"
+            onClick={() => setIsAddDomainModalOpen(true)}
+            className="p-2 text-slate-700 dark:text-slate-300 hover:text-[#0B1A2D] dark:hover:text-[#B7F229] transition-colors cursor-pointer active:scale-95 shrink-0"
+            title="Añadir dominio personalizado"
+            aria-label="Añadir dominio personalizado"
+          >
+            <Plus className="w-6 h-6 stroke-[2.2]" />
+          </button>
+        }
+      />
 
       {/* =====================================================================
           2. LISTADO DE DOMINIOS ACTIVOS Y SSL (SIN CONTENEDORES DOBLES)

@@ -16,6 +16,7 @@ import {
   Trash2,
 } from 'lucide-react';
 import { AdminNotificationSettings } from './AdminNotificationSettings';
+import { AdminSectionHeader } from './AdminSectionHeader';
 
 export interface DaySchedule {
   day: string;
@@ -541,43 +542,34 @@ export const AdminSettings: React.FC = () => {
   ];
 
   return (
-    <div className="max-w-5xl mx-auto pt-3 pb-28 sm:pb-20 space-y-7 font-sans text-[#0B1A2D] dark:text-slate-100 antialiased animate-in fade-in duration-150">
+    <div className="max-w-7xl mx-auto pb-28 sm:pb-20 space-y-5 font-sans text-[#0B1A2D] dark:text-slate-100 antialiased animate-in fade-in duration-150">
       {/* =====================================================================
-          1. CABECERA LIMPIA Y MÍNIMALISTA
+          1. CABECERA LIMPIA Y SELECTOR DE SEDE UNIFICADO
           ===================================================================== */}
-      <section className="pt-2 pb-1 space-y-5">
-        <div>
-          <span className="text-sm font-medium text-slate-600 dark:text-slate-300 tracking-wide block mb-1">
-            {currentTenant?.name || 'Centro de Pádel San Mateo'}
-          </span>
-          <h1 className="text-[26px] sm:text-3xl font-bold text-[#0B1A2D] dark:text-white tracking-tight leading-tight">
-            Configuración
-          </h1>
-        </div>
+      <AdminSectionHeader title="Configuración" />
 
-        {/* Pestañas limpias con desplazamiento horizontal en móvil */}
-        <div className="overflow-x-auto no-scrollbar border-b border-slate-200/80 dark:border-[#1A314D]">
-          <div className="flex items-center gap-1 sm:gap-2 pb-3 min-w-max">
-            {tabs.map((tab) => {
-              const active = activeSection === tab.id;
-              return (
-                <button
-                  key={tab.id}
-                  type="button"
-                  onClick={() => setActiveSection(tab.id)}
-                  className={`px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap shrink-0 transition cursor-pointer ${
-                    active
-                      ? 'bg-[#0B1A2D] text-white dark:bg-[#B7F229] dark:text-[#0B1A2D] shadow-2xs'
-                      : 'text-slate-600 dark:text-slate-400 hover:text-[#0B1A2D] dark:hover:text-white hover:bg-slate-100/80 dark:hover:bg-[#0E2239]'
-                  }`}
-                >
-                  {tab.label}
-                </button>
-              );
-            })}
-          </div>
+      {/* Pestañas limpias con desplazamiento horizontal en móvil */}
+      <div className="overflow-x-auto no-scrollbar border-b border-slate-200/80 dark:border-[#1A314D]">
+        <div className="flex items-center gap-1 sm:gap-2 pb-3 min-w-max">
+          {tabs.map((tab) => {
+            const active = activeSection === tab.id;
+            return (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => setActiveSection(tab.id)}
+                className={`px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap shrink-0 transition cursor-pointer ${
+                  active
+                    ? 'bg-[#0B1A2D] text-white dark:bg-[#B7F229] dark:text-[#0B1A2D] shadow-2xs'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-[#0B1A2D] dark:hover:text-white hover:bg-slate-100/80 dark:hover:bg-[#0E2239]'
+                }`}
+              >
+                {tab.label}
+              </button>
+            );
+          })}
         </div>
-      </section>
+      </div>
 
       {/* =====================================================================
           PESTAÑA 1: GENERAL (SIN GRANDES CONTENEDORES EN BLOQUE)

@@ -30,6 +30,7 @@ import {
   Eye,
   Share2,
 } from 'lucide-react';
+import { AdminSectionHeader } from './AdminSectionHeader';
 
 export interface ShopOrder {
   id: string;
@@ -620,21 +621,13 @@ export const AdminShopOrders: React.FC = () => {
   const pendingOrdersCount = orders.filter((o) => o.status === 'pendiente' || o.status === 'preparado').length;
 
   return (
-    <div className="max-w-7xl mx-auto pt-3 pb-24 sm:pb-16 space-y-6 sm:space-y-8 font-sans text-[#0B1A2D] dark:text-slate-100 antialiased animate-in fade-in duration-150">
+    <div className="max-w-7xl mx-auto pb-24 sm:pb-16 space-y-5 font-sans text-[#0B1A2D] dark:text-slate-100 antialiased animate-in fade-in duration-150">
       {/* ======================================================================
-          1. CABECERA LIMPIA + MENÚ DESPLEGABLE "+"
+          1. CABECERA LIMPIA + MENÚ DESPLEGABLE "+" + SELECTOR DE SEDE UNIFICADO
           ====================================================================== */}
-      <section className="pt-2 pb-1 space-y-4" data-purpose="header-section">
-        <div className="flex items-center justify-between gap-3">
-          <div>
-            <span className="text-sm font-medium text-slate-600 dark:text-slate-300 tracking-wide block mb-1">
-              {currentTenant?.name || 'Centro de Pádel San Mateo'}
-            </span>
-            <h1 className="text-[26px] sm:text-3xl font-bold text-[#0B1A2D] dark:text-white tracking-tight leading-tight">
-              Tienda
-            </h1>
-          </div>
-
+      <AdminSectionHeader
+        title="Tienda"
+        rightSlot={
           <div className="relative shrink-0" ref={actionMenuRef}>
             <button
               type="button"
@@ -675,56 +668,56 @@ export const AdminShopOrders: React.FC = () => {
               </div>
             )}
           </div>
+        }
+      />
+
+      {/* ====================================================================
+          2. SELECTOR SIMPLIFICADO DE DOS PESTAÑAS (ANCHO COMPLETO)
+          ==================================================================== */}
+      {activeView === 'new_order' ? (
+        <div className="flex items-center justify-between gap-3">
+          <button
+            type="button"
+            onClick={() => navigateTo('tienda', '/admin/tienda')}
+            className="inline-flex items-center gap-2 min-h-[42px] px-3.5 py-2 rounded-xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] text-xs font-bold text-[#0B1A2D] dark:text-white hover:bg-slate-50 dark:hover:bg-[#132A45] transition cursor-pointer shadow-2xs"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span>Volver a Tienda</span>
+          </button>
+          <span className="text-xs font-bold text-[#8B5CF6] dark:text-[#B7F229]">
+            Nuevo Pedido de Mostrador
+          </span>
         </div>
+      ) : (
+        <div className="p-1 bg-slate-100 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-2xl grid grid-cols-2 gap-1 w-full text-xs sm:text-sm select-none shadow-2xs">
+          <button
+            type="button"
+            onClick={() => navigateTo('tienda', '/admin/tienda')}
+            className={`px-4 py-2.5 rounded-xl font-bold transition flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap ${
+              activeView === 'tienda'
+                ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D] shadow-xs'
+                : 'text-slate-600 dark:text-slate-400 hover:text-[#0B1A2D] dark:hover:text-white'
+            }`}
+          >
+            <ShoppingBag className="w-4 h-4 shrink-0" />
+            <span>Tienda</span>
+          </button>
 
-        {/* ====================================================================
-            2. SELECTOR SIMPLIFICADO DE DOS PESTAÑAS (ANCHO COMPLETO)
-            ==================================================================== */}
-        {activeView === 'new_order' ? (
-          <div className="flex items-center justify-between gap-3">
-            <button
-              type="button"
-              onClick={() => navigateTo('tienda', '/admin/tienda')}
-              className="inline-flex items-center gap-2 min-h-[42px] px-3.5 py-2 rounded-xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] text-xs font-bold text-[#0B1A2D] dark:text-white hover:bg-slate-50 dark:hover:bg-[#132A45] transition cursor-pointer shadow-2xs"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              <span>Volver a Tienda</span>
-            </button>
-            <span className="text-xs font-bold text-[#8B5CF6] dark:text-[#B7F229]">
-              Nuevo Pedido de Mostrador
-            </span>
-          </div>
-        ) : (
-          <div className="p-1 bg-slate-100 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-2xl grid grid-cols-2 gap-1 w-full text-xs sm:text-sm select-none shadow-2xs">
-            <button
-              type="button"
-              onClick={() => navigateTo('tienda', '/admin/tienda')}
-              className={`px-4 py-2.5 rounded-xl font-bold transition flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap ${
-                activeView === 'tienda'
-                  ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D] shadow-xs'
-                  : 'text-slate-600 dark:text-slate-400 hover:text-[#0B1A2D] dark:hover:text-white'
-              }`}
-            >
-              <ShoppingBag className="w-4 h-4 shrink-0" />
-              <span>Tienda</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => navigateTo('pedidos', '/admin/tienda/pedidos')}
-              className={`px-4 py-2.5 rounded-xl font-bold transition flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap ${
-                activeView === 'pedidos'
-                  ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D] shadow-xs'
-                  : 'text-slate-600 dark:text-slate-400 hover:text-[#0B1A2D] dark:hover:text-white'
-              }`}
-            >
-              <Receipt className="w-4 h-4 shrink-0" />
-              <span>Pedidos</span>
-              <span className="font-mono tabular-nums text-[11px] opacity-75">({orders.length})</span>
-            </button>
-          </div>
-        )}
-      </section>
+          <button
+            type="button"
+            onClick={() => navigateTo('pedidos', '/admin/tienda/pedidos')}
+            className={`px-4 py-2.5 rounded-xl font-bold transition flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap ${
+              activeView === 'pedidos'
+                ? 'bg-[#0B1A2D] text-white dark:bg-white dark:text-[#0B1A2D] shadow-xs'
+                : 'text-slate-600 dark:text-slate-400 hover:text-[#0B1A2D] dark:hover:text-white'
+            }`}
+          >
+            <Receipt className="w-4 h-4 shrink-0" />
+            <span>Pedidos</span>
+            <span className="font-mono tabular-nums text-[11px] opacity-75">({orders.length})</span>
+          </button>
+        </div>
+      )}
 
       {/* ======================================================================
           VISTA 1: TIENDA (KPIS + GRÁFICO INTERACTIVO + TOP VENTAS + CATÁLOGO)

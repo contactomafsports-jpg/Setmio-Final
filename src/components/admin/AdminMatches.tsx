@@ -42,6 +42,7 @@ import {
   MoreVertical,
 } from 'lucide-react';
 import { NewMatchModal } from './NewMatchModal';
+import { AdminSectionHeader } from './AdminSectionHeader';
 
 export const AdminMatches: React.FC = () => {
   const {
@@ -70,9 +71,6 @@ export const AdminMatches: React.FC = () => {
     sendNotification,
     t,
   } = useApp();
-
-  // Unified Venue Selector Dropdown State
-  const [isVenueSelectorOpen, setIsVenueSelectorOpen] = useState(false);
 
   // Filters State
   const [search, setSearch] = useState('');
@@ -1074,21 +1072,13 @@ export const AdminMatches: React.FC = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto pt-3 pb-24 sm:pb-16 space-y-7 sm:space-y-8 font-sans text-[#0B1A2D] dark:text-slate-100 antialiased">
+    <div className="max-w-7xl mx-auto pb-24 sm:pb-16 space-y-5 font-sans text-[#0B1A2D] dark:text-slate-100 antialiased">
       {/* ======================================================================
-          1. CABECERA LIMPIA Y SIMÉTRICA (ESTILO INICIO & RESERVAS)
+          1. CABECERA LIMPIA Y SIMÉTRICA CON SELECTOR DE SEDE UNIFICADO
           ====================================================================== */}
-      <section className="pt-2 pb-1 space-y-5" data-purpose="header-section">
-        <div className="flex items-center justify-between gap-3">
-          <div>
-            <span className="text-sm font-medium text-slate-600 dark:text-slate-300 tracking-wide block mb-1">
-              {currentTenant?.name || 'Centro de Pádel San Mateo'}
-            </span>
-            <h1 className="text-[26px] sm:text-3xl font-bold text-[#0B1A2D] dark:text-white tracking-tight leading-tight">
-              Partidas Abiertas
-            </h1>
-          </div>
-
+      <AdminSectionHeader
+        title="Partidas Abiertas"
+        rightSlot={
           <button
             type="button"
             onClick={() => {
@@ -1103,125 +1093,8 @@ export const AdminMatches: React.FC = () => {
           >
             <Plus className="w-6 h-6 stroke-[2.2]" />
           </button>
-        </div>
-
-        {/* Pill de Sede y Estado Operativo Unificado (colocado antes del Dashboard de Métricas) */}
-        <div className="relative">
-          <div className="flex items-center justify-between gap-2.5 sm:gap-3 p-3.5 sm:p-5 bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200/80 dark:border-[#1A314D] shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
-            {/* Selector de Sede */}
-            <div
-              onClick={() => setIsVenueSelectorOpen(!isVenueSelectorOpen)}
-              className="flex items-center gap-2.5 sm:gap-3 cursor-pointer group select-none min-w-0 flex-1"
-              title="Cambiar sede activa o ver red consolidada"
-            >
-              <div className="w-10 h-10 rounded-xl bg-slate-50 dark:bg-[#071220] border border-slate-100 dark:border-[#1A314D] flex items-center justify-center text-[#0B1A2D] dark:text-slate-200 shrink-0">
-                <Building2 className="w-4.5 h-4.5 text-[#0B1A2D] dark:text-white" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-1.5 min-w-0">
-                  <span className="text-[13px] sm:text-base font-bold text-[#0B1A2D] dark:text-white truncate whitespace-nowrap">
-                    {isConsolidatedView ? 'Todas las Sedes' : selectedVenue.shortName || selectedVenue.name}
-                  </span>
-                  <ChevronDown
-                    className={`w-4 h-4 text-slate-500 group-hover:text-[#0B1A2D] dark:text-slate-400 dark:group-hover:text-white transition-transform shrink-0 ${
-                      isVenueSelectorOpen ? 'rotate-180 text-[#0B1A2D] dark:text-white' : ''
-                    }`}
-                  />
-                </div>
-                <span className="text-xs sm:text-[13px] font-medium text-slate-600 dark:text-slate-300 block truncate whitespace-nowrap">
-                  {venues.length > 1 ? `${venues.length} sedes conectadas` : 'Sede oficial'}
-                </span>
-              </div>
-            </div>
-
-            {/* Badge Dinámico de Apertura / Resumen Multisede */}
-            <button
-              type="button"
-              onClick={isConsolidatedView ? () => setIsVenueSelectorOpen((prev) => !prev) : toggleClubOpenState}
-              className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-full bg-[#F0FCCF] dark:bg-[#B7F229]/20 border border-[#B7F229]/50 transition-all cursor-pointer hover:scale-102 shrink-0 select-none whitespace-nowrap"
-              title={
-                isConsolidatedView
-                  ? `Red multisede consolidada (${venues.length} sedes operativas)`
-                  : 'Haz clic para conmutar estado de apertura de la sede'
-              }
-            >
-              <span
-                className={`w-2 h-2 rounded-full shrink-0 ${
-                  isConsolidatedView
-                    ? 'bg-[#82b805] dark:bg-[#B7F229]'
-                    : isClubOpen
-                    ? 'bg-[#82b805] animate-pulse'
-                    : 'bg-rose-500'
-                }`}
-              />
-              <span className="text-xs sm:text-[13px] font-bold text-[#0B1A2D] dark:text-[#B7F229] whitespace-nowrap">
-                {isConsolidatedView
-                  ? `${venues.length} Sedes Activas`
-                  : isClubOpen
-                  ? 'Abierto · hasta 23:30'
-                  : 'Cerrado temporal'}
-              </span>
-            </button>
-          </div>
-
-          {/* Menú Desplegable de Sedes */}
-          {isVenueSelectorOpen && (
-            <div className="absolute top-full left-0 right-0 mt-2 z-30 p-2 bg-white dark:bg-[#0E2239] rounded-2xl border border-slate-200 dark:border-[#1A314D] shadow-xl space-y-1 animate-in fade-in slide-in-from-top-2 duration-150">
-              <div className="text-xs font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400 px-2.5 py-1.5">
-                Red Deportiva · Seleccionar Sede
-              </div>
-
-              {venues.length > 1 && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSelectedVenueId('all');
-                    setIsVenueSelectorOpen(false);
-                  }}
-                  className={`w-full flex items-center justify-between p-2.5 rounded-xl text-sm font-bold transition text-left cursor-pointer ${
-                    isConsolidatedView
-                      ? 'bg-[#B7F229]/20 text-[#0B1A2D] dark:text-white'
-                      : 'hover:bg-slate-50 dark:hover:bg-[#132A45] text-slate-700 dark:text-slate-300'
-                  }`}
-                >
-                  <span className="flex items-center gap-2">
-                    <Layers className="w-4 h-4 text-[#8B5CF6]" />
-                    <span>Todas las Sedes (Consolidado)</span>
-                  </span>
-                  {isConsolidatedView && <CheckCircle2 className="w-4 h-4 text-[#82b805]" />}
-                </button>
-              )}
-
-              {venues
-                .filter((v) => v.id !== 'all')
-                .map((venue) => {
-                  const isSelected = !isConsolidatedView && selectedVenueId === venue.id;
-                  return (
-                    <button
-                      key={venue.id}
-                      type="button"
-                      onClick={() => {
-                        setSelectedVenueId(venue.id);
-                        setIsVenueSelectorOpen(false);
-                      }}
-                      className={`w-full flex items-center justify-between p-2.5 rounded-xl text-sm font-bold transition text-left cursor-pointer ${
-                        isSelected
-                          ? 'bg-[#B7F229]/20 text-[#0B1A2D] dark:text-white'
-                          : 'hover:bg-slate-50 dark:hover:bg-[#132A45] text-slate-700 dark:text-slate-300'
-                      }`}
-                    >
-                      <span className="flex items-center gap-2 truncate">
-                        <Building2 className="w-4 h-4 text-slate-400 shrink-0" />
-                        <span className="truncate">{venue.name}</span>
-                      </span>
-                      {isSelected && <CheckCircle2 className="w-4 h-4 text-[#82b805] shrink-0" />}
-                    </button>
-                  );
-                })}
-            </div>
-          )}
-        </div>
-      </section>
+        }
+      />
 
       {/* 2. KPIs Ejecutivos de Partidas (Bento Grid) */}
       <section className="grid grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4" data-purpose="bento-metrics">

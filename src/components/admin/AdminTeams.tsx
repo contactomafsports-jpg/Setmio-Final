@@ -23,6 +23,7 @@ import {
   Crown,
   Lock,
 } from 'lucide-react';
+import { AdminSectionHeader } from './AdminSectionHeader';
 
 const TeamBannerImage: React.FC<{
   src?: string;
@@ -2148,19 +2149,11 @@ ${declined.map((p) => `• ${p.playerName}`).join('\n')}
   // VISTA PRINCIPAL: EQUIPOS (DISEÑO MINIMALISTA SETMIO)
   // =========================================================================
   return (
-    <div className="max-w-7xl mx-auto pt-3 pb-24 sm:pb-16 space-y-6 font-sans text-[#0B1A2D] dark:text-slate-100 antialiased animate-in fade-in duration-150">
-      {/* 1. Cabecera Limpia con Título "Equipos" + Menú Desplegable "+" */}
-      <section className="pt-2 pb-1 space-y-4" data-purpose="header-section">
-        <div className="flex items-center justify-between gap-3">
-          <div>
-            <span className="text-sm font-medium text-slate-600 dark:text-slate-300 tracking-wide block mb-1">
-              {currentTenant?.name || 'Centro de Pádel San Mateo'}
-            </span>
-            <h1 className="text-[26px] sm:text-3xl font-bold text-[#0B1A2D] dark:text-white tracking-tight leading-tight">
-              Equipos
-            </h1>
-          </div>
-
+    <div className="max-w-7xl mx-auto pb-24 sm:pb-16 space-y-5 font-sans text-[#0B1A2D] dark:text-slate-100 antialiased animate-in fade-in duration-150">
+      {/* 1. Cabecera Limpia con Título "Equipos" + Menú Desplegable "+" + Selector de Sede Unificado */}
+      <AdminSectionHeader
+        title="Equipos"
+        rightSlot={
           <div className="relative shrink-0" ref={actionMenuRef}>
             <button
               type="button"
@@ -2189,8 +2182,8 @@ ${declined.map((p) => `• ${p.playerName}`).join('\n')}
               </div>
             )}
           </div>
-        </div>
-      </section>
+        }
+      />
 
       {/* 2. Barra de Búsqueda + Filtro Flotando Directamente en Una Única Línea */}
       <div className="space-y-2.5">

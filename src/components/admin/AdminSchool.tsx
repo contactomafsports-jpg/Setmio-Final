@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useApp } from '../../context/AppContext';
 import {
   GraduationCap,
@@ -38,6 +38,7 @@ import {
   ShieldCheck,
   CalendarDays,
 } from 'lucide-react';
+import { AdminSectionHeader } from './AdminSectionHeader';
 
 export interface SchoolStudent {
   id: string;
@@ -467,6 +468,20 @@ export const AdminSchool: React.FC = () => {
     sendGroupConvocatoria,
     t,
   } = useApp();
+
+  const [isActionMenuOpen, setIsActionMenuOpen] = useState(false);
+  const actionMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!isActionMenuOpen) return;
+    const handleClickOutside = (e: MouseEvent) => {
+      if (actionMenuRef.current && !actionMenuRef.current.contains(e.target as Node)) {
+        setIsActionMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isActionMenuOpen]);
 
   const [groups, setGroups] = useState<SchoolGroupItem[]>(INITIAL_GROUPS);
   const [coachesList, setCoachesList] = useState<SchoolCoachItem[]>(INITIAL_COACHES_DATA);
@@ -1197,7 +1212,7 @@ export const AdminSchool: React.FC = () => {
   });
 
   return (
-    <div className="space-y-6 text-[#0B1A2D] dark:text-slate-100 max-w-7xl mx-auto pb-24 sm:pb-16">
+    <div className="space-y-5 font-sans text-[#0B1A2D] dark:text-slate-100 antialiased max-w-7xl mx-auto pb-24 sm:pb-16">
       {/* =====================================================================
           DETALLE DE CURSO / CLASE (SUBVISTA INDEPENDIENTE)
           ===================================================================== */}
@@ -2066,67 +2081,70 @@ export const AdminSchool: React.FC = () => {
            VISTA PRINCIPAL: CURSOS, CLASES, ALUMNOS Y PROFESORES
            ===================================================================== */
         <>
-          {/* Header limpio y simétrico */}
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pt-2 pb-1">
-            <div className="min-w-0">
-              <span className="text-sm font-medium text-slate-600 dark:text-slate-300 tracking-wide block mb-1 truncate">
-                {currentTenant?.name || 'Centro de Pádel San Mateo'}
-              </span>
-              <h1 className="text-[26px] sm:text-3xl font-bold text-[#0B1A2D] dark:text-white tracking-tight leading-tight">
-                Escuela
-              </h1>
-            </div>
+          {/* Header Unificado con Menú Contextual '+' y Selector de Sede */}
+          <AdminSectionHeader
+            title="Escuela"
+            rightSlot={
+              <div className="relative shrink-0" ref={actionMenuRef}>
+                <button
+                  type="button"
+                  onClick={() => setIsActionMenuOpen((prev) => !prev)}
+                  className="p-2 text-slate-700 dark:text-slate-300 hover:text-[#0B1A2D] dark:hover:text-[#B7F229] transition-colors cursor-pointer active:scale-95"
+                  title="Añadir grupo, clase, alumno o profesor"
+                  aria-label="Añadir grupo, clase, alumno o profesor"
+                  aria-expanded={isActionMenuOpen}
+                >
+                  <Plus className="w-6 h-6 stroke-[2.2]" />
+                </button>
 
-            {/* Botonera Superior Alineada: Azul Profundo #0B1A2D + Verde Lima #B7F229 */}
-            <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto shrink-0">
-              {/* 1. Nuevo Grupo (Primario) */}
-              <button
-                type="button"
-                onClick={() => {
-                  setEditingGroup(null);
-                  setIsNewGroupModalOpen(true);
-                }}
-                className="min-h-[40px] px-4 py-2 rounded-xl bg-[#0B1A2D] hover:bg-[#132A45] dark:bg-[#B7F229] dark:hover:bg-[#a3db20] text-white dark:text-[#0B1A2D] font-bold text-xs flex items-center gap-1.5 shadow-2xs transition active:scale-95 cursor-pointer whitespace-nowrap shrink-0"
-                title="Crear grupo periódico con matrícula y cuota"
-              >
-                <Plus className="w-3.5 h-3.5 text-[#B7F229] dark:text-[#0B1A2D] shrink-0" />
-                <span>Nuevo Grupo</span>
-              </button>
-
-              {/* 2. Nueva Clase */}
-              <button
-                type="button"
-                onClick={() => setIsNewClassModalOpen(true)}
-                className="min-h-[40px] px-3.5 py-2 rounded-xl bg-white dark:bg-[#0E2239] hover:bg-slate-50 dark:hover:bg-[#132A45] text-[#0B1A2D] dark:text-slate-200 border border-slate-200/80 dark:border-[#1A314D] font-bold text-xs flex items-center gap-1.5 shadow-2xs transition active:scale-95 cursor-pointer whitespace-nowrap shrink-0"
-                title="Publicar clase suelta o clínica"
-              >
-                <Plus className="w-3.5 h-3.5 text-[#0B1A2D] dark:text-[#B7F229] shrink-0" />
-                <span>Nueva Clase</span>
-              </button>
-
-              {/* 3. Nuevo Alumno */}
-              <button
-                type="button"
-                onClick={() => setIsNewStudentModalOpen(true)}
-                className="min-h-[40px] px-3.5 py-2 rounded-xl bg-white dark:bg-[#0E2239] hover:bg-slate-50 dark:hover:bg-[#132A45] text-[#0B1A2D] dark:text-slate-200 border border-slate-200/80 dark:border-[#1A314D] font-bold text-xs flex items-center gap-1.5 shadow-2xs transition active:scale-95 cursor-pointer whitespace-nowrap shrink-0"
-                title="Matricular alumno directamente"
-              >
-                <Plus className="w-3.5 h-3.5 text-[#0B1A2D] dark:text-[#B7F229] shrink-0" />
-                <span>Nuevo Alumno</span>
-              </button>
-
-              {/* 4. Nuevo Profesor */}
-              <button
-                type="button"
-                onClick={() => setIsNewCoachModalOpen(true)}
-                className="min-h-[40px] px-3.5 py-2 rounded-xl bg-white dark:bg-[#0E2239] hover:bg-slate-50 dark:hover:bg-[#132A45] text-[#0B1A2D] dark:text-slate-200 border border-slate-200/80 dark:border-[#1A314D] font-bold text-xs flex items-center gap-1.5 shadow-2xs transition active:scale-95 cursor-pointer whitespace-nowrap shrink-0"
-                title="Dar de alta nuevo entrenador"
-              >
-                <Plus className="w-3.5 h-3.5 text-[#0B1A2D] dark:text-[#B7F229] shrink-0" />
-                <span>Nuevo Profesor</span>
-              </button>
-            </div>
-          </div>
+                {isActionMenuOpen && (
+                  <div className="absolute right-0 top-full mt-2 w-48 rounded-2xl bg-white dark:bg-[#0E2239] border border-slate-200/90 dark:border-[#1A314D] shadow-xl py-1.5 z-40 animate-in fade-in slide-in-from-top-1 duration-150">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsActionMenuOpen(false);
+                        setEditingGroup(null);
+                        setIsNewGroupModalOpen(true);
+                      }}
+                      className="w-full px-3.5 py-2.5 text-left text-xs font-bold text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-[#132A45] hover:text-[#0B1A2D] dark:hover:text-[#B7F229] flex items-center gap-2.5 transition cursor-pointer"
+                    >
+                      <span>Nuevo Grupo</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsActionMenuOpen(false);
+                        setIsNewClassModalOpen(true);
+                      }}
+                      className="w-full px-3.5 py-2.5 text-left text-xs font-bold text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-[#132A45] hover:text-[#0B1A2D] dark:hover:text-[#B7F229] flex items-center gap-2.5 transition cursor-pointer"
+                    >
+                      <span>Nueva Clase</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsActionMenuOpen(false);
+                        setIsNewStudentModalOpen(true);
+                      }}
+                      className="w-full px-3.5 py-2.5 text-left text-xs font-bold text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-[#132A45] hover:text-[#0B1A2D] dark:hover:text-[#B7F229] flex items-center gap-2.5 transition cursor-pointer"
+                    >
+                      <span>Nuevo Alumno</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsActionMenuOpen(false);
+                        setIsNewCoachModalOpen(true);
+                      }}
+                      className="w-full px-3.5 py-2.5 text-left text-xs font-bold text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-[#132A45] hover:text-[#0B1A2D] dark:hover:text-[#B7F229] flex items-center gap-2.5 transition cursor-pointer"
+                    >
+                      <span>Nuevo Profesor</span>
+                    </button>
+                  </div>
+                )}
+              </div>
+            }
+          />
 
           {/* Buscador y Segmented Control Unificado */}
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">

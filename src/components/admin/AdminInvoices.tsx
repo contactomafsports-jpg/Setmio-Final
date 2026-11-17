@@ -23,6 +23,7 @@ import {
   RefreshCw,
   Globe,
 } from 'lucide-react';
+import { AdminSectionHeader } from './AdminSectionHeader';
 
 export const AdminInvoices: React.FC = () => {
   const {
@@ -227,21 +228,13 @@ export const AdminInvoices: React.FC = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto pt-3 pb-24 sm:pb-16 space-y-6 sm:space-y-8 font-sans text-[#0B1A2D] dark:text-slate-100 antialiased animate-in fade-in duration-150">
+    <div className="max-w-7xl mx-auto pb-24 sm:pb-16 space-y-5 font-sans text-[#0B1A2D] dark:text-slate-100 antialiased animate-in fade-in duration-150">
       {/* ======================================================================
-          1. CABECERA LIMPIA Y SIMÉTRICA (ESTILO PARTIDAS) + BARRA VERI*FACTU (ESPAÑA)
+          1. CABECERA LIMPIA Y SIMÉTRICA CON SELECTOR DE SEDE UNIFICADO
           ====================================================================== */}
-      <section className="pt-2 pb-1 space-y-4" data-purpose="header-section">
-        <div className="flex items-center justify-between gap-3">
-          <div>
-            <span className="text-sm font-medium text-slate-600 dark:text-slate-300 tracking-wide block mb-1">
-              {currentTenant?.name || 'Centro de Pádel San Mateo'}
-            </span>
-            <h1 className="text-[26px] sm:text-3xl font-bold text-[#0B1A2D] dark:text-white tracking-tight leading-tight">
-              Facturación
-            </h1>
-          </div>
-
+      <AdminSectionHeader
+        title="Facturación"
+        rightSlot={
           <button
             type="button"
             onClick={() => setShowNewInvoiceModal(true)}
@@ -251,10 +244,12 @@ export const AdminInvoices: React.FC = () => {
           >
             <Plus className="w-6 h-6 stroke-[2.2]" />
           </button>
-        </div>
+        }
+      />
 
-        {/* Estado y sincronización fiscal Veri*factu / AEAT (solo clubes en España) */}
-        {isSpainClub && (
+      {/* Estado y sincronización fiscal Veri*factu / AEAT (solo clubes en España) */}
+      {isSpainClub && (
+        <section className="space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-3 p-3.5 sm:px-5 sm:py-3.5 rounded-2xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] shadow-2xs">
             <div className="flex items-center gap-2.5 min-w-0">
               <span className="px-2.5 py-1 rounded-full text-[11px] font-bold tracking-wide bg-[#F0FCCF] text-[#0B1A2D] dark:bg-[#B7F229]/20 dark:text-[#B7F229] border border-[#B7F229]/50 inline-flex items-center gap-1.5 shrink-0">
@@ -285,8 +280,8 @@ export const AdminInvoices: React.FC = () => {
               </div>
             )}
           </div>
-        )}
-      </section>
+        </section>
+      )}
 
       {/* ======================================================================
           2. KPIS FINANCIEROS COMPACTOS (SINGLE-ELEVATION)

@@ -10,6 +10,7 @@ import {
   X,
   ArrowUpRight,
 } from 'lucide-react';
+import { AdminSectionHeader } from './AdminSectionHeader';
 
 export const AdminSubscription: React.FC = () => {
   const { currentTenant, plans, venues, customers, updateCurrentTenant, triggerDemoToast } = useApp();
@@ -93,40 +94,38 @@ export const AdminSubscription: React.FC = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto pt-3 pb-24 sm:pb-16 space-y-6 sm:space-y-8 font-sans text-[#0B1A2D] dark:text-slate-100 antialiased animate-in fade-in duration-150">
+    <div className="max-w-7xl mx-auto pb-24 sm:pb-16 space-y-5 font-sans text-[#0B1A2D] dark:text-slate-100 antialiased animate-in fade-in duration-150">
       {/* =====================================================================
-          1. CABECERA LIMPIA
+          1. CABECERA LIMPIA + SELECTOR DE SEDE UNIFICADO
           ===================================================================== */}
-      <section className="pt-2 pb-1 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
-        <div>
-          <span className="text-sm font-medium text-slate-600 dark:text-slate-300 tracking-wide block mb-1">
-            {currentTenant?.name || 'Centro de Pádel San Mateo'}
-          </span>
-          <h1 className="text-[26px] sm:text-3xl font-bold text-[#0B1A2D] dark:text-white tracking-tight leading-tight">
-            Suscripción
-          </h1>
-        </div>
+      <AdminSectionHeader
+        title="Suscripción"
+        rightSlot={
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <button
+              type="button"
+              onClick={() => setIsPaymentModalOpen(true)}
+              className="px-3 py-2 rounded-xl bg-white dark:bg-[#0E2239] hover:bg-slate-50 dark:hover:bg-[#132A45] text-[#0B1A2D] dark:text-slate-200 font-bold text-xs border border-slate-200/80 dark:border-[#1A314D] flex items-center gap-1.5 transition cursor-pointer active:scale-95 shadow-2xs"
+              title="Actualizar Método de Pago"
+            >
+              <CreditCard className="w-3.5 h-3.5 shrink-0" />
+              <span className="hidden sm:inline">Actualizar Método de Pago</span>
+              <span className="sm:hidden">Pago</span>
+            </button>
 
-        <div className="flex flex-wrap items-center gap-2">
-          <button
-            type="button"
-            onClick={() => setIsPaymentModalOpen(true)}
-            className="px-3.5 py-2.5 rounded-xl bg-white dark:bg-[#0E2239] hover:bg-slate-50 dark:hover:bg-[#132A45] text-[#0B1A2D] dark:text-slate-200 font-bold text-xs border border-slate-200/80 dark:border-[#1A314D] flex items-center gap-1.5 transition cursor-pointer active:scale-95 shadow-2xs"
-          >
-            <CreditCard className="w-3.5 h-3.5" />
-            <span>Actualizar Método de Pago</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={scrollToPlans}
-            className="px-3.5 py-2.5 rounded-xl bg-slate-100 dark:bg-[#071220] hover:bg-slate-200/80 dark:hover:bg-[#132A45] text-[#0B1A2D] dark:text-[#B7F229] font-bold text-xs border border-slate-200/80 dark:border-[#1A314D] flex items-center gap-1.5 transition cursor-pointer active:scale-95"
-          >
-            <span>Cambiar Plan</span>
-            <ArrowUpRight className="w-3.5 h-3.5" />
-          </button>
-        </div>
-      </section>
+            <button
+              type="button"
+              onClick={scrollToPlans}
+              className="px-3 py-2 rounded-xl bg-slate-100 dark:bg-[#071220] hover:bg-slate-200/80 dark:hover:bg-[#132A45] text-[#0B1A2D] dark:text-[#B7F229] font-bold text-xs border border-slate-200/80 dark:border-[#1A314D] flex items-center gap-1.5 transition cursor-pointer active:scale-95"
+              title="Cambiar Plan"
+            >
+              <span className="hidden sm:inline">Cambiar Plan</span>
+              <span className="sm:hidden">Plan</span>
+              <ArrowUpRight className="w-3.5 h-3.5 shrink-0" />
+            </button>
+          </div>
+        }
+      />
 
       {/* =====================================================================
           2. TARJETA PRINCIPAL DE PLAN ACTUAL + CONSUMO SUTIL

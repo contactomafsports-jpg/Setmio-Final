@@ -41,6 +41,7 @@ import {
   List,
   GitBranch,
 } from 'lucide-react';
+import { AdminSectionHeader } from './AdminSectionHeader';
 
 export interface ProBracketMatch {
   id: string;
@@ -686,34 +687,27 @@ export const AdminTournaments: React.FC = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto pt-3 pb-24 sm:pb-16 space-y-6 sm:space-y-8 font-sans text-[#0B1A2D] dark:text-slate-100 antialiased">
+    <div className="max-w-7xl mx-auto pb-24 sm:pb-16 space-y-5 font-sans text-[#0B1A2D] dark:text-slate-100 antialiased">
       {/* ======================================================================
           VISTA 1: LISTADO PRINCIPAL DE COMPETICIONES / RANKINGS
           ====================================================================== */}
       {!selectedTournamentId ? (
-        <div className="space-y-6 sm:space-y-7 animate-in fade-in duration-150">
-          {/* Header Principal Homogéneo */}
-          <div className="flex items-center justify-between gap-3 mt-2 mb-6">
-            <div>
-              <span className="text-sm font-medium text-slate-500 dark:text-slate-400 tracking-wide block mb-1">
-                {currentTenant?.name || 'Centro de Pádel San Mateo'}
-              </span>
-              <h1 className="text-[26px] sm:text-3xl font-bold text-[#0B1A2D] dark:text-white tracking-tight leading-tight">
-                Competiciones
-              </h1>
-            </div>
-
-            <button
-              type="button"
-              onClick={() => setIsCreateModalOpen(true)}
-              className="min-h-[44px] px-3 py-2 rounded-xl text-slate-700 dark:text-slate-300 hover:text-[#0B1A2D] dark:hover:text-[#B7F229] hover:bg-slate-100/80 dark:hover:bg-white/[0.06] transition-colors cursor-pointer active:scale-95 flex items-center gap-1.5 shrink-0"
-              title="Nueva Competición"
-              aria-label="Nueva Competición"
-            >
-              <Plus className="w-5 h-5 stroke-[2.2]" />
-              <span className="text-xs sm:text-sm font-bold sm:inline hidden whitespace-nowrap">Nueva Competición</span>
-            </button>
-          </div>
+        <div className="space-y-5 animate-in fade-in duration-150">
+          {/* Header Principal Unificado */}
+          <AdminSectionHeader
+            title="Competiciones"
+            rightSlot={
+              <button
+                type="button"
+                onClick={() => setIsCreateModalOpen(true)}
+                className="p-2 text-slate-700 dark:text-slate-300 hover:text-[#0B1A2D] dark:hover:text-[#B7F229] transition-colors cursor-pointer active:scale-95"
+                title="Nueva Competición"
+                aria-label="Nueva Competición"
+              >
+                <Plus className="w-6 h-6 stroke-[2.2]" />
+              </button>
+            }
+          />
 
           {/* Selector de Pestañas Consistente: Competiciones vs Rankings */}
           <div className="p-1 bg-slate-100 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-2xl grid grid-cols-2 gap-1 w-full sm:w-fit sm:inline-grid text-xs sm:text-sm select-none shadow-2xs">
