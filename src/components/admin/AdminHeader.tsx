@@ -8,11 +8,12 @@ import {
   ChevronDown,
   Check,
   Globe,
-  Bot,
-  Minimize2,
   X,
   Send,
   Building2,
+  CalendarCheck,
+  TrendingUp,
+  GraduationCap,
 } from 'lucide-react';
 import { NotificationsPopover } from '../common/NotificationsPopover';
 import { UserProfileDropdown } from '../common/UserProfileDropdown';
@@ -345,20 +346,20 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
             {/* 1. Centro Global de Notificaciones (Campanita con badge dinámico) */}
             <NotificationsPopover variant="admin" />
 
-            {/* 2. Asistente IA Copiloto (Acento Violeta de Marca #8B5CF6) */}
+            {/* 2. Asistente IA Copiloto (Paleta Oficial #0B1A2D + #B7F229) */}
             <button
               type="button"
               onClick={() => setAiDrawerOpen(!aiDrawerOpen)}
-              className={`w-8 h-8 rounded-full flex items-center justify-center transition-all cursor-pointer relative ${
+              className={`w-9 h-9 rounded-full flex items-center justify-center transition-all cursor-pointer relative ${
                 aiDrawerOpen
-                  ? 'bg-[#8B5CF6] text-white shadow-xs'
-                  : 'text-[#8B5CF6] hover:bg-[#8B5CF6]/15'
+                  ? 'bg-[#B7F229] text-[#0B1A2D] shadow-sm ring-2 ring-[#B7F229]/30'
+                  : 'text-[#0B1A2D] dark:text-[#B7F229] hover:bg-[#0B1A2D]/8 dark:hover:bg-white/10'
               }`}
               title="Copiloto y Asistente IA Setmio"
               aria-label="Abrir Asistente IA"
+              aria-expanded={aiDrawerOpen}
             >
-              <Sparkles className="w-4 h-4 text-[#8B5CF6]" />
-              <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-[#8B5CF6] animate-pulse" />
+              <Sparkles className="w-4 h-4" />
             </button>
 
             {/* 3. Avatar del Usuario con Menú Desplegable Unificado */}
@@ -371,9 +372,14 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
         </div>
       </header>
 
-      {/* DRAWER TÁCTIL INFERIOR (BOTTOM SHEET) CON CHAT DE LA IA */}
+      {/* PANEL FLOTANTE DEL COPILOTO IA */}
       {aiDrawerOpen && (
-        <div className="fixed inset-0 z-50 flex flex-col justify-end bg-slate-950/60 backdrop-blur-xs transition-opacity animate-in fade-in duration-200">
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="Copiloto IA"
+          className="fixed inset-0 z-50 flex flex-col justify-end px-3 pt-4 pb-[calc(6.5rem+env(safe-area-inset-bottom))] sm:px-6 sm:pb-8 bg-[#040B15]/55 backdrop-blur-[2px] transition-opacity animate-in fade-in duration-200"
+        >
           {/* Backdrop Click Handler */}
           <div
             className="flex-1 w-full"
@@ -381,64 +387,45 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
             aria-hidden="true"
           />
 
-          {/* Bottom Sheet Modal Container */}
-          <div className="w-full max-w-2xl mx-auto bg-slate-900 border-t sm:border-x sm:rounded-t-3xl border-slate-800 shadow-2xl flex flex-col max-h-[82vh] sm:max-h-[640px] text-slate-100 animate-in slide-in-from-bottom duration-300">
-            {/* Grab handle táctil para móvil */}
-            <div className="pt-2.5 pb-1 flex justify-center cursor-pointer" onClick={() => setAiDrawerOpen(false)}>
-              <div className="w-12 h-1.5 rounded-full bg-slate-700 hover:bg-slate-600 transition" />
-            </div>
-
-            {/* Header del Drawer */}
-            <div className="px-5 py-3 border-b border-slate-800 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-700 flex items-center justify-center text-white shadow-sm">
-                  <Bot className="w-5 h-5" />
-                </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="font-extrabold text-sm text-white">
-                      Copiloto IA · {currentTenant.name}
-                    </span>
-                    <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-400 border border-emerald-800 font-bold">
-                      Club Admin
-                    </span>
-                  </div>
-                  <p className="text-[11px] text-slate-400">
-                    Consultas operativas, métricas de pistas y redacción automática
-                  </p>
+          {/* Floating Chat Container */}
+          <div className="w-full max-w-xl mx-auto bg-[#0B1A2D] border border-white/12 rounded-3xl shadow-[0_24px_64px_rgba(3,9,20,0.65)] flex flex-col overflow-hidden max-h-[calc(100dvh-8.5rem)] sm:max-h-[600px] text-white animate-in fade-in slide-in-from-bottom-4 duration-200">
+            {/* Cabecera Minimalista */}
+            <div className="px-5 pt-5 pb-3 flex items-center justify-between gap-3 shrink-0">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <Sparkles className="w-4 h-4 text-[#B7F229] shrink-0" />
+                <div className="flex items-baseline gap-2 min-w-0">
+                  <h2 className="text-[15px] font-bold tracking-tight text-white shrink-0">
+                    Copiloto IA
+                  </h2>
+                  <span className="text-xs font-medium text-slate-300/75 truncate">
+                    {selectedVenue?.name || currentTenant.name}
+                  </span>
                 </div>
               </div>
 
-              <div className="flex items-center gap-1">
-                <button
-                  type="button"
-                  onClick={() => setAiDrawerOpen(false)}
-                  className="p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition"
-                  title="Cerrar panel de IA"
-                >
-                  <Minimize2 className="w-4 h-4 hidden sm:block" />
-                  <X className="w-4 h-4 sm:hidden" />
-                </button>
-              </div>
+              <button
+                type="button"
+                onClick={() => setAiDrawerOpen(false)}
+                className="w-10 h-10 -mr-1.5 rounded-full text-slate-300 hover:text-white hover:bg-white/[0.08] flex items-center justify-center transition cursor-pointer shrink-0"
+                title="Cerrar Copiloto IA"
+                aria-label="Cerrar Copiloto IA"
+              >
+                <X className="w-4 h-4" />
+              </button>
             </div>
 
             {/* Mensajes del Asistente */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-3 text-xs bg-slate-900/95 min-h-[220px]">
+            <div className="flex-1 overflow-y-auto px-5 py-2.5 space-y-3.5 text-[13px] min-h-[200px] tabular-nums">
               {aiMessages.map((msg) => (
                 <div
                   key={msg.id}
-                  className={`flex gap-2.5 ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+                  className={`flex items-start gap-2.5 ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
                 >
-                  {msg.sender === 'assistant' && (
-                    <div className="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0 mt-0.5 border border-emerald-500/30">
-                      <Sparkles className="w-4 h-4" />
-                    </div>
-                  )}
                   <div
-                    className={`max-w-[85%] rounded-2xl px-4 py-2.5 leading-relaxed shadow-xs ${
+                    className={`max-w-[88%] rounded-2xl leading-relaxed ${
                       msg.sender === 'user'
-                        ? 'bg-emerald-600 text-white rounded-br-none'
-                        : 'bg-slate-800/90 text-slate-200 border border-slate-700/60 rounded-bl-none'
+                        ? 'bg-[#B7F229] text-[#0B1A2D] font-medium px-4 py-2.5 rounded-br-sm shadow-xs'
+                        : 'bg-white/[0.06] text-slate-100 border border-white/[0.08] px-4 py-3.5 rounded-bl-sm'
                     }`}
                   >
                     <p className="whitespace-pre-wrap">{msg.text}</p>
@@ -447,56 +434,62 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
               ))}
 
               {isAiThinking && (
-                <div className="flex items-center gap-2 text-slate-400 text-xs pl-9">
-                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-                  <span>Consultando base de datos de {currentTenant.shortName}...</span>
+                <div className="inline-flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-white/[0.05] border border-white/[0.08] text-slate-300 text-xs">
+                  <Sparkles className="w-3.5 h-3.5 text-[#B7F229] animate-pulse shrink-0" />
+                  <span>Consultando datos de {currentTenant.shortName}...</span>
                 </div>
               )}
               <div ref={chatBottomRef} />
             </div>
 
-            {/* Chips con prompts rápidos */}
-            <div className="px-4 py-2 bg-slate-950/80 border-t border-slate-800/60 flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+            {/* Píldoras de sugerencia rápida */}
+            <div className="px-5 pt-2 pb-1 flex items-center gap-2 overflow-x-auto no-scrollbar shrink-0">
               <button
                 type="button"
                 onClick={() => handleQuickPrompt('¿Cuál es el estado de ocupación y pistas libres hoy?')}
-                className="whitespace-nowrap px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-[11px] text-slate-300 font-medium transition active:scale-95"
+                className="whitespace-nowrap min-h-[36px] px-3.5 py-1.5 rounded-full bg-white/[0.04] border border-white/15 hover:border-[#B7F229]/75 hover:bg-[#B7F229]/12 text-xs font-medium text-slate-100 hover:text-white inline-flex items-center gap-1.5 transition-all duration-150 active:scale-[0.98] cursor-pointer"
               >
-                🎾 Pistas libres hoy
+                <CalendarCheck className="w-3.5 h-3.5 text-[#B7F229] shrink-0" />
+                <span>Pistas libres hoy</span>
               </button>
               <button
                 type="button"
                 onClick={() => handleQuickPrompt('Resume los ingresos totales de hoy entre online y cafetería.')}
-                className="whitespace-nowrap px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-[11px] text-slate-300 font-medium transition active:scale-95"
+                className="whitespace-nowrap min-h-[36px] px-3.5 py-1.5 rounded-full bg-white/[0.04] border border-white/15 hover:border-[#B7F229]/75 hover:bg-[#B7F229]/12 text-xs font-medium text-slate-100 hover:text-white inline-flex items-center gap-1.5 transition-all duration-150 active:scale-[0.98] cursor-pointer"
               >
-                💶 Resumen de ingresos
+                <TrendingUp className="w-3.5 h-3.5 text-[#B7F229] shrink-0" />
+                <span>Resumen de ingresos</span>
               </button>
               <button
                 type="button"
                 onClick={() => handleQuickPrompt('¿Cuántas clases de escuela tenemos programadas esta tarde?')}
-                className="whitespace-nowrap px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-[11px] text-slate-300 font-medium transition active:scale-95"
+                className="whitespace-nowrap min-h-[36px] px-3.5 py-1.5 rounded-full bg-white/[0.04] border border-white/15 hover:border-[#B7F229]/75 hover:bg-[#B7F229]/12 text-xs font-medium text-slate-100 hover:text-white inline-flex items-center gap-1.5 transition-all duration-150 active:scale-[0.98] cursor-pointer"
               >
-                🎓 Clases de escuela
+                <GraduationCap className="w-3.5 h-3.5 text-[#B7F229] shrink-0" />
+                <span>Clases de escuela</span>
               </button>
             </div>
 
-            {/* Input Form */}
-            <form onSubmit={handleSendAi} className="p-3 bg-slate-950 border-t border-slate-800 flex items-center gap-2">
-              <input
-                type="text"
-                value={aiInputText}
-                onChange={(e) => setAiInputText(e.target.value)}
-                placeholder={`Pregunta a la IA sobre pistas, agenda o socios de ${currentTenant.shortName}...`}
-                className="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition"
-              />
-              <button
-                type="submit"
-                disabled={!aiInputText.trim() || isAiThinking}
-                className="p-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 disabled:opacity-40 disabled:hover:bg-emerald-500 text-slate-950 font-black transition active:scale-95"
-                title="Enviar mensaje"
-              >
-                <Send className="w-4 h-4" />
-              </button>
+            {/* Barra de entrada flotante */}
+            <form onSubmit={handleSendAi} className="px-4 pt-2 pb-4 shrink-0">
+              <div className="flex items-center gap-2 rounded-full bg-[#071220] border border-white/15 focus-within:border-[#B7F229] pl-4 pr-1.5 py-1.5 transition-colors">
+                <input
+                  type="text"
+                  value={aiInputText}
+                  onChange={(e) => setAiInputText(e.target.value)}
+                  placeholder={`Pregunta a la IA sobre pistas, agenda o socios de ${currentTenant.shortName}...`}
+                  className="flex-1 min-w-0 bg-transparent py-1.5 text-[13px] text-white placeholder-slate-400 focus:outline-none"
+                />
+                <button
+                  type="submit"
+                  disabled={!aiInputText.trim() || isAiThinking}
+                  className="w-9 h-9 rounded-full bg-[#B7F229] hover:bg-[#a6de1f] disabled:opacity-35 disabled:hover:bg-[#B7F229] text-[#0B1A2D] flex items-center justify-center transition active:scale-95 shrink-0 cursor-pointer disabled:cursor-not-allowed"
+                  title="Enviar mensaje"
+                  aria-label="Enviar mensaje"
+                >
+                  <Send className="w-4 h-4" />
+                </button>
+              </div>
             </form>
           </div>
         </div>

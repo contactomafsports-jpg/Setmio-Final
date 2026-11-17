@@ -1,17 +1,10 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
+import playerPadelImg from '../../assets/images/player_padel_action_1794872242959.jpg';
 import {
   ArrowLeft,
   GraduationCap,
-  Users,
-  Clock,
-  Calendar,
   CheckCircle2,
-  DollarSign,
-  Star,
-  Award,
-  AlertCircle,
-  Sparkles,
 } from 'lucide-react';
 
 interface ClassGroupDetailViewProps {
@@ -45,15 +38,15 @@ export const ClassGroupDetailView: React.FC<ClassGroupDetailViewProps> = ({
     monthlyPrice: 65.0,
     singleClassPrice: 18.0,
     maxStudents: 4,
-    currentStudents: 3, // 1 free slot available!
+    currentStudents: 3,
     waitingListCount: 2,
     period: 'Trimestral (Renovación automática)',
     coach: {
       name: 'Laura Senra',
       title: 'Directora de Tecnificación & Entrenadora Nacional N2 FEP',
       rating: 4.95,
-      avatarUrl: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=300&q=80',
-      bio: 'Ex-jugadora World Padel Tour y especialista en biomecánica de golpeo y transiciones defensa-ataque.',
+      avatarUrl: playerPadelImg,
+      bio: 'Ex-jugadora profesional y especialista en biomecánica de golpeo y transiciones defensa-ataque.',
     },
     students: [
       { name: 'Carlos Méndez', level: 3.85, attendance: '100%' },
@@ -83,189 +76,189 @@ export const ClassGroupDetailView: React.FC<ClassGroupDetailViewProps> = ({
   };
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-in fade-in duration-200">
-      {/* 1. TOP BAR WITH BACK BUTTON */}
-      <div className="flex items-center justify-between mb-4">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12 animate-in fade-in duration-200">
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
         <button
+          type="button"
           onClick={handleBack}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-200 hover:text-emerald-600 dark:hover:text-emerald-400 font-bold text-xs shadow-xs transition cursor-pointer active:scale-95"
+          className="min-h-[40px] inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] text-[#0B1A2D] dark:text-slate-200 hover:border-[#0B1A2D] dark:hover:border-[#B7F229] font-semibold text-xs transition cursor-pointer"
         >
-          <ArrowLeft className="w-4 h-4" />
+          <ArrowLeft className="w-4 h-4 text-[#8B5CF6] dark:text-[#a78bfa]" />
           <span>Volver a Escuela</span>
         </button>
 
-        <span className="px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-400 font-mono text-xs font-bold">
-          {freeSlots > 0 ? `¡${freeSlots} Plaza Libre Disponible!` : 'Grupo Completo (Lista de Espera)'}
+        <span className="px-3 py-1 rounded-md bg-[#B7F229] text-[#0B1A2D] font-mono tabular-nums text-xs font-bold">
+          {freeSlots > 0 ? `${freeSlots} Plaza Libre Disponible` : 'Grupo Completo'}
         </span>
       </div>
 
       <div className="space-y-8">
-        {/* 2. GROUP HERO CARD */}
-      <div className="p-6 sm:p-10 rounded-3xl bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-white border border-indigo-900/60 shadow-2xl space-y-6">
-        <div className="space-y-3">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-xs font-bold">
-            <GraduationCap className="w-4 h-4" />
-            <span>Escuela Oficial de Tecnificación · {currentTenant.name}</span>
-          </div>
-
-          <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight">
-            {group.name}
-          </h1>
-
-          <p className="text-slate-300 text-sm max-w-2xl leading-relaxed">
-            Programa de entrenamiento periódico enfocado en juego aéreo (bandeja, víbora y remate de definición), salida de pared de fondo y táctica de compenetración en la red.
-          </p>
-        </div>
-
-        {/* Group Specs Pills */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4 border-t border-indigo-900/60 text-xs">
-          <div>
-            <div className="text-slate-400">Horario Semanal</div>
-            <div className="font-bold text-white mt-0.5">{group.schedule}</div>
-          </div>
-          <div>
-            <div className="text-slate-400">Nivel Requerido</div>
-            <div className="font-bold text-emerald-400 mt-0.5">{group.level}</div>
-          </div>
-          <div>
-            <div className="text-slate-400">Cupo Máximo</div>
-            <div className="font-bold text-white mt-0.5">{group.currentStudents} / {group.maxStudents} Alumnos</div>
-          </div>
-          <div>
-            <div className="text-slate-400">Cuota Mensual</div>
-            <div className="font-black text-xl text-amber-400 font-mono">{group.monthlyPrice.toFixed(2)} €/mes</div>
-          </div>
-        </div>
-      </div>
-
-      {/* 3. LÓGICA DE PLAZAS SUELTAS VS MENSUAL */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Option A: Monthly Enrollment */}
-        <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-4 flex flex-col justify-between">
+        {/* Hero Card */}
+        <div className="p-6 sm:p-10 rounded-2xl bg-[#0B1A2D] text-white border border-[#1A314D] space-y-6">
           <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-bold text-xs">
-                Opción Regular
-              </span>
-              <span className="text-2xl font-black text-slate-900 dark:text-white font-mono">
-                {group.monthlyPrice.toFixed(2)} €<span className="text-xs text-slate-400 font-normal">/mes</span>
-              </span>
+            <div className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-[0.14em] text-[#B7F229]">
+              <GraduationCap className="w-4 h-4" />
+              <span>Escuela Oficial de Tecnificación · {currentTenant.name}</span>
             </div>
 
-            <h3 className="text-lg font-black text-slate-900 dark:text-white">
-              Inscripción al Grupo Trimestral
-            </h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-              Reserva tu plaza fija en el grupo con acceso a 8 clases al mes, evaluaciones mensuales de nivel y preparación para torneos federados.
+            <h1 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight">
+              {group.name}
+            </h1>
+
+            <p className="text-slate-300 text-sm max-w-2xl leading-relaxed">
+              Programa de entrenamiento periódico enfocado en juego aéreo (bandeja, víbora y remate), salida de pared de fondo y táctica en la red.
             </p>
-
-            <div className="space-y-2 text-xs text-slate-700 dark:text-slate-300 pt-2">
-              <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                <span>8 sesiones de entrenamiento intensivo al mes</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                <span>Seguimiento de progresión y grabación en vídeo</span>
-              </div>
-            </div>
           </div>
 
-          <button
-            onClick={handleJoinMonthly}
-            disabled={registered}
-            className={`w-full py-3 rounded-xl font-bold text-xs transition shadow-sm ${
-              registered
-                ? 'bg-emerald-600 text-white cursor-default'
-                : 'bg-emerald-600 hover:bg-emerald-500 text-white'
-            }`}
-          >
-            {registered ? '✓ Ya estás Inscrito al Grupo' : 'Inscribirme al Grupo Trimestral'}
-          </button>
-        </div>
-
-        {/* Option B: Loose Class Drop-in Seat */}
-        <div className="p-6 rounded-3xl bg-gradient-to-br from-purple-50/50 to-indigo-50/50 dark:from-purple-950/20 dark:to-indigo-950/20 border-2 border-purple-300 dark:border-purple-800/80 shadow-sm space-y-4 flex flex-col justify-between">
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="px-3 py-1 rounded-full bg-purple-600 text-white font-bold text-xs uppercase tracking-wider flex items-center gap-1 shadow-xs">
-                <Sparkles className="w-3.5 h-3.5" />
-                <span>Novedad: Plaza Suelta</span>
-              </span>
-              <span className="text-2xl font-black text-purple-700 dark:text-purple-300 font-mono">
-                {group.singleClassPrice.toFixed(2)} €<span className="text-xs text-slate-400 font-normal">/sesión</span>
-              </span>
-            </div>
-
-            <h3 className="text-lg font-black text-slate-900 dark:text-white">
-              Comprar 1 Plaza Suelta (Hueco Libre)
-            </h3>
-            <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-              ¿No puedes comprometerte todo el mes? Aprovecha los huecos libres del grupo para unirte a una sesión individual sin cuota periódica.
-            </p>
-
-            <div className="p-3 rounded-xl bg-purple-100/70 dark:bg-purple-900/30 border border-purple-200 dark:border-purple-800 text-xs text-purple-950 dark:text-purple-200">
-              <strong>1 plaza disponible</strong> para la próxima sesión del <strong>Martes a las 19:30</strong> con Laura Senra.
-            </div>
-          </div>
-
-          <button
-            onClick={handleBuySingleSeat}
-            disabled={purchasedSingleSeat}
-            className={`w-full py-3 rounded-xl font-bold text-xs transition shadow-sm ${
-              purchasedSingleSeat
-                ? 'bg-purple-700 text-white cursor-default'
-                : 'bg-purple-600 hover:bg-purple-500 text-white'
-            }`}
-          >
-            {purchasedSingleSeat ? '✓ Plaza Suelta Reservada para el Martes' : `Comprar Plaza Suelta (${group.singleClassPrice.toFixed(2)} €)`}
-          </button>
-        </div>
-      </div>
-
-      {/* 4. COACH BIO & STUDENTS ROSTER */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Coach card */}
-        <div className="md:col-span-1 p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
-          <div className="flex items-center gap-3">
-            <img
-              src={group.coach.avatarUrl}
-              alt={group.coach.name}
-              className="w-14 h-14 rounded-2xl object-cover ring-2 ring-emerald-500"
-            />
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-5 border-t border-[#1A314D] text-xs">
             <div>
-              <div className="font-bold text-sm text-slate-900 dark:text-white">{group.coach.name}</div>
-              <div className="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium">{group.coach.title}</div>
+              <div className="text-slate-400">Horario Semanal</div>
+              <div className="font-semibold text-white mt-0.5 font-mono tabular-nums">{group.schedule}</div>
+            </div>
+            <div>
+              <div className="text-slate-400">Nivel Requerido</div>
+              <div className="font-semibold text-[#B7F229] mt-0.5 font-mono tabular-nums">{group.level}</div>
+            </div>
+            <div>
+              <div className="text-slate-400">Cupo Máximo</div>
+              <div className="font-semibold text-white mt-0.5 font-mono tabular-nums">{group.currentStudents} / {group.maxStudents} Alumnos</div>
+            </div>
+            <div>
+              <div className="text-slate-400">Cuota Mensual</div>
+              <div className="font-extrabold text-xl text-[#B7F229] font-mono tabular-nums">{group.monthlyPrice.toFixed(2)} €/mes</div>
             </div>
           </div>
-          <p className="text-xs text-slate-500 leading-relaxed">{group.coach.bio}</p>
         </div>
 
-        {/* Current Students */}
-        <div className="md:col-span-2 p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="font-black text-slate-900 dark:text-white text-base">Alumnos del Grupo ({group.students.length}/{group.maxStudents})</h3>
-            <span className="text-xs text-slate-400">{group.waitingListCount} en lista de espera</span>
-          </div>
-
-          <div className="space-y-2.5">
-            {group.students.map((student, i) => (
-              <div key={i} className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-slate-950 text-xs">
-                <div className="flex items-center gap-2">
-                  <div className="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-600 flex items-center justify-center font-bold text-[11px]">
-                    {student.name.charAt(0)}
-                  </div>
-                  <div>
-                    <strong className="text-slate-800 dark:text-slate-200">{student.name}</strong>
-                    <div className="text-[10px] text-slate-400">Nivel FEP {student.level.toFixed(2)}</div>
-                  </div>
-                </div>
-                <span className="text-[11px] font-mono text-emerald-600 font-bold">{student.attendance} Asistencia</span>
+        {/* Enrollment Options */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="p-6 rounded-2xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] space-y-5 flex flex-col justify-between">
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-mono uppercase tracking-wider text-[#8B5CF6] dark:text-[#a78bfa] font-semibold">
+                  Opción Regular
+                </span>
+                <span className="text-2xl font-extrabold text-[#0B1A2D] dark:text-white font-mono tabular-nums">
+                  {group.monthlyPrice.toFixed(2)} €<span className="text-xs text-slate-400 font-normal">/mes</span>
+                </span>
               </div>
-            ))}
+
+              <h3 className="text-lg font-bold text-[#0B1A2D] dark:text-white">
+                Inscripción al Grupo Trimestral
+              </h3>
+              <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                Reserva tu plaza fija en el grupo con acceso a 8 clases al mes, evaluaciones de nivel y preparación para torneos.
+              </p>
+
+              <div className="space-y-2 text-xs text-slate-700 dark:text-slate-300 pt-2">
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-[#8B5CF6] dark:text-[#a78bfa] shrink-0" />
+                  <span>8 sesiones de entrenamiento intensivo al mes</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-[#8B5CF6] dark:text-[#a78bfa] shrink-0" />
+                  <span>Seguimiento de progresión y grabación en vídeo</span>
+                </div>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={handleJoinMonthly}
+              disabled={registered}
+              className={`w-full min-h-[42px] py-2.5 rounded-xl font-bold text-xs transition cursor-pointer ${
+                registered
+                  ? 'bg-[#0B1A2D] text-[#B7F229] cursor-default'
+                  : 'bg-[#B7F229] hover:bg-[#a6de1f] text-[#0B1A2D]'
+              }`}
+            >
+              {registered ? 'Inscrito al Grupo' : 'Inscribirme al Grupo Trimestral'}
+            </button>
+          </div>
+
+          <div className="p-6 rounded-2xl bg-white dark:bg-[#0E2239] border border-[#8B5CF6] space-y-5 flex flex-col justify-between">
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="px-2.5 py-0.5 rounded-md bg-[#8B5CF6] text-white font-mono text-[10px] uppercase tracking-wider font-bold">
+                  Plaza Suelta
+                </span>
+                <span className="text-2xl font-extrabold text-[#8B5CF6] dark:text-[#a78bfa] font-mono tabular-nums">
+                  {group.singleClassPrice.toFixed(2)} €<span className="text-xs text-slate-400 font-normal">/sesión</span>
+                </span>
+              </div>
+
+              <h3 className="text-lg font-bold text-[#0B1A2D] dark:text-white">
+                Comprar 1 Plaza Suelta
+              </h3>
+              <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                Aprovecha los huecos libres del grupo para unirte a una sesión individual sin cuota periódica.
+              </p>
+
+              <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-[#071220] text-xs text-[#0B1A2D] dark:text-slate-200">
+                <strong className="font-mono tabular-nums">1 plaza disponible</strong> para el próximo <strong>Martes a las 19:30</strong> con Laura Senra.
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={handleBuySingleSeat}
+              disabled={purchasedSingleSeat}
+              className={`w-full min-h-[42px] py-2.5 rounded-xl font-bold text-xs transition cursor-pointer ${
+                purchasedSingleSeat
+                  ? 'bg-[#0B1A2D] text-[#B7F229] cursor-default'
+                  : 'bg-[#8B5CF6] hover:bg-[#7c3aed] text-white'
+              }`}
+            >
+              {purchasedSingleSeat ? 'Plaza Suelta Reservada' : `Comprar Plaza Suelta (${group.singleClassPrice.toFixed(2)} €)`}
+            </button>
           </div>
         </div>
-      </div>
+
+        {/* Coach Bio & Roster */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="md:col-span-1 p-6 rounded-2xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] space-y-4">
+            <div className="flex items-center gap-3">
+              <img
+                src={group.coach.avatarUrl}
+                alt={group.coach.name}
+                className="w-14 h-14 rounded-xl object-cover border-2 border-[#B7F229]"
+              />
+              <div>
+                <div className="font-bold text-sm text-[#0B1A2D] dark:text-white">{group.coach.name}</div>
+                <div className="text-[11px] text-[#8B5CF6] dark:text-[#a78bfa] font-medium">{group.coach.title}</div>
+              </div>
+            </div>
+            <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">{group.coach.bio}</p>
+          </div>
+
+          <div className="md:col-span-2 p-6 rounded-2xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="font-bold text-[#0B1A2D] dark:text-white text-base">
+                Alumnos del Grupo (<span className="font-mono tabular-nums">{group.students.length}/{group.maxStudents}</span>)
+              </h3>
+              <span className="text-xs font-mono tabular-nums text-slate-400">{group.waitingListCount} en espera</span>
+            </div>
+
+            <div className="divide-y divide-slate-200/80 dark:divide-[#1A314D] border border-slate-200/80 dark:border-[#1A314D] rounded-xl overflow-hidden">
+              {group.students.map((student, i) => (
+                <div key={i} className="flex items-center justify-between p-3.5 bg-slate-50 dark:bg-[#071220] text-xs">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-[#0B1A2D] dark:bg-[#B7F229] text-[#B7F229] dark:text-[#0B1A2D] flex items-center justify-center font-bold text-xs">
+                      {student.name.charAt(0)}
+                    </div>
+                    <div>
+                      <strong className="text-[#0B1A2D] dark:text-slate-200">{student.name}</strong>
+                      <div className="text-[11px] font-mono tabular-nums text-slate-500">Nivel {student.level.toFixed(2)}</div>
+                    </div>
+                  </div>
+                  <span className="text-[11px] font-mono tabular-nums text-[#8B5CF6] dark:text-[#a78bfa] font-semibold">
+                    {student.attendance} Asistencia
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

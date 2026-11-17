@@ -1,15 +1,11 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
+import playerPadelImg from '../../assets/images/player_padel_action_1794872242959.jpg';
 import {
   ArrowLeft,
-  Trophy,
   Shield,
-  Star,
   Activity,
-  Calendar,
   Award,
-  CheckCircle2,
-  TrendingUp,
   Share2,
   Sparkles,
   Flame,
@@ -44,7 +40,6 @@ interface PlayerProfileData {
     name: string;
     level: number;
     matchesTogether: number;
-    avatarUrl: string;
   }[];
   headToHead?: {
     opponentName: string;
@@ -64,7 +59,7 @@ const PLAYERS_DIRECTORY: Record<string, PlayerProfileData> = {
     id: 'user-player-carlos',
     name: 'Carlos Méndez',
     memberNum: 'SM-408',
-    avatarUrl: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=400&q=80',
+    avatarUrl: playerPadelImg,
     level: 3.85,
     levelHistory: [
       { month: 'Jun', level: 3.50 },
@@ -89,21 +84,18 @@ const PLAYERS_DIRECTORY: Record<string, PlayerProfileData> = {
         name: 'Mateo Varela',
         level: 4.10,
         matchesTogether: 14,
-        avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80',
       },
       {
         id: 'lucas-pineiro',
         name: 'Lucas Piñeiro',
         level: 3.85,
         matchesTogether: 9,
-        avatarUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=200&q=80',
       },
       {
         id: 'diego-soto',
         name: 'Diego Soto',
         level: 3.90,
         matchesTogether: 7,
-        avatarUrl: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=200&q=80',
       },
     ],
   },
@@ -111,7 +103,7 @@ const PLAYERS_DIRECTORY: Record<string, PlayerProfileData> = {
     id: 'mateo-varela',
     name: 'Mateo Varela',
     memberNum: 'SM-201',
-    avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80',
+    avatarUrl: playerPadelImg,
     level: 4.10,
     levelHistory: [
       { month: 'Jun', level: 3.95 },
@@ -143,7 +135,7 @@ const PLAYERS_DIRECTORY: Record<string, PlayerProfileData> = {
     id: 'lucas-pineiro',
     name: 'Lucas Piñeiro',
     memberNum: 'SM-305',
-    avatarUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=400&q=80',
+    avatarUrl: playerPadelImg,
     level: 3.85,
     levelHistory: [
       { month: 'Jun', level: 3.65 },
@@ -175,7 +167,7 @@ const PLAYERS_DIRECTORY: Record<string, PlayerProfileData> = {
     id: 'diego-soto',
     name: 'Diego Soto',
     memberNum: 'SM-409',
-    avatarUrl: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=400&q=80',
+    avatarUrl: playerPadelImg,
     level: 3.90,
     levelHistory: [
       { month: 'Jun', level: 3.70 },
@@ -221,7 +213,6 @@ export const PlayerPublicProfileView: React.FC<PlayerPublicProfileViewProps> = (
     return playerId || 'user-player-carlos';
   });
 
-  // Check if viewing own profile
   const isSelf = activePlayerId === 'user-player-carlos' || activePlayerId === currentUser.id;
   const player = PLAYERS_DIRECTORY[activePlayerId] || PLAYERS_DIRECTORY['user-player-carlos'];
 
@@ -250,15 +241,15 @@ export const PlayerPublicProfileView: React.FC<PlayerPublicProfileViewProps> = (
   };
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-in fade-in duration-200">
-      {/* 1. TOP NAVIGATION WITH UNIVERSAL BACK BUTTON */}
-      <div className="flex items-center justify-between mb-4">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12 animate-in fade-in duration-200">
+      {/* Top Navigation */}
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
         <button
           type="button"
           onClick={handleBack}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-200 hover:text-emerald-600 dark:hover:text-emerald-400 font-bold text-xs shadow-xs transition cursor-pointer active:scale-95"
+          className="min-h-[40px] inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] text-[#0B1A2D] dark:text-slate-200 hover:border-[#0B1A2D] dark:hover:border-[#B7F229] font-semibold text-xs transition cursor-pointer"
         >
-          <ArrowLeft className="w-4 h-4" />
+          <ArrowLeft className="w-4 h-4 text-[#8B5CF6] dark:text-[#a78bfa]" />
           <span>Volver</span>
         </button>
 
@@ -267,9 +258,9 @@ export const PlayerPublicProfileView: React.FC<PlayerPublicProfileViewProps> = (
             <button
               type="button"
               onClick={onOpenNotifications}
-              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800 text-xs font-bold transition cursor-pointer active:scale-95 shadow-2xs"
+              className="min-h-[40px] inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white dark:bg-[#0E2239] hover:bg-slate-50 dark:hover:bg-[#132A45] text-[#0B1A2D] dark:text-slate-200 border border-slate-200/80 dark:border-[#1A314D] text-xs font-semibold transition cursor-pointer"
             >
-              <Bell className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+              <Bell className="w-3.5 h-3.5 text-[#8B5CF6] dark:text-[#a78bfa]" />
               <span>Preferencias de Avisos</span>
             </button>
           )}
@@ -277,297 +268,293 @@ export const PlayerPublicProfileView: React.FC<PlayerPublicProfileViewProps> = (
           <button
             type="button"
             onClick={handleShare}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs font-semibold transition cursor-pointer active:scale-95"
+            className="min-h-[40px] inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#0B1A2D] dark:bg-[#B7F229] text-white dark:text-[#0B1A2D] text-xs font-bold transition cursor-pointer"
           >
-            <Share2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+            <Share2 className="w-3.5 h-3.5" />
             <span>Compartir Ficha</span>
           </button>
         </div>
       </div>
 
       <div className="space-y-8">
-        {/* 2. HERO CARD: Diseño prémium centrado con avatar destacado */}
-      <div className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-slate-900 via-slate-900 to-slate-950 text-white border border-slate-800 p-6 sm:p-8 shadow-2xl">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-[radial-gradient(circle_at_70%_30%,rgba(16,185,129,0.18),transparent_60%)] pointer-events-none" />
-
-        <div className="relative z-10 flex flex-col md:flex-row items-center md:items-start gap-6 sm:gap-8 text-center md:text-left">
-          <div className="relative shrink-0">
-            <img
-              src={player.avatarUrl}
-              alt={player.name}
-              className="w-28 h-28 sm:w-36 sm:h-36 rounded-3xl object-cover ring-4 ring-emerald-500/40 shadow-2xl"
-            />
-            {player.memberNum && isSelf && (
-              <span className="absolute -bottom-2 -right-2 px-2.5 py-0.5 rounded-full bg-emerald-500 text-slate-950 font-black text-[10px] tracking-wider uppercase ring-2 ring-slate-900">
-                Socio #{player.memberNum}
-              </span>
-            )}
-          </div>
-
-          <div className="flex-1 space-y-2.5">
-            <div className="flex flex-wrap items-center justify-center md:justify-start gap-2">
-              <span className="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-bold font-mono">
-                Nivel Oficial {player.level.toFixed(2)}
-              </span>
-              <span className="px-3 py-1 rounded-full bg-slate-800 text-slate-300 border border-slate-700 text-xs font-semibold">
-                {currentTenant.name}
-              </span>
-              <span className="px-2.5 py-1 rounded-full bg-cyan-950 text-cyan-400 border border-cyan-800 text-[11px] font-semibold">
-                Ficha Federada
-              </span>
+        {/* Hero Card */}
+        <div className="rounded-2xl overflow-hidden bg-[#0B1A2D] text-white border border-[#1A314D] p-6 sm:p-8">
+          <div className="flex flex-col md:flex-row items-center md:items-start gap-6 sm:gap-8 text-center md:text-left">
+            <div className="relative shrink-0">
+              <img
+                src={player.avatarUrl}
+                alt={player.name}
+                className="w-28 h-28 sm:w-32 sm:h-32 rounded-2xl object-cover border-2 border-[#B7F229]"
+              />
+              {player.memberNum && isSelf && (
+                <span className="absolute -bottom-2 -right-2 px-2.5 py-0.5 rounded-md bg-[#B7F229] text-[#0B1A2D] font-mono font-bold text-[10px] tracking-wider uppercase">
+                  #{player.memberNum}
+                </span>
+              )}
             </div>
 
-            <h1 className="text-3xl sm:text-4xl font-black text-white tracking-tight">
-              {player.name}
-            </h1>
+            <div className="flex-1 space-y-3">
+              <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 text-xs font-mono">
+                <span className="px-2.5 py-1 rounded-md bg-[#B7F229] text-[#0B1A2D] font-bold tabular-nums">
+                  Nivel {player.level.toFixed(2)}
+                </span>
+                <span className="text-slate-300">·</span>
+                <span className="text-slate-300">{currentTenant.name}</span>
+                <span className="text-slate-300">·</span>
+                <span className="text-[#a78bfa]">Ficha Federada</span>
+              </div>
 
-            {/* Estilo de juego público */}
-            <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 pt-1 text-xs text-slate-300">
-              <span className="flex items-center gap-1.5">
-                <Shield className="w-4 h-4 text-emerald-400" /> Posición: <strong>{player.position}</strong>
-              </span>
-              <span className="flex items-center gap-1.5">
-                <Activity className="w-4 h-4 text-cyan-400" /> Mano: <strong>{player.hand}</strong>
-              </span>
-              <span className="flex items-center gap-1.5">
-                <Sparkles className="w-4 h-4 text-amber-400" /> Pala: <strong>{player.racket}</strong>
-              </span>
+              <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+                {player.name}
+              </h1>
+
+              <div className="flex flex-wrap items-center justify-center md:justify-start gap-5 pt-1 text-xs text-slate-300">
+                <span className="flex items-center gap-1.5">
+                  <Shield className="w-4 h-4 text-[#B7F229]" /> Posición: <strong className="text-white">{player.position}</strong>
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <Activity className="w-4 h-4 text-[#a78bfa]" /> Mano: <strong className="text-white">{player.hand}</strong>
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <Sparkles className="w-4 h-4 text-[#B7F229]" /> Pala: <strong className="text-white">{player.racket}</strong>
+                </span>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* VISTA A: PROPIO JUGADOR (MI PERFIL - Requerimiento 6.B) */}
-      {isSelf && (
-        <>
-          {/* Tarjeta de Socio Digital & Saldo Monedero */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {/* Saldo de Monedero */}
-            <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex items-center justify-between">
-              <div>
-                <span className="text-xs text-slate-500 font-bold uppercase tracking-wider block">
-                  Saldo en Monedero
-                </span>
-                <div className="text-3xl font-black font-mono text-emerald-600 dark:text-emerald-400 mt-1">
-                  {(player.balance || 24.50).toFixed(2)} €
-                </div>
-                <span className="text-[11px] text-slate-400">Activo para reservas y consumiciones</span>
-              </div>
-              <div className="p-3 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400">
-                <Wallet className="w-7 h-7" />
-              </div>
-            </div>
-
-            {/* Tarjeta de Socio Digital */}
-            <div className="md:col-span-2 p-5 rounded-2xl bg-gradient-to-r from-slate-900 to-slate-800 text-white border border-slate-700 shadow-sm flex items-center justify-between">
-              <div className="space-y-1">
-                <div className="text-xs text-emerald-400 font-bold uppercase tracking-wider flex items-center gap-1.5">
-                  <CreditCard className="w-4 h-4" />
-                  <span>Carnet de Socio Setmio Pádel</span>
-                </div>
-                <div className="text-lg font-black text-white">{player.name}</div>
-                <div className="text-xs text-slate-300 font-mono">
-                  Socio #{player.memberNum} · Temporada 2026
-                </div>
-              </div>
-              <div className="p-2.5 rounded-xl bg-white text-slate-900 shrink-0">
-                <QrCode className="w-10 h-10" />
-              </div>
-            </div>
-          </div>
-
-          {/* Gráficos e Indicadores / Widgets Prémium (Requerimiento 6.B) */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {/* Widget 1: Evolución de Nivel */}
-            <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-                  Evolución de Nivel FEP
-                </span>
-                <span className="text-xs font-bold font-mono text-emerald-500 bg-emerald-50 dark:bg-emerald-950 px-2 py-0.5 rounded-md">
-                  +0.35 pts
-                </span>
-              </div>
-
-              <div className="text-2xl font-black font-mono text-slate-900 dark:text-white">
-                {player.level.toFixed(2)}
-              </div>
-
-              {/* Mini gráfico de barras de evolución */}
-              <div className="flex items-end justify-between gap-2 pt-2 h-16">
-                {player.levelHistory.map((pt, i) => (
-                  <div key={i} className="flex-1 flex flex-col items-center gap-1">
-                    <div
-                      className="w-full rounded-t-md bg-emerald-500/80 hover:bg-emerald-400 transition"
-                      style={{ height: `${((pt.level - 3.0) / 1.5) * 100}%` }}
-                    />
-                    <span className="text-[10px] text-slate-400 font-mono">{pt.month}</span>
+        {/* SELF VIEW */}
+        {isSelf && (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="p-5 rounded-2xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] flex items-center justify-between">
+                <div>
+                  <span className="text-[11px] font-mono text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
+                    Saldo en Monedero
+                  </span>
+                  <div className="text-3xl font-extrabold font-mono tabular-nums text-[#0B1A2D] dark:text-[#B7F229] mt-1">
+                    {(player.balance || 24.50).toFixed(2)} €
                   </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Widget 2: Porcentaje de Victorias */}
-            <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-                  Porcentaje de Victorias
-                </span>
-                <Award className="w-4 h-4 text-emerald-500" />
-              </div>
-
-              <div className="text-2xl font-black font-mono text-emerald-600 dark:text-emerald-400">
-                {player.winRate}%
-              </div>
-
-              <div className="space-y-1.5">
-                <div className="w-full h-3 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden flex">
-                  <div className="bg-emerald-500 h-full" style={{ width: `${player.winRate}%` }} />
-                  <div className="bg-slate-300 dark:bg-slate-700 h-full flex-1" />
+                  <span className="text-[11px] text-slate-500 dark:text-slate-400">Activo para reservas y tienda</span>
                 </div>
-                <div className="flex justify-between text-[11px] text-slate-500">
-                  <span>{player.matchesWon} Victorias</span>
-                  <span>{player.matchesPlayed - player.matchesWon} Derrotas</span>
+                <div className="p-3 rounded-xl bg-slate-100 dark:bg-[#071220] text-[#8B5CF6] dark:text-[#a78bfa]">
+                  <Wallet className="w-6 h-6" />
+                </div>
+              </div>
+
+              <div className="md:col-span-2 p-5 rounded-2xl bg-[#0B1A2D] text-white border border-[#1A314D] flex items-center justify-between">
+                <div className="space-y-1">
+                  <div className="text-xs text-[#B7F229] font-mono uppercase tracking-wider flex items-center gap-1.5">
+                    <CreditCard className="w-4 h-4" />
+                    <span>Carnet de Socio Setmio</span>
+                  </div>
+                  <div className="text-lg font-bold text-white">{player.name}</div>
+                  <div className="text-xs text-slate-300 font-mono tabular-nums">
+                    Socio #{player.memberNum} · Temporada 2026
+                  </div>
+                </div>
+                <div className="p-2.5 rounded-xl bg-white text-[#0B1A2D] shrink-0">
+                  <QrCode className="w-10 h-10" />
                 </div>
               </div>
             </div>
 
-            {/* Widget 3: Racha Actual */}
-            <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-                  Racha Actual
-                </span>
-                <Flame className="w-4 h-4 text-amber-500" />
-              </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="p-5 rounded-2xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-mono text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                    Evolución de Nivel
+                  </span>
+                  <span className="text-xs font-bold font-mono tabular-nums text-[#0B1A2D] bg-[#B7F229] px-2 py-0.5 rounded-md">
+                    +0.35 pts
+                  </span>
+                </div>
 
-              <div className="text-2xl font-black text-amber-500 flex items-center gap-2">
-                <span>{player.currentStreak}</span>
-                <Flame className="w-6 h-6 text-amber-500 animate-bounce" />
-              </div>
+                <div className="text-2xl font-extrabold font-mono tabular-nums text-[#0B1A2D] dark:text-white">
+                  {player.level.toFixed(2)}
+                </div>
 
-              <p className="text-[11px] text-slate-500">
-                Mejor racha de temporada: <strong className="text-slate-800 dark:text-slate-200">{player.bestStreak}</strong>. Victorias consecutivas en liga social.
-              </p>
-            </div>
-          </div>
-
-          {/* Compañeros Habituales (Requerimiento 6.B: Navega a su perfil al pulsar) */}
-          <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Users className="w-5 h-5 text-emerald-500" />
-                <h3 className="text-base font-black text-slate-900 dark:text-white">
-                  Compañeros Habituales
-                </h3>
-              </div>
-              <span className="text-xs text-slate-500">Toca sobre un compañero para ver su perfil</span>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              {player.frequentPartners?.map((p) => (
-                <button
-                  key={p.id}
-                  type="button"
-                  onClick={() => setActivePlayerId(p.id)}
-                  className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 hover:bg-emerald-50 dark:hover:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80 hover:border-emerald-500/50 text-left transition flex items-center justify-between group cursor-pointer"
-                >
-                  <div className="flex items-center gap-3 min-w-0">
-                    <img
-                      src={p.avatarUrl}
-                      alt={p.name}
-                      className="w-10 h-10 rounded-xl object-cover ring-1 ring-slate-300 dark:ring-slate-700"
-                    />
-                    <div className="min-w-0">
-                      <div className="font-bold text-xs text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 truncate">
-                        {p.name}
-                      </div>
-                      <div className="text-[10px] text-slate-500">
-                        Nivel {p.level.toFixed(2)} · {p.matchesTogether} partidas
-                      </div>
+                <div className="flex items-end justify-between gap-2 pt-2 h-16">
+                  {player.levelHistory.map((pt, i) => (
+                    <div key={i} className="flex-1 flex flex-col items-center gap-1">
+                      <div
+                        className="w-full rounded-t-md bg-[#0B1A2D] dark:bg-[#B7F229] transition"
+                        style={{ height: `${Math.max(20, ((pt.level - 3.0) / 1.5) * 100)}%` }}
+                      />
+                      <span className="text-[10px] text-slate-400 font-mono">{pt.month}</span>
                     </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="p-5 rounded-2xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-mono text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                    Porcentaje de Victorias
+                  </span>
+                  <Award className="w-4 h-4 text-[#8B5CF6] dark:text-[#a78bfa]" />
+                </div>
+
+                <div className="text-2xl font-extrabold font-mono tabular-nums text-[#0B1A2D] dark:text-[#B7F229]">
+                  {player.winRate}%
+                </div>
+
+                <div className="space-y-2">
+                  <div className="w-full h-2 rounded-full bg-slate-100 dark:bg-[#071220] overflow-hidden flex">
+                    <div className="bg-[#0B1A2D] dark:bg-[#B7F229] h-full" style={{ width: `${player.winRate}%` }} />
                   </div>
-                  <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-emerald-500 transition shrink-0" />
-                </button>
-              ))}
-            </div>
-          </div>
-        </>
-      )}
-
-      {/* VISTA C: OTRO JUGADOR (PERFIL PÚBLICO / RIVAL - Requerimiento 6.C) */}
-      {!isSelf && (
-        <div className="space-y-6">
-          {/* Estadísticas Públicas (Sin datos financieros, ni teléfono, ni monedero) */}
-          <div className="grid grid-cols-3 gap-3 sm:gap-4">
-            <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm text-center">
-              <div className="text-xs text-slate-500 font-bold uppercase tracking-wider">Partidos Jugados</div>
-              <div className="text-2xl sm:text-3xl font-black font-mono text-slate-900 dark:text-white mt-1">
-                {player.matchesPlayed}
+                  <div className="flex justify-between text-[11px] font-mono tabular-nums text-slate-500 dark:text-slate-400">
+                    <span>{player.matchesWon} Victorias</span>
+                    <span>{player.matchesPlayed - player.matchesWon} Derrotas</span>
+                  </div>
+                </div>
               </div>
-              <span className="text-[10px] text-slate-400">Temporada Oficial</span>
-            </div>
 
-            <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm text-center">
-              <div className="text-xs text-slate-500 font-bold uppercase tracking-wider">% Victorias</div>
-              <div className="text-2xl sm:text-3xl font-black font-mono text-emerald-600 dark:text-emerald-400 mt-1">
-                {player.winRate}%
+              <div className="p-5 rounded-2xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-mono text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                    Racha Actual
+                  </span>
+                  <Flame className="w-4 h-4 text-[#8B5CF6] dark:text-[#a78bfa]" />
+                </div>
+
+                <div className="text-2xl font-extrabold font-mono tabular-nums text-[#8B5CF6] dark:text-[#a78bfa]">
+                  {player.currentStreak}
+                </div>
+
+                <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                  Mejor racha de temporada: <strong className="text-[#0B1A2D] dark:text-slate-200 font-mono">{player.bestStreak}</strong>.
+                </p>
               </div>
-              <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold">{player.matchesWon} victorias</span>
             </div>
 
-            <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm text-center">
-              <div className="text-xs text-slate-500 font-bold uppercase tracking-wider">Racha</div>
-              <div className="text-xl sm:text-2xl font-black text-amber-500 mt-1">
-                {player.currentStreak}
-              </div>
-              <span className="text-[10px] text-slate-400">En activo</span>
-            </div>
-          </div>
-
-          {/* Historial de Enfrentamientos Mutuos (Head-to-head - Requerimiento 6.C) */}
-          {player.headToHead && (
-            <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
-              <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+            <div className="p-6 rounded-2xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] space-y-4">
+              <div className="flex flex-wrap items-center justify-between gap-2">
                 <div className="flex items-center gap-2">
-                  <Swords className="w-5 h-5 text-amber-500" />
-                  <h3 className="text-base font-black text-slate-900 dark:text-white">
-                    Historial de Enfrentamientos Mutuos (Cara a Cara)
+                  <Users className="w-5 h-5 text-[#8B5CF6] dark:text-[#a78bfa]" />
+                  <h3 className="text-base font-bold text-[#0B1A2D] dark:text-white">
+                    Compañeros Habituales
                   </h3>
                 </div>
-                <span className="text-xs font-mono font-bold text-slate-600 dark:text-slate-300">
-                  {player.headToHead.wins}V - {player.headToHead.losses}D vs {player.headToHead.opponentName}
+                <span className="text-xs text-slate-500 dark:text-slate-400">Pulsa sobre un compañero para ver su ficha</span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                {player.frequentPartners?.map((p) => {
+                  const initials = p.name
+                    .split(' ')
+                    .slice(0, 2)
+                    .map((n) => n[0])
+                    .join('')
+                    .toUpperCase();
+                  return (
+                    <button
+                      key={p.id}
+                      type="button"
+                      onClick={() => setActivePlayerId(p.id)}
+                      className="min-h-[60px] p-3.5 rounded-xl bg-slate-50 dark:bg-[#071220] hover:border-[#0B1A2D] dark:hover:border-[#B7F229] border border-slate-200/80 dark:border-[#1A314D] text-left transition flex items-center justify-between group cursor-pointer"
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="w-10 h-10 rounded-xl bg-[#0B1A2D] dark:bg-[#B7F229] text-[#B7F229] dark:text-[#0B1A2D] font-bold text-xs flex items-center justify-center shrink-0">
+                          {initials}
+                        </div>
+                        <div className="min-w-0">
+                          <div className="font-bold text-xs text-[#0B1A2D] dark:text-white truncate">
+                            {p.name}
+                          </div>
+                          <div className="text-[11px] font-mono tabular-nums text-slate-500 dark:text-slate-400">
+                            Niv {p.level.toFixed(2)} · {p.matchesTogether} partidos
+                          </div>
+                        </div>
+                      </div>
+                      <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-[#0B1A2D] dark:group-hover:text-[#B7F229] transition shrink-0" />
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* OTHER PLAYER VIEW */}
+        {!isSelf && (
+          <div className="space-y-6">
+            <div className="grid grid-cols-3 divide-x divide-slate-200/80 dark:divide-[#1A314D] rounded-2xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D]">
+              <div className="p-5 text-center">
+                <div className="text-[11px] font-mono text-slate-500 dark:text-slate-400 uppercase tracking-wider">Partidos</div>
+                <div className="text-2xl sm:text-3xl font-extrabold font-mono tabular-nums text-[#0B1A2D] dark:text-white mt-1">
+                  {player.matchesPlayed}
+                </div>
+                <span className="text-[10px] text-slate-400">Temporada Oficial</span>
+              </div>
+
+              <div className="p-5 text-center">
+                <div className="text-[11px] font-mono text-slate-500 dark:text-slate-400 uppercase tracking-wider">% Victorias</div>
+                <div className="text-2xl sm:text-3xl font-extrabold font-mono tabular-nums text-[#0B1A2D] dark:text-[#B7F229] mt-1">
+                  {player.winRate}%
+                </div>
+                <span className="text-[10px] font-mono tabular-nums text-[#8B5CF6] dark:text-[#a78bfa] font-semibold">
+                  {player.matchesWon} victorias
                 </span>
               </div>
 
-              <div className="space-y-2.5">
-                {player.headToHead.matches.map((match, idx) => (
-                  <div
-                    key={idx}
-                    className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80 flex items-center justify-between text-xs"
-                  >
-                    <div>
-                      <div className="font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                        <span className={`px-2 py-0.5 rounded-md text-[10px] font-black uppercase ${match.result === 'win' ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300' : 'bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-300'}`}>
-                          {match.result === 'win' ? 'Victoria' : 'Derrota'}
-                        </span>
-                        <span className="font-mono">{match.score}</span>
-                      </div>
-                      <div className="text-[11px] text-slate-500 mt-0.5">
-                        {match.date} · {match.court}
-                      </div>
-                    </div>
-
-                    <span className="text-[11px] font-semibold text-slate-600 dark:text-slate-400">
-                      Partido Oficial Club
-                    </span>
-                  </div>
-                ))}
+              <div className="p-5 text-center">
+                <div className="text-[11px] font-mono text-slate-500 dark:text-slate-400 uppercase tracking-wider">Racha</div>
+                <div className="text-xl sm:text-2xl font-extrabold font-mono tabular-nums text-[#8B5CF6] dark:text-[#a78bfa] mt-1">
+                  {player.currentStreak}
+                </div>
+                <span className="text-[10px] text-slate-400">En activo</span>
               </div>
             </div>
-          )}
-        </div>
-      )}
+
+            {player.headToHead && (
+              <div className="p-6 rounded-2xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] space-y-4">
+                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200/80 dark:border-[#1A314D] pb-3.5">
+                  <div className="flex items-center gap-2">
+                    <Swords className="w-5 h-5 text-[#8B5CF6] dark:text-[#a78bfa]" />
+                    <h3 className="text-base font-bold text-[#0B1A2D] dark:text-white">
+                      Historial Cara a Cara
+                    </h3>
+                  </div>
+                  <span className="text-xs font-mono tabular-nums font-bold text-[#0B1A2D] dark:text-[#B7F229]">
+                    {player.headToHead.wins}V - {player.headToHead.losses}D vs {player.headToHead.opponentName}
+                  </span>
+                </div>
+
+                <div className="divide-y divide-slate-200/80 dark:divide-[#1A314D] border border-slate-200/80 dark:border-[#1A314D] rounded-xl overflow-hidden">
+                  {player.headToHead.matches.map((match, idx) => (
+                    <div
+                      key={idx}
+                      className="p-3.5 bg-slate-50 dark:bg-[#071220] flex items-center justify-between text-xs"
+                    >
+                      <div>
+                        <div className="font-bold text-[#0B1A2D] dark:text-white flex items-center gap-2">
+                          <span
+                            className={`px-2 py-0.5 rounded-md text-[10px] font-bold uppercase ${
+                              match.result === 'win'
+                                ? 'bg-[#B7F229] text-[#0B1A2D]'
+                                : 'bg-slate-200 text-slate-700 dark:bg-[#132A45] dark:text-slate-300'
+                            }`}
+                          >
+                            {match.result === 'win' ? 'Victoria' : 'Derrota'}
+                          </span>
+                          <span className="font-mono tabular-nums">{match.score}</span>
+                        </div>
+                        <div className="text-[11px] text-slate-500 mt-0.5 font-mono tabular-nums">
+                          {match.date} · {match.court}
+                        </div>
+                      </div>
+
+                      <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400">
+                        Oficial Club
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

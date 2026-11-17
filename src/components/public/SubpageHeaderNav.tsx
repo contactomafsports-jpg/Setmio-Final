@@ -37,9 +37,9 @@ export function SubpageHeaderNav({
     <button
       type="button"
       onClick={handleBack}
-      className={`mb-4 inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-bold text-slate-700 shadow-xs transition hover:border-emerald-400 hover:text-emerald-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200 dark:hover:text-emerald-400 cursor-pointer active:scale-95 ${className || ''}`}
+      className={`mb-6 inline-flex min-h-[40px] items-center gap-2 rounded-xl border border-slate-200/80 bg-white px-4 py-2 text-xs font-semibold text-[#0B1A2D] transition hover:border-[#8B5CF6]/60 hover:text-[#8B5CF6] dark:border-[#1A314D] dark:bg-[#0E2239] dark:text-slate-200 dark:hover:border-[#B7F229]/60 dark:hover:text-[#B7F229] cursor-pointer active:scale-95 ${className || ''}`}
     >
-      <ArrowLeft className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+      <ArrowLeft className="h-4 w-4 text-[#8B5CF6] dark:text-[#B7F229]" />
       <span>{label || t('common.back', 'Volver atrás')}</span>
     </button>
   );

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Check, Sparkles, ShieldCheck, ArrowRight, HelpCircle } from 'lucide-react';
+import { Check, ShieldCheck, ArrowRight } from 'lucide-react';
 import { SubpageHeaderNav } from './SubpageHeaderNav';
 import { useApp } from '../../context/AppContext';
 
@@ -71,35 +71,32 @@ export const PricingView: React.FC<PricingViewProps> = ({ onBack, onOpenDemo, on
   };
 
   return (
-    <main className="min-h-[calc(100vh-4rem)] bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 py-10 transition-colors duration-200">
+    <main className="min-h-[calc(100vh-4rem)] bg-white dark:bg-[#0B1A2D] text-[#0B1A2D] dark:text-white py-12 sm:py-20 transition-colors duration-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Navigation alineada a la izquierda */}
-        <div className="mb-4 flex items-center justify-start">
+        <div className="mb-6 flex items-center justify-start">
           <SubpageHeaderNav onBack={onBack} className="mb-0" />
         </div>
 
-        <div className="space-y-12">
-          {/* Header Estrictamente Centrado */}
-        <div className="space-y-6 text-center w-full">
-          <div className="max-w-3xl mx-auto space-y-4 text-center flex flex-col items-center justify-center">
-            <div className="inline-flex items-center justify-center gap-2 px-3.5 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs font-black uppercase tracking-widest border border-emerald-500/20 text-center">
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>{t('pricing.heroBadge')}</span>
+        <div className="space-y-16">
+          {/* Header */}
+          <div className="max-w-3xl mx-auto space-y-5 text-center">
+            <div className="text-xs font-bold uppercase tracking-[0.18em] text-[#8B5CF6] dark:text-[#a78bfa]">
+              {t('pricing.heroBadge')}
             </div>
 
-            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-slate-900 dark:text-white leading-tight text-center">
+            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-[#0B1A2D] dark:text-white leading-[1.08] text-balance">
               {t('pricing.heroTitle')}
             </h1>
 
-            <p className="text-base sm:text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto leading-relaxed text-center font-normal">
+            <p className="text-base sm:text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto leading-relaxed">
               {t('pricing.heroSubtitle')}
             </p>
 
-            {/* Selector de Periodo de Facturación Estrictamente Centrado */}
-            <div className="flex items-center justify-center gap-3 pt-4 text-center">
+            {/* Billing Cycle Switch */}
+            <div className="inline-flex items-center justify-center gap-4 pt-3">
               <span
-                className={`text-xs font-bold transition-colors ${
-                  billingCycle === 'monthly' ? 'text-slate-900 dark:text-white font-black' : 'text-slate-500 dark:text-slate-400'
+                className={`text-xs font-semibold transition-colors ${
+                  billingCycle === 'monthly' ? 'text-[#0B1A2D] dark:text-white font-bold' : 'text-slate-500 dark:text-slate-400'
                 }`}
               >
                 {t('pricing.cycleMonthly', 'Facturación Mensual')}
@@ -108,156 +105,148 @@ export const PricingView: React.FC<PricingViewProps> = ({ onBack, onOpenDemo, on
               <button
                 type="button"
                 onClick={() => setBillingCycle(billingCycle === 'monthly' ? 'yearly' : 'monthly')}
-                className="relative w-14 h-7 rounded-full bg-emerald-600 transition p-0.5 cursor-pointer shadow-inner focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+                className="relative w-12 h-6 rounded-full bg-[#0B1A2D] dark:bg-[#132A45] border border-slate-300 dark:border-[#1A314D] transition p-0.5 cursor-pointer"
                 aria-label={t('pricing.toggleCycle', 'Alternar facturación mensual y anual')}
               >
                 <span
-                  className={`block w-6 h-6 rounded-full bg-white transition-transform duration-200 shadow-md ${
-                    billingCycle === 'yearly' ? 'translate-x-7' : 'translate-x-0'
+                  className={`block w-5 h-5 rounded-full bg-[#B7F229] transition-transform duration-200 ${
+                    billingCycle === 'yearly' ? 'translate-x-6' : 'translate-x-0'
                   }`}
                 />
               </button>
 
               <span
-                className={`text-xs font-bold transition-colors flex items-center justify-center gap-1.5 ${
-                  billingCycle === 'yearly' ? 'text-slate-900 dark:text-white font-black' : 'text-slate-500 dark:text-slate-400'
+                className={`text-xs font-semibold transition-colors flex items-center gap-2 ${
+                  billingCycle === 'yearly' ? 'text-[#0B1A2D] dark:text-white font-bold' : 'text-slate-500 dark:text-slate-400'
                 }`}
               >
                 <span>{t('pricing.cycleYearly', 'Facturación Anual')}</span>
-                <span className="px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 font-black text-[10px] tracking-wide border border-emerald-500/30">
+                <span className="px-2 py-0.5 rounded-md bg-[#B7F229]/20 text-[#0B1A2D] dark:text-[#B7F229] font-bold text-[10px] tracking-wide border border-[#B7F229]/40">
                   {t('pricing.cycleYearlyDiscount', 'Ahorra 2 meses (20%)')}
                 </span>
               </span>
             </div>
           </div>
-        </div>
 
-        {/* Grid de Precios con Cada Tarjeta y su Interior Estrictamente Centrados */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch">
-          {pricingTierConfigs.map((tier) => {
-            const price = billingCycle === 'yearly' ? tier.priceYearly : tier.priceMonthly;
+          {/* Pricing Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 items-stretch">
+            {pricingTierConfigs.map((tier) => {
+              const price = billingCycle === 'yearly' ? tier.priceYearly : tier.priceMonthly;
 
-            return (
-              <article
-                key={tier.id}
-                className={`relative rounded-3xl p-7 flex flex-col justify-between text-center items-center transition-all duration-200 hover:-translate-y-1.5 shadow-sm hover:shadow-xl ${
-                  tier.featured
-                    ? 'bg-white dark:bg-slate-900 border-2 border-emerald-500 ring-4 ring-emerald-500/10 shadow-lg'
-                    : 'bg-slate-50/70 dark:bg-slate-900/60 border border-slate-200/90 dark:border-slate-800'
-                }`}
-              >
-                {/* Badge Superior Centrado */}
-                <div className="w-full flex justify-center mb-3 text-center">
-                  <span
-                    className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider text-center ${
-                      tier.badgeHighlight
-                        ? 'bg-emerald-500 text-white shadow-xs'
-                        : 'bg-slate-200/80 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
-                    }`}
-                  >
-                    {t(`pricing.tiers.${tier.id}.badge`)}
-                  </span>
-                </div>
-
-                {/* Contenido Principal de la Tarjeta Estrictamente Centrado */}
-                <div className="w-full space-y-4 flex flex-col items-center justify-center text-center">
-                  <h2 className="text-2xl font-black text-slate-900 dark:text-white text-center w-full">
-                    {t(`pricing.tiers.${tier.id}.name`)}
-                  </h2>
-
-                  {/* Precio Centrado */}
-                  <div className="flex items-baseline justify-center gap-1 border-b border-slate-100 dark:border-slate-800/80 pb-4 w-full text-center">
-                    {price === null ? (
-                      <span className="text-3xl font-black text-slate-900 dark:text-white tracking-tight text-center">
-                        {t('pricing.customPrice')}
+              return (
+                <article
+                  key={tier.id}
+                  className={`relative rounded-2xl p-7 flex flex-col justify-between transition-colors ${
+                    tier.featured
+                      ? 'bg-[#0B1A2D] text-white border-2 border-[#B7F229] dark:bg-[#0E2239]'
+                      : 'bg-[#F8FAFC] dark:bg-[#0E2239] text-[#0B1A2D] dark:text-white border border-slate-200/80 dark:border-[#1A314D] hover:border-[#8B5CF6]/50'
+                  }`}
+                >
+                  <div className="space-y-6">
+                    <div className="space-y-3">
+                      <span
+                        className={`inline-block text-[10px] font-bold uppercase tracking-[0.16em] ${
+                          tier.badgeHighlight
+                            ? 'text-[#B7F229]'
+                            : 'text-[#8B5CF6] dark:text-[#a78bfa]'
+                        }`}
+                      >
+                        {t(`pricing.tiers.${tier.id}.badge`)}
                       </span>
-                    ) : (
-                      <>
-                        <span className="text-4xl sm:text-5xl font-black font-mono tracking-tight text-emerald-600 dark:text-emerald-400 text-center">
-                          {price}€
+
+                      <h2 className={`text-xl font-black ${tier.featured ? 'text-white' : 'text-[#0B1A2D] dark:text-white'}`}>
+                        {t(`pricing.tiers.${tier.id}.name`)}
+                      </h2>
+                    </div>
+
+                    {/* Price */}
+                    <div className={`flex items-baseline gap-1.5 pb-5 border-b ${tier.featured ? 'border-[#1A314D]' : 'border-slate-200/80 dark:border-[#1A314D]'}`}>
+                      {price === null ? (
+                        <span className={`text-3xl font-black tracking-tight ${tier.featured ? 'text-white' : 'text-[#0B1A2D] dark:text-white'}`}>
+                          {t('pricing.customPrice')}
                         </span>
-                        <span className="text-xs text-slate-500 dark:text-slate-400 font-semibold text-center">
-                          {t('pricing.perMonth')}
-                        </span>
-                      </>
-                    )}
+                      ) : (
+                        <>
+                          <span className={`text-4xl font-black font-mono tabular-nums tracking-tight ${tier.featured ? 'text-[#B7F229]' : 'text-[#0B1A2D] dark:text-white'}`}>
+                            {price}€
+                          </span>
+                          <span className={`text-xs font-medium ${tier.featured ? 'text-slate-400' : 'text-slate-500 dark:text-slate-400'}`}>
+                            {t('pricing.perMonth')}
+                          </span>
+                        </>
+                      )}
+                    </div>
+
+                    <p className={`text-xs leading-relaxed min-h-10 ${tier.featured ? 'text-slate-300' : 'text-slate-600 dark:text-slate-400'}`}>
+                      {t(`pricing.tiers.${tier.id}.desc`)}
+                    </p>
+
+                    <ul className={`space-y-3 pt-4 border-t ${tier.featured ? 'border-[#1A314D]' : 'border-slate-200/80 dark:border-[#1A314D]'}`}>
+                      {Array.from({ length: tier.featureCount }).map((_, idx) => (
+                        <li
+                          key={idx}
+                          className={`text-xs flex items-start gap-2.5 ${tier.featured ? 'text-slate-200' : 'text-slate-700 dark:text-slate-300'}`}
+                        >
+                          <Check className={`w-4 h-4 shrink-0 mt-0.5 ${tier.featured ? 'text-[#B7F229]' : 'text-[#8B5CF6] dark:text-[#B7F229]'}`} />
+                          <span>{t(`pricing.tiers.${tier.id}.f${idx + 1}`)}</span>
+                        </li>
+                      ))}
+                    </ul>
                   </div>
 
-                  {/* Descripción Centrada */}
-                  <p className="text-xs text-slate-600 dark:text-slate-400 min-h-12 leading-relaxed text-center px-1 w-full">
-                    {t(`pricing.tiers.${tier.id}.desc`)}
-                  </p>
+                  <div className={`pt-6 mt-6 border-t ${tier.featured ? 'border-[#1A314D]' : 'border-slate-200/80 dark:border-[#1A314D]'}`}>
+                    <button
+                      type="button"
+                      onClick={() => handleSelectPlan(tier.id)}
+                      className={`w-full min-h-[44px] py-3 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-95 ${
+                        tier.featured
+                          ? 'bg-[#B7F229] hover:bg-[#c5f64e] text-[#0B1A2D]'
+                          : 'bg-[#0B1A2D] hover:bg-[#132A45] text-white dark:bg-white dark:text-[#0B1A2D] dark:hover:bg-slate-100'
+                      }`}
+                    >
+                      <span>{t(`pricing.tiers.${tier.id}.cta`)}</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
 
-                  {/* Lista de Características Centrada */}
-                  <ul className="w-full space-y-3 pt-3 border-t border-slate-100 dark:border-slate-800/80 flex flex-col items-center justify-center text-center">
-                    {Array.from({ length: tier.featureCount }).map((_, idx) => (
-                      <li
-                        key={idx}
-                        className="text-xs text-slate-700 dark:text-slate-300 flex items-center justify-center gap-2 text-center w-full"
-                      >
-                        <Check className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-                        <span className="text-center">{t(`pricing.tiers.${tier.id}.f${idx + 1}`)}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                {/* Botón de Acción Centrado */}
-                <div className="w-full pt-6 mt-6 border-t border-slate-100 dark:border-slate-800/80 flex justify-center text-center">
-                  <button
-                    type="button"
-                    onClick={() => handleSelectPlan(tier.id)}
-                    className={`w-full py-3.5 px-4 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-2 cursor-pointer shadow-xs active:scale-95 text-center ${
-                      tier.featured
-                        ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-600/25 shadow-md'
-                        : 'bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-900 dark:text-white border border-slate-300 dark:border-slate-700'
-                    }`}
-                  >
-                    <span>{t(`pricing.tiers.${tier.id}.cta`)}</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-              </article>
-            );
-          })}
-        </div>
-
-        {/* Garantía y FAQ Breve Estrictamente Centrado (Sin mención de 30 días de prueba, 2 botones) */}
-        <section className="rounded-3xl bg-slate-50 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 p-8 sm:p-10 text-center space-y-4 max-w-3xl mx-auto flex flex-col items-center justify-center">
-          <div className="flex justify-center text-center">
-            <div className="w-12 h-12 rounded-2xl bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
-              <ShieldCheck className="w-6 h-6" />
+          {/* Guarantee Banner */}
+          <section className="rounded-2xl bg-[#F8FAFC] dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] p-8 sm:p-12 text-center space-y-5 max-w-4xl mx-auto">
+            <div className="w-11 h-11 rounded-xl bg-[#0B1A2D] dark:bg-[#B7F229]/15 text-[#B7F229] flex items-center justify-center mx-auto">
+              <ShieldCheck className="w-5 h-5" />
             </div>
-          </div>
 
-          <h3 className="text-xl font-black text-slate-900 dark:text-white text-center w-full">
-            {t('pricing.finalBadge', 'Garantía y Compromiso Setmio: Alta Guiada y Migración Sin Costes Ocultos')}
-          </h3>
+            <h3 className="text-xl sm:text-2xl font-black text-[#0B1A2D] dark:text-white tracking-tight">
+              {t('pricing.finalBadge', 'Garantía y Compromiso Setmio: Alta Guiada y Migración Sin Costes Ocultos')}
+            </h3>
 
-          <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed text-center w-full max-w-xl mx-auto">
-            {t('pricing.finalSubtitle', 'Configuramos tu club, importamos tu base de socios y te formamos a ti y a tu equipo de recepción de forma completamente gratuita. Sin contratos de permanencia ni costes de alta ocultos.')}
-          </p>
+            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed max-w-xl mx-auto">
+              {t('pricing.finalSubtitle', 'Configuramos tu club, importamos tu base de socios y te formamos a ti y a tu equipo de recepción de forma completamente gratuita. Sin contratos de permanencia ni costes de alta ocultos.')}
+            </p>
 
-          <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3 w-full">
-            <button
-              type="button"
-              onClick={handleRegisterCta}
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition cursor-pointer shadow-md text-center active:scale-95"
-            >
-              <span>{t('pricing.registerBtn', 'Registrarse')}</span>
-              <ArrowRight className="w-4 h-4" />
-            </button>
+            <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
+              <button
+                type="button"
+                onClick={handleRegisterCta}
+                className="w-full sm:w-auto min-h-[44px] inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-[#B7F229] hover:bg-[#c5f64e] text-[#0B1A2D] font-bold text-xs transition cursor-pointer active:scale-95"
+              >
+                <span>{t('pricing.registerBtn', 'Registrarse')}</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
 
-            <button
-              type="button"
-              onClick={onOpenDemo}
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-900 dark:text-white font-bold text-xs transition cursor-pointer shadow-xs text-center active:scale-95"
-            >
-              <span>{t('pricing.demoBtn', 'Ver demo')}</span>
-            </button>
-          </div>
-        </section>
-      </div>
+              <button
+                type="button"
+                onClick={onOpenDemo}
+                className="w-full sm:w-auto min-h-[44px] inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-white dark:bg-[#0B1A2D] border border-slate-200/80 dark:border-[#1A314D] hover:border-[#8B5CF6] text-[#0B1A2D] dark:text-white font-bold text-xs transition cursor-pointer active:scale-95"
+              >
+                <span>{t('pricing.demoBtn', 'Ver demo')}</span>
+              </button>
+            </div>
+          </section>
+        </div>
       </div>
     </main>
   );

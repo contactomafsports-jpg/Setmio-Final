@@ -34,15 +34,14 @@ export const ProLandingHeader: React.FC<ProLandingHeaderProps> = ({
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full max-w-full overflow-x-hidden bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 transition-colors duration-200">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 sm:h-16 flex items-center justify-between gap-3">
-        {/* Left: Brand / Pro info */}
+    <header className="sticky top-0 z-50 w-full max-w-full overflow-x-hidden bg-white/95 dark:bg-[#0B1A2D]/95 backdrop-blur-md border-b border-slate-200/80 dark:border-[#1A314D] text-[#0B1A2D] dark:text-slate-100 transition-colors duration-200">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
         <div className="flex items-center gap-3 min-w-0">
           {onBack ? (
             <button
               type="button"
               onClick={onBack}
-              className="p-2 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+              className="min-h-[40px] min-w-[40px] p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#132A45] transition flex items-center justify-center cursor-pointer"
               title="Volver"
             >
               <ArrowLeft className="w-4 h-4" />
@@ -51,9 +50,9 @@ export const ProLandingHeader: React.FC<ProLandingHeaderProps> = ({
             <button
               type="button"
               onClick={() => setPublicPage('home')}
-              className="flex items-center gap-2 text-left"
+              className="flex items-center gap-2 text-left cursor-pointer"
             >
-              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-700 text-white font-black text-sm flex items-center justify-center shadow-xs">
+              <div className="w-8 h-8 rounded-xl bg-[#0B1A2D] dark:bg-[#B7F229] text-[#B7F229] dark:text-[#0B1A2D] font-extrabold text-sm flex items-center justify-center">
                 S
               </div>
             </button>
@@ -61,11 +60,11 @@ export const ProLandingHeader: React.FC<ProLandingHeaderProps> = ({
 
           <div className="min-w-0">
             <div className="flex items-center gap-2">
-              <span className="font-extrabold text-sm sm:text-base text-slate-900 dark:text-white truncate">
+              <span className="font-bold text-sm sm:text-base text-[#0B1A2D] dark:text-white truncate">
                 {title || currentTenant.branding.heroTitle || currentTenant.name}
               </span>
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-emerald-50 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 border border-emerald-300/80 dark:border-emerald-800/80 hidden sm:inline-flex items-center gap-1">
-                <Trophy className="w-3 h-3 text-emerald-500" />
+              <span className="px-2 py-0.5 rounded-md text-[10px] font-mono font-bold bg-[#B7F229] text-[#0B1A2D] hidden sm:inline-flex items-center gap-1">
+                <Trophy className="w-3 h-3" />
                 {badge}
               </span>
             </div>
@@ -75,14 +74,12 @@ export const ProLandingHeader: React.FC<ProLandingHeaderProps> = ({
           </div>
         </div>
 
-        {/* Right: Actions (Idioma, Tema, Compartir, Contacto Prensa) */}
         <div className="flex items-center gap-2 shrink-0">
-          {/* Selector de Idioma */}
           <div className="relative">
             <button
               type="button"
               onClick={() => setLangOpen(!langOpen)}
-              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition border border-slate-200 dark:border-slate-800 cursor-pointer"
+              className="min-h-[40px] flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-semibold text-[#0B1A2D] dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#132A45] transition border border-slate-200/80 dark:border-[#1A314D] cursor-pointer"
               aria-label="Seleccionar idioma"
             >
               <OfficialFlag code={currentLangObj.code} />
@@ -90,19 +87,20 @@ export const ProLandingHeader: React.FC<ProLandingHeaderProps> = ({
             </button>
 
             {langOpen && (
-              <div className="absolute right-0 mt-1.5 w-40 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl p-1 z-50 animate-in fade-in-50 duration-100 text-xs">
+              <div className="absolute right-0 mt-1.5 w-40 rounded-xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] p-1 z-50 animate-in fade-in-50 duration-100 text-xs">
                 {SUPPORTED_LANGUAGES.map((langOpt) => (
                   <button
                     key={langOpt.code}
+                    type="button"
                     onClick={() => {
                       i18n.changeLanguage(langOpt.code);
                       setLanguage(langOpt.code);
                       setLangOpen(false);
                     }}
-                    className={`w-full flex items-center gap-2 px-2.5 py-1.5 rounded-xl transition text-left cursor-pointer ${
+                    className={`w-full flex items-center gap-2 px-2.5 py-2 rounded-lg transition text-left cursor-pointer ${
                       language === langOpt.code
-                        ? 'bg-emerald-600 text-white font-bold'
-                        : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+                        ? 'bg-[#0B1A2D] dark:bg-[#B7F229] text-white dark:text-[#0B1A2D] font-bold'
+                        : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#132A45]'
                     }`}
                   >
                     <OfficialFlag code={langOpt.code} />
@@ -116,26 +114,24 @@ export const ProLandingHeader: React.FC<ProLandingHeaderProps> = ({
           <button
             type="button"
             onClick={handleShare}
-            className="p-2 rounded-xl text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition border border-slate-200 dark:border-slate-800 cursor-pointer"
+            className="min-h-[40px] min-w-[40px] p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:text-[#0B1A2D] dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#132A45] transition border border-slate-200/80 dark:border-[#1A314D] flex items-center justify-center cursor-pointer"
             title="Compartir perfil profesional"
           >
             <Share2 className="w-4 h-4" />
           </button>
 
-          {/* Theme toggle */}
           <button
             type="button"
             onClick={toggleTheme}
-            className="p-2 rounded-xl text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+            className="min-h-[40px] min-w-[40px] p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:text-[#0B1A2D] dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#132A45] transition flex items-center justify-center cursor-pointer"
             title={theme === 'dark' ? 'Modo claro' : 'Modo oscuro'}
           >
-            {theme === 'dark' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-slate-700" />}
+            {theme === 'dark' ? <Sun className="w-4 h-4 text-[#B7F229]" /> : <Moon className="w-4 h-4 text-[#0B1A2D]" />}
           </button>
 
-          {/* Contact button */}
           <a
             href={`mailto:${currentTenant.contactEmail || 'contacto@setmio.com'}`}
-            className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs shadow-xs transition"
+            className="hidden sm:inline-flex min-h-[40px] items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#B7F229] hover:bg-[#a6de1f] text-[#0B1A2D] font-bold text-xs transition"
           >
             <Mail className="w-3.5 h-3.5" />
             <span>Contacto Prensa</span>

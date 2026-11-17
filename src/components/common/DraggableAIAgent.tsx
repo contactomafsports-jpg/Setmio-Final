@@ -1,18 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useApp } from '../../context/AppContext';
 import {
-  MessageSquare,
   MessageCircle,
   X,
   Minimize2,
   Maximize2,
   Send,
   Sparkles,
-  Bot,
   Move,
-  CheckCircle2,
-  HelpCircle,
-  ExternalLink,
+  CalendarCheck,
+  GraduationCap,
+  MapPin,
 } from 'lucide-react';
 
 export const DraggableAIAgent: React.FC = () => {
@@ -168,24 +166,21 @@ export const DraggableAIAgent: React.FC = () => {
             onClick={() => {
               if (!isDragging) setIsOpen(true);
             }}
-            className="group relative flex items-center gap-2 cursor-grab active:cursor-grabbing p-3 sm:px-3.5 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-700 text-white shadow-2xl hover:scale-105 transition-transform touch-none"
-            title="Arrastra para mover o haz clic para abrir el Asistente IA"
-            aria-label="Abrir Asistente IA"
+            className="group relative flex items-center gap-2 cursor-grab active:cursor-grabbing p-3 sm:px-4 rounded-full bg-[#0B1A2D] border border-white/15 text-white shadow-[0_14px_36px_rgba(11,26,45,0.45)] hover:border-[#B7F229]/60 hover:scale-[1.03] transition-all touch-none"
+            title="Arrastra para mover o haz clic para abrir el Copiloto IA"
+            aria-label="Abrir Copiloto IA"
           >
-            <div className="relative">
-              <Bot className="w-6 h-6 text-white" />
-              <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-emerald-300 ring-2 ring-emerald-950 animate-pulse" />
-            </div>
-            <span className="hidden sm:inline text-xs font-bold tracking-tight pr-1">
-              Asistente {currentTenant.shortName}
+            <Sparkles className="w-5 h-5 text-[#B7F229] shrink-0" />
+            <span className="hidden sm:inline text-xs font-bold tracking-tight pr-0.5">
+              Copiloto IA
             </span>
             <div className="opacity-40 group-hover:opacity-100 transition-opacity">
-              <Move className="w-3.5 h-3.5" />
+              <Move className="w-3.5 h-3.5 text-slate-300" />
             </div>
           </div>
         </div>
       ) : (
-        // Expanded Chat Window (Supports Fullscreen on desktop or full fixed overlay on mobile)
+        // Expanded Chat Window
         <div
           style={
             isFullscreen || (typeof window !== 'undefined' && window.innerWidth < 640)
@@ -199,8 +194,8 @@ export const DraggableAIAgent: React.FC = () => {
           }
           className={
             isFullscreen
-              ? 'fixed inset-2 sm:inset-6 z-[70] bg-slate-900 border border-slate-700 rounded-3xl shadow-2xl flex flex-col overflow-hidden text-slate-100 animate-in fade-in zoom-in-95 duration-150'
-              : 'fixed inset-0 z-50 sm:inset-auto sm:w-[380px] sm:h-[520px] sm:max-h-[82vh] bg-slate-900 sm:border sm:border-slate-700 sm:rounded-2xl shadow-2xl flex flex-col overflow-hidden text-slate-100 animate-in fade-in zoom-in-95 duration-150'
+              ? 'fixed inset-2 sm:inset-6 z-[70] bg-[#0B1A2D] border border-white/12 rounded-3xl shadow-[0_24px_64px_rgba(3,9,20,0.65)] flex flex-col overflow-hidden text-white animate-in fade-in zoom-in-95 duration-150'
+              : 'fixed inset-x-3 bottom-20 top-12 z-50 sm:inset-auto sm:w-[380px] sm:h-[520px] sm:max-h-[82vh] bg-[#0B1A2D] border border-white/12 rounded-3xl shadow-[0_24px_64px_rgba(3,9,20,0.65)] flex flex-col overflow-hidden text-white animate-in fade-in zoom-in-95 duration-150'
           }
         >
           {/* Header & Drag Handle */}
@@ -212,101 +207,71 @@ export const DraggableAIAgent: React.FC = () => {
               isFullscreen || (typeof window !== 'undefined' && window.innerWidth < 640)
                 ? 'cursor-default'
                 : 'cursor-grab active:cursor-grabbing'
-            } bg-slate-950 px-4 py-3 border-b border-slate-800 flex items-center justify-between`}
+            } px-5 pt-4 pb-2.5 flex items-center justify-between gap-2 shrink-0`}
           >
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400">
-                <Sparkles className="w-4 h-4" />
-              </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-bold text-white tracking-tight">{headerInfo.title}</span>
-                  <span className="text-[9px] uppercase px-1.5 py-0.5 rounded bg-emerald-950 border border-emerald-800 text-emerald-400 font-mono">
-                    {headerInfo.badge}
-                  </span>
-                </div>
-                <div className="text-[10px] text-slate-400">{headerInfo.subtitle}</div>
+            <div className="flex items-center gap-2 min-w-0">
+              <Sparkles className="w-4 h-4 text-[#B7F229] shrink-0" />
+              <div className="flex items-baseline gap-2 min-w-0">
+                <span className="text-sm font-bold text-white tracking-tight shrink-0">
+                  {headerInfo.title}
+                </span>
+                <span className="text-[11px] font-medium text-slate-300/75 truncate">
+                  {currentTenant.shortName}
+                </span>
               </div>
             </div>
 
-            <div className="flex items-center gap-1">
-              {/* WhatsApp Divert button if mode is 'both' */}
+            <div className="flex items-center gap-1 shrink-0">
               {widgetMode === 'both' && (
                 <a
                   href={whatsappDivertUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hidden sm:inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/30 text-[10px] font-bold transition mr-1"
+                  className="hidden sm:inline-flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-white/[0.06] hover:border-[#B7F229]/60 border border-white/12 text-slate-200 hover:text-white text-[11px] font-medium transition mr-0.5"
                   title="Desviar conversación a WhatsApp oficial"
                 >
-                  <MessageCircle className="w-3.5 h-3.5 text-emerald-400" />
+                  <MessageCircle className="w-3 h-3 text-[#B7F229]" />
                   <span>WhatsApp</span>
                 </a>
               )}
 
-              {/* Fullscreen Expand / Restore */}
               <button
+                type="button"
                 onClick={() => setIsFullscreen(!isFullscreen)}
-                className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
+                className="w-9 h-9 rounded-full text-slate-300 hover:text-white hover:bg-white/[0.08] flex items-center justify-center transition cursor-pointer"
                 title={isFullscreen ? 'Reducir tamaño' : 'Pantalla completa'}
+                aria-label={isFullscreen ? 'Reducir tamaño' : 'Pantalla completa'}
               >
                 {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
               </button>
 
-              {/* Close Button */}
               <button
+                type="button"
                 onClick={() => {
                   setIsOpen(false);
                   setIsFullscreen(false);
                 }}
-                className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
+                className="w-9 h-9 rounded-full text-slate-300 hover:text-white hover:bg-white/[0.08] flex items-center justify-center transition cursor-pointer"
                 title="Cerrar"
+                aria-label="Cerrar"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
           </div>
 
-          {/* Multichannel status strip */}
-          <div className="bg-slate-950/70 border-b border-slate-800/80 px-3 py-1 flex items-center justify-between text-[10px] text-slate-400">
-            <div className="flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-              <span>Web Chat: Activo</span>
-            </div>
-            <div className="flex items-center gap-2 text-slate-400">
-              {widgetMode === 'both' ? (
-                <a
-                  href={whatsappDivertUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-emerald-400 hover:underline flex items-center gap-1"
-                >
-                  <MessageCircle className="w-3 h-3" />
-                  <span>Desviar a WhatsApp</span>
-                </a>
-              ) : (
-                <span>Atención Setmio IA</span>
-              )}
-            </div>
-          </div>
-
           {/* Messages Area */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-3 text-xs bg-slate-900/90">
+          <div className="flex-1 overflow-y-auto px-5 py-2.5 space-y-3 text-[13px] tabular-nums">
             {aiMessages.map((msg) => (
               <div
                 key={msg.id}
                 className={`flex gap-2.5 ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
               >
-                {msg.sender === 'assistant' && (
-                  <div className="w-6 h-6 rounded-md bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
-                    <Bot className="w-3.5 h-3.5" />
-                  </div>
-                )}
                 <div
-                  className={`max-w-[82%] rounded-2xl px-3.5 py-2.5 leading-relaxed shadow-sm ${
+                  className={`max-w-[86%] rounded-2xl leading-relaxed ${
                     msg.sender === 'user'
-                      ? 'bg-emerald-600 text-white rounded-br-none'
-                      : 'bg-slate-800 text-slate-200 border border-slate-700/60 rounded-bl-none'
+                      ? 'bg-[#B7F229] text-[#0B1A2D] font-medium px-4 py-2.5 rounded-br-sm shadow-xs'
+                      : 'bg-white/[0.06] text-slate-100 border border-white/[0.08] px-4 py-3 rounded-bl-sm'
                   }`}
                 >
                   <p className="whitespace-pre-wrap">{msg.text}</p>
@@ -315,52 +280,62 @@ export const DraggableAIAgent: React.FC = () => {
             ))}
 
             {isAiThinking && (
-              <div className="flex items-center gap-2 text-slate-400 text-xs pl-8">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+              <div className="inline-flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-white/[0.05] border border-white/[0.08] text-slate-300 text-xs">
+                <Sparkles className="w-3.5 h-3.5 text-[#B7F229] animate-pulse shrink-0" />
                 <span>Analizando datos del club...</span>
               </div>
             )}
             <div ref={chatEndRef} />
           </div>
 
-          {/* Quick Suggestions Chips */}
-          <div className="px-3 py-1.5 bg-slate-950/60 border-t border-slate-800/60 flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+          {/* Quick Suggestions Pills */}
+          <div className="px-4 pt-2 pb-1 flex items-center gap-1.5 overflow-x-auto no-scrollbar shrink-0">
             <button
+              type="button"
               onClick={() => sendAIMessage('¿Qué pistas y horarios tenéis libres hoy?')}
-              className="whitespace-nowrap px-2 py-1 rounded bg-slate-800/80 hover:bg-slate-700 text-[11px] text-slate-300 transition"
+              className="whitespace-nowrap min-h-[34px] px-3 py-1 rounded-full bg-white/[0.04] border border-white/15 hover:border-[#B7F229]/75 hover:bg-[#B7F229]/12 text-[11px] font-medium text-slate-100 inline-flex items-center gap-1.5 transition cursor-pointer"
             >
-              🎾 Pistas libres
+              <CalendarCheck className="w-3 h-3 text-[#B7F229] shrink-0" />
+              <span>Pistas libres hoy</span>
             </button>
             <button
+              type="button"
               onClick={() => sendAIMessage('Información de la escuela y clases')}
-              className="whitespace-nowrap px-2 py-1 rounded bg-slate-800/80 hover:bg-slate-700 text-[11px] text-slate-300 transition"
+              className="whitespace-nowrap min-h-[34px] px-3 py-1 rounded-full bg-white/[0.04] border border-white/15 hover:border-[#B7F229]/75 hover:bg-[#B7F229]/12 text-[11px] font-medium text-slate-100 inline-flex items-center gap-1.5 transition cursor-pointer"
             >
-              🎓 Escuela y tarifas
+              <GraduationCap className="w-3 h-3 text-[#B7F229] shrink-0" />
+              <span>Escuela y tarifas</span>
             </button>
             <button
+              type="button"
               onClick={() => sendAIMessage('¿Dónde está ubicado el club en Narón?')}
-              className="whitespace-nowrap px-2 py-1 rounded bg-slate-800/80 hover:bg-slate-700 text-[11px] text-slate-300 transition"
+              className="whitespace-nowrap min-h-[34px] px-3 py-1 rounded-full bg-white/[0.04] border border-white/15 hover:border-[#B7F229]/75 hover:bg-[#B7F229]/12 text-[11px] font-medium text-slate-100 inline-flex items-center gap-1.5 transition cursor-pointer"
             >
-              📍 Cómo llegar
+              <MapPin className="w-3 h-3 text-[#B7F229] shrink-0" />
+              <span>Cómo llegar</span>
             </button>
           </div>
 
-          {/* Message Input Form */}
-          <form onSubmit={handleSubmit} className="p-3 bg-slate-950 border-t border-slate-800 flex items-center gap-2">
-            <input
-              type="text"
-              value={inputText}
-              onChange={(e) => setInputText(e.target.value)}
-              placeholder="Pregunta sobre reservas, escuela, pistas..."
-              className="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition"
-            />
-            <button
-              type="submit"
-              disabled={!inputText.trim()}
-              className="p-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 disabled:opacity-40 disabled:hover:bg-emerald-500 text-slate-950 font-bold transition"
-            >
-              <Send className="w-4 h-4" />
-            </button>
+          {/* Floating Message Input Form */}
+          <form onSubmit={handleSubmit} className="px-4 pt-2 pb-4 shrink-0">
+            <div className="flex items-center gap-2 rounded-full bg-[#071220] border border-white/15 focus-within:border-[#B7F229] pl-4 pr-1.5 py-1.5 transition-colors">
+              <input
+                type="text"
+                value={inputText}
+                onChange={(e) => setInputText(e.target.value)}
+                placeholder="Pregunta a la IA sobre pistas, escuela..."
+                className="flex-1 min-w-0 bg-transparent py-1 text-xs text-white placeholder-slate-400 focus:outline-none"
+              />
+              <button
+                type="submit"
+                disabled={!inputText.trim() || isAiThinking}
+                className="w-8 h-8 rounded-full bg-[#B7F229] hover:bg-[#a6de1f] disabled:opacity-35 disabled:hover:bg-[#B7F229] text-[#0B1A2D] flex items-center justify-center transition active:scale-95 shrink-0 cursor-pointer disabled:cursor-not-allowed"
+                title="Enviar mensaje"
+                aria-label="Enviar mensaje"
+              >
+                <Send className="w-3.5 h-3.5" />
+              </button>
+            </div>
           </form>
         </div>
       )}

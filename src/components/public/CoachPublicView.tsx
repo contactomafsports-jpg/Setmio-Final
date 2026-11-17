@@ -1,20 +1,15 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
+import playerPadelImg from '../../assets/images/player_padel_action_1794872242959.jpg';
 import {
   GraduationCap,
   Calendar,
   Star,
   CheckCircle2,
-  Clock,
-  ArrowRight,
   ShieldCheck,
   Video,
-  Users,
   Award,
   MessageCircle,
-  Phone,
-  Mail,
-  Sparkles,
   Zap,
   Check,
   X,
@@ -23,7 +18,7 @@ import {
 } from 'lucide-react';
 
 export const CoachPublicView: React.FC = () => {
-  const { currentTenant, triggerDemoToast, setPublicPage } = useApp();
+  const { currentTenant, triggerDemoToast } = useApp();
   const coachStats = currentTenant.coachStats || {
     certifications: ['Entrenador Nacional Nivel 2 FEP', 'Especialista en Biomecánica de Golpeo', 'Ex-jugador Profesional'],
     hourlyRate: 45.0,
@@ -127,7 +122,7 @@ export const CoachPublicView: React.FC = () => {
     e.preventDefault();
     triggerDemoToast(
       'Solicitud de Clase Recibida',
-      `Petición para "${selectedProgram}" enviada con éxito. Mateo Varela te contactará en el ${studentPhone || 'teléfono'} para confirmar fecha y pista.`,
+      `Petición para "${selectedProgram}" enviada con éxito. ${currentTenant.name} te contactará en el ${studentPhone || 'teléfono'} para confirmar fecha y pista.`,
       'success'
     );
     setBookingModalOpen(false);
@@ -137,44 +132,44 @@ export const CoachPublicView: React.FC = () => {
   };
 
   return (
-    <div className="space-y-16 pb-20 text-slate-900 dark:text-slate-100 transition-colors">
+    <div className="bg-white dark:bg-[#0B1A2D] space-y-20 pb-24 text-[#0B1A2D] dark:text-slate-100 transition-colors">
       {/* 1. Hero Personal del Entrenador */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-emerald-50/60 via-white to-slate-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 py-12 lg:py-20 border-b border-slate-200 dark:border-slate-800">
+      <section className="bg-[#0B1A2D] text-white py-14 lg:py-20 border-b border-[#1A314D]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
             <div className="lg:col-span-7 space-y-6">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-bold text-xs uppercase tracking-wider border border-emerald-500/20">
-                <GraduationCap className="w-3.5 h-3.5" />
+              <div className="inline-flex items-center gap-2 text-[#B7F229] font-semibold text-xs tracking-wide">
+                <GraduationCap className="w-4 h-4 shrink-0" />
                 <span>{currentTenant.branding.badgeText || 'CERTIFIED FEP MASTER COACH'}</span>
               </div>
 
-              <h1 className="text-4xl sm:text-6xl font-black tracking-tight text-slate-900 dark:text-white leading-tight">
+              <h1 className="text-4xl sm:text-5xl lg:text-[54px] font-bold tracking-tight text-white leading-[1.08] text-balance">
                 {currentTenant.branding.heroTitle || 'Tecnificación y Alto Rendimiento de Pádel'}
               </h1>
 
-              <p className="text-base sm:text-lg text-slate-600 dark:text-slate-300 max-w-xl font-normal leading-relaxed">
+              <p className="text-base sm:text-lg text-slate-300 max-w-xl font-normal leading-relaxed">
                 {currentTenant.branding.heroSubtitle ||
                   'Entrenador Nacional Nivel 2 FEP. Planes biomecánicos individuales, preparación táctica de competición y clinics intensivos.'}
               </p>
 
-              {/* KPI Badges */}
-              <div className="grid grid-cols-3 gap-3 pt-2 text-xs">
-                <div className="p-3.5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
-                  <div className="flex items-center gap-1 text-amber-500">
-                    <Star className="w-3.5 h-3.5 fill-current" />
-                    <span className="font-bold text-base text-slate-900 dark:text-white">{coachStats.rating}</span>
+              {/* KPI Strip */}
+              <div className="grid grid-cols-3 gap-6 pt-4 border-t border-[#1A314D]">
+                <div>
+                  <div className="flex items-center gap-1.5 text-[#B7F229]">
+                    <Star className="w-4 h-4 fill-current shrink-0" />
+                    <span className="font-bold text-2xl text-white font-mono tabular-nums">{coachStats.rating}</span>
                   </div>
-                  <span className="text-[10px] text-slate-500 uppercase font-semibold">Valoración Media</span>
+                  <span className="text-xs text-slate-400">Valoración Media</span>
                 </div>
 
-                <div className="p-3.5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
-                  <div className="text-base font-black text-emerald-600 dark:text-emerald-400 font-mono">+{coachStats.activeStudents}</div>
-                  <span className="text-[10px] text-slate-500 uppercase font-semibold">Alumnos Activos</span>
+                <div>
+                  <div className="text-2xl font-bold text-[#B7F229] font-mono tabular-nums">+{coachStats.activeStudents}</div>
+                  <span className="text-xs text-slate-400">Alumnos Activos</span>
                 </div>
 
-                <div className="p-3.5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
-                  <div className="text-base font-black text-slate-900 dark:text-white font-mono">{coachStats.weeklyLessons}h</div>
-                  <span className="text-[10px] text-slate-500 uppercase font-semibold">Clases / Semana</span>
+                <div>
+                  <div className="text-2xl font-bold text-[#a78bfa] font-mono tabular-nums">{coachStats.weeklyLessons}h</div>
+                  <span className="text-xs text-slate-400">Clases / Semana</span>
                 </div>
               </div>
 
@@ -183,41 +178,42 @@ export const CoachPublicView: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => handleOpenBooking('Clase Particular 1 a 1')}
-                  className="px-6 py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-lg flex items-center gap-2 transition hover:scale-105 active:scale-95"
+                  className="min-h-[44px] px-6 py-3 rounded-xl bg-[#B7F229] hover:bg-[#a6de1f] text-[#0B1A2D] font-bold text-sm flex items-center gap-2 transition-colors cursor-pointer whitespace-nowrap"
                 >
-                  <Calendar className="w-4 h-4" />
+                  <Calendar className="w-4 h-4 shrink-0" />
                   <span>Reservar Clase / Disponibilidad</span>
                 </button>
 
                 <a
                   href={`https://wa.me/${currentTenant.whatsappNumber.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(
-                    currentTenant.settings.whatsappGreetingMessage || 'Hola Mateo, me gustaría consultar disponibilidad de clases de pádel.'
+                    currentTenant.settings.whatsappGreetingMessage || 'Hola, me gustaría consultar disponibilidad de clases de pádel.'
                   )}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-5 py-3.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/60 dark:hover:bg-emerald-900/60 text-emerald-800 dark:text-emerald-300 font-bold text-xs border border-emerald-300 dark:border-emerald-800 flex items-center gap-2 transition"
+                  className="min-h-[44px] px-5 py-3 rounded-xl bg-[#0E2239] hover:bg-[#132A45] text-white font-semibold text-sm border border-[#1A314D] flex items-center gap-2 transition-colors whitespace-nowrap"
                 >
-                  <MessageCircle className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                  <MessageCircle className="w-4 h-4 text-[#B7F229] shrink-0" />
                   <span>Contactar por WhatsApp</span>
                 </a>
               </div>
             </div>
 
-            {/* Coach Photo Card */}
+            {/* Coach Photo Frame */}
             <div className="lg:col-span-5">
-              <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-slate-200 dark:border-slate-800">
+              <div className="relative rounded-3xl overflow-hidden border border-[#1A314D] bg-[#0E2239] shadow-2xl">
                 <img
-                  src={currentTenant.branding.heroImageUrl}
+                  src={currentTenant.branding.heroImageUrl || playerPadelImg}
                   alt={currentTenant.name}
-                  className="w-full h-[460px] object-cover"
+                  referrerPolicy="no-referrer"
+                  className="w-full h-[440px] object-cover"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0B1A2D] via-[#0B1A2D]/20 to-transparent" />
                 <div className="absolute bottom-5 left-5 right-5 text-white text-xs space-y-1">
-                  <div className="font-black text-lg text-white">{currentTenant.name}</div>
-                  <div className="text-emerald-300 text-[11px] font-semibold">
+                  <div className="font-bold text-lg text-white">{currentTenant.name}</div>
+                  <div className="text-[#B7F229] font-medium">
                     Entrenador Nacional Nivel 2 FEP · Biomecánica & Rendimiento
                   </div>
-                  <div className="text-slate-300 text-[10px]">
+                  <div className="text-slate-300">
                     {currentTenant.city}, {currentTenant.region} · Instalaciones cubiertas oficiales
                   </div>
                 </div>
@@ -228,13 +224,15 @@ export const CoachPublicView: React.FC = () => {
       </section>
 
       {/* 2. Programas y Tarifas de Clases */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-        <div className="text-center space-y-2">
-          <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
+        <div className="text-left sm:text-center space-y-2 max-w-2xl sm:mx-auto">
+          <span className="text-xs font-semibold text-[#8B5CF6] dark:text-[#a78bfa] tracking-wide">
             Formatos Individuales y de Parejas
           </span>
-          <h2 className="text-3xl font-black text-slate-900 dark:text-white">Sesiones de Entrenamiento en Pista</h2>
-          <p className="text-xs text-slate-500 max-w-xl mx-auto">
+          <h2 className="text-3xl font-bold text-[#0B1A2D] dark:text-white tracking-tight">
+            Sesiones de Entrenamiento en Pista
+          </h2>
+          <p className="text-sm text-slate-600 dark:text-slate-400">
             Todas las sesiones incluyen pista cubierta climatizada, bolas nuevas y videoanálisis biomecánico en directo.
           </p>
         </div>
@@ -243,22 +241,24 @@ export const CoachPublicView: React.FC = () => {
           {services.map((s) => (
             <div
               key={s.id}
-              className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-5 flex flex-col justify-between shadow-sm hover:border-emerald-500/50 transition group"
+              className="p-7 rounded-2xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] space-y-5 flex flex-col justify-between hover:border-[#8B5CF6]/50 dark:hover:border-[#B7F229]/40 transition-colors group"
             >
-              <div className="space-y-3">
-                <span className="px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-[10px] uppercase">
+              <div className="space-y-4">
+                <span className="text-xs font-semibold text-[#8B5CF6] dark:text-[#a78bfa] block">
                   {s.badge}
                 </span>
-                <h3 className="text-lg font-bold text-slate-900 dark:text-white group-hover:text-emerald-600 transition-colors">
+                <h3 className="text-lg font-bold text-[#0B1A2D] dark:text-white tracking-tight">
                   {s.title}
                 </h3>
-                <div className="text-2xl font-black text-emerald-600 dark:text-emerald-400 font-mono">{s.price}</div>
-                <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">{s.desc}</p>
+                <div className="text-2xl font-bold text-[#0B1A2D] dark:text-[#B7F229] font-mono tabular-nums">
+                  {s.price}
+                </div>
+                <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">{s.desc}</p>
 
-                <div className="pt-3 border-t border-slate-100 dark:border-slate-800 space-y-2 text-xs">
+                <div className="pt-4 border-t border-slate-100 dark:border-[#1A314D] space-y-2.5 text-xs">
                   {s.features.map((f, i) => (
                     <div key={i} className="flex items-center gap-2 text-slate-700 dark:text-slate-300">
-                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                      <CheckCircle2 className="w-4 h-4 text-[#8B5CF6] dark:text-[#B7F229] shrink-0" />
                       <span>{f}</span>
                     </div>
                   ))}
@@ -268,9 +268,9 @@ export const CoachPublicView: React.FC = () => {
               <button
                 type="button"
                 onClick={() => handleOpenBooking(s.title)}
-                className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow transition active:scale-95 flex items-center justify-center gap-2"
+                className="w-full min-h-[42px] py-2.5 rounded-xl bg-[#B7F229] hover:bg-[#a6de1f] text-[#0B1A2D] font-bold text-xs transition-colors flex items-center justify-center gap-2 cursor-pointer"
               >
-                <Calendar className="w-4 h-4" />
+                <Calendar className="w-4 h-4 shrink-0" />
                 <span>Solicitar Horario</span>
               </button>
             </div>
@@ -278,15 +278,15 @@ export const CoachPublicView: React.FC = () => {
         </div>
       </section>
 
-      {/* 3. Bonos de Clases (Requerimiento Específico Parte 1) */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-        <div className="text-center space-y-2">
-          <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider flex items-center justify-center gap-1.5">
-            <Ticket className="w-4 h-4" />
+      {/* 3. Bonos de Clases */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
+        <div className="text-left sm:text-center space-y-2 max-w-2xl sm:mx-auto">
+          <span className="text-xs font-semibold text-[#8B5CF6] dark:text-[#a78bfa] tracking-wide flex items-center sm:justify-center gap-1.5">
+            <Ticket className="w-4 h-4 shrink-0" />
             <span>Packs con Descuento por Fidelidad</span>
           </span>
-          <h2 className="text-3xl font-black text-slate-900 dark:text-white">Bonos de Tecnificación</h2>
-          <p className="text-xs text-slate-500 max-w-xl mx-auto">
+          <h2 className="text-3xl font-bold text-[#0B1A2D] dark:text-white tracking-tight">Bonos de Tecnificación</h2>
+          <p className="text-sm text-slate-600 dark:text-slate-400">
             Contrata un bono de entrenamiento con tarifas reducidas por sesión y reserva anticipada prioritaria.
           </p>
         </div>
@@ -295,33 +295,38 @@ export const CoachPublicView: React.FC = () => {
           {bonos.map((b) => (
             <div
               key={b.id}
-              className={`p-6 sm:p-8 rounded-3xl bg-white dark:bg-slate-900 border ${
-                b.popular ? 'border-emerald-500 shadow-xl ring-2 ring-emerald-500/20' : 'border-slate-200 dark:border-slate-800 shadow-sm'
-              } space-y-5 flex flex-col justify-between relative`}
+              className={`p-7 sm:p-8 rounded-2xl space-y-5 flex flex-col justify-between ${
+                b.popular
+                  ? 'bg-[#0B1A2D] text-white border-2 border-[#B7F229]'
+                  : 'bg-[#F8FAFC] dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D]'
+              }`}
             >
-              {b.popular && (
-                <span className="absolute -top-3 right-6 px-3 py-1 rounded-full bg-emerald-500 text-slate-950 font-black text-[10px] uppercase shadow-md">
-                  MÁS POPULAR
-                </span>
-              )}
-
               <div className="space-y-4">
                 <div>
-                  <h3 className="text-xl font-black text-slate-900 dark:text-white">{b.title}</h3>
-                  <p className="text-xs text-slate-500 mt-1">{b.desc}</p>
+                  {b.popular && (
+                    <span className="text-xs font-semibold text-[#B7F229] block mb-1">Más Popular</span>
+                  )}
+                  <h3 className={`text-xl font-bold tracking-tight ${b.popular ? 'text-white' : 'text-[#0B1A2D] dark:text-white'}`}>
+                    {b.title}
+                  </h3>
+                  <p className={`text-sm mt-1 ${b.popular ? 'text-slate-300' : 'text-slate-600 dark:text-slate-400'}`}>
+                    {b.desc}
+                  </p>
                 </div>
 
-                <div className="flex items-baseline gap-2">
-                  <div className="text-3xl font-black text-emerald-600 dark:text-emerald-400 font-mono">{b.price}</div>
-                  <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded-md">
+                <div className="flex flex-wrap items-baseline gap-3">
+                  <div className={`text-3xl font-bold font-mono tabular-nums ${b.popular ? 'text-[#B7F229]' : 'text-[#0B1A2D] dark:text-white'}`}>
+                    {b.price}
+                  </div>
+                  <span className={`text-xs font-semibold ${b.popular ? 'text-[#a78bfa]' : 'text-[#8B5CF6] dark:text-[#B7F229]'}`}>
                     {b.saving}
                   </span>
                 </div>
 
-                <div className="pt-3 border-t border-slate-100 dark:border-slate-800 space-y-2 text-xs">
+                <div className={`pt-4 border-t space-y-2.5 text-xs ${b.popular ? 'border-[#1A314D] text-slate-200' : 'border-slate-200/80 dark:border-[#1A314D] text-slate-700 dark:text-slate-300'}`}>
                   {b.features.map((f, i) => (
-                    <div key={i} className="flex items-center gap-2 text-slate-700 dark:text-slate-300">
-                      <Check className="w-4 h-4 text-emerald-500 shrink-0" />
+                    <div key={i} className="flex items-center gap-2">
+                      <Check className={`w-4 h-4 shrink-0 ${b.popular ? 'text-[#B7F229]' : 'text-[#8B5CF6] dark:text-[#B7F229]'}`} />
                       <span>{f}</span>
                     </div>
                   ))}
@@ -331,13 +336,13 @@ export const CoachPublicView: React.FC = () => {
               <button
                 type="button"
                 onClick={() => handleOpenBooking(b.title)}
-                className={`w-full py-3 rounded-xl font-bold text-xs shadow transition active:scale-95 flex items-center justify-center gap-2 ${
+                className={`w-full min-h-[44px] py-3 rounded-xl font-bold text-xs transition-colors flex items-center justify-center gap-2 cursor-pointer ${
                   b.popular
-                    ? 'bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black'
-                    : 'bg-slate-900 hover:bg-slate-800 text-white dark:bg-white dark:text-slate-900'
+                    ? 'bg-[#B7F229] hover:bg-[#a6de1f] text-[#0B1A2D]'
+                    : 'bg-[#0B1A2D] hover:bg-[#132A45] text-white dark:bg-[#132A45] dark:hover:bg-[#1A314D]'
                 }`}
               >
-                <Ticket className="w-4 h-4" />
+                <Ticket className="w-4 h-4 shrink-0" />
                 <span>Adquirir {b.title}</span>
               </button>
             </div>
@@ -347,77 +352,63 @@ export const CoachPublicView: React.FC = () => {
 
       {/* 4. Metodología y Biomecánica */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="rounded-3xl bg-slate-900 text-white p-8 sm:p-12 shadow-xl space-y-8">
+        <div className="rounded-3xl bg-[#0B1A2D] border border-[#1A314D] text-white p-8 sm:p-12 space-y-8">
           <div className="max-w-2xl space-y-2">
-            <span className="text-xs font-semibold text-emerald-400 uppercase tracking-wider">Metodología de Alto Nivel</span>
-            <h2 className="text-2xl sm:text-3xl font-black">Los 4 Pilares del Método Mateo Varela</h2>
-            <p className="text-xs text-slate-300 leading-relaxed">
+            <span className="text-xs font-semibold text-[#B7F229] tracking-wide">Metodología de Alto Nivel</span>
+            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">Los 4 Pilares del Método Técnico</h2>
+            <p className="text-sm text-slate-300 leading-relaxed">
               Un enfoque científico del pádel que combina biomecánica de golpeo, software de trazada de impacto y psicología de puntos de presión.
             </p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 text-xs">
-            <div className="p-4 rounded-2xl bg-slate-800/80 border border-slate-700 space-y-2">
-              <Video className="w-6 h-6 text-emerald-400" />
-              <h3 className="font-bold text-sm text-white">1. Biomecánica en Pista</h3>
-              <p className="text-slate-300 leading-relaxed">
-                Trazada del plano de impacto, punto dulce de la pala y cadena cinética del cuerpo.
-              </p>
-            </div>
-
-            <div className="p-4 rounded-2xl bg-slate-800/80 border border-slate-700 space-y-2">
-              <Zap className="w-6 h-6 text-amber-400" />
-              <h3 className="font-bold text-sm text-white">2. Apoyos y Transición</h3>
-              <p className="text-slate-300 leading-relaxed">
-                Pasos de ajuste en esquinas, salidas de pared sin pérdida de equilibrio y subida sincronizada a la red.
-              </p>
-            </div>
-
-            <div className="p-4 rounded-2xl bg-slate-800/80 border border-slate-700 space-y-2">
-              <ShieldCheck className="w-6 h-6 text-cyan-400" />
-              <h3 className="font-bold text-sm text-white">3. Táctica Situacional</h3>
-              <p className="text-slate-300 leading-relaxed">
-                Elegir el tiro correcto según la profundidad del rival, el viento y la velocidad de la pista.
-              </p>
-            </div>
-
-            <div className="p-4 rounded-2xl bg-slate-800/80 border border-slate-700 space-y-2">
-              <Award className="w-6 h-6 text-purple-400" />
-              <h3 className="font-bold text-sm text-white">4. Puntos de Presión</h3>
-              <p className="text-slate-300 leading-relaxed">
-                Entrenamiento con bola de break en contra, resolución en tie-break y lenguaje no verbal positivo.
-              </p>
-            </div>
+            {[
+              { icon: Video, title: '01. Biomecánica en Pista', desc: 'Trazada del plano de impacto, punto dulce de la pala y cadena cinética del cuerpo.' },
+              { icon: Zap, title: '02. Apoyos y Transición', desc: 'Pasos de ajuste en esquinas, salidas de pared sin pérdida de equilibrio y subida sincronizada a la red.' },
+              { icon: ShieldCheck, title: '03. Táctica Situacional', desc: 'Elegir el tiro correcto según la profundidad del rival, el viento y la velocidad de la pista.' },
+              { icon: Award, title: '04. Puntos de Presión', desc: 'Entrenamiento con bola de break en contra, resolución en tie-break y lenguaje no verbal positivo.' },
+            ].map((item) => {
+              const Icon = item.icon;
+              return (
+                <div key={item.title} className="p-5 rounded-2xl bg-[#0E2239] border border-[#1A314D] space-y-2.5">
+                  <Icon className="w-5 h-5 text-[#B7F229]" />
+                  <h3 className="font-bold text-sm text-white">{item.title}</h3>
+                  <p className="text-slate-300 leading-relaxed">{item.desc}</p>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
 
       {/* 5. Testimonios de Alumnos */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         <div className="text-center space-y-2">
-          <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
+          <span className="text-xs font-semibold text-[#8B5CF6] dark:text-[#a78bfa] tracking-wide">
             Opiniones Reales
           </span>
-          <h2 className="text-2xl font-black text-slate-900 dark:text-white">Lo que dicen los Alumnos</h2>
+          <h2 className="text-2xl sm:text-3xl font-bold text-[#0B1A2D] dark:text-white tracking-tight">
+            Lo que dicen los Alumnos
+          </h2>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-          {testimonials.map((t, idx) => (
+          {testimonials.map((item, idx) => (
             <div
               key={idx}
-              className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-3"
+              className="p-6 rounded-2xl bg-[#F8FAFC] dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] space-y-4"
             >
-              <div className="flex items-center gap-1 text-amber-400">
-                {[...Array(t.rating)].map((_, i) => (
+              <div className="flex items-center gap-1 text-[#8B5CF6] dark:text-[#B7F229]">
+                {[...Array(item.rating)].map((_, i) => (
                   <Star key={i} className="w-4 h-4 fill-current" />
                 ))}
               </div>
-              <p className="text-xs text-slate-600 dark:text-slate-300 italic leading-relaxed">
-                "{t.comment}"
+              <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+                "{item.comment}"
               </p>
-              <div className="pt-2 border-t border-slate-100 dark:border-slate-800 text-xs">
-                <div className="font-bold text-slate-900 dark:text-white">{t.name}</div>
-                <div className="text-slate-400 text-[10px]">{t.level}</div>
+              <div className="pt-3 border-t border-slate-200/80 dark:border-[#1A314D] text-xs">
+                <div className="font-bold text-[#0B1A2D] dark:text-white">{item.name}</div>
+                <div className="text-slate-500 dark:text-slate-400">{item.level}</div>
               </div>
             </div>
           ))}
@@ -426,60 +417,60 @@ export const CoachPublicView: React.FC = () => {
 
       {/* 6. MODAL INTERACTIVO DE RESERVA DE CLASE O BONO */}
       {bookingModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4 backdrop-blur-sm animate-in fade-in duration-150">
-          <div className="relative w-full max-w-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl text-slate-900 dark:text-slate-100 space-y-5">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0B1A2D]/80 p-4 backdrop-blur-sm">
+          <div className="relative w-full max-w-lg bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] rounded-3xl p-6 sm:p-8 shadow-2xl text-[#0B1A2D] dark:text-slate-100 space-y-5">
             <button
               type="button"
               onClick={() => setBookingModalOpen(false)}
-              className="absolute top-4 right-4 p-2 rounded-xl text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+              className="absolute top-4 right-4 w-9 h-9 rounded-xl text-slate-400 hover:text-[#0B1A2D] dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#132A45] flex items-center justify-center transition-colors cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
 
             <div>
-              <span className="text-[10px] font-bold uppercase text-emerald-600 dark:text-emerald-400">
+              <span className="text-xs font-semibold text-[#8B5CF6] dark:text-[#a78bfa]">
                 Formulario de Contacto Directo
               </span>
-              <h3 className="text-xl font-black text-slate-900 dark:text-white mt-1">
+              <h3 className="text-xl font-bold text-[#0B1A2D] dark:text-white mt-1 tracking-tight">
                 Solicitar {selectedProgram}
               </h3>
-              <p className="text-xs text-slate-500 mt-0.5">
-                Indica tus preferencias y Mateo Varela contactará contigo hoy mismo.
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                Indica tus preferencias y {currentTenant.name} contactará contigo hoy mismo.
               </p>
             </div>
 
             <form onSubmit={handleSubmitBooking} className="space-y-4 text-xs">
               <div>
-                <label className="block font-semibold mb-1">Nombre Completo:</label>
+                <label className="block font-semibold mb-1.5">Nombre Completo:</label>
                 <input
                   type="text"
                   required
                   value={studentName}
                   onChange={(e) => setStudentName(e.target.value)}
                   placeholder="Ej. Carlos Méndez"
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  className="w-full min-h-[42px] px-3.5 py-2 rounded-xl border border-slate-200 dark:border-[#1A314D] bg-[#F8FAFC] dark:bg-[#071220] text-sm focus:outline-none focus:border-[#8B5CF6]"
                 />
               </div>
 
               <div>
-                <label className="block font-semibold mb-1">Teléfono / WhatsApp:</label>
+                <label className="block font-semibold mb-1.5">Teléfono / WhatsApp:</label>
                 <input
                   type="tel"
                   required
                   value={studentPhone}
                   onChange={(e) => setStudentPhone(e.target.value)}
                   placeholder="Ej. +34 600 11 22 33"
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  className="w-full min-h-[42px] px-3.5 py-2 rounded-xl border border-slate-200 dark:border-[#1A314D] bg-[#F8FAFC] dark:bg-[#071220] text-sm font-mono tabular-nums focus:outline-none focus:border-[#8B5CF6]"
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-semibold mb-1">Franja Horaria Preferida:</label>
+                  <label className="block font-semibold mb-1.5">Franja Horaria Preferida:</label>
                   <select
                     value={selectedTimeSlot}
                     onChange={(e) => setSelectedTimeSlot(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    className="w-full min-h-[42px] px-3.5 py-2 rounded-xl border border-slate-200 dark:border-[#1A314D] bg-[#F8FAFC] dark:bg-[#071220] text-sm focus:outline-none focus:border-[#8B5CF6]"
                   >
                     <option value="Mañana (09:00 - 13:00)">Mañana (09:00 - 13:00)</option>
                     <option value="Mediodía (13:00 - 16:00)">Mediodía (13:00 - 16:00)</option>
@@ -489,11 +480,11 @@ export const CoachPublicView: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block font-semibold mb-1">Nivel Estimado:</label>
+                  <label className="block font-semibold mb-1.5">Nivel Estimado:</label>
                   <select
                     value={studentLevel}
                     onChange={(e) => setStudentLevel(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    className="w-full min-h-[42px] px-3.5 py-2 rounded-xl border border-slate-200 dark:border-[#1A314D] bg-[#F8FAFC] dark:bg-[#071220] text-sm focus:outline-none focus:border-[#8B5CF6]"
                   >
                     <option value="Iniciación (Nivel 1.5 - 2.5)">Iniciación (1.5 - 2.5)</option>
                     <option value="Intermedio (Nivel 3.0 - 4.0)">Intermedio (3.0 - 4.0)</option>
@@ -503,22 +494,22 @@ export const CoachPublicView: React.FC = () => {
               </div>
 
               <div>
-                <label className="block font-semibold mb-1">Notas u Objetivos (opcional):</label>
+                <label className="block font-semibold mb-1.5">Notas u Objetivos (opcional):</label>
                 <textarea
                   rows={2}
                   value={studentNotes}
                   onChange={(e) => setStudentNotes(e.target.value)}
                   placeholder="Ej. Quiero mejorar la bandeja y salidas de pared con giro..."
-                  className="w-full px-3.5 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-[#1A314D] bg-[#F8FAFC] dark:bg-[#071220] text-sm focus:outline-none focus:border-[#8B5CF6]"
                 />
               </div>
 
               <button
                 type="submit"
-                className="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md transition active:scale-95 flex items-center justify-center gap-2"
+                className="w-full min-h-[44px] py-3 rounded-xl bg-[#B7F229] hover:bg-[#a6de1f] text-[#0B1A2D] font-bold text-sm transition-colors flex items-center justify-center gap-2 cursor-pointer"
               >
-                <Send className="w-4 h-4" />
-                <span>Enviar Solicitud a Mateo Varela</span>
+                <Send className="w-4 h-4 shrink-0" />
+                <span>Enviar Solicitud</span>
               </button>
             </form>
           </div>

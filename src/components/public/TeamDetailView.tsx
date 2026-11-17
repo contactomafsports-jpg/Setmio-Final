@@ -1,18 +1,12 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useApp } from '../../context/AppContext';
 import { ClubTeam, ClubTeamPlayer } from '../../types/database';
+import heroPadelImg from '../../assets/images/hero_padel_club_1794872242820.jpg';
 import {
   ArrowLeft,
   Users,
-  Trophy,
-  Calendar,
-  Shield,
   Star,
-  Clock,
-  MapPin,
-  Award,
   ChevronRight,
-  TrendingUp,
 } from 'lucide-react';
 
 interface TeamDetailViewProps {
@@ -44,7 +38,7 @@ export const TeamDetailView: React.FC<TeamDetailViewProps> = ({
     division: 'División de Honor FGP',
     coach: 'Laura Senra',
     captain: 'Mateo Varela',
-    photoUrl: 'https://images.unsplash.com/photo-1526676037777-05a232554f77?auto=format&fit=crop&w=1200&q=80',
+    photoUrl: heroPadelImg,
     matchesWon: 8,
     matchesPlayed: 10,
     nextMatch: {
@@ -54,12 +48,12 @@ export const TeamDetailView: React.FC<TeamDetailViewProps> = ({
       location: 'Pistas Centrales San Mateo',
     },
     players: [
-      { id: 'p1', name: 'Mateo Varela', level: 5.5, hand: 'diestro', position: 'reves', avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80' },
-      { id: 'p2', name: 'Carlos Méndez', level: 4.85, hand: 'diestro', position: 'drive', avatarUrl: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=300&q=80' },
-      { id: 'p3', name: 'Diego Soto', level: 4.5, hand: 'zurdo', position: 'drive', avatarUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=300&q=80' },
-      { id: 'p4', name: 'Rubén Loureiro', level: 4.75, hand: 'diestro', position: 'reves', avatarUrl: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=300&q=80' },
-      { id: 'p5', name: 'Javier Fraga', level: 4.25, hand: 'diestro', position: 'ambas', avatarUrl: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=300&q=80' },
-      { id: 'p6', name: 'Adrián Pena', level: 4.0, hand: 'diestro', position: 'drive', avatarUrl: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=300&q=80' },
+      { id: 'p1', name: 'Mateo Varela', level: 5.5, hand: 'diestro', position: 'reves', avatarUrl: '' },
+      { id: 'p2', name: 'Carlos Méndez', level: 4.85, hand: 'diestro', position: 'drive', avatarUrl: '' },
+      { id: 'p3', name: 'Diego Soto', level: 4.5, hand: 'zurdo', position: 'drive', avatarUrl: '' },
+      { id: 'p4', name: 'Rubén Loureiro', level: 4.75, hand: 'diestro', position: 'reves', avatarUrl: '' },
+      { id: 'p5', name: 'Javier Fraga', level: 4.25, hand: 'diestro', position: 'ambas', avatarUrl: '' },
+      { id: 'p6', name: 'Adrián Pena', level: 4.0, hand: 'diestro', position: 'drive', avatarUrl: '' },
     ],
   };
 
@@ -72,157 +66,158 @@ export const TeamDetailView: React.FC<TeamDetailViewProps> = ({
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-in fade-in duration-200">
-      {/* 1. TOP BAR WITH BACK BUTTON */}
-      <div className="flex items-center justify-between mb-4">
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12 animate-in fade-in duration-200">
+      <div className="flex items-center justify-between mb-6">
         <button
+          type="button"
           onClick={handleBack}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-200 hover:text-emerald-600 dark:hover:text-emerald-400 font-bold text-xs shadow-xs transition cursor-pointer active:scale-95"
+          className="min-h-[40px] inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] text-[#0B1A2D] dark:text-slate-200 hover:border-[#0B1A2D] dark:hover:border-[#B7F229] font-semibold text-xs transition cursor-pointer"
           aria-label="Volver al listado de equipos"
         >
-          <ArrowLeft className="w-4 h-4" />
+          <ArrowLeft className="w-4 h-4 text-[#8B5CF6] dark:text-[#a78bfa]" />
           <span>Volver a Equipos</span>
         </button>
       </div>
 
       <div className="space-y-8">
-        {/* 2. TEAM HERO */}
-      <div className="relative rounded-3xl overflow-hidden bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl">
-        <div className="relative h-72 sm:h-96 w-full">
-          <img
-            src={team.photoUrl}
-            alt={team.name}
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent" />
-          <div className="absolute bottom-6 left-6 right-6 text-white space-y-2">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="px-3 py-1 rounded-full bg-emerald-500 font-bold text-xs uppercase tracking-wider">
-                {team.category}
-              </span>
-              <span className="px-3 py-1 rounded-full bg-slate-900/80 text-slate-200 border border-slate-700 text-xs font-semibold">
-                {team.division}
-              </span>
-            </div>
-            <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight">
-              {team.name}
-            </h1>
-            <p className="text-slate-200 text-xs sm:text-sm">
-              Entrenadora: <strong>{team.coach}</strong> · Capitanía Oficial: <strong>{team.captain}</strong>
-            </p>
-          </div>
-        </div>
-
-        {/* Quick Stats Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 p-6 text-center text-xs">
-          <div className="border-r border-slate-200 dark:border-slate-800 last:border-r-0">
-            <div className="text-slate-500 dark:text-slate-400">Victorias</div>
-            <div className="text-2xl font-black text-emerald-600 dark:text-emerald-400 font-mono mt-0.5">
-              {team.matchesWon} / {team.matchesPlayed}
-            </div>
-            <div className="text-[10px] text-emerald-600">80% efectividad</div>
-          </div>
-          <div className="border-r border-slate-200 dark:border-slate-800 last:border-r-0">
-            <div className="text-slate-500 dark:text-slate-400">Plantilla</div>
-            <div className="text-2xl font-black text-slate-900 dark:text-white font-mono mt-0.5">
-              {team.players.length} Jugadores
-            </div>
-            <div className="text-[10px] text-slate-400">Convocatoria activa</div>
-          </div>
-          <div className="border-r border-slate-200 dark:border-slate-800 last:border-r-0">
-            <div className="text-slate-500 dark:text-slate-400">Capitán</div>
-            <div className="text-base font-black text-amber-500 mt-1 truncate">
-              {team.captain}
-            </div>
-            <div className="text-[10px] text-amber-500">Líder en pista</div>
-          </div>
-          <div>
-            <div className="text-slate-500 dark:text-slate-400">Club Sede</div>
-            <div className="text-base font-black text-slate-900 dark:text-white mt-1 truncate">
-              {currentTenant.name}
-            </div>
-            <div className="text-[10px] text-slate-400">{currentTenant.city}</div>
-          </div>
-        </div>
-      </div>
-
-      {/* 3. CAPITÁN HIGHLIGHT BANNER */}
-      <div className="p-6 rounded-3xl bg-gradient-to-r from-amber-950/80 via-slate-900 to-slate-900 border border-amber-800/40 text-white shadow-lg flex flex-col sm:flex-row items-center justify-between gap-6">
-        <div className="flex items-center gap-4">
-          <div className="w-14 h-14 rounded-2xl bg-amber-500/20 text-amber-400 flex items-center justify-center shrink-0 border border-amber-500/30">
-            <Star className="w-7 h-7 fill-amber-400" />
-          </div>
-          <div className="space-y-0.5">
-            <span className="text-[10px] font-bold uppercase tracking-widest text-amber-400">Figura de Capitanía</span>
-            <h3 className="text-lg font-black text-white">{team.captain}</h3>
-            <p className="text-xs text-slate-300">
-              Responsable de actas oficiales, sorteo de pista y convocatorias del equipo ante la Federación Gallega de Pádel.
-            </p>
-          </div>
-        </div>
-
-        <button
-          onClick={() => setPublicPage('player_profile')}
-          className="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs transition shrink-0"
-        >
-          Ver Ficha del Capitán
-        </button>
-      </div>
-
-      {/* 4. ROSTER GRID (Click opens independent public player profile) */}
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-black text-slate-900 dark:text-white flex items-center gap-2">
-            <Users className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
-            <span>Plantilla de Jugadores Convocados</span>
-          </h2>
-          <span className="text-xs text-slate-500 dark:text-slate-400">
-            Haz clic en un jugador para abrir su perfil público completo
-          </span>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {team.players.map((player) => {
-            const isCaptain = player.name.includes(team.captain) || player.name.includes('Capitán');
-            return (
-              <div
-                key={player.id}
-                onClick={() => handlePlayerClick(player)}
-                className="group cursor-pointer p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-emerald-500 dark:hover:border-emerald-500 shadow-xs hover:shadow-lg transition-all duration-200 flex items-center gap-3.5"
-              >
-                <div className="relative">
-                  <img
-                    src={player.avatarUrl}
-                    alt={player.name}
-                    className="w-14 h-14 rounded-2xl object-cover border-2 border-emerald-500/30 group-hover:scale-105 transition-transform"
-                  />
-                  {isCaptain && (
-                    <div className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-amber-500 text-slate-950 flex items-center justify-center shadow">
-                      <Star className="w-3 h-3 fill-slate-950" />
-                    </div>
-                  )}
-                </div>
-
-                <div className="min-w-0 flex-1 text-xs">
-                  <div className="flex items-center gap-1.5">
-                    <span className="font-bold text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 truncate text-sm">
-                      {player.name}
-                    </span>
-                  </div>
-                  <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
-                    Nivel FEP {player.level.toFixed(2)} · {player.position.toUpperCase()}
-                  </div>
-                  <div className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold capitalize mt-0.5">
-                    Mano: {player.hand}
-                  </div>
-                </div>
-
-                <ChevronRight className="w-5 h-5 text-slate-400 group-hover:text-emerald-500 group-hover:translate-x-0.5 transition-all" />
+        {/* Team Hero */}
+        <div className="rounded-2xl overflow-hidden bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D]">
+          <div className="relative h-72 sm:h-88 w-full bg-[#071220]">
+            <img
+              src={team.photoUrl}
+              alt={team.name}
+              className="w-full h-full object-cover opacity-85"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#071220] via-[#071220]/45 to-transparent" />
+            <div className="absolute bottom-6 left-6 right-6 text-white space-y-2">
+              <div className="flex flex-wrap items-center gap-2 text-xs font-mono">
+                <span className="px-2.5 py-0.5 rounded-md bg-[#B7F229] text-[#0B1A2D] font-bold uppercase tracking-wider">
+                  {team.category}
+                </span>
+                <span className="text-slate-300">·</span>
+                <span className="text-slate-200">{team.division}</span>
               </div>
-            );
-          })}
+              <h1 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight">
+                {team.name}
+              </h1>
+              <p className="text-slate-300 text-xs sm:text-sm">
+                Entrenadora: <strong className="text-white">{team.coach}</strong> · Capitanía Oficial: <strong className="text-white">{team.captain}</strong>
+              </p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-slate-200/80 dark:divide-[#1A314D] border-t border-slate-200/80 dark:border-[#1A314D] bg-slate-50 dark:bg-[#071220] text-center text-xs">
+            <div className="p-5">
+              <div className="text-slate-500 dark:text-slate-400">Victorias</div>
+              <div className="text-2xl font-extrabold text-[#0B1A2D] dark:text-[#B7F229] font-mono tabular-nums mt-0.5">
+                {team.matchesWon} / {team.matchesPlayed}
+              </div>
+              <div className="text-[10px] font-mono tabular-nums text-[#8B5CF6] dark:text-[#a78bfa]">80% efectividad</div>
+            </div>
+            <div className="p-5">
+              <div className="text-slate-500 dark:text-slate-400">Plantilla</div>
+              <div className="text-2xl font-extrabold text-[#0B1A2D] dark:text-white font-mono tabular-nums mt-0.5">
+                {team.players.length} Jugadores
+              </div>
+              <div className="text-[10px] text-slate-400">Convocatoria activa</div>
+            </div>
+            <div className="p-5">
+              <div className="text-slate-500 dark:text-slate-400">Capitán</div>
+              <div className="text-base font-bold text-[#0B1A2D] dark:text-white mt-1 truncate">
+                {team.captain}
+              </div>
+              <div className="text-[10px] text-[#8B5CF6] dark:text-[#a78bfa]">Líder en pista</div>
+            </div>
+            <div className="p-5">
+              <div className="text-slate-500 dark:text-slate-400">Club Sede</div>
+              <div className="text-base font-bold text-[#0B1A2D] dark:text-white mt-1 truncate">
+                {currentTenant.name}
+              </div>
+              <div className="text-[10px] text-slate-400">{currentTenant.city}</div>
+            </div>
+          </div>
         </div>
-      </div>
+
+        {/* Captain Banner */}
+        <div className="p-6 rounded-2xl bg-[#0B1A2D] border border-[#1A314D] text-white flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl bg-[#B7F229] text-[#0B1A2D] flex items-center justify-center shrink-0">
+              <Star className="w-6 h-6" />
+            </div>
+            <div className="space-y-0.5">
+              <span className="text-[10px] font-mono uppercase tracking-[0.14em] text-[#B7F229]">Figura de Capitanía</span>
+              <h3 className="text-lg font-bold text-white">{team.captain}</h3>
+              <p className="text-xs text-slate-300">
+                Responsable de actas oficiales, sorteo de pista y convocatorias del equipo ante la Federación.
+              </p>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setPublicPage('player_profile')}
+            className="min-h-[40px] px-5 py-2 rounded-xl bg-[#B7F229] hover:bg-[#a6de1f] text-[#0B1A2D] font-bold text-xs transition shrink-0 cursor-pointer"
+          >
+            Ver Ficha del Capitán
+          </button>
+        </div>
+
+        {/* Roster Grid */}
+        <div className="space-y-4">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <h2 className="text-2xl font-extrabold text-[#0B1A2D] dark:text-white flex items-center gap-2">
+              <Users className="w-5 h-5 text-[#8B5CF6] dark:text-[#a78bfa]" />
+              <span>Plantilla de Jugadores Convocados</span>
+            </h2>
+            <span className="text-xs text-slate-500 dark:text-slate-400">
+              Pulsa en un jugador para abrir su ficha pública
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {team.players.map((player) => {
+              const isCaptain = player.name.includes(team.captain) || player.name.includes('Capitán');
+              const initials = player.name
+                .split(' ')
+                .slice(0, 2)
+                .map((n) => n[0])
+                .join('')
+                .toUpperCase();
+              return (
+                <div
+                  key={player.id}
+                  onClick={() => handlePlayerClick(player)}
+                  className="group cursor-pointer p-4 rounded-xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] hover:border-[#0B1A2D] dark:hover:border-[#B7F229] transition flex items-center gap-3.5"
+                >
+                  <div className="relative shrink-0">
+                    <div className="w-12 h-12 rounded-xl bg-[#0B1A2D] dark:bg-[#B7F229] text-[#B7F229] dark:text-[#0B1A2D] font-bold text-sm flex items-center justify-center">
+                      {initials}
+                    </div>
+                    {isCaptain && (
+                      <div className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-[#8B5CF6] text-white flex items-center justify-center">
+                        <Star className="w-3 h-3" />
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="min-w-0 flex-1 text-xs">
+                    <div className="font-bold text-[#0B1A2D] dark:text-white truncate text-sm">
+                      {player.name}
+                    </div>
+                    <div className="text-[11px] font-mono tabular-nums text-slate-500 dark:text-slate-400 mt-0.5">
+                      Nivel {player.level.toFixed(2)} · {player.position.toUpperCase()}
+                    </div>
+                    <div className="text-[10px] text-[#8B5CF6] dark:text-[#a78bfa] font-semibold capitalize mt-0.5">
+                      Mano: {player.hand}
+                    </div>
+                  </div>
+
+                  <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-[#0B1A2D] dark:group-hover:text-[#B7F229] transition shrink-0" />
+                </div>
+              );
+            })}
+          </div>
+        </div>
       </div>
     </div>
   );
