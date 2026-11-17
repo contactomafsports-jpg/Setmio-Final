@@ -53,6 +53,7 @@ import { fallbackLng, SupportedLanguage, TRANSLATIONS } from '../lib/i18n';
 import { i18n } from '../i18n';
 import { LOCALES } from '../locales';
 import { checkPermission, PermissionAction, PermissionCheckResult } from '../lib/permissions';
+import { isSupabaseConfigured, supabase } from '../lib/supabase';
 
 export type MainView = 'public' | 'admin' | 'player' | 'coach' | 'hq';
 
@@ -395,6 +396,17 @@ const readRoute = () => {
     };
   }
 
+  if (path === '/hq' || path.startsWith('/hq/') || path === '/superadmin' || path.startsWith('/superadmin/')) {
+    return {
+      view: 'hq' as MainView,
+      page: 'home' as PublicPage,
+      admin: 'dashboard' as AdminTab,
+      player: 'dashboard' as PlayerTab,
+      clubSlug: null,
+      isCorporate: false,
+    };
+  }
+
   // 1. Detect Subdomain (e.g. sanmateo.setmiofinal2.vercel.app or sanmateo.localhost)
   let detectedSubdomain: string | null = null;
   if (hostname.endsWith('.setmiofinal2.vercel.app')) {
@@ -440,7 +452,7 @@ const readRoute = () => {
   // Every public corporate route uses the Setmio layout; only club subdomains, custom domains or /club/:slug use the club layout.
   const isCorporate = !activeClubSlug;
 
-  if (remainingPath === '/hq') {
+  if (remainingPath === '/hq' || remainingPath === '/superadmin') {
     return {
       view: 'hq' as MainView,
       page: 'home' as PublicPage,
@@ -775,6 +787,7 @@ interface AppContextType {
 
   // Auth & Roles & Permissions
   currentUser: UserSession;
+  loginUser: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   switchUserRole: (role: UserRole) => void;
   logoutOrExitDemo: () => void;
   isSuperadmin: boolean;
@@ -1691,6 +1704,280 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   }, [isCorporateLanding, currentView, currentUser.role, currentTenant?.branding]);
 
+  const resolveProfileRole = (rawRole?: string | null, email?: string | null): UserRole => {
+    const cleanEmail = (email || '').trim().toLowerCase();
+    const normalized = (rawRole || '').trim().toLowerCase();
+
+    if (
+      normalized === 'superadmin' ||
+      normalized === 'super_admin' ||
+      cleanEmail === 'contactomafsports@gmail.com'
+    ) {
+      return 'SUPERADMIN';
+    }
+    if (normalized === 'tenant_owner' || normalized === 'owner') return 'TENANT_OWNER';
+    if (
+      normalized === 'admin' ||
+      normalized === 'club_admin' ||
+      normalized === 'tenant_admin'
+    ) {
+      return 'TENANT_ADMIN';
+    }
+    if (normalized === 'reception' || normalized === 'recepcion') return 'RECEPTION';
+    if (normalized === 'coach' || normalized === 'profesor') return 'COACH';
+    if (normalized === 'academy_manager') return 'ACADEMY_MANAGER';
+    if (normalized === 'tournament_organizer') return 'TOURNAMENT_ORGANIZER';
+    if (normalized === 'store_manager') return 'STORE_MANAGER';
+    if (normalized === 'team_manager') return 'TEAM_MANAGER';
+    if (normalized === 'professional_player' || normalized === 'pro_player') {
+      return 'PROFESSIONAL_PLAYER';
+    }
+    if (normalized === 'parent_or_guardian') return 'PARENT_OR_GUARDIAN';
+    if (normalized === 'staff') return 'STAFF';
+    return 'PLAYER';
+  };
+
+  const applyAuthenticatedProfile = useCallback(
+    (params: {
+      userId: string;
+      email: string;
+      fullName?: string | null;
+      role?: string | null;
+      sedeId?: string | null;
+      navigateToView?: boolean;
+    }) => {
+      const cleanEmail = params.email.trim().toLowerCase();
+      const resolvedRole = resolveProfileRole(params.role, cleanEmail);
+      const fallbackProfile = ROLE_PROFILES[resolvedRole] || ROLE_PROFILES.PLAYER;
+
+      setCurrentUser({
+        id: params.userId,
+        name: params.fullName?.trim() || fallbackProfile.name,
+        email: cleanEmail || fallbackProfile.email,
+        role: resolvedRole,
+        avatarUrl: fallbackProfile.avatarUrl,
+        playLevel: fallbackProfile.playLevel,
+      });
+
+      if (params.sedeId) {
+        const matchedVenue = INITIAL_VENUES.find((v) => v.id === params.sedeId);
+        if (matchedVenue) {
+          setSelectedVenueId(matchedVenue.id);
+        }
+        const matchedTenant = tenants.find((t) => t.id === params.sedeId || t.slug === params.sedeId);
+        if (matchedTenant) {
+          setCurrentTenantId(matchedTenant.id);
+        }
+      }
+
+      if (params.navigateToView !== false) {
+        setIsCorporateLanding(false);
+        setIsWhiteLabelPlayerPreview(false);
+
+        if (resolvedRole === 'SUPERADMIN') {
+          clearAdminSession();
+          setCurrentViewState('hq');
+        } else if (resolvedRole === 'PLAYER' || resolvedRole === 'PARENT_OR_GUARDIAN') {
+          clearAdminSession();
+          setCurrentViewState('player');
+        } else if (resolvedRole === 'COACH') {
+          clearAdminSession();
+          setCurrentViewState('coach');
+        } else {
+          if (resolvedRole === 'PROFESSIONAL_PLAYER') {
+            const proTenant =
+              tenants.find((t) => t.type === 'PRO_PLAYER') ||
+              tenants.find((t) => t.id === 'tenant-martin-pro');
+            if (proTenant) setCurrentTenantId(proTenant.id);
+          }
+          setAdminTabState('dashboard');
+          setCurrentViewState('admin');
+        }
+      }
+
+      return resolvedRole;
+    },
+    [tenants, setSelectedVenueId]
+  );
+
+  // Hydrate Supabase session on startup if a real authenticated session already exists
+  useEffect(() => {
+    const sb = supabase;
+    if (!isSupabaseConfigured || !sb) return;
+    let isMounted = true;
+
+    const hydrateSession = async () => {
+      try {
+        const { data } = await sb.auth.getSession();
+        const user = data.session?.user;
+        if (!user || !isMounted) return;
+
+        const { data: profileData, error: profileError } = await sb
+          .from('profiles')
+          .select('role, sede_id, full_name')
+          .eq('id', user.id)
+          .single();
+
+        if (profileError) {
+          console.error('Error al obtener perfil:', profileError);
+        }
+
+        if (!isMounted) return;
+        const resolvedRole = applyAuthenticatedProfile({
+          userId: user.id,
+          email: user.email || '',
+          fullName: profileData?.full_name || user.user_metadata?.full_name,
+          role: profileData?.role || user.user_metadata?.role,
+          sedeId: profileData?.sede_id,
+          navigateToView: false,
+        });
+
+        // Si el usuario autenticado es superadmin y está en /hq o /login, asegurar vista HQ
+        if (
+          resolvedRole === 'SUPERADMIN' &&
+          typeof window !== 'undefined' &&
+          (window.location.pathname === '/hq' || window.location.pathname === '/superadmin')
+        ) {
+          setIsCorporateLanding(false);
+          setCurrentViewState('hq');
+        }
+      } catch (err) {
+        console.error('Error al restaurar sesión de Supabase:', err);
+      }
+    };
+
+    hydrateSession();
+
+    const { data: authListener } = sb.auth.onAuthStateChange((event) => {
+      if (event === 'SIGNED_OUT' && isMounted) {
+        clearAdminSession();
+        setCurrentUser(ROLE_PROFILES.PLAYER);
+      }
+    });
+
+    return () => {
+      isMounted = false;
+      authListener.subscription.unsubscribe();
+    };
+  }, [applyAuthenticatedProfile]);
+
+  const loginUser = async (
+    email: string,
+    password: string
+  ): Promise<{ success: boolean; error?: string }> => {
+    const trimmedEmail = email.trim();
+    const cleanEmail = trimmedEmail.toLowerCase();
+
+    try {
+      if (isSupabaseConfigured && supabase) {
+        // 1. Autenticar con Supabase Auth
+        const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+          email: trimmedEmail,
+          password,
+        });
+
+        if (authError) throw authError;
+
+        if (authData.user) {
+          // 2. Consultar el perfil y rol en la tabla public.profiles
+          const { data: profileData, error: profileError } = await supabase
+            .from('profiles')
+            .select('role, sede_id, full_name')
+            .eq('id', authData.user.id)
+            .single();
+
+          if (profileError) {
+            console.error('Error al obtener perfil:', profileError);
+          }
+
+          // 3. Establecer el rol en el estado global de la app
+          const resolvedRole = applyAuthenticatedProfile({
+            userId: authData.user.id,
+            email: authData.user.email || cleanEmail,
+            fullName: profileData?.full_name || authData.user.user_metadata?.full_name,
+            role: profileData?.role || authData.user.user_metadata?.role || 'player',
+            sedeId: profileData?.sede_id,
+            navigateToView: true,
+          });
+
+          if (resolvedRole === 'SUPERADMIN') {
+            triggerDemoToast(
+              'Superadministrador Setmio HQ',
+              `Acceso global verificado para ${authData.user.email || cleanEmail}.`,
+              'success'
+            );
+          } else {
+            triggerDemoToast(
+              'Sesión iniciada',
+              `Bienvenido ${profileData?.full_name || authData.user.email || 'de nuevo'} a Setmio.`,
+              'success'
+            );
+          }
+          return { success: true };
+        }
+      }
+
+      // Fallback local cuando Supabase no está configurado en variables de entorno
+      const matchedDemoProfile = Object.values(ROLE_PROFILES).find(
+        (p) => p.email.toLowerCase() === cleanEmail
+      );
+
+      if (cleanEmail === 'contactomafsports@gmail.com') {
+        applyAuthenticatedProfile({
+          userId: ROLE_PROFILES.SUPERADMIN.id,
+          email: cleanEmail,
+          fullName: ROLE_PROFILES.SUPERADMIN.name,
+          role: 'superadmin',
+          navigateToView: true,
+        });
+        triggerDemoToast(
+          'Superadministrador Setmio HQ',
+          'Sesión vinculada a contactomafsports@gmail.com.',
+          'success'
+        );
+        return { success: true };
+      }
+
+      if (matchedDemoProfile) {
+        applyAuthenticatedProfile({
+          userId: matchedDemoProfile.id,
+          email: matchedDemoProfile.email,
+          fullName: matchedDemoProfile.name,
+          role: matchedDemoProfile.role,
+          navigateToView: true,
+        });
+        triggerDemoToast(
+          'Bienvenido a Setmio',
+          `Sesión iniciada como ${matchedDemoProfile.name}.`,
+          'success'
+        );
+        return { success: true };
+      }
+
+      applyAuthenticatedProfile({
+        userId: `user-${Date.now()}`,
+        email: cleanEmail,
+        fullName: cleanEmail.split('@')[0] || 'Jugador Setmio',
+        role: 'player',
+        navigateToView: true,
+      });
+      triggerDemoToast(
+        'Bienvenido a Setmio',
+        `Has iniciado sesión en ${currentTenant.name}.`,
+        'success'
+      );
+      return { success: true };
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : 'No se pudo completar el inicio de sesión.';
+      console.error('Error en el inicio de sesión:', errorMessage);
+      triggerDemoToast('Error de Autenticación', errorMessage, 'warning');
+      return { success: false, error: errorMessage };
+    }
+  };
+
   const switchUserRole = (role: UserRole) => {
     const profile = ROLE_PROFILES[role] || ROLE_PROFILES.PLAYER;
     setCurrentUser(profile);
@@ -1698,10 +1985,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
     // Auto navigate to relevant view based on role
     if (role === 'SUPERADMIN') {
+      clearAdminSession();
       setCurrentViewState('hq');
     } else if (role === 'PLAYER' || role === 'PARENT_OR_GUARDIAN') {
+      clearAdminSession();
       setCurrentViewState('player');
     } else if (role === 'COACH') {
+      clearAdminSession();
       setCurrentViewState('coach');
     } else if (role === 'PROFESSIONAL_PLAYER') {
       const proTenant = tenants.find((t) => t.type === 'PRO_PLAYER') || tenants.find((t) => t.id === 'tenant-martin-pro');
@@ -1725,6 +2015,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     try {
       localStorage.removeItem(LAST_ACTIVE_ROUTE_KEY);
     } catch {}
+    if (isSupabaseConfigured && supabase) {
+      supabase.auth.signOut().catch((err) => {
+        console.warn('Error closing Supabase session:', err);
+      });
+    }
     setCurrentUser(ROLE_PROFILES.PLAYER);
     setCurrentViewState('public');
     setPublicPage('home');
@@ -3197,6 +3492,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         isConsolidatedView,
 
         currentUser,
+        loginUser,
         switchUserRole,
         logoutOrExitDemo,
         isSuperadmin,

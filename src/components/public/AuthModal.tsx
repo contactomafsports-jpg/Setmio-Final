@@ -30,7 +30,15 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   onClose,
   initialMode = 'login',
 }) => {
-  const { currentTenant, switchUserRole, triggerDemoToast, setCurrentView, t, currentLanguage } = useApp();
+  const {
+    currentTenant,
+    loginUser,
+    switchUserRole,
+    triggerDemoToast,
+    setCurrentView,
+    t,
+    currentLanguage,
+  } = useApp();
   void currentLanguage;
 
   const [mode, setMode] = useState<'login' | 'register'>(initialMode);
@@ -62,11 +70,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const [acceptTerms, setAcceptTerms] = useState(true);
   const [notifyWhatsapp, setNotifyWhatsapp] = useState(true);
   const [loading, setLoading] = useState(false);
+  const [authError, setAuthError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!isOpen) return;
     setMode(initialMode);
     setRegisterStep(1);
+    setAuthError(null);
 
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
@@ -120,77 +130,80 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
   const handleCustomSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setAuthError(null);
     setLoading(true);
+
+    if (mode === 'login') {
+      try {
+        const result = await loginUser(email, password);
+        if (!result.success) {
+          setAuthError(result.error || 'Error de autenticación. Verifica tus credenciales.');
+          return;
+        }
+        onClose();
+      } finally {
+        setLoading(false);
+      }
+      return;
+    }
 
     if (isSupabaseConfigured && supabase) {
       try {
-        if (mode === 'login') {
-          const { error } = await supabase.auth.signInWithPassword({ email, password });
-          if (error) throw error;
-          triggerDemoToast('Inicio de sesión Supabase', 'Sesión iniciada con éxito en el servidor.', 'success');
-        } else {
-          const { error } = await supabase.auth.signUp({
-            email,
-            password,
-            options: {
-              data: {
-                full_name: fullName,
-                tenant_id: currentTenant.id,
-                role: selectedRole === 'club_admin' ? 'ADMIN' : selectedRole === 'coach' ? 'COACH' : 'PLAYER',
-                play_level: playLevel,
-                dominant_hand: dominantHand,
-                preferred_position: preferredPosition,
-                phone,
-                club_name: clubName,
-                court_count: courtCount,
-                plan: selectedPlan,
-              },
+        const { error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            data: {
+              full_name: fullName,
+              tenant_id: currentTenant.id,
+              role: selectedRole === 'club_admin' ? 'ADMIN' : selectedRole === 'coach' ? 'COACH' : 'PLAYER',
+              play_level: playLevel,
+              dominant_hand: dominantHand,
+              preferred_position: preferredPosition,
+              phone,
+              club_name: clubName,
+              court_count: courtCount,
+              plan: selectedPlan,
             },
-          });
-          if (error) throw error;
-          triggerDemoToast('Registro en Supabase', 'Cuenta creada con éxito. Perfil vinculado.', 'success');
-        }
+          },
+        });
+        if (error) throw error;
+        triggerDemoToast('Registro en Supabase', 'Cuenta creada con éxito. Perfil vinculado.', 'success');
         handleClose();
       } catch (err: unknown) {
-        triggerDemoToast('Error de Autenticación', (err as Error)?.message || 'Fallo en la autenticación.', 'warning');
+        const message = (err as Error)?.message || 'Fallo en el registro.';
+        setAuthError(message);
+        triggerDemoToast('Error de Autenticación', message, 'warning');
       } finally {
         setLoading(false);
       }
     } else {
       setTimeout(() => {
         setLoading(false);
-        if (mode === 'login') {
+        if (selectedRole === 'club_admin') {
+          switchUserRole('TENANT_ADMIN');
+          setCurrentView('admin');
           triggerDemoToast(
-            'Bienvenido a Setmio',
-            `Has iniciado sesión en ${currentTenant.name}.`,
+            t('register.toast.adminTitle', 'Club Registrado con Éxito'),
+            t('register.toast.adminDesc', `Bienvenido a Setmio Pro. Has activado la gestión de ${clubName || 'tu club'}.`),
+            'success'
+          );
+        } else if (selectedRole === 'coach') {
+          switchUserRole('COACH');
+          setCurrentView('coach');
+          triggerDemoToast(
+            t('register.toast.coachTitle', 'Perfil de Entrenador Activado'),
+            t('register.toast.coachDesc', `Bienvenido ${fullName}. Ya puedes gestionar tus clases y alumnos.`),
             'success'
           );
         } else {
-          if (selectedRole === 'club_admin') {
-            switchUserRole('TENANT_ADMIN');
-            setCurrentView('admin');
-            triggerDemoToast(
-              t('register.toast.adminTitle', 'Club Registrado con Éxito'),
-              t('register.toast.adminDesc', `Bienvenido a Setmio Pro. Has activado la gestión de ${clubName || 'tu club'}.`),
-              'success'
-            );
-          } else if (selectedRole === 'coach') {
-            switchUserRole('COACH');
-            setCurrentView('coach');
-            triggerDemoToast(
-              t('register.toast.coachTitle', 'Perfil de Entrenador Activado'),
-              t('register.toast.coachDesc', `Bienvenido ${fullName}. Ya puedes gestionar tus clases y alumnos.`),
-              'success'
-            );
-          } else {
-            switchUserRole('PLAYER');
-            setCurrentView('player');
-            triggerDemoToast(
-              t('register.toast.playerTitle', 'Perfil de Jugador Creado'),
-              t('register.toast.playerDesc', `Bienvenido ${fullName}. Ficha deportiva activada para reservas y partidos.`),
-              'success'
-            );
-          }
+          switchUserRole('PLAYER');
+          setCurrentView('player');
+          triggerDemoToast(
+            t('register.toast.playerTitle', 'Perfil de Jugador Creado'),
+            t('register.toast.playerDesc', `Bienvenido ${fullName}. Ficha deportiva activada para reservas y partidos.`),
+            'success'
+          );
         }
         handleClose();
       }, 500);
@@ -280,6 +293,14 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         </div>
 
         <form onSubmit={handleCustomSubmit} className="space-y-4">
+          {authError && (
+            <div
+              role="alert"
+              className="rounded-xl border border-rose-500/30 bg-rose-500/10 px-3.5 py-2.5 text-xs text-rose-700 dark:text-rose-300"
+            >
+              {authError}
+            </div>
+          )}
           {mode === 'login' ? (
             <>
               <div>

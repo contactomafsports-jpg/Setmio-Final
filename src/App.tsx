@@ -137,6 +137,12 @@ export function App() {
         return;
       }
 
+      if (pathname === '/hq' || pathname.startsWith('/hq/') || pathname === '/superadmin' || pathname.startsWith('/superadmin/')) {
+        setIsCorporateLanding(false);
+        setCurrentView('hq');
+        return;
+      }
+
       if (pathname === '/demo') {
         setIsCorporateLanding(true);
         setCurrentView('public');
@@ -199,6 +205,12 @@ export function App() {
         // Si la ruta restante corresponde a portal de jugador
         if (remaining.startsWith('/app') || remaining.startsWith('/jugador')) {
           setCurrentView('player');
+          return;
+        }
+
+        // Si la ruta restante corresponde a Superadmin HQ
+        if (remaining === '/hq' || remaining.startsWith('/hq/') || remaining === '/superadmin' || remaining.startsWith('/superadmin/')) {
+          setCurrentView('hq');
           return;
         }
 
