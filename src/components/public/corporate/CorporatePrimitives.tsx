@@ -1,0 +1,229 @@
+import React from 'react';
+import { ArrowLeft, ArrowRight, ChevronRight } from 'lucide-react';
+import { PublicPage } from '../../../context/AppContext';
+
+export function navigateCorporateRoute(
+  path: string,
+  page: PublicPage,
+  setPublicPage: (page: PublicPage) => void,
+  behavior: ScrollBehavior = 'smooth'
+) {
+  if (typeof window !== 'undefined') {
+    window.history.pushState({}, '', path);
+    window.dispatchEvent(new PopStateEvent('popstate'));
+    window.scrollTo({ top: 0, behavior });
+  }
+  setPublicPage(page);
+}
+
+export const CorporateContainer: React.FC<{
+  children: React.ReactNode;
+  className?: string;
+  narrow?: boolean;
+}> = ({ children, className = '', narrow = false }) => (
+  <div
+    className={`mx-auto w-full px-4 sm:px-6 lg:px-8 ${
+      narrow ? 'max-w-4xl' : 'max-w-[1180px]'
+    } ${className}`}
+  >
+    {children}
+  </div>
+);
+
+export const CorporateEyebrow: React.FC<{
+  children: React.ReactNode;
+  accent?: 'lime' | 'navy' | 'violet';
+  className?: string;
+}> = ({ children, accent = 'lime', className = '' }) => {
+  const dotColor =
+    accent === 'violet'
+      ? 'bg-[#8B5CF6]'
+      : accent === 'navy'
+      ? 'bg-[#0B1A2D] dark:bg-[#B7F229]'
+      : 'bg-[#B7F229]';
+
+  return (
+    <div
+      className={`inline-flex items-center gap-2.5 text-[11px] font-bold uppercase tracking-[0.18em] text-slate-600 dark:text-slate-300 ${className}`}
+    >
+      <span className={`h-1.5 w-1.5 rounded-full shrink-0 ${dotColor}`} aria-hidden="true" />
+      <span>{children}</span>
+    </div>
+  );
+};
+
+export interface BreadcrumbItem {
+  label: string;
+  onClick?: () => void;
+}
+
+export const CorporateBreadcrumb: React.FC<{
+  items: BreadcrumbItem[];
+  onBack?: () => void;
+  backLabel?: string;
+  className?: string;
+}> = ({ items, onBack, backLabel = 'Volver', className = '' }) => (
+  <div
+    className={`flex flex-wrap items-center justify-between gap-4 pb-8 border-b border-slate-200/80 dark:border-[#1A314D] ${className}`}
+  >
+    <nav aria-label="Ruta de navegación" className="flex flex-wrap items-center gap-1.5 text-xs">
+      {items.map((item, idx) => {
+        const isLast = idx === items.length - 1;
+        return (
+          <React.Fragment key={`${item.label}-${idx}`}>
+            {item.onClick && !isLast ? (
+              <button
+                type="button"
+                onClick={item.onClick}
+                className="font-medium text-slate-500 dark:text-slate-400 hover:text-[#0B1A2D] dark:hover:text-white transition-colors cursor-pointer"
+              >
+                {item.label}
+              </button>
+            ) : (
+              <span
+                className={
+                  isLast
+                    ? 'font-semibold text-[#0B1A2D] dark:text-white'
+                    : 'font-medium text-slate-500 dark:text-slate-400'
+                }
+              >
+                {item.label}
+              </span>
+            )}
+            {!isLast && (
+              <ChevronRight className="w-3.5 h-3.5 text-slate-300 dark:text-slate-600 shrink-0" aria-hidden="true" />
+            )}
+          </React.Fragment>
+        );
+      })}
+    </nav>
+
+    {onBack && (
+      <button
+        type="button"
+        onClick={onBack}
+        className="inline-flex min-h-[36px] items-center gap-1.5 rounded-lg border border-slate-200/80 dark:border-[#1A314D] bg-white dark:bg-[#0E2239] px-3 py-1.5 text-xs font-semibold text-[#0B1A2D] dark:text-slate-200 hover:border-[#0B1A2D]/40 dark:hover:border-[#B7F229]/50 transition-colors cursor-pointer"
+      >
+        <ArrowLeft className="w-3.5 h-3.5 text-[#0B1A2D] dark:text-[#B7F229]" />
+        <span>{backLabel}</span>
+      </button>
+    )}
+  </div>
+);
+
+export const CorporatePrimaryButton: React.FC<
+  React.ButtonHTMLAttributes<HTMLButtonElement> & { icon?: React.ReactNode }
+> = ({ children, className = '', icon, ...props }) => (
+  <button
+    type="button"
+    {...props}
+    className={`inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl bg-[#B7F229] hover:bg-[#c5f64e] text-[#0B1A2D] font-bold text-sm px-6 py-3 transition-colors cursor-pointer active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed whitespace-nowrap ${className}`}
+  >
+    <span>{children}</span>
+    {icon !== undefined ? icon : <ArrowRight className="w-4 h-4 shrink-0" />}
+  </button>
+);
+
+export const CorporateSecondaryButton: React.FC<
+  React.ButtonHTMLAttributes<HTMLButtonElement> & { icon?: React.ReactNode }
+> = ({ children, className = '', icon, ...props }) => (
+  <button
+    type="button"
+    {...props}
+    className={`inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl border border-slate-200 dark:border-[#1E3A5F] bg-white dark:bg-[#0E2239] hover:border-[#0B1A2D]/40 dark:hover:border-[#B7F229]/60 text-[#0B1A2D] dark:text-white font-semibold text-sm px-6 py-3 transition-colors cursor-pointer active:scale-[0.98] disabled:opacity-60 whitespace-nowrap ${className}`}
+  >
+    {icon}
+    <span>{children}</span>
+  </button>
+);
+
+export const CorporateNavyButton: React.FC<
+  React.ButtonHTMLAttributes<HTMLButtonElement> & { icon?: React.ReactNode }
+> = ({ children, className = '', icon, ...props }) => (
+  <button
+    type="button"
+    {...props}
+    className={`inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl bg-[#0B1A2D] hover:bg-[#132A45] text-white dark:bg-[#B7F229] dark:hover:bg-[#c5f64e] dark:text-[#0B1A2D] font-bold text-sm px-6 py-3 transition-colors cursor-pointer active:scale-[0.98] whitespace-nowrap ${className}`}
+  >
+    <span>{children}</span>
+    {icon !== undefined ? icon : <ArrowRight className="w-4 h-4 shrink-0" />}
+  </button>
+);
+
+export const CorporateSectionHeader: React.FC<{
+  eyebrow?: string;
+  title: string;
+  subtitle?: string;
+  align?: 'left' | 'center';
+  accent?: 'lime' | 'navy' | 'violet';
+  action?: React.ReactNode;
+}> = ({ eyebrow, title, subtitle, align = 'left', accent = 'lime', action }) => (
+  <div
+    className={`flex flex-col gap-6 ${
+      action ? 'md:flex-row md:items-end md:justify-between' : ''
+    } ${align === 'center' && !action ? 'items-center text-center mx-auto max-w-3xl' : 'max-w-3xl'}`}
+  >
+    <div className="space-y-3.5">
+      {eyebrow && <CorporateEyebrow accent={accent}>{eyebrow}</CorporateEyebrow>}
+      <h2 className="text-3xl sm:text-4xl lg:text-[42px] font-extrabold tracking-tight text-[#0B1A2D] dark:text-white leading-[1.12] text-balance font-display">
+        {title}
+      </h2>
+      {subtitle && (
+        <p className="text-base text-slate-600 dark:text-slate-300 leading-relaxed font-normal max-w-2xl">
+          {subtitle}
+        </p>
+      )}
+    </div>
+    {action && <div className="shrink-0">{action}</div>}
+  </div>
+);
+
+export const CorporateCtaBanner: React.FC<{
+  eyebrow?: string;
+  title: string;
+  subtitle: string;
+  primaryLabel: string;
+  onPrimary: () => void;
+  secondaryLabel?: string;
+  onSecondary?: () => void;
+}> = ({
+  eyebrow = 'Setmio Pro · Implantación Sin Permanencia',
+  title,
+  subtitle,
+  primaryLabel,
+  onPrimary,
+  secondaryLabel,
+  onSecondary,
+}) => (
+  <section className="rounded-3xl bg-[#0B1A2D] dark:bg-[#071220] border border-[#1A314D] p-8 sm:p-12 lg:p-14 text-white">
+    <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
+      <div className="space-y-3.5 max-w-2xl">
+        <div className="inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.18em] text-[#B7F229]">
+          <span className="h-1.5 w-1.5 rounded-full bg-[#B7F229]" aria-hidden="true" />
+          <span>{eyebrow}</span>
+        </div>
+        <h2 className="text-2xl sm:text-4xl font-extrabold tracking-tight leading-[1.12] text-white text-balance font-display">
+          {title}
+        </h2>
+        <p className="text-sm sm:text-base text-slate-300 leading-relaxed">
+          {subtitle}
+        </p>
+      </div>
+
+      <div className="flex flex-col sm:flex-row lg:flex-col xl:flex-row items-stretch sm:items-center gap-3 shrink-0">
+        <CorporatePrimaryButton onClick={onPrimary}>
+          {primaryLabel}
+        </CorporatePrimaryButton>
+        {secondaryLabel && onSecondary && (
+          <button
+            type="button"
+            onClick={onSecondary}
+            className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl border border-[#244163] bg-[#0E2239] hover:border-[#B7F229]/60 text-white font-semibold text-sm px-6 py-3 transition-colors cursor-pointer whitespace-nowrap"
+          >
+            {secondaryLabel}
+          </button>
+        )}
+      </div>
+    </div>
+  </section>
+);

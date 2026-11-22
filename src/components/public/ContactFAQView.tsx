@@ -1,23 +1,27 @@
 import React, { useState } from 'react';
-import { SubpageHeaderNav } from './SubpageHeaderNav';
-import { useApp } from '../../context/AppContext';
 import {
   Building2,
-  Phone,
-  Mail,
-  ChevronDown,
-  Send,
-  MessageCircle,
-  ShieldCheck,
-  Sparkles,
-  Cpu,
-  MapPin,
-  ArrowRight,
   Check,
+  CheckCircle2,
+  ChevronDown,
+  Cpu,
+  Mail,
+  MapPin,
+  Phone,
+  Send,
+  ShieldCheck,
 } from 'lucide-react';
+import { useApp, PublicPage } from '../../context/AppContext';
+import {
+  CorporateBreadcrumb,
+  CorporateContainer,
+  CorporateEyebrow,
+  CorporatePrimaryButton,
+  navigateCorporateRoute,
+} from './corporate/CorporatePrimitives';
 
 export const ContactFAQView: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
-  const { triggerDemoToast, t } = useApp();
+  const { triggerDemoToast, setPublicPage } = useApp();
 
   const [formName, setFormName] = useState('');
   const [formEmail, setFormEmail] = useState('');
@@ -28,47 +32,62 @@ export const ContactFAQView: React.FC<{ onBack?: () => void }> = ({ onBack }) =>
   const [rgpdAccepted, setRgpdAccepted] = useState(true);
   const [activeFAQ, setActiveFAQ] = useState<number | null>(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
+
+  const navigate = (path: string, page: PublicPage) => {
+    navigateCorporateRoute(path, page, setPublicPage);
+  };
 
   const corporateFaqs = [
     {
-      q: t('corporateContact.faqs.0.q', '¿Cómo es el proceso de migración de datos desde nuestro software actual?'),
-      a: t('corporateContact.faqs.0.a', 'Nuestro equipo de ingeniería se encarga del 100% de la migración de tu base de socios, historiales y reservas en menos de 24 horas sin interrumpir la operación habitual de tu club.'),
+      q: '¿Cómo se realiza la migración de datos desde nuestro sistema actual?',
+      a: 'Nuestro equipo técnico importa tu base de socios, saldos de monedero, grupos de escuela y reservas futuras en 24 horas sin detener la operativa diaria del club.',
     },
     {
-      q: t('corporateContact.faqs.1.q', '¿Cuánto tiempo requiere la instalación de la domótica de luces y accesos?'),
-      a: t('corporateContact.faqs.1.a', 'El hardware IoT de Setmio se envía preconfigurado bajo normativa europea. Un electricista autorizado de tu zona completa la conexión en el cuadro general en menos de 48 horas sin obras civiles.'),
+      q: '¿Qué requiere instalar la domótica de luces y cerraduras por PIN?',
+      a: 'Preparamos el esquema eléctrico para relés industriales y cerraduras IP compatibles. Un electricista autorizado realiza la conexión en cuadro sin obra civil.',
     },
     {
-      q: t('corporateContact.faqs.2.q', '¿Setmio cobra comisiones por pista reservada o por split payment?'),
-      a: t('corporateContact.faqs.2.a', 'No, rotunda y categóricamente. Setmio opera bajo un modelo de suscripción plana mensual o anual. El 100% de los cobros de tus jugadores va directo a tu cuenta bancaria sin intermediarios ni retenciones.'),
+      q: '¿Existen comisiones sobre reservas o pagos divididos?',
+      a: 'No. Setmio funciona mediante suscripción fija mensual o anual. El 100% de los cobros de tus jugadores llega directamente a la cuenta bancaria de tu organización.',
     },
     {
-      q: t('corporateContact.faqs.3.q', '¿El software incluye aplicación móvil de marca blanca para nuestros socios?'),
-      a: t('corporateContact.faqs.3.a', 'Sí. Tu club dispondrá de su propia web y app corporativa con tu logotipo, colores oficiales y dominio dedicado (ej. tuclub.com), sin referencias visibles a proveedores externos.'),
+      q: '¿Pueden contratar la plataforma ayuntamientos, federaciones o equipos independientes?',
+      a: 'Sí. Disponemos de configuraciones específicas para clubes, academias, entrenadores, administraciones públicas, federaciones y equipos que gestionan su plantilla y temporada sin depender de un club.',
     },
     {
-      q: t('corporateContact.faqs.4.q', '¿Qué formación y soporte técnico recibe nuestro equipo de recepción?'),
-      a: t('corporateContact.faqs.4.a', 'Ofrecemos formación telefónica y por videollamada personalizada para gerencia y personal de mostrador, además de soporte técnico prioritario los 365 días del año.'),
+      q: '¿Cómo protege Setmio la relación del club con sus socios?',
+      a: 'Toda la web y app operan bajo tu marca blanca y dominio propio. Setmio no incluye directorios de clubes competidores ni desvía tráfico a terceros.',
     },
   ];
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    setFormError(null);
+
+    const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formEmail.trim());
+    const phoneDigits = formPhone.replace(/\D/g, '');
+    if (!emailValid) {
+      setFormError('Introduce un correo electrónico válido.');
+      return;
+    }
+    if (phoneDigits.length < 7) {
+      setFormError('Introduce un número de teléfono válido.');
+      return;
+    }
     if (!rgpdAccepted) {
-      triggerDemoToast(
-        t('common.notice', 'Aviso'),
-        t('corporateContact.form.rgpdError', 'Por favor, acepta la política de privacidad para continuar.'),
-        'info'
-      );
+      setFormError('Acepta la política de privacidad para enviar la consulta.');
       return;
     }
 
     setIsSubmitting(true);
     setTimeout(() => {
       setIsSubmitting(false);
+      setSubmitted(true);
       triggerDemoToast(
-        t('corporateContact.toastSuccess', 'Solicitud Corporativa Enviada'),
-        t('corporateContact.toastSuccessDesc', 'Gracias por contactar con Setmio. Nuestro equipo directivo revisará tu consulta y te responderá a la brevedad.'),
+        'Consulta enviada',
+        'Nuestro equipo revisará los datos de tu organización y se pondrá en contacto contigo.',
         'success'
       );
       setFormName('');
@@ -76,357 +95,315 @@ export const ContactFAQView: React.FC<{ onBack?: () => void }> = ({ onBack }) =>
       setFormPhone('');
       setFormCourts('');
       setFormMessage('');
-    }, 600);
+    }, 450);
   };
 
   return (
-    <div className="bg-white dark:bg-[#0B1A2D] text-[#0B1A2D] dark:text-slate-100 transition-colors duration-200">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-20">
-        <div className="mb-8 flex items-center justify-start">
-          <SubpageHeaderNav onBack={onBack} className="mb-0" />
-        </div>
+    <main className="min-h-[calc(100vh-4rem)] bg-white dark:bg-[#0B1A2D] text-[#0B1A2D] dark:text-white py-12 sm:py-16 transition-colors duration-200">
+      <CorporateContainer className="space-y-16">
+        <CorporateBreadcrumb
+          items={[
+            { label: 'Inicio', onClick: () => navigate('/', 'home') },
+            { label: 'Contacto' },
+          ]}
+          onBack={onBack}
+          backLabel="Volver al inicio"
+        />
 
-        <div className="space-y-16 sm:space-y-20">
-          {/* Header Corporativo */}
-          <div className="max-w-3xl space-y-4 text-left">
-            <div className="inline-flex items-center gap-2 text-xs font-semibold tracking-wide text-[#8B5CF6] dark:text-[#a78bfa]">
-              <Sparkles className="w-4 h-4 shrink-0" />
-              <span>{t('corporateContact.eyebrow', 'Contacto & Expansión Setmio SaaS')}</span>
+        {/* Header */}
+        <section className="max-w-3xl space-y-4">
+          <CorporateEyebrow>Contacto Directo Setmio</CorporateEyebrow>
+          <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-[#0B1A2D] dark:text-white leading-[1.08] font-display text-balance">
+            Hablemos sobre la digitalización de tu organización.
+          </h1>
+          <p className="text-base sm:text-lg text-slate-600 dark:text-slate-300 leading-relaxed">
+            Asesoramiento técnico y comercial para clubes, academias, entrenadores, administraciones públicas, federaciones y equipos.
+          </p>
+        </section>
+
+        {/* Direct Channels */}
+        <section className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <div className="p-6 sm:p-7 rounded-2xl bg-[#F7F9FC] dark:bg-[#0E2239] border border-slate-200/90 dark:border-[#1A314D] space-y-4">
+            <div className="w-10 h-10 rounded-xl bg-[#0B1A2D] dark:bg-[#B7F229]/15 text-[#B7F229] flex items-center justify-center">
+              <Mail className="w-5 h-5" />
             </div>
-            <h1 className="text-3xl sm:text-5xl lg:text-[54px] font-bold text-[#0B1A2D] dark:text-white tracking-tight leading-[1.08] text-balance">
-              {t('corporateContact.title', 'Hablemos sobre el futuro digital de tu club de pádel')}
-            </h1>
-            <p className="text-slate-600 dark:text-slate-300 text-base sm:text-lg leading-relaxed max-w-2xl font-normal">
-              {t('corporateContact.subtitle', 'Nuestro equipo de consultores y especialistas en software deportivo está a tu disposición para asesorarte sobre domótica IoT, migración de datos y planes a medida.')}
+            <h2 className="text-base font-bold text-[#0B1A2D] dark:text-white">
+              Comercial y Demostraciones
+            </h2>
+            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+              Presentaciones personalizadas según tu perfil y número de pistas.
             </p>
-          </div>
-
-          {/* Tarjetas de Canales de Contacto Corporativo */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Card 1: Ventas y Demostraciones */}
-            <div className="p-7 rounded-2xl bg-[#F8FAFC] dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] hover:border-[#8B5CF6]/50 dark:hover:border-[#B7F229]/40 transition-colors space-y-5 flex flex-col justify-between">
-              <div className="space-y-4">
-                <div className="w-11 h-11 rounded-xl bg-[#0B1A2D] dark:bg-[#B7F229]/15 text-[#B7F229] flex items-center justify-center">
-                  <Sparkles className="w-5 h-5" />
-                </div>
-                <h3 className="text-lg font-bold text-[#0B1A2D] dark:text-white tracking-tight">
-                  {t('corporateContact.sales.title', 'Ventas & Demostraciones')}
-                </h3>
-                <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-                  {t('corporateContact.sales.desc', 'Asesoramiento para comités, gerentes de club y academias. Demo personalizada en menos de 24h.')}
-                </p>
-                <div className="space-y-2 pt-4 border-t border-slate-200/80 dark:border-[#1A314D] text-xs text-slate-700 dark:text-slate-300">
-                  <div className="flex items-center gap-2">
-                    <Mail className="w-3.5 h-3.5 text-[#8B5CF6] dark:text-[#B7F229] shrink-0" />
-                    <span className="font-mono">{t('corporateContact.sales.email', 'ventas@setmio.com')}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Phone className="w-3.5 h-3.5 text-[#8B5CF6] dark:text-[#B7F229] shrink-0" />
-                    <span className="font-mono tabular-nums">{t('corporateContact.sales.phone', '+34 910 038 412')}</span>
-                  </div>
-                </div>
-              </div>
-              <a
-                href="mailto:ventas@setmio.com?subject=Solicitud%20de%20Demostracion%20Setmio"
-                className="inline-flex items-center justify-center gap-2 w-full min-h-[42px] py-2.5 px-4 rounded-xl bg-[#B7F229] hover:bg-[#a6de1f] text-[#0B1A2D] font-bold text-xs transition-colors text-center whitespace-nowrap"
-              >
-                <span>{t('corporateContact.sales.action', 'Agendar Demo de 20 min')}</span>
-                <ArrowRight className="w-3.5 h-3.5 shrink-0" />
-              </a>
-            </div>
-
-            {/* Card 2: Soporte Técnico & IoT */}
-            <div className="p-7 rounded-2xl bg-[#F8FAFC] dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] hover:border-[#8B5CF6]/50 dark:hover:border-[#8B5CF6]/60 transition-colors space-y-5 flex flex-col justify-between">
-              <div className="space-y-4">
-                <div className="w-11 h-11 rounded-xl bg-[#8B5CF6]/10 dark:bg-[#8B5CF6]/20 text-[#8B5CF6] dark:text-[#a78bfa] flex items-center justify-center">
-                  <Cpu className="w-5 h-5" />
-                </div>
-                <h3 className="text-lg font-bold text-[#0B1A2D] dark:text-white tracking-tight">
-                  {t('corporateContact.support.title', 'Soporte Técnico & Hardware IoT')}
-                </h3>
-                <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-                  {t('corporateContact.support.desc', 'Asistencia técnica para cuadros eléctricos, relés IP, tornos de acceso y pasarelas bancarias.')}
-                </p>
-                <div className="space-y-2 pt-4 border-t border-slate-200/80 dark:border-[#1A314D] text-xs text-slate-700 dark:text-slate-300">
-                  <div className="flex items-center gap-2">
-                    <Mail className="w-3.5 h-3.5 text-[#8B5CF6] dark:text-[#a78bfa] shrink-0" />
-                    <span className="font-mono">{t('corporateContact.support.email', 'soporte@setmio.com')}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Phone className="w-3.5 h-3.5 text-[#8B5CF6] dark:text-[#a78bfa] shrink-0" />
-                    <span className="font-mono tabular-nums">{t('corporateContact.support.phone', '+34 622 918 340')}</span>
-                  </div>
-                </div>
-              </div>
-              <a
-                href="https://wa.me/34622918340?text=Hola,%20contacto%20desde%20la%20web%20de%20Setmio%20para%20una%20consulta%20técnica."
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 w-full min-h-[42px] py-2.5 px-4 rounded-xl bg-[#8B5CF6] hover:bg-[#7c4dff] text-white font-bold text-xs transition-colors text-center whitespace-nowrap"
-              >
-                <MessageCircle className="w-3.5 h-3.5 shrink-0" />
-                <span>{t('corporateContact.support.action', 'Canal Técnico WhatsApp')}</span>
-              </a>
-            </div>
-
-            {/* Card 3: Alianzas & Federaciones */}
-            <div className="p-7 rounded-2xl bg-[#F8FAFC] dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] hover:border-[#0B1A2D]/40 dark:hover:border-slate-500 transition-colors space-y-5 flex flex-col justify-between">
-              <div className="space-y-4">
-                <div className="w-11 h-11 rounded-xl bg-slate-200/70 dark:bg-[#132A45] text-[#0B1A2D] dark:text-white flex items-center justify-center">
-                  <Building2 className="w-5 h-5" />
-                </div>
-                <h3 className="text-lg font-bold text-[#0B1A2D] dark:text-white tracking-tight">
-                  {t('corporateContact.partners.title', 'Alianzas, Cadenas & Federaciones')}
-                </h3>
-                <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-                  {t('corporateContact.partners.desc', 'Integraciones API a medida, acuerdos federativos e implantaciones multi-sede a escala internacional.')}
-                </p>
-                <div className="space-y-2 pt-4 border-t border-slate-200/80 dark:border-[#1A314D] text-xs text-slate-700 dark:text-slate-300">
-                  <div className="flex items-center gap-2">
-                    <Mail className="w-3.5 h-3.5 text-[#0B1A2D] dark:text-slate-300 shrink-0" />
-                    <span className="font-mono">{t('corporateContact.partners.email', 'partners@setmio.com')}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <MapPin className="w-3.5 h-3.5 text-[#0B1A2D] dark:text-slate-300 shrink-0" />
-                    <span>{t('corporateContact.partners.location', 'Madrid · Barcelona · A Coruña')}</span>
-                  </div>
-                </div>
-              </div>
-              <a
-                href="mailto:partners@setmio.com?subject=Propuesta%20de%20Alianza%20o%20Cadena%20Deportiva"
-                className="inline-flex items-center justify-center gap-2 w-full min-h-[42px] py-2.5 px-4 rounded-xl bg-[#0B1A2D] dark:bg-[#132A45] hover:bg-[#132A45] dark:hover:bg-[#1A314D] text-white font-bold text-xs border border-transparent dark:border-[#1A314D] transition-colors text-center whitespace-nowrap"
-              >
-                <span>{t('corporateContact.partners.action', 'Contactar con Dirección')}</span>
-                <ArrowRight className="w-3.5 h-3.5 shrink-0" />
-              </a>
+            <div className="pt-3 border-t border-slate-200/80 dark:border-[#1A314D] space-y-1.5 text-xs font-mono">
+              <div className="text-[#0B1A2D] dark:text-white">ventas@setmio.com</div>
+              <div className="text-slate-500 dark:text-slate-400 tabular-nums">+34 910 038 412</div>
             </div>
           </div>
 
-          {/* Formulario de Contacto Corporativo */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
-            <div className="lg:col-span-7 p-7 sm:p-10 rounded-3xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] space-y-6">
-              <div className="space-y-2">
-                <span className="text-xs font-semibold tracking-wide text-[#8B5CF6] dark:text-[#a78bfa]">
-                  {t('corporateContact.form.badge', 'Formulario de Contacto Oficial')}
-                </span>
-                <h2 className="text-2xl sm:text-3xl font-bold text-[#0B1A2D] dark:text-white tracking-tight text-balance">
-                  {t('corporateContact.form.title', 'Solicita un Estudio de Digitalización o Contacta con Nosotros')}
-                </h2>
-                <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-                  {t('corporateContact.form.subtitle', 'Indícanos los datos de tus instalaciones y te responderemos en menos de 2 horas laborables.')}
-                </p>
+          <div className="p-6 sm:p-7 rounded-2xl bg-[#F7F9FC] dark:bg-[#0E2239] border border-slate-200/90 dark:border-[#1A314D] space-y-4">
+            <div className="w-10 h-10 rounded-xl bg-[#0B1A2D] dark:bg-[#B7F229]/15 text-[#B7F229] flex items-center justify-center">
+              <Cpu className="w-5 h-5" />
+            </div>
+            <h2 className="text-base font-bold text-[#0B1A2D] dark:text-white">
+              Soporte Técnico y Domótica
+            </h2>
+            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+              Consultas sobre cuadros eléctricos, relés IP, accesos PIN y pasarelas.
+            </p>
+            <div className="pt-3 border-t border-slate-200/80 dark:border-[#1A314D] space-y-1.5 text-xs font-mono">
+              <div className="text-[#0B1A2D] dark:text-white">soporte@setmio.com</div>
+              <div className="text-slate-500 dark:text-slate-400 tabular-nums">+34 981 38 00 00</div>
+            </div>
+          </div>
+
+          <div className="p-6 sm:p-7 rounded-2xl bg-[#F7F9FC] dark:bg-[#0E2239] border border-slate-200/90 dark:border-[#1A314D] space-y-4">
+            <div className="w-10 h-10 rounded-xl bg-[#0B1A2D] dark:bg-[#B7F229]/15 text-[#B7F229] flex items-center justify-center">
+              <Building2 className="w-5 h-5" />
+            </div>
+            <h2 className="text-base font-bold text-[#0B1A2D] dark:text-white">
+              Sector Público y Federaciones
+            </h2>
+            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+              Memorias técnicas, licitaciones municipales y convenios federativos.
+            </p>
+            <div className="pt-3 border-t border-slate-200/80 dark:border-[#1A314D] space-y-1.5 text-xs">
+              <div className="font-mono text-[#0B1A2D] dark:text-white">partners@setmio.com</div>
+              <div className="flex items-center gap-1.5 text-slate-500 dark:text-slate-400">
+                <MapPin className="w-3.5 h-3.5 shrink-0" />
+                <span>Madrid · Barcelona · A Coruña</span>
               </div>
+            </div>
+          </div>
+        </section>
 
-              <form onSubmit={handleSubmit} className="space-y-4 text-xs sm:text-sm">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-slate-700 dark:text-slate-300 font-semibold text-xs mb-1.5">
-                      {t('corporateContact.form.name', 'Nombre y Apellidos')} *
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      placeholder={t('corporateContact.form.namePlaceholder', 'ej. Mateo Varela')}
-                      value={formName}
-                      onChange={(e) => setFormName(e.target.value)}
-                      className="w-full min-h-[44px] px-4 py-2.5 rounded-xl bg-[#F8FAFC] dark:bg-[#071220] border border-slate-200 dark:border-[#1A314D] text-[#0B1A2D] dark:text-white text-sm focus:outline-none focus:border-[#8B5CF6] transition-colors"
-                    />
-                  </div>
+        {/* Form + Guarantees */}
+        <section className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+          <div className="lg:col-span-7 p-7 sm:p-9 rounded-3xl bg-[#F7F9FC] dark:bg-[#0E2239] border border-slate-200/90 dark:border-[#1A314D] space-y-6">
+            <div className="space-y-2">
+              <CorporateEyebrow>Formulario de Contacto</CorporateEyebrow>
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-[#0B1A2D] dark:text-white font-display">
+                Cuéntanos qué necesita tu entidad
+              </h2>
+            </div>
 
-                  <div>
-                    <label className="block text-slate-700 dark:text-slate-300 font-semibold text-xs mb-1.5">
-                      {t('corporateContact.form.email', 'Email Corporativo')} *
-                    </label>
-                    <input
-                      type="email"
-                      required
-                      placeholder={t('corporateContact.form.emailPlaceholder', 'gerencia@tuclub.es')}
-                      value={formEmail}
-                      onChange={(e) => setFormEmail(e.target.value)}
-                      className="w-full min-h-[44px] px-4 py-2.5 rounded-xl bg-[#F8FAFC] dark:bg-[#071220] border border-slate-200 dark:border-[#1A314D] text-[#0B1A2D] dark:text-white text-sm focus:outline-none focus:border-[#8B5CF6] transition-colors"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-slate-700 dark:text-slate-300 font-semibold text-xs mb-1.5">
-                      {t('corporateContact.form.phone', 'Teléfono / WhatsApp')} *
-                    </label>
-                    <input
-                      type="tel"
-                      required
-                      placeholder={t('corporateContact.form.phonePlaceholder', '+34 600 000 000')}
-                      value={formPhone}
-                      onChange={(e) => setFormPhone(e.target.value)}
-                      className="w-full min-h-[44px] px-4 py-2.5 rounded-xl bg-[#F8FAFC] dark:bg-[#071220] border border-slate-200 dark:border-[#1A314D] text-[#0B1A2D] dark:text-white text-sm font-mono tabular-nums focus:outline-none focus:border-[#8B5CF6] transition-colors"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-slate-700 dark:text-slate-300 font-semibold text-xs mb-1.5">
-                      {t('corporateContact.form.entityType', 'Tipo de Organización')}
-                    </label>
-                    <select
-                      value={formEntityType}
-                      onChange={(e) => setFormEntityType(e.target.value)}
-                      className="w-full min-h-[44px] px-4 py-2.5 rounded-xl bg-[#F8FAFC] dark:bg-[#071220] border border-slate-200 dark:border-[#1A314D] text-[#0B1A2D] dark:text-white text-sm focus:outline-none focus:border-[#8B5CF6] cursor-pointer transition-colors"
-                    >
-                      <option value="club">{t('corporateContact.form.typeClub', 'Club de Pádel / Instalación Deportiva')}</option>
-                      <option value="school">{t('corporateContact.form.typeSchool', 'Escuela de Pádel / Academia Docente')}</option>
-                      <option value="pro">{t('corporateContact.form.typePro', 'Jugador Profesional / Atleta de Élite')}</option>
-                      <option value="chain">{t('corporateContact.form.typeChain', 'Cadena Deportiva / Multi-Club')}</option>
-                      <option value="other">{t('corporateContact.form.typeOther', 'Otro (Federación, Empresa, Inversor)')}</option>
-                    </select>
-                  </div>
-                </div>
-
+            {submitted && (
+              <div className="p-4 rounded-xl bg-white dark:bg-[#0B1A2D] border border-[#B7F229] flex items-start gap-3 text-xs sm:text-sm">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-[#B7F229] shrink-0 mt-0.5" />
                 <div>
-                  <label className="block text-slate-700 dark:text-slate-300 font-semibold text-xs mb-1.5">
-                    {t('corporateContact.form.courtsCount', 'Número de Pistas o Instalaciones')}
+                  <div className="font-bold text-[#0B1A2D] dark:text-white">
+                    Solicitud recibida correctamente
+                  </div>
+                  <p className="text-slate-600 dark:text-slate-300 mt-0.5">
+                    Un especialista revisará tus datos y responderá en horario laboral.
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {formError && (
+              <div className="p-3.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-xs font-semibold text-rose-700 dark:text-rose-300">
+                {formError}
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit} className="space-y-4 text-xs sm:text-sm">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-[#0B1A2D] dark:text-slate-200 font-semibold text-xs mb-1.5">
+                    Nombre y apellidos *
                   </label>
                   <input
                     type="text"
-                    placeholder={t('corporateContact.form.courtsPlaceholder', 'ej. 8 pistas (4 cubiertas + 4 exteriores)')}
-                    value={formCourts}
-                    onChange={(e) => setFormCourts(e.target.value)}
-                    className="w-full min-h-[44px] px-4 py-2.5 rounded-xl bg-[#F8FAFC] dark:bg-[#071220] border border-slate-200 dark:border-[#1A314D] text-[#0B1A2D] dark:text-white text-sm focus:outline-none focus:border-[#8B5CF6] transition-colors"
+                    required
+                    placeholder="ej. Mateo Varela"
+                    value={formName}
+                    onChange={(e) => setFormName(e.target.value)}
+                    className="w-full min-h-[44px] px-4 py-2.5 rounded-xl bg-white dark:bg-[#0B1A2D] border border-slate-200 dark:border-[#1A314D] text-[#0B1A2D] dark:text-white text-sm focus:outline-none focus:border-[#0B1A2D] dark:focus:border-[#B7F229]"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-slate-700 dark:text-slate-300 font-semibold text-xs mb-1.5">
-                    {t('corporateContact.form.message', 'Mensaje o Consulta Técnica')} *
+                  <label className="block text-[#0B1A2D] dark:text-slate-200 font-semibold text-xs mb-1.5">
+                    Correo electrónico *
                   </label>
-                  <textarea
-                    required
-                    rows={4}
-                    placeholder={t('corporateContact.form.messagePlaceholder', 'Cuéntanos sobre tu club: software actual, necesidades de domótica, fecha estimada de inicio...')}
-                    value={formMessage}
-                    onChange={(e) => setFormMessage(e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl bg-[#F8FAFC] dark:bg-[#071220] border border-slate-200 dark:border-[#1A314D] text-[#0B1A2D] dark:text-white text-sm focus:outline-none focus:border-[#8B5CF6] transition-colors"
-                  />
-                </div>
-
-                <div className="flex items-start gap-2.5 pt-1">
                   <input
-                    type="checkbox"
-                    id="rgpd"
-                    checked={rgpdAccepted}
-                    onChange={(e) => setRgpdAccepted(e.target.checked)}
-                    className="mt-0.5 rounded border-slate-300 dark:border-[#1A314D] accent-[#8B5CF6]"
+                    type="email"
+                    required
+                    placeholder="contacto@tuorganizacion.es"
+                    value={formEmail}
+                    onChange={(e) => setFormEmail(e.target.value)}
+                    className="w-full min-h-[44px] px-4 py-2.5 rounded-xl bg-white dark:bg-[#0B1A2D] border border-slate-200 dark:border-[#1A314D] text-[#0B1A2D] dark:text-white text-sm focus:outline-none focus:border-[#0B1A2D] dark:focus:border-[#B7F229]"
                   />
-                  <label htmlFor="rgpd" className="text-xs text-slate-500 dark:text-slate-400 leading-normal cursor-pointer">
-                    {t('corporateContact.form.rgpd', 'Acepto el tratamiento de mis datos de contacto con fines informativos según la Política de Privacidad de Setmio.')}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-[#0B1A2D] dark:text-slate-200 font-semibold text-xs mb-1.5">
+                    Teléfono / WhatsApp *
                   </label>
+                  <input
+                    type="tel"
+                    required
+                    placeholder="+34 600 000 000"
+                    value={formPhone}
+                    onChange={(e) => setFormPhone(e.target.value)}
+                    className="w-full min-h-[44px] px-4 py-2.5 rounded-xl bg-white dark:bg-[#0B1A2D] border border-slate-200 dark:border-[#1A314D] text-[#0B1A2D] dark:text-white text-sm font-mono tabular-nums focus:outline-none focus:border-[#0B1A2D] dark:focus:border-[#B7F229]"
+                  />
                 </div>
 
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="w-full min-h-[46px] py-3 px-6 rounded-xl bg-[#B7F229] hover:bg-[#a6de1f] text-[#0B1A2D] font-bold text-sm transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-70"
-                >
-                  <Send className="w-4 h-4 shrink-0" />
-                  <span>{isSubmitting ? t('common.loading', 'Enviando...') : t('corporateContact.form.submit', 'Enviar Consulta Corporativa')}</span>
-                </button>
-              </form>
-            </div>
-
-            {/* Garantías y Beneficios de Setmio SaaS */}
-            <div className="lg:col-span-5 space-y-6">
-              <div className="p-8 rounded-2xl bg-[#F8FAFC] dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] space-y-5">
-                <div className="flex items-center gap-2.5">
-                  <ShieldCheck className="w-5 h-5 text-[#8B5CF6] dark:text-[#B7F229] shrink-0" />
-                  <h3 className="text-base font-bold text-[#0B1A2D] dark:text-white tracking-tight">
-                    {t('corporateContact.commitment.title', 'Compromiso de Calidad Setmio')}
-                  </h3>
+                <div>
+                  <label className="block text-[#0B1A2D] dark:text-slate-200 font-semibold text-xs mb-1.5">
+                    Perfil de entidad
+                  </label>
+                  <select
+                    value={formEntityType}
+                    onChange={(e) => setFormEntityType(e.target.value)}
+                    className="w-full min-h-[44px] px-4 py-2.5 rounded-xl bg-white dark:bg-[#0B1A2D] border border-slate-200 dark:border-[#1A314D] text-[#0B1A2D] dark:text-white text-sm focus:outline-none focus:border-[#0B1A2D] dark:focus:border-[#B7F229] cursor-pointer"
+                  >
+                    <option value="club">Club de pádel / centro deportivo</option>
+                    <option value="school">Academia o escuela</option>
+                    <option value="coach">Entrenador o profesor</option>
+                    <option value="council">Administración pública / ayuntamiento</option>
+                    <option value="federation">Federación territorial o nacional</option>
+                    <option value="team">Equipo independiente o liga</option>
+                    <option value="pro">Jugador profesional</option>
+                  </select>
                 </div>
-                <ul className="space-y-3.5 text-sm text-slate-600 dark:text-slate-300">
-                  <li className="flex items-start gap-2.5">
-                    <Check className="w-4 h-4 text-[#8B5CF6] dark:text-[#B7F229] shrink-0 mt-0.5" />
-                    <span>
-                      <strong className="text-[#0B1A2D] dark:text-white">{t('corporateContact.commitment.migration', 'Migración 100% gratuita')}:</strong>{' '}
-                      {t('corporateContact.commitment.migrationDesc', 'Tu base de socios, pistas y deudas queda configurada en 24h.')}
-                    </span>
-                  </li>
-                  <li className="flex items-start gap-2.5">
-                    <Check className="w-4 h-4 text-[#8B5CF6] dark:text-[#B7F229] shrink-0 mt-0.5" />
-                    <span>
-                      <strong className="text-[#0B1A2D] dark:text-white">{t('corporateContact.commitment.zeroCommissions', 'Cero comisiones')}:</strong>{' '}
-                      {t('corporateContact.commitment.zeroCommissionsDesc', 'No cobramos ningún porcentaje sobre las reservas de tus pistas.')}
-                    </span>
-                  </li>
-                  <li className="flex items-start gap-2.5">
-                    <Check className="w-4 h-4 text-[#8B5CF6] dark:text-[#B7F229] shrink-0 mt-0.5" />
-                    <span>
-                      <strong className="text-[#0B1A2D] dark:text-white">{t('corporateContact.commitment.hardware', 'Hardware homologado')}:</strong>{' '}
-                      {t('corporateContact.commitment.hardwareDesc', 'Compatibilidad con relés Schneider, Finder, Shelly y tornos IP.')}
-                    </span>
-                  </li>
-                  <li className="flex items-start gap-2.5">
-                    <Check className="w-4 h-4 text-[#8B5CF6] dark:text-[#B7F229] shrink-0 mt-0.5" />
-                    <span>
-                      <strong className="text-[#0B1A2D] dark:text-white">{t('corporateContact.commitment.support', 'Soporte prioritario')}:</strong>{' '}
-                      {t('corporateContact.commitment.supportDesc', 'Contacto directo con ingenieros sin bots impersonales.')}
-                    </span>
-                  </li>
-                </ul>
               </div>
 
-              <div className="p-8 rounded-2xl bg-[#0B1A2D] text-white border border-[#1A314D] space-y-3">
-                <span className="text-xs font-mono text-[#B7F229] font-semibold">
-                  {t('corporateContact.international.badge', 'Despliegue Internacional')}
-                </span>
-                <h4 className="text-base font-bold text-white tracking-tight">
-                  {t('corporateContact.international.title', 'Soporte Multilingüe y Multidivisa')}
-                </h4>
-                <p className="text-sm text-slate-300 leading-relaxed">
-                  {t('corporateContact.international.desc', 'Infraestructura preparada para operar en 11 idiomas con pasarelas de pago locales (Bizum, Redsys, Stripe, SEPA) para clubes en España, Portugal, Italia, Francia, Alemania y Oriente Medio.')}
-                </p>
+              <div>
+                <label className="block text-[#0B1A2D] dark:text-slate-200 font-semibold text-xs mb-1.5">
+                  Pistas, sedes o tamaño de plantilla
+                </label>
+                <input
+                  type="text"
+                  placeholder="ej. 6 pistas indoor, escuela de 120 alumnos o equipo de 18 jugadores"
+                  value={formCourts}
+                  onChange={(e) => setFormCourts(e.target.value)}
+                  className="w-full min-h-[44px] px-4 py-2.5 rounded-xl bg-white dark:bg-[#0B1A2D] border border-slate-200 dark:border-[#1A314D] text-[#0B1A2D] dark:text-white text-sm focus:outline-none focus:border-[#0B1A2D] dark:focus:border-[#B7F229]"
+                />
               </div>
-            </div>
+
+              <div>
+                <label className="block text-[#0B1A2D] dark:text-slate-200 font-semibold text-xs mb-1.5">
+                  Mensaje *
+                </label>
+                <textarea
+                  required
+                  rows={4}
+                  placeholder="Indícanos tus objetivos, plazos o dudas sobre módulos y domótica..."
+                  value={formMessage}
+                  onChange={(e) => setFormMessage(e.target.value)}
+                  className="w-full px-4 py-3 rounded-xl bg-white dark:bg-[#0B1A2D] border border-slate-200 dark:border-[#1A314D] text-[#0B1A2D] dark:text-white text-sm focus:outline-none focus:border-[#0B1A2D] dark:focus:border-[#B7F229]"
+                />
+              </div>
+
+              <div className="flex items-start gap-2.5 pt-1">
+                <input
+                  type="checkbox"
+                  id="rgpd-contact"
+                  checked={rgpdAccepted}
+                  onChange={(e) => setRgpdAccepted(e.target.checked)}
+                  className="mt-0.5 rounded border-slate-300 dark:border-[#1A314D] accent-[#0B1A2D]"
+                />
+                <label htmlFor="rgpd-contact" className="text-xs text-slate-500 dark:text-slate-400 cursor-pointer">
+                  Acepto el tratamiento de mis datos de contacto conforme al Aviso Legal y Política de Privacidad de Setmio.
+                </label>
+              </div>
+
+              <CorporatePrimaryButton
+                type="submit"
+                disabled={isSubmitting}
+                icon={<Send className="w-4 h-4 shrink-0" />}
+                className="w-full"
+              >
+                {isSubmitting ? 'Enviando consulta...' : 'Enviar consulta'}
+              </CorporatePrimaryButton>
+            </form>
           </div>
 
-          {/* FAQs Corporativas */}
-          <div className="space-y-8 pt-4">
-            <div className="space-y-2 text-left max-w-2xl">
-              <span className="text-xs font-semibold tracking-wide text-[#8B5CF6] dark:text-[#a78bfa]">
-                {t('corporateContact.faqEyebrow', 'Preguntas Frecuentes')}
-              </span>
-              <h2 className="text-2xl sm:text-4xl font-bold text-[#0B1A2D] dark:text-white tracking-tight text-balance">
-                {t('corporateContact.faqTitle', 'Dudas habituales sobre la implantación de Setmio')}
-              </h2>
-              <p className="text-slate-600 dark:text-slate-400 text-sm sm:text-base">
-                {t('corporateContact.faqSubtitle', 'Todo lo que necesitas saber sobre migración, hardware y modelo de negocio.')}
+          <div className="lg:col-span-5 space-y-6">
+            <div className="p-7 rounded-2xl bg-[#F7F9FC] dark:bg-[#0E2239] border border-slate-200/90 dark:border-[#1A314D] space-y-4">
+              <div className="flex items-center gap-2 text-sm font-bold text-[#0B1A2D] dark:text-white">
+                <ShieldCheck className="w-4 h-4 text-[#0B1A2D] dark:text-[#B7F229]" />
+                <span>Garantías operativas Setmio</span>
+              </div>
+              <ul className="space-y-3 text-xs sm:text-sm text-slate-600 dark:text-slate-300">
+                <li className="flex items-start gap-2.5">
+                  <Check className="w-4 h-4 text-[#0B1A2D] dark:text-[#B7F229] shrink-0 mt-0.5" />
+                  <span>Migración inicial de datos asistida en 24 horas.</span>
+                </li>
+                <li className="flex items-start gap-2.5">
+                  <Check className="w-4 h-4 text-[#0B1A2D] dark:text-[#B7F229] shrink-0 mt-0.5" />
+                  <span>Sin comisiones por reserva ni permanencia forzosa.</span>
+                </li>
+                <li className="flex items-start gap-2.5">
+                  <Check className="w-4 h-4 text-[#0B1A2D] dark:text-[#B7F229] shrink-0 mt-0.5" />
+                  <span>Alojamiento en la Unión Europea conforme a RGPD.</span>
+                </li>
+                <li className="flex items-start gap-2.5">
+                  <Check className="w-4 h-4 text-[#0B1A2D] dark:text-[#B7F229] shrink-0 mt-0.5" />
+                  <span>Soporte directo en español y 10 idiomas adicionales.</span>
+                </li>
+              </ul>
+            </div>
+
+            <div className="p-7 rounded-2xl bg-[#0B1A2D] text-white border border-[#1A314D] space-y-3">
+              <div className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#B7F229]">
+                Atención telefónica directa
+              </div>
+              <p className="text-sm text-slate-300 leading-relaxed">
+                Si prefieres resolver dudas sobre despliegue o domótica por teléfono, contacta directamente con nuestro equipo.
               </p>
-            </div>
-
-            <div className="rounded-2xl border border-slate-200/80 dark:border-[#1A314D] bg-white dark:bg-[#0E2239] divide-y divide-slate-200/80 dark:divide-[#1A314D] overflow-hidden">
-              {corporateFaqs.map((faq, idx) => {
-                const isOpen = activeFAQ === idx;
-                return (
-                  <div key={idx}>
-                    <button
-                      type="button"
-                      onClick={() => setActiveFAQ(isOpen ? null : idx)}
-                      className="w-full min-h-[56px] px-6 py-5 text-left flex items-center justify-between gap-4 font-semibold text-sm sm:text-base text-[#0B1A2D] dark:text-white hover:text-[#8B5CF6] dark:hover:text-[#B7F229] transition-colors cursor-pointer"
-                    >
-                      <span>{faq.q}</span>
-                      <ChevronDown className={`w-4 h-4 shrink-0 transition-transform duration-200 ${isOpen ? 'rotate-180 text-[#8B5CF6] dark:text-[#B7F229]' : 'text-slate-400'}`} />
-                    </button>
-                    {isOpen && (
-                      <div className="px-6 pb-6 pt-1 text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
-                        {faq.a}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
+              <a
+                href="tel:+34981380000"
+                className="inline-flex items-center gap-2 text-sm font-mono font-bold text-white hover:text-[#B7F229] transition-colors"
+              >
+                <Phone className="w-4 h-4 text-[#B7F229]" />
+                <span>+34 981 38 00 00</span>
+              </a>
             </div>
           </div>
-        </div>
-      </div>
-    </div>
+        </section>
+
+        {/* FAQs */}
+        <section className="space-y-6">
+          <div className="max-w-2xl space-y-2">
+            <CorporateEyebrow>Preguntas Frecuentes</CorporateEyebrow>
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-[#0B1A2D] dark:text-white font-display">
+              Dudas habituales antes de empezar
+            </h2>
+          </div>
+
+          <div className="rounded-2xl border border-slate-200/90 dark:border-[#1A314D] bg-[#F7F9FC] dark:bg-[#0E2239] divide-y divide-slate-200/80 dark:divide-[#1A314D] overflow-hidden">
+            {corporateFaqs.map((faq, idx) => {
+              const isOpen = activeFAQ === idx;
+              return (
+                <div key={faq.q}>
+                  <button
+                    type="button"
+                    onClick={() => setActiveFAQ(isOpen ? null : idx)}
+                    className="w-full min-h-[56px] px-6 py-4 text-left flex items-center justify-between gap-4 font-semibold text-sm sm:text-base text-[#0B1A2D] dark:text-white cursor-pointer"
+                  >
+                    <span>{faq.q}</span>
+                    <ChevronDown
+                      className={`w-4 h-4 shrink-0 transition-transform duration-200 ${
+                        isOpen ? 'rotate-180 text-[#0B1A2D] dark:text-[#B7F229]' : 'text-slate-400'
+                      }`}
+                    />
+                  </button>
+                  {isOpen && (
+                    <div className="px-6 pb-5 text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+                      {faq.a}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      </CorporateContainer>
+    </main>
   );
 };
 

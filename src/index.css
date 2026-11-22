@@ -25,8 +25,9 @@
 @variant dark (&:where(.dark, .dark *));
 
 @theme {
-  --font-sans: "Inter", "DM Sans", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Inter", "Manrope", sans-serif;
+  --font-sans: "Plus Jakarta Sans", "Manrope", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Manrope", "Plus Jakarta Sans", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
 
   /* PALETA OFICIAL SETMIO PÁDEL (image_16.png) */
   --color-setmio-dark: #0B1A2D;       /* Azul profundo: Fondo principal, base corporativa, modo oscuro */
@@ -171,8 +172,8 @@ input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-
   }
 }
 
-:root { font-family: 'Inter', 'DM Sans', sans-serif; }
-h1, h2, h3, h4 { font-family: 'Inter', 'Manrope', sans-serif; letter-spacing: -.025em; }
+:root { font-family: 'Plus Jakarta Sans', 'Manrope', sans-serif; }
+h1, h2, h3, h4 { font-family: 'Manrope', 'Plus Jakarta Sans', sans-serif; letter-spacing: -.025em; }
 
 @layer utilities {
   .text-balance { text-wrap: balance; }

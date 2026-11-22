@@ -151,6 +151,9 @@ export type PublicPage =
   | 'solution_clubs'
   | 'solution_schools'
   | 'solution_coaches'
+  | 'solution_councils'
+  | 'solution_federations'
+  | 'solution_teams'
   | 'solution_players'
   | 'solution_pro_players'
   | 'players_app'
@@ -183,6 +186,10 @@ const PUBLIC_ROUTES: Record<string, PublicPage> = {
   '/soluciones/clubes': 'solution_clubs',
   '/soluciones/escuelas': 'solution_schools',
   '/soluciones/profesores': 'solution_coaches',
+  '/soluciones/administraciones': 'solution_councils',
+  '/soluciones/ayuntamientos': 'solution_councils',
+  '/soluciones/federaciones': 'solution_federations',
+  '/soluciones/equipos': 'solution_teams',
   '/soluciones/jugadores': 'players_app',
   '/soluciones/jugadores-profesionales': 'solution_pro_players',
   '/jugadores-app': 'players_app',
@@ -211,6 +218,9 @@ const routeForPage: Record<PublicPage, string> = {
   solution_clubs: '/soluciones/clubes',
   solution_schools: '/soluciones/escuelas',
   solution_coaches: '/soluciones/profesores',
+  solution_councils: '/soluciones/administraciones',
+  solution_federations: '/soluciones/federaciones',
+  solution_teams: '/soluciones/equipos',
   solution_players: '/para-jugadores',
   solution_pro_players: '/soluciones/jugadores-profesionales',
   players_app: '/para-jugadores',
@@ -631,7 +641,12 @@ const readRoute = () => {
     };
   }
 
-  const page = PUBLIC_ROUTES[remainingPath] || 'home';
+  const page =
+    remainingPath.startsWith('/blog/')
+      ? 'blog'
+      : remainingPath.startsWith('/modulos/') || remainingPath.startsWith('/funcionalidades/')
+      ? 'features'
+      : PUBLIC_ROUTES[remainingPath] || 'home';
   return {
     view: 'public' as MainView,
     page,
@@ -1539,6 +1554,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         window.location.pathname !== '/registro' &&
         window.location.pathname !== '/login' &&
         window.location.pathname !== corporatePath &&
+        !window.location.pathname.startsWith('/blog/') &&
+        !window.location.pathname.startsWith('/modulos/') &&
+        !window.location.pathname.startsWith('/funcionalidades/') &&
         !window.location.pathname.startsWith('/club/') &&
         !window.location.pathname.startsWith('/p/')
       ) {

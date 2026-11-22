@@ -43,6 +43,13 @@ import {
 } from 'lucide-react';
 import { NewMatchModal } from './NewMatchModal';
 import { AdminSectionHeader } from './AdminSectionHeader';
+import {
+  PlayerAvatar,
+  extractTimeHmSafe,
+  formatMatchTimeWithDurationSafe,
+  formatModalDateEs,
+  parseSafeDateParts,
+} from './modalShared';
 
 export const AdminMatches: React.FC = () => {
   const {
@@ -271,60 +278,22 @@ export const AdminMatches: React.FC = () => {
   const [paymentPolicy, setPaymentPolicy] = useState<'online_only' | 'counter_only' | 'both'>('both');
 
   // Helper minimalista para formateo de hora y duración: "10:00 - 11:30 (1h 30m)"
-  const formatMatchTimeWithDuration = (startTimeStr: string, durationMinutes: number = 90) => {
-    let timePart = '19:30';
-    if (startTimeStr.includes('T')) {
-      timePart = startTimeStr.replace('Z', '').split('T')[1]?.slice(0, 5) || '19:30';
-    } else if (startTimeStr.includes(':')) {
-      timePart = startTimeStr.slice(0, 5);
-    }
+  const formatMatchTimeWithDuration = (startTimeStr: string, durationMinutes: number = 90) =>
+    formatMatchTimeWithDurationSafe(startTimeStr, durationMinutes);
 
-    const [hStr, mStr] = timePart.split(':');
-    const startH = parseInt(hStr || '19', 10);
-    const startM = parseInt(mStr || '30', 10);
-    const totalStartMinutes = startH * 60 + startM;
-    const totalEndMinutes = totalStartMinutes + durationMinutes;
-
-    const endH = Math.floor(totalEndMinutes / 60) % 24;
-    const endM = totalEndMinutes % 60;
-    const endTimePart = `${String(endH).padStart(2, '0')}:${String(endM).padStart(2, '0')}`;
-
-    const durH = Math.floor(durationMinutes / 60);
-    const durM = durationMinutes % 60;
-    const durationLabel =
-      durM > 0
-        ? durH > 0
-          ? `${durH}h ${durM}m`
-          : `${durM}m`
-        : `${durH}h`;
-
-    return `${timePart} - ${endTimePart} (${durationLabel})`;
-  };
-
-  // Helper simplificado para fechas legibles estilo "Jue, 1 Oct · 19:30"
+  // Helper simplificado para fechas legibles estilo "Jue, 1 Oct · 19:30" (sin "Invalid Date")
   const formatSimplifiedMatchDate = (startTimeStr: string) => {
-    try {
-      let datePart = '2026-10-01';
-      let timePart = '19:30';
-      if (startTimeStr.includes('T')) {
-        const parts = startTimeStr.replace('Z', '').split('T');
-        datePart = parts[0];
-        timePart = parts[1]?.slice(0, 5) || '19:30';
-      } else if (startTimeStr.includes(' ')) {
-        const parts = startTimeStr.split(' ');
-        datePart = parts[0];
-        timePart = parts[1]?.slice(0, 5) || '19:30';
-      }
-      const [y, m, d] = datePart.split('-').map(Number);
-      const dateObj = new Date(y, (m || 10) - 1, d || 1);
-      const weekday = dateObj.toLocaleDateString('es-ES', { weekday: 'short' });
-      const capWeekday = weekday.charAt(0).toUpperCase() + weekday.slice(1).replace('.', '');
-      const month = dateObj.toLocaleDateString('es-ES', { month: 'short' });
-      const capMonth = month.charAt(0).toUpperCase() + month.slice(1).replace('.', '');
-      return `${capWeekday}, ${d} ${capMonth} · ${timePart}`;
-    } catch {
-      return startTimeStr;
+    const { hasExplicitDate, dateObj } = parseSafeDateParts(startTimeStr);
+    const timePart = extractTimeHmSafe(startTimeStr, '19:30');
+    const weekday = dateObj.toLocaleDateString('es-ES', { weekday: 'short' });
+    const capWeekday = (weekday.charAt(0).toUpperCase() + weekday.slice(1)).replace('.', '');
+    const month = dateObj.toLocaleDateString('es-ES', { month: 'short' });
+    const capMonth = (month.charAt(0).toUpperCase() + month.slice(1)).replace('.', '');
+    const dayNum = dateObj.getDate();
+    if (!hasExplicitDate) {
+      return `Hoy · ${capWeekday}, ${dayNum} ${capMonth} · ${timePart}`;
     }
+    return `${capWeekday}, ${dayNum} ${capMonth} · ${timePart}`;
   };
 
   // Pistas filtradas por la sede seleccionada en el formulario de creación
@@ -998,10 +967,8 @@ export const AdminMatches: React.FC = () => {
     setSelectedIndividualPlayer(CLUB_PLAYERS_LIST[0].name);
 
     const openSlots = Math.max(1, 4 - match.players.length);
-    const dateFormatted = match.startTime.split('T')[0] || 'Hoy';
-    const timeFormatted = match.startTime.includes('T')
-      ? match.startTime.split('T')[1].slice(0, 5)
-      : '19:30';
+    const dateFormatted = formatModalDateEs(match.startTime, { compact: true });
+    const timeFormatted = extractTimeHmSafe(match.startTime, '19:30');
 
     setHubSubject(
       `🏆 Convocatoria de Pádel: ${openSlots} plaza${openSlots > 1 ? 's' : ''} libre${openSlots > 1 ? 's' : ''} en ${match.courtName}`
@@ -1792,52 +1759,65 @@ export const AdminMatches: React.FC = () => {
           MODAL 1: DETALLE COMPLETO DE PARTIDA Y GESTIÓN DE SOLICITUDES
           ====================================================================== */}
       {selectedMatchForDetail && (
-        <div className="fixed inset-0 z-50 flex flex-col justify-end sm:justify-center sm:items-center bg-slate-950/70 dark:bg-black/85 backdrop-blur-md p-0 sm:p-4 lg:p-6 overflow-hidden animate-in fade-in duration-200">
-          <div className="w-full sm:max-w-2xl h-full sm:h-auto sm:max-h-[92vh] bg-white dark:bg-[#071220] sm:border border-slate-200/90 dark:border-[#1A314D] sm:rounded-3xl shadow-2xl flex flex-col overflow-hidden text-slate-900 dark:text-slate-100">
-            {/* Barra táctil indicadora en móvil */}
-            <div className="w-12 h-1 bg-slate-300 dark:bg-slate-700 rounded-full mx-auto my-2 sm:hidden shrink-0" />
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="Detalles de Partida"
+          className="fixed inset-0 z-[90] flex items-end sm:items-center justify-center bg-slate-950/70 dark:bg-black/85 backdrop-blur-md p-0 sm:p-4 lg:p-6 overflow-hidden animate-in fade-in duration-200"
+          onClick={closeMatchDetail}
+        >
+          <div
+            className="w-full sm:max-w-2xl max-h-[92dvh] sm:max-h-[90vh] bg-white dark:bg-[#071220] border-t sm:border border-slate-200/90 dark:border-[#1A314D] rounded-t-3xl sm:rounded-3xl shadow-2xl flex flex-col overflow-hidden text-[#0B1A2D] dark:text-slate-100 animate-in slide-in-from-bottom-4 sm:zoom-in-95 duration-200"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Barra de arrastre en móvil */}
+            <div className="w-11 h-1 bg-slate-300 dark:bg-slate-700 rounded-full mx-auto mt-2.5 mb-0.5 sm:hidden shrink-0" />
 
-            {/* 1. CABECERA MINIMALISTA FIJA (NIVEL 3 - MÁXIMO ESPACIO ÚTIL) */}
-            <div className="px-5 sm:px-6 py-3 border-b border-slate-100 dark:border-[#1A314D] flex items-center justify-between bg-white dark:bg-[#071220] shrink-0">
-              <div className="flex items-center gap-2.5 min-w-0 pr-3">
-                <h3 className="text-base sm:text-lg font-black text-[#0B1A2D] dark:text-white truncate">
-                  {selectedMatchForDetail.courtName}
-                </h3>
-                <span className="text-[11px] font-mono font-medium text-slate-400 dark:text-slate-500 shrink-0">
-                  Play! #{selectedMatchForDetail.id.slice(-6).toUpperCase()}
-                </span>
+            {/* Cabecera limpia alineada con Panel de Control */}
+            <header className="px-5 sm:px-6 py-3.5 border-b border-slate-100 dark:border-[#1A314D] flex items-center justify-between gap-4 bg-white dark:bg-[#071220] shrink-0">
+              <div className="min-w-0">
+                <h2 className="text-lg sm:text-xl font-bold tracking-tight text-[#0B1A2D] dark:text-white leading-tight truncate">
+                  Detalles de Partida
+                </h2>
+                <p className="text-xs text-slate-500 dark:text-slate-400 truncate mt-0.5 tabular-nums">
+                  {selectedMatchForDetail.courtName} · Play! #{selectedMatchForDetail.id.slice(-6).toUpperCase()}
+                </p>
               </div>
 
               <button
                 type="button"
                 onClick={closeMatchDetail}
-                className="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-[#0B1A2D] dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#0E2239] transition cursor-pointer shrink-0"
-                title="Cerrar expediente"
+                className="min-h-[44px] min-w-[44px] w-11 h-11 rounded-2xl bg-slate-50 dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] flex items-center justify-center text-[#0B1A2D] dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-[#132A45] transition cursor-pointer active:scale-95 shrink-0"
+                aria-label="Cerrar detalles de partida"
               >
                 <X className="w-5 h-5" />
               </button>
-            </div>
+            </header>
 
-            {/* 2. CUERPO DEL EXPEDIENTE (LECTURA EJECUTIVA, TIPOGRAFÍA LIMPIA Y AIRE VISUAL) */}
-            <div className="p-5 sm:p-6 overflow-y-auto overscroll-contain space-y-4 text-xs flex-1">
-              {/* Ficha Rápida del Turno: Fecha, Horario, Sede, Plazas, Modalidad */}
-              <div className="pb-3 border-b border-slate-100 dark:border-[#1A314D] space-y-1.5 text-xs">
+            {/* Cuerpo scrollable */}
+            <div className="px-5 sm:px-6 py-4 sm:py-5 overflow-y-auto overscroll-contain space-y-4 text-xs flex-1">
+              {/* Fecha, Horario, Sede y Modalidad */}
+              <div className="pb-3.5 border-b border-slate-100 dark:border-[#1A314D] space-y-1.5">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300 flex-wrap">
-                    <Clock className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                    <Calendar className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                     <span className="font-bold text-[#0B1A2D] dark:text-white">
-                      {selectedMatchForDetail.startTime.split('T')[0]} · {formatMatchTimeWithDuration(selectedMatchForDetail.startTime, selectedMatchForDetail.durationMinutes)}
+                      {formatModalDateEs(selectedMatchForDetail.startTime)}
+                    </span>
+                    <span className="text-slate-300 dark:text-slate-700">·</span>
+                    <span className="font-mono font-bold tabular-nums text-[#0B1A2D] dark:text-white">
+                      {formatMatchTimeWithDuration(selectedMatchForDetail.startTime, selectedMatchForDetail.durationMinutes)}
                     </span>
                   </div>
 
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-[11px] font-bold text-slate-600 dark:text-slate-300">
+                  <div className="flex items-center gap-2 shrink-0">
+                    <span className="text-[11px] font-bold text-slate-600 dark:text-slate-300 tabular-nums">
                       {selectedMatchForDetail.status === 'open' || selectedMatchForDetail.players.length < 4
                         ? `${Math.max(0, 4 - selectedMatchForDetail.players.length)} plazas libres`
                         : 'Partida completa'}
                     </span>
                     {selectedMatchForDetail.visibility === 'group' && (
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-[#0E2239] text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-[#1A314D]">
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-100 dark:bg-[#0E2239] text-[#0B1A2D] dark:text-slate-300 border border-slate-200 dark:border-[#1A314D]">
                         {selectedMatchForDetail.restrictedGroupName || 'Grupo'}
                       </span>
                     )}
@@ -1848,13 +1828,15 @@ export const AdminMatches: React.FC = () => {
                   {isMultiVenue && (selectedMatchForDetail.venueShortName || selectedMatchForDetail.venueName) && (
                     <>
                       <span className="flex items-center gap-1 text-slate-600 dark:text-slate-300 font-medium">
-                        <Building2 className="w-3 h-3 text-slate-400" />
+                        <Building2 className="w-3 h-3 text-slate-400 shrink-0" />
                         <span>{selectedMatchForDetail.venueShortName || selectedMatchForDetail.venueName}</span>
                       </span>
                       <span className="text-slate-300 dark:text-slate-700">·</span>
                     </>
                   )}
-                  <span className="capitalize">{selectedMatchForDetail.gender === 'female' ? 'Femenina' : selectedMatchForDetail.gender === 'mixed' ? 'Mixta' : 'Masculina'}</span>
+                  <span>
+                    {selectedMatchForDetail.gender === 'female' ? 'Femenina' : selectedMatchForDetail.gender === 'mixed' ? 'Mixta' : 'Masculina'}
+                  </span>
                   <span className="text-slate-300 dark:text-slate-700">·</span>
                   <span className="font-medium text-slate-700 dark:text-slate-300">
                     {selectedMatchForDetail.mode === 'friendly' ? 'Amistoso' : 'Competitivo (ELO)'}
@@ -1862,44 +1844,44 @@ export const AdminMatches: React.FC = () => {
                 </div>
               </div>
 
-              {/* Franja de Indicadores Clave (KPIs) */}
-              <div className="grid grid-cols-3 gap-3 p-3.5 rounded-2xl bg-slate-50/70 dark:bg-[#0E2239]/40 border border-slate-200/80 dark:border-[#1A314D]">
+              {/* Indicadores Clave */}
+              <div className="grid grid-cols-3 gap-3 p-3.5 rounded-2xl bg-slate-50/80 dark:bg-[#0E2239]/50 border border-slate-200/80 dark:border-[#1A314D]">
                 <div className="text-center">
                   <span className="text-[10px] uppercase font-bold text-slate-400 block tracking-wider">Nivel ELO</span>
-                  <span className="text-sm font-mono font-black text-[#0B1A2D] dark:text-white mt-0.5 block">
+                  <span className="text-sm font-mono tabular-nums font-black text-[#0B1A2D] dark:text-white mt-0.5 block">
                     {selectedMatchForDetail.minLevel.toFixed(2)} - {selectedMatchForDetail.maxLevel.toFixed(2)}
                   </span>
                 </div>
                 <div className="text-center border-x border-slate-200/80 dark:border-[#1A314D] px-2">
                   <span className="text-[10px] uppercase font-bold text-slate-400 block tracking-wider">Tarifa / Plaza</span>
-                  <span className="text-sm font-mono font-black text-[#0B1A2D] dark:text-white mt-0.5 block">
+                  <span className="text-sm font-mono tabular-nums font-black text-[#0B1A2D] dark:text-white mt-0.5 block">
                     {selectedMatchForDetail.pricePerPlayer.toFixed(2)} €
                   </span>
                 </div>
                 <div className="text-center">
-                  <span className="text-[10px] uppercase font-bold text-slate-400 block tracking-wider">Disponibilidad</span>
-                  <span className="text-sm font-mono font-black text-[#0B1A2D] dark:text-white mt-0.5 block">
+                  <span className="text-[10px] uppercase font-bold text-slate-400 block tracking-wider">Plazas</span>
+                  <span className="text-sm font-mono tabular-nums font-black text-[#0B1A2D] dark:text-white mt-0.5 block">
                     {selectedMatchForDetail.players.length} / 4
                   </span>
                 </div>
               </div>
 
-              {/* Lista Tipográfica: Jugadores Inscritos */}
+              {/* Jugadores Inscritos */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
                     Jugadores Inscritos ({selectedMatchForDetail.players.length} de 4)
                   </span>
                   {selectedMatchForDetail.players.length < 4 && (
-                    <span className="text-[11px] font-bold text-slate-600 dark:text-slate-300">
-                      {4 - selectedMatchForDetail.players.length} plazas restantes
+                    <span className="text-[11px] font-bold text-slate-600 dark:text-slate-300 tabular-nums">
+                      {4 - selectedMatchForDetail.players.length} libres
                     </span>
                   )}
                 </div>
 
                 <div className="rounded-2xl border border-slate-200/80 dark:border-[#1A314D] divide-y divide-slate-100 dark:divide-[#1A314D] overflow-hidden bg-white dark:bg-[#071220]">
                   {selectedMatchForDetail.players.map((p, idx) => (
-                    <div key={idx} className="p-3.5 flex items-center justify-between text-xs hover:bg-slate-50/50 dark:hover:bg-[#0B1A2D]/20 transition">
+                    <div key={idx} className="p-3.5 flex items-center justify-between gap-3 text-xs hover:bg-slate-50/70 dark:hover:bg-[#0E2239]/40 transition">
                       <div
                         role="button"
                         tabIndex={0}
@@ -1907,39 +1889,48 @@ export const AdminMatches: React.FC = () => {
                           setSelectedMatchForDetail(null);
                           navigateToPlayerProfile(p.name, 'matches');
                         }}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            setSelectedMatchForDetail(null);
+                            navigateToPlayerProfile(p.name, 'matches');
+                          }
+                        }}
                         className="flex items-center gap-3 cursor-pointer group min-w-0"
                         title={`Ver perfil de ${p.name}`}
                       >
-                        <div className="w-8 h-8 rounded-xl bg-[#0B1A2D] dark:bg-[#0E2239] text-white border border-slate-200 dark:border-[#1A314D] font-black text-xs flex items-center justify-center shrink-0">
-                          {p.name.slice(0, 2).toUpperCase()}
-                        </div>
+                        <PlayerAvatar
+                          name={p.name}
+                          avatar={(p as { avatar?: string }).avatar}
+                          customers={customers}
+                          size="sm"
+                        />
                         <div className="min-w-0">
                           <div className="font-bold text-[#0B1A2D] dark:text-white flex items-center gap-1.5 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition truncate">
-                            <span>{p.name}</span>
-                            <span className="text-[10px] text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity">↗</span>
+                            <span className="truncate">{p.name}</span>
+                            <span className="text-[10px] text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">↗</span>
                             {p.customPrice && (
-                              <span className="text-[10px] font-mono text-[#0B1A2D] dark:text-white font-bold">
+                              <span className="text-[10px] font-mono tabular-nums text-[#0B1A2D] dark:text-white font-bold shrink-0">
                                 ({p.customPrice.toFixed(2)} €)
                               </span>
                             )}
                           </div>
-                          <div className="text-[10px] text-slate-400 font-mono">
-                            Nivel ELO {p.level.toFixed(2)} · Posición: <span className="capitalize">{p.position}</span>
+                          <div className="text-[10px] text-slate-400 font-mono tabular-nums truncate">
+                            Nivel {p.level.toFixed(2)} · {p.position === 'reves' ? 'Revés' : p.position === 'drive' ? 'Drive' : 'Ambas'}
                           </div>
                         </div>
                       </div>
 
                       <div className="flex items-center gap-2 shrink-0">
                         {p.paid ? (
-                          <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 dark:bg-[#0E2239] text-slate-700 dark:text-slate-300 border border-slate-200/80 dark:border-[#1A314D] flex items-center gap-1">
-                            <Check className="w-3 h-3 text-slate-600 dark:text-slate-400" />
+                          <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-[#F0FCCF]/80 dark:bg-[#B7F229]/15 text-[#0B1A2D] dark:text-[#B7F229] border border-[#B7F229]/40 flex items-center gap-1">
+                            <Check className="w-3 h-3" />
                             <span>Pagado</span>
                           </span>
                         ) : (
                           <button
                             type="button"
                             onClick={() => handlePayPlayerShare(selectedMatchForDetail.id, p.name)}
-                            className="px-2.5 py-1 rounded-xl bg-[#0B1A2D] hover:bg-[#132A45] text-white font-bold text-[11px] shadow-2xs transition cursor-pointer flex items-center gap-1"
+                            className="px-2.5 py-1.5 rounded-xl bg-[#0B1A2D] hover:bg-[#132A45] text-white font-bold text-[11px] transition cursor-pointer flex items-center gap-1"
                             title="Cobrar cuota en TPV o saldo"
                           >
                             <Wallet className="w-3 h-3" />
@@ -1947,9 +1938,8 @@ export const AdminMatches: React.FC = () => {
                           </button>
                         )}
 
-                        {/* Acciones de gestión para administradores */}
                         {(selectedMatchForDetail.status === 'open' || selectedMatchForDetail.players.length < 4) && (
-                          <div className="flex items-center gap-1 border-l border-slate-200 dark:border-[#1A314D] pl-2 ml-1">
+                          <div className="flex items-center gap-1 border-l border-slate-200 dark:border-[#1A314D] pl-2 ml-0.5">
                             <button
                               type="button"
                               onClick={() => {
@@ -1958,8 +1948,9 @@ export const AdminMatches: React.FC = () => {
                                 setSelectedMatchForDetail(null);
                                 setSelectedMatchForAdd(m);
                               }}
-                              className="p-1.5 rounded-lg bg-slate-50 dark:bg-[#0E2239] hover:bg-slate-100 dark:hover:bg-[#132A45] text-slate-600 dark:text-slate-300 border border-slate-200/80 dark:border-[#1A314D] transition cursor-pointer"
+                              className="w-8 h-8 rounded-lg bg-slate-50 dark:bg-[#0E2239] hover:bg-slate-100 dark:hover:bg-[#132A45] text-slate-600 dark:text-slate-300 border border-slate-200/80 dark:border-[#1A314D] flex items-center justify-center transition cursor-pointer"
                               title={`Reemplazar a ${p.name}`}
+                              aria-label={`Reemplazar a ${p.name}`}
                             >
                               <UserPlus className="w-3.5 h-3.5 text-slate-500" />
                             </button>
@@ -1968,11 +1959,12 @@ export const AdminMatches: React.FC = () => {
                               onClick={() => {
                                 leaveOpenMatch(selectedMatchForDetail.id, p.name);
                                 setSelectedMatchForDetail((prev) =>
-                                    prev ? { ...prev, players: prev.players.filter((pl) => pl.name !== p.name), status: 'open' } : null
+                                  prev ? { ...prev, players: prev.players.filter((pl) => pl.name !== p.name), status: 'open' } : null
                                 );
                               }}
-                              className="p-1.5 rounded-lg bg-rose-50/70 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/40 text-rose-600 border border-rose-200/60 dark:border-rose-900/40 transition cursor-pointer"
+                              className="w-8 h-8 rounded-lg bg-rose-50/70 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/40 text-rose-600 border border-rose-200/60 dark:border-rose-900/40 flex items-center justify-center transition cursor-pointer"
                               title={`Quitar a ${p.name} de la partida`}
+                              aria-label={`Quitar a ${p.name}`}
                             >
                               <Trash2 className="w-3.5 h-3.5" />
                             </button>
@@ -1982,14 +1974,14 @@ export const AdminMatches: React.FC = () => {
                     </div>
                   ))}
 
-                  {/* Plazas libres restantes con botón directo */}
+                  {/* Plazas libres */}
                   {Array.from({ length: Math.max(0, 4 - selectedMatchForDetail.players.length) }).map((_, emptyIdx) => (
                     <div
                       key={`slot-${emptyIdx}`}
-                      className="p-3.5 flex items-center justify-between text-xs text-slate-400 bg-slate-50/30 dark:bg-[#0B1A2D]/10"
+                      className="p-3.5 flex items-center justify-between text-xs text-slate-400 bg-slate-50/40 dark:bg-[#0E2239]/20"
                     >
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-xl border border-dashed border-slate-300 dark:border-slate-700 flex items-center justify-center font-mono text-[11px] text-slate-400">
+                        <div className="w-9 h-9 rounded-xl border border-dashed border-slate-300 dark:border-slate-700 flex items-center justify-center font-mono tabular-nums text-[11px] text-slate-400 shrink-0">
                           {selectedMatchForDetail.players.length + emptyIdx + 1}
                         </div>
                         <span className="font-medium text-slate-500 dark:text-slate-400">
@@ -2003,7 +1995,7 @@ export const AdminMatches: React.FC = () => {
                           setSelectedMatchForDetail(null);
                           setSelectedMatchForAdd(m);
                         }}
-                        className="px-3 py-1.5 rounded-xl bg-[#0B1A2D] hover:bg-[#132A45] text-white font-bold text-xs cursor-pointer shadow-xs active:scale-95 transition"
+                        className="h-9 px-3 rounded-xl bg-[#0B1A2D] hover:bg-[#132A45] text-white font-bold text-xs cursor-pointer active:scale-95 transition"
                       >
                         + Inscribir
                       </button>
@@ -2012,12 +2004,12 @@ export const AdminMatches: React.FC = () => {
                 </div>
               </div>
 
-              {/* Solicitudes de Plaza por Nivel */}
+              {/* Solicitudes de Nivel */}
               <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <AlertCircle className="w-4 h-4 text-amber-500" />
-                    <span className="text-xs font-bold text-[#0B1A2D] dark:text-white uppercase tracking-wider">
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-1.5 min-w-0">
+                    <AlertCircle className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                    <span className="text-[10px] font-bold text-[#0B1A2D] dark:text-white uppercase tracking-wider truncate">
                       Solicitudes de Nivel ({selectedMatchForDetail.slotRequests?.length || 0})
                     </span>
                   </div>
@@ -2026,19 +2018,15 @@ export const AdminMatches: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => setSlotRequestTargetMatch(selectedMatchForDetail)}
-                      className="px-2.5 py-1 rounded-xl bg-slate-50 dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] text-slate-700 dark:text-slate-300 font-bold text-[10px] hover:border-slate-400 transition cursor-pointer shadow-2xs"
+                      className="px-2.5 py-1 rounded-xl bg-slate-50 dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] text-[#0B1A2D] dark:text-slate-300 font-bold text-[10px] hover:border-slate-400 transition cursor-pointer shrink-0"
                     >
                       + Solicitar Nivel
                     </button>
                   )}
                 </div>
 
-                <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                  Jugadores fuera de rango ({selectedMatchForDetail.minLevel.toFixed(2)} - {selectedMatchForDetail.maxLevel.toFixed(2)}) pendientes de aprobación.
-                </p>
-
                 {(!selectedMatchForDetail.slotRequests || selectedMatchForDetail.slotRequests.length === 0) ? (
-                  <div className="text-[11px] text-slate-400 italic py-2 px-1">
+                  <div className="text-[11px] text-slate-400 py-2 px-1">
                     No hay solicitudes de nivel pendientes.
                   </div>
                 ) : (
@@ -2046,30 +2034,34 @@ export const AdminMatches: React.FC = () => {
                     {selectedMatchForDetail.slotRequests.map((req) => (
                       <div
                         key={req.id}
-                        className="p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-xs hover:bg-slate-50/50 dark:hover:bg-[#0B1A2D]/20 transition"
+                        className="p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-xs hover:bg-slate-50/70 dark:hover:bg-[#0E2239]/40 transition"
                       >
-                        <div>
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setSelectedMatchForDetail(null);
-                                navigateToPlayerProfile(req.playerName, 'matches');
-                              }}
-                              className="font-bold text-[#0B1A2D] dark:text-white flex items-center gap-1.5 cursor-pointer hover:text-slate-600 dark:hover:text-slate-300 transition group text-left"
-                            >
-                              <span className="group-hover:underline">{req.playerName}</span>
-                              <span className="text-[10px] text-slate-400 font-normal">↗</span>
-                            </button>
-                            <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-slate-100 dark:bg-[#0E2239] text-slate-700 dark:text-slate-300 border border-slate-200/80 dark:border-[#1A314D]">
-                              Nivel {req.playerLevel.toFixed(2)}
-                            </span>
-                            <span className="text-[10px] text-slate-400 capitalize font-mono">
-                              · {req.position || 'drive'}
-                            </span>
-                          </div>
-                          <div className="text-[10px] text-slate-400 mt-0.5 font-mono">
-                            {req.requestedAt} · Tel: {req.playerPhone || 'N/A'}
+                        <div className="flex items-center gap-3 min-w-0">
+                          <PlayerAvatar
+                            name={req.playerName}
+                            customers={customers}
+                            size="sm"
+                          />
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setSelectedMatchForDetail(null);
+                                  navigateToPlayerProfile(req.playerName, 'matches');
+                                }}
+                                className="font-bold text-[#0B1A2D] dark:text-white flex items-center gap-1 cursor-pointer hover:text-slate-600 dark:hover:text-slate-300 transition group text-left truncate"
+                              >
+                                <span className="group-hover:underline truncate">{req.playerName}</span>
+                                <span className="text-[10px] text-slate-400 font-normal">↗</span>
+                              </button>
+                              <span className="text-[10px] font-mono tabular-nums font-bold text-slate-600 dark:text-slate-300">
+                                Nivel {req.playerLevel.toFixed(2)} · {req.position === 'reves' ? 'Revés' : req.position === 'both' ? 'Ambas' : 'Drive'}
+                              </span>
+                            </div>
+                            <div className="text-[10px] text-slate-400 mt-0.5 font-mono tabular-nums truncate">
+                              {req.requestedAt} · {req.playerPhone || 'Sin teléfono'}
+                            </div>
                           </div>
                         </div>
 
@@ -2079,25 +2071,25 @@ export const AdminMatches: React.FC = () => {
                               <button
                                 type="button"
                                 onClick={() => handleAcceptSlotRequest(selectedMatchForDetail.id, req.id)}
-                                className="px-3 py-1 rounded-xl bg-[#0B1A2D] hover:bg-[#132A45] text-white font-bold text-xs shadow-2xs transition cursor-pointer"
+                                className="h-8 px-3 rounded-xl bg-[#B7F229] hover:bg-[#a6df17] text-[#0B1A2D] font-bold text-xs transition cursor-pointer"
                               >
                                 Aceptar
                               </button>
                               <button
                                 type="button"
                                 onClick={() => handleRejectSlotRequest(selectedMatchForDetail.id, req.id)}
-                                className="px-2.5 py-1 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-[#0E2239] dark:hover:bg-[#132A45] text-slate-700 dark:text-slate-300 font-bold text-xs transition cursor-pointer"
+                                className="h-8 px-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-[#0E2239] dark:hover:bg-[#132A45] text-slate-700 dark:text-slate-300 font-bold text-xs transition cursor-pointer"
                               >
                                 Rechazar
                               </button>
                             </>
                           ) : req.status === 'accepted' ? (
-                            <span className="px-2.5 py-1 rounded-xl bg-slate-100 dark:bg-[#0E2239] text-slate-700 dark:text-slate-300 border border-slate-200/80 dark:border-[#1A314D] font-bold text-xs flex items-center gap-1">
-                              <Check className="w-3.5 h-3.5 text-slate-600 dark:text-slate-400" />
+                            <span className="px-2.5 py-1 rounded-md bg-[#F0FCCF]/80 dark:bg-[#B7F229]/15 text-[#0B1A2D] dark:text-[#B7F229] border border-[#B7F229]/40 font-bold text-xs flex items-center gap-1">
+                              <Check className="w-3.5 h-3.5" />
                               <span>Aceptada</span>
                             </span>
                           ) : (
-                            <span className="px-2.5 py-1 rounded-xl bg-slate-100 dark:bg-[#0E2239] text-slate-500 font-bold text-xs">
+                            <span className="px-2.5 py-1 rounded-md bg-slate-100 dark:bg-[#0E2239] text-slate-500 font-bold text-xs">
                               Rechazada
                             </span>
                           )}
@@ -2109,40 +2101,42 @@ export const AdminMatches: React.FC = () => {
               </div>
             </div>
 
-            {/* 3. BOTONERA INFERIOR INTELIGENTE Y NO INTRUSIVA (LEVEL 3) */}
-            <div className="px-5 sm:px-6 py-3.5 border-t border-slate-100 dark:border-[#1A314D] bg-white dark:bg-[#071220] shrink-0">
+            {/* Barra de acciones inferior coherente */}
+            <footer className="px-5 sm:px-6 py-3.5 pb-[max(0.875rem,env(safe-area-inset-bottom))] border-t border-slate-100 dark:border-[#1A314D] bg-white dark:bg-[#071220] shrink-0">
               <div className="flex items-center gap-2">
-                {/* Acción Primaria Prominente: Compartir / Notificar (Único elemento en Verde Lima) */}
                 <button
                   type="button"
                   onClick={() => {
                     const m = selectedMatchForDetail;
                     handleOpenShareNotifyHub(m);
                   }}
-                  className="flex-1 h-12 rounded-xl bg-[#B7F229] hover:bg-[#a6df17] text-[#0B1A2D] font-black text-sm transition flex items-center justify-center gap-2 cursor-pointer shadow-sm active:scale-98"
+                  className="flex-1 h-12 px-5 rounded-xl bg-[#B7F229] hover:bg-[#a6df17] text-[#0B1A2D] font-bold text-sm transition flex items-center justify-center gap-2 cursor-pointer shadow-xs active:scale-[0.98]"
                 >
-                  <Share2 className="w-4 h-4 text-[#0B1A2D]" />
-                  <span>Compartir / Notificar</span>
+                  <Share2 className="w-4 h-4 text-[#0B1A2D] shrink-0" />
+                  <span className="truncate">Compartir / Notificar</span>
                 </button>
 
-                {/* Acción Secundaria Rápida: Copiar Enlace */}
                 <button
                   type="button"
                   onClick={() => handleCopyMatchLink(selectedMatchForDetail.id)}
-                  className="h-12 px-3.5 rounded-xl bg-slate-50 dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] text-slate-700 dark:text-slate-200 font-bold text-xs hover:bg-slate-100 dark:hover:bg-[#132A45] transition flex items-center gap-1.5 cursor-pointer shadow-2xs shrink-0"
+                  className="h-12 px-4 rounded-xl bg-slate-50 dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] text-[#0B1A2D] dark:text-slate-200 font-bold text-xs hover:bg-slate-100 dark:hover:bg-[#132A45] transition flex items-center gap-1.5 cursor-pointer shrink-0"
                   title="Copiar enlace de convocatoria"
                 >
                   <Copy className="w-4 h-4 text-slate-500 dark:text-slate-300" />
                   <span className="hidden sm:inline">Copiar</span>
                 </button>
 
-                {/* Menú Más Acciones (...) */}
                 <div className="relative shrink-0">
                   <button
                     type="button"
                     onClick={() => setShowMatchMoreActions(!showMatchMoreActions)}
-                    className="h-12 w-12 rounded-xl bg-slate-50 dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#132A45] flex items-center justify-center transition cursor-pointer shadow-2xs"
+                    className={`h-12 w-12 rounded-xl border flex items-center justify-center transition cursor-pointer ${
+                      showMatchMoreActions
+                        ? 'bg-[#0B1A2D] text-white border-[#0B1A2D]'
+                        : 'bg-slate-50 hover:bg-slate-100 dark:bg-[#0E2239] dark:hover:bg-[#132A45] border-slate-200/80 dark:border-[#1A314D] text-[#0B1A2D] dark:text-slate-300'
+                    }`}
                     title="Más opciones de gestión"
+                    aria-label="Más opciones"
                   >
                     <MoreVertical className="w-5 h-5" />
                   </button>
@@ -2162,7 +2156,7 @@ export const AdminMatches: React.FC = () => {
                               const m = selectedMatchForDetail;
                               handleOpenNotifyGroup(m);
                             }}
-                            className="w-full text-left px-3 py-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-[#132A45] text-slate-700 dark:text-slate-200 text-xs font-bold flex items-center gap-2.5 transition cursor-pointer"
+                            className="w-full text-left px-3 py-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-[#132A45] text-[#0B1A2D] dark:text-slate-200 text-xs font-bold flex items-center gap-2.5 transition cursor-pointer"
                           >
                             <Megaphone className="w-4 h-4 text-slate-500" />
                             <span>Notificar a grupo</span>
@@ -2174,7 +2168,7 @@ export const AdminMatches: React.FC = () => {
                             setShowMatchMoreActions(false);
                             handleOpenEditMatch(selectedMatchForDetail);
                           }}
-                          className="w-full text-left px-3 py-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-[#132A45] text-slate-700 dark:text-slate-200 text-xs font-bold flex items-center gap-2.5 transition cursor-pointer"
+                          className="w-full text-left px-3 py-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-[#132A45] text-[#0B1A2D] dark:text-slate-200 text-xs font-bold flex items-center gap-2.5 transition cursor-pointer"
                         >
                           <Edit3 className="w-4 h-4 text-slate-500" />
                           <span>Editar partida</span>
@@ -2196,16 +2190,15 @@ export const AdminMatches: React.FC = () => {
                   )}
                 </div>
 
-                {/* Botón Cerrar */}
                 <button
                   type="button"
                   onClick={closeMatchDetail}
-                  className="h-12 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-[#0E2239] dark:hover:bg-[#132A45] text-slate-700 dark:text-slate-200 font-bold text-xs cursor-pointer transition shrink-0"
+                  className="h-12 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-[#0E2239] dark:hover:bg-[#132A45] border border-slate-200/80 dark:border-[#1A314D] text-[#0B1A2D] dark:text-slate-200 font-bold text-xs cursor-pointer transition shrink-0"
                 >
                   Cerrar
                 </button>
               </div>
-            </div>
+            </footer>
           </div>
         </div>
       )}
@@ -3056,286 +3049,341 @@ export const AdminMatches: React.FC = () => {
       )}
 
       {/* ======================================================================
-          MODAL 8: HUB UNIFICADO PARA COMPARTIR Y NOTIFICAR
+          MODAL 8: COMPARTIR Y NOTIFICAR PARTIDA
           ====================================================================== */}
       {shareNotifyMatch && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs animate-in fade-in duration-150">
-          <div className="w-full max-w-xl rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl p-6 sm:p-7 space-y-4 max-h-[92vh] overflow-y-auto text-slate-900 dark:text-slate-100">
-            {/* Header */}
-            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
-              <div className="flex items-center gap-2.5">
-                <div className="p-2 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-xs">
-                  <Share2 className="w-5 h-5" />
-                </div>
-                <div>
-                  <h3 className="text-base font-black text-slate-900 dark:text-white">
-                    Compartir / Notificar Partida
-                  </h3>
-                  <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                    Hub centralizado para difusión multicanal y convocatoria segmentada de jugadores
-                  </p>
-                </div>
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="Compartir / Notificar Partida"
+          className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center bg-slate-950/70 dark:bg-black/85 backdrop-blur-md p-0 sm:p-4 lg:p-6 overflow-hidden animate-in fade-in duration-200"
+          onClick={() => setShareNotifyMatch(null)}
+        >
+          <div
+            className="w-full sm:max-w-xl max-h-[92dvh] sm:max-h-[90vh] bg-white dark:bg-[#071220] border-t sm:border border-slate-200/90 dark:border-[#1A314D] rounded-t-3xl sm:rounded-3xl shadow-2xl flex flex-col overflow-hidden text-[#0B1A2D] dark:text-slate-100 animate-in slide-in-from-bottom-4 sm:zoom-in-95 duration-200"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Barra de arrastre en móvil */}
+            <div className="w-11 h-1 bg-slate-300 dark:bg-slate-700 rounded-full mx-auto mt-2.5 mb-0.5 sm:hidden shrink-0" />
+
+            {/* Cabecera limpia alineada con Panel de Control */}
+            <header className="px-5 sm:px-6 py-3.5 border-b border-slate-100 dark:border-[#1A314D] flex items-center justify-between gap-4 bg-white dark:bg-[#071220] shrink-0">
+              <div className="min-w-0">
+                <h2 className="text-lg sm:text-xl font-bold tracking-tight text-[#0B1A2D] dark:text-white leading-tight truncate">
+                  Compartir / Notificar
+                </h2>
+                <p className="text-xs text-slate-500 dark:text-slate-400 truncate mt-0.5 tabular-nums">
+                  {shareNotifyMatch.courtName} · Play! #{shareNotifyMatch.id.slice(-6).toUpperCase()}
+                </p>
               </div>
               <button
                 type="button"
                 onClick={() => setShareNotifyMatch(null)}
-                className="p-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white"
+                className="min-h-[44px] min-w-[44px] w-11 h-11 rounded-2xl bg-slate-50 dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] flex items-center justify-center text-[#0B1A2D] dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-[#132A45] transition cursor-pointer active:scale-95 shrink-0"
+                aria-label="Cerrar compartir partida"
               >
                 <X className="w-5 h-5" />
               </button>
-            </div>
+            </header>
 
-            {/* Resumen de la Partida */}
-            <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 space-y-2 text-xs">
-              <div className="flex items-center justify-between font-bold">
-                <span className="flex items-center gap-1.5 text-slate-900 dark:text-white">
-                  <Clock className="w-3.5 h-3.5 text-emerald-500" />
-                  <span>{shareNotifyMatch.courtName} · {shareNotifyMatch.startTime.replace('T', ' ')}</span>
-                </span>
-                <span className="px-2.5 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300 font-bold text-[10px]">
-                  {4 - shareNotifyMatch.players.length} plazas libres
-                </span>
-              </div>
-              <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 pt-1 border-t border-slate-200/60 dark:border-slate-800/60">
-                <span>Rango requerido: <strong className="text-slate-800 dark:text-slate-200">{shareNotifyMatch.minLevel.toFixed(2)} - {shareNotifyMatch.maxLevel.toFixed(2)}</strong></span>
-                <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400">
-                  {shareNotifyMatch.pricePerPlayer.toFixed(2)} €/jugador
-                </span>
-              </div>
-            </div>
-
-            {/* Enlace Directo Copiable */}
-            <div className="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 flex items-center justify-between gap-2">
-              <span className="text-[11px] font-mono text-slate-600 dark:text-slate-300 truncate select-all">
-                https://setmio.com/partida/{shareNotifyMatch.id}
-              </span>
-              <button
-                type="button"
-                onClick={() => handleCopyMatchLink(shareNotifyMatch.id)}
-                className="px-2.5 py-1 rounded-lg bg-white dark:bg-slate-900 hover:bg-slate-50 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 text-[11px] font-bold transition flex items-center gap-1 cursor-pointer shrink-0 shadow-2xs"
-              >
-                <Copy className="w-3 h-3 text-emerald-500" />
-                <span>Copiar enlace</span>
-              </button>
-            </div>
-
-            <form onSubmit={handleSendShareNotifyHub} className="space-y-4 text-xs">
-              {/* 1. Selector dinámico de canal */}
-              <div>
-                <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">
-                  1. Seleccionar Canal de Difusión:
-                </label>
-                <div className="grid grid-cols-3 gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setShareChannel('whatsapp')}
-                    className={`p-3 rounded-2xl border text-xs font-bold flex flex-col items-center justify-center gap-1.5 transition cursor-pointer ${
-                      shareChannel === 'whatsapp'
-                        ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-500 text-emerald-700 dark:text-emerald-300 shadow-2xs'
-                        : 'bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400'
-                    }`}
-                  >
-                    <MessageCircle className="w-5 h-5 text-emerald-500" />
-                    <span>WhatsApp</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setShareChannel('email')}
-                    className={`p-3 rounded-2xl border text-xs font-bold flex flex-col items-center justify-center gap-1.5 transition cursor-pointer ${
-                      shareChannel === 'email'
-                        ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-500 text-emerald-700 dark:text-emerald-300 shadow-2xs'
-                        : 'bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400'
-                    }`}
-                  >
-                    <Mail className="w-5 h-5 text-indigo-500" />
-                    <span>Email</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setShareChannel('push')}
-                    className={`p-3 rounded-2xl border text-xs font-bold flex flex-col items-center justify-center gap-1.5 transition cursor-pointer ${
-                      shareChannel === 'push'
-                        ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-500 text-emerald-700 dark:text-emerald-300 shadow-2xs'
-                        : 'bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400'
-                    }`}
-                  >
-                    <Smartphone className="w-5 h-5 text-amber-500" />
-                    <span>Push In-App</span>
-                  </button>
-                </div>
-              </div>
-
-              {/* 2. Segmentación de Destinatarios */}
-              <div>
-                <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">
-                  2. Segmentar Destinatarios por:
-                </label>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 p-1 rounded-xl bg-slate-100 dark:bg-slate-800/80 mb-2.5">
-                  <button
-                    type="button"
-                    onClick={() => setSegmentType('level')}
-                    className={`py-1.5 px-2 rounded-lg text-[11px] font-bold transition cursor-pointer ${
-                      segmentType === 'level'
-                        ? 'bg-white dark:bg-slate-900 text-emerald-600 dark:text-emerald-400 shadow-xs'
-                        : 'text-slate-600 dark:text-slate-400'
-                    }`}
-                  >
-                    Nivel ELO
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setSegmentType('group')}
-                    className={`py-1.5 px-2 rounded-lg text-[11px] font-bold transition cursor-pointer ${
-                      segmentType === 'group'
-                        ? 'bg-white dark:bg-slate-900 text-emerald-600 dark:text-emerald-400 shadow-xs'
-                        : 'text-slate-600 dark:text-slate-400'
-                    }`}
-                  >
-                    👥 Grupos
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setSegmentType('teams')}
-                    className={`py-1.5 px-2 rounded-lg text-[11px] font-bold transition cursor-pointer ${
-                      segmentType === 'teams'
-                        ? 'bg-white dark:bg-slate-900 text-amber-600 dark:text-amber-400 shadow-xs'
-                        : 'text-slate-600 dark:text-slate-400'
-                    }`}
-                  >
-                    🏆 Equipos
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setSegmentType('individual')}
-                    className={`py-1.5 px-2 rounded-lg text-[11px] font-bold transition cursor-pointer ${
-                      segmentType === 'individual'
-                        ? 'bg-white dark:bg-slate-900 text-emerald-600 dark:text-emerald-400 shadow-xs'
-                        : 'text-slate-600 dark:text-slate-400'
-                    }`}
-                  >
-                    Individual
-                  </button>
-                </div>
-
-                {/* Sub-selector según Segmentación */}
-                {segmentType === 'level' && (
-                  <div className="p-3 rounded-2xl bg-emerald-50/60 dark:bg-emerald-950/40 border border-emerald-500/20 space-y-1">
-                    <span className="font-bold text-slate-900 dark:text-white flex items-center justify-between">
-                      <span>Rango ELO seleccionado:</span>
-                      <span className="font-mono text-emerald-600 dark:text-emerald-400">
-                        {shareNotifyMatch.minLevel.toFixed(2)} - {shareNotifyMatch.maxLevel.toFixed(2)}
-                      </span>
+            {/* Cuerpo scrollable */}
+            <div className="px-5 sm:px-6 py-4 sm:py-5 overflow-y-auto overscroll-contain flex-1 space-y-4 text-xs">
+              {/* Resumen de la Partida + Jugadores Inscritos */}
+              <div className="p-3.5 rounded-2xl bg-slate-50/80 dark:bg-[#0E2239]/50 border border-slate-200/80 dark:border-[#1A314D] space-y-2.5">
+                <div className="flex items-center justify-between gap-2 flex-wrap">
+                  <span className="flex items-center gap-1.5 font-bold text-[#0B1A2D] dark:text-white">
+                    <Calendar className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                    <span>{formatModalDateEs(shareNotifyMatch.startTime, { compact: true })}</span>
+                    <span className="text-slate-300 dark:text-slate-700">·</span>
+                    <span className="font-mono tabular-nums">
+                      {formatMatchTimeWithDuration(shareNotifyMatch.startTime, shareNotifyMatch.durationMinutes)}
                     </span>
-                    <p className="text-[11px] text-slate-600 dark:text-slate-400">
-                      Se enviará automáticamente a los <strong>18 socios cualificados</strong> del club cuyo nivel Play! o ELO coincide con esta partida.
-                    </p>
-                  </div>
-                )}
+                  </span>
+                  <span className="text-[11px] font-bold text-slate-600 dark:text-slate-300 tabular-nums shrink-0">
+                    {Math.max(0, 4 - shareNotifyMatch.players.length)} plazas libres
+                  </span>
+                </div>
 
-                {segmentType === 'group' && (
-                  <div className="space-y-1">
-                    <label className="block text-[11px] font-bold text-emerald-700 dark:text-emerald-300">
-                      Grupo Social / Comunidad del Club:
-                    </label>
-                    <select
-                      value={selectedGroupId}
-                      onChange={(e) => setSelectedGroupId(e.target.value)}
-                      className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-bold text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
-                    >
-                      {playerGroups.map((g) => (
-                        <option key={g.id} value={g.id}>
-                          👥 {g.name} ({g.memberCount} socios · {g.category.toUpperCase()})
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                )}
+                <div className="flex items-center justify-between gap-2 text-[11px] text-slate-500 dark:text-slate-400 pt-2 border-t border-slate-200/70 dark:border-[#1A314D]">
+                  <span className="tabular-nums">
+                    Nivel <strong className="font-mono text-[#0B1A2D] dark:text-white">{shareNotifyMatch.minLevel.toFixed(2)} - {shareNotifyMatch.maxLevel.toFixed(2)}</strong>
+                  </span>
+                  <span className="font-mono tabular-nums font-bold text-[#0B1A2D] dark:text-[#B7F229]">
+                    {shareNotifyMatch.pricePerPlayer.toFixed(2)} €/jugador
+                  </span>
+                </div>
 
-                {segmentType === 'teams' && (
-                  <div className="space-y-1">
-                    <label className="block text-[11px] font-bold text-amber-700 dark:text-amber-300">
-                      Equipo Federado Oficial:
-                    </label>
-                    <select
-                      value={selectedTeamName}
-                      onChange={(e) => setSelectedTeamName(e.target.value)}
-                      className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-amber-300 dark:border-amber-800 rounded-xl text-xs font-bold text-slate-900 dark:text-white focus:outline-none focus:border-amber-500"
-                    >
-                      <option value="Equipo A Masculino (Federado 1ª)">🏆 Equipo A Masculino (Federado 1ª Gallega · 12 jug.)</option>
-                      <option value="Equipo B Femenino (Federado 2ª)">🏆 Equipo B Femenino (Federado 2ª Gallega · 10 jug.)</option>
-                      <option value="Veteranos +45 (Liga Autonómica)">🏆 Veteranos +45 (Liga Autonómica Social · 14 jug.)</option>
-                      <option value="Equipo Menores / Júnior">🏆 Equipo Menores / Promesas (Júnior · 8 jug.)</option>
-                    </select>
-                  </div>
-                )}
-
-                {segmentType === 'individual' && (
-                  <div className="space-y-1">
-                    <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300">
-                      Socio / Jugador Individual:
-                    </label>
-                    <select
-                      value={selectedIndividualPlayer}
-                      onChange={(e) => setSelectedIndividualPlayer(e.target.value)}
-                      className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-bold text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
-                    >
-                      {CLUB_PLAYERS_LIST.map((p) => (
-                        <option key={p.id} value={p.name}>
-                          {p.name} (Nivel {p.level.toFixed(2)} · {p.phone})
-                        </option>
-                      ))}
-                    </select>
+                {shareNotifyMatch.players.length > 0 && (
+                  <div className="flex items-center justify-between gap-2 pt-2 border-t border-slate-200/70 dark:border-[#1A314D]">
+                    <div className="flex items-center gap-1.5 min-w-0">
+                      <div className="flex items-center -space-x-1.5 shrink-0">
+                        {shareNotifyMatch.players.map((p, idx) => (
+                          <PlayerAvatar
+                            key={idx}
+                            name={p.name}
+                            avatar={(p as { avatar?: string }).avatar}
+                            customers={customers}
+                            size="xs"
+                            className="ring-2 ring-white dark:ring-[#071220]"
+                          />
+                        ))}
+                      </div>
+                      <span className="text-[11px] text-slate-600 dark:text-slate-300 truncate ml-1">
+                        {shareNotifyMatch.players.map((p) => p.name.split(' ')[0]).join(', ')}
+                      </span>
+                    </div>
+                    <span className="text-[10px] font-mono tabular-nums text-slate-400 shrink-0">
+                      {shareNotifyMatch.players.length}/4 inscritos
+                    </span>
                   </div>
                 )}
               </div>
 
-              {/* 3. Mensaje Personalizable */}
-              <div>
-                <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
-                  Asunto del aviso:
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={hubSubject}
-                  onChange={(e) => setHubSubject(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
-                />
+              {/* Enlace Directo Copiable */}
+              <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-[#0E2239]/40 border border-slate-200/80 dark:border-[#1A314D] flex items-center justify-between gap-2">
+                <span className="text-[11px] font-mono text-slate-600 dark:text-slate-300 truncate select-all px-1">
+                  https://setmio.com/partida/{shareNotifyMatch.id}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => handleCopyMatchLink(shareNotifyMatch.id)}
+                  className="h-8 px-3 rounded-lg bg-white dark:bg-[#071220] hover:bg-slate-100 dark:hover:bg-[#132A45] text-[#0B1A2D] dark:text-slate-200 border border-slate-200/80 dark:border-[#1A314D] text-[11px] font-bold transition flex items-center gap-1.5 cursor-pointer shrink-0"
+                >
+                  <Copy className="w-3 h-3 text-slate-500" />
+                  <span>Copiar</span>
+                </button>
               </div>
 
-              <div>
-                <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
-                  Texto del Mensaje:
-                </label>
-                <textarea
-                  rows={3}
-                  required
-                  value={hubMessage}
-                  onChange={(e) => setHubMessage(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 leading-relaxed"
-                />
-              </div>
+              <form id="share-notify-form" onSubmit={handleSendShareNotifyHub} className="space-y-4 text-xs">
+                {/* 1. Canal de Difusión */}
+                <div>
+                  <label className="block font-bold text-[#0B1A2D] dark:text-slate-200 mb-1.5">
+                    1. Canal de Difusión
+                  </label>
+                  <div className="grid grid-cols-3 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setShareChannel('whatsapp')}
+                      className={`p-3 rounded-2xl border text-xs font-bold flex flex-col items-center justify-center gap-1.5 transition cursor-pointer ${
+                        shareChannel === 'whatsapp'
+                          ? 'bg-[#F0FCCF]/70 dark:bg-[#B7F229]/15 border-[#0B1A2D] dark:border-[#B7F229] text-[#0B1A2D] dark:text-[#B7F229]'
+                          : 'bg-white dark:bg-[#0E2239]/30 border-slate-200/80 dark:border-[#1A314D] text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-[#0E2239]/60'
+                      }`}
+                    >
+                      <MessageCircle className="w-4 h-4" />
+                      <span>WhatsApp</span>
+                    </button>
 
-              {/* Acciones */}
-              <div className="pt-2 flex justify-end gap-2 border-t border-slate-100 dark:border-slate-800">
+                    <button
+                      type="button"
+                      onClick={() => setShareChannel('email')}
+                      className={`p-3 rounded-2xl border text-xs font-bold flex flex-col items-center justify-center gap-1.5 transition cursor-pointer ${
+                        shareChannel === 'email'
+                          ? 'bg-[#F0FCCF]/70 dark:bg-[#B7F229]/15 border-[#0B1A2D] dark:border-[#B7F229] text-[#0B1A2D] dark:text-[#B7F229]'
+                          : 'bg-white dark:bg-[#0E2239]/30 border-slate-200/80 dark:border-[#1A314D] text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-[#0E2239]/60'
+                      }`}
+                    >
+                      <Mail className="w-4 h-4" />
+                      <span>Email</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setShareChannel('push')}
+                      className={`p-3 rounded-2xl border text-xs font-bold flex flex-col items-center justify-center gap-1.5 transition cursor-pointer ${
+                        shareChannel === 'push'
+                          ? 'bg-[#F0FCCF]/70 dark:bg-[#B7F229]/15 border-[#0B1A2D] dark:border-[#B7F229] text-[#0B1A2D] dark:text-[#B7F229]'
+                          : 'bg-white dark:bg-[#0E2239]/30 border-slate-200/80 dark:border-[#1A314D] text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-[#0E2239]/60'
+                      }`}
+                    >
+                      <Smartphone className="w-4 h-4" />
+                      <span>Push App</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* 2. Segmentación de Destinatarios */}
+                <div>
+                  <label className="block font-bold text-[#0B1A2D] dark:text-slate-200 mb-1.5">
+                    2. Segmentar Destinatarios
+                  </label>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 p-1 rounded-xl bg-slate-100 dark:bg-[#0E2239] border border-slate-200/60 dark:border-[#1A314D] mb-2.5">
+                    <button
+                      type="button"
+                      onClick={() => setSegmentType('level')}
+                      className={`py-2 px-2 rounded-lg text-[11px] font-bold transition cursor-pointer ${
+                        segmentType === 'level'
+                          ? 'bg-white dark:bg-[#071220] text-[#0B1A2D] dark:text-[#B7F229] shadow-2xs'
+                          : 'text-slate-600 dark:text-slate-400'
+                      }`}
+                    >
+                      Nivel ELO
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setSegmentType('group')}
+                      className={`py-2 px-2 rounded-lg text-[11px] font-bold transition cursor-pointer ${
+                        segmentType === 'group'
+                          ? 'bg-white dark:bg-[#071220] text-[#0B1A2D] dark:text-[#B7F229] shadow-2xs'
+                          : 'text-slate-600 dark:text-slate-400'
+                      }`}
+                    >
+                      Grupos
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setSegmentType('teams')}
+                      className={`py-2 px-2 rounded-lg text-[11px] font-bold transition cursor-pointer ${
+                        segmentType === 'teams'
+                          ? 'bg-white dark:bg-[#071220] text-[#0B1A2D] dark:text-[#B7F229] shadow-2xs'
+                          : 'text-slate-600 dark:text-slate-400'
+                      }`}
+                    >
+                      Equipos
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setSegmentType('individual')}
+                      className={`py-2 px-2 rounded-lg text-[11px] font-bold transition cursor-pointer ${
+                        segmentType === 'individual'
+                          ? 'bg-white dark:bg-[#071220] text-[#0B1A2D] dark:text-[#B7F229] shadow-2xs'
+                          : 'text-slate-600 dark:text-slate-400'
+                      }`}
+                    >
+                      Individual
+                    </button>
+                  </div>
+
+                  {segmentType === 'level' && (
+                    <div className="p-3 rounded-2xl bg-slate-50 dark:bg-[#0E2239]/40 border border-slate-200/80 dark:border-[#1A314D] space-y-1">
+                      <span className="font-bold text-[#0B1A2D] dark:text-white flex items-center justify-between">
+                        <span>Rango ELO seleccionado</span>
+                        <span className="font-mono tabular-nums text-[#0B1A2D] dark:text-[#B7F229]">
+                          {shareNotifyMatch.minLevel.toFixed(2)} - {shareNotifyMatch.maxLevel.toFixed(2)}
+                        </span>
+                      </span>
+                      <p className="text-[11px] text-slate-600 dark:text-slate-400">
+                        Envío automático a los <strong className="tabular-nums">18 socios</strong> cuyo nivel coincide con esta partida.
+                      </p>
+                    </div>
+                  )}
+
+                  {segmentType === 'group' && (
+                    <div className="space-y-1">
+                      <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-300">
+                        Grupo o Comunidad del Club
+                      </label>
+                      <select
+                        value={selectedGroupId}
+                        onChange={(e) => setSelectedGroupId(e.target.value)}
+                        className="w-full h-10 px-3 bg-slate-50 dark:bg-[#0E2239]/50 border border-slate-200 dark:border-[#1A314D] rounded-xl text-xs font-semibold text-[#0B1A2D] dark:text-white focus:outline-none focus:border-[#0B1A2D] dark:focus:border-[#B7F229]"
+                      >
+                        {playerGroups.map((g) => (
+                          <option key={g.id} value={g.id}>
+                            {g.name} ({g.memberCount} socios · {g.category.toUpperCase()})
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+
+                  {segmentType === 'teams' && (
+                    <div className="space-y-1">
+                      <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-300">
+                        Equipo Federado Oficial
+                      </label>
+                      <select
+                        value={selectedTeamName}
+                        onChange={(e) => setSelectedTeamName(e.target.value)}
+                        className="w-full h-10 px-3 bg-slate-50 dark:bg-[#0E2239]/50 border border-slate-200 dark:border-[#1A314D] rounded-xl text-xs font-semibold text-[#0B1A2D] dark:text-white focus:outline-none focus:border-[#0B1A2D] dark:focus:border-[#B7F229]"
+                      >
+                        <option value="Equipo A Masculino (Federado 1ª)">Equipo A Masculino (Federado 1ª Gallega · 12 jug.)</option>
+                        <option value="Equipo B Femenino (Federado 2ª)">Equipo B Femenino (Federado 2ª Gallega · 10 jug.)</option>
+                        <option value="Veteranos +45 (Liga Autonómica)">Veteranos +45 (Liga Autonómica · 14 jug.)</option>
+                        <option value="Equipo Menores / Júnior">Equipo Menores / Promesas (Júnior · 8 jug.)</option>
+                      </select>
+                    </div>
+                  )}
+
+                  {segmentType === 'individual' && (
+                    <div className="space-y-1.5">
+                      <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-300">
+                        Socio / Jugador Individual
+                      </label>
+                      <div className="flex items-center gap-2.5">
+                        <PlayerAvatar
+                          name={selectedIndividualPlayer}
+                          customers={customers}
+                          size="md"
+                        />
+                        <select
+                          value={selectedIndividualPlayer}
+                          onChange={(e) => setSelectedIndividualPlayer(e.target.value)}
+                          className="flex-1 h-10 px-3 bg-slate-50 dark:bg-[#0E2239]/50 border border-slate-200 dark:border-[#1A314D] rounded-xl text-xs font-semibold text-[#0B1A2D] dark:text-white focus:outline-none focus:border-[#0B1A2D] dark:focus:border-[#B7F229]"
+                        >
+                          {CLUB_PLAYERS_LIST.map((p) => (
+                            <option key={p.id} value={p.name}>
+                              {p.name} (Nivel {p.level.toFixed(2)} · {p.phone})
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* 3. Mensaje Personalizable */}
+                <div>
+                  <label className="block font-bold text-[#0B1A2D] dark:text-slate-200 mb-1">
+                    Asunto del aviso
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={hubSubject}
+                    onChange={(e) => setHubSubject(e.target.value)}
+                    className="w-full h-10 px-3 bg-slate-50 dark:bg-[#0E2239]/40 border border-slate-200 dark:border-[#1A314D] rounded-xl text-xs text-[#0B1A2D] dark:text-white focus:outline-none focus:border-[#0B1A2D] dark:focus:border-[#B7F229]"
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-bold text-[#0B1A2D] dark:text-slate-200 mb-1">
+                    Texto del Mensaje
+                  </label>
+                  <textarea
+                    rows={3}
+                    required
+                    value={hubMessage}
+                    onChange={(e) => setHubMessage(e.target.value)}
+                    className="w-full px-3 py-2.5 bg-slate-50 dark:bg-[#0E2239]/40 border border-slate-200 dark:border-[#1A314D] rounded-xl text-xs text-[#0B1A2D] dark:text-white focus:outline-none focus:border-[#0B1A2D] dark:focus:border-[#B7F229] leading-relaxed resize-none"
+                  />
+                </div>
+              </form>
+            </div>
+
+            {/* Barra de acciones inferior coherente */}
+            <footer className="px-5 sm:px-6 py-3.5 pb-[max(0.875rem,env(safe-area-inset-bottom))] border-t border-slate-100 dark:border-[#1A314D] bg-white dark:bg-[#071220] shrink-0">
+              <div className="flex items-center gap-2">
+                <button
+                  type="submit"
+                  form="share-notify-form"
+                  className="flex-1 h-12 px-5 rounded-xl bg-[#B7F229] hover:bg-[#a6df17] text-[#0B1A2D] font-bold text-sm transition shadow-xs flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98]"
+                >
+                  <Send className="w-4 h-4 text-[#0B1A2D] shrink-0" />
+                  <span className="truncate">
+                    Enviar por {shareChannel === 'whatsapp' ? 'WhatsApp' : shareChannel === 'email' ? 'Email' : 'Push'}
+                  </span>
+                </button>
+
                 <button
                   type="button"
                   onClick={() => setShareNotifyMatch(null)}
-                  className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs cursor-pointer"
+                  className="h-12 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-[#0E2239] dark:hover:bg-[#132A45] border border-slate-200/80 dark:border-[#1A314D] text-[#0B1A2D] dark:text-slate-200 font-bold text-xs cursor-pointer transition shrink-0"
                 >
                   Cancelar
                 </button>
-                <button
-                  type="submit"
-                  className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md flex items-center gap-1.5 cursor-pointer active:scale-95"
-                >
-                  <Send className="w-4 h-4" />
-                  <span>Enviar por {shareChannel === 'whatsapp' ? 'WhatsApp' : shareChannel === 'email' ? 'Email' : 'Push'}</span>
-                </button>
               </div>
-            </form>
+            </footer>
           </div>
         </div>
       )}

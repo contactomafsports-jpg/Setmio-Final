@@ -138,6 +138,22 @@ export const SetmioWordmark: React.FC<{
   const navyLogo = '/branding/setmio-horizontal-navy.png';
   const whiteLogo = '/branding/setmio-horizontal-white.png';
 
+  if (theme === 'dark') {
+    return (
+      <span className={`inline-flex max-w-full ${heightClass} select-none`} aria-label="Setmio Pádel">
+        <img src={whiteLogo} alt="Setmio Pádel" className={imageClass} />
+      </span>
+    );
+  }
+
+  if (theme === 'light') {
+    return (
+      <span className={`inline-flex max-w-full ${heightClass} select-none`} aria-label="Setmio Pádel">
+        <img src={navyLogo} alt="Setmio Pádel" className={imageClass} />
+      </span>
+    );
+  }
+
   return (
     <span className={`inline-flex max-w-full ${heightClass} select-none`} aria-label="Setmio Pádel">
       <img src={navyLogo} alt="Setmio Pádel" className={`${imageClass} dark:hidden`} />

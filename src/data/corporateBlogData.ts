@@ -1,4 +1,8 @@
 import { BlogPost } from '../types/database';
+import heroCourtImg from '../assets/images/setmio_hero_court_1795368969510.jpg';
+import proFacilityImg from '../assets/images/setmio_pro_facility_1795368970973.jpg';
+import playerFocusImg from '../assets/images/setmio_player_focus_1795368971038.jpg';
+import clubMatchImg from '../assets/images/hero_padel_club_1794872242820.jpg';
 
 export const CORPORATE_BLOG_POSTS: BlogPost[] = [
   {
@@ -31,7 +35,7 @@ Las cerraduras electromagnéticas y teclados antivandálicos Salto KS eliminan l
 
 ### 3. Resultados operativos reales
 Los clubes que han implementado la domótica integral de Setmio registran una reducción media del 65% en su factura de luz y la posibilidad de abrir horarios de juego no tripulados a primera hora de la mañana y medianoche sin incrementar personal.`,
-    coverImage: 'https://images.unsplash.com/photo-1554068865-24cecd4e34b8?auto=format&fit=crop&w=1200&q=80',
+    coverImage: heroCourtImg,
     author: 'Equipo de Ingeniería Setmio IoT',
     category: 'Tecnología & Domótica',
     readingTime: 5,
@@ -63,7 +67,7 @@ Con Setmio, cada club dispone de un ecosistema tecnológico 100% personalizado:
 
 ### 3. Aumento del 40% en la retención de socios
 Al unificar reservas, escuela, partidos abiertos Play! y tienda oficial bajo una misma marca del club, la tasa de recurrencia mensual aumenta significativamente.`,
-    coverImage: 'https://images.unsplash.com/photo-1526676037777-05a232554f77?auto=format&fit=crop&w=1200&q=80',
+    coverImage: proFacilityImg,
     author: 'Consultoría SaaS Setmio',
     category: 'Gestión de Clubes',
     readingTime: 6,
@@ -95,7 +99,7 @@ El monedero digital interno fideliza la tesorería del club:
 
 ### 3. Partidos abiertos Play! para completar cuadrantes
 Cuando a una reserva le faltan 1 o 2 jugadores, la función de partido abierto notifica a los jugadores del mismo nivel NSRP mediante WhatsApp o notificación push, logrando que ninguna pista quede vacía por cancelaciones de última hora.`,
-    coverImage: 'https://images.unsplash.com/photo-1517649763962-0c623266ddc0?auto=format&fit=crop&w=1200&q=80',
+    coverImage: playerFocusImg,
     author: 'Área de Estrategia de Negocio Setmio',
     category: 'Finanzas & Ocupación',
     readingTime: 4,
@@ -126,7 +130,7 @@ Organizar torneos y ligas con Setmio es ágil y profesional:
 - **Inscripción y pago online de parejas:** Cierre automático de inscripciones al alcanzar el cupo máximo.
 - **Generación de cuadros y brackets:** Cuadros principales, consolación y cruces automáticos.
 - **Publicación de resultados en directo:** Los participantes consultan sus horarios de partido y resultados desde su propio teléfono móvil.`,
-    coverImage: 'https://images.unsplash.com/photo-1521537634581-0dced2fee2ef?auto=format&fit=crop&w=1200&q=80',
+    coverImage: clubMatchImg,
     author: 'Dpto. de Producto & Competición Setmio',
     category: 'Escuelas & Competición',
     readingTime: 5,

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useApp, getLastActiveRoute, getSavedAdminSession, clearAdminSession } from './context/AppContext';
+import { useApp, PublicPage, getLastActiveRoute, getSavedAdminSession, clearAdminSession } from './context/AppContext';
 import { RoleSelectorModal } from './components/common/RoleSelectorModal';
 import { Navbar } from './components/common/Navbar';
 import { Footer } from './components/common/Footer';
@@ -114,6 +114,10 @@ export function App() {
       '/soluciones/clubes': 'solution_clubs',
       '/soluciones/escuelas': 'solution_schools',
       '/soluciones/profesores': 'solution_coaches',
+      '/soluciones/administraciones': 'solution_councils',
+      '/soluciones/ayuntamientos': 'solution_councils',
+      '/soluciones/federaciones': 'solution_federations',
+      '/soluciones/equipos': 'solution_teams',
       '/soluciones/jugadores': 'players_app',
       '/soluciones/jugadores-profesionales': 'solution_pro_players',
       '/para-jugadores': 'players_app',
@@ -124,6 +128,7 @@ export function App() {
       '/demo': 'demo',
       '/blog': 'blog',
       '/contacto': 'contact',
+      '/legal': 'legal',
       '/precios': 'pricing',
     };
     const syncRoute = () => {
@@ -244,10 +249,15 @@ export function App() {
         return;
       }
 
-      // URLs de gestión interna
+      // URLs de blog y módulos corporativos (L2 / L3)
       if (pathname === '/blog' || pathname.startsWith('/blog/')) {
         setCurrentView('public');
         setPublicPage('blog');
+        return;
+      }
+      if (pathname.startsWith('/modulos/') || pathname.startsWith('/funcionalidades/')) {
+        setCurrentView('public');
+        setPublicPage('features');
         return;
       }
       if (pathname === '/admin' || pathname === '/gestion') {
@@ -483,9 +493,41 @@ export function App() {
       case 'solution_clubs':
       case 'solution_schools':
       case 'solution_coaches':
+      case 'solution_councils':
+      case 'solution_federations':
+      case 'solution_teams':
       case 'solution_players':
-      case 'solution_pro_players':
-        return <SolucionesPage onOpenRegister={() => { setRegistrationOpen(true); setAuthOpen(true); }} roleId={publicPage === 'solution_clubs' ? 'clubes' : publicPage === 'solution_schools' ? 'escuelas' : publicPage === 'solution_coaches' ? 'profesores' : publicPage === 'solution_players' ? 'jugadores' : publicPage === 'solution_pro_players' ? 'profesionales' : undefined} onOpenRole={(roleId) => setPublicPage(`solution_${roleId === 'clubes' ? 'clubs' : roleId === 'escuelas' ? 'schools' : roleId === 'profesores' ? 'coaches' : roleId === 'jugadores' ? 'players' : 'pro_players'}` as typeof publicPage)} onBack={goHome} onOpenDemo={() => setRoleSelectorOpen(true)} />;
+      case 'solution_pro_players': {
+        const roleIdMap: Partial<Record<typeof publicPage, string>> = {
+          solution_clubs: 'clubes',
+          solution_schools: 'escuelas',
+          solution_coaches: 'profesores',
+          solution_councils: 'administraciones',
+          solution_federations: 'federaciones',
+          solution_teams: 'equipos',
+          solution_players: 'jugadores',
+          solution_pro_players: 'profesionales',
+        };
+        const pageMap: Record<string, PublicPage> = {
+          clubes: 'solution_clubs',
+          escuelas: 'solution_schools',
+          profesores: 'solution_coaches',
+          administraciones: 'solution_councils',
+          federaciones: 'solution_federations',
+          equipos: 'solution_teams',
+          jugadores: 'players_app',
+          profesionales: 'solution_pro_players',
+        };
+        return (
+          <SolucionesPage
+            onOpenRegister={() => { setRegistrationOpen(true); setAuthOpen(true); }}
+            roleId={roleIdMap[publicPage]}
+            onOpenRole={(roleId) => setPublicPage(pageMap[roleId] || 'solutions')}
+            onBack={goHome}
+            onOpenDemo={() => setRoleSelectorOpen(true)}
+          />
+        );
+      }
       case 'players_app':
         return <ParaJugadoresPage onBack={goHome} onOpenDemo={() => setRoleSelectorOpen(true)} onOpenRegister={() => { setRegistrationOpen(true); setAuthOpen(true); }} />;
       case 'modules':
