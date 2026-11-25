@@ -13,6 +13,10 @@ import {
   Trophy,
   Building2,
   GraduationCap,
+  Users,
+  Layers,
+  Landmark,
+  Award,
 } from 'lucide-react';
 import { isSupabaseConfigured, supabase } from '../../lib/supabase';
 
@@ -24,6 +28,75 @@ interface AuthModalProps {
 }
 
 export type OnboardingRole = 'club_admin' | 'coach' | 'player';
+export type EcosystemTrack = 'pro' | 'player';
+export type ProProfileId =
+  | 'club'
+  | 'academy'
+  | 'coach'
+  | 'team'
+  | 'organizer'
+  | 'council'
+  | 'pro_player';
+
+interface ProProfileOption {
+  id: ProProfileId;
+  mappedRole: OnboardingRole;
+  icon: React.ComponentType<{ className?: string }>;
+  title: string;
+  desc: string;
+}
+
+const PRO_PROFILES: ProProfileOption[] = [
+  {
+    id: 'club',
+    mappedRole: 'club_admin',
+    icon: Building2,
+    title: 'Club de Pádel',
+    desc: 'Pistas, reservas, TPV, domótica y marca blanca.',
+  },
+  {
+    id: 'academy',
+    mappedRole: 'club_admin',
+    icon: Users,
+    title: 'Academia / Escuela',
+    desc: 'Grupos, matrículas, profesores y evaluaciones.',
+  },
+  {
+    id: 'coach',
+    mappedRole: 'coach',
+    icon: GraduationCap,
+    title: 'Entrenador / Profesor',
+    desc: 'Agenda particular, alumnos, bonos y cobros.',
+  },
+  {
+    id: 'team',
+    mappedRole: 'club_admin',
+    icon: Trophy,
+    title: 'Equipos',
+    desc: 'Plantillas, convocatorias, actas y alineaciones.',
+  },
+  {
+    id: 'organizer',
+    mappedRole: 'club_admin',
+    icon: Layers,
+    title: 'Organizador / Federación',
+    desc: 'Torneos, ligas multi-sede, cuadros y rankings.',
+  },
+  {
+    id: 'council',
+    mappedRole: 'club_admin',
+    icon: Landmark,
+    title: 'Ayuntamiento / Pública',
+    desc: 'Instalación municipal, tarifas y empadronados.',
+  },
+  {
+    id: 'pro_player',
+    mappedRole: 'coach',
+    icon: Award,
+    title: 'Jugador Profesional',
+    desc: 'Circuito, patrocinadores, clinics y marca propia.',
+  },
+];
 
 export const AuthModal: React.FC<AuthModalProps> = ({
   isOpen,
@@ -43,6 +116,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
   const [mode, setMode] = useState<'login' | 'register'>(initialMode);
   const [registerStep, setRegisterStep] = useState<1 | 2 | 3 | 4>(1);
+  const [ecosystemTrack, setEcosystemTrack] = useState<EcosystemTrack>('pro');
+  const [selectedProProfile, setSelectedProProfile] = useState<ProProfileId>('club');
   const [selectedRole, setSelectedRole] = useState<OnboardingRole>('club_admin');
   const [urlPlan, setUrlPlan] = useState<string | null>(null);
 
@@ -56,6 +131,11 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const [clubCity, setClubCity] = useState('Madrid');
   const [selectedPlan, setSelectedPlan] = useState<'club_base' | 'profesional' | 'enterprise'>('profesional');
   const [needDomotica, setNeedDomotica] = useState(true);
+
+  const [teamCategory, setTeamCategory] = useState('1ª Categoría / Liga Interclubes');
+  const [organizerScope, setOrganizerScope] = useState('Circuito Autonómico / 4+ sedes');
+  const [proCircuit, setProCircuit] = useState('Premier Padel / FIP');
+  const [proRanking, setProRanking] = useState('Top 100 · Cuadro Final');
 
   const [coachType, setCoachType] = useState('Independiente / Autónomo');
   const [coachCertification, setCoachCertification] = useState('Monitor Nacional FEP');
@@ -83,13 +163,16 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       const planParam = params.get('plan');
       if (planParam) {
         setUrlPlan(planParam);
+        setEcosystemTrack('pro');
         if (planParam === 'coach') {
+          setSelectedProProfile('coach');
           setSelectedRole('coach');
         } else {
+          setSelectedProProfile('club');
           setSelectedRole('club_admin');
-          if (planParam === 'club_base' || planParam === 'club') {
+          if (planParam === 'club_base' || planParam === 'club' || planParam === 'esencial') {
             setSelectedPlan('club_base');
-          } else if (planParam === 'enterprise') {
+          } else if (planParam === 'enterprise' || planParam === 'pro') {
             setSelectedPlan('enterprise');
           } else {
             setSelectedPlan('profesional');
@@ -99,10 +182,37 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     }
   }, [isOpen, initialMode]);
 
+  const handleSelectTrack = (track: EcosystemTrack) => {
+    setEcosystemTrack(track);
+    if (track === 'player') {
+      setSelectedRole('player');
+    } else {
+      const profile = PRO_PROFILES.find((p) => p.id === selectedProProfile) || PRO_PROFILES[0];
+      setSelectedRole(profile.mappedRole);
+    }
+  };
+
+  const handleSelectProProfile = (profile: ProProfileOption) => {
+    setEcosystemTrack('pro');
+    setSelectedProProfile(profile.id);
+    setSelectedRole(profile.mappedRole);
+  };
+
+  const activeProOption =
+    PRO_PROFILES.find((p) => p.id === selectedProProfile) || PRO_PROFILES[0];
+
+  const activeRoleSummaryLabel =
+    ecosystemTrack === 'player'
+      ? 'Setmio Player · Jugador y Socio'
+      : `Setmio Pro · ${activeProOption.title}`;
+
   const handleClose = () => {
     onClose();
     if (mode === 'register') {
-      if (typeof window !== 'undefined' && (window.location.pathname === '/registro' || window.location.pathname === '/register')) {
+      if (
+        typeof window !== 'undefined' &&
+        (window.location.pathname === '/registro' || window.location.pathname === '/register')
+      ) {
         window.history.pushState({}, '', '/');
         window.dispatchEvent(new PopStateEvent('popstate'));
       }
@@ -112,18 +222,18 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
   if (!isOpen) return null;
 
-  const handleAutocompleteSetmioID = () => {
-    setFullName('Lucas Rey Domínguez');
-    setEmail('lucas.rey@setmio.com');
-    setPhone('+34 689 44 22 11');
+  const handleAutocompleteDemoLogin = () => {
+    setFullName('Jugador Demo');
+    setEmail('demo.jugador@ejemplo.com');
+    setPhone('+34 600 00 00 00');
     setPassword('Setmio2026!');
     setPlayLevel(4.25);
     setDominantHand('right');
     setPreferredPosition('drive');
     setIsTeamCaptain(true);
     triggerDemoToast(
-      t('auth.autofill.title', 'Autocompletado con Setmio Global ID'),
-      t('auth.autofill.desc', 'Datos deportivos y credenciales federadas cargadas automáticamente.'),
+      t('auth.autofill.title', 'Credenciales de prueba cargadas'),
+      t('auth.autofill.desc', 'Datos de demostración listos para probar el acceso.'),
       'info'
     );
   };
@@ -157,6 +267,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               full_name: fullName,
               tenant_id: currentTenant.id,
               role: selectedRole === 'club_admin' ? 'ADMIN' : selectedRole === 'coach' ? 'COACH' : 'PLAYER',
+              ecosystem_track: ecosystemTrack,
+              pro_profile: ecosystemTrack === 'pro' ? selectedProProfile : 'player',
               play_level: playLevel,
               dominant_hand: dominantHand,
               preferred_position: preferredPosition,
@@ -168,7 +280,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           },
         });
         if (error) throw error;
-        triggerDemoToast('Registro en Supabase', 'Cuenta creada con éxito. Perfil vinculado.', 'success');
+        triggerDemoToast('Registro completado', 'Cuenta creada con éxito. Perfil vinculado.', 'success');
         handleClose();
       } catch (err: unknown) {
         const message = (err as Error)?.message || 'Fallo en el registro.';
@@ -180,28 +292,28 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     } else {
       setTimeout(() => {
         setLoading(false);
-        if (selectedRole === 'club_admin') {
-          switchUserRole('TENANT_ADMIN');
-          setCurrentView('admin');
+        if (ecosystemTrack === 'player' || selectedRole === 'player') {
+          switchUserRole('PLAYER');
+          setCurrentView('player');
           triggerDemoToast(
-            t('register.toast.adminTitle', 'Club Registrado con Éxito'),
-            t('register.toast.adminDesc', `Bienvenido a Setmio Pro. Has activado la gestión de ${clubName || 'tu club'}.`),
+            t('register.toast.playerTitle', 'Perfil Setmio Player Creado'),
+            t('register.toast.playerDesc', `Bienvenido ${fullName}. Ficha deportiva activada para reservas y partidos.`),
             'success'
           );
         } else if (selectedRole === 'coach') {
           switchUserRole('COACH');
           setCurrentView('coach');
           triggerDemoToast(
-            t('register.toast.coachTitle', 'Perfil de Entrenador Activado'),
-            t('register.toast.coachDesc', `Bienvenido ${fullName}. Ya puedes gestionar tus clases y alumnos.`),
+            t('register.toast.coachTitle', 'Perfil Setmio Pro Activado'),
+            t('register.toast.coachDesc', `Bienvenido ${fullName}. Entorno ${activeProOption.title} preparado.`),
             'success'
           );
         } else {
-          switchUserRole('PLAYER');
-          setCurrentView('player');
+          switchUserRole('TENANT_ADMIN');
+          setCurrentView('admin');
           triggerDemoToast(
-            t('register.toast.playerTitle', 'Perfil de Jugador Creado'),
-            t('register.toast.playerDesc', `Bienvenido ${fullName}. Ficha deportiva activada para reservas y partidos.`),
+            t('register.toast.adminTitle', 'Entorno Setmio Pro Activado'),
+            t('register.toast.adminDesc', `Bienvenido a Setmio Pro. Has activado ${clubName || activeProOption.title}.`),
             'success'
           );
         }
@@ -218,36 +330,17 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     return t('register.level.pro', 'Alta Competición / Pro (5.5+)');
   };
 
-  const roleConfigs = [
-    {
-      id: 'club_admin' as OnboardingRole,
-      icon: Building2,
-      title: t('register.roles.club_admin.title', 'Administrador de Club / Profesional'),
-      desc: t('register.roles.club_admin.description', 'Gestión integral de pistas, reservas, domótica IoT, cobros y marca blanca.'),
-      badge: t('register.roles.club_admin.badge', 'Gestión B2B'),
-    },
-    {
-      id: 'coach' as OnboardingRole,
-      icon: GraduationCap,
-      title: t('register.roles.coach.title', 'Profesor / Entrenador de Pádel'),
-      desc: t('register.roles.coach.description', 'Gestión de clases particulares, alumnos, grupos de academia y cuadrantes docentes.'),
-      badge: t('register.roles.coach.badge', 'Docencia'),
-    },
-    {
-      id: 'player' as OnboardingRole,
-      icon: User,
-      title: t('register.roles.player.title', 'Socio / Jugador / Cliente'),
-      desc: t('register.roles.player.description', 'Reserva rápida de pistas, partidos abiertos Play!, monedero y nivel deportivo.'),
-      badge: t('register.roles.player.badge', 'Jugador'),
-    },
-  ];
+  const isFacilityProfile =
+    selectedProProfile === 'club' ||
+    selectedProProfile === 'academy' ||
+    selectedProProfile === 'council';
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-[#071220]/80 sm:p-4 backdrop-blur-xs">
       <div
         role="dialog"
         aria-modal="true"
-        className="relative w-full h-[100dvh] sm:h-auto sm:max-h-[92vh] sm:max-w-lg bg-white dark:bg-[#0E2239] border-0 sm:border sm:border-slate-200/90 sm:dark:border-[#1A314D] rounded-none sm:rounded-2xl px-4 py-6 sm:p-8 text-[#0B1A2D] dark:text-white overflow-y-auto overscroll-contain animate-float-in"
+        className="relative w-full h-[100dvh] sm:h-auto sm:max-h-[92vh] sm:max-w-xl bg-white dark:bg-[#0E2239] border-0 sm:border sm:border-slate-200/90 sm:dark:border-[#1A314D] rounded-none sm:rounded-2xl px-4 py-6 sm:p-7 text-[#0B1A2D] dark:text-white overflow-y-auto overscroll-contain animate-float-in"
       >
         <button
           type="button"
@@ -258,21 +351,21 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           <X className="w-5 h-5" />
         </button>
 
-        <div className="text-center mb-6 pt-1">
+        <div className="text-center mb-5 pt-1">
           <div className="inline-flex items-center justify-center w-11 h-11 rounded-xl bg-[#0B1A2D] dark:bg-[#132A45] text-[#B7F229] font-extrabold text-base tracking-tight mb-3 font-display">
             SM
           </div>
           <h3 className="text-xl font-extrabold text-[#0B1A2D] dark:text-white font-display">
             {mode === 'login' ? t('auth.titleLogin', 'Acceso Usuarios Setmio') : t('register.title', 'Registro y Alta por Rol')}
           </h3>
-          <p className="text-xs text-slate-600 dark:text-slate-300 mt-1.5 max-w-sm mx-auto leading-relaxed">
+          <p className="text-xs text-slate-600 dark:text-slate-300 mt-1.5 max-w-md mx-auto leading-relaxed">
             {mode === 'login'
               ? t('auth.subtitleLogin', 'Accede a tus reservas, partidas abiertas, torneos y monedero')
-              : t('register.subtitle', 'Configura tu cuenta y perfil según tu función dentro del ecosistema del pádel.')}
+              : t('register.subtitle', 'Configura paso a paso tu cuenta o entorno en Setmio según tu rol.')}
           </p>
 
           {mode === 'register' && (
-            <div className="mt-5 grid grid-cols-4 gap-1.5 w-full">
+            <div className="mt-4 grid grid-cols-4 gap-1.5 w-full">
               {[
                 { step: 1, label: t('register.steps.role', '1. Rol') },
                 { step: 2, label: t('register.steps.account', '2. Cuenta') },
@@ -348,11 +441,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 </label>
                 <button
                   type="button"
-                  onClick={handleAutocompleteSetmioID}
-                  className="font-semibold text-[#0B1A2D] dark:text-white hover:underline flex items-center gap-1.5 cursor-pointer"
+                  onClick={handleAutocompleteDemoLogin}
+                  className="text-[11px] font-medium text-slate-500 dark:text-slate-400 hover:text-[#0B1A2D] dark:hover:text-slate-200 underline-offset-2 hover:underline transition-colors cursor-pointer"
                 >
-                  <Sparkles className="w-3.5 h-3.5 text-[#8B5CF6] dark:text-[#A78BFA]" />
-                  <span>{t('auth.demoAutoFill', 'Auto-rellenar')}</span>
+                  {t('auth.demoAutoFill', 'Autocompletar demo')}
                 </button>
               </div>
 
@@ -369,67 +461,143 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             <>
               {registerStep === 1 && (
                 <div key="step-1" className="space-y-4 animate-float-in">
-                  <div className="text-left space-y-1">
-                    <h4 className="text-sm font-bold text-[#0B1A2D] dark:text-white font-display">
-                      {t('register.step1.title', '¿Cuál es tu rol principal en el pádel?')}
-                    </h4>
-                    <p className="text-xs text-slate-600 dark:text-slate-300">
-                      {t('register.step1.desc', 'Adaptaremos el formulario y los permisos de la plataforma a tus necesidades.')}
-                    </p>
-                  </div>
-
                   {urlPlan && (
-                    <div className="p-3 rounded-xl bg-[#F7F9FC] dark:bg-[#071220] border border-[#8B5CF6]/35 text-xs text-[#0B1A2D] dark:text-slate-200 flex items-center gap-2">
-                      <Sparkles className="w-4 h-4 text-[#8B5CF6] dark:text-[#A78BFA] shrink-0" />
+                    <div className="p-2.5 rounded-xl bg-[#F7F9FC] dark:bg-[#071220] border border-[#8B5CF6]/35 text-xs text-[#0B1A2D] dark:text-slate-200 flex items-center gap-2">
+                      <Sparkles className="w-3.5 h-3.5 text-[#8B5CF6] dark:text-[#A78BFA] shrink-0" />
                       <span>
-                        {t('register.preselectedPlan', 'Plan preseleccionado:')} <strong className="font-mono">{urlPlan.toUpperCase()}</strong>
+                        {t('register.preselectedPlan', 'Plan preseleccionado:')}{' '}
+                        <strong className="font-mono">{urlPlan.toUpperCase()}</strong>
                       </span>
                     </div>
                   )}
 
-                  <div className="space-y-2.5">
-                    {roleConfigs.map((r) => {
-                      const Icon = r.icon;
-                      const isSelected = selectedRole === r.id;
-
-                      return (
-                        <button
-                          type="button"
-                          key={r.id}
-                          onClick={() => setSelectedRole(r.id)}
-                          className={`w-full p-4 rounded-xl border text-left transition-colors flex items-start gap-3 cursor-pointer ${
-                            isSelected
-                              ? 'bg-[#F7F9FC] dark:bg-[#132A45] border-[#0B1A2D] dark:border-[#B7F229]'
-                              : 'bg-white dark:bg-[#071220] border-slate-200/90 dark:border-[#1A314D] hover:border-[#0B1A2D]/40 dark:hover:border-[#B7F229]/50'
+                  {/* Ecosystem Compact Selector: Setmio Pro vs Setmio Player */}
+                  <div className="space-y-1.5 text-left">
+                    <span className="block text-[11px] font-mono uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                      Elige tu ecosistema
+                    </span>
+                    <div
+                      role="tablist"
+                      aria-label="Seleccionar ecosistema de Setmio"
+                      className="grid grid-cols-2 gap-2"
+                    >
+                      <button
+                        type="button"
+                        role="tab"
+                        aria-selected={ecosystemTrack === 'pro'}
+                        onClick={() => handleSelectTrack('pro')}
+                        className={`p-3 rounded-xl border text-left transition-colors motion-reduce:transition-none cursor-pointer ${
+                          ecosystemTrack === 'pro'
+                            ? 'bg-[#0B1A2D] text-white border-[#0B1A2D] dark:bg-[#B7F229] dark:text-[#0B1A2D] dark:border-[#B7F229]'
+                            : 'bg-[#F7F9FC] dark:bg-[#071220] text-[#0B1A2D] dark:text-slate-200 border-slate-200/90 dark:border-[#1A314D] hover:border-[#0B1A2D]/40 dark:hover:border-[#B7F229]/50'
+                        }`}
+                      >
+                        <div className="text-xs font-extrabold font-display leading-tight">
+                          Setmio Pro
+                        </div>
+                        <div
+                          className={`text-[11px] mt-0.5 leading-snug ${
+                            ecosystemTrack === 'pro'
+                              ? 'text-slate-300 dark:text-[#0B1A2D]/80'
+                              : 'text-slate-500 dark:text-slate-400'
                           }`}
                         >
-                          <div
-                            className={`w-10 h-10 rounded-xl shrink-0 flex items-center justify-center ${
-                              isSelected
-                                ? 'bg-[#0B1A2D] dark:bg-[#B7F229] text-[#B7F229] dark:text-[#0B1A2D]'
-                                : 'bg-[#F7F9FC] dark:bg-[#0E2239] text-[#0B1A2D] dark:text-slate-300 border border-slate-200/80 dark:border-[#1A314D]'
-                            }`}
-                          >
-                            <Icon className="w-5 h-5" />
-                          </div>
+                          Organizaciones y profesionales
+                        </div>
+                      </button>
 
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center justify-between gap-2">
-                              <span className="text-sm font-bold text-[#0B1A2D] dark:text-white leading-snug">
-                                {r.title}
-                              </span>
-                              <span className="text-[10px] font-mono font-semibold text-slate-500 dark:text-slate-300 shrink-0">
-                                {r.badge}
-                              </span>
-                            </div>
-                            <p className="text-xs text-slate-600 dark:text-slate-300 mt-1 leading-relaxed">
-                              {r.desc}
-                            </p>
-                          </div>
-                        </button>
-                      );
-                    })}
+                      <button
+                        type="button"
+                        role="tab"
+                        aria-selected={ecosystemTrack === 'player'}
+                        onClick={() => handleSelectTrack('player')}
+                        className={`p-3 rounded-xl border text-left transition-colors motion-reduce:transition-none cursor-pointer ${
+                          ecosystemTrack === 'player'
+                            ? 'bg-[#0B1A2D] text-white border-[#0B1A2D] dark:bg-[#B7F229] dark:text-[#0B1A2D] dark:border-[#B7F229]'
+                            : 'bg-[#F7F9FC] dark:bg-[#071220] text-[#0B1A2D] dark:text-slate-200 border-slate-200/90 dark:border-[#1A314D] hover:border-[#0B1A2D]/40 dark:hover:border-[#B7F229]/50'
+                        }`}
+                      >
+                        <div className="text-xs font-extrabold font-display leading-tight">
+                          Setmio Player
+                        </div>
+                        <div
+                          className={`text-[11px] mt-0.5 leading-snug ${
+                            ecosystemTrack === 'player'
+                              ? 'text-slate-300 dark:text-[#0B1A2D]/80'
+                              : 'text-slate-500 dark:text-slate-400'
+                          }`}
+                        >
+                          Jugadores y socios
+                        </div>
+                      </button>
+                    </div>
                   </div>
+
+                  {ecosystemTrack === 'pro' ? (
+                    <div className="space-y-2 text-left">
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="text-xs font-bold text-[#0B1A2D] dark:text-white font-display">
+                          Selecciona tu perfil en Setmio Pro
+                        </span>
+                        <span className="text-[10px] font-mono text-slate-500 dark:text-slate-400">
+                          7 perfiles
+                        </span>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        {PRO_PROFILES.map((profile) => {
+                          const Icon = profile.icon;
+                          const isSelected = selectedProProfile === profile.id;
+                          return (
+                            <button
+                              key={profile.id}
+                              type="button"
+                              onClick={() => handleSelectProProfile(profile)}
+                              className={`w-full p-2.5 sm:p-3 rounded-xl border text-left transition-colors motion-reduce:transition-none flex items-start gap-2.5 cursor-pointer ${
+                                isSelected
+                                  ? 'bg-[#F7F9FC] dark:bg-[#132A45] border-[#0B1A2D] dark:border-[#B7F229]'
+                                  : 'bg-white dark:bg-[#071220] border-slate-200/90 dark:border-[#1A314D] hover:border-[#0B1A2D]/40 dark:hover:border-[#B7F229]/50'
+                              }`}
+                            >
+                              <div
+                                className={`w-8 h-8 rounded-lg shrink-0 flex items-center justify-center ${
+                                  isSelected
+                                    ? 'bg-[#0B1A2D] dark:bg-[#B7F229] text-[#B7F229] dark:text-[#0B1A2D]'
+                                    : 'bg-[#F7F9FC] dark:bg-[#0E2239] text-[#0B1A2D] dark:text-slate-300 border border-slate-200/80 dark:border-[#1A314D]'
+                                }`}
+                              >
+                                <Icon className="w-4 h-4" />
+                              </div>
+                              <div className="min-w-0 flex-1">
+                                <div className="text-xs font-bold text-[#0B1A2D] dark:text-white leading-snug truncate">
+                                  {profile.title}
+                                </div>
+                                <p className="text-[11px] text-slate-600 dark:text-slate-300 mt-0.5 leading-snug line-clamp-2">
+                                  {profile.desc}
+                                </p>
+                              </div>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="p-4 rounded-xl bg-[#F7F9FC] dark:bg-[#071220] border border-[#0B1A2D]/25 dark:border-[#B7F229]/40 text-left space-y-2.5">
+                      <div className="flex items-start gap-3">
+                        <div className="w-9 h-9 rounded-lg bg-[#0B1A2D] dark:bg-[#B7F229] text-[#B7F229] dark:text-[#0B1A2D] flex items-center justify-center shrink-0">
+                          <User className="w-4 h-4" />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <div className="text-sm font-bold text-[#0B1A2D] dark:text-white font-display">
+                            Cuenta Personal Setmio Player
+                          </div>
+                          <p className="text-xs text-slate-600 dark:text-slate-300 mt-0.5 leading-relaxed">
+                            Reserva pistas en segundos, únete a partidos abiertos por nivel, consulta tus estadísticas y conéctate con tus clubes.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
 
                   <button
                     type="button"
@@ -447,7 +615,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   <div className="flex items-center justify-between gap-2 rounded-xl bg-[#F7F9FC] dark:bg-[#071220] px-3.5 py-2.5 text-xs font-semibold text-[#0B1A2D] dark:text-slate-200 border border-slate-200/90 dark:border-[#1A314D]">
                     <span className="truncate">
                       {t('register.roleBadge', 'Rol:')}{' '}
-                      <strong>{roleConfigs.find((r) => r.id === selectedRole)?.title}</strong>
+                      <strong>{activeRoleSummaryLabel}</strong>
                     </span>
                     <button
                       type="button"
@@ -469,7 +637,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                         required
                         value={fullName}
                         onChange={(e) => setFullName(e.target.value)}
-                        placeholder={t('register.fullNamePlaceholder', 'Ej. Lucas Rey Domínguez')}
+                        placeholder={t('register.fullNamePlaceholder', 'Ej. Nombre y apellidos')}
                         className="w-full min-h-[42px] pl-9 pr-3 py-2 bg-[#F7F9FC] dark:bg-[#071220] border border-slate-200/90 dark:border-[#1A314D] rounded-xl text-xs text-[#0B1A2D] dark:text-white placeholder-slate-400 focus:outline-none focus:border-[#0B1A2D] dark:focus:border-[#B7F229]"
                       />
                     </div>
@@ -559,20 +727,29 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
               {registerStep === 3 && (
                 <div key="step-3" className="space-y-4 animate-float-in">
-                  {selectedRole === 'club_admin' && (
+                  {ecosystemTrack === 'pro' && isFacilityProfile && (
                     <div className="space-y-3.5 text-left">
                       <div className="p-3.5 rounded-xl bg-[#F7F9FC] dark:bg-[#071220] border border-slate-200/90 dark:border-[#1A314D] text-xs">
                         <span className="font-bold text-[#0B1A2D] dark:text-white block mb-0.5">
-                          {t('register.club.headerTitle', 'Datos de la Instalación Deportiva')}
+                          {selectedProProfile === 'academy'
+                            ? 'Datos de la Academia o Escuela'
+                            : selectedProProfile === 'council'
+                            ? 'Datos de la Instalación Municipal'
+                            : t('register.club.headerTitle', 'Datos de la Instalación Deportiva')}
                         </span>
                         <span className="text-slate-600 dark:text-slate-300 text-[11px]">
-                          {t('register.club.headerDesc', 'Configura tu centro deportivo para reservas, cobros y domótica.')}
+                          {t('register.club.headerDesc', 'Configura tu entorno para reservas, cobros y automatización.')}
                         </span>
                       </div>
 
                       <div>
                         <label className="block text-[11px] font-mono text-slate-600 dark:text-slate-300 uppercase tracking-wider mb-1.5">
-                          {t('register.club.name', 'Nombre del Club o Centro Deportivo')} *
+                          {selectedProProfile === 'academy'
+                            ? 'Nombre de la Academia / Escuela'
+                            : selectedProProfile === 'council'
+                            ? 'Ayuntamiento o Patronato Deportivo'
+                            : t('register.club.name', 'Nombre del Club o Centro Deportivo')}{' '}
+                          *
                         </label>
                         <input
                           type="text"
@@ -649,7 +826,83 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                     </div>
                   )}
 
-                  {selectedRole === 'coach' && (
+                  {ecosystemTrack === 'pro' && (selectedProProfile === 'team' || selectedProProfile === 'organizer') && (
+                    <div className="space-y-3.5 text-left">
+                      <div className="p-3.5 rounded-xl bg-[#F7F9FC] dark:bg-[#071220] border border-slate-200/90 dark:border-[#1A314D] text-xs">
+                        <span className="font-bold text-[#0B1A2D] dark:text-white block mb-0.5">
+                          {selectedProProfile === 'team'
+                            ? 'Configuración de Equipo y Competición'
+                            : 'Configuración de Circuito o Federación'}
+                        </span>
+                        <span className="text-slate-600 dark:text-slate-300 text-[11px]">
+                          {selectedProProfile === 'team'
+                            ? 'Centraliza convocatorias, actas de jornada, alineaciones y cuotas de plantilla.'
+                            : 'Gestiona torneos, ligas multi-sede, licencias y cuadros oficiales.'}
+                        </span>
+                      </div>
+
+                      <div>
+                        <label className="block text-[11px] font-mono text-slate-600 dark:text-slate-300 uppercase tracking-wider mb-1.5">
+                          {selectedProProfile === 'team' ? 'Nombre del Equipo' : 'Nombre del Circuito / Federación'} *
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          value={clubName}
+                          onChange={(e) => setClubName(e.target.value)}
+                          placeholder={selectedProProfile === 'team' ? 'Ej: Equipo Masculino 1ª' : 'Ej: Circuito Regional de Pádel'}
+                          className="w-full min-h-[42px] px-3 py-2 bg-[#F7F9FC] dark:bg-[#071220] border border-slate-200/90 dark:border-[#1A314D] rounded-xl text-xs text-[#0B1A2D] dark:text-white focus:outline-none focus:border-[#0B1A2D] dark:focus:border-[#B7F229]"
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-[11px] font-mono text-slate-600 dark:text-slate-300 uppercase tracking-wider mb-1.5">
+                            {selectedProProfile === 'team' ? 'Categoría' : 'Alcance'}
+                          </label>
+                          <input
+                            type="text"
+                            value={selectedProProfile === 'team' ? teamCategory : organizerScope}
+                            onChange={(e) =>
+                              selectedProProfile === 'team'
+                                ? setTeamCategory(e.target.value)
+                                : setOrganizerScope(e.target.value)
+                            }
+                            className="w-full min-h-[42px] px-3 py-2 bg-[#F7F9FC] dark:bg-[#071220] border border-slate-200/90 dark:border-[#1A314D] rounded-xl text-xs text-[#0B1A2D] dark:text-white focus:outline-none focus:border-[#0B1A2D] dark:focus:border-[#B7F229]"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[11px] font-mono text-slate-600 dark:text-slate-300 uppercase tracking-wider mb-1.5">
+                            Ciudad / Ámbito *
+                          </label>
+                          <input
+                            type="text"
+                            required
+                            value={clubCity}
+                            onChange={(e) => setClubCity(e.target.value)}
+                            className="w-full min-h-[42px] px-3 py-2 bg-[#F7F9FC] dark:bg-[#071220] border border-slate-200/90 dark:border-[#1A314D] rounded-xl text-xs text-[#0B1A2D] dark:text-white focus:outline-none focus:border-[#0B1A2D] dark:focus:border-[#B7F229]"
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-[11px] font-mono text-slate-600 dark:text-slate-300 uppercase tracking-wider mb-1.5">
+                          Plan de Suscripción
+                        </label>
+                        <select
+                          value={selectedPlan}
+                          onChange={(e) => setSelectedPlan(e.target.value as typeof selectedPlan)}
+                          className="w-full min-h-[42px] px-3 py-2 bg-[#F7F9FC] dark:bg-[#071220] border border-slate-200/90 dark:border-[#1A314D] rounded-xl text-xs font-bold text-[#0B1A2D] dark:text-[#B7F229] focus:outline-none focus:border-[#0B1A2D] dark:focus:border-[#B7F229]"
+                        >
+                          <option value="club_base">Plan Esencial (desde 79 €/mes + instalación inicial)</option>
+                          <option value="profesional">Plan Club &amp; Academia (desde 149 €/mes + instalación inicial)</option>
+                          <option value="enterprise">Plan Pro 360 / A Medida (desde 249 €/mes + instalación inicial)</option>
+                        </select>
+                      </div>
+                    </div>
+                  )}
+
+                  {ecosystemTrack === 'pro' && selectedProProfile === 'coach' && (
                     <div className="space-y-3.5 text-left">
                       <div className="p-3.5 rounded-xl bg-[#F7F9FC] dark:bg-[#071220] border border-slate-200/90 dark:border-[#1A314D] text-xs">
                         <span className="font-bold text-[#0B1A2D] dark:text-white block mb-0.5">
@@ -726,7 +979,61 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                     </div>
                   )}
 
-                  {selectedRole === 'player' && (
+                  {ecosystemTrack === 'pro' && selectedProProfile === 'pro_player' && (
+                    <div className="space-y-3.5 text-left">
+                      <div className="p-3.5 rounded-xl bg-[#F7F9FC] dark:bg-[#071220] border border-slate-200/90 dark:border-[#1A314D] text-xs">
+                        <span className="font-bold text-[#0B1A2D] dark:text-white block mb-0.5">
+                          Entorno Profesional del Jugador
+                        </span>
+                        <span className="text-slate-600 dark:text-slate-300 text-[11px]">
+                          Calendario de circuito, acuerdos comerciales, clinics privados y web de marca personal.
+                        </span>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-[11px] font-mono text-slate-600 dark:text-slate-300 uppercase tracking-wider mb-1.5">
+                            Circuito Principal
+                          </label>
+                          <select
+                            value={proCircuit}
+                            onChange={(e) => setProCircuit(e.target.value)}
+                            className="w-full min-h-[42px] px-3 py-2 bg-[#F7F9FC] dark:bg-[#071220] border border-slate-200/90 dark:border-[#1A314D] rounded-xl text-xs text-[#0B1A2D] dark:text-white focus:outline-none focus:border-[#0B1A2D] dark:focus:border-[#B7F229]"
+                          >
+                            <option>Premier Padel / FIP</option>
+                            <option>FIP Tour / A1 Padel</option>
+                            <option>Circuito Nacional Absoluto</option>
+                          </select>
+                        </div>
+
+                        <div>
+                          <label className="block text-[11px] font-mono text-slate-600 dark:text-slate-300 uppercase tracking-wider mb-1.5">
+                            Categoría / Ranking
+                          </label>
+                          <input
+                            type="text"
+                            value={proRanking}
+                            onChange={(e) => setProRanking(e.target.value)}
+                            className="w-full min-h-[42px] px-3 py-2 bg-[#F7F9FC] dark:bg-[#071220] border border-slate-200/90 dark:border-[#1A314D] rounded-xl text-xs text-[#0B1A2D] dark:text-white focus:outline-none focus:border-[#0B1A2D] dark:focus:border-[#B7F229]"
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-[11px] font-mono text-slate-600 dark:text-slate-300 uppercase tracking-wider mb-1.5">
+                          Ciudad Base
+                        </label>
+                        <input
+                          type="text"
+                          value={clubCity}
+                          onChange={(e) => setClubCity(e.target.value)}
+                          className="w-full min-h-[42px] px-3 py-2 bg-[#F7F9FC] dark:bg-[#071220] border border-slate-200/90 dark:border-[#1A314D] rounded-xl text-xs text-[#0B1A2D] dark:text-white focus:outline-none focus:border-[#0B1A2D] dark:focus:border-[#B7F229]"
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {ecosystemTrack === 'player' && (
                     <div className="space-y-3.5 text-left">
                       <div>
                         <div className="flex items-center justify-between mb-1.5">
@@ -858,8 +1165,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-slate-600 dark:text-slate-300 text-[11px] pt-1">
                       <div className="truncate">
-                        {t('register.roleLabel', 'Rol:')}{' '}
-                        <strong className="text-[#0B1A2D] dark:text-white">{roleConfigs.find((r) => r.id === selectedRole)?.title}</strong>
+                        {t('register.roleLabel', 'Perfil:')}{' '}
+                        <strong className="text-[#0B1A2D] dark:text-white">{activeRoleSummaryLabel}</strong>
                       </div>
                       <div className="truncate">
                         {t('register.nameLabel', 'Nombre:')} <strong className="text-[#0B1A2D] dark:text-white">{fullName}</strong>
@@ -871,10 +1178,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                         {t('register.phoneLabel', 'Teléfono:')} <strong className="font-mono tabular-nums text-[#0B1A2D] dark:text-white">{phone}</strong>
                       </div>
 
-                      {selectedRole === 'club_admin' && (
+                      {ecosystemTrack === 'pro' && isFacilityProfile && (
                         <>
                           <div className="truncate">
-                            {t('register.clubLabel', 'Club:')} <strong className="text-[#0B1A2D] dark:text-white">{clubName}</strong> ({courtCount} pistas)
+                            Entidad: <strong className="text-[#0B1A2D] dark:text-white">{clubName}</strong> ({courtCount} pistas)
                           </div>
                           <div className="truncate">
                             {t('register.planLabel', 'Plan:')} <strong className="font-mono text-[#0B1A2D] dark:text-[#B7F229]">{selectedPlan.toUpperCase()}</strong>
@@ -882,7 +1189,18 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                         </>
                       )}
 
-                      {selectedRole === 'coach' && (
+                      {ecosystemTrack === 'pro' && (selectedProProfile === 'team' || selectedProProfile === 'organizer') && (
+                        <>
+                          <div className="truncate">
+                            Entidad: <strong className="text-[#0B1A2D] dark:text-white">{clubName}</strong>
+                          </div>
+                          <div className="truncate">
+                            Ámbito: <strong className="text-[#0B1A2D] dark:text-white">{clubCity}</strong>
+                          </div>
+                        </>
+                      )}
+
+                      {ecosystemTrack === 'pro' && selectedProProfile === 'coach' && (
                         <>
                           <div className="truncate">
                             {t('register.certLabel', 'Titulación:')} <strong className="text-[#0B1A2D] dark:text-white">{coachCertification}</strong>
@@ -893,7 +1211,18 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                         </>
                       )}
 
-                      {selectedRole === 'player' && (
+                      {ecosystemTrack === 'pro' && selectedProProfile === 'pro_player' && (
+                        <>
+                          <div className="truncate">
+                            Circuito: <strong className="text-[#0B1A2D] dark:text-white">{proCircuit}</strong>
+                          </div>
+                          <div className="truncate">
+                            Categoría: <strong className="text-[#0B1A2D] dark:text-white">{proRanking}</strong>
+                          </div>
+                        </>
+                      )}
+
+                      {ecosystemTrack === 'player' && (
                         <>
                           <div>
                             {t('register.levelLabel', 'Nivel:')} <strong className="font-mono tabular-nums text-[#0B1A2D] dark:text-white">{playLevel.toFixed(2)}</strong>
@@ -905,7 +1234,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                       )}
                     </div>
 
-                    {(selectedRole === 'club_admin' || selectedRole === 'coach') && (
+                    {ecosystemTrack === 'pro' && (
                       <p className="text-[11px] text-slate-500 dark:text-slate-400 pt-2 border-t border-slate-200/80 dark:border-[#1A314D] leading-relaxed">
                         Las suscripciones profesionales incluyen puesta en marcha asistida con coste único de instalación inicial.
                       </p>
@@ -959,7 +1288,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           )}
         </form>
 
-        <div className="mt-6 pt-4 border-t border-slate-200/80 dark:border-[#1A314D] text-center text-xs text-slate-600 dark:text-slate-300">
+        <div className="mt-5 pt-4 border-t border-slate-200/80 dark:border-[#1A314D] text-center text-xs text-slate-600 dark:text-slate-300">
           {mode === 'login' ? (
             <p>
               {t('auth.noAccount', '¿No tienes una cuenta aún?')}{' '}

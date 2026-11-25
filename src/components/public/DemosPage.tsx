@@ -490,59 +490,45 @@ export const DemosPage: React.FC<DemosPageProps> = ({ onOpenRegister }) => {
                 </button>
               </article>
             )}
+          </div>
 
-            {/* 07. SUPERADMINISTRADOR */}
-            {(activeFilter === 'all' || activeFilter === 'player_hq') && (
-              <article className="rounded-2xl bg-white dark:bg-[#0E2239] border border-slate-200/90 dark:border-[#1A314D] hover:border-[#0B1A2D]/40 dark:hover:border-[#B7F229]/50 transition-[transform,border-color,box-shadow] duration-200 ease-out hover:-translate-y-0.5 hover:shadow-md hover:shadow-[#0B1A2D]/5 dark:hover:shadow-black/25 motion-reduce:transform-none motion-reduce:transition-none p-5 sm:p-6 flex flex-col justify-between gap-5 min-w-0">
-                <div className="space-y-3.5 min-w-0">
-                  <div className="flex items-center justify-between gap-2">
-                    <div className="w-10 h-10 rounded-xl bg-[#0B1A2D] dark:bg-[#132A45] text-[#B7F229] flex items-center justify-center shrink-0">
-                      <ShieldCheck className="w-5 h-5" />
-                    </div>
-                    <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 text-right truncate">
-                      <span className="font-mono font-bold tabular-nums text-[#0B1A2D] dark:text-[#B7F229] mr-1.5">
-                        07
-                      </span>
-                      · Consola SaaS HQ
-                    </span>
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <h2 className="text-lg font-bold text-[#0B1A2D] dark:text-white font-display leading-snug">
-                      Superadministrador
-                    </h2>
-                    <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
-                      Aprovisionamiento de entidades, planes B2B, facturación SaaS y auditoría global.
-                    </p>
-                  </div>
-
-                  <div className="p-3 rounded-xl bg-[#F7F9FC] dark:bg-[#0B1A2D] border border-slate-200/80 dark:border-[#1A314D] text-xs space-y-1.5">
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="text-slate-500 dark:text-slate-400">Usuario demo</span>
-                      <span className="font-mono font-semibold text-[#0B1A2D] dark:text-white text-[11px] truncate">
-                        demo-hq@setmio.com
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="text-slate-500 dark:text-slate-400">Ámbito</span>
-                      <span className="font-semibold text-[#0B1A2D] dark:text-white">
-                        Control Multi-Tenant
-                      </span>
-                    </div>
-                  </div>
+          {/* 07. SUPERADMINISTRADOR — SOBER TECHNICAL PLATFORM ENTRY */}
+          {(activeFilter === 'all' || activeFilter === 'player_hq') && (
+            <article className="rounded-2xl bg-white dark:bg-[#0E2239] border border-slate-200/90 dark:border-[#1A314D] p-5 sm:p-6 flex flex-col md:flex-row md:items-center justify-between gap-5 animate-float-in">
+              <div className="flex items-start gap-4 min-w-0">
+                <div className="w-11 h-11 rounded-xl bg-[#0B1A2D] dark:bg-[#132A45] border border-[#1A314D] text-white flex items-center justify-center shrink-0">
+                  <ShieldCheck className="w-5 h-5 text-[#B7F229]" />
                 </div>
+                <div className="space-y-1 min-w-0">
+                  <div className="flex flex-wrap items-center gap-2 text-[11px] font-mono text-slate-500 dark:text-slate-400">
+                    <span className="font-bold text-[#0B1A2D] dark:text-slate-200">07</span>
+                    <span>·</span>
+                    <span className="uppercase tracking-wider">Acceso técnico de plataforma · Consola SaaS HQ</span>
+                  </div>
+                  <h2 className="text-base sm:text-lg font-bold text-[#0B1A2D] dark:text-white font-display">
+                    Superadministrador Multi-Tenant
+                  </h2>
+                  <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed max-w-2xl">
+                    Entorno interno de aprovisionamiento de entidades, planes B2B, dominios y auditoría global del ecosistema.
+                  </p>
+                </div>
+              </div>
 
+              <div className="shrink-0 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                <span className="text-[11px] font-mono text-slate-500 dark:text-slate-400 px-3 py-1.5 rounded-lg bg-[#F7F9FC] dark:bg-[#0B1A2D] border border-slate-200/80 dark:border-[#1A314D] text-center">
+                  Control Multi-Tenant HQ
+                </span>
                 <button
                   type="button"
                   onClick={() => handleLaunch('superadmin')}
-                  className="w-full min-h-[42px] py-2.5 px-4 rounded-xl bg-[#B7F229] hover:bg-[#c5f64e] text-[#0B1A2D] font-bold text-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                  className="min-h-[42px] px-5 py-2.5 rounded-xl bg-[#0B1A2D] hover:bg-[#132A45] text-white dark:bg-[#132A45] dark:hover:bg-[#1B385C] border border-[#0B1A2D] dark:border-[#244163] font-bold text-xs flex items-center justify-center gap-2 transition-colors cursor-pointer whitespace-nowrap"
                 >
                   <span>Entrar a Superadmin HQ</span>
                   <ArrowRight className="w-3.5 h-3.5 shrink-0" />
                 </button>
-              </article>
-            )}
-          </div>
+              </div>
+            </article>
+          )}
 
           <div className="rounded-2xl bg-white dark:bg-[#0E2239] border border-slate-200/90 dark:border-[#1A314D] p-4 sm:p-5 flex items-start sm:items-center gap-3 text-xs text-slate-600 dark:text-slate-300">
             <CheckCircle2 className="w-4 h-4 text-[#0B1A2D] dark:text-[#B7F229] shrink-0 mt-0.5 sm:mt-0" />

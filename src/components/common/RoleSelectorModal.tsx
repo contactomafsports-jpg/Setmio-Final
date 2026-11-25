@@ -397,54 +397,38 @@ export const RoleSelectorModal: React.FC<RoleSelectorModalProps> = ({
               </button>
             </div>
           )}
-
-          {(activeFilter === 'all' || activeFilter === 'player_hq') && (
-            <div className="rounded-2xl bg-[#F7F9FC] dark:bg-[#0B1A2D] border border-slate-200/90 dark:border-[#1A314D] hover:border-[#0B1A2D]/40 dark:hover:border-[#B7F229]/50 p-5 flex flex-col justify-between space-y-4 transition-colors">
-              <div className="space-y-3">
-                <div className="flex items-center justify-between gap-2">
-                  <div className="w-10 h-10 rounded-xl bg-[#0B1A2D] dark:bg-[#132A45] text-[#B7F229] flex items-center justify-center shrink-0">
-                    <ShieldCheck className="w-5 h-5" />
-                  </div>
-                  <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 truncate">
-                    <span className="font-mono font-bold text-[#0B1A2D] dark:text-[#B7F229] mr-1">07</span>
-                    · Consola SaaS HQ
-                  </span>
-                </div>
-
-                <div>
-                  <h3 className="text-base font-bold text-[#0B1A2D] dark:text-white font-display">
-                    Superadministrador
-                  </h3>
-                  <p className="text-xs text-slate-600 dark:text-slate-300 mt-1 leading-relaxed">
-                    Aprovisionamiento de entidades, planes B2B, facturación SaaS y auditoría global.
-                  </p>
-                </div>
-
-                <div className="p-3 rounded-xl bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] text-xs space-y-1">
-                  <div className="flex items-center justify-between text-slate-600 dark:text-slate-300 gap-2">
-                    <span>Usuario demo</span>
-                    <span className="font-mono font-semibold text-[#0B1A2D] dark:text-white text-[11px] truncate">
-                      demo-hq@setmio.com
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between text-slate-600 dark:text-slate-300">
-                    <span>Ámbito</span>
-                    <span className="font-semibold text-[#0B1A2D] dark:text-white">Control Multi-Tenant</span>
-                  </div>
-                </div>
-              </div>
-
-              <button
-                type="button"
-                onClick={() => handleLaunch('superadmin')}
-                className="w-full min-h-[40px] py-2 px-3 rounded-xl bg-[#B7F229] hover:bg-[#c5f64e] text-[#0B1A2D] font-bold text-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
-              >
-                <span>Entrar a Superadmin HQ</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </button>
-            </div>
-          )}
         </div>
+
+        {(activeFilter === 'all' || activeFilter === 'player_hq') && (
+          <div className="rounded-2xl bg-[#F7F9FC] dark:bg-[#0B1A2D] border border-slate-200/90 dark:border-[#1A314D] p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex items-start gap-3.5 min-w-0">
+              <div className="w-10 h-10 rounded-xl bg-[#0B1A2D] dark:bg-[#132A45] border border-[#1A314D] text-[#B7F229] flex items-center justify-center shrink-0">
+                <ShieldCheck className="w-5 h-5" />
+              </div>
+              <div className="min-w-0">
+                <div className="text-[11px] font-mono text-slate-500 dark:text-slate-400">
+                  <span className="font-bold text-[#0B1A2D] dark:text-slate-200 mr-1.5">07</span>
+                  · Acceso técnico de plataforma · Control Multi-Tenant HQ
+                </div>
+                <h3 className="text-sm sm:text-base font-bold text-[#0B1A2D] dark:text-white font-display">
+                  Superadministrador Multi-Tenant
+                </h3>
+                <p className="text-xs text-slate-600 dark:text-slate-300 mt-0.5 leading-relaxed">
+                  Aprovisionamiento de entidades, planes B2B, dominios y auditoría global del ecosistema.
+                </p>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => handleLaunch('superadmin')}
+              className="shrink-0 min-h-[40px] px-4 py-2 rounded-xl bg-[#0B1A2D] hover:bg-[#132A45] text-white dark:bg-[#132A45] dark:hover:bg-[#1B385C] border border-[#0B1A2D] dark:border-[#244163] font-bold text-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer whitespace-nowrap"
+            >
+              <span>Entrar a Superadmin HQ</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        )}
 
         {/* Footer info note */}
         <div className="p-3.5 rounded-xl bg-[#F7F9FC] dark:bg-[#0B1A2D] border border-slate-200/90 dark:border-[#1A314D] text-xs text-slate-600 dark:text-slate-300 flex items-start sm:items-center gap-2.5">
