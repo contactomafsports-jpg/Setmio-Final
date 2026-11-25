@@ -21,7 +21,10 @@ export const DraggableAIAgent: React.FC = () => {
     sendAIMessage,
     isAiThinking,
     currentView,
+    isCorporateLanding,
   } = useApp();
+
+  const isPublicCorporate = isCorporateLanding && currentView === 'public';
 
   const [isOpen, setIsOpen] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -54,6 +57,13 @@ export const DraggableAIAgent: React.FC = () => {
     } catch {
       // Ignore
     }
+  }, []);
+
+  // Listen for top-bar AI toggle event on public corporate pages
+  useEffect(() => {
+    const handleToggleCorporateAi = () => setIsOpen((prev) => !prev);
+    window.addEventListener('setmio:toggle-corporate-ai', handleToggleCorporateAi);
+    return () => window.removeEventListener('setmio:toggle-corporate-ai', handleToggleCorporateAi);
   }, []);
 
   // Auto scroll chat to bottom & block body scroll on mobile
@@ -130,6 +140,13 @@ export const DraggableAIAgent: React.FC = () => {
 
   // Determine Agent Mode Title
   const getAgentHeader = () => {
+    if (isPublicCorporate) {
+      return {
+        title: 'Asistente Setmio',
+        badge: 'Setmio Pro & Player',
+        subtitle: 'Plataforma de Pádel',
+      };
+    }
     if (currentView === 'player') {
       return {
         title: `Coach Personal IA`,
@@ -149,16 +166,17 @@ export const DraggableAIAgent: React.FC = () => {
   return (
     <>
       {!isOpen ? (
-        // Minimized floating bubble
-        <div
-          style={{
-            position: 'fixed',
-            right: `${position.x}px`,
-            bottom: `${position.y}px`,
-            zIndex: 50,
-          }}
-          className="touch-none select-none transition-shadow"
-        >
+        isPublicCorporate ? null : (
+          // Minimized floating bubble (non-corporate / client white-label & player views)
+          <div
+            style={{
+              position: 'fixed',
+              right: `${position.x}px`,
+              bottom: `${position.y}px`,
+              zIndex: 50,
+            }}
+            className="touch-none select-none transition-shadow"
+          >
           <div
             onPointerDown={handlePointerDown}
             onPointerMove={handlePointerMove}
@@ -179,11 +197,12 @@ export const DraggableAIAgent: React.FC = () => {
             </div>
           </div>
         </div>
+        )
       ) : (
         // Expanded Chat Window
         <div
           style={
-            isFullscreen || (typeof window !== 'undefined' && window.innerWidth < 640)
+            isPublicCorporate || isFullscreen || (typeof window !== 'undefined' && window.innerWidth < 640)
               ? undefined
               : {
                   position: 'fixed',
@@ -195,19 +214,21 @@ export const DraggableAIAgent: React.FC = () => {
           className={
             isFullscreen
               ? 'fixed inset-2 sm:inset-6 z-[70] bg-[#0B1A2D] border border-white/12 rounded-3xl shadow-[0_24px_64px_rgba(3,9,20,0.65)] flex flex-col overflow-hidden text-white animate-in fade-in zoom-in-95 duration-150'
+              : isPublicCorporate
+              ? 'fixed inset-x-3 top-20 bottom-4 z-50 sm:inset-auto sm:top-20 sm:right-6 sm:w-[380px] sm:h-[520px] sm:max-h-[calc(100dvh-6rem)] bg-[#0B1A2D] border border-[#1A314D] rounded-3xl shadow-[0_24px_64px_rgba(3,9,20,0.65)] flex flex-col overflow-hidden text-white animate-in fade-in zoom-in-95 duration-150'
               : 'fixed inset-x-3 bottom-20 top-12 z-50 sm:inset-auto sm:w-[380px] sm:h-[520px] sm:max-h-[82vh] bg-[#0B1A2D] border border-white/12 rounded-3xl shadow-[0_24px_64px_rgba(3,9,20,0.65)] flex flex-col overflow-hidden text-white animate-in fade-in zoom-in-95 duration-150'
           }
         >
           {/* Header & Drag Handle */}
           <div
-            onPointerDown={isFullscreen || (typeof window !== 'undefined' && window.innerWidth < 640) ? undefined : handlePointerDown}
-            onPointerMove={isFullscreen || (typeof window !== 'undefined' && window.innerWidth < 640) ? undefined : handlePointerMove}
-            onPointerUp={isFullscreen || (typeof window !== 'undefined' && window.innerWidth < 640) ? undefined : handlePointerUp}
+            onPointerDown={isPublicCorporate || isFullscreen || (typeof window !== 'undefined' && window.innerWidth < 640) ? undefined : handlePointerDown}
+            onPointerMove={isPublicCorporate || isFullscreen || (typeof window !== 'undefined' && window.innerWidth < 640) ? undefined : handlePointerMove}
+            onPointerUp={isPublicCorporate || isFullscreen || (typeof window !== 'undefined' && window.innerWidth < 640) ? undefined : handlePointerUp}
             className={`${
-              isFullscreen || (typeof window !== 'undefined' && window.innerWidth < 640)
+              isPublicCorporate || isFullscreen || (typeof window !== 'undefined' && window.innerWidth < 640)
                 ? 'cursor-default'
                 : 'cursor-grab active:cursor-grabbing'
-            } px-5 pt-4 pb-2.5 flex items-center justify-between gap-2 shrink-0`}
+            } px-5 pt-4 pb-2.5 flex items-center justify-between gap-2 shrink-0 border-b border-white/10`}
           >
             <div className="flex items-center gap-2 min-w-0">
               <Sparkles className="w-4 h-4 text-[#B7F229] shrink-0" />
@@ -216,7 +237,7 @@ export const DraggableAIAgent: React.FC = () => {
                   {headerInfo.title}
                 </span>
                 <span className="text-[11px] font-medium text-slate-300/75 truncate">
-                  {currentTenant.shortName}
+                  {isPublicCorporate ? headerInfo.subtitle : currentTenant.shortName}
                 </span>
               </div>
             </div>
@@ -261,69 +282,106 @@ export const DraggableAIAgent: React.FC = () => {
           </div>
 
           {/* Messages Area */}
-          <div className="flex-1 overflow-y-auto px-5 py-2.5 space-y-3 text-[13px] tabular-nums">
-            {aiMessages.map((msg) => (
-              <div
-                key={msg.id}
-                className={`flex gap-2.5 ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
-              >
+          <div className="flex-1 overflow-y-auto px-5 py-3 space-y-3 text-[13px] tabular-nums">
+            {aiMessages.map((msg, index) => {
+              const displayMsgText =
+                isPublicCorporate && index === 0 && msg.sender === 'assistant'
+                  ? '¡Hola! Soy el asistente de Setmio. Puedo informarte sobre nuestras soluciones para clubes, escuelas, entrenadores, administraciones, federaciones, equipos y jugadores profesionales, además de planes y domótica. ¿Qué necesitas consultar?'
+                  : msg.text;
+              return (
                 <div
-                  className={`max-w-[86%] rounded-2xl leading-relaxed ${
-                    msg.sender === 'user'
-                      ? 'bg-[#B7F229] text-[#0B1A2D] font-medium px-4 py-2.5 rounded-br-sm shadow-xs'
-                      : 'bg-white/[0.06] text-slate-100 border border-white/[0.08] px-4 py-3 rounded-bl-sm'
-                  }`}
+                  key={msg.id}
+                  className={`flex gap-2.5 ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
                 >
-                  <p className="whitespace-pre-wrap">{msg.text}</p>
+                  <div
+                    className={`max-w-[86%] rounded-2xl leading-relaxed ${
+                      msg.sender === 'user'
+                        ? 'bg-[#B7F229] text-[#0B1A2D] font-medium px-4 py-2.5 rounded-br-sm shadow-xs'
+                        : 'bg-white/[0.06] text-slate-100 border border-white/[0.08] px-4 py-3 rounded-bl-sm'
+                    }`}
+                  >
+                    <p className="whitespace-pre-wrap">{displayMsgText}</p>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
 
             {isAiThinking && (
               <div className="inline-flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-white/[0.05] border border-white/[0.08] text-slate-300 text-xs">
                 <Sparkles className="w-3.5 h-3.5 text-[#B7F229] animate-pulse shrink-0" />
-                <span>Analizando datos del club...</span>
+                <span>{isPublicCorporate ? 'Consultando plataforma Setmio...' : 'Analizando datos del club...'}</span>
               </div>
             )}
             <div ref={chatEndRef} />
           </div>
 
-          {/* Quick Suggestions Pills */}
+          {/* Quick Suggestions */}
           <div className="px-4 pt-2 pb-1 flex items-center gap-1.5 overflow-x-auto no-scrollbar shrink-0">
-            <button
-              type="button"
-              onClick={() => sendAIMessage('¿Qué pistas y horarios tenéis libres hoy?')}
-              className="whitespace-nowrap min-h-[34px] px-3 py-1 rounded-full bg-white/[0.04] border border-white/15 hover:border-[#B7F229]/75 hover:bg-[#B7F229]/12 text-[11px] font-medium text-slate-100 inline-flex items-center gap-1.5 transition cursor-pointer"
-            >
-              <CalendarCheck className="w-3 h-3 text-[#B7F229] shrink-0" />
-              <span>Pistas libres hoy</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => sendAIMessage('Información de la escuela y clases')}
-              className="whitespace-nowrap min-h-[34px] px-3 py-1 rounded-full bg-white/[0.04] border border-white/15 hover:border-[#B7F229]/75 hover:bg-[#B7F229]/12 text-[11px] font-medium text-slate-100 inline-flex items-center gap-1.5 transition cursor-pointer"
-            >
-              <GraduationCap className="w-3 h-3 text-[#B7F229] shrink-0" />
-              <span>Escuela y tarifas</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => sendAIMessage('¿Dónde está ubicado el club en Narón?')}
-              className="whitespace-nowrap min-h-[34px] px-3 py-1 rounded-full bg-white/[0.04] border border-white/15 hover:border-[#B7F229]/75 hover:bg-[#B7F229]/12 text-[11px] font-medium text-slate-100 inline-flex items-center gap-1.5 transition cursor-pointer"
-            >
-              <MapPin className="w-3 h-3 text-[#B7F229] shrink-0" />
-              <span>Cómo llegar</span>
-            </button>
+            {isPublicCorporate ? (
+              <>
+                <button
+                  type="button"
+                  onClick={() => sendAIMessage('¿Cómo funciona la marca blanca y los precios?')}
+                  className="whitespace-nowrap min-h-[34px] px-3 py-1 rounded-full bg-white/[0.04] border border-white/15 hover:border-[#B7F229]/75 hover:bg-[#B7F229]/12 text-[11px] font-medium text-slate-100 inline-flex items-center gap-1.5 transition cursor-pointer"
+                >
+                  <CalendarCheck className="w-3 h-3 text-[#B7F229] shrink-0" />
+                  <span>Marca blanca y precios</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => sendAIMessage('¿Qué incluye la domótica de pistas 24/7?')}
+                  className="whitespace-nowrap min-h-[34px] px-3 py-1 rounded-full bg-white/[0.04] border border-white/15 hover:border-[#B7F229]/75 hover:bg-[#B7F229]/12 text-[11px] font-medium text-slate-100 inline-flex items-center gap-1.5 transition cursor-pointer"
+                >
+                  <GraduationCap className="w-3 h-3 text-[#B7F229] shrink-0" />
+                  <span>Domótica 24/7</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => sendAIMessage('¿Qué soluciones tenéis para jugadores y equipos?')}
+                  className="whitespace-nowrap min-h-[34px] px-3 py-1 rounded-full bg-white/[0.04] border border-white/15 hover:border-[#B7F229]/75 hover:bg-[#B7F229]/12 text-[11px] font-medium text-slate-100 inline-flex items-center gap-1.5 transition cursor-pointer"
+                >
+                  <MapPin className="w-3 h-3 text-[#B7F229] shrink-0" />
+                  <span>Equipos y jugador</span>
+                </button>
+              </>
+            ) : (
+              <>
+                <button
+                  type="button"
+                  onClick={() => sendAIMessage('¿Qué pistas y horarios tenéis libres hoy?')}
+                  className="whitespace-nowrap min-h-[34px] px-3 py-1 rounded-full bg-white/[0.04] border border-white/15 hover:border-[#B7F229]/75 hover:bg-[#B7F229]/12 text-[11px] font-medium text-slate-100 inline-flex items-center gap-1.5 transition cursor-pointer"
+                >
+                  <CalendarCheck className="w-3 h-3 text-[#B7F229] shrink-0" />
+                  <span>Pistas libres hoy</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => sendAIMessage('Información de la escuela y clases')}
+                  className="whitespace-nowrap min-h-[34px] px-3 py-1 rounded-full bg-white/[0.04] border border-white/15 hover:border-[#B7F229]/75 hover:bg-[#B7F229]/12 text-[11px] font-medium text-slate-100 inline-flex items-center gap-1.5 transition cursor-pointer"
+                >
+                  <GraduationCap className="w-3 h-3 text-[#B7F229] shrink-0" />
+                  <span>Escuela y tarifas</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => sendAIMessage('¿Dónde está ubicado el club en Narón?')}
+                  className="whitespace-nowrap min-h-[34px] px-3 py-1 rounded-full bg-white/[0.04] border border-white/15 hover:border-[#B7F229]/75 hover:bg-[#B7F229]/12 text-[11px] font-medium text-slate-100 inline-flex items-center gap-1.5 transition cursor-pointer"
+                >
+                  <MapPin className="w-3 h-3 text-[#B7F229] shrink-0" />
+                  <span>Cómo llegar</span>
+                </button>
+              </>
+            )}
           </div>
 
-          {/* Floating Message Input Form */}
+          {/* Message Input Form */}
           <form onSubmit={handleSubmit} className="px-4 pt-2 pb-4 shrink-0">
             <div className="flex items-center gap-2 rounded-full bg-[#071220] border border-white/15 focus-within:border-[#B7F229] pl-4 pr-1.5 py-1.5 transition-colors">
               <input
                 type="text"
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
-                placeholder="Pregunta a la IA sobre pistas, escuela..."
+                placeholder={isPublicCorporate ? 'Pregunta sobre Setmio Pro o Player...' : 'Pregunta a la IA sobre pistas, escuela...'}
                 className="flex-1 min-w-0 bg-transparent py-1 text-xs text-white placeholder-slate-400 focus:outline-none"
               />
               <button

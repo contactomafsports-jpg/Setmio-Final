@@ -7,6 +7,7 @@ import {
   Menu,
   Moon,
   Play,
+  Sparkles,
   Sun,
   X,
 } from 'lucide-react';
@@ -15,7 +16,7 @@ import { SUPPORTED_LANGUAGES, SupportedLanguage } from '../../lib/i18n';
 import { i18n } from '../../i18n';
 import { OfficialFlag } from '../common/OfficialFlag';
 import { SetmioLogo } from '../common/SetmioLogo';
-import { SETMIO_PRO_CORE_SEGMENTS } from './corporate/corporateData';
+import { SETMIO_PRO_SEGMENTS } from './corporate/corporateData';
 
 interface CorporateHeaderProps {
   onOpenDemo?: () => void;
@@ -177,7 +178,7 @@ export function CorporateHeader({ onOpenDemo, onOpenAuth, onOpenRegister }: Corp
                 </div>
 
                 <div className="grid grid-cols-1 gap-0.5">
-                  {SETMIO_PRO_CORE_SEGMENTS.map((seg) => (
+                  {SETMIO_PRO_SEGMENTS.map((seg) => (
                     <button
                       key={seg.id}
                       type="button"
@@ -310,6 +311,22 @@ export function CorporateHeader({ onOpenDemo, onOpenAuth, onOpenRegister }: Corp
             {corporateTheme === 'dark' ? <Sun className="h-4 w-4 text-[#B7F229]" /> : <Moon className="h-4 w-4" />}
           </button>
 
+          {/* AI Assistant Trigger (cleanly anchored in top bar next to Language & Theme) */}
+          <button
+            type="button"
+            onClick={() => {
+              closeAll();
+              if (typeof window !== 'undefined') {
+                window.dispatchEvent(new CustomEvent('setmio:toggle-corporate-ai'));
+              }
+            }}
+            className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200/90 dark:border-[#1A314D] bg-white dark:bg-[#0E2239] text-[#0B1A2D] dark:text-[#B7F229] hover:border-[#0B1A2D]/40 dark:hover:border-[#B7F229]/60 transition-colors cursor-pointer"
+            aria-label={t('nav.aiAssistant', 'Abrir Asistente IA Setmio')}
+            title={t('nav.aiAssistant', 'Asistente IA Setmio')}
+          >
+            <Sparkles className="h-4 w-4" />
+          </button>
+
           {/* Desktop Action Buttons */}
           <button
             type="button"
@@ -396,7 +413,7 @@ export function CorporateHeader({ onOpenDemo, onOpenAuth, onOpenRegister }: Corp
                     >
                       Todas las soluciones Setmio Pro
                     </a>
-                    {SETMIO_PRO_CORE_SEGMENTS.map((seg) => (
+                    {SETMIO_PRO_SEGMENTS.map((seg) => (
                       <a
                         key={seg.id}
                         href={seg.path}

@@ -2,7 +2,7 @@ import React from 'react';
 import { useApp, PublicPage } from '../../context/AppContext';
 import { Instagram, Facebook, Mail, Phone } from 'lucide-react';
 import { SetmioLogo } from './SetmioLogo';
-import { SETMIO_PRO_CORE_SEGMENTS } from '../public/corporate/corporateData';
+import { SETMIO_PRO_SEGMENTS } from '../public/corporate/corporateData';
 
 interface CorporateFooterProps {
   minimized?: boolean;
@@ -122,7 +122,7 @@ export const CorporateFooter: React.FC<CorporateFooterProps> = ({ minimized = fa
                 Setmio Pro
               </h4>
               <ul className="space-y-2 text-xs">
-                {SETMIO_PRO_CORE_SEGMENTS.map((seg) => (
+                {SETMIO_PRO_SEGMENTS.map((seg) => (
                   <li key={seg.id}>
                     <button
                       type="button"
@@ -133,15 +133,6 @@ export const CorporateFooter: React.FC<CorporateFooterProps> = ({ minimized = fa
                     </button>
                   </li>
                 ))}
-                <li>
-                  <button
-                    type="button"
-                    onClick={() => navigateTo('/soluciones/jugadores-profesionales', 'solution_pro_players')}
-                    className="text-slate-300 hover:text-[#B7F229] transition-colors text-left cursor-pointer"
-                  >
-                    Jugadores Profesionales
-                  </button>
-                </li>
               </ul>
             </div>
 

@@ -37,7 +37,7 @@ export const CorporateEyebrow: React.FC<{
 }> = ({ children, accent = 'lime', className = '' }) => {
   const ruleColor =
     accent === 'violet'
-      ? 'bg-[#8B5CF6]/80 dark:bg-[#B7F229]'
+      ? 'bg-[#8B5CF6]/70 dark:bg-[#8B5CF6]/80'
       : accent === 'navy'
       ? 'bg-[#0B1A2D] dark:bg-[#B7F229]'
       : 'bg-[#B7F229]';
@@ -171,7 +171,7 @@ export const CorporatePrimaryButton: React.FC<
   <button
     type="button"
     {...props}
-    className={`inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl bg-[#B7F229] hover:bg-[#c5f64e] text-[#0B1A2D] font-bold text-sm px-6 py-3 transition-colors cursor-pointer active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed whitespace-nowrap shrink-0 ${className}`}
+    className={`inline-flex max-w-full min-h-[44px] items-center justify-center gap-2 rounded-xl bg-[#B7F229] hover:bg-[#c5f64e] text-[#0B1A2D] font-bold text-sm px-5 sm:px-6 py-3 transition-colors cursor-pointer active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed whitespace-normal text-center leading-snug ${className}`}
   >
     <span>{children}</span>
     {icon !== undefined ? icon : <ArrowRight className="w-4 h-4 shrink-0" />}
@@ -184,7 +184,7 @@ export const CorporateSecondaryButton: React.FC<
   <button
     type="button"
     {...props}
-    className={`inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl border border-slate-200 dark:border-[#1E3A5F] bg-white dark:bg-[#0E2239] hover:border-[#0B1A2D]/40 dark:hover:border-[#B7F229]/60 text-[#0B1A2D] dark:text-white font-semibold text-sm px-6 py-3 transition-colors cursor-pointer active:scale-[0.98] disabled:opacity-60 whitespace-nowrap shrink-0 ${className}`}
+    className={`inline-flex max-w-full min-h-[44px] items-center justify-center gap-2 rounded-xl border border-slate-300/90 dark:border-[#244163] bg-white dark:bg-[#0E2239] hover:border-[#0B1A2D] dark:hover:border-[#B7F229]/60 text-[#0B1A2D] dark:text-white font-semibold text-sm px-5 sm:px-6 py-3 transition-colors cursor-pointer active:scale-[0.98] disabled:opacity-60 whitespace-normal text-center leading-snug ${className}`}
   >
     {icon}
     <span>{children}</span>
@@ -197,7 +197,7 @@ export const CorporateNavyButton: React.FC<
   <button
     type="button"
     {...props}
-    className={`inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl bg-[#0B1A2D] hover:bg-[#132A45] text-white dark:bg-[#B7F229] dark:hover:bg-[#c5f64e] dark:text-[#0B1A2D] font-bold text-sm px-6 py-3 transition-colors cursor-pointer active:scale-[0.98] whitespace-nowrap shrink-0 ${className}`}
+    className={`inline-flex max-w-full min-h-[44px] items-center justify-center gap-2 rounded-xl bg-[#0B1A2D] hover:bg-[#132A45] text-white dark:bg-[#132A45] dark:hover:bg-[#1B385C] dark:text-white dark:border dark:border-[#2A4A70] font-bold text-sm px-5 sm:px-6 py-3 transition-colors cursor-pointer active:scale-[0.98] whitespace-normal text-center leading-snug ${className}`}
   >
     <span>{children}</span>
     {icon !== undefined ? icon : <ArrowRight className="w-4 h-4 shrink-0" />}
@@ -249,7 +249,7 @@ export const CorporateCtaBanner: React.FC<{
   secondaryLabel,
   onSecondary,
 }) => (
-  <section className="rounded-3xl bg-[#0B1A2D] dark:bg-[#071220] border border-[#1A314D] p-8 sm:p-12 lg:p-14 text-white">
+  <section className="rounded-3xl bg-[#0B1A2D] dark:bg-[#071220] border border-[#1A314D] p-7 sm:p-12 lg:p-14 text-white">
     <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
       <div className="space-y-3.5 max-w-2xl">
         <div className="inline-flex items-center gap-2.5 text-[11px] font-bold uppercase tracking-[0.18em] text-[#B7F229]">
@@ -272,7 +272,7 @@ export const CorporateCtaBanner: React.FC<{
           <button
             type="button"
             onClick={onSecondary}
-            className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl border border-[#244163] bg-[#0E2239] hover:border-[#B7F229]/60 text-white font-semibold text-sm px-6 py-3 transition-colors cursor-pointer whitespace-nowrap shrink-0"
+            className="inline-flex max-w-full min-h-[44px] items-center justify-center gap-2 rounded-xl border border-[#244163] bg-[#0E2239] hover:border-[#B7F229]/60 text-white font-semibold text-sm px-5 sm:px-6 py-3 transition-colors cursor-pointer whitespace-normal text-center leading-snug"
           >
             {secondaryLabel}
           </button>

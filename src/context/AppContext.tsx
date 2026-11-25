@@ -3207,7 +3207,17 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       let reply = '';
       const lower = text.toLowerCase();
 
-      if (currentTenant.type === 'PRO_PLAYER') {
+      if (isCorporateLanding && currentView === 'public') {
+        if (lower.includes('domótic') || lower.includes('domotic') || lower.includes('luz') || lower.includes('pin') || lower.includes('acceso')) {
+          reply = 'La domótica de Setmio conecta relés IP y controladores de acceso para encender los focos LED automáticamente 5 minutos antes de cada reserva y emitir códigos PIN temporales válidos solo durante la franja reservada.';
+        } else if (lower.includes('equipo') || lower.includes('jugador') || lower.includes('player')) {
+          reply = 'Setmio Pro incluye módulos específicos para Equipos independientes y Jugador Profesional (oficina digital de atleta, clinics y patrocinadores), además de Setmio Player para estadísticas de partido, análisis de parejas/rivales y enlace directo con tus clubes.';
+        } else if (lower.includes('marca blanca') || lower.includes('precio') || lower.includes('plan') || lower.includes('comision')) {
+          reply = 'Setmio opera con marca blanca completa bajo tu propio dominio y sin comisiones por reserva ni por pista. Dispones de 30 días de prueba sin permanencia y migración asistida en 24 horas.';
+        } else {
+          reply = 'Setmio unifica reservas, escuelas, torneos, pagos divididos directos al IBAN, domótica 24/7 y marca blanca para clubes, academias, entrenadores, administraciones públicas, federaciones, equipos y jugadores profesionales. ¿Sobre qué perfil te gustaría profundizar?';
+        }
+      } else if (currentTenant.type === 'PRO_PLAYER') {
         reply = `Hola. Soy el asistente oficial de ${currentTenant.name}. Actualmente ocupa el ranking FIP #${currentTenant.proPlayerStats?.fipRanking || 18}. Su próximo torneo es en Madrid. Para solicitudes de patrocinio, clinics o exhibiciones, puedes consultar la sección de Media Kit y Contacto.`;
       } else if (currentTenant.type === 'COACH') {
         reply = `Hola. Soy el asistente de ${currentTenant.name}. Ofrece clases individuales (tarifa ${currentTenant.coachStats?.hourlyRate || 45}€/h) y clinics grupales de fin de semana. ¿Buscas perfeccionar tu técnica o preparar torneos de competición?`;

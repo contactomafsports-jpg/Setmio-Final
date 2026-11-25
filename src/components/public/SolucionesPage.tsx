@@ -377,7 +377,7 @@ export function SolucionesPage({
               </h2>
             </div>
             <span className="text-xs text-slate-500 dark:text-slate-400">
-              6 perfiles principales + deportistas profesionales
+              7 perfiles profesionales · De clubes a Jugador Profesional
             </span>
           </div>
 
@@ -421,10 +421,10 @@ export function SolucionesPage({
                   <button
                     type="button"
                     onClick={() => handleSelectRole(seg.id)}
-                    className="w-full min-h-[42px] px-4 py-2.5 rounded-xl bg-[#0B1A2D] hover:bg-[#132A45] text-white dark:bg-[#B7F229] dark:hover:bg-[#c5f64e] dark:text-[#0B1A2D] font-bold text-xs flex items-center justify-center gap-2 transition-colors cursor-pointer"
+                    className="w-full max-w-full min-h-[42px] px-4 py-2.5 rounded-xl bg-[#0B1A2D] hover:bg-[#132A45] text-white dark:bg-[#132A45] dark:hover:bg-[#1B385C] dark:text-white dark:border dark:border-[#244163] font-bold text-xs flex items-center justify-center gap-2 transition-colors cursor-pointer whitespace-normal text-center"
                   >
                     <span>Explorar {seg.shortTitle}</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
+                    <ArrowRight className="w-3.5 h-3.5 shrink-0" />
                   </button>
                 </article>
               );
@@ -454,7 +454,7 @@ export function SolucionesPage({
                 onClick={() => handleSelectRole('profesionales')}
                 className="shrink-0"
               >
-                Ver solución de atleta
+                Ver Jugador Profesional
               </CorporateSecondaryButton>
             </div>
           )}

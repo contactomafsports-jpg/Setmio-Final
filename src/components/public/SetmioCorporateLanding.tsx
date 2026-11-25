@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useApp, PublicPage } from '../../context/AppContext';
 import {
   ArrowRight,
-  Check,
   Play,
   X,
 } from 'lucide-react';
@@ -16,10 +15,9 @@ import {
   CorporatePrimaryButton,
   CorporateSecondaryButton,
   CorporateSectionHeader,
-  CorporateSurface,
   navigateCorporateRoute,
 } from './corporate/CorporatePrimitives';
-import { SETMIO_PRO_CORE_SEGMENTS, SetmioProSegmentId } from './corporate/corporateData';
+import { SETMIO_PRO_SEGMENTS } from './corporate/corporateData';
 import heroCourtImg from '../../assets/images/setmio_hero_court_1795368969510.jpg';
 import proFacilityImg from '../../assets/images/setmio_pro_facility_1795368970973.jpg';
 import playerFocusImg from '../../assets/images/setmio_player_focus_1795368971038.jpg';
@@ -40,7 +38,6 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
 }) => {
   const { triggerDemoToast, setPublicPage, t } = useApp();
 
-  const [selectedSegmentId, setSelectedSegmentId] = useState<SetmioProSegmentId>('clubes');
   const [registerModalOpen, setRegisterModalOpen] = useState(false);
   const [localDemoModalOpen, setLocalDemoModalOpen] = useState(false);
   const [clubName, setClubName] = useState('');
@@ -51,10 +48,6 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
   const [contactPhone, setContactPhone] = useState('');
 
   void _onExploreClub;
-
-  const activeSegment =
-    SETMIO_PRO_CORE_SEGMENTS.find((s) => s.id === selectedSegmentId) ??
-    SETMIO_PRO_CORE_SEGMENTS[0];
 
   const navigate = (path: string, page: PublicPage) => {
     navigateCorporateRoute(path, page, setPublicPage);
@@ -141,17 +134,17 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
   ];
 
   return (
-    <div className="bg-white dark:bg-[#0B1A2D] text-[#0B1A2D] dark:text-white transition-colors duration-200">
+    <div className="bg-white dark:bg-[#0B1A2D] text-[#0B1A2D] dark:text-white transition-colors duration-200 overflow-x-clip">
       {/* 1. HERO SECTION — Clean Editorial Split */}
-      <section className="border-b border-slate-200/80 dark:border-[#1A314D] py-16 sm:py-20 lg:py-24">
+      <section className="border-b border-slate-200/80 dark:border-[#1A314D] py-14 sm:py-20 lg:py-24">
         <CorporateContainer>
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-14 items-center">
-            <div className="lg:col-span-6 space-y-7 animate-float-in">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
+            <div className="lg:col-span-6 space-y-6 sm:space-y-7 animate-float-in min-w-0">
               <CorporateEyebrow accent="lime">
                 Setmio Pro · Setmio Player
               </CorporateEyebrow>
 
-              <h1 className="text-4xl sm:text-5xl lg:text-[52px] font-extrabold tracking-tight text-[#0B1A2D] dark:text-white leading-[1.06] text-balance font-display">
+              <h1 className="text-3xl sm:text-5xl lg:text-[52px] font-extrabold tracking-tight text-[#0B1A2D] dark:text-white leading-[1.06] text-balance font-display">
                 Software de marca blanca para la gestión integral del pádel.
               </h1>
 
@@ -159,14 +152,14 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
                 Unifica reservas, escuelas, torneos, cobros directos y domótica bajo tu propia identidad digital, sin comisiones por pista y adaptado a cada perfil del sector.
               </p>
 
-              <div className="flex flex-wrap items-center gap-3 pt-1">
+              <div className="flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center gap-3 pt-1">
                 <CorporatePrimaryButton onClick={handleOpenRegister}>
                   Empezar prueba de 30 días
                 </CorporatePrimaryButton>
 
                 <CorporateSecondaryButton
                   onClick={handleOpenDemo}
-                  icon={<Play className="w-3.5 h-3.5 fill-current" />}
+                  icon={<Play className="w-3.5 h-3.5 fill-current shrink-0" />}
                 >
                   Ver demo interactiva
                 </CorporateSecondaryButton>
@@ -181,7 +174,7 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
               </div>
             </div>
 
-            <div className="lg:col-span-6 animate-float-in">
+            <div className="lg:col-span-6 animate-float-in min-w-0">
               <CorporateMediaFrame
                 src={heroCourtImg}
                 alt="Pista de pádel contemporánea gestionada con Setmio Pro"
@@ -194,153 +187,80 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
         </CorporateContainer>
       </section>
 
-      {/* 2. SETMIO PRO — INTERACTIVE ARCHITECTURAL SEGMENT DIRECTORY (FIRST IN HIERARCHY) */}
-      <section className="py-20 sm:py-24 bg-[#F7F9FC] dark:bg-[#081424] border-b border-slate-200/80 dark:border-[#1A314D]">
-        <CorporateContainer className="space-y-12">
+      {/* 2. SETMIO PRO — CLEAR 7-ROLE SOLUTIONS DIRECTORY (FIRST IN HIERARCHY) */}
+      <section className="py-16 sm:py-24 bg-[#F7F9FC] dark:bg-[#081424] border-b border-slate-200/80 dark:border-[#1A314D]">
+        <CorporateContainer className="space-y-10 sm:space-y-12">
           <CorporateSectionHeader
-            eyebrow="Setmio Pro · Entorno Profesional y Corporativo"
-            title="Una solución dedicada para cada organización del pádel"
-            subtitle="Desde clubes privados y academias hasta administraciones públicas, federaciones y equipos independientes que contratan la plataforma directamente."
-            accent="lime"
+            eyebrow="Setmio Pro · Soluciones por Perfil"
+            title="Una solución dedicada para cada perfil del pádel"
+            subtitle="Clubes de pádel, academias y escuelas, entrenadores y profesores, administraciones públicas y ayuntamientos, federaciones, equipos y jugadores profesionales."
+            accent="navy"
             action={
               <CorporateSecondaryButton onClick={() => navigate('/soluciones', 'solutions')}>
-                Explorar todas las soluciones
+                Comparar soluciones
               </CorporateSecondaryButton>
             }
           />
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start">
-            {/* Left Directory Selector (No 6-card grid clone) */}
-            <div className="lg:col-span-5 space-y-4">
-              <div
-                className="border-y border-slate-200 dark:border-[#1A314D] divide-y divide-slate-200 dark:divide-[#1A314D]"
-                role="tablist"
-                aria-label="Perfiles profesionales Setmio Pro"
-              >
-                {SETMIO_PRO_CORE_SEGMENTS.map((segment) => {
-                  const isActive = segment.id === activeSegment.id;
-                  return (
-                    <button
-                      key={segment.id}
-                      type="button"
-                      role="tab"
-                      aria-selected={isActive}
-                      onClick={() => setSelectedSegmentId(segment.id)}
-                      className={`w-full flex items-center justify-between gap-4 px-4 py-4 text-left transition-colors cursor-pointer ${
-                        isActive
-                          ? 'bg-white dark:bg-[#0E2239] text-[#0B1A2D] dark:text-white'
-                          : 'bg-transparent text-slate-600 dark:text-slate-300 hover:bg-white/70 dark:hover:bg-[#0E2239]/60 hover:text-[#0B1A2D] dark:hover:text-white'
-                      }`}
-                    >
-                      <span className="flex items-center gap-3.5 min-w-0">
-                        <span
-                          className={`font-mono text-xs font-bold tabular-nums shrink-0 ${
-                            isActive
-                              ? 'text-[#0B1A2D] dark:text-[#B7F229]'
-                              : 'text-slate-400 dark:text-slate-500'
-                          }`}
-                        >
-                          {segment.order}
-                        </span>
-                        <span className={`text-sm sm:text-base truncate ${isActive ? 'font-bold' : 'font-semibold'}`}>
-                          {segment.shortTitle}
-                        </span>
-                      </span>
+          {/* Scannable 7-row hairline editorial directory: zero hidden info, zero overflowing buttons */}
+          <div className="border-y border-slate-200 dark:border-[#1A314D] divide-y divide-slate-200 dark:divide-[#1A314D]">
+            {SETMIO_PRO_SEGMENTS.map((segment) => {
+              const displayTitle =
+                segment.id === 'administraciones'
+                  ? 'Administraciones Públicas y Ayuntamientos'
+                  : segment.shortTitle;
 
-                      <ArrowRight
-                        className={`w-4 h-4 shrink-0 transition-transform ${
-                          isActive
-                            ? 'text-[#0B1A2D] dark:text-[#B7F229] translate-x-0.5'
-                            : 'text-slate-300 dark:text-slate-600'
-                        }`}
-                      />
-                    </button>
-                  );
-                })}
-              </div>
-
-              <div className="px-1 pt-1 flex items-center justify-between text-xs">
-                <span className="text-slate-500 dark:text-slate-400">
-                  ¿Compites en circuito profesional?
-                </span>
-                <button
-                  type="button"
-                  onClick={() =>
-                    navigate('/soluciones/jugadores-profesionales', 'solution_pro_players')
-                  }
-                  className="font-semibold text-[#0B1A2D] dark:text-[#B7F229] hover:underline cursor-pointer whitespace-nowrap"
+              return (
+                <article
+                  key={segment.id}
+                  className="py-6 sm:py-7 grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-8 items-start lg:items-center min-w-0"
                 >
-                  Jugadores Profesionales →
-                </button>
-              </div>
-            </div>
-
-            {/* Right Active Detail Surface */}
-            <div className="lg:col-span-7">
-              <CorporateSurface className="p-7 sm:p-10 space-y-7">
-                <div className="flex flex-wrap items-center justify-between gap-3 pb-5 border-b border-slate-200/80 dark:border-[#1A314D]">
-                  <div className="flex items-center gap-2.5 text-xs">
-                    <span className="font-mono font-bold text-[#0B1A2D] dark:text-[#B7F229] tabular-nums">
-                      {activeSegment.order}
+                  <div className="lg:col-span-4 flex items-start gap-3.5 min-w-0">
+                    <span className="font-mono text-xs font-bold text-[#0B1A2D] dark:text-[#B7F229] tabular-nums pt-1 shrink-0">
+                      {segment.order}
                     </span>
-                    <span aria-hidden="true" className="text-slate-300 dark:text-[#244163]">·</span>
-                    <span className="font-semibold text-slate-600 dark:text-slate-300">
-                      {activeSegment.badge}
-                    </span>
+                    <div className="min-w-0 space-y-1">
+                      <h3 className="text-lg sm:text-xl font-bold text-[#0B1A2D] dark:text-white tracking-tight font-display leading-snug">
+                        {displayTitle}
+                      </h3>
+                      <div className="text-xs font-medium text-slate-500 dark:text-slate-400">
+                        {segment.recommendedPlan}
+                      </div>
+                    </div>
                   </div>
 
-                  <span className="text-xs font-medium text-slate-500 dark:text-slate-300">
-                    {activeSegment.recommendedPlan}
-                  </span>
-                </div>
+                  <div className="lg:col-span-6 space-y-1.5 min-w-0">
+                    <p className="text-sm font-medium text-[#0B1A2D] dark:text-slate-100 leading-relaxed">
+                      {segment.headline}
+                    </p>
+                    <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                      {segment.highlights.slice(0, 2).join(' · ')}
+                    </p>
+                  </div>
 
-                <div className="space-y-3">
-                  <h3 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#0B1A2D] dark:text-white font-display">
-                    {activeSegment.title}
-                  </h3>
-                  <p className="text-base font-semibold text-[#0B1A2D]/90 dark:text-slate-100 leading-snug">
-                    {activeSegment.headline}
-                  </p>
-                  <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
-                    {activeSegment.summary}
-                  </p>
-                </div>
-
-                <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3.5 pt-5 border-t border-slate-200/80 dark:border-[#1A314D] text-xs text-slate-700 dark:text-slate-200">
-                  {activeSegment.highlights.map((item) => (
-                    <li key={item} className="flex items-start gap-2.5">
-                      <Check className="w-4 h-4 text-[#0B1A2D] dark:text-[#B7F229] shrink-0 mt-0.5" />
-                      <span className="leading-relaxed">{item}</span>
-                    </li>
-                  ))}
-                </ul>
-
-                <div className="pt-5 border-t border-slate-200/80 dark:border-[#1A314D] flex flex-wrap items-center gap-4">
-                  <CorporateNavyButton
-                    onClick={() => navigate(activeSegment.path, activeSegment.pageKey)}
-                  >
-                    Ver solución para {activeSegment.shortTitle.toLowerCase()}
-                  </CorporateNavyButton>
-
-                  <button
-                    type="button"
-                    onClick={handleOpenDemo}
-                    className="text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-[#0B1A2D] dark:hover:text-[#B7F229] transition-colors cursor-pointer whitespace-nowrap"
-                  >
-                    Explorar entorno demo →
-                  </button>
-                </div>
-              </CorporateSurface>
-            </div>
+                  <div className="lg:col-span-2 flex lg:justify-end min-w-0 pt-1 lg:pt-0">
+                    <button
+                      type="button"
+                      onClick={() => navigate(segment.path, segment.pageKey)}
+                      aria-label={`Ver solución para ${displayTitle}`}
+                      className="w-full sm:w-auto max-w-full min-h-[42px] inline-flex items-center justify-center gap-2 rounded-xl border border-[#0B1A2D]/25 dark:border-[#244163] bg-white dark:bg-[#0E2239] hover:bg-[#0B1A2D] hover:text-white hover:border-[#0B1A2D] dark:hover:bg-[#132A45] dark:hover:border-[#B7F229]/60 text-[#0B1A2D] dark:text-white font-semibold text-xs px-4 py-2.5 transition-colors cursor-pointer"
+                    >
+                      <span>Ver solución</span>
+                      <ArrowRight className="w-3.5 h-3.5 shrink-0" />
+                    </button>
+                  </div>
+                </article>
+              );
+            })}
           </div>
         </CorporateContainer>
       </section>
 
       {/* 3. OPERATIONAL ARCHITECTURE — ASYMMETRIC SPLIT + HAIRLINE NUMBERED LIST */}
-      <section className="py-20 sm:py-24 border-b border-slate-200/80 dark:border-[#1A314D]">
+      <section className="py-16 sm:py-24 border-b border-slate-200/80 dark:border-[#1A314D]">
         <CorporateContainer>
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-14 items-start">
-            <div className="lg:col-span-5 space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-start">
+            <div className="lg:col-span-5 space-y-6 min-w-0">
               <CorporateEyebrow accent="navy">Plataforma Modular</CorporateEyebrow>
               <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-[#0B1A2D] dark:text-white leading-[1.12] text-balance font-display">
                 Una sola base operativa para pistas, cobros y automatización.
@@ -357,15 +277,15 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
               />
             </div>
 
-            <div className="lg:col-span-7 space-y-8">
+            <div className="lg:col-span-7 space-y-8 min-w-0">
               <div className="border-y border-slate-200/90 dark:border-[#1A314D] divide-y divide-slate-200/90 dark:divide-[#1A314D]">
                 {platformCapabilities.map((item) => (
                   <div
                     key={item.number}
                     className="py-6 sm:py-7 grid grid-cols-1 sm:grid-cols-12 gap-3 sm:gap-6 items-baseline"
                   >
-                    <div className="sm:col-span-5 flex items-baseline gap-3">
-                      <span className="font-mono text-xs font-bold text-slate-400 dark:text-[#B7F229] tabular-nums shrink-0">
+                    <div className="sm:col-span-5 flex items-baseline gap-3 min-w-0">
+                      <span className="font-mono text-xs font-bold text-slate-500 dark:text-[#B7F229] tabular-nums shrink-0">
                         {item.number}
                       </span>
                       <h3 className="text-base font-bold text-[#0B1A2D] dark:text-white leading-snug">
@@ -379,10 +299,10 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
                 ))}
               </div>
 
-              <div className="flex flex-wrap items-center gap-3">
-                <CorporatePrimaryButton onClick={handleOpenModules}>
+              <div className="flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center gap-3">
+                <CorporateNavyButton onClick={handleOpenModules}>
                   Explorar módulos
-                </CorporatePrimaryButton>
+                </CorporateNavyButton>
                 <CorporateSecondaryButton onClick={() => navigate('/domotica', 'modules')}>
                   Domótica y accesos
                 </CorporateSecondaryButton>
@@ -393,11 +313,11 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
       </section>
 
       {/* 4. SETMIO PLAYER — INDIVIDUAL PLAYER EXPERIENCE (SECOND IN HIERARCHY, ZERO MARKETPLACE) */}
-      <section className="py-20 sm:py-24 bg-[#F7F9FC] dark:bg-[#081424] border-b border-slate-200/80 dark:border-[#1A314D]">
+      <section className="py-16 sm:py-24 bg-[#F7F9FC] dark:bg-[#081424] border-b border-slate-200/80 dark:border-[#1A314D]">
         <CorporateContainer>
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-14 items-center">
-            <div className="lg:col-span-6 space-y-6">
-              <CorporateEyebrow accent="violet">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
+            <div className="lg:col-span-6 space-y-6 min-w-0">
+              <CorporateEyebrow accent="navy">
                 Setmio Player · Experiencia del Jugador
               </CorporateEyebrow>
 
@@ -411,11 +331,11 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
 
               <div className="border-y border-slate-200/90 dark:border-[#1A314D] divide-y divide-slate-200/90 dark:divide-[#1A314D]">
                 {playerCapabilities.map((item) => (
-                  <div key={item.number} className="py-4 flex items-start gap-4">
+                  <div key={item.number} className="py-4 flex items-start gap-4 min-w-0">
                     <span className="font-mono text-xs font-bold text-[#0B1A2D] dark:text-[#B7F229] tabular-nums pt-0.5 shrink-0">
                       {item.number}
                     </span>
-                    <div className="space-y-1">
+                    <div className="space-y-1 min-w-0">
                       <h3 className="text-sm font-bold text-[#0B1A2D] dark:text-white">
                         {item.title}
                       </h3>
@@ -427,14 +347,14 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
                 ))}
               </div>
 
-              <div className="pt-1">
+              <div className="pt-1 flex flex-col sm:flex-row sm:items-center gap-3">
                 <CorporatePrimaryButton onClick={() => navigate('/para-jugadores', 'players_app')}>
                   Conocer Setmio Player
                 </CorporatePrimaryButton>
               </div>
             </div>
 
-            <div className="lg:col-span-6">
+            <div className="lg:col-span-6 min-w-0">
               <CorporateMediaFrame
                 src={playerFocusImg}
                 alt="Pala de pádel y pelotas sobre banco para análisis de rendimiento en Setmio Player"

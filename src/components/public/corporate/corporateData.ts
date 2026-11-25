@@ -636,9 +636,9 @@ export const SETMIO_PRO_SEGMENTS: SetmioProSegment[] = [
     order: '07',
     pageKey: 'solution_pro_players',
     path: '/soluciones/jugadores-profesionales',
-    shortTitle: 'Jugadores Profesionales',
+    shortTitle: 'Jugador Profesional',
     badge: 'Setmio Pro · Atletas',
-    title: 'Jugadores Profesionales y Atletas',
+    title: 'Jugador Profesional',
     headline: 'Tu oficina digital de carrera deportiva, patrocinadores, clinics y presencia propia.',
     summary:
       'Portal profesional para atletas de circuito que centraliza calendario de torneos, acuerdos con marcas, clinics exclusivos y venta de equipación.',
