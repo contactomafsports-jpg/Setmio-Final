@@ -579,7 +579,16 @@ export function App() {
         return <ShopView />;
       case 'blog':
       case 'article':
-        return <BlogView onBack={goHome} />;
+        return (
+          <BlogView
+            onBack={goHome}
+            onOpenDemo={() => setRoleSelectorOpen(true)}
+            onOpenRegister={() => {
+              setRegistrationOpen(true);
+              setAuthOpen(true);
+            }}
+          />
+        );
       case 'contact':
         return isCorporateLanding ? <ContactFAQView onBack={goHome} /> : <ClubContactFAQView onBack={goHome} />;
       case 'legal':
