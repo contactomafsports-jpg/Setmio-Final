@@ -4,13 +4,13 @@ import {
   Bot,
   Calendar,
   Check,
+  ChevronRight,
   Cpu,
   CreditCard,
   Globe,
   GraduationCap,
   Shield,
   ShoppingBag,
-  Sparkles,
   Trophy,
 } from 'lucide-react';
 import { useApp, PublicPage } from '../../context/AppContext';
@@ -46,14 +46,16 @@ const MODULE_ICONS: Record<string, React.ComponentType<{ className?: string }>> 
 type ModuleFilter = 'all' | FeatureModuleDetail['category'];
 
 export const FeaturesView: React.FC<FeaturesViewProps> = ({
-  onBack,
+  onBack: _onBack,
   onOpenOnboarding,
   onOpenDemo,
 }) => {
-  const { setPublicPage, setIsCorporateLanding } = useApp();
+  const { setPublicPage } = useApp();
   const [filter, setFilter] = useState<ModuleFilter>('all');
   const [selectedModuleId, setSelectedModuleId] = useState<string | null>(null);
   const [localDemoModalOpen, setLocalDemoModalOpen] = useState(false);
+
+  void _onBack;
 
   useEffect(() => {
     const syncFromPath = () => {
@@ -74,15 +76,6 @@ export const FeaturesView: React.FC<FeaturesViewProps> = ({
 
   const navigate = (path: string, page: PublicPage) => {
     navigateCorporateRoute(path, page, setPublicPage);
-  };
-
-  const handleBackRoot = () => {
-    if (onBack) {
-      onBack();
-    } else {
-      setIsCorporateLanding(true);
-      navigate('/', 'home');
-    }
   };
 
   const handleSelectModule = (id: string) => {
@@ -125,13 +118,12 @@ export const FeaturesView: React.FC<FeaturesViewProps> = ({
   // LEVEL 3 MODULE DETAIL VIEW
   if (selectedModule) {
     const Icon = MODULE_ICONS[selectedModule.id] || Calendar;
-    const isAiModule = selectedModule.id === 'copiloto-ia';
     const siblingModules = CORPORATE_MODULES.filter((m) => m.id !== selectedModule.id).slice(0, 3);
 
     return (
       <div className="bg-white dark:bg-[#0B1A2D] text-[#0B1A2D] dark:text-white transition-colors duration-200 overflow-x-clip">
-        <section className="border-b border-slate-200/80 dark:border-[#1A314D] py-10 sm:py-16">
-          <CorporateContainer className="space-y-10 sm:space-y-12">
+        <section className="border-b border-slate-200/80 dark:border-[#1A314D] py-8 sm:py-12">
+          <CorporateContainer className="space-y-8">
             <CorporateBreadcrumb
               items={[
                 { label: 'Inicio', onClick: () => navigate('/', 'home') },
@@ -140,21 +132,16 @@ export const FeaturesView: React.FC<FeaturesViewProps> = ({
               ]}
               onBack={handleBackToCatalog}
               backLabel="Todos los módulos"
+              className="pb-5"
             />
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-start animate-float-in">
               <div className="lg:col-span-8 space-y-5 min-w-0">
                 <div className="flex flex-wrap items-center gap-3">
-                  <span
-                    className={`w-10 h-10 rounded-xl inline-flex items-center justify-center shrink-0 ${
-                      isAiModule
-                        ? 'bg-[#8B5CF6]/10 dark:bg-[#8B5CF6]/15 border border-[#8B5CF6]/25 text-[#8B5CF6] dark:text-[#A78BFA]'
-                        : 'bg-[#0B1A2D] dark:bg-[#132A45] text-[#B7F229]'
-                    }`}
-                  >
+                  <span className="w-10 h-10 rounded-xl bg-[#0B1A2D] dark:bg-[#132A45] text-[#B7F229] inline-flex items-center justify-center shrink-0">
                     <Icon className="w-5 h-5" />
                   </span>
-                  <CorporateEyebrow accent={isAiModule ? 'violet' : 'lime'}>
+                  <CorporateEyebrow accent="lime">
                     {selectedModule.order} · {selectedModule.categoryLabel}
                   </CorporateEyebrow>
                 </div>
@@ -186,11 +173,7 @@ export const FeaturesView: React.FC<FeaturesViewProps> = ({
                     {selectedModule.applicableProfiles.map((prof) => (
                       <li key={prof} className="flex items-center gap-2">
                         <span
-                          className={`h-[2px] w-3 shrink-0 ${
-                            isAiModule
-                              ? 'bg-[#8B5CF6] dark:bg-[#A78BFA]'
-                              : 'bg-[#0B1A2D] dark:bg-[#B7F229]'
-                          }`}
+                          className="h-[2px] w-3 bg-[#0B1A2D] dark:bg-[#B7F229] shrink-0"
                           aria-hidden="true"
                         />
                         <span>{prof}</span>
@@ -216,9 +199,9 @@ export const FeaturesView: React.FC<FeaturesViewProps> = ({
           </CorporateContainer>
         </section>
 
-        <section className="py-14 sm:py-20 bg-[#F7F9FC] dark:bg-[#081424] border-b border-slate-200/80 dark:border-[#1A314D]">
+        <section className="py-12 sm:py-16 bg-[#F7F9FC] dark:bg-[#081424] border-b border-slate-200/80 dark:border-[#1A314D]">
           <CorporateContainer className="space-y-12">
-            <div className="rounded-2xl bg-white dark:bg-[#0E2239] border border-slate-200/90 dark:border-[#1A314D] p-7 sm:p-9 space-y-6">
+            <div className="rounded-2xl bg-white dark:bg-[#0E2239] border border-slate-200/90 dark:border-[#1A314D] p-6 sm:p-8 space-y-5">
               <h2 className="text-xl sm:text-2xl font-bold text-[#0B1A2D] dark:text-white font-display">
                 Capacidades incluidas en este módulo
               </h2>
@@ -240,38 +223,35 @@ export const FeaturesView: React.FC<FeaturesViewProps> = ({
                 Otros módulos relacionados
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-                {siblingModules.map((mod) => {
-                  const modIsAi = mod.id === 'copiloto-ia';
-                  return (
-                    <button
-                      key={mod.id}
-                      type="button"
-                      onClick={() => handleSelectModule(mod.id)}
-                      className="text-left p-6 rounded-2xl bg-white dark:bg-[#0E2239] border border-slate-200/90 dark:border-[#1A314D] hover:border-[#0B1A2D]/40 dark:hover:border-[#B7F229]/50 transition-[transform,border-color,box-shadow] duration-200 ease-out hover:-translate-y-0.5 hover:shadow-md hover:shadow-[#0B1A2D]/5 dark:hover:shadow-black/25 motion-reduce:transform-none motion-reduce:transition-none space-y-3 cursor-pointer group"
-                    >
-                      <div className="flex items-center justify-between gap-2 text-[11px] font-mono font-bold">
-                        <span className={modIsAi ? 'text-[#8B5CF6] dark:text-[#A78BFA]' : 'text-[#0B1A2D] dark:text-[#B7F229]'}>
-                          {mod.order}
-                        </span>
-                        <span className="font-sans font-medium text-slate-500 dark:text-slate-400">
-                          {mod.categoryLabel}
-                        </span>
-                      </div>
-                      <div className="text-base font-bold text-[#0B1A2D] dark:text-white font-display group-hover:underline">
-                        {mod.title}
-                      </div>
-                      <p className="text-xs text-slate-600 dark:text-slate-300 line-clamp-2 leading-relaxed">
-                        {mod.shortDesc}
-                      </p>
-                    </button>
-                  );
-                })}
+                {siblingModules.map((mod) => (
+                  <button
+                    key={mod.id}
+                    type="button"
+                    onClick={() => handleSelectModule(mod.id)}
+                    className="text-left p-6 rounded-2xl bg-white dark:bg-[#0E2239] border border-slate-200/90 dark:border-[#1A314D] hover:border-[#0B1A2D]/40 dark:hover:border-[#B7F229]/50 transition-[transform,border-color,box-shadow] duration-200 ease-out hover:-translate-y-0.5 hover:shadow-md hover:shadow-[#0B1A2D]/5 dark:hover:shadow-black/25 motion-reduce:transform-none motion-reduce:transition-none space-y-3 cursor-pointer group"
+                  >
+                    <div className="flex items-center justify-between gap-2 text-[11px] font-mono font-bold">
+                      <span className="text-[#0B1A2D] dark:text-[#B7F229]">
+                        {mod.order}
+                      </span>
+                      <span className="font-sans font-medium text-slate-500 dark:text-slate-400">
+                        {mod.categoryLabel}
+                      </span>
+                    </div>
+                    <div className="text-base font-bold text-[#0B1A2D] dark:text-white font-display group-hover:underline">
+                      {mod.title}
+                    </div>
+                    <p className="text-xs text-slate-600 dark:text-slate-300 line-clamp-2 leading-relaxed">
+                      {mod.shortDesc}
+                    </p>
+                  </button>
+                ))}
               </div>
             </div>
           </CorporateContainer>
         </section>
 
-        <section className="py-16 sm:py-20">
+        <section className="py-14 sm:py-18">
           <CorporateContainer>
             <CorporateCtaBanner
               eyebrow="Setmio Pro · Suscripción modular con alta guiada"
@@ -325,37 +305,41 @@ export const FeaturesView: React.FC<FeaturesViewProps> = ({
 
   return (
     <div className="bg-white dark:bg-[#0B1A2D] text-[#0B1A2D] dark:text-white transition-colors duration-200 overflow-x-clip">
-      {/* 1. HERO & WRAPPED FILTER BAR */}
-      <section className="border-b border-slate-200/80 dark:border-[#1A314D] py-10 sm:py-16">
-        <CorporateContainer className="space-y-10">
-          <CorporateBreadcrumb
-            items={[
-              { label: 'Inicio', onClick: () => navigate('/', 'home') },
-              { label: 'Funcionalidades' },
-            ]}
-            onBack={handleBackRoot}
-            backLabel="Volver al inicio"
-          />
+      {/* 1. COMPACT HERO & WRAPPED FILTER BAR */}
+      <section className="border-b border-slate-200/80 dark:border-[#1A314D] py-7 sm:py-11">
+        <CorporateContainer className="space-y-5 sm:space-y-6">
+          <nav aria-label="Ruta de navegación" className="flex items-center gap-1.5 text-xs">
+            <button
+              type="button"
+              onClick={() => navigate('/', 'home')}
+              className="font-medium text-slate-500 dark:text-slate-400 hover:text-[#0B1A2D] dark:hover:text-white transition-colors cursor-pointer"
+            >
+              Inicio
+            </button>
+            <ChevronRight className="w-3.5 h-3.5 text-slate-300 dark:text-slate-600 shrink-0" aria-hidden="true" />
+            <span className="font-semibold text-[#0B1A2D] dark:text-white">
+              Funcionalidades
+            </span>
+          </nav>
 
-          <div className="max-w-3xl space-y-4 animate-float-in">
+          <div className="max-w-3xl space-y-3 animate-float-in">
             <CorporateEyebrow accent="lime">Setmio Pro · Ecosistema Modular</CorporateEyebrow>
-            <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-[#0B1A2D] dark:text-white leading-[1.08] font-display text-balance">
+            <h1 className="text-3xl sm:text-4xl lg:text-[44px] font-extrabold tracking-tight text-[#0B1A2D] dark:text-white leading-[1.08] font-display text-balance">
               Módulos conectados para operar cada área de tu organización.
             </h1>
-            <p className="text-base sm:text-lg text-slate-600 dark:text-slate-300 leading-relaxed max-w-2xl">
+            <p className="text-sm sm:text-base text-slate-600 dark:text-slate-300 leading-relaxed max-w-2xl">
               Activa reservas, escuelas, torneos, gestión de equipos, TPV, pagos divididos, asistente IA y marca blanca sobre una base unificada.
             </p>
           </div>
 
-          {/* Multi-line Wrapped Category Filters — Fully Visible Without Horizontal Clipping */}
+          {/* Compact Multi-line Wrapped Category Filters — Fully Visible Without Horizontal Clipping */}
           <div
             role="tablist"
             aria-label="Filtrar módulos por área"
-            className="flex flex-wrap items-center gap-2 sm:gap-2.5 pt-2"
+            className="flex flex-wrap items-center gap-1.5 sm:gap-2 pt-1"
           >
             {categories.map((cat) => {
               const active = filter === cat.id;
-              const isAiCategory = cat.id === 'ia';
 
               return (
                 <button
@@ -364,27 +348,18 @@ export const FeaturesView: React.FC<FeaturesViewProps> = ({
                   role="tab"
                   aria-selected={active}
                   onClick={() => setFilter(cat.id)}
-                  className={`inline-flex items-center gap-2 min-h-[40px] px-3.5 sm:px-4 py-2 rounded-xl text-xs font-semibold transition-all duration-150 motion-reduce:transition-none cursor-pointer border ${
+                  className={`inline-flex items-center gap-1.5 min-h-[34px] px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors duration-150 motion-reduce:transition-none cursor-pointer border ${
                     active
-                      ? 'bg-[#0B1A2D] text-white border-[#0B1A2D] dark:bg-[#B7F229] dark:text-[#0B1A2D] dark:border-[#B7F229] shadow-xs'
+                      ? 'bg-[#0B1A2D] text-white border-[#0B1A2D] dark:bg-[#B7F229] dark:text-[#0B1A2D] dark:border-[#B7F229]'
                       : 'bg-[#F7F9FC] dark:bg-[#0E2239] text-slate-700 dark:text-slate-300 border-slate-200/90 dark:border-[#1A314D] hover:border-[#0B1A2D]/40 dark:hover:border-[#B7F229]/50 hover:text-[#0B1A2D] dark:hover:text-white'
                   }`}
                 >
-                  {isAiCategory && (
-                    <Sparkles
-                      className={`w-3.5 h-3.5 shrink-0 ${
-                        active
-                          ? 'text-[#A78BFA] dark:text-[#0B1A2D]'
-                          : 'text-[#8B5CF6] dark:text-[#A78BFA]'
-                      }`}
-                    />
-                  )}
                   <span>{cat.label}</span>
                   <span
-                    className={`font-mono text-[10px] tabular-nums px-1.5 py-0.5 rounded-md ${
+                    className={`font-mono text-[10px] tabular-nums ${
                       active
-                        ? 'bg-white/15 text-[#B7F229] dark:bg-[#0B1A2D]/15 dark:text-[#0B1A2D]'
-                        : 'bg-slate-200/70 dark:bg-[#132A45] text-slate-600 dark:text-slate-400'
+                        ? 'text-[#B7F229] dark:text-[#0B1A2D]/80'
+                        : 'text-slate-400 dark:text-slate-400'
                     }`}
                   >
                     {String(cat.count).padStart(2, '0')}
@@ -397,7 +372,7 @@ export const FeaturesView: React.FC<FeaturesViewProps> = ({
       </section>
 
       {/* 2. UNIFORM MODULE CARDS CATALOG */}
-      <section className="py-14 sm:py-20 bg-[#F7F9FC] dark:bg-[#081424] border-b border-slate-200/80 dark:border-[#1A314D]">
+      <section className="py-10 sm:py-16 bg-[#F7F9FC] dark:bg-[#081424] border-b border-slate-200/80 dark:border-[#1A314D]">
         <CorporateContainer className="space-y-8">
           <div
             key={filter}
@@ -405,7 +380,6 @@ export const FeaturesView: React.FC<FeaturesViewProps> = ({
           >
             {visibleModules.map((mod) => {
               const Icon = MODULE_ICONS[mod.id] || Calendar;
-              const isAiModule = mod.id === 'copiloto-ia';
 
               return (
                 <article
@@ -414,23 +388,11 @@ export const FeaturesView: React.FC<FeaturesViewProps> = ({
                 >
                   <div className="space-y-4 min-w-0">
                     <div className="flex items-center justify-between gap-3">
-                      <div
-                        className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
-                          isAiModule
-                            ? 'bg-[#8B5CF6]/10 dark:bg-[#8B5CF6]/15 border border-[#8B5CF6]/25 text-[#8B5CF6] dark:text-[#A78BFA]'
-                            : 'bg-[#0B1A2D] dark:bg-[#132A45] text-[#B7F229]'
-                        }`}
-                      >
+                      <div className="w-10 h-10 rounded-xl bg-[#0B1A2D] dark:bg-[#132A45] text-[#B7F229] flex items-center justify-center shrink-0">
                         <Icon className="w-5 h-5" />
                       </div>
                       <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 text-right">
-                        <span
-                          className={`font-mono font-bold tabular-nums mr-1.5 ${
-                            isAiModule
-                              ? 'text-[#8B5CF6] dark:text-[#A78BFA]'
-                              : 'text-[#0B1A2D] dark:text-[#B7F229]'
-                          }`}
-                        >
+                        <span className="font-mono font-bold tabular-nums mr-1.5 text-[#0B1A2D] dark:text-[#B7F229]">
                           {mod.order}
                         </span>
                         · {mod.categoryLabel}
@@ -449,13 +411,7 @@ export const FeaturesView: React.FC<FeaturesViewProps> = ({
                     <ul className="space-y-2.5 pt-3.5 border-t border-slate-100 dark:border-[#1A314D] text-xs text-slate-700 dark:text-slate-300">
                       {mod.bullets.slice(0, 3).map((b) => (
                         <li key={b} className="flex items-start gap-2.5">
-                          <Check
-                            className={`w-3.5 h-3.5 shrink-0 mt-0.5 ${
-                              isAiModule
-                                ? 'text-[#8B5CF6] dark:text-[#A78BFA]'
-                                : 'text-[#0B1A2D] dark:text-[#B7F229]'
-                            }`}
-                          />
+                          <Check className="w-3.5 h-3.5 shrink-0 mt-0.5 text-[#0B1A2D] dark:text-[#B7F229]" />
                           <span className="leading-relaxed">{b}</span>
                         </li>
                       ))}
@@ -507,7 +463,7 @@ export const FeaturesView: React.FC<FeaturesViewProps> = ({
       </section>
 
       {/* 3. CLOSING DARK CTA BANNER — Aligned with Setmio Subscription & Guided Setup */}
-      <section className="py-16 sm:py-20">
+      <section className="py-14 sm:py-18">
         <CorporateContainer>
           <CorporateCtaBanner
             eyebrow="Setmio Pro · Suscripción modular con alta guiada"

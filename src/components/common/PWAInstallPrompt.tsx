@@ -8,7 +8,10 @@ export const PWAInstallPrompt: React.FC = () => {
   const { isInstallable, isInstalled, isIOS, installPWA } = usePWA();
   const { currentTenant, isCorporateLanding, currentView } = useApp();
   const [showIOSModal, setShowIOSModal] = useState(false);
-  const [dismissed, setDismissed] = useState(false);
+  const [dismissed, setDismissed] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return window.sessionStorage.getItem('setmio_pwa_dismissed') === '1';
+  });
   const [hasScrolledPastHero, setHasScrolledPastHero] = useState(false);
 
   const isPublicCorporate = isCorporateLanding && currentView === 'public';
@@ -20,15 +23,24 @@ export const PWAInstallPrompt: React.FC = () => {
     }
 
     const onScroll = () => {
-      if (window.scrollY > 260) {
-        setHasScrolledPastHero(true);
-      }
+      setHasScrolledPastHero(window.scrollY > 420);
     };
 
     onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
+    window.addEventListener('popstate', onScroll);
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('popstate', onScroll);
+    };
   }, [isPublicCorporate]);
+
+  const handleDismiss = () => {
+    setDismissed(true);
+    if (typeof window !== 'undefined') {
+      window.sessionStorage.setItem('setmio_pwa_dismissed', '1');
+    }
+  };
 
   if (isInstalled || dismissed) return null;
   if (isPublicCorporate && !hasScrolledPastHero) return null;
@@ -51,7 +63,7 @@ export const PWAInstallPrompt: React.FC = () => {
       {(isInstallable || isIOS) && (
         <aside
           aria-label="Instalación de la aplicación web"
-          className={`fixed ${positionClass} z-30 rounded-2xl border border-[#1A314D] bg-[#0B1A2D]/95 backdrop-blur-xl p-3.5 shadow-2xl shadow-[#040B14]/40 flex items-center justify-between gap-3 text-white animate-float-in`}
+          className={`fixed ${positionClass} z-30 rounded-2xl border border-[#1A314D] bg-[#0B1A2D]/95 backdrop-blur-xl p-3 shadow-2xl shadow-[#040B14]/40 flex items-center justify-between gap-3 text-white animate-float-in`}
         >
           <div className="flex items-center gap-3 min-w-0">
             <div className="w-10 h-10 rounded-xl bg-[#071220] border border-[#1A314D] flex items-center justify-center shrink-0">
@@ -92,7 +104,7 @@ export const PWAInstallPrompt: React.FC = () => {
 
             <button
               type="button"
-              onClick={() => setDismissed(true)}
+              onClick={handleDismiss}
               className="p-2 rounded-lg text-slate-300 hover:text-white hover:bg-[#132A45] transition-colors cursor-pointer"
               title="Cerrar aviso"
               aria-label="Cerrar aviso"
