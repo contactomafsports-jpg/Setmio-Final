@@ -1,6 +1,6 @@
 import React from 'react';
 import { useApp, PublicPage } from '../../context/AppContext';
-import { Instagram, Facebook, Mail, Phone } from 'lucide-react';
+import { Instagram, Facebook, Linkedin, Mail, Phone } from 'lucide-react';
 import { SetmioLogo } from './SetmioLogo';
 import { SETMIO_PRO_SEGMENTS } from '../public/corporate/corporateData';
 
@@ -111,6 +111,31 @@ export const CorporateFooter: React.FC<CorporateFooterProps> = ({ minimized = fa
                 aria-label={t('footer.facebookAria', 'Facebook oficial')}
               >
                 <Facebook className="w-4 h-4" />
+              </a>
+              <a
+                href="https://x.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-9 h-9 rounded-lg bg-[#0B1A2D] hover:bg-[#132A45] border border-[#1A314D] text-slate-200 hover:text-[#B7F229] flex items-center justify-center transition-colors"
+                aria-label={t('footer.xAria', 'X (Twitter) oficial')}
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  className="w-4 h-4"
+                  aria-hidden="true"
+                >
+                  <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                </svg>
+              </a>
+              <a
+                href="https://linkedin.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-9 h-9 rounded-lg bg-[#0B1A2D] hover:bg-[#132A45] border border-[#1A314D] text-slate-200 hover:text-[#B7F229] flex items-center justify-center transition-colors"
+                aria-label={t('footer.linkedinAria', 'LinkedIn oficial')}
+              >
+                <Linkedin className="w-4 h-4" />
               </a>
             </div>
           </div>

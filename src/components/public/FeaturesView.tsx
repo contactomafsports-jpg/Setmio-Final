@@ -9,6 +9,7 @@ import {
   CreditCard,
   Globe,
   GraduationCap,
+  Play,
   Shield,
   ShoppingBag,
   Trophy,
@@ -16,7 +17,6 @@ import {
 import { useApp, PublicPage } from '../../context/AppContext';
 import { RoleSelectorModal } from '../common/RoleSelectorModal';
 import {
-  CorporateBreadcrumb,
   CorporateContainer,
   CorporateCtaBanner,
   CorporateEyebrow,
@@ -118,56 +118,89 @@ export const FeaturesView: React.FC<FeaturesViewProps> = ({
   // LEVEL 3 MODULE DETAIL VIEW
   if (selectedModule) {
     const Icon = MODULE_ICONS[selectedModule.id] || Calendar;
-    const siblingModules = CORPORATE_MODULES.filter((m) => m.id !== selectedModule.id).slice(0, 3);
+    const currentIdx = CORPORATE_MODULES.findIndex((m) => m.id === selectedModule.id);
+    const sameCategory = CORPORATE_MODULES.filter(
+      (m) => m.id !== selectedModule.id && m.category === selectedModule.category
+    );
+    const rotated = [
+      ...CORPORATE_MODULES.slice(currentIdx + 1),
+      ...CORPORATE_MODULES.slice(0, currentIdx),
+    ].filter((m) => m.id !== selectedModule.id && m.category !== selectedModule.category);
+    const siblingModules = [...sameCategory, ...rotated].slice(0, 3);
+    const showsDomoticaCrossLink =
+      selectedModule.category === 'operacion' ||
+      selectedModule.category === 'ingresos' ||
+      selectedModule.category === 'ia';
 
     return (
       <div className="bg-white dark:bg-[#0B1A2D] text-[#0B1A2D] dark:text-white transition-colors duration-200 overflow-x-clip">
-        <section className="border-b border-slate-200/80 dark:border-[#1A314D] py-8 sm:py-12">
-          <CorporateContainer className="space-y-8">
-            <CorporateBreadcrumb
-              items={[
-                { label: 'Inicio', onClick: () => navigate('/', 'home') },
-                { label: 'Funcionalidades', onClick: handleBackToCatalog },
-                { label: selectedModule.title },
-              ]}
-              onBack={handleBackToCatalog}
-              backLabel="Todos los módulos"
-              className="pb-5"
-            />
+        {/* 1. COMPACT SINGLE-LINE BREADCRUMB & HERO SUMMARY */}
+        <section className="border-b border-slate-200/80 dark:border-[#1A314D] py-7 sm:py-11">
+          <CorporateContainer className="space-y-6 sm:space-y-8">
+            <nav
+              aria-label="Ruta de navegación"
+              className="flex items-center gap-1.5 text-xs whitespace-nowrap min-w-0"
+            >
+              <button
+                type="button"
+                onClick={() => navigate('/', 'home')}
+                className="font-medium text-slate-500 dark:text-slate-400 hover:text-[#0B1A2D] dark:hover:text-white transition-colors cursor-pointer shrink-0"
+              >
+                Inicio
+              </button>
+              <ChevronRight className="w-3.5 h-3.5 text-slate-300 dark:text-slate-600 shrink-0" aria-hidden="true" />
+              <button
+                type="button"
+                onClick={handleBackToCatalog}
+                className="font-medium text-slate-500 dark:text-slate-400 hover:text-[#0B1A2D] dark:hover:text-white transition-colors cursor-pointer shrink-0"
+              >
+                Funcionalidades
+              </button>
+              <ChevronRight className="w-3.5 h-3.5 text-slate-300 dark:text-slate-600 shrink-0" aria-hidden="true" />
+              <span className="font-semibold text-[#0B1A2D] dark:text-white truncate min-w-0">
+                {selectedModule.title}
+              </span>
+            </nav>
 
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-start animate-float-in">
-              <div className="lg:col-span-8 space-y-5 min-w-0">
+            <div
+              key={selectedModule.id}
+              className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start animate-float-in"
+            >
+              <div className="lg:col-span-8 space-y-4 sm:space-y-5 min-w-0">
                 <div className="flex flex-wrap items-center gap-3">
                   <span className="w-10 h-10 rounded-xl bg-[#0B1A2D] dark:bg-[#132A45] text-[#B7F229] inline-flex items-center justify-center shrink-0">
                     <Icon className="w-5 h-5" />
                   </span>
-                  <CorporateEyebrow accent="lime">
+                  <CorporateEyebrow accent={selectedModule.id === 'copiloto-ia' ? 'violet' : 'lime'}>
                     {selectedModule.order} · {selectedModule.categoryLabel}
                   </CorporateEyebrow>
                 </div>
 
-                <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-[#0B1A2D] dark:text-white leading-[1.08] font-display text-balance">
+                <h1 className="text-3xl sm:text-4xl lg:text-[44px] font-extrabold tracking-tight text-[#0B1A2D] dark:text-white leading-[1.08] font-display text-balance">
                   {selectedModule.title}
                 </h1>
 
-                <p className="text-base sm:text-lg text-slate-600 dark:text-slate-300 leading-relaxed max-w-2xl">
+                <p className="text-sm sm:text-base text-slate-600 dark:text-slate-300 leading-relaxed max-w-2xl">
                   {selectedModule.fullDesc}
                 </p>
 
-                <div className="pt-2 flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center gap-3">
+                <div className="pt-1 flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center gap-3">
                   <CorporatePrimaryButton onClick={handleOpenOnboardingClick}>
                     Registrarse
                   </CorporatePrimaryButton>
-                  <CorporateSecondaryButton onClick={handleOpenDemoClick}>
-                    Explorar demo por perfil
+                  <CorporateSecondaryButton
+                    onClick={handleOpenDemoClick}
+                    icon={<Play className="w-3.5 h-3.5 fill-current shrink-0" />}
+                  >
+                    Explorar demo
                   </CorporateSecondaryButton>
                 </div>
               </div>
 
-              <aside className="lg:col-span-4 rounded-2xl bg-[#F7F9FC] dark:bg-[#0E2239] border border-slate-200/90 dark:border-[#1A314D] p-6 space-y-5 min-w-0">
+              <aside className="lg:col-span-4 rounded-2xl bg-[#F7F9FC] dark:bg-[#0E2239] border border-slate-200/90 dark:border-[#1A314D] p-5 sm:p-6 space-y-4 min-w-0">
                 <div>
                   <div className="text-[11px] font-bold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">
-                    Perfiles compatibles
+                    Roles compatibles
                   </div>
                   <ul className="mt-3 space-y-2 text-xs font-semibold text-[#0B1A2D] dark:text-slate-200">
                     {selectedModule.applicableProfiles.map((prof) => (
@@ -184,12 +217,13 @@ export const FeaturesView: React.FC<FeaturesViewProps> = ({
 
                 <div className="pt-4 border-t border-slate-200/80 dark:border-[#1A314D]">
                   <div className="text-[11px] font-bold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">
-                    Operación diaria
+                    Ventaja operativa
                   </div>
                   <ul className="mt-3 space-y-2 text-xs text-slate-600 dark:text-slate-300">
                     {selectedModule.workflowNotes.map((note) => (
-                      <li key={note} className="leading-relaxed">
-                        · {note}
+                      <li key={note} className="flex items-start gap-2 leading-relaxed">
+                        <Check className="w-3.5 h-3.5 text-[#0B1A2D] dark:text-[#B7F229] shrink-0 mt-0.5" />
+                        <span>{note}</span>
                       </li>
                     ))}
                   </ul>
@@ -199,17 +233,23 @@ export const FeaturesView: React.FC<FeaturesViewProps> = ({
           </CorporateContainer>
         </section>
 
-        <section className="py-12 sm:py-16 bg-[#F7F9FC] dark:bg-[#081424] border-b border-slate-200/80 dark:border-[#1A314D]">
-          <CorporateContainer className="space-y-12">
+        {/* 2. CAPABILITIES & RELATED MODULES */}
+        <section className="py-10 sm:py-16 bg-[#F7F9FC] dark:bg-[#081424] border-b border-slate-200/80 dark:border-[#1A314D]">
+          <CorporateContainer className="space-y-10 sm:space-y-12">
             <div className="rounded-2xl bg-white dark:bg-[#0E2239] border border-slate-200/90 dark:border-[#1A314D] p-6 sm:p-8 space-y-5">
-              <h2 className="text-xl sm:text-2xl font-bold text-[#0B1A2D] dark:text-white font-display">
-                Capacidades incluidas en este módulo
-              </h2>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <h2 className="text-xl sm:text-2xl font-bold text-[#0B1A2D] dark:text-white font-display">
+                  Capacidades incluidas en este módulo
+                </h2>
+                <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
+                  Integrado en tu suscripción modular
+                </span>
+              </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {selectedModule.bullets.map((bullet) => (
                   <div
                     key={bullet}
-                    className="p-4 rounded-xl bg-[#F7F9FC] dark:bg-[#0B1A2D] border border-slate-200/80 dark:border-[#1A314D] flex items-start gap-3 text-sm text-slate-700 dark:text-slate-200"
+                    className="p-4 sm:p-5 rounded-xl bg-[#F7F9FC] dark:bg-[#0B1A2D] border border-slate-200/80 dark:border-[#1A314D] flex items-start gap-3 text-sm text-slate-700 dark:text-slate-200 leading-relaxed"
                   >
                     <Check className="w-4 h-4 text-[#0B1A2D] dark:text-[#B7F229] shrink-0 mt-0.5" />
                     <span>{bullet}</span>
@@ -219,47 +259,94 @@ export const FeaturesView: React.FC<FeaturesViewProps> = ({
             </div>
 
             <div className="space-y-5">
-              <h3 className="text-lg font-bold text-[#0B1A2D] dark:text-white font-display">
-                Otros módulos relacionados
-              </h3>
+              <div className="flex items-center justify-between gap-4">
+                <h3 className="text-lg font-bold text-[#0B1A2D] dark:text-white font-display">
+                  Otros módulos relacionados
+                </h3>
+                <button
+                  type="button"
+                  onClick={handleBackToCatalog}
+                  className="text-xs font-bold text-[#0B1A2D] dark:text-[#B7F229] hover:underline cursor-pointer shrink-0"
+                >
+                  Ver todos los módulos
+                </button>
+              </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-                {siblingModules.map((mod) => (
-                  <button
-                    key={mod.id}
-                    type="button"
-                    onClick={() => handleSelectModule(mod.id)}
-                    className="text-left p-6 rounded-2xl bg-white dark:bg-[#0E2239] border border-slate-200/90 dark:border-[#1A314D] hover:border-[#0B1A2D]/40 dark:hover:border-[#B7F229]/50 transition-[transform,border-color,box-shadow] duration-200 ease-out hover:-translate-y-0.5 hover:shadow-md hover:shadow-[#0B1A2D]/5 dark:hover:shadow-black/25 motion-reduce:transform-none motion-reduce:transition-none space-y-3 cursor-pointer group"
-                  >
-                    <div className="flex items-center justify-between gap-2 text-[11px] font-mono font-bold">
-                      <span className="text-[#0B1A2D] dark:text-[#B7F229]">
-                        {mod.order}
+                {siblingModules.map((mod) => {
+                  const ModIcon = MODULE_ICONS[mod.id] || Calendar;
+                  return (
+                    <button
+                      key={mod.id}
+                      type="button"
+                      onClick={() => handleSelectModule(mod.id)}
+                      className="text-left p-6 rounded-2xl bg-white dark:bg-[#0E2239] border border-slate-200/90 dark:border-[#1A314D] hover:border-[#0B1A2D]/40 dark:hover:border-[#B7F229]/50 transition-[transform,border-color,box-shadow] duration-200 ease-out hover:-translate-y-0.5 hover:shadow-md hover:shadow-[#0B1A2D]/5 dark:hover:shadow-black/25 motion-reduce:transform-none motion-reduce:transition-none flex flex-col justify-between gap-4 cursor-pointer group min-w-0"
+                    >
+                      <div className="space-y-3 min-w-0">
+                        <div className="flex items-center justify-between gap-2 text-[11px] font-mono font-bold">
+                          <span className="inline-flex items-center gap-2 text-[#0B1A2D] dark:text-[#B7F229]">
+                            <span className="w-7 h-7 rounded-lg bg-[#0B1A2D] dark:bg-[#132A45] text-[#B7F229] inline-flex items-center justify-center shrink-0">
+                              <ModIcon className="w-3.5 h-3.5" />
+                            </span>
+                            <span className="tabular-nums">{mod.order}</span>
+                          </span>
+                          <span className="font-sans font-medium text-slate-500 dark:text-slate-400 truncate">
+                            {mod.categoryLabel}
+                          </span>
+                        </div>
+                        <div className="text-base font-bold text-[#0B1A2D] dark:text-white font-display group-hover:underline decoration-[#0B1A2D]/40 dark:decoration-[#B7F229]/60 underline-offset-4">
+                          {mod.title}
+                        </div>
+                        <p className="text-xs text-slate-600 dark:text-slate-300 line-clamp-2 leading-relaxed">
+                          {mod.shortDesc}
+                        </p>
+                      </div>
+                      <span className="inline-flex items-center gap-1.5 text-xs font-bold text-[#0B1A2D] dark:text-[#B7F229]">
+                        <span>Ver módulo</span>
+                        <ArrowRight className="w-3.5 h-3.5 transition-transform duration-150 group-hover:translate-x-0.5 motion-reduce:transform-none" />
                       </span>
-                      <span className="font-sans font-medium text-slate-500 dark:text-slate-400">
-                        {mod.categoryLabel}
-                      </span>
-                    </div>
-                    <div className="text-base font-bold text-[#0B1A2D] dark:text-white font-display group-hover:underline">
-                      {mod.title}
-                    </div>
-                    <p className="text-xs text-slate-600 dark:text-slate-300 line-clamp-2 leading-relaxed">
-                      {mod.shortDesc}
-                    </p>
-                  </button>
-                ))}
+                    </button>
+                  );
+                })}
               </div>
             </div>
+
+            {showsDomoticaCrossLink && (
+              <div className="rounded-2xl bg-white dark:bg-[#0E2239] border border-slate-200/90 dark:border-[#1A314D] p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="flex items-start sm:items-center gap-3.5 min-w-0">
+                  <div className="w-10 h-10 rounded-xl bg-[#0B1A2D] dark:bg-[#132A45] text-[#B7F229] flex items-center justify-center shrink-0">
+                    <Cpu className="w-5 h-5" />
+                  </div>
+                  <div className="min-w-0">
+                    <div className="text-sm font-bold text-[#0B1A2D] dark:text-white font-display">
+                      Domótica e Iluminación IoT conectada al cuadrante
+                    </div>
+                    <p className="text-xs text-slate-600 dark:text-slate-300 mt-0.5">
+                      Sincroniza cerraduras con PIN dinámico, tornos y encendido de pistas con cada reserva confirmada.
+                    </p>
+                  </div>
+                </div>
+
+                <CorporateSecondaryButton
+                  onClick={() => navigate('/domotica', 'modules')}
+                  className="shrink-0 text-xs px-4 py-2.5 min-h-[40px]"
+                >
+                  Ver Domótica y Accesos
+                </CorporateSecondaryButton>
+              </div>
+            )}
           </CorporateContainer>
         </section>
 
+        {/* 3. CLOSING DARK CTA BANNER */}
         <section className="py-14 sm:py-18">
           <CorporateContainer>
             <CorporateCtaBanner
               eyebrow="Setmio Pro · Suscripción modular con alta guiada"
               title="Activa la plataforma completa bajo tu propia marca"
-              subtitle="Todos los módulos comparten una única base de socios, pistas y facturación con implantación asistida y sin comisiones por pista."
+              subtitle="Todos los módulos comparten una única base de socios, pistas y facturación con instalación inicial asistida y sin comisiones por pista."
               primaryLabel="Registrarse"
               onPrimary={handleOpenOnboardingClick}
-              secondaryLabel="Explorar demo por perfil"
+              secondaryLabel="Explorar demo"
               onSecondary={handleOpenDemoClick}
             />
           </CorporateContainer>

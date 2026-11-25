@@ -23,7 +23,7 @@ export const esLocale: Record<string, string> = {
   "auth.noAccount": "¿No tienes una cuenta aún?",
   "auth.passwordLabel": "Contraseña",
   "auth.passwordPlaceholder": "••••••••",
-  "auth.registerFree": "Regístrate gratis",
+  "auth.registerFree": "Regístrate",
   "auth.roleSelector": "Acceso rápido con perfiles demo preconfigurados:",
   "auth.sessionClosed": "Sesión Cerrada",
   "auth.submit": "Entrar a mi Cuenta",

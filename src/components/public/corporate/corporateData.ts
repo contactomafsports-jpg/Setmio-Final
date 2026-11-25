@@ -844,6 +844,8 @@ export const CORPORATE_MODULES: FeatureModuleDetail[] = [
       'Liquidación directa en el IBAN de la entidad sin comisiones sobre reserva',
       'Bonos prepago y recargas de monedero con saldo incentivado',
       'Remesas bancarias SEPA para cuotas sociales y escuela',
+      'Veri*factu para cumplimiento de facturación y registro fiscal (aplica exclusivamente a clientes en España)',
+      'Conciliación de cobros por pista y devoluciones automáticas en plazo o por lluvia',
     ],
     applicableProfiles: ['Clubes de Pádel', 'Academias', 'Administraciones Públicas'],
     workflowNotes: [
@@ -864,7 +866,7 @@ export const CORPORATE_MODULES: FeatureModuleDetail[] = [
       'Cargo rápido de bebidas, bolas o grips a la cuenta de los jugadores',
       'Control de inventario de tienda y alquiler/prueba de palas',
       'Arqueos diarios de caja por método de pago y turno de personal',
-      'Facturación adaptada a normativa vigente (VeriFactu / TicketBAI / SII)',
+      'Facturación adaptada a normativa vigente en España (Veri*factu / TicketBAI / SII)',
     ],
     applicableProfiles: ['Clubes de Pádel', 'Academias'],
     workflowNotes: [

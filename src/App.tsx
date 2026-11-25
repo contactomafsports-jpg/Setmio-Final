@@ -34,6 +34,7 @@ import { SolucionesPage } from './components/public/SolucionesPage';
 import { CorporateLayout } from './components/public/CorporateLayout';
 import { PlayerPublicProfileView } from './components/public/PlayerPublicProfileView';
 import { ParaJugadoresPage } from './components/public/ParaJugadoresPage';
+import { DemosPage } from './components/public/DemosPage';
 
 // Admin views
 import { AdminLayout } from './components/admin/AdminLayout';
@@ -151,8 +152,7 @@ export function App() {
       if (pathname === '/demo') {
         setIsCorporateLanding(true);
         setCurrentView('public');
-        setPublicPage('home');
-        setRoleSelectorOpen(true);
+        setPublicPage('demo');
         return;
       }
 
@@ -427,8 +427,7 @@ export function App() {
 
       const page = routeToPage[pathname];
       if (page === 'demo') {
-        setPublicPage('home');
-        setRoleSelectorOpen(true);
+        setPublicPage('demo');
       } else if (page) {
         setPublicPage(page);
         if (pathname === '/registro') {
@@ -482,6 +481,18 @@ export function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const openCorporateDemos = () => {
+    if (isCorporateLanding) {
+      if (typeof window !== 'undefined' && window.location.pathname !== '/demo') {
+        window.history.pushState({}, '', '/demo');
+      }
+      setPublicPage('demo');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+      setRoleSelectorOpen(true);
+    }
+  };
+
   // Render Public Page Switcher
   const renderPublicPage = () => {
     switch (publicPage) {
@@ -491,7 +502,7 @@ export function App() {
         return (
           <FeaturesView
             onBack={goHome}
-            onOpenDemo={() => setRoleSelectorOpen(true)}
+            onOpenDemo={openCorporateDemos}
             onOpenOnboarding={() => {
               window.history.pushState({}, '', '/registro');
               window.dispatchEvent(new PopStateEvent('popstate'));
@@ -535,17 +546,17 @@ export function App() {
             roleId={roleIdMap[publicPage]}
             onOpenRole={(roleId) => setPublicPage(pageMap[roleId] || 'solutions')}
             onBack={goHome}
-            onOpenDemo={() => setRoleSelectorOpen(true)}
+            onOpenDemo={openCorporateDemos}
           />
         );
       }
       case 'players_app':
-        return <ParaJugadoresPage onBack={goHome} onOpenDemo={() => setRoleSelectorOpen(true)} onOpenRegister={() => { setRegistrationOpen(true); setAuthOpen(true); }} />;
+        return <ParaJugadoresPage onBack={goHome} onOpenDemo={openCorporateDemos} onOpenRegister={() => { setRegistrationOpen(true); setAuthOpen(true); }} />;
       case 'modules':
         return (
           <ModulosDomoticaPage
             onBack={goHome}
-            onOpenDemo={() => setRoleSelectorOpen(true)}
+            onOpenDemo={openCorporateDemos}
             onOpenRegister={() => {
               window.history.pushState({}, '', '/registro');
               window.dispatchEvent(new PopStateEvent('popstate'));
@@ -555,9 +566,18 @@ export function App() {
           />
         );
       case 'demo':
-        return <HomeView />;
+        return isCorporateLanding ? (
+          <DemosPage
+            onOpenRegister={() => {
+              setRegistrationOpen(true);
+              setAuthOpen(true);
+            }}
+          />
+        ) : (
+          <HomeView />
+        );
       case 'pricing':
-        return <PricingView onBack={goHome} onOpenDemo={() => setRoleSelectorOpen(true)} onOpenRegister={() => { setRegistrationOpen(true); setAuthOpen(true); }} />;
+        return <PricingView onBack={goHome} onOpenDemo={openCorporateDemos} onOpenRegister={() => { setRegistrationOpen(true); setAuthOpen(true); }} />;
       case 'player_profile':
         return <PlayerPublicProfileView onBack={() => setPublicPage('teams')} />;
       case 'club':
@@ -582,7 +602,7 @@ export function App() {
         return (
           <BlogView
             onBack={goHome}
-            onOpenDemo={() => setRoleSelectorOpen(true)}
+            onOpenDemo={openCorporateDemos}
             onOpenRegister={() => {
               setRegistrationOpen(true);
               setAuthOpen(true);
@@ -687,12 +707,12 @@ export function App() {
     <div className="min-h-screen bg-background text-foreground dark:bg-slate-950 dark:text-slate-100 font-sans selection:bg-[#B7F229] selection:text-[#0B1A2D] antialiased transition-colors duration-200">
       {/* Main view renderer: Corporate SaaS Landing OR Club View */}
       {currentView === 'public' && (isCorporateLanding ? (
-        <CorporateLayout onOpenDemo={() => setRoleSelectorOpen(true)} onOpenAuth={() => setAuthOpen(true)} onOpenRegister={() => { window.history.pushState({}, '', '/registro'); setRegistrationOpen(true); setAuthOpen(true); }}>
+        <CorporateLayout onOpenDemo={openCorporateDemos} onOpenAuth={() => setAuthOpen(true)} onOpenRegister={() => { window.history.pushState({}, '', '/registro'); setRegistrationOpen(true); setAuthOpen(true); }}>
           {publicPage === 'home' ? (
             <SetmioCorporateLanding
               onOpenAuth={() => setAuthOpen(true)}
               onExploreClub={navigateToClub}
-              onOpenDemoRoleModal={() => setRoleSelectorOpen(true)}
+              onOpenDemoRoleModal={openCorporateDemos}
               onOpenFeatures={() => { window.history.pushState({}, '', '/funcionalidades'); setPublicPage('features'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
               onOpenOnboarding={() => { window.history.pushState({}, '', '/registro'); window.dispatchEvent(new PopStateEvent('popstate')); setRegistrationOpen(true); setAuthOpen(true); }}
             />

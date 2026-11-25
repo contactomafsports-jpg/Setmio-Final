@@ -243,32 +243,36 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   ];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#071220]/80 p-4 backdrop-blur-xs animate-in fade-in duration-150">
-      <div className="relative w-full max-w-lg bg-white dark:bg-[#0E2239] border border-slate-200/80 dark:border-[#1A314D] rounded-2xl p-6 sm:p-8 text-[#0B1A2D] dark:text-slate-100 max-h-[92vh] overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-[#071220]/80 sm:p-4 backdrop-blur-xs">
+      <div
+        role="dialog"
+        aria-modal="true"
+        className="relative w-full h-[100dvh] sm:h-auto sm:max-h-[92vh] sm:max-w-lg bg-white dark:bg-[#0E2239] border-0 sm:border sm:border-slate-200/90 sm:dark:border-[#1A314D] rounded-none sm:rounded-2xl px-4 py-6 sm:p-8 text-[#0B1A2D] dark:text-white overflow-y-auto overscroll-contain animate-float-in"
+      >
         <button
           type="button"
           aria-label={t('common.close', 'Cerrar')}
           onClick={handleClose}
-          className="min-h-[40px] min-w-[40px] flex items-center justify-center absolute top-4 right-4 p-2 rounded-xl text-slate-400 hover:text-[#0B1A2D] dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#132A45] transition cursor-pointer"
+          className="min-h-[40px] min-w-[40px] flex items-center justify-center absolute top-4 right-4 p-2 rounded-xl text-slate-400 hover:text-[#0B1A2D] dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#132A45] transition-colors cursor-pointer"
         >
           <X className="w-5 h-5" />
         </button>
 
-        <div className="text-center mb-6">
-          <div className="inline-flex items-center justify-center w-11 h-11 rounded-xl bg-[#0B1A2D] dark:bg-[#B7F229] text-[#B7F229] dark:text-[#0B1A2D] font-extrabold text-lg mb-3">
+        <div className="text-center mb-6 pt-1">
+          <div className="inline-flex items-center justify-center w-11 h-11 rounded-xl bg-[#0B1A2D] dark:bg-[#132A45] text-[#B7F229] font-extrabold text-base tracking-tight mb-3 font-display">
             SM
           </div>
-          <h3 className="text-xl font-extrabold text-[#0B1A2D] dark:text-white">
-            {mode === 'login' ? t('auth.titleLogin', 'Acceso Usuarios Setmio') : t('register.title', 'Registro y Onboarding por Rol')}
+          <h3 className="text-xl font-extrabold text-[#0B1A2D] dark:text-white font-display">
+            {mode === 'login' ? t('auth.titleLogin', 'Acceso Usuarios Setmio') : t('register.title', 'Registro y Alta por Rol')}
           </h3>
-          <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
+          <p className="text-xs text-slate-600 dark:text-slate-300 mt-1.5 max-w-sm mx-auto leading-relaxed">
             {mode === 'login'
               ? t('auth.subtitleLogin', 'Accede a tus reservas, partidas abiertas, torneos y monedero')
-              : t('register.subtitle', 'Configura tu cuenta y perfil especializado según tu función en el ecosistema del pádel.')}
+              : t('register.subtitle', 'Configura tu cuenta y perfil según tu función dentro del ecosistema del pádel.')}
           </p>
 
           {mode === 'register' && (
-            <div className="mt-4 flex flex-wrap items-center justify-center gap-1.5">
+            <div className="mt-5 grid grid-cols-4 gap-1.5 w-full">
               {[
                 { step: 1, label: t('register.steps.role', '1. Rol') },
                 { step: 2, label: t('register.steps.account', '2. Cuenta') },
@@ -277,12 +281,12 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               ].map((s) => (
                 <div
                   key={s.step}
-                  className={`px-2.5 py-1 rounded-lg text-[11px] font-mono font-semibold transition ${
+                  className={`min-w-0 truncate text-center px-1.5 py-2 rounded-lg text-[10px] sm:text-[11px] font-mono font-semibold transition-colors motion-reduce:transition-none border ${
                     registerStep === s.step
-                      ? 'bg-[#B7F229] text-[#0B1A2D]'
+                      ? 'bg-[#B7F229] text-[#0B1A2D] border-[#B7F229]'
                       : registerStep > s.step
-                      ? 'bg-[#0B1A2D] dark:bg-[#132A45] text-[#B7F229]'
-                      : 'bg-slate-100 text-slate-400 dark:bg-[#071220] dark:text-slate-500'
+                      ? 'bg-[#0B1A2D] dark:bg-[#132A45] text-[#B7F229] border-[#0B1A2D] dark:border-[#244163]'
+                      : 'bg-[#F7F9FC] text-slate-500 border-slate-200/80 dark:bg-[#071220] dark:text-slate-400 dark:border-[#1A314D]'
                   }`}
                 >
                   <span>{s.label}</span>
@@ -315,39 +319,39 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder={t('auth.emailPlaceholder', 'tu-correo@ejemplo.com')}
-                    className="w-full min-h-[42px] pl-9 pr-3 py-2 bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-xl text-xs text-[#0B1A2D] dark:text-white placeholder-slate-400 focus:outline-none focus:border-[#8B5CF6]"
+                    className="w-full min-h-[44px] pl-9 pr-3 py-2 bg-[#F7F9FC] dark:bg-[#071220] border border-slate-200/90 dark:border-[#1A314D] rounded-xl text-xs text-[#0B1A2D] dark:text-white placeholder-slate-400 focus:outline-none focus:border-[#0B1A2D] dark:focus:border-[#B7F229]"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-[11px] font-mono text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-1.5">
+                <label className="block text-[11px] font-mono text-slate-600 dark:text-slate-300 uppercase tracking-wider mb-1.5">
                   {t('auth.passwordLabel', 'Contraseña')}
                 </label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-3 w-4 h-4 text-slate-400" />
+                  <Lock className="absolute left-3 top-3.5 w-4 h-4 text-slate-400" />
                   <input
                     type="password"
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••"
-                    className="w-full min-h-[42px] pl-9 pr-3 py-2 bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-xl text-xs text-[#0B1A2D] dark:text-white placeholder-slate-400 focus:outline-none focus:border-[#8B5CF6]"
+                    className="w-full min-h-[44px] pl-9 pr-3 py-2 bg-[#F7F9FC] dark:bg-[#071220] border border-slate-200/90 dark:border-[#1A314D] rounded-xl text-xs text-[#0B1A2D] dark:text-white placeholder-slate-400 focus:outline-none focus:border-[#0B1A2D] dark:focus:border-[#B7F229]"
                   />
                 </div>
               </div>
 
-              <div className="flex items-center justify-between text-xs">
-                <label className="flex items-center gap-2 cursor-pointer text-slate-600 dark:text-slate-400">
+              <div className="flex items-center justify-between gap-2 text-xs">
+                <label className="flex items-center gap-2 cursor-pointer text-slate-600 dark:text-slate-300">
                   <input type="checkbox" defaultChecked className="rounded accent-[#0B1A2D]" />
                   <span>{t('auth.rememberMe', 'Recordarme')}</span>
                 </label>
                 <button
                   type="button"
                   onClick={handleAutocompleteSetmioID}
-                  className="font-semibold text-[#8B5CF6] dark:text-[#a78bfa] hover:underline flex items-center gap-1 cursor-pointer"
+                  className="font-semibold text-[#0B1A2D] dark:text-white hover:underline flex items-center gap-1.5 cursor-pointer"
                 >
-                  <Sparkles className="w-3.5 h-3.5" />
+                  <Sparkles className="w-3.5 h-3.5 text-[#8B5CF6] dark:text-[#A78BFA]" />
                   <span>{t('auth.demoAutoFill', 'Auto-rellenar')}</span>
                 </button>
               </div>
@@ -355,7 +359,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full min-h-[44px] py-3 rounded-xl bg-[#B7F229] hover:bg-[#a6de1f] text-[#0B1A2D] font-bold text-xs transition flex items-center justify-center gap-2 cursor-pointer"
+                className="w-full min-h-[46px] py-3 rounded-xl bg-[#B7F229] hover:bg-[#c5f64e] text-[#0B1A2D] font-bold text-xs sm:text-sm transition-colors flex items-center justify-center gap-2 cursor-pointer"
               >
                 {loading ? t('auth.loading', 'Iniciando sesión...') : t('auth.submit', 'Entrar a mi Cuenta')}
                 <ArrowRight className="w-4 h-4" />
@@ -364,19 +368,19 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           ) : (
             <>
               {registerStep === 1 && (
-                <div className="space-y-4 animate-in fade-in duration-150">
+                <div key="step-1" className="space-y-4 animate-float-in">
                   <div className="text-left space-y-1">
-                    <h4 className="text-sm font-bold text-[#0B1A2D] dark:text-white">
+                    <h4 className="text-sm font-bold text-[#0B1A2D] dark:text-white font-display">
                       {t('register.step1.title', '¿Cuál es tu rol principal en el pádel?')}
                     </h4>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                    <p className="text-xs text-slate-600 dark:text-slate-300">
                       {t('register.step1.desc', 'Adaptaremos el formulario y los permisos de la plataforma a tus necesidades.')}
                     </p>
                   </div>
 
                   {urlPlan && (
-                    <div className="p-3 rounded-xl bg-slate-50 dark:bg-[#071220] border border-[#8B5CF6]/30 text-xs text-[#0B1A2D] dark:text-slate-200 flex items-center gap-2">
-                      <Sparkles className="w-4 h-4 text-[#8B5CF6] dark:text-[#a78bfa] shrink-0" />
+                    <div className="p-3 rounded-xl bg-[#F7F9FC] dark:bg-[#071220] border border-[#8B5CF6]/35 text-xs text-[#0B1A2D] dark:text-slate-200 flex items-center gap-2">
+                      <Sparkles className="w-4 h-4 text-[#8B5CF6] dark:text-[#A78BFA] shrink-0" />
                       <span>
                         {t('register.preselectedPlan', 'Plan preseleccionado:')} <strong className="font-mono">{urlPlan.toUpperCase()}</strong>
                       </span>
@@ -393,17 +397,17 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                           type="button"
                           key={r.id}
                           onClick={() => setSelectedRole(r.id)}
-                          className={`w-full p-4 rounded-xl border text-left transition flex items-start gap-3 cursor-pointer ${
+                          className={`w-full p-4 rounded-xl border text-left transition-colors flex items-start gap-3 cursor-pointer ${
                             isSelected
-                              ? 'bg-slate-50 dark:bg-[#132A45] border-[#0B1A2D] dark:border-[#B7F229]'
-                              : 'bg-white dark:bg-[#071220] border-slate-200/80 dark:border-[#1A314D] hover:border-slate-300 dark:hover:border-slate-600'
+                              ? 'bg-[#F7F9FC] dark:bg-[#132A45] border-[#0B1A2D] dark:border-[#B7F229]'
+                              : 'bg-white dark:bg-[#071220] border-slate-200/90 dark:border-[#1A314D] hover:border-[#0B1A2D]/40 dark:hover:border-[#B7F229]/50'
                           }`}
                         >
                           <div
-                            className={`p-2.5 rounded-xl shrink-0 mt-0.5 ${
+                            className={`w-10 h-10 rounded-xl shrink-0 flex items-center justify-center ${
                               isSelected
                                 ? 'bg-[#0B1A2D] dark:bg-[#B7F229] text-[#B7F229] dark:text-[#0B1A2D]'
-                                : 'bg-slate-100 dark:bg-[#0E2239] text-slate-600 dark:text-slate-400'
+                                : 'bg-[#F7F9FC] dark:bg-[#0E2239] text-[#0B1A2D] dark:text-slate-300 border border-slate-200/80 dark:border-[#1A314D]'
                             }`}
                           >
                             <Icon className="w-5 h-5" />
@@ -411,14 +415,14 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center justify-between gap-2">
-                              <span className="text-sm font-bold text-[#0B1A2D] dark:text-white">
+                              <span className="text-sm font-bold text-[#0B1A2D] dark:text-white leading-snug">
                                 {r.title}
                               </span>
-                              <span className="text-[10px] font-mono text-[#8B5CF6] dark:text-[#a78bfa]">
+                              <span className="text-[10px] font-mono font-semibold text-slate-500 dark:text-slate-300 shrink-0">
                                 {r.badge}
                               </span>
                             </div>
-                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
+                            <p className="text-xs text-slate-600 dark:text-slate-300 mt-1 leading-relaxed">
                               {r.desc}
                             </p>
                           </div>
@@ -430,7 +434,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   <button
                     type="button"
                     onClick={() => setRegisterStep(2)}
-                    className="w-full min-h-[44px] py-3 rounded-xl bg-[#B7F229] hover:bg-[#a6de1f] text-[#0B1A2D] font-bold text-xs transition flex items-center justify-center gap-2 cursor-pointer"
+                    className="w-full min-h-[46px] py-3 rounded-xl bg-[#B7F229] hover:bg-[#c5f64e] text-[#0B1A2D] font-bold text-xs sm:text-sm transition-colors flex items-center justify-center gap-2 cursor-pointer"
                   >
                     <span>{t('register.nextAccount', 'Continuar con este Rol')}</span>
                     <ArrowRight className="w-4 h-4" />
@@ -439,16 +443,16 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               )}
 
               {registerStep === 2 && (
-                <div className="space-y-4 animate-in fade-in duration-150">
-                  <div className="flex items-center justify-between rounded-xl bg-slate-50 dark:bg-[#071220] px-3.5 py-2.5 text-xs font-semibold text-[#0B1A2D] dark:text-slate-200 border border-slate-200/80 dark:border-[#1A314D]">
-                    <span>
+                <div key="step-2" className="space-y-4 animate-float-in">
+                  <div className="flex items-center justify-between gap-2 rounded-xl bg-[#F7F9FC] dark:bg-[#071220] px-3.5 py-2.5 text-xs font-semibold text-[#0B1A2D] dark:text-slate-200 border border-slate-200/90 dark:border-[#1A314D]">
+                    <span className="truncate">
                       {t('register.roleBadge', 'Rol:')}{' '}
                       <strong>{roleConfigs.find((r) => r.id === selectedRole)?.title}</strong>
                     </span>
                     <button
                       type="button"
                       onClick={() => setRegisterStep(1)}
-                      className="text-[#8B5CF6] dark:text-[#a78bfa] hover:underline cursor-pointer"
+                      className="text-[#0B1A2D] dark:text-[#B7F229] font-bold hover:underline cursor-pointer shrink-0"
                     >
                       {t('register.change', 'Cambiar')}
                     </button>
@@ -466,13 +470,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                         value={fullName}
                         onChange={(e) => setFullName(e.target.value)}
                         placeholder={t('register.fullNamePlaceholder', 'Ej. Lucas Rey Domínguez')}
-                        className="w-full min-h-[40px] pl-9 pr-3 py-2 bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-xl text-xs text-[#0B1A2D] dark:text-white placeholder-slate-400 focus:outline-none focus:border-[#8B5CF6]"
+                        className="w-full min-h-[42px] pl-9 pr-3 py-2 bg-[#F7F9FC] dark:bg-[#071220] border border-slate-200/90 dark:border-[#1A314D] rounded-xl text-xs text-[#0B1A2D] dark:text-white placeholder-slate-400 focus:outline-none focus:border-[#0B1A2D] dark:focus:border-[#B7F229]"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-[11px] font-mono text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-1.5">
+                    <label className="block text-[11px] font-mono text-slate-600 dark:text-slate-300 uppercase tracking-wider mb-1.5">
                       {t('register.email', 'Correo Electrónico (Obligatorio)')} *
                     </label>
                     <div className="relative">
@@ -483,13 +487,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder="tu-correo@ejemplo.com"
-                        className="w-full min-h-[40px] pl-9 pr-3 py-2 bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-xl text-xs text-[#0B1A2D] dark:text-white placeholder-slate-400 focus:outline-none focus:border-[#8B5CF6]"
+                        className="w-full min-h-[42px] pl-9 pr-3 py-2 bg-[#F7F9FC] dark:bg-[#071220] border border-slate-200/90 dark:border-[#1A314D] rounded-xl text-xs text-[#0B1A2D] dark:text-white placeholder-slate-400 focus:outline-none focus:border-[#0B1A2D] dark:focus:border-[#B7F229]"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-[11px] font-mono text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-1.5">
+                    <label className="block text-[11px] font-mono text-slate-600 dark:text-slate-300 uppercase tracking-wider mb-1.5">
                       {t('register.phone', 'Teléfono de Contacto (Obligatorio)')} *
                     </label>
                     <div className="relative">
@@ -500,13 +504,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                         value={phone}
                         onChange={(e) => setPhone(e.target.value)}
                         placeholder="+34 600 000 000"
-                        className="w-full min-h-[40px] pl-9 pr-3 py-2 bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-xl text-xs text-[#0B1A2D] dark:text-white placeholder-slate-400 focus:outline-none focus:border-[#8B5CF6] font-mono tabular-nums"
+                        className="w-full min-h-[42px] pl-9 pr-3 py-2 bg-[#F7F9FC] dark:bg-[#071220] border border-slate-200/90 dark:border-[#1A314D] rounded-xl text-xs text-[#0B1A2D] dark:text-white placeholder-slate-400 focus:outline-none focus:border-[#0B1A2D] dark:focus:border-[#B7F229] font-mono tabular-nums"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-[11px] font-mono text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-1.5">
+                    <label className="block text-[11px] font-mono text-slate-600 dark:text-slate-300 uppercase tracking-wider mb-1.5">
                       {t('auth.passwordLabel', 'Contraseña')} *
                     </label>
                     <div className="relative">
@@ -517,7 +521,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         placeholder={t('register.passwordMin', 'Mínimo 6 caracteres')}
-                        className="w-full min-h-[40px] pl-9 pr-3 py-2 bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-xl text-xs text-[#0B1A2D] dark:text-white placeholder-slate-400 focus:outline-none focus:border-[#8B5CF6]"
+                        className="w-full min-h-[42px] pl-9 pr-3 py-2 bg-[#F7F9FC] dark:bg-[#071220] border border-slate-200/90 dark:border-[#1A314D] rounded-xl text-xs text-[#0B1A2D] dark:text-white placeholder-slate-400 focus:outline-none focus:border-[#0B1A2D] dark:focus:border-[#B7F229]"
                       />
                     </div>
                   </div>
@@ -526,7 +530,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                     <button
                       type="button"
                       onClick={() => setRegisterStep(1)}
-                      className="w-1/3 min-h-[42px] py-2.5 rounded-xl border border-slate-200/80 dark:border-[#1A314D] font-semibold text-xs text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-[#132A45] transition flex items-center justify-center gap-1 cursor-pointer"
+                      className="w-1/3 min-h-[44px] py-2.5 rounded-xl border border-slate-200/90 dark:border-[#1A314D] font-semibold text-xs text-[#0B1A2D] dark:text-slate-200 hover:bg-[#F7F9FC] dark:hover:bg-[#132A45] transition-colors flex items-center justify-center gap-1 cursor-pointer"
                     >
                       <ArrowLeft className="w-4 h-4" />
                       <span>{t('register.back', 'Atrás')}</span>
@@ -544,7 +548,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                         }
                         setRegisterStep(3);
                       }}
-                      className="w-2/3 min-h-[42px] py-2.5 rounded-xl bg-[#B7F229] hover:bg-[#a6de1f] text-[#0B1A2D] font-bold text-xs transition flex items-center justify-center gap-2 cursor-pointer"
+                      className="w-2/3 min-h-[44px] py-2.5 rounded-xl bg-[#B7F229] hover:bg-[#c5f64e] text-[#0B1A2D] font-bold text-xs transition-colors flex items-center justify-center gap-2 cursor-pointer"
                     >
                       <span>{t('register.nextProfile', 'Siguiente: Perfil')}</span>
                       <ArrowRight className="w-4 h-4" />
@@ -554,20 +558,20 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               )}
 
               {registerStep === 3 && (
-                <div className="space-y-4 animate-in fade-in duration-150">
+                <div key="step-3" className="space-y-4 animate-float-in">
                   {selectedRole === 'club_admin' && (
                     <div className="space-y-3.5 text-left">
-                      <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] text-xs">
+                      <div className="p-3.5 rounded-xl bg-[#F7F9FC] dark:bg-[#071220] border border-slate-200/90 dark:border-[#1A314D] text-xs">
                         <span className="font-bold text-[#0B1A2D] dark:text-white block mb-0.5">
                           {t('register.club.headerTitle', 'Datos de la Instalación Deportiva')}
                         </span>
-                        <span className="text-slate-500 text-[11px]">
-                          {t('register.club.headerDesc', 'Configura tu centro deportivo para reservas y domótica.')}
+                        <span className="text-slate-600 dark:text-slate-300 text-[11px]">
+                          {t('register.club.headerDesc', 'Configura tu centro deportivo para reservas, cobros y domótica.')}
                         </span>
                       </div>
 
                       <div>
-                        <label className="block text-[11px] font-mono text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-1.5">
+                        <label className="block text-[11px] font-mono text-slate-600 dark:text-slate-300 uppercase tracking-wider mb-1.5">
                           {t('register.club.name', 'Nombre del Club o Centro Deportivo')} *
                         </label>
                         <input
@@ -576,19 +580,19 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                           value={clubName}
                           onChange={(e) => setClubName(e.target.value)}
                           placeholder="Ej: Pádel Costa Verde"
-                          className="w-full min-h-[40px] px-3 py-2 bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-xl text-xs text-[#0B1A2D] dark:text-white focus:outline-none focus:border-[#8B5CF6]"
+                          className="w-full min-h-[42px] px-3 py-2 bg-[#F7F9FC] dark:bg-[#071220] border border-slate-200/90 dark:border-[#1A314D] rounded-xl text-xs text-[#0B1A2D] dark:text-white focus:outline-none focus:border-[#0B1A2D] dark:focus:border-[#B7F229]"
                         />
                       </div>
 
-                      <div className="grid grid-cols-2 gap-3">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div>
-                          <label className="block text-[11px] font-mono text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-1.5">
+                          <label className="block text-[11px] font-mono text-slate-600 dark:text-slate-300 uppercase tracking-wider mb-1.5">
                             {t('register.club.courts', 'Nº de Pistas')}
                           </label>
                           <select
                             value={courtCount}
                             onChange={(e) => setCourtCount(parseInt(e.target.value))}
-                            className="w-full min-h-[40px] px-3 py-2 bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-xl text-xs text-[#0B1A2D] dark:text-white focus:outline-none focus:border-[#8B5CF6]"
+                            className="w-full min-h-[42px] px-3 py-2 bg-[#F7F9FC] dark:bg-[#071220] border border-slate-200/90 dark:border-[#1A314D] rounded-xl text-xs text-[#0B1A2D] dark:text-white focus:outline-none focus:border-[#0B1A2D] dark:focus:border-[#B7F229]"
                           >
                             <option value={2}>2 pistas</option>
                             <option value={4}>4 pistas</option>
@@ -599,7 +603,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                         </div>
 
                         <div>
-                          <label className="block text-[11px] font-mono text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-1.5">
+                          <label className="block text-[11px] font-mono text-slate-600 dark:text-slate-300 uppercase tracking-wider mb-1.5">
                             {t('register.club.city', 'Ciudad')} *
                           </label>
                           <input
@@ -608,34 +612,34 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                             value={clubCity}
                             onChange={(e) => setClubCity(e.target.value)}
                             placeholder="Ej: A Coruña"
-                            className="w-full min-h-[40px] px-3 py-2 bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-xl text-xs text-[#0B1A2D] dark:text-white focus:outline-none focus:border-[#8B5CF6]"
+                            className="w-full min-h-[42px] px-3 py-2 bg-[#F7F9FC] dark:bg-[#071220] border border-slate-200/90 dark:border-[#1A314D] rounded-xl text-xs text-[#0B1A2D] dark:text-white focus:outline-none focus:border-[#0B1A2D] dark:focus:border-[#B7F229]"
                           />
                         </div>
                       </div>
 
                       <div>
-                        <label className="block text-[11px] font-mono text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-1.5">
+                        <label className="block text-[11px] font-mono text-slate-600 dark:text-slate-300 uppercase tracking-wider mb-1.5">
                           {t('register.club.plan', 'Plan de Suscripción')}
                         </label>
                         <select
                           value={selectedPlan}
                           onChange={(e) => setSelectedPlan(e.target.value as typeof selectedPlan)}
-                          className="w-full min-h-[40px] px-3 py-2 bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-xl text-xs font-bold text-[#8B5CF6] dark:text-[#a78bfa] focus:outline-none focus:border-[#8B5CF6]"
+                          className="w-full min-h-[42px] px-3 py-2 bg-[#F7F9FC] dark:bg-[#071220] border border-slate-200/90 dark:border-[#1A314D] rounded-xl text-xs font-bold text-[#0B1A2D] dark:text-[#B7F229] focus:outline-none focus:border-[#0B1A2D] dark:focus:border-[#B7F229]"
                         >
-                          <option value="club_base">{t('register.plans.base', 'Plan Club Base (79 €/mes)')}</option>
-                          <option value="profesional">{t('register.plans.pro', 'Plan Profesional Pro (149 €/mes - Recomendado)')}</option>
-                          <option value="enterprise">{t('register.plans.enterprise', 'Plan Enterprise Personalizado')}</option>
+                          <option value="club_base">Plan Esencial (desde 79 €/mes + instalación inicial)</option>
+                          <option value="profesional">Plan Club &amp; Academia (desde 149 €/mes + instalación inicial)</option>
+                          <option value="enterprise">Plan Pro 360 / A Medida (desde 249 €/mes + instalación inicial)</option>
                         </select>
                       </div>
 
-                      <label className="flex items-start gap-2.5 cursor-pointer text-xs p-3 rounded-xl bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D]">
+                      <label className="flex items-start gap-2.5 cursor-pointer text-xs p-3 rounded-xl bg-[#F7F9FC] dark:bg-[#071220] border border-slate-200/90 dark:border-[#1A314D]">
                         <input
                           type="checkbox"
                           checked={needDomotica}
                           onChange={(e) => setNeedDomotica(e.target.checked)}
                           className="mt-0.5 rounded accent-[#0B1A2D]"
                         />
-                        <div className="text-[11px] text-slate-600 dark:text-slate-400">
+                        <div className="text-[11px] text-slate-600 dark:text-slate-300">
                           <strong className="text-[#0B1A2D] dark:text-white block font-bold">
                             {t('register.club.domoticaTitle', 'Automatización Domótica IoT')}
                           </strong>
@@ -647,23 +651,23 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
                   {selectedRole === 'coach' && (
                     <div className="space-y-3.5 text-left">
-                      <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] text-xs">
+                      <div className="p-3.5 rounded-xl bg-[#F7F9FC] dark:bg-[#071220] border border-slate-200/90 dark:border-[#1A314D] text-xs">
                         <span className="font-bold text-[#0B1A2D] dark:text-white block mb-0.5">
                           {t('register.coach.headerTitle', 'Perfil Profesional del Entrenador')}
                         </span>
-                        <span className="text-slate-500 text-[11px]">
+                        <span className="text-slate-600 dark:text-slate-300 text-[11px]">
                           {t('register.coach.headerDesc', 'Información docente para tu cuadrante de clases y alumnos.')}
                         </span>
                       </div>
 
                       <div>
-                        <label className="block text-[11px] font-mono text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-1.5">
+                        <label className="block text-[11px] font-mono text-slate-600 dark:text-slate-300 uppercase tracking-wider mb-1.5">
                           {t('register.coach.type', 'Modalidad de Trabajo')}
                         </label>
                         <select
                           value={coachType}
                           onChange={(e) => setCoachType(e.target.value)}
-                          className="w-full min-h-[40px] px-3 py-2 bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-xl text-xs text-[#0B1A2D] dark:text-white focus:outline-none focus:border-[#8B5CF6]"
+                          className="w-full min-h-[42px] px-3 py-2 bg-[#F7F9FC] dark:bg-[#071220] border border-slate-200/90 dark:border-[#1A314D] rounded-xl text-xs text-[#0B1A2D] dark:text-white focus:outline-none focus:border-[#0B1A2D] dark:focus:border-[#B7F229]"
                         >
                           <option>Independiente / Autónomo</option>
                           <option>En Plantilla de Club Deportivo</option>
@@ -671,15 +675,15 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                         </select>
                       </div>
 
-                      <div className="grid grid-cols-2 gap-3">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div>
-                          <label className="block text-[11px] font-mono text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-1.5">
+                          <label className="block text-[11px] font-mono text-slate-600 dark:text-slate-300 uppercase tracking-wider mb-1.5">
                             {t('register.coach.certification', 'Titulación Oficial')}
                           </label>
                           <select
                             value={coachCertification}
                             onChange={(e) => setCoachCertification(e.target.value)}
-                            className="w-full min-h-[40px] px-3 py-2 bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-xl text-xs text-[#0B1A2D] dark:text-white focus:outline-none focus:border-[#8B5CF6]"
+                            className="w-full min-h-[42px] px-3 py-2 bg-[#F7F9FC] dark:bg-[#071220] border border-slate-200/90 dark:border-[#1A314D] rounded-xl text-xs text-[#0B1A2D] dark:text-white focus:outline-none focus:border-[#0B1A2D] dark:focus:border-[#B7F229]"
                           >
                             <option>Monitor Nacional FEP</option>
                             <option>Entrenador Regional FGP</option>
@@ -689,13 +693,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                         </div>
 
                         <div>
-                          <label className="block text-[11px] font-mono text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-1.5">
+                          <label className="block text-[11px] font-mono text-slate-600 dark:text-slate-300 uppercase tracking-wider mb-1.5">
                             {t('register.coach.experience', 'Experiencia')}
                           </label>
                           <select
                             value={coachExperience}
                             onChange={(e) => setCoachExperience(e.target.value)}
-                            className="w-full min-h-[40px] px-3 py-2 bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-xl text-xs text-[#0B1A2D] dark:text-white focus:outline-none focus:border-[#8B5CF6]"
+                            className="w-full min-h-[42px] px-3 py-2 bg-[#F7F9FC] dark:bg-[#071220] border border-slate-200/90 dark:border-[#1A314D] rounded-xl text-xs text-[#0B1A2D] dark:text-white focus:outline-none focus:border-[#0B1A2D] dark:focus:border-[#B7F229]"
                           >
                             <option>1 - 3 años</option>
                             <option>3 - 6 años</option>
@@ -705,13 +709,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                       </div>
 
                       <div>
-                        <label className="block text-[11px] font-mono text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-1.5">
+                        <label className="block text-[11px] font-mono text-slate-600 dark:text-slate-300 uppercase tracking-wider mb-1.5">
                           {t('register.coach.specialty', 'Especialidad Principal')}
                         </label>
                         <select
                           value={coachSpecialty}
                           onChange={(e) => setCoachSpecialty(e.target.value)}
-                          className="w-full min-h-[40px] px-3 py-2 bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] rounded-xl text-xs text-[#0B1A2D] dark:text-white focus:outline-none focus:border-[#8B5CF6]"
+                          className="w-full min-h-[42px] px-3 py-2 bg-[#F7F9FC] dark:bg-[#071220] border border-slate-200/90 dark:border-[#1A314D] rounded-xl text-xs text-[#0B1A2D] dark:text-white focus:outline-none focus:border-[#0B1A2D] dark:focus:border-[#B7F229]"
                         >
                           <option>Competición y Perfeccionamiento</option>
                           <option>Iniciación y Adultos</option>
@@ -726,10 +730,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                     <div className="space-y-3.5 text-left">
                       <div>
                         <div className="flex items-center justify-between mb-1.5">
-                          <label className="text-[11px] font-mono text-slate-600 dark:text-slate-400 uppercase tracking-wider">
+                          <label className="text-[11px] font-mono text-slate-600 dark:text-slate-300 uppercase tracking-wider">
                             {t('register.levelEstimated', 'Nivel de Juego Estimado')}
                           </label>
-                          <span className="font-mono tabular-nums font-bold text-[#8B5CF6] dark:text-[#a78bfa] text-sm">
+                          <span className="font-mono tabular-nums font-bold text-[#0B1A2D] dark:text-[#B7F229] text-sm">
                             {playLevel.toFixed(2)}
                           </span>
                         </div>
@@ -742,24 +746,24 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                           onChange={(e) => setPlayLevel(parseFloat(e.target.value))}
                           className="w-full accent-[#0B1A2D] dark:accent-[#B7F229] h-2 bg-slate-200 dark:bg-[#071220] rounded-lg cursor-pointer"
                         />
-                        <div className="mt-1 text-[11px] font-semibold text-slate-600 dark:text-slate-400">
+                        <div className="mt-1 text-[11px] font-semibold text-slate-600 dark:text-slate-300">
                           {getLevelLabel(playLevel)}
                         </div>
                       </div>
 
-                      <div className="grid grid-cols-2 gap-3">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div>
-                          <label className="block text-[11px] font-mono text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-1.5">
+                          <label className="block text-[11px] font-mono text-slate-600 dark:text-slate-300 uppercase tracking-wider mb-1.5">
                             {t('register.dominantHand', 'Mano Dominante')}
                           </label>
                           <div className="grid grid-cols-2 gap-2">
                             <button
                               type="button"
                               onClick={() => setDominantHand('right')}
-                              className={`min-h-[38px] py-2 px-3 rounded-xl text-xs font-semibold border transition cursor-pointer ${
+                              className={`min-h-[40px] py-2 px-3 rounded-xl text-xs font-semibold border transition-colors cursor-pointer ${
                                 dominantHand === 'right'
                                   ? 'bg-[#0B1A2D] dark:bg-[#B7F229] border-[#0B1A2D] dark:border-[#B7F229] text-white dark:text-[#0B1A2D]'
-                                  : 'border-slate-200/80 dark:border-[#1A314D] text-slate-600 dark:text-slate-400'
+                                  : 'border-slate-200/90 dark:border-[#1A314D] text-slate-600 dark:text-slate-300'
                               }`}
                             >
                               {t('register.rightHanded', 'Diestro')}
@@ -767,10 +771,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                             <button
                               type="button"
                               onClick={() => setDominantHand('left')}
-                              className={`min-h-[38px] py-2 px-3 rounded-xl text-xs font-semibold border transition cursor-pointer ${
+                              className={`min-h-[40px] py-2 px-3 rounded-xl text-xs font-semibold border transition-colors cursor-pointer ${
                                 dominantHand === 'left'
                                   ? 'bg-[#0B1A2D] dark:bg-[#B7F229] border-[#0B1A2D] dark:border-[#B7F229] text-white dark:text-[#0B1A2D]'
-                                  : 'border-slate-200/80 dark:border-[#1A314D] text-slate-600 dark:text-slate-400'
+                                  : 'border-slate-200/90 dark:border-[#1A314D] text-slate-600 dark:text-slate-300'
                               }`}
                             >
                               {t('register.leftHanded', 'Zurdo')}
@@ -779,7 +783,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                         </div>
 
                         <div>
-                          <label className="block text-[11px] font-mono text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-1.5">
+                          <label className="block text-[11px] font-mono text-slate-600 dark:text-slate-300 uppercase tracking-wider mb-1.5">
                             {t('register.preferredPosition', 'Posición')}
                           </label>
                           <div className="grid grid-cols-3 gap-1">
@@ -788,10 +792,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                                 key={pos}
                                 type="button"
                                 onClick={() => setPreferredPosition(pos)}
-                                className={`min-h-[38px] py-2 px-1 rounded-xl text-[11px] font-semibold border transition cursor-pointer ${
+                                className={`min-h-[40px] py-2 px-1 rounded-xl text-[11px] font-semibold border transition-colors cursor-pointer ${
                                   preferredPosition === pos
                                     ? 'bg-[#0B1A2D] dark:bg-[#B7F229] border-[#0B1A2D] dark:border-[#B7F229] text-white dark:text-[#0B1A2D]'
-                                    : 'border-slate-200/80 dark:border-[#1A314D] text-slate-600 dark:text-slate-400'
+                                    : 'border-slate-200/90 dark:border-[#1A314D] text-slate-600 dark:text-slate-300'
                                 }`}
                               >
                                 {pos === 'drive' ? 'Drive' : pos === 'reves' ? 'Revés' : 'Ambas'}
@@ -801,7 +805,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                         </div>
                       </div>
 
-                      <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D]">
+                      <div className="p-3.5 rounded-xl bg-[#F7F9FC] dark:bg-[#071220] border border-slate-200/90 dark:border-[#1A314D]">
                         <label className="flex items-start gap-2.5 cursor-pointer">
                           <input
                             type="checkbox"
@@ -811,10 +815,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                           />
                           <div className="text-xs">
                             <div className="font-bold text-[#0B1A2D] dark:text-white flex items-center gap-1.5">
-                              <Trophy className="w-3.5 h-3.5 text-[#8B5CF6] dark:text-[#a78bfa]" />
+                              <Trophy className="w-3.5 h-3.5 text-[#0B1A2D] dark:text-[#B7F229]" />
                               <span>{t('register.captainTitle', 'Habilitar perfil de Capitán de Equipo')}</span>
                             </div>
-                            <div className="text-slate-500 dark:text-slate-400 text-[11px] mt-0.5">
+                            <div className="text-slate-600 dark:text-slate-300 text-[11px] mt-0.5">
                               {t('register.captainDesc', 'Te permite inscribir y gestionar convocatorias para equipos del club.')}
                             </div>
                           </div>
@@ -827,7 +831,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                     <button
                       type="button"
                       onClick={() => setRegisterStep(2)}
-                      className="w-1/3 min-h-[42px] py-2.5 rounded-xl border border-slate-200/80 dark:border-[#1A314D] font-semibold text-xs text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-[#132A45] transition flex items-center justify-center gap-1 cursor-pointer"
+                      className="w-1/3 min-h-[44px] py-2.5 rounded-xl border border-slate-200/90 dark:border-[#1A314D] font-semibold text-xs text-[#0B1A2D] dark:text-slate-200 hover:bg-[#F7F9FC] dark:hover:bg-[#132A45] transition-colors flex items-center justify-center gap-1 cursor-pointer"
                     >
                       <ArrowLeft className="w-4 h-4" />
                       <span>{t('register.back', 'Atrás')}</span>
@@ -835,7 +839,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                     <button
                       type="button"
                       onClick={() => setRegisterStep(4)}
-                      className="w-2/3 min-h-[42px] py-2.5 rounded-xl bg-[#B7F229] hover:bg-[#a6de1f] text-[#0B1A2D] font-bold text-xs transition flex items-center justify-center gap-2 cursor-pointer"
+                      className="w-2/3 min-h-[44px] py-2.5 rounded-xl bg-[#B7F229] hover:bg-[#c5f64e] text-[#0B1A2D] font-bold text-xs transition-colors flex items-center justify-center gap-2 cursor-pointer"
                     >
                       <span>{t('register.nextConfirm', 'Siguiente: Confirmación')}</span>
                       <ArrowRight className="w-4 h-4" />
@@ -845,45 +849,45 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               )}
 
               {registerStep === 4 && (
-                <div className="space-y-4 animate-in fade-in duration-150">
-                  <div className="p-4 rounded-xl bg-slate-50 dark:bg-[#071220] border border-slate-200/80 dark:border-[#1A314D] space-y-2 text-xs text-left">
+                <div key="step-4" className="space-y-4 animate-float-in">
+                  <div className="p-4 rounded-xl bg-[#F7F9FC] dark:bg-[#071220] border border-slate-200/90 dark:border-[#1A314D] space-y-2.5 text-xs text-left">
                     <div className="font-bold text-[#0B1A2D] dark:text-white flex items-center gap-1.5">
-                      <CheckCircle2 className="w-4 h-4 text-[#8B5CF6] dark:text-[#a78bfa]" />
+                      <CheckCircle2 className="w-4 h-4 text-[#0B1A2D] dark:text-[#B7F229]" />
                       <span>{t('register.summaryTitle', 'Resumen de Registro')}</span>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-2 text-slate-600 dark:text-slate-300 text-[11px] pt-1">
-                      <div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-slate-600 dark:text-slate-300 text-[11px] pt-1">
+                      <div className="truncate">
                         {t('register.roleLabel', 'Rol:')}{' '}
                         <strong className="text-[#0B1A2D] dark:text-white">{roleConfigs.find((r) => r.id === selectedRole)?.title}</strong>
                       </div>
-                      <div>
+                      <div className="truncate">
                         {t('register.nameLabel', 'Nombre:')} <strong className="text-[#0B1A2D] dark:text-white">{fullName}</strong>
                       </div>
-                      <div>
+                      <div className="truncate">
                         {t('register.emailLabel', 'Email:')} <strong className="text-[#0B1A2D] dark:text-white">{email}</strong>
                       </div>
-                      <div>
+                      <div className="truncate">
                         {t('register.phoneLabel', 'Teléfono:')} <strong className="font-mono tabular-nums text-[#0B1A2D] dark:text-white">{phone}</strong>
                       </div>
 
                       {selectedRole === 'club_admin' && (
                         <>
-                          <div>
+                          <div className="truncate">
                             {t('register.clubLabel', 'Club:')} <strong className="text-[#0B1A2D] dark:text-white">{clubName}</strong> ({courtCount} pistas)
                           </div>
-                          <div>
-                            {t('register.planLabel', 'Plan:')} <strong className="font-mono text-[#8B5CF6] dark:text-[#a78bfa]">{selectedPlan.toUpperCase()}</strong>
+                          <div className="truncate">
+                            {t('register.planLabel', 'Plan:')} <strong className="font-mono text-[#0B1A2D] dark:text-[#B7F229]">{selectedPlan.toUpperCase()}</strong>
                           </div>
                         </>
                       )}
 
                       {selectedRole === 'coach' && (
                         <>
-                          <div>
+                          <div className="truncate">
                             {t('register.certLabel', 'Titulación:')} <strong className="text-[#0B1A2D] dark:text-white">{coachCertification}</strong>
                           </div>
-                          <div>
+                          <div className="truncate">
                             {t('register.expLabel', 'Exp:')} <strong className="text-[#0B1A2D] dark:text-white">{coachExperience}</strong>
                           </div>
                         </>
@@ -900,6 +904,12 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                         </>
                       )}
                     </div>
+
+                    {(selectedRole === 'club_admin' || selectedRole === 'coach') && (
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 pt-2 border-t border-slate-200/80 dark:border-[#1A314D] leading-relaxed">
+                        Las suscripciones profesionales incluyen puesta en marcha asistida con coste único de instalación inicial.
+                      </p>
+                    )}
                   </div>
 
                   <div className="space-y-3 pt-1 text-left">
@@ -929,7 +939,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                     <button
                       type="button"
                       onClick={() => setRegisterStep(3)}
-                      className="w-1/3 min-h-[42px] py-2.5 rounded-xl border border-slate-200/80 dark:border-[#1A314D] font-semibold text-xs text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-[#132A45] transition flex items-center justify-center gap-1 cursor-pointer"
+                      className="w-1/3 min-h-[44px] py-2.5 rounded-xl border border-slate-200/90 dark:border-[#1A314D] font-semibold text-xs text-[#0B1A2D] dark:text-slate-200 hover:bg-[#F7F9FC] dark:hover:bg-[#132A45] transition-colors flex items-center justify-center gap-1 cursor-pointer"
                     >
                       <ArrowLeft className="w-4 h-4" />
                       <span>{t('register.back', 'Atrás')}</span>
@@ -937,7 +947,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                     <button
                       type="submit"
                       disabled={loading || !acceptTerms}
-                      className="w-2/3 min-h-[42px] py-2.5 rounded-xl bg-[#B7F229] hover:bg-[#a6de1f] text-[#0B1A2D] font-bold text-xs transition flex items-center justify-center gap-2 cursor-pointer"
+                      className="w-2/3 min-h-[44px] py-2.5 rounded-xl bg-[#B7F229] hover:bg-[#c5f64e] text-[#0B1A2D] font-bold text-xs transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
                     >
                       {loading ? t('register.submitting', 'Activando Cuenta...') : t('register.submitConfirm', 'Confirmar y Activar Cuenta')}
                       <CheckCircle2 className="w-4 h-4" />
@@ -949,7 +959,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           )}
         </form>
 
-        <div className="mt-6 pt-4 border-t border-slate-200/80 dark:border-[#1A314D] text-center text-xs text-slate-600 dark:text-slate-400">
+        <div className="mt-6 pt-4 border-t border-slate-200/80 dark:border-[#1A314D] text-center text-xs text-slate-600 dark:text-slate-300">
           {mode === 'login' ? (
             <p>
               {t('auth.noAccount', '¿No tienes una cuenta aún?')}{' '}
@@ -959,9 +969,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   setMode('register');
                   setRegisterStep(1);
                 }}
-                className="font-bold text-[#8B5CF6] dark:text-[#a78bfa] hover:underline cursor-pointer"
+                className="font-bold text-[#0B1A2D] dark:text-[#B7F229] hover:underline cursor-pointer"
               >
-                {t('auth.registerFree', 'Regístrate gratis')}
+                {t('auth.registerAction', 'Regístrate')}
               </button>
             </p>
           ) : (
@@ -969,7 +979,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               <button
                 type="button"
                 onClick={() => setMode('login')}
-                className="font-bold text-[#8B5CF6] dark:text-[#a78bfa] hover:underline cursor-pointer"
+                className="font-bold text-[#0B1A2D] dark:text-[#B7F229] hover:underline cursor-pointer"
               >
                 {t('register.already_account', '¿Ya tienes una cuenta? Iniciar Sesión')}
               </button>
