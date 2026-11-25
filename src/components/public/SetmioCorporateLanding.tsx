@@ -30,6 +30,12 @@ interface SetmioCorporateLandingProps {
   onOpenFeatures?: () => void;
 }
 
+const HOME_ROLE_DISPLAY_TITLES: Record<string, string> = {
+  administraciones: 'Administraciones Públicas y Ayuntamientos',
+  equipos: 'Equipos independientes y colectivos',
+  profesionales: 'Jugador Profesional',
+};
+
 export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
   onExploreClub: _onExploreClub,
   onOpenDemoRoleModal,
@@ -82,7 +88,7 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
     setRegisterModalOpen(false);
     triggerDemoToast(
       t('home.registerToast.title', 'Solicitud registrada'),
-      t('home.registerToast.desc', 'Hemos recibido los datos de tu instalación para iniciar la activación.'),
+      t('home.registerToast.desc', 'Hemos recibido los datos de tu entidad para iniciar el alta e implantación.'),
       'success'
     );
   };
@@ -123,13 +129,13 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
     },
     {
       number: '03',
-      title: 'Asistente de entrenador con IA',
+      title: 'Asistencia de coach con IA',
       desc: 'Lectura táctica de tus datos recientes para orientar entrenamientos y preparar partidos de liga.',
     },
     {
       number: '04',
       title: 'Conexión directa con tus clubes',
-      desc: 'Enlace directo al portal de reservas de tus clubes habituales, saldo de monedero y código PIN de acceso.',
+      desc: 'Asociación y enlace directo al portal de reservas de tus clubes habituales, saldo de monedero y código PIN.',
     },
   ];
 
@@ -154,23 +160,23 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
 
               <div className="flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center gap-3 pt-1">
                 <CorporatePrimaryButton onClick={handleOpenRegister}>
-                  Empezar prueba de 30 días
+                  Registrarse
                 </CorporatePrimaryButton>
 
                 <CorporateSecondaryButton
                   onClick={handleOpenDemo}
                   icon={<Play className="w-3.5 h-3.5 fill-current shrink-0" />}
                 >
-                  Ver demo interactiva
+                  Explorar demo por perfil
                 </CorporateSecondaryButton>
               </div>
 
               <div className="pt-5 border-t border-slate-200/80 dark:border-[#1A314D] flex flex-wrap items-center gap-x-3 gap-y-2 text-xs font-medium text-slate-500 dark:text-slate-300">
                 <span>Sin comisiones por reserva</span>
                 <span aria-hidden="true" className="text-slate-300 dark:text-[#244163]">·</span>
-                <span>Migración asistida en 24 h</span>
+                <span>Puesta en marcha asistida</span>
                 <span aria-hidden="true" className="text-slate-300 dark:text-[#244163]">·</span>
-                <span>Sin permanencia</span>
+                <span>Suscripción modular</span>
               </div>
             </div>
 
@@ -187,13 +193,13 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
         </CorporateContainer>
       </section>
 
-      {/* 2. SETMIO PRO — CLEAR 7-ROLE SOLUTIONS DIRECTORY (FIRST IN HIERARCHY) */}
+      {/* 2. SETMIO PRO — CLEAN UNIFORM 7-ROLE CARDS + SYMMETRIC OVERVIEW CARD (FIRST IN HIERARCHY) */}
       <section className="py-16 sm:py-24 bg-[#F7F9FC] dark:bg-[#081424] border-b border-slate-200/80 dark:border-[#1A314D]">
         <CorporateContainer className="space-y-10 sm:space-y-12">
           <CorporateSectionHeader
-            eyebrow="Setmio Pro · Soluciones por Perfil"
-            title="Una solución dedicada para cada perfil del pádel"
-            subtitle="Clubes de pádel, academias y escuelas, entrenadores y profesores, administraciones públicas y ayuntamientos, federaciones, equipos y jugadores profesionales."
+            eyebrow="Setmio Pro · Entorno Profesional y Corporativo"
+            title="Una solución estructurada para cada organización del pádel"
+            subtitle="Clubes de pádel, academias y escuelas, entrenadores y profesores, administraciones públicas y ayuntamientos, federaciones, equipos independientes y jugador profesional."
             accent="navy"
             action={
               <CorporateSecondaryButton onClick={() => navigate('/soluciones', 'solutions')}>
@@ -202,56 +208,75 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
             }
           />
 
-          {/* Scannable 7-row hairline editorial directory: zero hidden info, zero overflowing buttons */}
-          <div className="border-y border-slate-200 dark:border-[#1A314D] divide-y divide-slate-200 dark:divide-[#1A314D]">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 items-stretch">
             {SETMIO_PRO_SEGMENTS.map((segment) => {
               const displayTitle =
-                segment.id === 'administraciones'
-                  ? 'Administraciones Públicas y Ayuntamientos'
-                  : segment.shortTitle;
+                HOME_ROLE_DISPLAY_TITLES[segment.id] ?? segment.shortTitle;
 
               return (
-                <article
+                <button
                   key={segment.id}
-                  className="py-6 sm:py-7 grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-8 items-start lg:items-center min-w-0"
+                  type="button"
+                  onClick={() => navigate(segment.path, segment.pageKey)}
+                  className="group text-left h-full min-w-0 rounded-2xl border border-slate-200/90 dark:border-[#1A314D] bg-white dark:bg-[#0E2239] hover:border-[#0B1A2D]/40 dark:hover:border-[#B7F229]/50 p-6 flex flex-col justify-between gap-6 transition-[transform,border-color,box-shadow] duration-200 ease-out hover:-translate-y-0.5 hover:shadow-md hover:shadow-[#0B1A2D]/5 dark:hover:shadow-black/25 motion-reduce:transform-none motion-reduce:transition-none cursor-pointer"
                 >
-                  <div className="lg:col-span-4 flex items-start gap-3.5 min-w-0">
-                    <span className="font-mono text-xs font-bold text-[#0B1A2D] dark:text-[#B7F229] tabular-nums pt-1 shrink-0">
-                      {segment.order}
-                    </span>
-                    <div className="min-w-0 space-y-1">
-                      <h3 className="text-lg sm:text-xl font-bold text-[#0B1A2D] dark:text-white tracking-tight font-display leading-snug">
-                        {displayTitle}
-                      </h3>
-                      <div className="text-xs font-medium text-slate-500 dark:text-slate-400">
+                  <div className="space-y-3 min-w-0">
+                    <div className="flex items-center justify-between gap-2 text-[11px]">
+                      <span className="font-mono font-bold text-[#0B1A2D] dark:text-[#B7F229] tabular-nums">
+                        {segment.order}
+                      </span>
+                      <span className="font-medium text-slate-500 dark:text-slate-400 truncate">
                         {segment.recommendedPlan}
-                      </div>
+                      </span>
                     </div>
-                  </div>
 
-                  <div className="lg:col-span-6 space-y-1.5 min-w-0">
-                    <p className="text-sm font-medium text-[#0B1A2D] dark:text-slate-100 leading-relaxed">
+                    <h3 className="text-lg font-bold text-[#0B1A2D] dark:text-white tracking-tight font-display leading-snug">
+                      {displayTitle}
+                    </h3>
+
+                    <p className="text-xs sm:text-[13px] text-slate-600 dark:text-slate-300 leading-relaxed">
                       {segment.headline}
                     </p>
-                    <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-                      {segment.highlights.slice(0, 2).join(' · ')}
-                    </p>
                   </div>
 
-                  <div className="lg:col-span-2 flex lg:justify-end min-w-0 pt-1 lg:pt-0">
-                    <button
-                      type="button"
-                      onClick={() => navigate(segment.path, segment.pageKey)}
-                      aria-label={`Ver solución para ${displayTitle}`}
-                      className="w-full sm:w-auto max-w-full min-h-[42px] inline-flex items-center justify-center gap-2 rounded-xl border border-[#0B1A2D]/25 dark:border-[#244163] bg-white dark:bg-[#0E2239] hover:bg-[#0B1A2D] hover:text-white hover:border-[#0B1A2D] dark:hover:bg-[#132A45] dark:hover:border-[#B7F229]/60 text-[#0B1A2D] dark:text-white font-semibold text-xs px-4 py-2.5 transition-colors cursor-pointer"
-                    >
-                      <span>Ver solución</span>
-                      <ArrowRight className="w-3.5 h-3.5 shrink-0" />
-                    </button>
+                  <div className="pt-4 border-t border-slate-100 dark:border-[#1A314D] flex items-center justify-between gap-2 text-xs font-semibold text-[#0B1A2D] dark:text-white">
+                    <span>Ver solución</span>
+                    <ArrowRight className="w-3.5 h-3.5 shrink-0 text-[#0B1A2D] dark:text-[#B7F229] transition-transform duration-200 group-hover:translate-x-0.5 motion-reduce:transform-none" />
                   </div>
-                </article>
+                </button>
               );
             })}
+
+            {/* 8th symmetric overview & demo card */}
+            <button
+              type="button"
+              onClick={handleOpenDemo}
+              className="group text-left h-full min-w-0 rounded-2xl border border-[#1A314D] bg-[#0B1A2D] dark:bg-[#102742] hover:border-[#B7F229]/70 p-6 flex flex-col justify-between gap-6 text-white transition-[transform,border-color,box-shadow] duration-200 ease-out hover:-translate-y-0.5 hover:shadow-md hover:shadow-[#0B1A2D]/15 motion-reduce:transform-none motion-reduce:transition-none cursor-pointer"
+            >
+              <div className="space-y-3 min-w-0">
+                <div className="flex items-center justify-between gap-2 text-[11px]">
+                  <span className="font-mono font-bold text-[#B7F229] uppercase tracking-wider">
+                    Demos
+                  </span>
+                  <span className="font-medium text-slate-300">
+                    Por perfil
+                  </span>
+                </div>
+
+                <h3 className="text-lg font-bold text-white tracking-tight font-display leading-snug">
+                  Explora cada entorno en directo
+                </h3>
+
+                <p className="text-xs sm:text-[13px] text-slate-300 leading-relaxed">
+                  Accede a las demostraciones interactivas según el rol de tu club, escuela, institución o equipo.
+                </p>
+              </div>
+
+              <div className="pt-4 border-t border-[#1A314D] flex items-center justify-between gap-2 text-xs font-bold text-[#B7F229]">
+                <span>Explorar demos</span>
+                <Play className="w-3.5 h-3.5 shrink-0 fill-current transition-transform duration-200 group-hover:translate-x-0.5 motion-reduce:transform-none" />
+              </div>
+            </button>
           </div>
         </CorporateContainer>
       </section>
@@ -370,10 +395,10 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
       <section className="py-16 sm:py-20">
         <CorporateContainer>
           <CorporateCtaBanner
-            eyebrow="Setmio Pro · 30 días de prueba sin permanencia"
-            title="¿Quieres ver cómo encaja Setmio en tu club, academia o equipo?"
-            subtitle="Importamos tus datos iniciales en 24 horas y configuramos tu entorno de marca blanca sin comisiones por pista."
-            primaryLabel="Crear cuenta gratis"
+            eyebrow="Setmio Pro · Suscripción modular con alta guiada"
+            title="¿Quieres incorporar Setmio en tu club, academia o equipo?"
+            subtitle="Configuramos tu entorno de marca blanca bajo tu dominio con migración asistida de datos y sin comisiones por pista."
+            primaryLabel="Registrarse"
             onPrimary={handleOpenRegister}
             secondaryLabel="Explorar demo por perfil"
             onSecondary={handleOpenDemo}
@@ -401,10 +426,10 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
             <div className="space-y-2 mb-6">
               <CorporateEyebrow>Alta en Setmio Pro</CorporateEyebrow>
               <h3 className="text-2xl font-extrabold text-[#0B1A2D] dark:text-white font-display">
-                Solicita la activación de tu entorno
+                Solicita tu registro en Setmio Pro
               </h3>
               <p className="text-xs text-slate-600 dark:text-slate-300">
-                Configuración guiada sin permanencia ni tarjeta de crédito inicial.
+                Configuración guiada e implantación asistida adaptada a tu organización.
               </p>
             </div>
 
@@ -516,7 +541,7 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
 
               <div className="pt-2">
                 <CorporatePrimaryButton type="submit" className="w-full">
-                  Activar prueba de 30 días
+                  Registrarse
                 </CorporatePrimaryButton>
               </div>
             </form>

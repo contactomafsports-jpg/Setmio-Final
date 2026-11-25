@@ -174,7 +174,7 @@ export function SolucionesPage({
 
               <div className="flex flex-wrap items-center gap-3 pt-2">
                 <CorporatePrimaryButton onClick={handleRegisterClick}>
-                  Activar prueba de 30 días
+                  Registrarse
                 </CorporatePrimaryButton>
                 <CorporateSecondaryButton
                   onClick={onOpenDemo}
@@ -328,8 +328,8 @@ export function SolucionesPage({
           <CorporateCtaBanner
             eyebrow={`Setmio Pro · ${activeSegment.shortTitle}`}
             title={`Pon en marcha Setmio para ${activeSegment.shortTitle.toLowerCase()}`}
-            subtitle="Solicita una demostración aplicada a tu estructura real o inicia tu periodo de prueba de 30 días sin compromiso."
-            primaryLabel="Empezar prueba de 30 días"
+            subtitle="Solicita una demostración aplicada a tu estructura real o inicia el alta de tu entorno Setmio Pro."
+            primaryLabel="Registrarse"
             onPrimary={handleRegisterClick}
             secondaryLabel="Ver precios y planes"
             onSecondary={() => navigate('/precios', 'pricing')}
@@ -487,7 +487,7 @@ export function SolucionesPage({
         <CorporateCtaBanner
           title="¿No tienes claro qué configuración se adapta mejor a tu entidad?"
           subtitle="Te mostramos en directo cómo opera la plataforma aplicada a tu número de pistas, escuela, federación o equipo."
-          primaryLabel="Solicitar prueba de 30 días"
+          primaryLabel="Registrarse"
           onPrimary={handleRegisterClick}
           secondaryLabel="Explorar demo interactiva"
           onSecondary={onOpenDemo}

@@ -46,7 +46,7 @@ const PRICING_TIERS: PricingTier[] = [
       'Enlace propio de marca personal o equipo',
       'Soporte directo sin permanencia',
     ],
-    cta: 'Empezar prueba de 30 días',
+    cta: 'Registrarse',
     featured: false,
   },
   {
@@ -306,7 +306,7 @@ export const PricingView: React.FC<PricingViewProps> = ({
           <div className="rounded-2xl bg-[#F7F9FC] dark:bg-[#0E2239] border border-slate-200/90 dark:border-[#1A314D] p-7 space-y-3">
             <div className="flex items-center gap-2 text-sm font-bold text-[#0B1A2D] dark:text-white">
               <ShieldCheck className="w-4 h-4 text-[#0B1A2D] dark:text-[#B7F229]" />
-              <span>Migración inicial sin costes ocultos</span>
+              <span>Alta e implantación guiada en 24 horas</span>
             </div>
             <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
               Importamos tu base de socios, bonos activos y calendario actual de pistas en 24 horas para que no pierdas ningún dato ni interrumpas tu actividad diaria.
@@ -331,9 +331,9 @@ export const PricingView: React.FC<PricingViewProps> = ({
         </section>
 
         <CorporateCtaBanner
-          title="Empieza con 30 días de prueba sin permanencia"
-          subtitle="Configura tu entidad en minutos o solicita una demo guiada por perfil con nuestro equipo técnico."
-          primaryLabel="Crear cuenta gratis"
+          title="Activa Setmio Pro en tu organización"
+          subtitle="Configura tu entidad con puesta en marcha asistida o solicita una demo guiada por perfil con nuestro equipo técnico."
+          primaryLabel="Registrarse"
           onPrimary={handleRegisterCta}
           secondaryLabel="Explorar demo"
           onSecondary={onOpenDemo}

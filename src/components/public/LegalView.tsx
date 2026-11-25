@@ -119,7 +119,7 @@ export const LegalView: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
               {isCorporateLanding ? (
                 <ul className="list-disc pl-5 space-y-2">
                   <li>
-                    Los entornos de prueba y suscripción Setmio Pro se contratan sin permanencia ni comisiones sobre reservas.
+                    Las suscripciones Setmio Pro se contratan sin comisiones sobre reservas y con alta guiada por nuestro equipo.
                   </li>
                   <li>
                     Cada cliente conserva en todo momento la titularidad íntegra de su base de socios, datos contables y dominio corporativo.

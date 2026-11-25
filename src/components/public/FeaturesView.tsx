@@ -230,8 +230,8 @@ export const FeaturesView: React.FC<FeaturesViewProps> = ({
 
           <CorporateCtaBanner
             title="Activa la plataforma completa bajo tu propia marca"
-            subtitle="Todos los módulos comparten una única base de socios, pistas y facturación sin coste extra por migración."
-            primaryLabel="Empezar prueba de 30 días"
+            subtitle="Todos los módulos comparten una única base de socios, pistas y facturación con alta asistida por nuestro equipo."
+            primaryLabel="Registrarse"
             onPrimary={handleOpenOnboardingClick}
             secondaryLabel="Ver precios"
             onSecondary={() => navigate('/precios', 'pricing')}
@@ -360,7 +360,7 @@ export const FeaturesView: React.FC<FeaturesViewProps> = ({
           subtitle="Conecta el hardware de tus pistas directamente con el cuadrante de reservas para operar horarios no tripulados con seguridad."
           primaryLabel="Ver Domótica y Accesos"
           onPrimary={() => navigate('/domotica', 'modules')}
-          secondaryLabel="Solicitar prueba"
+          secondaryLabel="Registrarse"
           onSecondary={handleOpenOnboardingClick}
         />
       </CorporateContainer>

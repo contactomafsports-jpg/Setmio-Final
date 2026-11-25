@@ -3213,7 +3213,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         } else if (lower.includes('equipo') || lower.includes('jugador') || lower.includes('player')) {
           reply = 'Setmio Pro incluye módulos específicos para Equipos independientes y Jugador Profesional (oficina digital de atleta, clinics y patrocinadores), además de Setmio Player para estadísticas de partido, análisis de parejas/rivales y enlace directo con tus clubes.';
         } else if (lower.includes('marca blanca') || lower.includes('precio') || lower.includes('plan') || lower.includes('comision')) {
-          reply = 'Setmio opera con marca blanca completa bajo tu propio dominio y sin comisiones por reserva ni por pista. Dispones de 30 días de prueba sin permanencia y migración asistida en 24 horas.';
+          reply = 'Setmio opera con marca blanca completa bajo tu propio dominio y sin comisiones por reserva ni por pista. Las suscripciones incluyen puesta en marcha guiada e importación inicial de datos.';
         } else {
           reply = 'Setmio unifica reservas, escuelas, torneos, pagos divididos directos al IBAN, domótica 24/7 y marca blanca para clubes, academias, entrenadores, administraciones públicas, federaciones, equipos y jugadores profesionales. ¿Sobre qué perfil te gustaría profundizar?';
         }

@@ -220,7 +220,7 @@ export const CorporateFooter: React.FC<CorporateFooterProps> = ({ minimized = fa
                   onClick={handleOpenRegister}
                   className="text-[#B7F229] hover:text-[#c5f64e] font-semibold transition-colors text-left cursor-pointer"
                 >
-                  {t('footer.platformRegister', 'Crear cuenta')}
+                  {t('footer.platformRegister', 'Registrarse')}
                 </button>
               </li>
             </ul>

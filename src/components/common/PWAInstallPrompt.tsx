@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { usePWA } from '../../lib/pwa';
 import { useApp } from '../../context/AppContext';
 import { Download, Share, X, Smartphone } from 'lucide-react';
@@ -9,13 +9,33 @@ export const PWAInstallPrompt: React.FC = () => {
   const { currentTenant, isCorporateLanding, currentView } = useApp();
   const [showIOSModal, setShowIOSModal] = useState(false);
   const [dismissed, setDismissed] = useState(false);
-
-  if (isInstalled || dismissed) return null;
+  const [hasScrolledPastHero, setHasScrolledPastHero] = useState(false);
 
   const isPublicCorporate = isCorporateLanding && currentView === 'public';
+
+  useEffect(() => {
+    if (!isPublicCorporate) {
+      setHasScrolledPastHero(true);
+      return;
+    }
+
+    const onScroll = () => {
+      if (window.scrollY > 260) {
+        setHasScrolledPastHero(true);
+      }
+    };
+
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, [isPublicCorporate]);
+
+  if (isInstalled || dismissed) return null;
+  if (isPublicCorporate && !hasScrolledPastHero) return null;
+
   const positionClass =
     currentView === 'public'
-      ? 'bottom-4 left-3 right-3 sm:bottom-5 sm:left-auto sm:right-5 sm:w-[360px]'
+      ? 'bottom-4 left-3 right-3 sm:bottom-5 sm:left-auto sm:right-5 sm:w-[352px]'
       : 'bottom-[4.75rem] left-3 right-3 sm:bottom-5 sm:left-auto sm:right-5 sm:w-[340px]';
 
   const brandName = isPublicCorporate ? 'Setmio' : currentTenant.shortName;
@@ -23,7 +43,7 @@ export const PWAInstallPrompt: React.FC = () => {
     ? 'Instalar Setmio Web App'
     : `Instalar App de ${brandName}`;
   const subtitleText = isPublicCorporate
-    ? 'Acceso directo desde tu pantalla de inicio sin descargas'
+    ? 'Acceso directo desde tu pantalla de inicio'
     : 'Acceso rápido a reservas directas sin descargas pesadas';
 
   return (
@@ -31,7 +51,7 @@ export const PWAInstallPrompt: React.FC = () => {
       {(isInstallable || isIOS) && (
         <aside
           aria-label="Instalación de la aplicación web"
-          className={`fixed ${positionClass} z-30 rounded-2xl border border-[#1A314D] bg-[#0B1A2D]/95 backdrop-blur-xl p-3.5 shadow-2xl shadow-[#040B14]/40 flex items-center justify-between gap-3 text-white`}
+          className={`fixed ${positionClass} z-30 rounded-2xl border border-[#1A314D] bg-[#0B1A2D]/95 backdrop-blur-xl p-3.5 shadow-2xl shadow-[#040B14]/40 flex items-center justify-between gap-3 text-white animate-float-in`}
         >
           <div className="flex items-center gap-3 min-w-0">
             <div className="w-10 h-10 rounded-xl bg-[#071220] border border-[#1A314D] flex items-center justify-center shrink-0">

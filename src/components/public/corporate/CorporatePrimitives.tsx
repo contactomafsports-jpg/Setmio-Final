@@ -85,7 +85,7 @@ export const CorporateMediaFrame: React.FC<{
 
   return (
     <div
-      className={`rounded-2xl overflow-hidden border border-slate-200/90 dark:border-[#1A314D] bg-[#0B1A2D] ${aspectClass} ${className}`}
+      className={`group rounded-2xl overflow-hidden border border-slate-200/90 dark:border-[#1A314D] bg-[#0B1A2D] ${aspectClass} ${className}`}
     >
       {hasError ? (
         <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#071220] via-[#0B1A2D] to-[#132A45] p-8 text-center">
@@ -99,7 +99,7 @@ export const CorporateMediaFrame: React.FC<{
           alt={alt}
           referrerPolicy="no-referrer"
           onError={() => setHasError(true)}
-          className="w-full h-full object-cover object-center"
+          className="w-full h-full object-cover object-center transition-transform duration-500 ease-out group-hover:scale-[1.015] motion-reduce:transition-none motion-reduce:transform-none"
         />
       )}
     </div>
@@ -241,7 +241,7 @@ export const CorporateCtaBanner: React.FC<{
   secondaryLabel?: string;
   onSecondary?: () => void;
 }> = ({
-  eyebrow = 'Setmio Pro · Implantación Sin Permanencia',
+  eyebrow = 'Setmio Pro · Suscripción modular con alta guiada',
   title,
   subtitle,
   primaryLabel,
