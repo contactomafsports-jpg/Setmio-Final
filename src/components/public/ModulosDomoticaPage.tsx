@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import {
   Check,
   CheckCircle2,
+  ChevronRight,
   Cpu,
   Lightbulb,
   LockKeyhole,
@@ -220,25 +221,41 @@ export function ModulosDomoticaPage({
 
   return (
     <div className="bg-white dark:bg-[#0B1A2D] text-[#0B1A2D] dark:text-white transition-colors duration-200 overflow-x-clip">
-      {/* 1. HERO & INTERACTIVE CONTROLLER PREVIEW */}
-      <section className="border-b border-slate-200/80 dark:border-[#1A314D] py-9 sm:py-14">
+      {/* 1. COMPACT HERO & INTERACTIVE CONTROLLER PREVIEW */}
+      <section className="border-b border-slate-200/80 dark:border-[#1A314D] py-7 sm:py-11">
         <CorporateContainer className="space-y-8 sm:space-y-10">
-          <div className="max-w-3xl space-y-4 animate-float-in">
-            <CorporateEyebrow accent="lime">Setmio IoT · Pistas Desatendidas</CorporateEyebrow>
-            <h1 className="text-3xl sm:text-4xl lg:text-[46px] font-extrabold tracking-tight text-[#0B1A2D] dark:text-white leading-[1.08] font-display text-balance">
-              Automatiza la iluminación LED y el acceso por PIN de cada pista.
-            </h1>
-            <p className="text-sm sm:text-base text-slate-600 dark:text-slate-300 leading-relaxed max-w-2xl">
-              Conecta tus cuadros eléctricos y cerraduras directamente al motor de reservas para abrir horarios de mañana y noche sin presencia continua en recepción.
-            </p>
+          <div className="space-y-5 sm:space-y-6">
+            <nav aria-label="Ruta de navegación" className="flex items-center gap-1.5 text-xs whitespace-nowrap">
+              <button
+                type="button"
+                onClick={() => navigate('/', 'home')}
+                className="font-medium text-slate-500 dark:text-slate-400 hover:text-[#0B1A2D] dark:hover:text-white transition-colors cursor-pointer"
+              >
+                Inicio
+              </button>
+              <ChevronRight className="w-3.5 h-3.5 text-slate-300 dark:text-slate-600 shrink-0" aria-hidden="true" />
+              <span className="font-semibold text-[#0B1A2D] dark:text-white">
+                Domótica
+              </span>
+            </nav>
 
-            <div className="flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center gap-3 pt-1">
-              <CorporatePrimaryButton onClick={handleOpenRegisterClick}>
-                Registrarse
-              </CorporatePrimaryButton>
-              <CorporateSecondaryButton onClick={() => navigate('/funcionalidades', 'features')}>
-                Ver funcionalidades
-              </CorporateSecondaryButton>
+            <div className="max-w-3xl space-y-3.5 animate-float-in">
+              <CorporateEyebrow accent="lime">Setmio IoT · Pistas Desatendidas</CorporateEyebrow>
+              <h1 className="text-3xl sm:text-4xl lg:text-[44px] font-extrabold tracking-tight text-[#0B1A2D] dark:text-white leading-[1.08] font-display text-balance">
+                Automatiza la iluminación LED y el acceso por PIN de cada pista.
+              </h1>
+              <p className="text-sm sm:text-base text-slate-600 dark:text-slate-300 leading-relaxed max-w-2xl">
+                Conecta tus cuadros eléctricos y cerraduras directamente al motor de reservas para abrir horarios de mañana y noche sin presencia continua en recepción.
+              </p>
+
+              <div className="flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center gap-3 pt-1">
+                <CorporatePrimaryButton onClick={handleOpenRegisterClick}>
+                  Registrarse
+                </CorporatePrimaryButton>
+                <CorporateSecondaryButton onClick={() => navigate('/funcionalidades', 'features')}>
+                  Ver funcionalidades
+                </CorporateSecondaryButton>
+              </div>
             </div>
           </div>
 
