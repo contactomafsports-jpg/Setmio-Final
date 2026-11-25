@@ -3,9 +3,6 @@ import { useApp, PublicPage } from '../../context/AppContext';
 import {
   ArrowRight,
   Check,
-  CheckCircle2,
-  ExternalLink,
-  MapPin,
   Play,
   X,
 } from 'lucide-react';
@@ -14,12 +11,15 @@ import {
   CorporateContainer,
   CorporateCtaBanner,
   CorporateEyebrow,
+  CorporateMediaFrame,
+  CorporateNavyButton,
   CorporatePrimaryButton,
   CorporateSecondaryButton,
   CorporateSectionHeader,
+  CorporateSurface,
   navigateCorporateRoute,
 } from './corporate/CorporatePrimitives';
-import { SETMIO_PRO_CORE_SEGMENTS } from './corporate/corporateData';
+import { SETMIO_PRO_CORE_SEGMENTS, SetmioProSegmentId } from './corporate/corporateData';
 import heroCourtImg from '../../assets/images/setmio_hero_court_1795368969510.jpg';
 import proFacilityImg from '../../assets/images/setmio_pro_facility_1795368970973.jpg';
 import playerFocusImg from '../../assets/images/setmio_player_focus_1795368971038.jpg';
@@ -33,13 +33,14 @@ interface SetmioCorporateLandingProps {
 }
 
 export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
-  onExploreClub,
+  onExploreClub: _onExploreClub,
   onOpenDemoRoleModal,
   onOpenOnboarding,
   onOpenFeatures,
 }) => {
-  const { tenants, triggerDemoToast, setPublicPage, t } = useApp();
+  const { triggerDemoToast, setPublicPage, t } = useApp();
 
+  const [selectedSegmentId, setSelectedSegmentId] = useState<SetmioProSegmentId>('clubes');
   const [registerModalOpen, setRegisterModalOpen] = useState(false);
   const [localDemoModalOpen, setLocalDemoModalOpen] = useState(false);
   const [clubName, setClubName] = useState('');
@@ -48,6 +49,12 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
   const [clubCity, setClubCity] = useState('');
   const [contactEmail, setContactEmail] = useState('');
   const [contactPhone, setContactPhone] = useState('');
+
+  void _onExploreClub;
+
+  const activeSegment =
+    SETMIO_PRO_CORE_SEGMENTS.find((s) => s.id === selectedSegmentId) ??
+    SETMIO_PRO_CORE_SEGMENTS[0];
 
   const navigate = (path: string, page: PublicPage) => {
     navigateCorporateRoute(path, page, setPublicPage);
@@ -87,28 +94,26 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
     );
   };
 
-  const featuredVenues = (tenants || []).slice(0, 4);
-
-  const platformPillars = [
+  const platformCapabilities = [
     {
       number: '01',
       title: 'Marca blanca completa y dominio propio',
-      desc: 'Tu web, reservas y app llevan exclusivamente tu identidad visual, logotipo y dominio corporativo.',
+      desc: 'Tu web pública, reservas y app llevan exclusivamente tu identidad visual, logotipo y dominio corporativo con certificado SSL.',
     },
     {
       number: '02',
       title: 'Cobros directos sin comisiones por pista',
-      desc: 'Pagos divididos entre jugadores, monedero de club y remesas SEPA con liquidación directa a tu cuenta bancaria.',
+      desc: 'Pagos fraccionados entre jugadores, monedero de club y remesas SEPA con liquidación directa a tu cuenta bancaria.',
     },
     {
       number: '03',
       title: 'Domótica de iluminación y accesos 24/7',
-      desc: 'Encendido sincronizado de focos LED y apertura de puertas por PIN temporal sin personal presencial en recepción.',
+      desc: 'Encendido sincronizado de focos LED y apertura de puertas por código PIN temporal sin personal presencial en recepción.',
     },
     {
       number: '04',
-      title: 'Asistente IA para web y WhatsApp',
-      desc: 'Atención automática a consultas de disponibilidad, tarifas y normativa conectada al cuadrante real de tu centro.',
+      title: 'Asistente IA conectado al cuadrante real',
+      desc: 'Atención automática en web y WhatsApp para resolver disponibilidad, horarios y normativa según las reglas de cada sede.',
     },
   ];
 
@@ -116,42 +121,42 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
     {
       number: '01',
       title: 'Estadísticas de partidos y evolución',
-      desc: 'Registro detallado de encuentros, sets ganados, rachas de juego y progresión real de tu nivel por periodo.',
+      desc: 'Historial detallado de encuentros, sets ganados, rachas y evolución real de tu nivel deportivo.',
     },
     {
       number: '02',
       title: 'Análisis de rivales y compañeros',
-      desc: 'Consulta tu porcentaje de éxito según pareja, historial frente a rivales directos y rendimiento por lado de pista.',
+      desc: 'Consulta tu porcentaje de éxito por pareja, lado de pista y rendimiento frente a rivales habituales.',
     },
     {
       number: '03',
       title: 'Asistente de entrenador con IA',
-      desc: 'Lectura inteligente de tus datos de partido para detectar patrones tácticos y orientar tus entrenamientos.',
+      desc: 'Lectura táctica de tus datos recientes para orientar entrenamientos y preparar partidos de liga.',
     },
     {
       number: '04',
       title: 'Conexión directa con tus clubes',
-      desc: 'Enlace directo a la web de reserva de tu club habitual, saldo de monedero y código PIN sin intermediarios.',
+      desc: 'Enlace directo al portal de reservas de tus clubes habituales, saldo de monedero y código PIN de acceso.',
     },
   ];
 
   return (
     <div className="bg-white dark:bg-[#0B1A2D] text-[#0B1A2D] dark:text-white transition-colors duration-200">
-      {/* 1. HERO SECTION (Dual Light/Dark Architectural Opening) */}
+      {/* 1. HERO SECTION — Clean Editorial Split */}
       <section className="border-b border-slate-200/80 dark:border-[#1A314D] py-16 sm:py-20 lg:py-24">
         <CorporateContainer>
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-14 items-center">
             <div className="lg:col-span-6 space-y-7 animate-float-in">
               <CorporateEyebrow accent="lime">
-                Setmio Pro & Setmio Player
+                Setmio Pro · Setmio Player
               </CorporateEyebrow>
 
-              <h1 className="text-4xl sm:text-5xl lg:text-[54px] font-extrabold tracking-tight text-[#0B1A2D] dark:text-white leading-[1.06] text-balance font-display">
-                El sistema operativo de marca blanca para la gestión del pádel.
+              <h1 className="text-4xl sm:text-5xl lg:text-[52px] font-extrabold tracking-tight text-[#0B1A2D] dark:text-white leading-[1.06] text-balance font-display">
+                Software de marca blanca para la gestión integral del pádel.
               </h1>
 
               <p className="text-base sm:text-lg text-slate-600 dark:text-slate-300 leading-relaxed max-w-xl font-normal">
-                Digitaliza reservas, escuelas, torneos, cobros y domótica bajo tu propia marca, sin comisiones por pista y con herramientas dedicadas para cada perfil del sector.
+                Unifica reservas, escuelas, torneos, cobros directos y domótica bajo tu propia identidad digital, sin comisiones por pista y adaptado a cada perfil del sector.
               </p>
 
               <div className="flex flex-wrap items-center gap-3 pt-1">
@@ -167,88 +172,35 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
                 </CorporateSecondaryButton>
               </div>
 
-              <div className="pt-4 border-t border-slate-200/80 dark:border-[#1A314D] flex flex-wrap items-center gap-x-6 gap-y-2 text-xs font-medium text-slate-600 dark:text-slate-300">
-                <span className="inline-flex items-center gap-1.5">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-[#0B1A2D] dark:text-[#B7F229]" />
-                  Cero comisiones por reserva
-                </span>
-                <span className="inline-flex items-center gap-1.5">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-[#0B1A2D] dark:text-[#B7F229]" />
-                  Migración asistida en 24h
-                </span>
-                <span className="inline-flex items-center gap-1.5">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-[#0B1A2D] dark:text-[#B7F229]" />
-                  Sin permanencia
-                </span>
+              <div className="pt-5 border-t border-slate-200/80 dark:border-[#1A314D] flex flex-wrap items-center gap-x-3 gap-y-2 text-xs font-medium text-slate-500 dark:text-slate-300">
+                <span>Sin comisiones por reserva</span>
+                <span aria-hidden="true" className="text-slate-300 dark:text-[#244163]">·</span>
+                <span>Migración asistida en 24 h</span>
+                <span aria-hidden="true" className="text-slate-300 dark:text-[#244163]">·</span>
+                <span>Sin permanencia</span>
               </div>
             </div>
 
-            {/* Clean Architectural Visual Frame */}
-            <div className="lg:col-span-6">
-              <div className="rounded-3xl overflow-hidden border border-slate-200/90 dark:border-[#1A314D] bg-[#0B1A2D] shadow-lg shadow-[#0B1A2D]/5 dark:shadow-black/30">
-                <div className="relative aspect-[16/10] overflow-hidden">
-                  <img
-                    src={heroCourtImg}
-                    alt="Pista de pádel arquitectónica gestionada con Setmio Pro"
-                    className="w-full h-full object-cover object-center"
-                  />
-                  <div
-                    className="absolute inset-0 bg-gradient-to-t from-[#0B1A2D] via-[#0B1A2D]/20 to-transparent"
-                    aria-hidden="true"
-                  />
-
-                  <div className="absolute bottom-5 left-5 right-5 flex flex-wrap items-end justify-between gap-4 text-white">
-                    <div>
-                      <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#B7F229]">
-                        Infraestructura de marca blanca
-                      </div>
-                      <div className="text-sm sm:text-base font-bold mt-1">
-                        Web pública · Panel de gestión · App de socios · Domótica
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Restrained Architectural Capabilities Strip (no fake telemetry) */}
-                <div className="grid grid-cols-3 divide-x divide-[#1A314D] bg-[#0B1A2D] text-white">
-                  <div className="p-4 sm:p-5">
-                    <div className="font-mono text-lg sm:text-xl font-bold text-[#B7F229] tabular-nums">
-                      0%
-                    </div>
-                    <div className="text-[11px] text-slate-300 mt-1">
-                      Comisión por pista
-                    </div>
-                  </div>
-                  <div className="p-4 sm:p-5">
-                    <div className="font-mono text-lg sm:text-xl font-bold text-white tabular-nums">
-                      24/7
-                    </div>
-                    <div className="text-[11px] text-slate-300 mt-1">
-                      Acceso PIN & LED
-                    </div>
-                  </div>
-                  <div className="p-4 sm:p-5">
-                    <div className="font-mono text-lg sm:text-xl font-bold text-white tabular-nums">
-                      100%
-                    </div>
-                    <div className="text-[11px] text-slate-300 mt-1">
-                      Dominio propio
-                    </div>
-                  </div>
-                </div>
-              </div>
+            <div className="lg:col-span-6 animate-float-in">
+              <CorporateMediaFrame
+                src={heroCourtImg}
+                alt="Pista de pádel contemporánea gestionada con Setmio Pro"
+                aspectClass="aspect-[16/10]"
+                fallbackLabel="Setmio Pro · Infraestructura Deportiva"
+                className="shadow-lg shadow-[#0B1A2D]/5 dark:shadow-black/30"
+              />
             </div>
           </div>
         </CorporateContainer>
       </section>
 
-      {/* 2. SETMIO PRO — PROFESSIONAL & CORPORATE SEGMENT (FIRST IN HIERARCHY) */}
+      {/* 2. SETMIO PRO — INTERACTIVE ARCHITECTURAL SEGMENT DIRECTORY (FIRST IN HIERARCHY) */}
       <section className="py-20 sm:py-24 bg-[#F7F9FC] dark:bg-[#081424] border-b border-slate-200/80 dark:border-[#1A314D]">
         <CorporateContainer className="space-y-12">
           <CorporateSectionHeader
             eyebrow="Setmio Pro · Entorno Profesional y Corporativo"
-            title="Una solución estructurada para cada organización del pádel"
-            subtitle="Desde clubes privados y academias hasta administraciones públicas, federaciones y equipos independientes que contratan el sistema directamente."
+            title="Una solución dedicada para cada organización del pádel"
+            subtitle="Desde clubes privados y academias hasta administraciones públicas, federaciones y equipos independientes que contratan la plataforma directamente."
             accent="lime"
             action={
               <CorporateSecondaryButton onClick={() => navigate('/soluciones', 'solutions')}>
@@ -257,71 +209,177 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
             }
           />
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {SETMIO_PRO_CORE_SEGMENTS.map((segment) => (
-              <article
-                key={segment.id}
-                className="rounded-2xl bg-white dark:bg-[#0E2239] border border-slate-200/90 dark:border-[#1A314D] hover:border-[#0B1A2D]/40 dark:hover:border-[#B7F229]/60 transition-colors p-7 flex flex-col justify-between space-y-6"
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start">
+            {/* Left Directory Selector (No 6-card grid clone) */}
+            <div className="lg:col-span-5 space-y-4">
+              <div
+                className="border-y border-slate-200 dark:border-[#1A314D] divide-y divide-slate-200 dark:divide-[#1A314D]"
+                role="tablist"
+                aria-label="Perfiles profesionales Setmio Pro"
               >
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <span className="font-mono text-xs font-bold text-[#0B1A2D] dark:text-[#B7F229]">
-                      {segment.order}
+                {SETMIO_PRO_CORE_SEGMENTS.map((segment) => {
+                  const isActive = segment.id === activeSegment.id;
+                  return (
+                    <button
+                      key={segment.id}
+                      type="button"
+                      role="tab"
+                      aria-selected={isActive}
+                      onClick={() => setSelectedSegmentId(segment.id)}
+                      className={`w-full flex items-center justify-between gap-4 px-4 py-4 text-left transition-colors cursor-pointer ${
+                        isActive
+                          ? 'bg-white dark:bg-[#0E2239] text-[#0B1A2D] dark:text-white'
+                          : 'bg-transparent text-slate-600 dark:text-slate-300 hover:bg-white/70 dark:hover:bg-[#0E2239]/60 hover:text-[#0B1A2D] dark:hover:text-white'
+                      }`}
+                    >
+                      <span className="flex items-center gap-3.5 min-w-0">
+                        <span
+                          className={`font-mono text-xs font-bold tabular-nums shrink-0 ${
+                            isActive
+                              ? 'text-[#0B1A2D] dark:text-[#B7F229]'
+                              : 'text-slate-400 dark:text-slate-500'
+                          }`}
+                        >
+                          {segment.order}
+                        </span>
+                        <span className={`text-sm sm:text-base truncate ${isActive ? 'font-bold' : 'font-semibold'}`}>
+                          {segment.shortTitle}
+                        </span>
+                      </span>
+
+                      <ArrowRight
+                        className={`w-4 h-4 shrink-0 transition-transform ${
+                          isActive
+                            ? 'text-[#0B1A2D] dark:text-[#B7F229] translate-x-0.5'
+                            : 'text-slate-300 dark:text-slate-600'
+                        }`}
+                      />
+                    </button>
+                  );
+                })}
+              </div>
+
+              <div className="px-1 pt-1 flex items-center justify-between text-xs">
+                <span className="text-slate-500 dark:text-slate-400">
+                  ¿Compites en circuito profesional?
+                </span>
+                <button
+                  type="button"
+                  onClick={() =>
+                    navigate('/soluciones/jugadores-profesionales', 'solution_pro_players')
+                  }
+                  className="font-semibold text-[#0B1A2D] dark:text-[#B7F229] hover:underline cursor-pointer whitespace-nowrap"
+                >
+                  Jugadores Profesionales →
+                </button>
+              </div>
+            </div>
+
+            {/* Right Active Detail Surface */}
+            <div className="lg:col-span-7">
+              <CorporateSurface className="p-7 sm:p-10 space-y-7">
+                <div className="flex flex-wrap items-center justify-between gap-3 pb-5 border-b border-slate-200/80 dark:border-[#1A314D]">
+                  <div className="flex items-center gap-2.5 text-xs">
+                    <span className="font-mono font-bold text-[#0B1A2D] dark:text-[#B7F229] tabular-nums">
+                      {activeSegment.order}
                     </span>
-                    <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400">
-                      Setmio Pro
+                    <span aria-hidden="true" className="text-slate-300 dark:text-[#244163]">·</span>
+                    <span className="font-semibold text-slate-600 dark:text-slate-300">
+                      {activeSegment.badge}
                     </span>
                   </div>
 
-                  <div className="space-y-2">
-                    <h3 className="text-xl font-bold text-[#0B1A2D] dark:text-white tracking-tight font-display">
-                      {segment.title}
-                    </h3>
-                    <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
-                      {segment.summary}
-                    </p>
-                  </div>
-
-                  <ul className="space-y-2 pt-3 border-t border-slate-100 dark:border-[#1A314D] text-xs text-slate-600 dark:text-slate-300">
-                    {segment.highlights.slice(0, 3).map((item) => (
-                      <li key={item} className="flex items-start gap-2">
-                        <Check className="w-3.5 h-3.5 text-[#0B1A2D] dark:text-[#B7F229] shrink-0 mt-0.5" />
-                        <span>{item}</span>
-                      </li>
-                    ))}
-                  </ul>
+                  <span className="text-xs font-medium text-slate-500 dark:text-slate-300">
+                    {activeSegment.recommendedPlan}
+                  </span>
                 </div>
 
-                <div className="pt-4 border-t border-slate-100 dark:border-[#1A314D]">
+                <div className="space-y-3">
+                  <h3 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#0B1A2D] dark:text-white font-display">
+                    {activeSegment.title}
+                  </h3>
+                  <p className="text-base font-semibold text-[#0B1A2D]/90 dark:text-slate-100 leading-snug">
+                    {activeSegment.headline}
+                  </p>
+                  <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+                    {activeSegment.summary}
+                  </p>
+                </div>
+
+                <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3.5 pt-5 border-t border-slate-200/80 dark:border-[#1A314D] text-xs text-slate-700 dark:text-slate-200">
+                  {activeSegment.highlights.map((item) => (
+                    <li key={item} className="flex items-start gap-2.5">
+                      <Check className="w-4 h-4 text-[#0B1A2D] dark:text-[#B7F229] shrink-0 mt-0.5" />
+                      <span className="leading-relaxed">{item}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                <div className="pt-5 border-t border-slate-200/80 dark:border-[#1A314D] flex flex-wrap items-center gap-4">
+                  <CorporateNavyButton
+                    onClick={() => navigate(activeSegment.path, activeSegment.pageKey)}
+                  >
+                    Ver solución para {activeSegment.shortTitle.toLowerCase()}
+                  </CorporateNavyButton>
+
                   <button
                     type="button"
-                    onClick={() => navigate(segment.path, segment.pageKey)}
-                    className="inline-flex items-center gap-2 text-xs font-bold text-[#0B1A2D] dark:text-[#B7F229] hover:gap-3 transition-all cursor-pointer"
+                    onClick={handleOpenDemo}
+                    className="text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-[#0B1A2D] dark:hover:text-[#B7F229] transition-colors cursor-pointer whitespace-nowrap"
                   >
-                    <span>Ver solución para {segment.shortTitle.toLowerCase()}</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
+                    Explorar entorno demo →
                   </button>
                 </div>
-              </article>
-            ))}
+              </CorporateSurface>
+            </div>
           </div>
         </CorporateContainer>
       </section>
 
-      {/* 3. OPERATIONAL ARCHITECTURE & MODULES */}
+      {/* 3. OPERATIONAL ARCHITECTURE — ASYMMETRIC SPLIT + HAIRLINE NUMBERED LIST */}
       <section className="py-20 sm:py-24 border-b border-slate-200/80 dark:border-[#1A314D]">
-        <CorporateContainer className="space-y-14">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
-            <div className="lg:col-span-6 space-y-6">
-              <CorporateEyebrow accent="navy">Arquitectura Modular</CorporateEyebrow>
-              <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-[#0B1A2D] dark:text-white leading-[1.12] font-display">
-                Todo el control operativo en una sola plataforma sin fricciones.
+        <CorporateContainer>
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-14 items-start">
+            <div className="lg:col-span-5 space-y-6">
+              <CorporateEyebrow accent="navy">Plataforma Modular</CorporateEyebrow>
+              <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-[#0B1A2D] dark:text-white leading-[1.12] text-balance font-display">
+                Una sola base operativa para pistas, cobros y automatización.
               </h2>
               <p className="text-base text-slate-600 dark:text-slate-300 leading-relaxed">
-                Cada módulo trabaja conectado sobre la misma base de socios, pistas y facturación: evita duplicidades administrativas y ofrece a tus usuarios una experiencia coherente de principio a fin.
+                Cada área trabaja sincronizada sobre el mismo registro de socios, horarios y liquidación bancaria para evitar duplicidades administrativas.
               </p>
 
-              <div className="flex flex-wrap items-center gap-3 pt-1">
+              <CorporateMediaFrame
+                src={proFacilityImg}
+                alt="Instalación deportiva contemporánea gestionada con Setmio Pro"
+                aspectClass="aspect-[4/3]"
+                fallbackLabel="Instalación Setmio Pro"
+              />
+            </div>
+
+            <div className="lg:col-span-7 space-y-8">
+              <div className="border-y border-slate-200/90 dark:border-[#1A314D] divide-y divide-slate-200/90 dark:divide-[#1A314D]">
+                {platformCapabilities.map((item) => (
+                  <div
+                    key={item.number}
+                    className="py-6 sm:py-7 grid grid-cols-1 sm:grid-cols-12 gap-3 sm:gap-6 items-baseline"
+                  >
+                    <div className="sm:col-span-5 flex items-baseline gap-3">
+                      <span className="font-mono text-xs font-bold text-slate-400 dark:text-[#B7F229] tabular-nums shrink-0">
+                        {item.number}
+                      </span>
+                      <h3 className="text-base font-bold text-[#0B1A2D] dark:text-white leading-snug">
+                        {item.title}
+                      </h3>
+                    </div>
+                    <p className="sm:col-span-7 text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+                      {item.desc}
+                    </p>
+                  </div>
+                ))}
+              </div>
+
+              <div className="flex flex-wrap items-center gap-3">
                 <CorporatePrimaryButton onClick={handleOpenModules}>
                   Explorar módulos
                 </CorporatePrimaryButton>
@@ -330,108 +388,41 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
                 </CorporateSecondaryButton>
               </div>
             </div>
-
-            <div className="lg:col-span-6">
-              <div className="rounded-3xl overflow-hidden border border-slate-200/90 dark:border-[#1A314D] aspect-[16/10] bg-[#0B1A2D]">
-                <img
-                  src={proFacilityImg}
-                  alt="Instalación de pádel contemporánea operando con Setmio"
-                  className="w-full h-full object-cover object-center"
-                />
-              </div>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 border border-slate-200/90 dark:border-[#1A314D] rounded-2xl divide-y sm:divide-y-0 sm:divide-x divide-slate-200/90 dark:divide-[#1A314D] bg-white dark:bg-[#0E2239]">
-            {platformPillars.map((pillar) => (
-              <div key={pillar.number} className="p-6 sm:p-7 space-y-3">
-                <span className="font-mono text-xs font-bold text-[#8B5CF6] dark:text-[#B7F229]">
-                  {pillar.number}
-                </span>
-                <h3 className="text-base font-bold text-[#0B1A2D] dark:text-white leading-snug">
-                  {pillar.title}
-                </h3>
-                <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-                  {pillar.desc}
-                </p>
-              </div>
-            ))}
           </div>
         </CorporateContainer>
       </section>
 
-      {/* 4. SETMIO PLAYER — INDIVIDUAL PLAYER EXPERIENCE (SECOND IN HIERARCHY, NO MARKETPLACE) */}
+      {/* 4. SETMIO PLAYER — INDIVIDUAL PLAYER EXPERIENCE (SECOND IN HIERARCHY, ZERO MARKETPLACE) */}
       <section className="py-20 sm:py-24 bg-[#F7F9FC] dark:bg-[#081424] border-b border-slate-200/80 dark:border-[#1A314D]">
         <CorporateContainer>
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-            <div className="lg:col-span-6 order-2 lg:order-1">
-              <div className="rounded-3xl overflow-hidden border border-slate-200/90 dark:border-[#1A314D] bg-white dark:bg-[#0E2239]">
-                <div className="aspect-[4/3] overflow-hidden bg-[#0B1A2D]">
-                  <img
-                    src={playerFocusImg}
-                    alt="Equipación y análisis de rendimiento para jugadores en Setmio Player"
-                    className="w-full h-full object-cover object-center"
-                  />
-                </div>
-                <div className="p-6 sm:p-7 border-t border-slate-200/80 dark:border-[#1A314D] grid grid-cols-3 gap-4 text-left">
-                  <div>
-                    <div className="text-[11px] font-medium text-slate-500 dark:text-slate-400">
-                      Rendimiento
-                    </div>
-                    <div className="text-sm font-bold text-[#0B1A2D] dark:text-white mt-0.5">
-                      Historial y rachas
-                    </div>
-                  </div>
-                  <div>
-                    <div className="text-[11px] font-medium text-slate-500 dark:text-slate-400">
-                      Análisis táctico
-                    </div>
-                    <div className="text-sm font-bold text-[#0B1A2D] dark:text-white mt-0.5">
-                      Pareja y rivales
-                    </div>
-                  </div>
-                  <div>
-                    <div className="text-[11px] font-medium text-slate-500 dark:text-slate-400">
-                      Tu club
-                    </div>
-                    <div className="text-sm font-bold text-[#0B1A2D] dark:text-[#B7F229] mt-0.5">
-                      Enlace directo
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="lg:col-span-6 order-1 lg:order-2 space-y-7">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-14 items-center">
+            <div className="lg:col-span-6 space-y-6">
               <CorporateEyebrow accent="violet">
                 Setmio Player · Experiencia del Jugador
               </CorporateEyebrow>
 
-              <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-[#0B1A2D] dark:text-white leading-[1.12] font-display">
-                Tu evolución en pista, tus rivales y acceso directo a tus clubes.
+              <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-[#0B1A2D] dark:text-white leading-[1.12] text-balance font-display">
+                Tu evolución en pista, tus parejas y el enlace directo con tus clubes.
               </h2>
 
               <p className="text-base text-slate-600 dark:text-slate-300 leading-relaxed">
-                Un espacio personal centrado exclusivamente en tu juego: registra estadísticas de cada encuentro, analiza cómo rindes con distintos compañeros y recibe orientación de entrenador con IA sin salir del vínculo con tu club habitual.
+                Un espacio personal centrado exclusivamente en tu rendimiento deportivo: sigue tus estadísticas de partido, analiza cómo rindes con cada compañero o rival y accede sin intermediarios al portal de reserva de tus clubes habituales.
               </p>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="border-y border-slate-200/90 dark:border-[#1A314D] divide-y divide-slate-200/90 dark:divide-[#1A314D]">
                 {playerCapabilities.map((item) => (
-                  <div
-                    key={item.number}
-                    className="p-5 rounded-2xl bg-white dark:bg-[#0E2239] border border-slate-200/90 dark:border-[#1A314D] space-y-2"
-                  >
-                    <div className="flex items-center gap-2">
-                      <span className="font-mono text-[11px] font-bold text-[#0B1A2D] dark:text-[#B7F229]">
-                        {item.number}
-                      </span>
+                  <div key={item.number} className="py-4 flex items-start gap-4">
+                    <span className="font-mono text-xs font-bold text-[#0B1A2D] dark:text-[#B7F229] tabular-nums pt-0.5 shrink-0">
+                      {item.number}
+                    </span>
+                    <div className="space-y-1">
                       <h3 className="text-sm font-bold text-[#0B1A2D] dark:text-white">
                         {item.title}
                       </h3>
+                      <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                        {item.desc}
+                      </p>
                     </div>
-                    <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-                      {item.desc}
-                    </p>
                   </div>
                 ))}
               </div>
@@ -442,57 +433,20 @@ export const SetmioCorporateLanding: React.FC<SetmioCorporateLandingProps> = ({
                 </CorporatePrimaryButton>
               </div>
             </div>
+
+            <div className="lg:col-span-6">
+              <CorporateMediaFrame
+                src={playerFocusImg}
+                alt="Pala de pádel y pelotas sobre banco para análisis de rendimiento en Setmio Player"
+                aspectClass="aspect-[4/3]"
+                fallbackLabel="Setmio Player · Análisis Personal"
+              />
+            </div>
           </div>
         </CorporateContainer>
       </section>
 
-      {/* 5. REAL WHITE-LABEL VENUES PREVIEW */}
-      {featuredVenues.length > 0 && (
-        <section className="py-16 sm:py-20 border-b border-slate-200/80 dark:border-[#1A314D]">
-          <CorporateContainer className="space-y-10">
-            <CorporateSectionHeader
-              eyebrow="Entornos de Marca Blanca Activos"
-              title="Ejemplos reales de sedes operando con Setmio"
-              subtitle="Cada organización dispone de su propio portal independiente con identidad, tarifas y reservas diferenciadas."
-              accent="navy"
-            />
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-              {featuredVenues.map((venue) => (
-                <button
-                  key={venue.id}
-                  type="button"
-                  onClick={() => onExploreClub(venue.slug)}
-                  className="text-left p-6 rounded-2xl bg-[#F7F9FC] dark:bg-[#0E2239] border border-slate-200/90 dark:border-[#1A314D] hover:border-[#0B1A2D]/40 dark:hover:border-[#B7F229]/60 transition-colors flex flex-col justify-between space-y-5 group cursor-pointer"
-                >
-                  <div className="space-y-2.5">
-                    <div className="flex items-center justify-between text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-                      <span>{venue.type.replace('_', ' ')}</span>
-                      <ExternalLink className="w-3.5 h-3.5 opacity-60 group-hover:opacity-100 transition-opacity" />
-                    </div>
-                    <h3 className="text-base font-bold text-[#0B1A2D] dark:text-white group-hover:underline">
-                      {venue.name}
-                    </h3>
-                    <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
-                      <MapPin className="w-3.5 h-3.5 shrink-0" />
-                      <span className="truncate">
-                        {venue.city}, {venue.country}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="pt-3 border-t border-slate-200/80 dark:border-[#1A314D] flex items-center justify-between text-xs font-semibold text-[#0B1A2D] dark:text-[#B7F229]">
-                    <span>Abrir portal de ejemplo</span>
-                    <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
-                  </div>
-                </button>
-              ))}
-            </div>
-          </CorporateContainer>
-        </section>
-      )}
-
-      {/* 6. UNIFIED PRE-FOOTER CTA BANNER */}
+      {/* 5. CLOSING CTA BANNER */}
       <section className="py-16 sm:py-20">
         <CorporateContainer>
           <CorporateCtaBanner

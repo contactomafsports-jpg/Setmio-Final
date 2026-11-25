@@ -109,9 +109,9 @@ export function CorporateHeader({ onOpenDemo, onOpenAuth, onOpenRegister }: Corp
     publicPage === 'players_app';
 
   const navLinkClass = (active: boolean) =>
-    `relative py-1 text-xs font-semibold transition-colors whitespace-nowrap ${
+    `relative py-1 text-xs font-semibold transition-colors whitespace-nowrap shrink-0 ${
       active
-        ? 'text-[#0B1A2D] dark:text-white after:absolute after:left-0 after:right-0 after:-bottom-1 after:h-[2px] after:bg-[#B7F229]'
+        ? 'text-[#0B1A2D] dark:text-white after:absolute after:left-0 after:right-0 after:-bottom-1 after:h-[2px] after:bg-[#0B1A2D] dark:after:bg-[#B7F229]'
         : 'text-slate-600 dark:text-slate-300 hover:text-[#0B1A2D] dark:hover:text-white'
     }`;
 

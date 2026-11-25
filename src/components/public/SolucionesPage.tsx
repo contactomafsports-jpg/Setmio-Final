@@ -239,7 +239,7 @@ export function SolucionesPage({
                     className="p-7 rounded-2xl bg-[#F7F9FC] dark:bg-[#0E2239] border border-slate-200/90 dark:border-[#1A314D] flex flex-col justify-between space-y-5"
                   >
                     <div className="space-y-3">
-                      <span className="font-mono text-xs font-bold text-[#8B5CF6] dark:text-[#B7F229]">
+                      <span className="font-mono text-xs font-bold text-[#0B1A2D] dark:text-[#B7F229]">
                         0{idx + 1}
                       </span>
                       <h3 className="text-lg font-bold text-[#0B1A2D] dark:text-white">
@@ -464,7 +464,7 @@ export function SolucionesPage({
         <section className="rounded-3xl bg-[#F7F9FC] dark:bg-[#081424] border border-slate-200/90 dark:border-[#1A314D] p-8 sm:p-10">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
             <div className="space-y-3 max-w-2xl">
-              <div className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-[#8B5CF6] dark:text-[#B7F229]">
+              <div className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-[#0B1A2D] dark:text-[#B7F229]">
                 <Users className="w-4 h-4" />
                 <span>Setmio Player · Experiencia Individual</span>
               </div>

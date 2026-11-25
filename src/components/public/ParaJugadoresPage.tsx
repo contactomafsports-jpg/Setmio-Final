@@ -1,6 +1,5 @@
 import React from 'react';
 import {
-  Activity,
   Bot,
   Check,
   Link2,
@@ -15,6 +14,7 @@ import {
   CorporateContainer,
   CorporateCtaBanner,
   CorporateEyebrow,
+  CorporateMediaFrame,
   CorporatePrimaryButton,
   CorporateSecondaryButton,
   navigateCorporateRoute,
@@ -130,67 +130,14 @@ export function ParaJugadoresPage({ onBack, onOpenDemo }: ParaJugadoresPageProps
             </div>
           </div>
 
-          {/* Minimalist Architectural Player Preview */}
+          {/* Clean Architectural Player Visual */}
           <div className="lg:col-span-6">
-            <div className="rounded-3xl border border-slate-200/90 dark:border-[#1A314D] bg-[#F7F9FC] dark:bg-[#0E2239] overflow-hidden">
-              <div className="aspect-[16/9] overflow-hidden bg-[#0B1A2D] relative">
-                <img
-                  src={playerFocusImg}
-                  alt="Equipación y pista de pádel para análisis en Setmio Player"
-                  className="w-full h-full object-cover object-center"
-                />
-                <div
-                  className="absolute inset-0 bg-gradient-to-t from-[#0B1A2D]/85 via-transparent to-transparent"
-                  aria-hidden="true"
-                />
-                <div className="absolute bottom-4 left-5 right-5 flex items-center justify-between text-white">
-                  <div>
-                    <div className="text-[11px] uppercase tracking-[0.16em] text-[#B7F229] font-bold">
-                      Ficha de rendimiento personal
-                    </div>
-                    <div className="text-sm font-bold mt-0.5">
-                      Seguimiento táctico y vínculo directo con tu club
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="p-6 sm:p-7 space-y-5">
-                <div className="grid grid-cols-3 divide-x divide-slate-200/80 dark:divide-[#1A314D]">
-                  <div className="pr-4">
-                    <div className="text-[11px] text-slate-500 dark:text-slate-400">
-                      Partidos registrados
-                    </div>
-                    <div className="font-mono text-xl font-bold text-[#0B1A2D] dark:text-white tabular-nums mt-1">
-                      48
-                    </div>
-                  </div>
-                  <div className="px-4">
-                    <div className="text-[11px] text-slate-500 dark:text-slate-400">
-                      Éxito con pareja habitual
-                    </div>
-                    <div className="font-mono text-xl font-bold text-[#0B1A2D] dark:text-[#B7F229] tabular-nums mt-1">
-                      68%
-                    </div>
-                  </div>
-                  <div className="pl-4">
-                    <div className="text-[11px] text-slate-500 dark:text-slate-400">
-                      Clubes vinculados
-                    </div>
-                    <div className="font-mono text-xl font-bold text-[#0B1A2D] dark:text-white tabular-nums mt-1">
-                      2
-                    </div>
-                  </div>
-                </div>
-
-                <div className="pt-4 border-t border-slate-200/80 dark:border-[#1A314D] flex items-start gap-3">
-                  <Activity className="w-4 h-4 text-[#8B5CF6] dark:text-[#B7F229] shrink-0 mt-0.5" />
-                  <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-                    Tu resumen combina evolución de partido, lectura de emparejamientos y enlace directo a las reservas y códigos de acceso de tus clubes habituales.
-                  </p>
-                </div>
-              </div>
-            </div>
+            <CorporateMediaFrame
+              src={playerFocusImg}
+              alt="Equipación y pista de pádel para análisis en Setmio Player"
+              aspectClass="aspect-[4/3]"
+              fallbackLabel="Setmio Player · Rendimiento Individual"
+            />
           </div>
         </section>
 

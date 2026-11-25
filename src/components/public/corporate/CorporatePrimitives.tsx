@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ArrowLeft, ArrowRight, ChevronRight } from 'lucide-react';
 import { PublicPage } from '../../../context/AppContext';
 
@@ -35,9 +35,9 @@ export const CorporateEyebrow: React.FC<{
   accent?: 'lime' | 'navy' | 'violet';
   className?: string;
 }> = ({ children, accent = 'lime', className = '' }) => {
-  const dotColor =
+  const ruleColor =
     accent === 'violet'
-      ? 'bg-[#8B5CF6]'
+      ? 'bg-[#8B5CF6]/80 dark:bg-[#B7F229]'
       : accent === 'navy'
       ? 'bg-[#0B1A2D] dark:bg-[#B7F229]'
       : 'bg-[#B7F229]';
@@ -46,8 +46,62 @@ export const CorporateEyebrow: React.FC<{
     <div
       className={`inline-flex items-center gap-2.5 text-[11px] font-bold uppercase tracking-[0.18em] text-slate-600 dark:text-slate-300 ${className}`}
     >
-      <span className={`h-1.5 w-1.5 rounded-full shrink-0 ${dotColor}`} aria-hidden="true" />
+      <span className={`h-[2px] w-4 shrink-0 ${ruleColor}`} aria-hidden="true" />
       <span>{children}</span>
+    </div>
+  );
+};
+
+export const CorporateSurface: React.FC<{
+  children: React.ReactNode;
+  variant?: 'default' | 'subtle';
+  className?: string;
+}> = ({ children, variant = 'default', className = '' }) => (
+  <div
+    className={`rounded-2xl border border-slate-200/90 dark:border-[#1A314D] ${
+      variant === 'subtle'
+        ? 'bg-[#F7F9FC] dark:bg-[#081424]'
+        : 'bg-white dark:bg-[#0E2239]'
+    } ${className}`}
+  >
+    {children}
+  </div>
+);
+
+export const CorporateMediaFrame: React.FC<{
+  src: string;
+  alt: string;
+  aspectClass?: string;
+  fallbackLabel?: string;
+  className?: string;
+}> = ({
+  src,
+  alt,
+  aspectClass = 'aspect-[16/10]',
+  fallbackLabel = 'Setmio',
+  className = '',
+}) => {
+  const [hasError, setHasError] = useState(false);
+
+  return (
+    <div
+      className={`rounded-2xl overflow-hidden border border-slate-200/90 dark:border-[#1A314D] bg-[#0B1A2D] ${aspectClass} ${className}`}
+    >
+      {hasError ? (
+        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#071220] via-[#0B1A2D] to-[#132A45] p-8 text-center">
+          <span className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-300">
+            {fallbackLabel}
+          </span>
+        </div>
+      ) : (
+        <img
+          src={src}
+          alt={alt}
+          referrerPolicy="no-referrer"
+          onError={() => setHasError(true)}
+          className="w-full h-full object-cover object-center"
+        />
+      )}
     </div>
   );
 };
@@ -117,7 +171,7 @@ export const CorporatePrimaryButton: React.FC<
   <button
     type="button"
     {...props}
-    className={`inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl bg-[#B7F229] hover:bg-[#c5f64e] text-[#0B1A2D] font-bold text-sm px-6 py-3 transition-colors cursor-pointer active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed whitespace-nowrap ${className}`}
+    className={`inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl bg-[#B7F229] hover:bg-[#c5f64e] text-[#0B1A2D] font-bold text-sm px-6 py-3 transition-colors cursor-pointer active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed whitespace-nowrap shrink-0 ${className}`}
   >
     <span>{children}</span>
     {icon !== undefined ? icon : <ArrowRight className="w-4 h-4 shrink-0" />}
@@ -130,7 +184,7 @@ export const CorporateSecondaryButton: React.FC<
   <button
     type="button"
     {...props}
-    className={`inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl border border-slate-200 dark:border-[#1E3A5F] bg-white dark:bg-[#0E2239] hover:border-[#0B1A2D]/40 dark:hover:border-[#B7F229]/60 text-[#0B1A2D] dark:text-white font-semibold text-sm px-6 py-3 transition-colors cursor-pointer active:scale-[0.98] disabled:opacity-60 whitespace-nowrap ${className}`}
+    className={`inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl border border-slate-200 dark:border-[#1E3A5F] bg-white dark:bg-[#0E2239] hover:border-[#0B1A2D]/40 dark:hover:border-[#B7F229]/60 text-[#0B1A2D] dark:text-white font-semibold text-sm px-6 py-3 transition-colors cursor-pointer active:scale-[0.98] disabled:opacity-60 whitespace-nowrap shrink-0 ${className}`}
   >
     {icon}
     <span>{children}</span>
@@ -143,7 +197,7 @@ export const CorporateNavyButton: React.FC<
   <button
     type="button"
     {...props}
-    className={`inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl bg-[#0B1A2D] hover:bg-[#132A45] text-white dark:bg-[#B7F229] dark:hover:bg-[#c5f64e] dark:text-[#0B1A2D] font-bold text-sm px-6 py-3 transition-colors cursor-pointer active:scale-[0.98] whitespace-nowrap ${className}`}
+    className={`inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl bg-[#0B1A2D] hover:bg-[#132A45] text-white dark:bg-[#B7F229] dark:hover:bg-[#c5f64e] dark:text-[#0B1A2D] font-bold text-sm px-6 py-3 transition-colors cursor-pointer active:scale-[0.98] whitespace-nowrap shrink-0 ${className}`}
   >
     <span>{children}</span>
     {icon !== undefined ? icon : <ArrowRight className="w-4 h-4 shrink-0" />}
@@ -198,8 +252,8 @@ export const CorporateCtaBanner: React.FC<{
   <section className="rounded-3xl bg-[#0B1A2D] dark:bg-[#071220] border border-[#1A314D] p-8 sm:p-12 lg:p-14 text-white">
     <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
       <div className="space-y-3.5 max-w-2xl">
-        <div className="inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.18em] text-[#B7F229]">
-          <span className="h-1.5 w-1.5 rounded-full bg-[#B7F229]" aria-hidden="true" />
+        <div className="inline-flex items-center gap-2.5 text-[11px] font-bold uppercase tracking-[0.18em] text-[#B7F229]">
+          <span className="h-[2px] w-4 bg-[#B7F229]" aria-hidden="true" />
           <span>{eyebrow}</span>
         </div>
         <h2 className="text-2xl sm:text-4xl font-extrabold tracking-tight leading-[1.12] text-white text-balance font-display">
@@ -218,7 +272,7 @@ export const CorporateCtaBanner: React.FC<{
           <button
             type="button"
             onClick={onSecondary}
-            className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl border border-[#244163] bg-[#0E2239] hover:border-[#B7F229]/60 text-white font-semibold text-sm px-6 py-3 transition-colors cursor-pointer whitespace-nowrap"
+            className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl border border-[#244163] bg-[#0E2239] hover:border-[#B7F229]/60 text-white font-semibold text-sm px-6 py-3 transition-colors cursor-pointer whitespace-nowrap shrink-0"
           >
             {secondaryLabel}
           </button>

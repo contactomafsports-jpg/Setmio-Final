@@ -43,12 +43,12 @@ export const CorporateFooter: React.FC<CorporateFooterProps> = ({ minimized = fa
 
   if (minimized) {
     return (
-      <footer className="border-t border-slate-200/80 dark:border-[#1A314D] bg-white dark:bg-[#0B1A2D] text-slate-500 dark:text-slate-400 py-8 text-xs transition-colors">
+      <footer className="border-t border-slate-200/80 dark:border-[#1A314D] bg-white dark:bg-[#0B1A2D] text-slate-500 dark:text-slate-300 py-8 text-xs transition-colors">
         <div className="max-w-[1180px] mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
           <div className="flex items-center gap-3">
-            <SetmioLogo variant="horizontal" size="xs" showSubtitle={true} />
+            <SetmioLogo variant="horizontal" size="sm" showSubtitle={true} theme="auto" />
             <span className="hidden md:inline text-slate-300 dark:text-[#1A314D]">|</span>
-            <span className="hidden md:inline text-[11px] text-slate-500 dark:text-slate-400">
+            <span className="hidden md:inline text-[11px] text-slate-500 dark:text-slate-300">
               {t('footer.tagline', 'Plataforma de gestión y marca blanca para el ecosistema del pádel.')}
             </span>
           </div>
@@ -72,10 +72,10 @@ export const CorporateFooter: React.FC<CorporateFooterProps> = ({ minimized = fa
   }
 
   return (
-    <footer className="bg-[#071220] text-slate-400 py-16 sm:py-20 border-t border-[#1A314D] text-xs">
+    <footer className="bg-[#071220] text-slate-300 py-16 sm:py-20 border-t border-[#1A314D] text-xs">
       <div className="max-w-[1180px] mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-10 lg:gap-12">
-          {/* Column 1: Brand (White wordmark forced on dark footer background) */}
+          {/* Column 1: High-contrast white wordmark on dark navy footer */}
           <div className="md:col-span-4 space-y-5">
             <button
               type="button"
@@ -83,10 +83,10 @@ export const CorporateFooter: React.FC<CorporateFooterProps> = ({ minimized = fa
               className="inline-flex items-center cursor-pointer focus:outline-none"
               aria-label="Setmio Pádel Inicio"
             >
-              <SetmioLogo variant="horizontal" size="sm" showSubtitle={true} theme="dark" />
+              <SetmioLogo variant="horizontal" size="md" showSubtitle={true} theme="dark" />
             </button>
 
-            <p className="text-slate-400 leading-relaxed text-xs max-w-xs">
+            <p className="text-slate-300 leading-relaxed text-xs max-w-xs">
               {t(
                 'footer.description',
                 'Plataforma SaaS de marca blanca para clubes, escuelas, entrenadores, administraciones públicas, federaciones, equipos y jugadores.'
@@ -98,7 +98,7 @@ export const CorporateFooter: React.FC<CorporateFooterProps> = ({ minimized = fa
                 href="https://instagram.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-9 h-9 rounded-lg bg-[#0B1A2D] hover:bg-[#132A45] border border-[#1A314D] text-slate-300 hover:text-[#B7F229] flex items-center justify-center transition-colors"
+                className="w-9 h-9 rounded-lg bg-[#0B1A2D] hover:bg-[#132A45] border border-[#1A314D] text-slate-200 hover:text-[#B7F229] flex items-center justify-center transition-colors"
                 aria-label={t('footer.instagramAria', 'Instagram oficial')}
               >
                 <Instagram className="w-4 h-4" />
@@ -107,7 +107,7 @@ export const CorporateFooter: React.FC<CorporateFooterProps> = ({ minimized = fa
                 href="https://facebook.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-9 h-9 rounded-lg bg-[#0B1A2D] hover:bg-[#132A45] border border-[#1A314D] text-slate-300 hover:text-[#B7F229] flex items-center justify-center transition-colors"
+                className="w-9 h-9 rounded-lg bg-[#0B1A2D] hover:bg-[#132A45] border border-[#1A314D] text-slate-200 hover:text-[#B7F229] flex items-center justify-center transition-colors"
                 aria-label={t('footer.facebookAria', 'Facebook oficial')}
               >
                 <Facebook className="w-4 h-4" />
@@ -118,9 +118,8 @@ export const CorporateFooter: React.FC<CorporateFooterProps> = ({ minimized = fa
           {/* Column 2: Setmio Pro & Setmio Player */}
           <div className="md:col-span-3 space-y-6">
             <div>
-              <h4 className="font-bold text-white mb-3.5 text-[11px] tracking-[0.14em] uppercase flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#B7F229]" aria-hidden="true" />
-                <span>Setmio Pro</span>
+              <h4 className="font-bold text-white mb-3.5 text-[11px] tracking-[0.14em] uppercase">
+                Setmio Pro
               </h4>
               <ul className="space-y-2 text-xs">
                 {SETMIO_PRO_CORE_SEGMENTS.map((seg) => (
@@ -138,7 +137,7 @@ export const CorporateFooter: React.FC<CorporateFooterProps> = ({ minimized = fa
                   <button
                     type="button"
                     onClick={() => navigateTo('/soluciones/jugadores-profesionales', 'solution_pro_players')}
-                    className="text-slate-400 hover:text-[#B7F229] transition-colors text-left cursor-pointer"
+                    className="text-slate-300 hover:text-[#B7F229] transition-colors text-left cursor-pointer"
                   >
                     Jugadores Profesionales
                   </button>
@@ -147,9 +146,8 @@ export const CorporateFooter: React.FC<CorporateFooterProps> = ({ minimized = fa
             </div>
 
             <div className="pt-4 border-t border-[#1A314D]">
-              <h4 className="font-bold text-white mb-3 text-[11px] tracking-[0.14em] uppercase flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#8B5CF6]" aria-hidden="true" />
-                <span>Setmio Player</span>
+              <h4 className="font-bold text-white mb-3 text-[11px] tracking-[0.14em] uppercase">
+                Setmio Player
               </h4>
               <ul className="space-y-2 text-xs">
                 <li>
@@ -242,7 +240,7 @@ export const CorporateFooter: React.FC<CorporateFooterProps> = ({ minimized = fa
             <h4 className="font-bold text-white mb-3.5 text-[11px] tracking-[0.14em] uppercase">
               {t('footer.contactTitle', 'Contacto Directo')}
             </h4>
-            <p className="text-xs text-slate-400 mb-4 leading-relaxed">
+            <p className="text-xs text-slate-300 mb-4 leading-relaxed">
               {t('footer.contactDirect', 'Atención comercial y técnica directa para clubes y organizaciones.')}
             </p>
             <div className="space-y-3 text-xs">
@@ -257,7 +255,7 @@ export const CorporateFooter: React.FC<CorporateFooterProps> = ({ minimized = fa
                 href="tel:+34981380000"
                 className="flex items-center gap-2.5 text-slate-300 hover:text-white transition-colors"
               >
-                <Phone className="w-4 h-4 text-slate-400 shrink-0" />
+                <Phone className="w-4 h-4 text-slate-300 shrink-0" />
                 <span className="font-mono tabular-nums">+34 981 38 00 00</span>
               </a>
               <div className="pt-2">
@@ -273,7 +271,7 @@ export const CorporateFooter: React.FC<CorporateFooterProps> = ({ minimized = fa
           </div>
         </div>
 
-        <div className="mt-14 pt-7 border-t border-[#1A314D] flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left text-[11px] text-slate-400">
+        <div className="mt-14 pt-7 border-t border-[#1A314D] flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left text-[11px] text-slate-300">
           <div>
             © {new Date().getFullYear()} SETMIO PÁDEL PRO. {t('footer.allRightsReserved', 'Todos los derechos reservados.')}
           </div>
@@ -285,7 +283,7 @@ export const CorporateFooter: React.FC<CorporateFooterProps> = ({ minimized = fa
             >
               {t('footer.legal', 'Aviso Legal')}
             </button>
-            <span className="text-[#1A314D]">·</span>
+            <span className="text-[#244163]">·</span>
             <button
               type="button"
               onClick={() => navigateTo('/legal', 'legal')}
@@ -293,7 +291,7 @@ export const CorporateFooter: React.FC<CorporateFooterProps> = ({ minimized = fa
             >
               {t('footer.privacy', 'Privacidad y RGPD')}
             </button>
-            <span className="text-[#1A314D]">·</span>
+            <span className="text-[#244163]">·</span>
             <button
               type="button"
               onClick={() => navigateTo('/contacto', 'contact')}

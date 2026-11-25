@@ -163,7 +163,7 @@ export const FeaturesView: React.FC<FeaturesViewProps> = ({
                 <ul className="mt-3 space-y-2 text-xs font-semibold text-[#0B1A2D] dark:text-slate-200">
                   {selectedModule.applicableProfiles.map((prof) => (
                     <li key={prof} className="flex items-center gap-2">
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#B7F229]" aria-hidden="true" />
+                      <span className="h-[2px] w-3 bg-[#0B1A2D] dark:bg-[#B7F229] shrink-0" aria-hidden="true" />
                       <span>{prof}</span>
                     </li>
                   ))}
