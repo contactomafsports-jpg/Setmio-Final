@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import {
   Check,
   CheckCircle2,
-  ChevronRight,
   Cpu,
   Lightbulb,
   LockKeyhole,
@@ -221,41 +220,25 @@ export function ModulosDomoticaPage({
 
   return (
     <div className="bg-white dark:bg-[#0B1A2D] text-[#0B1A2D] dark:text-white transition-colors duration-200 overflow-x-clip">
-      {/* 1. COMPACT HERO & INTERACTIVE CONTROLLER PREVIEW */}
-      <section className="border-b border-slate-200/80 dark:border-[#1A314D] py-7 sm:py-11">
+      {/* 1. HERO & INTERACTIVE CONTROLLER PREVIEW */}
+      <section className="border-b border-slate-200/80 dark:border-[#1A314D] py-9 sm:py-14">
         <CorporateContainer className="space-y-8 sm:space-y-10">
-          <div className="space-y-5 sm:space-y-6">
-            <nav aria-label="Ruta de navegación" className="flex items-center gap-1.5 text-xs">
-              <button
-                type="button"
-                onClick={() => navigate('/', 'home')}
-                className="font-medium text-slate-500 dark:text-slate-400 hover:text-[#0B1A2D] dark:hover:text-white transition-colors cursor-pointer"
-              >
-                Inicio
-              </button>
-              <ChevronRight className="w-3.5 h-3.5 text-slate-300 dark:text-slate-600 shrink-0" aria-hidden="true" />
-              <span className="font-semibold text-[#0B1A2D] dark:text-white">
-                Domótica
-              </span>
-            </nav>
+          <div className="max-w-3xl space-y-4 animate-float-in">
+            <CorporateEyebrow accent="lime">Setmio IoT · Pistas Desatendidas</CorporateEyebrow>
+            <h1 className="text-3xl sm:text-4xl lg:text-[46px] font-extrabold tracking-tight text-[#0B1A2D] dark:text-white leading-[1.08] font-display text-balance">
+              Automatiza la iluminación LED y el acceso por PIN de cada pista.
+            </h1>
+            <p className="text-sm sm:text-base text-slate-600 dark:text-slate-300 leading-relaxed max-w-2xl">
+              Conecta tus cuadros eléctricos y cerraduras directamente al motor de reservas para abrir horarios de mañana y noche sin presencia continua en recepción.
+            </p>
 
-            <div className="max-w-3xl space-y-3.5 animate-float-in">
-              <CorporateEyebrow accent="lime">Setmio IoT · Pistas Desatendidas</CorporateEyebrow>
-              <h1 className="text-3xl sm:text-4xl lg:text-[44px] font-extrabold tracking-tight text-[#0B1A2D] dark:text-white leading-[1.08] font-display text-balance">
-                Automatiza la iluminación LED y el acceso por PIN de cada pista.
-              </h1>
-              <p className="text-sm sm:text-base text-slate-600 dark:text-slate-300 leading-relaxed max-w-2xl">
-                Conecta tus cuadros eléctricos y cerraduras directamente al motor de reservas para abrir horarios de mañana y noche sin presencia continua en recepción.
-              </p>
-
-              <div className="flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center gap-3 pt-1.5">
-                <CorporatePrimaryButton onClick={handleOpenRegisterClick}>
-                  Registrarse
-                </CorporatePrimaryButton>
-                <CorporateSecondaryButton onClick={() => navigate('/funcionalidades', 'features')}>
-                  Ver funcionalidades
-                </CorporateSecondaryButton>
-              </div>
+            <div className="flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center gap-3 pt-1">
+              <CorporatePrimaryButton onClick={handleOpenRegisterClick}>
+                Registrarse
+              </CorporatePrimaryButton>
+              <CorporateSecondaryButton onClick={() => navigate('/funcionalidades', 'features')}>
+                Ver funcionalidades
+              </CorporateSecondaryButton>
             </div>
           </div>
 
@@ -274,10 +257,10 @@ export function ModulosDomoticaPage({
               <button
                 type="button"
                 onClick={() => setSimKeyInput('4829')}
-                className="self-start sm:self-auto text-[11px] font-mono font-semibold text-[#0B1A2D] dark:text-slate-200 bg-white dark:bg-[#0B1A2D] border border-slate-200/90 dark:border-[#1A314D] hover:border-[#0B1A2D]/40 dark:hover:border-[#B7F229]/60 rounded-lg px-2.5 py-1 transition-colors cursor-pointer shrink-0 tabular-nums"
+                className="self-start sm:self-auto text-[11px] font-mono font-semibold text-slate-600 dark:text-slate-300 hover:text-[#0B1A2D] dark:hover:text-[#B7F229] underline underline-offset-4 transition-colors cursor-pointer shrink-0 tabular-nums"
                 title="Rellenar PIN de prueba 4829"
               >
-                PIN de prueba: 4829
+                Usar PIN de prueba: 4829
               </button>
             </div>
 
@@ -299,7 +282,7 @@ export function ModulosDomoticaPage({
                       <h2 className="text-sm font-bold text-[#0B1A2D] dark:text-white leading-snug">
                         Circuito Focos LED · Pista 1
                       </h2>
-                      <span className="text-xs text-slate-500 dark:text-slate-400">
+                      <span className="text-xs text-slate-600 dark:text-slate-300">
                         Estado: {simCourtLight ? 'Encendido automático' : 'Apagado'}
                       </span>
                     </div>
@@ -319,7 +302,7 @@ export function ModulosDomoticaPage({
                   </button>
                 </div>
 
-                <div className="pt-4 border-t border-slate-100 dark:border-[#1A314D] flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 gap-2">
+                <div className="pt-4 border-t border-slate-100 dark:border-[#1A314D] flex items-center justify-between text-xs text-slate-600 dark:text-slate-300 gap-2">
                   <span>Franja programada</span>
                   <span className="font-mono font-semibold text-[#0B1A2D] dark:text-white tabular-nums">
                     19:25 — 21:10
@@ -343,7 +326,7 @@ export function ModulosDomoticaPage({
                     <h2 className="text-sm font-bold text-[#0B1A2D] dark:text-white leading-snug">
                       Cerradura de Acceso · Puerta Sur
                     </h2>
-                    <span className="text-xs text-slate-500 dark:text-slate-400">
+                    <span className="text-xs text-slate-600 dark:text-slate-300">
                       Estado: {!simDoorLocked ? 'Puerta abierta' : 'Cerrada'}
                     </span>
                   </div>
@@ -358,7 +341,7 @@ export function ModulosDomoticaPage({
                       placeholder="PIN (4829)"
                       value={simKeyInput}
                       onChange={(e) => setSimKeyInput(e.target.value)}
-                      className="flex-1 min-w-0 min-h-[40px] px-3 py-2 rounded-xl bg-[#F7F9FC] dark:bg-[#0E2239] border border-slate-200/90 dark:border-[#1A314D] text-[#0B1A2D] dark:text-white placeholder-slate-400 font-mono tabular-nums text-xs focus:outline-none focus:border-[#0B1A2D] dark:focus:border-[#B7F229] text-center"
+                      className="flex-1 min-w-0 min-h-[40px] px-3 py-2 rounded-xl bg-[#F7F9FC] dark:bg-[#0E2239] border border-slate-200/90 dark:border-[#1A314D] text-[#0B1A2D] dark:text-white placeholder-slate-500 dark:placeholder-slate-400 font-mono tabular-nums text-xs focus:outline-none focus:border-[#0B1A2D] dark:focus:border-[#B7F229] text-center"
                     />
                     <button
                       type="submit"
@@ -377,7 +360,7 @@ export function ModulosDomoticaPage({
                     </div>
                   )}
                   {simAccessStatus === 'denied' && (
-                    <div className="text-xs font-semibold text-rose-600 dark:text-rose-400">
+                    <div className="text-xs font-semibold text-rose-700 dark:text-rose-400">
                       PIN no válido para esta franja. Prueba con 4829.
                     </div>
                   )}
