@@ -542,7 +542,18 @@ export function App() {
       case 'players_app':
         return <ParaJugadoresPage onBack={goHome} onOpenDemo={() => setRoleSelectorOpen(true)} onOpenRegister={() => { setRegistrationOpen(true); setAuthOpen(true); }} />;
       case 'modules':
-        return <ModulosDomoticaPage onBack={goHome} onOpenDemo={() => setRoleSelectorOpen(true)} />;
+        return (
+          <ModulosDomoticaPage
+            onBack={goHome}
+            onOpenDemo={() => setRoleSelectorOpen(true)}
+            onOpenRegister={() => {
+              window.history.pushState({}, '', '/registro');
+              window.dispatchEvent(new PopStateEvent('popstate'));
+              setRegistrationOpen(true);
+              setAuthOpen(true);
+            }}
+          />
+        );
       case 'demo':
         return <HomeView />;
       case 'pricing':
