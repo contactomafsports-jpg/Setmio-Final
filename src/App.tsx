@@ -488,7 +488,18 @@ export function App() {
       case 'home':
         return <PublicEntityLanding />;
       case 'features':
-        return <FeaturesView onBack={goHome} />;
+        return (
+          <FeaturesView
+            onBack={goHome}
+            onOpenDemo={() => setRoleSelectorOpen(true)}
+            onOpenOnboarding={() => {
+              window.history.pushState({}, '', '/registro');
+              window.dispatchEvent(new PopStateEvent('popstate'));
+              setRegistrationOpen(true);
+              setAuthOpen(true);
+            }}
+          />
+        );
       case 'solutions':
       case 'solution_clubs':
       case 'solution_schools':
